@@ -1,0 +1,193 @@
+{
+  "EditSurvey": {
+    "errorFetchingSurvey": "Virhe haettaessa kyselyä. Tarkista osoite tai yritä myöhemmin uudestaan.",
+    "untitledPage": "Nimetön sivu",
+    "fetchFailed": "Kyselyn haussa tapahtui virhe. Yritä myöhemmin uudestaan.",
+    "saveSuccessful": "Kysely tallennettiin onnistuneesti!",
+    "saveFailed": "Kyselyn tallentaminen epäonnistui. Yritä myöhemmin uudestaan.",
+    "saveFailedDuplicateName": "Saman niminen kysely on jo olemassa. Valitse toinen nimi ja yritä uudestaan.",
+    "invalidFields": "Seuraavien kenttien arvot eivät ole sallittuja:",
+    "validationError": {
+      "survey.title": "Kyselyn otsikko",
+      "survey.name": "Kyselyn nimi",
+      "survey.author": "Kyselyn laatija/yhteyshenkilö",
+      "survey.mapUrl": "Oskari-karttajulkaisun osoite"
+    },
+    "toFrontPage": "Etusivulle",
+    "info": "Kyselyn perustiedot",
+    "newPage": "Uusi sivu",
+    "newPageFailed": "Uuden sivun luomisessa tapahtui virhe. Yritä myöhemmin uudestaan.",
+    "thanksPage": "Kiitos-sivu",
+    "translations": "Käännökset",
+    "preview": "Esikatselu",
+    "toSurveyPage": "Kyselysivulle",
+    "preventUnloadConfirm": "Sivulla on tallentamattomia muutoksia. Haluatko varmasti poistua sivulta?",
+    "deleteSurvey": "Poista kysely",
+    "deleteSurveyConfirm": "Haluatko varmasti poistaa koko kyselyn? Toimintoa ei voi perua.",
+    "deleteSurveyFailed": "Kyselyn poistamisessa tapahtui virhe. Yritä myöhemmin uudestaan.",
+    "deleteSurveySuccessful": "Kysely poistettiin onnistuneesti!"
+  },
+  "EditSurveyInfo": {
+    "title": "Kyselyn otsikko",
+    "subtitle": "Kyselyn aliotsikko",
+    "name": "Kyselyn nimi",
+    "nameHelperText": "Kyselyn URL-osoitteessa näkyvä nimi. Voi sisältää vain kirjaimia (a-z), numeroita (0-9) ja viivoja (- ja _).",
+    "author": "Kyselyn laatija/yhteyshenkilö",
+    "authorUnit": "Kyselyn laatijan yksikkö",
+    "mapUrl": "Oskari-karttajulkaisun osoite",
+    "mapUrlError": "Karttatasojen haku annetulle osoitteelle epäonnistui. Tarkista osoite ja yritä uudestaan.",
+    "availableMapLayers": "Saatavilla olevat karttatasot:",
+    "startDate": "Alkamisaika",
+    "endDate": "Loppumisaika"
+  },
+  "EditSurveyPage": {
+    "name": "Sivun nimi",
+    "deletePage": "Poista sivu",
+    "confirmDeletePage": "Haluatko varmasti poistaa tämän sivun? Toimintoa ei voida perua.",
+    "deletePageFailed": "Sivun poistamisessa tapahtui virhe. Yritä myöhemmin uudestaan.",
+    "mapLayers": "Sivulla näytettävät karttatasot",
+    "untitledSection": "Nimetön osio",
+    "title": "Otsikko",
+    "deleteSection": "Poista osio",
+    "confirmDeleteSection": "Haluatko varmasti poistaa tämän osion?"
+  },
+  "AddSurveySectionActions": {
+    "radioQuestion": "Lisää valintakysymys",
+    "checkBoxQuestion": "Lisää monivalintakysymys",
+    "numericQuestion": "Lisää numeerinen kysymys",
+    "mapQuestion": "Lisää karttakysymys",
+    "textSection": "Lisää tekstiosio",
+    "freeTextQuestion": "Lisää vapaatekstikysymys"
+  },
+  "SurveySections": {
+    "limitAnswers": "Rajoita vastauslukumäärää",
+    "minAnswers": "Vastauksia vähintään",
+    "maxAnswers": "Vastauksia enintään",
+    "options": "Vastausvaihtoehdot",
+    "addOption": "Lisää vaihtoehto",
+    "allowCustomAnswer": "Salli “Jokin muu, mikä?” -vaihtoehto",
+    "isRequired": "Vastaus pakollinen"
+  },
+  "SurveyImageList": {
+    "attributions": "Tekijänoikeustiedot",
+    "noImage": "Ei taustakuvaa",
+    "surveyImage": "Kyselyn taustakuva",
+    "selectImage": "Valitse taustakuva",
+    "addNewImage": "Lisää uusi kuva",
+    "files": "Tiedosto",
+    "dropFiles": "Raahaa kuvatiedosto tähän tai klikkaa valitaksesi tiedosto"
+  },
+  "EditTextSection": {
+    "text": "Teksti"
+  },
+  "EditMapQuestion": {
+    "selectionTypes": "Sallitut karttavalinnan tyypit",
+    "point": "Piste",
+    "line": "Viiva",
+    "area": "Alue",
+    "subQuestions": "Alikysymykset"
+  },
+  "EditSurveyThanksPage": {
+    "title": "Kiitos-sivun otsikko",
+    "text": "Kiitos-sivun teksti"
+  },
+  "RichTextEditor": {
+    "generic.add": "Lisää",
+    "generic.cancel": "Peruuta",
+    "components.controls.inline.bold": "Lihavoi",
+    "components.controls.inline.italic": "Kursivoi",
+    "components.controls.link.linkTitle": "Linkin teksti",
+    "components.controls.link.linkTarget": "Osoite",
+    "components.controls.link.linkTargetOption": "Avaa uudessa ikkunassa",
+    "components.controls.link.link": "Lisää linkki",
+    "components.controls.link.unlink": "Poista linkki",
+    "components.controls.list.list": "Lista",
+    "components.controls.list.unordered": "Järjestämätön lista",
+    "components.controls.list.ordered": "Järjestetty lista"
+  },
+  "SurveyList": {
+    "title": "Vuorovaikutusalusta - Kyselyt",
+    "errorFetchingSurveys": "Virhe haettaessa kyselyitä. Yritä myöhemmin uudestaan.",
+    "editSurvey": "Muokkaa kyselyä",
+    "publishNow": "Julkaise nyt",
+    "confirmPublish": "Haluatko varmasti julkaista kyselyn?",
+    "publishSuccessful": "Kysely julkaistu!",
+    "publishFailed": "Kyselyn julkaisussa tapahtui virhe. Yritä myöhemmin uudestaan.",
+    "unpublish": "Päätä kysely",
+    "confirmUnpublish": "Haluatko varmasti päättää kyselyn?",
+    "unpublishSuccessful": "Kysely päätetty!",
+    "unpublishFailed": "Kyselyn päättämisessä tapahtui virhe. Yritä myöhemmin uudestaan.",
+    "createNewSurvey": "Uusi kysely",
+    "errorCreatingNewSurvey": "Virhe luotaessa uutta kyselyä. Yritä myöhemmin uudestaan.",
+    "untitledSurvey": "Nimetön kysely",
+    "author": "Tekijä/yhteyshenkilö",
+    "url": "Kyselyn osoite",
+    "open": "Avoinna",
+    "openFrom": "Avoinna alkaen",
+    "published": "Julkaistu",
+    "notPublished": "Ei julkaistu"
+  },
+  "SurveyPage": {
+    "errorSurveyNotFound": "Kyselyä ei löytynyt, tai se ei ole avoinna. Tarkista osoite ja yritä uudestaan.",
+    "errorFetchingSurvey": "Kyselyn haussa tapahtui virhe. Yritä myöhemmin uudestaan.",
+    "startSurveyLink": "Aloita kysely tästä"
+  },
+  "CopyToClipboard": {
+    "tooltip": "Kopioi leikepöydälle",
+    "successful": "Arvo kopioitu leikepöydälle!",
+    "fail": "Arvon leikepöydälle kopioinnissa tapahtui virhe. Yritä myöhemmin uudestaan."
+  },
+  "SurveyStepper": {
+    "next": "Seuraava",
+    "previous": "Edellinen",
+    "submit": "Lähetä",
+    "errorSubmittingSurvey": "Kyselyn lähettämisessä tapahtui virhe. Ole hyvä ja yritä myöhemmin uudestaan.",
+    "openMap": "Avaa kartta"
+  },
+  "SurveyQuestion": {
+    "errorFieldIsRequired": "Kenttä on pakollinen",
+    "answerLimitsMinMax": "Valitse vähintään {min}, enintään {max} vaihtoehtoa",
+    "answerLimitsMin": "Valitse vähintään {min} vaihtoehtoa",
+    "answerLimitsMax": "Valitse enintään {max} vaihtoehtoa",
+    "customAnswer": "Jokin muu, mikä?",
+    "charactersRemaining": "{x} merkki(ä) jäljellä"
+  },
+  "MapQuestion": {
+    "selectionTypes": {
+      "point": "Piste",
+      "line": "Viiva",
+      "area": "Alue"
+    },
+    "selectionHelperText": {
+      "point": "Sijoita piste oikeaan paikkaan klikkaamalla kartalla oikeassa kohdassa.",
+      "line": "Aloita piirtäminen klikkaamalla aloituskohtaa. Jatka piirtämistä klikkaamalla kartalla uudestaan, lopeta piirtäminen klikkaamalla viimeistä pistettä uudestaan.",
+      "area": "Aloita piirtäminen klikkaamalla aloituskohtaa. Jatka piirtämistä klikkaamalla kartalla uudestaan, lopeta piirtäminen klikkaamalla viimeistä pistettä uudestaan."
+    },
+    "clearAnswers": "Poista kaikki karttavastaukset"
+  },
+  "AppBarUserMenu": {
+    "logout": "Kirjaudu ulos"
+  },
+  "MapInfoBox": {
+    "answer": "Vastaus"
+  },
+  "navigation": {
+    "next": "Seuraava",
+    "back": "Takaisin"
+  },
+  "commands": {
+    "finish": "Valmis",
+    "cancel": "Peruuta",
+    "select": "Valitse",
+    "remove": "Poista",
+    "save": "Tallenna",
+    "discard": "Peruuta muutokset",
+    "edit": "Muokkaa",
+    "copy": "Kopioi"
+  },
+  "options": {
+    "yes": "Kyllä",
+    "no": "Ei",
+    "ok": "OK"
+  }
+}

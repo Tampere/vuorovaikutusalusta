@@ -1,0 +1,18 @@
+##
+# Development image for Node.js server
+##
+
+FROM node:14.17.1-alpine
+
+# Define Git directory and install Git for running Jest only on changed files
+ENV GIT_WORK_TREE=/app/server
+ENV GIT_DIR=/app/.git
+
+RUN apk update && apk add git
+
+WORKDIR /app/server
+COPY package*.json ./
+RUN npm i
+
+# Run migrations before starting the server
+CMD npm run dev

@@ -1,0 +1,7 @@
+{
+  "watch": ["src", "tsconfig.json", "package.json", ".env"],
+  "ext": "ts,json",
+  "ignore": ["src/**/*.test.ts"],
+  "exec": "npm run lint && node -r ts-node/register -r dotenv/config -r tsconfig-paths/register",
+  "legacyWatch": true
+}

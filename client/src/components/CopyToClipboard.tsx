@@ -1,0 +1,39 @@
+import { IconButton, Tooltip } from '@material-ui/core';
+import { FileCopy } from '@material-ui/icons';
+import { useToasts } from '@src/stores/ToastContext';
+import { useTranslations } from '@src/stores/TranslationContext';
+import React from 'react';
+
+interface Props {
+  data: string;
+  tooltip?: string;
+}
+
+export default function CopyToClipboard({ data, tooltip }: Props) {
+  const { tr } = useTranslations();
+  const { showToast } = useToasts();
+
+  return (
+    <Tooltip title={tooltip ?? tr.CopyToClipboard.tooltip}>
+      <IconButton
+        size="small"
+        onClick={async () => {
+          try {
+            await navigator.clipboard.writeText(data);
+            showToast({
+              severity: 'success',
+              message: tr.CopyToClipboard.successful,
+            });
+          } catch (error) {
+            showToast({
+              severity: 'error',
+              message: tr.CopyToClipboard.fail,
+            });
+          }
+        }}
+      >
+        <FileCopy />
+      </IconButton>
+    </Tooltip>
+  );
+}

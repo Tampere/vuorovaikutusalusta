@@ -1,0 +1,30 @@
+##
+# Syncs Git changes from GitHub repository to Azure DevOps.
+# Uses repository secrets:
+# - AZURE_SSH_PRIVATE_KEY: Private SSH key for connecting to Azure Git
+# - AZURE_GIT_USER_NAME: Name used for the merge commit
+# - AZURE_GIT_USER_EMAIL: Email used for the merge commit
+##
+name: Sync changes to Azure
+on:
+  push:
+    branches:
+      - master
+jobs:
+  git-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          ssh-key: ${{ secrets.AZURE_SSH_PRIVATE_KEY }}
+          fetch-depth: 0
+      - name: Sync changes to Azure
+        run: |
+          git config user.email "${{ secrets.AZURE_GIT_USER_EMAIL }}"
+          git config user.name "${{ secrets.AZURE_GIT_USER_NAME }}"
+          git remote add azure git@ssh.dev.azure.com:v3/tampereenseutu/tre-kaupunkiymparisto-vuorovaikutusalusta/tre-kaupunkiymparisto-vuorovaikutusalusta
+          git fetch azure
+          git checkout -b azure-master --track azure/master
+          git merge origin/master --allow-unrelated-histories --strategy-option theirs
+          git push azure HEAD:master

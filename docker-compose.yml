@@ -1,0 +1,39 @@
+version: '3.8'
+services:
+  client:
+    build:
+      context: client
+      dockerfile: Dockerfile.develop
+    volumes:
+      # Include .git for detecting changes in the workspace (e.g. only run tests on changed files)
+      - .git:/app/.git:cached
+      - ./client:/app/client:cached
+      - ./interfaces:/app/interfaces:cached
+      - /app/client/node_modules
+    ports:
+      - '8080:8080'
+  server:
+    build:
+      context: server
+      dockerfile: Dockerfile.develop
+    volumes:
+      # Include .git for detecting changes in the workspace (e.g. only run tests on changed files)
+      - .git:/app/.git:cached
+      - ./server:/app/server:cached
+      - ./interfaces:/app/interfaces:cached
+      - /app/server/node_modules
+    ports:
+      - '3000:3000'
+  database:
+    image: kartoza/postgis:11.5-2.8
+    environment:
+      POSTGRES_USER: vuorovaikutusalusta_user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: vuorovaikutusalusta_db
+      DEFAULT_COLLATION: 'fi_FI.UTF8'
+      DEFAULT_CTYPE: 'fi_FI.UTF8'
+      TZ: Europe/Helsinki
+    volumes:
+      - .db-data:/var/lib/postgresql:delegated
+    ports:
+      - '5432:5432'

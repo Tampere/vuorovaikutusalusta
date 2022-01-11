@@ -1,0 +1,17 @@
+##
+# Development image for client dev server
+##
+
+FROM node:14.17.1-alpine
+
+# Define Git directory and install Git for running Jest only on changed files
+ENV GIT_WORK_TREE=/app/client
+ENV GIT_DIR=/app/.git
+
+RUN apk update && apk add git
+
+WORKDIR /app/client
+COPY package*.json ./
+RUN npm i
+
+CMD ["npm", "run", "dev"]

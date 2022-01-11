@@ -1,0 +1,14 @@
+{
+  "testEnvironment": "jsdom",
+  "moduleNameMapper": {
+    "^@src(.*)$": "<rootDir>/src$1",
+    "^.+\\.(css|less)$": "<rootDir>/mocks/css-mock.js"
+  },
+  "testMatch": ["**/?(*.)+(spec|test).+(ts|tsx|js)"],
+  "transform": {
+    "^.+\\.(ts|tsx)$": "ts-jest"
+  },
+  "setupFiles": ["./setupTests.ts", "jest-canvas-mock"],
+  "transformIgnorePatterns": ["node_modules/(?!(ol)/)"],
+  "automock": false
+}
