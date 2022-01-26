@@ -13,7 +13,8 @@ export type SurveyQuestion =
   | SurveyRadioQuestion
   | SurveyNumericQuestion
   | SurveyFreeTextQuestion
-  | SurveyMapQuestion;
+  | SurveyMapQuestion
+  | SurveySortingQuestion;
 
 /**
  * Subquestion type for map questions
@@ -21,7 +22,9 @@ export type SurveyQuestion =
 export type SurveyMapSubQuestion =
   | SurveyCheckboxQuestion
   | SurveyRadioQuestion
-  | SurveyFreeTextQuestion;
+  | SurveyFreeTextQuestion
+  | SurveyNumericQuestion
+  | SurveySortingQuestion;
 
 /**
  * Common fields for survey page sections
@@ -89,6 +92,7 @@ export interface SurveyNumericQuestion extends CommonSurveyPageQuestion {
  */
 export interface SurveyFreeTextQuestion extends CommonSurveyPageQuestion {
   type: 'free-text';
+  maxLength?: number;
 }
 
 /**
@@ -103,6 +107,14 @@ export interface SurveyMapQuestion extends CommonSurveyPageQuestion {
   type: 'map';
   selectionTypes: MapQuestionSelectionType[];
   subQuestions: SurveyMapSubQuestion[];
+}
+
+/**
+ * Sorting question
+ */
+export interface SurveySortingQuestion extends CommonSurveyPageQuestion {
+  type: 'sorting';
+  options: SectionOption[];
 }
 
 /**
@@ -270,8 +282,16 @@ export type AnswerEntry = {
       value: string | number;
     }
   | {
+      type: 'numeric';
+      value: number;
+    }
+  | {
       type: 'map';
       value: MapQuestionAnswer[];
+    }
+  | {
+      type: 'sorting';
+      value: number[];
     }
 );
 

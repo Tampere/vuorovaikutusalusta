@@ -57,7 +57,8 @@
     "numericQuestion": "Lisää numeerinen kysymys",
     "mapQuestion": "Lisää karttakysymys",
     "textSection": "Lisää tekstiosio",
-    "freeTextQuestion": "Lisää vapaatekstikysymys"
+    "freeTextQuestion": "Lisää vapaatekstikysymys",
+    "sortingQuestion": "Lisää järjestyskysymys"
   },
   "SurveySections": {
     "limitAnswers": "Rajoita vastauslukumäärää",
@@ -66,7 +67,8 @@
     "options": "Vastausvaihtoehdot",
     "addOption": "Lisää vaihtoehto",
     "allowCustomAnswer": "Salli “Jokin muu, mikä?” -vaihtoehto",
-    "isRequired": "Vastaus pakollinen"
+    "isRequired": "Vastaus pakollinen",
+    "answerMaxLength": "Maksimi merkkimäärä"
   },
   "SurveyImageList": {
     "attributions": "Tekijänoikeustiedot",
@@ -164,6 +166,9 @@
       "area": "Aloita piirtäminen klikkaamalla aloituskohtaa. Jatka piirtämistä klikkaamalla kartalla uudestaan, lopeta piirtäminen klikkaamalla viimeistä pistettä uudestaan."
     },
     "clearAnswers": "Poista kaikki karttavastaukset"
+  },
+  "SortingQuestion": {
+    "empty": "Tyhjä"
   },
   "AppBarUserMenu": {
     "logout": "Kirjaudu ulos"

@@ -6,7 +6,9 @@ import React, { useMemo, useState } from 'react';
 import CheckBoxQuestion from './CheckBoxQuestion';
 import FreeTextQuestion from './FreeTextQuestion';
 import MapQuestion from './MapQuestion';
+import NumericQuestion from './NumericQuestion';
 import RadioQuestion from './RadioQuestion';
+import SortingQuestion from './SortingQuestion';
 
 interface Props {
   question: SurveyQuestion;
@@ -67,6 +69,21 @@ export default function SurveyQuestion({ question }: Props) {
       {question.type === 'free-text' && (
         <FreeTextQuestion
           value={value as string}
+          maxLength={question.maxLength}
+          onChange={(value) => {
+            updateAnswer({
+              sectionId: question.id,
+              type: question.type,
+              value,
+            });
+          }}
+          setDirty={setDirty}
+        />
+      )}
+      {/* Numeric question */}
+      {question.type === 'numeric' && (
+        <NumericQuestion
+          value={value as number}
           onChange={(value) => {
             updateAnswer({
               sectionId: question.id,
@@ -81,6 +98,21 @@ export default function SurveyQuestion({ question }: Props) {
       {question.type === 'map' && (
         <MapQuestion
           value={value as MapQuestionAnswer[]}
+          onChange={(value) => {
+            updateAnswer({
+              sectionId: question.id,
+              type: question.type,
+              value,
+            });
+          }}
+          question={question}
+          setDirty={setDirty}
+        />
+      )}
+      {/* Sorting question */}
+      {question.type === 'sorting' && (
+        <SortingQuestion
+          value={value as number[]}
           onChange={(value) => {
             updateAnswer({
               sectionId: question.id,

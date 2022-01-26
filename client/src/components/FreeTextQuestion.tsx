@@ -2,37 +2,38 @@ import { FormHelperText, TextField } from '@material-ui/core';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React from 'react';
 
-/**
- * Max length of free text questions
- */
-const freeTextAnswerMaxLength = 500;
-
 interface Props {
   value: string;
   onChange: (value: string) => void;
   setDirty: (dirty: boolean) => void;
+  maxLength?: number;
 }
 
-export default function FreeTextQuestion(props: Props) {
+export default function FreeTextQuestion({
+  value,
+  onChange,
+  setDirty,
+  maxLength = 500,
+}: Props) {
   const { tr } = useTranslations();
   return (
     <>
       <TextField
-        value={props.value}
+        value={value}
         multiline
-        inputProps={{ maxLength: freeTextAnswerMaxLength }}
+        inputProps={{ maxLength: maxLength }}
         onChange={(event) => {
-          props.setDirty(true);
-          props.onChange(event.target.value);
+          setDirty(true);
+          onChange(event.target.value);
         }}
         onBlur={() => {
-          props.setDirty(true);
+          setDirty(true);
         }}
       />
       <FormHelperText>
         {tr.SurveyQuestion.charactersRemaining.replace(
           '{x}',
-          String(freeTextAnswerMaxLength - props.value.length)
+          String(maxLength - value.length)
         )}
       </FormHelperText>
     </>

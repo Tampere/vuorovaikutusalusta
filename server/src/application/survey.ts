@@ -28,6 +28,12 @@ import logger from '@src/logger';
 // TODO: Find a better way to pass the language code when/if the localization is fully implemented
 const languageCode = 'fi';
 
+const sectionTypesWithOptions: SurveyPageSection['type'][] = [
+  'radio',
+  'checkbox',
+  'sorting',
+];
+
 /**
  * Survey's DB model
  */
@@ -262,6 +268,7 @@ const submissionEntryColumnSet = (inputSRID: number) =>
     'value_text',
     'value_option_id',
     getGeoJSONColumn('value_geometry', inputSRID),
+    'value_numeric',
   ]);
 
 /**
@@ -365,8 +372,8 @@ export async function getSurvey(params: { id: number } | { name: string }) {
       }
     }
 
-    // Only look for options in radio & checkbox question sections
-    if (['radio', 'checkbox'].includes(section?.type)) {
+    // Only look for options if the section type allows options
+    if (sectionTypesWithOptions.includes(section?.type)) {
       // For some reason TS cannot infer the section here correctly from the if above - assume the type in the new variable
       const question = section as SurveyRadioQuestion | SurveyCheckboxQuestion;
       // Try to find the pre-existing question option object
@@ -644,7 +651,7 @@ function dbSurveyJoinToSection(dbSurveyJoin: DBSurveyJoin): SurveyPageSection {
         // Trust that the JSON in the DB fits the rest of the detail fields
         ...(dbSurveyJoin.section_details as any),
         // Add an initial empty option array if the type allows options
-        ...(['radio', 'checkbox'].includes(type) && { options: [] }),
+        ...(sectionTypesWithOptions.includes(type) && { options: [] }),
       };
 }
 
@@ -780,6 +787,7 @@ function answerEntriesToRows(
             value_text: entry.value,
             value_option_id: null,
             value_geometry: null,
+            value_numeric: null,
           } as DBAnswerEntry,
         ];
         break;
@@ -792,6 +800,7 @@ function answerEntriesToRows(
             value_option_id:
               typeof entry.value === 'number' ? entry.value : null,
             value_geometry: null,
+            value_numeric: null,
           },
         ];
         break;
@@ -804,8 +813,21 @@ function answerEntriesToRows(
               value_text: typeof value === 'string' ? value : null,
               value_option_id: typeof value === 'number' ? value : null,
               value_geometry: null,
+              value_numeric: null,
             };
           }),
+        ];
+        break;
+      case 'numeric':
+        newEntry = [
+          {
+            submission_id: submissionID,
+            section_id: entry.sectionId,
+            value_text: null,
+            value_option_id: null,
+            value_geometry: null,
+            value_numeric: entry.value,
+          } as DBAnswerEntry,
         ];
         break;
       case 'map':
@@ -826,6 +848,17 @@ function answerEntriesToRows(
           return [...prevEntries, geometryEntry, ...subquestionEntries];
         }, []);
 
+        break;
+      case 'sorting':
+        newEntry = [
+          {
+            submission_id: submissionID,
+            section_id: entry.sectionId,
+            value_text: JSON.stringify(entry.value),
+            value_option_id: null,
+            value_geometry: null,
+          },
+        ];
         break;
     }
 

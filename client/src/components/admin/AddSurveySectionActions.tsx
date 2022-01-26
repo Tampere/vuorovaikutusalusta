@@ -2,10 +2,12 @@ import { SurveyPageSection } from '@interfaces/survey';
 import { Fab, Grid, Typography } from '@material-ui/core';
 import {
   CheckBox,
+  FormatListNumbered,
   Map,
   RadioButtonChecked,
   Subject,
   TextFields,
+  Looks4,
 } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
@@ -65,6 +67,12 @@ const defaultSections: {
     title: '',
     body: '',
   },
+  sorting: {
+    type: 'sorting',
+    title: '',
+    options: [{ text: '' }],
+    isRequired: false,
+  },
 };
 
 export default function AddSurveySectionActions(props: Props) {
@@ -110,10 +118,22 @@ export default function AddSurveySectionActions(props: Props) {
       icon: <TextFields />,
     },
     {
+      type: 'numeric',
+      label: tr.AddSurveySectionActions.numericQuestion,
+      ariaLabel: 'add-numeric-question',
+      icon: <Looks4 />,
+    },
+    {
       type: 'map',
       label: tr.AddSurveySectionActions.mapQuestion,
       ariaLabel: 'add-map-question',
       icon: <Map />,
+    },
+    {
+      type: 'sorting',
+      label: tr.AddSurveySectionActions.sortingQuestion,
+      ariaLabel: 'add-sorting-question',
+      icon: <FormatListNumbered />,
     },
   ];
 

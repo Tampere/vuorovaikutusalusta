@@ -2,8 +2,10 @@ import {
   SurveyCheckboxQuestion,
   SurveyFreeTextQuestion,
   SurveyMapQuestion,
+  SurveyNumericQuestion,
   SurveyPageSection,
   SurveyRadioQuestion,
+  SurveySortingQuestion,
   SurveyTextSection,
 } from '@interfaces/survey';
 import {
@@ -18,11 +20,12 @@ import {
 import {
   CheckBox,
   ExpandMore,
+  FormatListNumbered,
   Map,
   RadioButtonChecked,
   Subject,
   TextFields,
-  Tune,
+  Looks4,
 } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
@@ -31,7 +34,9 @@ import ConfirmDialog from '../ConfirmDialog';
 import EditCheckBoxQuestion from './EditCheckBoxQuestion';
 import EditFreeTextQuestion from './EditFreeTextQuestion';
 import EditMapQuestion from './EditMapQuestion';
+import EditNumericQuestion from './EditNumericQuestion';
 import EditRadioQuestion from './EditRadioQuestion';
+import EditSortingQuestion from './EditSortingQuestion';
 import EditTextSection from './EditTextSection';
 
 const useStyles = makeStyles({
@@ -96,8 +101,16 @@ export default function SurveySectionAccordion(props: Props) {
       ),
     },
     numeric: {
-      icon: <Tune />,
-      form: <></>,
+      icon: <Looks4 />,
+      form: (
+        <EditNumericQuestion
+          disabled={props.disabled}
+          section={props.section as SurveyNumericQuestion}
+          onChange={(section) => {
+            props.onEdit(section);
+          }}
+        />
+      ),
     },
     map: {
       icon: <Map />,
@@ -129,6 +142,18 @@ export default function SurveySectionAccordion(props: Props) {
         <EditTextSection
           disabled={props.disabled}
           section={props.section as SurveyTextSection}
+          onChange={(section) => {
+            props.onEdit(section);
+          }}
+        />
+      ),
+    },
+    sorting: {
+      icon: <FormatListNumbered />,
+      form: (
+        <EditSortingQuestion
+          disabled={props.disabled}
+          section={props.section as SurveySortingQuestion}
           onChange={(section) => {
             props.onEdit(section);
           }}

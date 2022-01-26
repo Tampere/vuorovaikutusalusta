@@ -64,11 +64,23 @@ export function getEmptyAnswer(section: SurveyPageSection): AnswerEntry {
         type: section.type,
         value: '',
       };
+    case 'numeric':
+      return {
+        sectionId: section.id,
+        type: section.type,
+        value: null,
+      };
     case 'map':
       return {
         sectionId: section.id,
         type: section.type,
         value: [],
+      };
+    case 'sorting':
+      return {
+        sectionId: section.id,
+        type: section.type,
+        value: null,
       };
     default:
       return null;
@@ -115,8 +127,17 @@ export function useSurveyAnswers() {
     }
 
     if (question.isRequired) {
+      // Sorting is considered incomplete, if the array contains any nullish values
+      if (question.type === 'sorting') {
+        if (
+          !answer.value ||
+          (answer.value as number[]).some((value) => value == null)
+        ) {
+          errors.push('required');
+        }
+      }
       // If value is an array, check the array length - otherwise check for its emptiness
-      if (
+      else if (
         Array.isArray(answer.value)
           ? !answer.value.length
           : answer.value == null || !answer.value.toString().length
@@ -124,7 +145,6 @@ export function useSurveyAnswers() {
         errors.push('required');
       }
     }
-
     return errors;
   }
 
