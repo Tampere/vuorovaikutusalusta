@@ -3,14 +3,14 @@ import {
   Survey,
   SurveyPage,
   SurveyPageSection,
-  SurveyQuestion,
+  SurveyQuestion
 } from '@interfaces/survey';
 import React, {
   createContext,
   ReactNode,
   useContext,
   useMemo,
-  useReducer,
+  useReducer
 } from 'react';
 
 interface State {
@@ -20,17 +20,17 @@ interface State {
 
 type Action =
   | {
-      type: 'SET_SURVEY';
-      survey: Survey;
-    }
+    type: 'SET_SURVEY';
+    survey: Survey;
+  }
   | {
-      type: 'UPDATE_ANSWER';
-      answer: AnswerEntry;
-    }
+    type: 'UPDATE_ANSWER';
+    answer: AnswerEntry;
+  }
   | {
-      type: 'SET_ANSWERS';
-      answers: AnswerEntry[];
-    };
+    type: 'SET_ANSWERS';
+    answers: AnswerEntry[];
+  };
 
 type Context = [State, React.Dispatch<Action>];
 
@@ -38,6 +38,9 @@ const stateDefaults: State = {
   answers: [],
   survey: null,
 };
+
+// Section types that won't have an answer (e.g. text sections)
+const nonQuestionSectionTypes: SurveyPageSection['type'][] = ['text'];
 
 /**
  * Context containing the state object and dispatch function.
@@ -82,8 +85,16 @@ export function getEmptyAnswer(section: SurveyPageSection): AnswerEntry {
         type: section.type,
         value: null,
       };
+    case 'slider':
+      return {
+        sectionId: section.id,
+        type: section.type,
+        value: null,
+      };
     default:
-      return null;
+      throw new Error(
+        `No default value defined for questions of type "${section.type}"`
+      );
   }
 }
 
@@ -164,10 +175,10 @@ export function useSurveyAnswers() {
     setSurvey(survey: Survey) {
       dispatch({ type: 'SET_SURVEY', survey });
       // Get all sections across survey pages
-      const sections = survey.pages.reduce(
-        (sections, page) => [...sections, ...page.sections],
-        []
-      );
+      const sections = survey.pages
+        .reduce((sections, page) => [...sections, ...page.sections], [])
+        // Skip sections that shouldn't get answers
+        .filter((section) => !nonQuestionSectionTypes.includes(section.type));
       dispatch({
         type: 'SET_ANSWERS',
         answers: sections.map(getEmptyAnswer).filter(Boolean),
@@ -188,9 +199,12 @@ export function useSurveyAnswers() {
      * @returns Is the page valid
      */
     isPageValid(page: SurveyPage) {
-      return !page.sections.some(
-        (section) => getValidationErrors(section as SurveyQuestion).length
-      );
+      return !page.sections
+        // Skip sections that shouldn't get answers
+        .filter((section) => !nonQuestionSectionTypes.includes(section.type))
+        .some(
+          (section) => getValidationErrors(section as SurveyQuestion).length
+        );
     },
   };
 }

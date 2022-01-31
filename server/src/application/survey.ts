@@ -159,6 +159,10 @@ interface DBSurveyPageSection {
    * Parent section ID for subquestions
    */
   parent_section: number;
+  /**
+   * Additional information related to the section
+   */
+  info: LocalizedText;
 }
 
 /**
@@ -196,6 +200,7 @@ type DBSurveyJoin = DBSurvey & {
   section_type: string;
   section_details: object;
   section_parent_section: number;
+  section_info: LocalizedText;
   option_id: number;
   option_text: LocalizedText;
 };
@@ -213,23 +218,25 @@ interface DBAnswerEntry {
    */
   submission_id: number;
   /**
-   * ID of the survey section
+   * ID of the section/question the answer is linked to
    */
   section_id: number;
   /**
    * Answer text for a free text question
    */
-  value_text?: string;
+  value_text: string;
+  /**
+   * Numeric answer value
+   */
+  value_numeric: number;
   /**
    * ID of the multichoise option to which the answer points
    */
-  value_option_id?: number;
+  value_option_id: number;
   /**
-   * Geometry of the answer
+   * Geometry answer value
    */
-  value_geometry?: GeoJSON.Feature<
-    GeoJSON.Point | GeoJSON.LineString | GeoJSON.Polygon
-  >;
+  value_geometry: GeoJSON.Geometry;
 }
 
 /**
@@ -293,7 +300,8 @@ export async function getSurvey(params: { id: number } | { name: string }) {
         section.type as section_type,
         section.details as section_details,
         section.idx as section_idx,
-        section.parent_section as section_parent_section
+        section.parent_section as section_parent_section,
+        section.info as section_info
       FROM (
         SELECT
           survey.*,
@@ -421,8 +429,8 @@ export async function createSurvey() {
 async function insertSection(section: DBSurveyPageSection, index: number) {
   return await getDb().one<DBSurveyPageSection>(
     `
-    INSERT INTO data.page_section (survey_page_id, idx, title, type, body, details, parent_section)
-    VALUES ($1, $2, $3::json, $4, $5::json, $6::json, $7) RETURNING id;
+    INSERT INTO data.page_section (survey_page_id, idx, title, type, body, details, parent_section, info)
+    VALUES ($1, $2, $3::json, $4, $5::json, $6::json, $7, $8) RETURNING id;
   `,
     [
       section.survey_page_id,
@@ -432,6 +440,7 @@ async function insertSection(section: DBSurveyPageSection, index: number) {
       section.body,
       section.details,
       section.parent_section,
+      section.info,
     ]
   );
 }
@@ -648,6 +657,7 @@ function dbSurveyJoinToSection(dbSurveyJoin: DBSurveyJoin): SurveyPageSection {
         title: dbSurveyJoin.section_title?.[languageCode],
         type: dbSurveyJoin.section_type as SurveyPageSection['type'],
         body: dbSurveyJoin.section_body?.[languageCode],
+        info: dbSurveyJoin.section_info?.[languageCode],
         // Trust that the JSON in the DB fits the rest of the detail fields
         ...(dbSurveyJoin.section_details as any),
         // Add an initial empty option array if the type allows options
@@ -776,11 +786,11 @@ function answerEntriesToRows(
   submissionEntries: AnswerEntry[]
 ) {
   return submissionEntries.reduce((entries, entry) => {
-    let newEntry;
+    let newEntries: DBAnswerEntry[];
 
     switch (entry.type) {
       case 'free-text':
-        newEntry = [
+        newEntries = [
           {
             submission_id: submissionID,
             section_id: entry.sectionId,
@@ -788,11 +798,11 @@ function answerEntriesToRows(
             value_option_id: null,
             value_geometry: null,
             value_numeric: null,
-          } as DBAnswerEntry,
+          },
         ];
         break;
       case 'radio':
-        newEntry = [
+        newEntries = [
           {
             submission_id: submissionID,
             section_id: entry.sectionId,
@@ -805,7 +815,7 @@ function answerEntriesToRows(
         ];
         break;
       case 'checkbox':
-        newEntry = [
+        newEntries = [
           ...entry.value.map((value) => {
             return {
               submission_id: submissionID,
@@ -819,7 +829,7 @@ function answerEntriesToRows(
         ];
         break;
       case 'numeric':
-        newEntry = [
+        newEntries = [
           {
             submission_id: submissionID,
             section_id: entry.sectionId,
@@ -827,18 +837,19 @@ function answerEntriesToRows(
             value_option_id: null,
             value_geometry: null,
             value_numeric: entry.value,
-          } as DBAnswerEntry,
+          },
         ];
         break;
       case 'map':
-        newEntry = entry.value.reduce((prevEntries, currentValue) => {
+        newEntries = entry.value.reduce((prevEntries, currentValue) => {
           const geometryEntry = {
             submission_id: submissionID,
             section_id: entry.sectionId,
             value_text: null,
             value_option_id: null,
             value_geometry: currentValue.geometry?.geometry,
-          };
+            value_numeric: null,
+          } as DBAnswerEntry;
 
           // Map over different subquestion answers using the same function recursively
           const subquestionEntries = currentValue.subQuestionAnswers
@@ -850,20 +861,33 @@ function answerEntriesToRows(
 
         break;
       case 'sorting':
-        newEntry = [
+        newEntries = [
           {
             submission_id: submissionID,
             section_id: entry.sectionId,
             value_text: JSON.stringify(entry.value),
             value_option_id: null,
             value_geometry: null,
+            value_numeric: null,
+          },
+        ];
+        break;
+      case 'slider':
+        newEntries = [
+          {
+            submission_id: submissionID,
+            section_id: entry.sectionId,
+            value_text: null,
+            value_option_id: null,
+            value_geometry: null,
+            value_numeric: entry.value,
           },
         ];
         break;
     }
 
-    return [...entries, ...(newEntry ?? [])];
-  }, []);
+    return [...entries, ...(newEntries ?? [])];
+  }, [] as DBAnswerEntry[]);
 }
 
 /**
@@ -910,6 +934,7 @@ function surveySectionsToRows(
       body = undefined,
       options = undefined,
       subQuestions = undefined,
+      info = undefined,
       ...details
     } = { ...surveySection };
     return {
@@ -926,6 +951,9 @@ function surveySectionsToRows(
       options,
       subQuestions,
       parent_section: parentSectionId ?? null,
+      info: {
+        fi: info,
+      },
     } as DBSurveyPageSection & {
       options: SectionOption[];
       subQuestions: SurveyMapSubQuestion[];

@@ -14,17 +14,15 @@ export type SurveyQuestion =
   | SurveyNumericQuestion
   | SurveyFreeTextQuestion
   | SurveyMapQuestion
-  | SurveySortingQuestion;
+  | SurveySortingQuestion
+  | SurveySliderQuestion;
 
 /**
- * Subquestion type for map questions
+ * Subquestion type for map questions.
+ *
+ * Same as SurveyQuestion, but exclude recursive map questions.
  */
-export type SurveyMapSubQuestion =
-  | SurveyCheckboxQuestion
-  | SurveyRadioQuestion
-  | SurveyFreeTextQuestion
-  | SurveyNumericQuestion
-  | SurveySortingQuestion;
+export type SurveyMapSubQuestion = Exclude<SurveyQuestion, SurveyMapQuestion>;
 
 /**
  * Common fields for survey page sections
@@ -38,6 +36,14 @@ interface CommonSurveyPageSection {
    * Section title
    */
   title: string;
+  /**
+   * Additional information related to the section
+   */
+  info?: string;
+  /**
+   * Toggler whether the section info should be shown
+   */
+  showInfo?: boolean;
 }
 
 /**
@@ -115,6 +121,18 @@ export interface SurveyMapQuestion extends CommonSurveyPageQuestion {
 export interface SurveySortingQuestion extends CommonSurveyPageQuestion {
   type: 'sorting';
   options: SectionOption[];
+}
+
+/**
+ * Slider question
+ */
+export interface SurveySliderQuestion extends CommonSurveyPageQuestion {
+  type: 'slider';
+  presentationType: 'literal' | 'numeric';
+  minValue: number;
+  maxValue: number;
+  minLabel: LocalizedText;
+  maxLabel: LocalizedText;
 }
 
 /**
@@ -229,7 +247,7 @@ export interface SectionOption {
 /**
  * Supported language codes
  */
-type LanguageCode = 'fi' | 'en';
+type LanguageCode = 'fi';
 
 /**
  * Type for localization typing
@@ -292,6 +310,10 @@ export type AnswerEntry = {
   | {
       type: 'sorting';
       value: number[];
+    }
+  | {
+      type: 'slider';
+      value: number;
     }
 );
 

@@ -58,7 +58,8 @@
     "mapQuestion": "Lisää karttakysymys",
     "textSection": "Lisää tekstiosio",
     "freeTextQuestion": "Lisää vapaatekstikysymys",
-    "sortingQuestion": "Lisää järjestyskysymys"
+    "sortingQuestion": "Lisää järjestyskysymys",
+    "sliderQuestion": "Lisää liukukytkinkysymys"
   },
   "SurveySections": {
     "limitAnswers": "Rajoita vastauslukumäärää",
@@ -68,7 +69,8 @@
     "addOption": "Lisää vaihtoehto",
     "allowCustomAnswer": "Salli “Jokin muu, mikä?” -vaihtoehto",
     "isRequired": "Vastaus pakollinen",
-    "answerMaxLength": "Maksimi merkkimäärä"
+    "answerMaxLength": "Maksimi merkkimäärä",
+    "sectionInfo": "Anna lisätietoja kysymykseen liittyen"
   },
   "SurveyImageList": {
     "attributions": "Tekijänoikeustiedot",
@@ -88,6 +90,16 @@
     "line": "Viiva",
     "area": "Alue",
     "subQuestions": "Alikysymykset"
+  },
+  "EditSliderQuestion": {
+    "presentationType": "Esitystapa",
+    "literal": "Sanallinen",
+    "numeric": "Numeerinen",
+    "minValue": "Minimiarvo",
+    "maxValue": "Maksimiarvo",
+    "defaultMinLabel": "Täysin eri mieltä",
+    "defaultMaxLabel": "Täysin samaa mieltä",
+    "literalHelperText": "Sanallisen liukukytkinkysymyksen vastaus tallennetaan tietokantaan arvovälillä 0 - 10."
   },
   "EditSurveyThanksPage": {
     "title": "Kiitos-sivun otsikko",
@@ -152,7 +164,8 @@
     "answerLimitsMin": "Valitse vähintään {min} vaihtoehtoa",
     "answerLimitsMax": "Valitse enintään {max} vaihtoehtoa",
     "customAnswer": "Jokin muu, mikä?",
-    "charactersRemaining": "{x} merkki(ä) jäljellä"
+    "charactersRemaining": "{x} merkki(ä) jäljellä",
+    "showInfo": "Näytä lisätietoja"
   },
   "MapQuestion": {
     "selectionTypes": {
@@ -188,7 +201,8 @@
     "save": "Tallenna",
     "discard": "Peruuta muutokset",
     "edit": "Muokkaa",
-    "copy": "Kopioi"
+    "copy": "Kopioi",
+    "close": "Sulje"
   },
   "options": {
     "yes": "Kyllä",
