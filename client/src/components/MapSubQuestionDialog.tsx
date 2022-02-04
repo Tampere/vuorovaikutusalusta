@@ -1,6 +1,6 @@
 import {
   SurveyMapSubQuestion,
-  SurveyMapSubQuestionAnswer,
+  SurveyMapSubQuestionAnswer
 } from '@interfaces/survey';
 import {
   Button,
@@ -9,18 +9,21 @@ import {
   DialogContent,
   FormControl,
   FormHelperText,
-  FormLabel,
+  FormLabel
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
 import {
   getEmptyAnswer,
-  useSurveyAnswers,
+  useSurveyAnswers
 } from '@src/stores/SurveyAnswerContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useEffect, useMemo, useState } from 'react';
 import CheckBoxQuestion from './CheckBoxQuestion';
 import FreeTextQuestion from './FreeTextQuestion';
+import NumericQuestion from './NumericQuestion';
 import RadioQuestion from './RadioQuestion';
+import SliderQuestion from './SliderQuestion';
+import SortingQuestion from './SortingQuestion';
 
 const useStyles = makeStyles({
   content: {
@@ -124,6 +127,44 @@ export default function MapSubQuestionDialog({
                   answers[index].value = value;
                   setAnswers([...answers]);
                 }}
+                setDirty={(value) => {
+                  dirty[index] = value;
+                  setDirty([...dirty]);
+                }}
+              />
+            ) : question.type === 'numeric' ? (
+              <NumericQuestion
+                value={answers[index]?.value as number}
+                onChange={(value) => {
+                  answers[index].value = value;
+                  setAnswers([...answers]);
+                }}
+                setDirty={(value) => {
+                  dirty[index] = value;
+                  setDirty([...dirty]);
+                }}
+              />
+            ) : question.type === 'sorting' ? (
+              <SortingQuestion
+                value={answers[index]?.value as number[]}
+                onChange={(value) => {
+                  answers[index].value = value;
+                  setAnswers([...answers]);
+                }}
+                question={question}
+                setDirty={(value) => {
+                  dirty[index] = value;
+                  setDirty([...dirty]);
+                }}
+              />
+            ) : question.type === 'slider' ? (
+              <SliderQuestion
+                value={answers[index]?.value as number}
+                onChange={(value) => {
+                  answers[index].value = value;
+                  setAnswers([...answers]);
+                }}
+                question={question}
                 setDirty={(value) => {
                   dirty[index] = value;
                   setDirty([...dirty]);

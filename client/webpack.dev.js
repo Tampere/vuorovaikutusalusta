@@ -11,7 +11,7 @@ module.exports = merge(common, {
   devtool: 'inline-source-map',
   devServer: {
     host: '0.0.0.0',
-    contentBase: './dist',
+    static: './dist',
     historyApiFallback: {
       rewrites: [
         { from: /^\/$/, to: '/index.html' },

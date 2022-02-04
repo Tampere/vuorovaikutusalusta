@@ -1,9 +1,7 @@
 import {
   MapQuestionSelectionType,
-  SurveyCheckboxQuestion,
-  SurveyFreeTextQuestion,
   SurveyMapQuestion,
-  SurveyRadioQuestion,
+  SurveyMapSubQuestion,
 } from '@interfaces/survey';
 import {
   Checkbox,
@@ -115,13 +113,15 @@ export default function EditMapQuestion({
         }}
       />
       <AddSurveySectionActions
-        types={['radio', 'checkbox', 'free-text']}
-        onAdd={(
-          newSection:
-            | SurveyRadioQuestion
-            | SurveyCheckboxQuestion
-            | SurveyFreeTextQuestion
-        ) => {
+        types={[
+          'radio',
+          'checkbox',
+          'free-text',
+          'numeric',
+          'sorting',
+          'slider',
+        ]}
+        onAdd={(newSection: SurveyMapSubQuestion) => {
           onChange({
             ...section,
             subQuestions: [...(section.subQuestions ?? []), newSection],

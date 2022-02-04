@@ -2,10 +2,13 @@ import { SurveyPageSection } from '@interfaces/survey';
 import { Fab, Grid, Typography } from '@material-ui/core';
 import {
   CheckBox,
+  FormatListNumbered,
+  LinearScale,
+  Looks4,
   Map,
   RadioButtonChecked,
   Subject,
-  TextFields,
+  TextFields
 } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
@@ -25,51 +28,79 @@ interface Props {
   onAdd: (newSection: SurveyPageSection) => void;
 }
 
-const defaultSections: {
-  [type in SurveyPageSection['type']]: SurveyPageSection;
-} = {
-  checkbox: {
-    type: 'checkbox',
-    title: '',
-    isRequired: false,
-    options: [{ text: '' }],
-    answerLimits: null,
-    allowCustomAnswer: false,
-  },
-  radio: {
-    type: 'radio',
-    title: '',
-    isRequired: false,
-    options: [{ text: '' }],
-    allowCustomAnswer: false,
-  },
-  numeric: {
-    type: 'numeric',
-    title: '',
-    isRequired: false,
-  },
-  map: {
-    type: 'map',
-    title: '',
-    isRequired: false,
-    selectionTypes: [],
-    subQuestions: [],
-  },
-  'free-text': {
-    type: 'free-text',
-    isRequired: false,
-    title: '',
-  },
-  text: {
-    type: 'text',
-    title: '',
-    body: '',
-  },
-};
-
 export default function AddSurveySectionActions(props: Props) {
   const classes = useStyles();
   const { tr } = useTranslations();
+
+  const defaultSections: {
+    [type in SurveyPageSection['type']]: SurveyPageSection;
+  } = {
+    checkbox: {
+      type: 'checkbox',
+      title: '',
+      isRequired: false,
+      info: null,
+      options: [{ text: '' }],
+      answerLimits: null,
+      allowCustomAnswer: false,
+    },
+    radio: {
+      type: 'radio',
+      title: '',
+      isRequired: false,
+      info: null,
+      options: [{ text: '' }],
+      allowCustomAnswer: false,
+    },
+    numeric: {
+      type: 'numeric',
+      title: '',
+      isRequired: false,
+      info: null,
+    },
+    map: {
+      type: 'map',
+      title: '',
+      isRequired: false,
+      info: null,
+      selectionTypes: [],
+      subQuestions: [],
+    },
+    'free-text': {
+      type: 'free-text',
+      isRequired: false,
+      info: null,
+      title: '',
+    },
+    text: {
+      type: 'text',
+      title: '',
+      body: '',
+      info: null,
+    },
+    sorting: {
+      type: 'sorting',
+      title: '',
+      options: [{ text: '' }],
+      isRequired: false,
+      info: null,
+    },
+    slider: {
+      type: 'slider',
+      isRequired: false,
+      info: null,
+      title: '',
+      presentationType: 'literal',
+      minValue: 0,
+      maxValue: 10,
+      minLabel: {
+        fi: tr.EditSliderQuestion.defaultMinLabel,
+      },
+      maxLabel: {
+        fi: tr.EditSliderQuestion.defaultMaxLabel,
+      },
+    },
+  };
 
   function handleAdd(type: SurveyPageSection['type']) {
     return () => {
@@ -85,37 +116,55 @@ export default function AddSurveySectionActions(props: Props) {
     ariaLabel: string;
     icon: ReactNode;
   }[] = [
-    {
-      type: 'text',
-      label: tr.AddSurveySectionActions.textSection,
-      ariaLabel: 'add-text-section',
-      icon: <Subject />,
-    },
-    {
-      type: 'radio',
-      label: tr.AddSurveySectionActions.radioQuestion,
-      ariaLabel: 'add-radio-question',
-      icon: <RadioButtonChecked />,
-    },
-    {
-      type: 'checkbox',
-      label: tr.AddSurveySectionActions.checkBoxQuestion,
-      ariaLabel: 'add-checkbox-question',
-      icon: <CheckBox />,
-    },
-    {
-      type: 'free-text',
-      label: tr.AddSurveySectionActions.freeTextQuestion,
-      ariaLabel: 'add-free-text-question',
-      icon: <TextFields />,
-    },
-    {
-      type: 'map',
-      label: tr.AddSurveySectionActions.mapQuestion,
-      ariaLabel: 'add-map-question',
-      icon: <Map />,
-    },
-  ];
+      {
+        type: 'text',
+        label: tr.AddSurveySectionActions.textSection,
+        ariaLabel: 'add-text-section',
+        icon: <Subject />,
+      },
+      {
+        type: 'radio',
+        label: tr.AddSurveySectionActions.radioQuestion,
+        ariaLabel: 'add-radio-question',
+        icon: <RadioButtonChecked />,
+      },
+      {
+        type: 'checkbox',
+        label: tr.AddSurveySectionActions.checkBoxQuestion,
+        ariaLabel: 'add-checkbox-question',
+        icon: <CheckBox />,
+      },
+      {
+        type: 'free-text',
+        label: tr.AddSurveySectionActions.freeTextQuestion,
+        ariaLabel: 'add-free-text-question',
+        icon: <TextFields />,
+      },
+      {
+        type: 'numeric',
+        label: tr.AddSurveySectionActions.numericQuestion,
+        ariaLabel: 'add-numeric-question',
+        icon: <Looks4 />,
+      },
+      {
+        type: 'map',
+        label: tr.AddSurveySectionActions.mapQuestion,
+        ariaLabel: 'add-map-question',
+        icon: <Map />,
+      },
+      {
+        type: 'sorting',
+        label: tr.AddSurveySectionActions.sortingQuestion,
+        ariaLabel: 'add-sorting-question',
+        icon: <FormatListNumbered />,
+      },
+      {
+        type: 'slider',
+        label: tr.AddSurveySectionActions.sliderQuestion,
+        ariaLabel: 'add-slider-question',
+        icon: <LinearScale />,
+      },
+    ];
 
   return (
     <Grid container spacing={3}>

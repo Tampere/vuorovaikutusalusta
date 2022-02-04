@@ -2,8 +2,11 @@ import {
   SurveyCheckboxQuestion,
   SurveyFreeTextQuestion,
   SurveyMapQuestion,
+  SurveyNumericQuestion,
   SurveyPageSection,
   SurveyRadioQuestion,
+  SurveySliderQuestion,
+  SurveySortingQuestion,
   SurveyTextSection,
 } from '@interfaces/survey';
 import {
@@ -11,6 +14,8 @@ import {
   AccordionDetails,
   AccordionSummary,
   Button,
+  Checkbox,
+  FormControlLabel,
   FormGroup,
   TextField,
   Typography,
@@ -18,20 +23,26 @@ import {
 import {
   CheckBox,
   ExpandMore,
+  FormatListNumbered,
+  LinearScale,
+  Looks4,
   Map,
   RadioButtonChecked,
   Subject,
   TextFields,
-  Tune,
 } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { ReactNode, useMemo, useState } from 'react';
 import ConfirmDialog from '../ConfirmDialog';
+import RichTextEditor from '../RichTextEditor';
 import EditCheckBoxQuestion from './EditCheckBoxQuestion';
 import EditFreeTextQuestion from './EditFreeTextQuestion';
 import EditMapQuestion from './EditMapQuestion';
+import EditNumericQuestion from './EditNumericQuestion';
 import EditRadioQuestion from './EditRadioQuestion';
+import EditSliderQuestion from './EditSliderQuestion';
+import EditSortingQuestion from './EditSortingQuestion';
 import EditTextSection from './EditTextSection';
 
 const useStyles = makeStyles({
@@ -96,8 +107,16 @@ export default function SurveySectionAccordion(props: Props) {
       ),
     },
     numeric: {
-      icon: <Tune />,
-      form: <></>,
+      icon: <Looks4 />,
+      form: (
+        <EditNumericQuestion
+          disabled={props.disabled}
+          section={props.section as SurveyNumericQuestion}
+          onChange={(section) => {
+            props.onEdit(section);
+          }}
+        />
+      ),
     },
     map: {
       icon: <Map />,
@@ -129,6 +148,30 @@ export default function SurveySectionAccordion(props: Props) {
         <EditTextSection
           disabled={props.disabled}
           section={props.section as SurveyTextSection}
+          onChange={(section) => {
+            props.onEdit(section);
+          }}
+        />
+      ),
+    },
+    sorting: {
+      icon: <FormatListNumbered />,
+      form: (
+        <EditSortingQuestion
+          disabled={props.disabled}
+          section={props.section as SurveySortingQuestion}
+          onChange={(section) => {
+            props.onEdit(section);
+          }}
+        />
+      ),
+    },
+    slider: {
+      icon: <LinearScale />,
+      form: (
+        <EditSliderQuestion
+          disabled={props.disabled}
+          section={props.section as SurveySliderQuestion}
           onChange={(section) => {
             props.onEdit(section);
           }}
@@ -173,6 +216,34 @@ export default function SurveySectionAccordion(props: Props) {
               props.onEdit({ ...props.section, title: event.target.value });
             }}
           />
+          {accordion.form}
+          <FormGroup row>
+            <FormControlLabel
+              label={tr.SurveySections.sectionInfo}
+              control={
+                <Checkbox
+                  name="section-info"
+                  checked={props.section.showInfo ?? false}
+                  onChange={(event) =>
+                    props.onEdit({
+                      ...props.section,
+                      showInfo: event.target.checked,
+                      info: !event.target.checked ? '' : props.section.info,
+                    })
+                  }
+                />
+              }
+            />
+          </FormGroup>
+          {props.section.showInfo && (
+            <RichTextEditor
+              value={props.section.info}
+              label={tr.EditTextSection.text}
+              onChange={(value) =>
+                props.onEdit({ ...props.section, info: value })
+              }
+            />
+          )}
           <FormGroup row>
             <Button
               variant="contained"
@@ -184,7 +255,6 @@ export default function SurveySectionAccordion(props: Props) {
               {tr.EditSurveyPage.deleteSection}
             </Button>
           </FormGroup>
-          {accordion.form}
         </AccordionDetails>
       </Accordion>
       <ConfirmDialog

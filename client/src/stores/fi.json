@@ -57,7 +57,9 @@
     "numericQuestion": "Lisää numeerinen kysymys",
     "mapQuestion": "Lisää karttakysymys",
     "textSection": "Lisää tekstiosio",
-    "freeTextQuestion": "Lisää vapaatekstikysymys"
+    "freeTextQuestion": "Lisää vapaatekstikysymys",
+    "sortingQuestion": "Lisää järjestyskysymys",
+    "sliderQuestion": "Lisää liukukytkinkysymys"
   },
   "SurveySections": {
     "limitAnswers": "Rajoita vastauslukumäärää",
@@ -66,7 +68,9 @@
     "options": "Vastausvaihtoehdot",
     "addOption": "Lisää vaihtoehto",
     "allowCustomAnswer": "Salli “Jokin muu, mikä?” -vaihtoehto",
-    "isRequired": "Vastaus pakollinen"
+    "isRequired": "Vastaus pakollinen",
+    "answerMaxLength": "Maksimi merkkimäärä",
+    "sectionInfo": "Anna lisätietoja kysymykseen liittyen"
   },
   "SurveyImageList": {
     "attributions": "Tekijänoikeustiedot",
@@ -86,6 +90,16 @@
     "line": "Viiva",
     "area": "Alue",
     "subQuestions": "Alikysymykset"
+  },
+  "EditSliderQuestion": {
+    "presentationType": "Esitystapa",
+    "literal": "Sanallinen",
+    "numeric": "Numeerinen",
+    "minValue": "Minimiarvo",
+    "maxValue": "Maksimiarvo",
+    "defaultMinLabel": "Täysin eri mieltä",
+    "defaultMaxLabel": "Täysin samaa mieltä",
+    "literalHelperText": "Sanallisen liukukytkinkysymyksen vastaus tallennetaan tietokantaan arvovälillä 0 - 10."
   },
   "EditSurveyThanksPage": {
     "title": "Kiitos-sivun otsikko",
@@ -150,7 +164,8 @@
     "answerLimitsMin": "Valitse vähintään {min} vaihtoehtoa",
     "answerLimitsMax": "Valitse enintään {max} vaihtoehtoa",
     "customAnswer": "Jokin muu, mikä?",
-    "charactersRemaining": "{x} merkki(ä) jäljellä"
+    "charactersRemaining": "{x} merkki(ä) jäljellä",
+    "showInfo": "Näytä lisätietoja"
   },
   "MapQuestion": {
     "selectionTypes": {
@@ -164,6 +179,9 @@
       "area": "Aloita piirtäminen klikkaamalla aloituskohtaa. Jatka piirtämistä klikkaamalla kartalla uudestaan, lopeta piirtäminen klikkaamalla viimeistä pistettä uudestaan."
     },
     "clearAnswers": "Poista kaikki karttavastaukset"
+  },
+  "SortingQuestion": {
+    "empty": "Tyhjä"
   },
   "AppBarUserMenu": {
     "logout": "Kirjaudu ulos"
@@ -183,7 +201,8 @@
     "save": "Tallenna",
     "discard": "Peruuta muutokset",
     "edit": "Muokkaa",
-    "copy": "Kopioi"
+    "copy": "Kopioi",
+    "close": "Sulje"
   },
   "options": {
     "yes": "Kyllä",
