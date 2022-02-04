@@ -31,8 +31,9 @@ router.post(
     const { buffer, originalname } = req.file;
     const { attributions } = req.body;
 
-    const fileName = originalname?.split('.')[0] ?? '';
-    const id = await storeImage(buffer, fileName, attributions);
+    const fileName = originalname?.split('.')[0] ?? null;
+    const fileFormat = originalname?.split('.')[1] ?? null;
+    const id = await storeImage(buffer, fileName, attributions, fileFormat);
     res.status(200).json({ id: id });
   })
 );

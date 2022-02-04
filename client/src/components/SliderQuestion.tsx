@@ -76,7 +76,7 @@ export default function SliderQuestion({
         step={1}
         marks
         onClick={() => {
-          if (!value) {
+          if (value == null) {
             onChange(visibleEmptyValue);
           }
         }}

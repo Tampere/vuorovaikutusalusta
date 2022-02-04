@@ -347,4 +347,12 @@ export interface SurveyBackgroundImage {
    * Image attributions (= who owns the image rights)
    */
   attributions: string;
+  /**
+   * Image file name
+   */
+  fileName: string;
+  /**
+   * Image file format (e.g. .png, .jpeg)
+   */
+  fileFormat: string;
 }

@@ -1042,14 +1042,15 @@ export async function unpublishSurvey(surveyId: number) {
 export async function storeImage(
   imageBuffer: Buffer,
   fileName: string,
-  attributions: string
+  attributions: string,
+  fileFormat: string
 ) {
   const imageString = `\\x${imageBuffer.toString('hex')}`;
   const row = await getDb().oneOrNone(
     `
-    INSERT INTO data.images (image, attributions, image_name) values ($1, $2, $3) RETURNING id;
+    INSERT INTO data.images (image, attributions, image_name, file_format) values ($1, $2, $3, $4) RETURNING id;
     `,
-    [imageString, attributions, fileName]
+    [imageString, attributions, fileName, fileFormat]
   );
 
   if (!row) {
@@ -1088,13 +1089,15 @@ export async function getImage(id: number) {
  */
 export async function getImages() {
   const rows = await getDb().manyOrNone(`
-    SELECT id, attributions, image FROM data.images;
-  `); // TODO order by
+    SELECT id, attributions, image, image_name, file_format FROM data.images ORDER BY created_at DESC;
+  `);
 
   return rows.map((row) => ({
     id: row.id,
     data: row.image.toString('base64'),
     attributions: row.attributions,
+    fileName: row.image_name,
+    fileFormat: row.file_format,
   })) as SurveyBackgroundImage[];
 }
 
