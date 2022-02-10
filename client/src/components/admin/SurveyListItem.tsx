@@ -3,7 +3,6 @@ import { Survey } from '@interfaces/survey';
 import { Button, Card, Link, Theme, Typography } from '@material-ui/core';
 import { CardContent } from '@material-ui/core';
 import { CardActions } from '@material-ui/core';
-import { NavLink, useRouteMatch } from 'react-router-dom';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { format } from 'date-fns';
 import CopyToClipboard from '../CopyToClipboard';
@@ -47,7 +46,6 @@ export default function SurveyListItem(props: Props) {
   const [loading, setLoading] = useState(false);
 
   const classes = useStyles();
-  const { url } = useRouteMatch();
   const { tr } = useTranslations();
   const { showToast } = useToasts();
 
@@ -110,7 +108,7 @@ export default function SurveyListItem(props: Props) {
           </Typography>
         </CardContent>
         <CardActions>
-          <Button component={NavLink} to={`${url}kyselyt/${survey.id}`}>
+          <Button onClick={() => window.open(`/admin/kyselyt/${survey.id}`)}>
             {tr.SurveyList.editSurvey}
           </Button>
           {/* Allow publish only if it isn't yet published and has a name */}
