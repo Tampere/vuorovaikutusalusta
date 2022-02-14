@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import {
   Divider,
   List,
@@ -16,13 +15,15 @@ import {
   InsertDriveFileOutlined,
   Preview,
 } from '@material-ui/icons';
+import { makeStyles } from '@material-ui/styles';
 import { useSurvey } from '@src/stores/SurveyContext';
+import { useToasts } from '@src/stores/ToastContext';
+import { useTranslations } from '@src/stores/TranslationContext';
+import React, { useState } from 'react';
+import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { useHistory, useRouteMatch } from 'react-router-dom';
 import ListItemLink from '../ListItemLink';
 import SideBar from '../SideBar';
-import { makeStyles } from '@material-ui/styles';
-import { useTranslations } from '@src/stores/TranslationContext';
-import { useToasts } from '@src/stores/ToastContext';
 
 const useStyles = makeStyles((theme: Theme) => ({
   '@keyframes pulse': {
@@ -63,6 +64,7 @@ export default function EditSurveySideBar(props: Props) {
     createPage,
     newPageLoading,
     activeSurveyLoading,
+    movePage,
   } = useSurvey();
   const { tr } = useTranslations();
   const { showToast } = useToasts();
@@ -89,17 +91,49 @@ export default function EditSurveySideBar(props: Props) {
       </List>
       <Divider />
       <List>
-        {activeSurvey.pages.map((page) => (
-          <ListItemLink key={page.id} to={`${url}/sivut/${page.id}`}>
-            <ListItemIcon>
-              <InsertDriveFileOutlined />
-            </ListItemIcon>
-            <ListItemText
-              primary={page.title || <em>{tr.EditSurvey.untitledPage}</em>}
-            />
-            <DragIndicator />
-          </ListItemLink>
-        ))}
+        <DragDropContext
+          onDragEnd={(event) => {
+            if (!event.destination) {
+              return;
+            }
+            movePage(Number(event.draggableId), event.destination.index);
+          }}
+        >
+          <Droppable droppableId="pages">
+            {(provided) => (
+              <div {...provided.droppableProps} ref={provided.innerRef}>
+                {activeSurvey.pages.map((page, index) => (
+                  <Draggable
+                    key={page.id}
+                    draggableId={String(page.id)}
+                    index={index}
+                  >
+                    {(provided) => (
+                      <div ref={provided.innerRef} {...provided.draggableProps}>
+                        <ListItemLink to={`${url}/sivut/${page.id}`}>
+                          <ListItemIcon>
+                            <InsertDriveFileOutlined />
+                          </ListItemIcon>
+                          <ListItemText
+                            primary={
+                              page.title || (
+                                <em>{tr.EditSurvey.untitledPage}</em>
+                              )
+                            }
+                          />
+                          <div {...provided.dragHandleProps}>
+                            <DragIndicator />
+                          </div>
+                        </ListItemLink>
+                      </div>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        </DragDropContext>
         <ListItem
           button
           className={`${

@@ -47,6 +47,10 @@ type Action =
       survey: Survey;
     }
   | {
+      type: 'SET_PAGES';
+      pages: SurveyPage[];
+    }
+  | {
       type: 'ADD_PAGE';
       page: SurveyPage;
     }
@@ -63,6 +67,11 @@ type Action =
   | {
       type: 'DELETE_PAGE';
       pageId: number;
+    }
+  | {
+      type: 'SET_SECTIONS';
+      pageId: number;
+      sections: SurveyPageSection[];
     }
   | {
       type: 'ADD_SECTION';
@@ -272,6 +281,25 @@ export function useSurvey() {
       }
     },
     /**
+     * Move a page into a new index.
+     * @param pageId
+     * @param index
+     */
+    movePage(pageId: number, index: number) {
+      const page = state.activeSurvey.pages.find((page) => page.id === pageId);
+      const otherPages = state.activeSurvey.pages.filter(
+        (page) => page.id !== pageId
+      );
+      dispatch({
+        type: 'SET_PAGES',
+        pages: [
+          ...otherPages.slice(0, index),
+          page,
+          ...otherPages.slice(index),
+        ],
+      });
+    },
+    /**
      * Adds a new section for a page.
      * @param pageId Page ID
      * @param section Section contents
@@ -299,6 +327,28 @@ export function useSurvey() {
      */
     deleteSection(pageId: number, sectionIndex: number) {
       dispatch({ type: 'DELETE_SECTION', pageId, sectionIndex });
+    },
+    /**
+     * Move a section into a new index.
+     * @param pageId
+     * @param oldIndex
+     * @param newIndex
+     */
+    moveSection(pageId: number, oldIndex: number, newIndex: number) {
+      const page = state.activeSurvey.pages.find((page) => page.id === pageId);
+      const section = page.sections[oldIndex];
+      const otherSections = page.sections.filter(
+        (_, index) => index !== oldIndex
+      );
+      dispatch({
+        type: 'SET_SECTIONS',
+        pageId,
+        sections: [
+          ...otherSections.slice(0, newIndex),
+          section,
+          ...otherSections.slice(newIndex),
+        ],
+      });
     },
     /**
      * Saves changes to the active survey
@@ -405,6 +455,14 @@ function reducer(state: State, action: Action): State {
           pages: state.activeSurvey.pages,
         },
       };
+    case 'SET_PAGES':
+      return {
+        ...state,
+        activeSurvey: {
+          ...state.activeSurvey,
+          pages: action.pages,
+        },
+      };
     case 'EDIT_PAGE':
       return {
         ...state,
@@ -429,6 +487,18 @@ function reducer(state: State, action: Action): State {
           ...state.originalActiveSurvey,
           pages: state.originalActiveSurvey.pages.filter(
             (page) => action.pageId !== page.id
+          ),
+        },
+      };
+    case 'SET_SECTIONS':
+      return {
+        ...state,
+        activeSurvey: {
+          ...state.activeSurvey,
+          pages: state.activeSurvey.pages.map((page) =>
+            action.pageId === page.id
+              ? { ...page, sections: action.sections }
+              : page
           ),
         },
       };

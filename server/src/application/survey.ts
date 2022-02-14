@@ -16,7 +16,6 @@ import {
   getDb,
   getGeoJSONColumn,
   getMultiInsertQuery,
-  getMultiUpdateQuery,
 } from '@src/database';
 import {
   BadRequestError,
@@ -503,16 +502,16 @@ export async function updateSurvey(survey: Survey) {
   }
 
   if (survey.pages.length) {
-    // Update pages belonging to the survey
-    // Form a query for updating multiple rows
-    const query =
-      getMultiUpdateQuery(
-        surveyPagesToRows(survey.pages, survey.id),
-        surveyPageColumnSet
-      ) +
-      // PgPromise uses 'v' and 't' aliases for the helper query
-      ' WHERE t.id = v.id';
-
+    // Clear old pages
+    await getDb().none(`DELETE FROM data.survey_page WHERE survey_id = $1;`, [
+      survey.id,
+    ]);
+    // Re-insert pages belonging to the survey
+    // Form a query for inserting multiple rows
+    const query = getMultiInsertQuery(
+      surveyPagesToRows(survey.pages, survey.id),
+      surveyPageColumnSet
+    );
     await getDb().none(query);
   }
 
@@ -954,7 +953,7 @@ function surveySectionsToRows(
   pageId: number,
   parentSectionId?: number
 ) {
-  return surveySections.map((surveySection, index) => {
+  return surveySections.filter(Boolean).map((surveySection, index) => {
     const {
       id,
       type,

@@ -13,7 +13,7 @@ import {
 } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useState } from 'react';
 
 const useStyles = makeStyles({
   actionItem: {
@@ -32,6 +32,8 @@ interface Props {
 export default function AddSurveySectionActions(props: Props) {
   const classes = useStyles();
   const { tr } = useTranslations();
+  // Sequence for making each section ID unique before they're added to database
+  const [sectionSequence, setSectionSequence] = useState(-1);
 
   const defaultSections: {
     [type in SurveyPageSection['type']]: SurveyPageSection;
@@ -114,8 +116,11 @@ export default function AddSurveySectionActions(props: Props) {
 
   function handleAdd(type: SurveyPageSection['type']) {
     return () => {
+      const id = sectionSequence;
+      setSectionSequence(sectionSequence - 1);
       props.onAdd({
         ...defaultSections[type],
+        id,
       });
     };
   }

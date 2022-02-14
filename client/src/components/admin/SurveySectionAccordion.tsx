@@ -23,6 +23,7 @@ import {
 } from '@material-ui/core';
 import {
   CheckBox,
+  DragIndicator,
   ExpandMore,
   FormatListNumbered,
   LinearScale,
@@ -36,6 +37,7 @@ import {
 import { makeStyles } from '@material-ui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { ReactNode, useMemo, useState } from 'react';
+import { DraggableProvided } from 'react-beautiful-dnd';
 import ConfirmDialog from '../ConfirmDialog';
 import RichTextEditor from '../RichTextEditor';
 import EditCheckBoxQuestion from './EditCheckBoxQuestion';
@@ -54,6 +56,7 @@ const useStyles = makeStyles({
   },
   sectionTitle: {
     marginLeft: '0.5rem',
+    flexGrow: 1,
   },
   content: {
     display: 'flex',
@@ -74,6 +77,7 @@ interface Props {
   name: string;
   onEdit: (section: SurveyPageSection) => void;
   onDelete: () => void;
+  provided: DraggableProvided;
 }
 
 export default function SurveySectionAccordion(props: Props) {
@@ -200,6 +204,8 @@ export default function SurveySectionAccordion(props: Props) {
   return (
     <>
       <Accordion
+        {...props.provided.draggableProps}
+        ref={props.provided.innerRef}
         expanded={props.expanded}
         onChange={(_, isExpanded) => {
           props.onExpandedChange(isExpanded);
@@ -217,6 +223,9 @@ export default function SurveySectionAccordion(props: Props) {
               <em>{tr.EditSurveyPage.untitledSection}</em>
             )}
           </Typography>
+          <div {...props.provided.dragHandleProps} style={{ display: 'flex' }}>
+            <DragIndicator />
+          </div>
         </AccordionSummary>
         <AccordionDetails className={classes.content}>
           <TextField
