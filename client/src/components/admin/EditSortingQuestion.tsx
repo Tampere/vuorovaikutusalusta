@@ -45,6 +45,7 @@ export default function EditSortingQuestion({
             options,
           });
         }}
+        title={tr.SurveySections.options}
       />
     </>
   );

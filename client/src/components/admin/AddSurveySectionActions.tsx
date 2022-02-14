@@ -8,7 +8,8 @@ import {
   Map,
   RadioButtonChecked,
   Subject,
-  TextFields
+  TextFields,
+  ViewComfy,
 } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
@@ -100,6 +101,15 @@ export default function AddSurveySectionActions(props: Props) {
         fi: tr.EditSliderQuestion.defaultMaxLabel,
       },
     },
+    matrix: {
+      type: 'matrix',
+      isRequired: false,
+      title: '',
+      info: null,
+      classes: [],
+      subjects: [],
+      allowEmptyAnswer: false,
+    },
   };
 
   function handleAdd(type: SurveyPageSection['type']) {
@@ -116,55 +126,61 @@ export default function AddSurveySectionActions(props: Props) {
     ariaLabel: string;
     icon: ReactNode;
   }[] = [
-      {
-        type: 'text',
-        label: tr.AddSurveySectionActions.textSection,
-        ariaLabel: 'add-text-section',
-        icon: <Subject />,
-      },
-      {
-        type: 'radio',
-        label: tr.AddSurveySectionActions.radioQuestion,
-        ariaLabel: 'add-radio-question',
-        icon: <RadioButtonChecked />,
-      },
-      {
-        type: 'checkbox',
-        label: tr.AddSurveySectionActions.checkBoxQuestion,
-        ariaLabel: 'add-checkbox-question',
-        icon: <CheckBox />,
-      },
-      {
-        type: 'free-text',
-        label: tr.AddSurveySectionActions.freeTextQuestion,
-        ariaLabel: 'add-free-text-question',
-        icon: <TextFields />,
-      },
-      {
-        type: 'numeric',
-        label: tr.AddSurveySectionActions.numericQuestion,
-        ariaLabel: 'add-numeric-question',
-        icon: <Looks4 />,
-      },
-      {
-        type: 'map',
-        label: tr.AddSurveySectionActions.mapQuestion,
-        ariaLabel: 'add-map-question',
-        icon: <Map />,
-      },
-      {
-        type: 'sorting',
-        label: tr.AddSurveySectionActions.sortingQuestion,
-        ariaLabel: 'add-sorting-question',
-        icon: <FormatListNumbered />,
-      },
-      {
-        type: 'slider',
-        label: tr.AddSurveySectionActions.sliderQuestion,
-        ariaLabel: 'add-slider-question',
-        icon: <LinearScale />,
-      },
-    ];
+    {
+      type: 'text',
+      label: tr.AddSurveySectionActions.textSection,
+      ariaLabel: 'add-text-section',
+      icon: <Subject />,
+    },
+    {
+      type: 'radio',
+      label: tr.AddSurveySectionActions.radioQuestion,
+      ariaLabel: 'add-radio-question',
+      icon: <RadioButtonChecked />,
+    },
+    {
+      type: 'checkbox',
+      label: tr.AddSurveySectionActions.checkBoxQuestion,
+      ariaLabel: 'add-checkbox-question',
+      icon: <CheckBox />,
+    },
+    {
+      type: 'free-text',
+      label: tr.AddSurveySectionActions.freeTextQuestion,
+      ariaLabel: 'add-free-text-question',
+      icon: <TextFields />,
+    },
+    {
+      type: 'numeric',
+      label: tr.AddSurveySectionActions.numericQuestion,
+      ariaLabel: 'add-numeric-question',
+      icon: <Looks4 />,
+    },
+    {
+      type: 'map',
+      label: tr.AddSurveySectionActions.mapQuestion,
+      ariaLabel: 'add-map-question',
+      icon: <Map />,
+    },
+    {
+      type: 'sorting',
+      label: tr.AddSurveySectionActions.sortingQuestion,
+      ariaLabel: 'add-sorting-question',
+      icon: <FormatListNumbered />,
+    },
+    {
+      type: 'slider',
+      label: tr.AddSurveySectionActions.sliderQuestion,
+      ariaLabel: 'add-slider-question',
+      icon: <LinearScale />,
+    },
+    {
+      type: 'matrix',
+      label: tr.AddSurveySectionActions.matrixQuestion,
+      ariaLabel: 'add-matrix-question',
+      icon: <ViewComfy />,
+    },
+  ];
 
   return (
     <Grid container spacing={3}>

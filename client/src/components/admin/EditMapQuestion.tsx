@@ -120,6 +120,7 @@ export default function EditMapQuestion({
           'numeric',
           'sorting',
           'slider',
+          'matrix',
         ]}
         onAdd={(newSection: SurveyMapSubQuestion) => {
           onChange({

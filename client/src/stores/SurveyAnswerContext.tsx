@@ -3,14 +3,14 @@ import {
   Survey,
   SurveyPage,
   SurveyPageSection,
-  SurveyQuestion
+  SurveyQuestion,
 } from '@interfaces/survey';
 import React, {
   createContext,
   ReactNode,
   useContext,
   useMemo,
-  useReducer
+  useReducer,
 } from 'react';
 
 interface State {
@@ -20,17 +20,17 @@ interface State {
 
 type Action =
   | {
-    type: 'SET_SURVEY';
-    survey: Survey;
-  }
+      type: 'SET_SURVEY';
+      survey: Survey;
+    }
   | {
-    type: 'UPDATE_ANSWER';
-    answer: AnswerEntry;
-  }
+      type: 'UPDATE_ANSWER';
+      answer: AnswerEntry;
+    }
   | {
-    type: 'SET_ANSWERS';
-    answers: AnswerEntry[];
-  };
+      type: 'SET_ANSWERS';
+      answers: AnswerEntry[];
+    };
 
 type Context = [State, React.Dispatch<Action>];
 
@@ -91,6 +91,12 @@ export function getEmptyAnswer(section: SurveyPageSection): AnswerEntry {
         type: section.type,
         value: null,
       };
+    case 'matrix':
+      return {
+        sectionId: section.id,
+        type: section.type,
+        value: [],
+      };
     default:
       throw new Error(
         `No default value defined for questions of type "${section.type}"`
@@ -138,6 +144,12 @@ export function useSurveyAnswers() {
     }
 
     if (question.isRequired) {
+      // Matrix is considered incomplete, if the answer array doesn't contain as many elements as there are rows in the matrix
+      if (question.type === 'matrix') {
+        if ((answer.value as string[]).length !== question.subjects?.length) {
+          errors.push('required');
+        }
+      }
       // Sorting is considered incomplete, if the array contains any nullish values
       if (question.type === 'sorting') {
         if (

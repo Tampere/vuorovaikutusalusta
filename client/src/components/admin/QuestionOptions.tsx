@@ -31,12 +31,14 @@ interface Props {
   options: SectionOption[];
   disabled?: boolean;
   onChange: (options: SectionOption[]) => void;
+  title: string;
 }
 
 export default function QuestionOptions({
   options,
   disabled,
   onChange,
+  title,
 }: Props) {
   const classes = useStyles();
   const { tr } = useTranslations();
@@ -58,7 +60,7 @@ export default function QuestionOptions({
 
   return (
     <div className={classes.wrapper}>
-      <Typography>{tr.SurveySections.options}</Typography>
+      <Typography>{title}</Typography>
       <div>
         {options.map((option, index) => (
           <div className={`${classes.row} ${classes.option}`} key={index}>
