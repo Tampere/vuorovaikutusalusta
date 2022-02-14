@@ -15,7 +15,8 @@ export type SurveyQuestion =
   | SurveyFreeTextQuestion
   | SurveyMapQuestion
   | SurveySortingQuestion
-  | SurveySliderQuestion;
+  | SurveySliderQuestion
+  | SurveyMatrixQuestion;
 
 /**
  * Subquestion type for map questions.
@@ -133,6 +134,16 @@ export interface SurveySliderQuestion extends CommonSurveyPageQuestion {
   maxValue: number;
   minLabel: LocalizedText;
   maxLabel: LocalizedText;
+}
+
+/**
+ * Matrix question
+ */
+export interface SurveyMatrixQuestion extends CommonSurveyPageQuestion {
+  type: 'matrix';
+  classes: LocalizedText[];
+  subjects: LocalizedText[];
+  allowEmptyAnswer: boolean;
 }
 
 /**
@@ -314,6 +325,10 @@ export type AnswerEntry = {
   | {
       type: 'slider';
       value: number;
+    }
+  | {
+      type: 'matrix';
+      value: string[];
     }
 );
 

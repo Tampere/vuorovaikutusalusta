@@ -59,18 +59,21 @@
     "textSection": "Lisää tekstiosio",
     "freeTextQuestion": "Lisää vapaatekstikysymys",
     "sortingQuestion": "Lisää järjestyskysymys",
-    "sliderQuestion": "Lisää liukukytkinkysymys"
+    "sliderQuestion": "Lisää liukukytkinkysymys",
+    "matrixQuestion": "Lisää likert -kysymys"
   },
   "SurveySections": {
     "limitAnswers": "Rajoita vastauslukumäärää",
     "minAnswers": "Vastauksia vähintään",
     "maxAnswers": "Vastauksia enintään",
-    "options": "Vastausvaihtoehdot",
+    "classes": "Vastausluokat",
+    "subjects": "Vastausaiheet",
     "addOption": "Lisää vaihtoehto",
     "allowCustomAnswer": "Salli “Jokin muu, mikä?” -vaihtoehto",
     "isRequired": "Vastaus pakollinen",
     "answerMaxLength": "Maksimi merkkimäärä",
-    "sectionInfo": "Anna lisätietoja kysymykseen liittyen"
+    "sectionInfo": "Anna lisätietoja kysymykseen liittyen",
+    "allowEmptyAnswer": "Salli “En osaa sanoa” -vaihtoehto"
   },
   "SurveyImageList": {
     "attributions": "Tekijänoikeustiedot",
@@ -179,6 +182,9 @@
       "area": "Aloita piirtäminen klikkaamalla aloituskohtaa. Jatka piirtämistä klikkaamalla kartalla uudestaan, lopeta piirtäminen klikkaamalla viimeistä pistettä uudestaan."
     },
     "clearAnswers": "Poista kaikki karttavastaukset"
+  },
+  "MatrixQuestion": {
+    "emptyAnswer": "En osaa sanoa"
   },
   "SortingQuestion": {
     "empty": "Tyhjä"

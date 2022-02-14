@@ -6,6 +6,7 @@ import React, { useMemo, useState } from 'react';
 import CheckBoxQuestion from './CheckBoxQuestion';
 import FreeTextQuestion from './FreeTextQuestion';
 import MapQuestion from './MapQuestion';
+import MatrixQuestion from './MatrixQuestion';
 import NumericQuestion from './NumericQuestion';
 import RadioQuestion from './RadioQuestion';
 import SectionInfo from './SectionInfo';
@@ -137,6 +138,20 @@ export default function SurveyQuestion({ question }: Props) {
         {question.type === 'slider' && (
           <SliderQuestion
             value={value as number}
+            onChange={(value) => {
+              updateAnswer({
+                sectionId: question.id,
+                type: question.type,
+                value,
+              });
+            }}
+            question={question}
+            setDirty={setDirty}
+          />
+        )}
+        {question.type === 'matrix' && (
+          <MatrixQuestion
+            value={value as string[]}
             onChange={(value) => {
               updateAnswer({
                 sectionId: question.id,

@@ -237,6 +237,10 @@ interface DBAnswerEntry {
    * Geometry answer value
    */
   value_geometry: GeoJSON.Geometry;
+  /**
+   * JSON answer value
+   */
+  value_json: string;
 }
 
 /**
@@ -276,6 +280,10 @@ const submissionEntryColumnSet = (inputSRID: number) =>
     'value_option_id',
     getGeoJSONColumn('value_geometry', inputSRID),
     'value_numeric',
+    {
+      name: 'value_json',
+      cast: 'json',
+    },
   ]);
 
 /**
@@ -798,6 +806,7 @@ function answerEntriesToRows(
             value_option_id: null,
             value_geometry: null,
             value_numeric: null,
+            value_json: null,
           },
         ];
         break;
@@ -811,6 +820,7 @@ function answerEntriesToRows(
               typeof entry.value === 'number' ? entry.value : null,
             value_geometry: null,
             value_numeric: null,
+            value_json: null,
           },
         ];
         break;
@@ -824,6 +834,7 @@ function answerEntriesToRows(
               value_option_id: typeof value === 'number' ? value : null,
               value_geometry: null,
               value_numeric: null,
+              value_json: null,
             };
           }),
         ];
@@ -837,6 +848,7 @@ function answerEntriesToRows(
             value_option_id: null,
             value_geometry: null,
             value_numeric: entry.value,
+            value_json: null,
           },
         ];
         break;
@@ -849,6 +861,7 @@ function answerEntriesToRows(
             value_option_id: null,
             value_geometry: currentValue.geometry?.geometry,
             value_numeric: null,
+            value_json: null,
           } as DBAnswerEntry;
 
           // Map over different subquestion answers using the same function recursively
@@ -869,6 +882,7 @@ function answerEntriesToRows(
             value_option_id: null,
             value_geometry: null,
             value_numeric: null,
+            value_json: null,
           },
         ];
         break;
@@ -881,6 +895,20 @@ function answerEntriesToRows(
             value_option_id: null,
             value_geometry: null,
             value_numeric: entry.value,
+            value_json: null,
+          },
+        ];
+        break;
+      case 'matrix':
+        newEntries = [
+          {
+            submission_id: submissionID,
+            section_id: entry.sectionId,
+            value_text: null,
+            value_option_id: null,
+            value_geometry: null,
+            value_numeric: null,
+            value_json: JSON.stringify(entry.value),
           },
         ];
         break;

@@ -1,6 +1,6 @@
 import {
   SurveyMapSubQuestion,
-  SurveyMapSubQuestionAnswer
+  SurveyMapSubQuestionAnswer,
 } from '@interfaces/survey';
 import {
   Button,
@@ -9,17 +9,18 @@ import {
   DialogContent,
   FormControl,
   FormHelperText,
-  FormLabel
+  FormLabel,
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
 import {
   getEmptyAnswer,
-  useSurveyAnswers
+  useSurveyAnswers,
 } from '@src/stores/SurveyAnswerContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useEffect, useMemo, useState } from 'react';
 import CheckBoxQuestion from './CheckBoxQuestion';
 import FreeTextQuestion from './FreeTextQuestion';
+import MatrixQuestion from './MatrixQuestion';
 import NumericQuestion from './NumericQuestion';
 import RadioQuestion from './RadioQuestion';
 import SliderQuestion from './SliderQuestion';
@@ -160,6 +161,19 @@ export default function MapSubQuestionDialog({
             ) : question.type === 'slider' ? (
               <SliderQuestion
                 value={answers[index]?.value as number}
+                onChange={(value) => {
+                  answers[index].value = value;
+                  setAnswers([...answers]);
+                }}
+                question={question}
+                setDirty={(value) => {
+                  dirty[index] = value;
+                  setDirty([...dirty]);
+                }}
+              />
+            ) : question.type === 'matrix' ? (
+              <MatrixQuestion
+                value={answers[index]?.value as string[]}
                 onChange={(value) => {
                   answers[index].value = value;
                   setAnswers([...answers]);

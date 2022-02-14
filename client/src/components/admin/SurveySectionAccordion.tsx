@@ -2,6 +2,7 @@ import {
   SurveyCheckboxQuestion,
   SurveyFreeTextQuestion,
   SurveyMapQuestion,
+  SurveyMatrixQuestion,
   SurveyNumericQuestion,
   SurveyPageSection,
   SurveyRadioQuestion,
@@ -30,6 +31,7 @@ import {
   RadioButtonChecked,
   Subject,
   TextFields,
+  ViewComfy,
 } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
@@ -44,6 +46,7 @@ import EditRadioQuestion from './EditRadioQuestion';
 import EditSliderQuestion from './EditSliderQuestion';
 import EditSortingQuestion from './EditSortingQuestion';
 import EditTextSection from './EditTextSection';
+import EditMatrixQuestion from './EditMatrixQuestion';
 
 const useStyles = makeStyles({
   accordion: {
@@ -175,6 +178,16 @@ export default function SurveySectionAccordion(props: Props) {
           onChange={(section) => {
             props.onEdit(section);
           }}
+        />
+      ),
+    },
+    matrix: {
+      icon: <ViewComfy />,
+      form: (
+        <EditMatrixQuestion
+          disabled={props.disabled}
+          section={props.section as SurveyMatrixQuestion}
+          onChange={(section) => props.onEdit(section)}
         />
       ),
     },

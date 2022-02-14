@@ -157,6 +157,7 @@ export default function EditCheckBoxQuestion({
             options,
           });
         }}
+        title={tr.SurveySections.options}
       />
       <FormGroup row>
         <FormControlLabel
