@@ -3,7 +3,7 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  Fab,
+  IconButton,
   Tooltip,
 } from '@material-ui/core';
 import React, { useState } from 'react';
@@ -14,7 +14,7 @@ import { useTranslations } from '@src/stores/TranslationContext';
 
 interface Props {
   infoText: string;
-  style: React.CSSProperties;
+  style?: React.CSSProperties;
 }
 
 export default function SectionInfo({ infoText, style }: Props) {
@@ -24,26 +24,22 @@ export default function SectionInfo({ infoText, style }: Props) {
   return (
     <div style={style ?? {}}>
       <Tooltip title={tr.SurveyQuestion.showInfo}>
-        <Fab
-          aria-label={'info'}
-          size="small"
-          onClick={() => setInfoDialogOpen(true)}
-        >
-          <HelpIcon color="primary" fontSize="large" />
-        </Fab>
+        <IconButton aria-label={'info'} onClick={() => setInfoDialogOpen(true)}>
+          <HelpIcon color="primary" fontSize="medium" />
+        </IconButton>
       </Tooltip>
       <Dialog onClose={() => setInfoDialogOpen(false)} open={infoDialogOpen}>
-        <DialogContent>
+        <DialogContent tabIndex={0}>
           <ReactMarkdown rehypePlugins={[rehypeExternalLinks]}>
             {infoText}
           </ReactMarkdown>
         </DialogContent>
         <DialogActions>
           <Button
+            tabIndex={1}
             color="primary"
             variant="contained"
             onClick={() => setInfoDialogOpen(false)}
-            autoFocus
           >
             {tr.commands.close}
           </Button>

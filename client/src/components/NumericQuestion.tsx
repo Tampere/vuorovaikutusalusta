@@ -11,7 +11,7 @@ export default function NumericQuestion({ value, onChange, setDirty }: Props) {
   return (
     <>
       <TextField
-        value={value ?? 0}
+        value={value ?? ''}
         type="number"
         onChange={(event) => {
           setDirty(true);

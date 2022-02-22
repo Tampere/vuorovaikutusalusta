@@ -166,37 +166,50 @@ export default function MapQuestion({ value, onChange, question }: Props) {
 
   return (
     <>
-      <ToggleButtonGroup
-        value={selectionType}
-        exclusive
-        onChange={(_, newValue) => {
-          setSelectionType(newValue);
-        }}
-        aria-label="map-selection-type"
-      >
-        {question.selectionTypes.includes('point') && getToggleButton('point')}
-        {question.selectionTypes.includes('line') && getToggleButton('line')}
-        {question.selectionTypes.includes('area') && getToggleButton('area')}
-      </ToggleButtonGroup>
-      {selectionType !== null && (
-        <FormHelperText>
-          {tr.MapQuestion.selectionHelperText[selectionType]}
-        </FormHelperText>
-      )}
-      {value?.length > 0 && (
-        <div>
-          <Button
-            style={{ marginTop: '2rem' }}
-            variant="outlined"
-            color="primary"
-            onClick={() => {
-              onChange([]);
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+          }}
+        >
+          <ToggleButtonGroup
+            value={selectionType}
+            exclusive
+            onChange={(_, newValue) => {
+              setSelectionType(newValue);
             }}
+            aria-label="map-selection-type"
           >
-            {tr.MapQuestion.clearAnswers}
-          </Button>
+            {question.selectionTypes.includes('point') &&
+              getToggleButton('point')}
+            {question.selectionTypes.includes('line') &&
+              getToggleButton('line')}
+            {question.selectionTypes.includes('area') &&
+              getToggleButton('area')}
+          </ToggleButtonGroup>
+          {selectionType !== null && (
+            <FormHelperText>
+              {tr.MapQuestion.selectionHelperText[selectionType]}
+            </FormHelperText>
+          )}
         </div>
-      )}
+        {value?.length > 0 && (
+          <div>
+            <Button
+              style={{ marginTop: '2rem' }}
+              variant="outlined"
+              color="primary"
+              onClick={() => {
+                onChange([]);
+              }}
+            >
+              {tr.MapQuestion.clearAnswers}
+            </Button>
+          </div>
+        )}
+      </div>
       <MapSubQuestionDialog
         open={subQuestionDialogOpen}
         subQuestions={question.subQuestions}

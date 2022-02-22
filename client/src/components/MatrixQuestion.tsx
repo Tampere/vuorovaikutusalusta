@@ -17,18 +17,15 @@ interface Props {
 }
 
 const useStyles = makeStyles({
-  matrixContainer: {
-    backgroundColor: 'lightgrey',
-  },
   matrixRow: {
     display: 'flex',
     flexDirection: 'row',
-    justifyContent: 'space-evenly',
   },
   matrixCell: {
     width: '100px',
     wordWrap: 'break-word',
     margin: '0',
+    marginLeft: '0.5rem',
     textAlign: 'center',
   },
   matrixText: {
@@ -47,7 +44,7 @@ export default function MatrixQuestion({
   const classes = useStyles();
 
   return (
-    <div className={classes.matrixContainer}>
+    <div>
       <div className={classes.matrixRow}>
         <div className={classes.matrixCell}></div>
         {question.classes.map((entry: LocalizedText, index: number) => {

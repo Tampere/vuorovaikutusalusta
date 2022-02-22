@@ -69,7 +69,6 @@
     "classes": "Vastausluokat",
     "options": "Vastausvaihtoehdot",
     "subjects": "Vastausaiheet",
-    "addOption": "Lisää vaihtoehto",
     "allowCustomAnswer": "Salli “Jokin muu, mikä?” -vaihtoehto",
     "isRequired": "Vastaus pakollinen",
     "answerMaxLength": "Maksimi merkkimäärä",

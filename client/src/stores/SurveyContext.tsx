@@ -409,9 +409,7 @@ function reducer(state: State, action: Action): State {
       return {
         ...state,
         activeSurvey: { ...action.survey },
-        originalActiveSurvey: {
-          ...action.survey,
-        },
+        originalActiveSurvey: JSON.parse(JSON.stringify(action.survey)),
       };
     case 'START_LOADING_ACTIVE_SURVEY':
       return {

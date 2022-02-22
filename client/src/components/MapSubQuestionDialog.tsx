@@ -23,6 +23,7 @@ import FreeTextQuestion from './FreeTextQuestion';
 import MatrixQuestion from './MatrixQuestion';
 import NumericQuestion from './NumericQuestion';
 import RadioQuestion from './RadioQuestion';
+import SectionInfo from './SectionInfo';
 import SliderQuestion from './SliderQuestion';
 import SortingQuestion from './SortingQuestion';
 
@@ -92,9 +93,18 @@ export default function MapSubQuestionDialog({
             error={dirty?.[index] && validationErrors?.[index].length > 0}
             style={{ width: '100%' }}
           >
-            <FormLabel component="legend">
-              {question.title} {question.isRequired && '*'}
-            </FormLabel>
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+              }}
+            >
+              <FormLabel component="legend">
+                {question.title} {question.isRequired && '*'}
+              </FormLabel>
+              {question.info && <SectionInfo infoText={question.info} />}
+            </div>
             {question.type === 'checkbox' ? (
               <CheckBoxQuestion
                 value={answers[index]?.value as (number | string)[]}
