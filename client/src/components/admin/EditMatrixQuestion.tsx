@@ -47,7 +47,24 @@ export default function EditMatrixQuestion({ section, onChange }: Props) {
         />
       </FormGroup>
       <FormGroup row>
-        <Typography> {tr.SurveySections.classes} </Typography>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <Fab
+            color="primary"
+            aria-label="add-matrix-class"
+            size="small"
+            onClick={() => {
+              onChange({
+                ...section,
+                classes: [...section.classes, { [language]: null }],
+              });
+            }}
+          >
+            <Add />
+          </Fab>
+          <Typography style={{ paddingLeft: '1rem' }}>
+            {tr.SurveySections.classes}{' '}
+          </Typography>
+        </div>
       </FormGroup>
       <div style={{ display: 'flex', flexDirection: 'row' }}>
         {section.classes?.map((entry: LocalizedText, index) => {
@@ -88,21 +105,6 @@ export default function EditMatrixQuestion({ section, onChange }: Props) {
           );
         })}
       </div>
-      <FormGroup>
-        <Fab
-          color="primary"
-          aria-label="add-matrix-class"
-          size="small"
-          onClick={() => {
-            onChange({
-              ...section,
-              classes: [...section.classes, { [language]: null }],
-            });
-          }}
-        >
-          <Add />
-        </Fab>
-      </FormGroup>
       <QuestionOptions
         options={section.subjects.map((entry) => ({ text: entry[language] }))}
         onChange={(subjects: any) => {

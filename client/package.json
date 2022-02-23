@@ -58,7 +58,8 @@
     "react-markdown": "^7.0.1",
     "react-router-dom": "^5.2.0",
     "react-split-pane": "^0.1.92",
-    "rehype-external-links": "^1.0.0"
+    "rehype-external-links": "^1.0.0",
+    "remark-breaks": "^3.0.2"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.14.5",
