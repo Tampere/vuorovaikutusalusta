@@ -9,8 +9,10 @@ import {
   publishSurvey,
   unpublishSurvey,
   updateSurvey,
+  userCanEditSurvey,
 } from '@src/application/survey';
 import { ensureAuthenticated } from '@src/auth';
+import { ForbiddenError } from '@src/error';
 import { Router } from 'express';
 import asyncHandler from 'express-async-handler';
 import { body, param } from 'express-validator';
@@ -52,7 +54,7 @@ router.post(
   '/',
   ensureAuthenticated(),
   asyncHandler(async (req, res) => {
-    const createdSurvey = await createSurvey();
+    const createdSurvey = await createSurvey(req.user);
     res.status(201).json(createdSurvey);
   })
 );
@@ -121,9 +123,14 @@ router.put(
       .withMessage('Section type must be a string'),
   ]),
   asyncHandler(async (req, res) => {
+    const surveyId = Number(req.params.id);
+    const permissionsOk = await userCanEditSurvey(req.user, surveyId);
+    if (!permissionsOk) {
+      throw new ForbiddenError('User not author nor admin of the survey');
+    }
     const survey: Survey = {
       ...req.body,
-      id: req.params.id,
+      id: surveyId,
       startDate: req.body.startDate ? new Date(req.body.startDate) : null,
       endDate: req.body.endDate ? new Date(req.body.endDate) : null,
       pages: req.body.pages,
@@ -143,8 +150,12 @@ router.delete(
     param('id').isNumeric().toInt().withMessage('ID must be a number'),
   ]),
   asyncHandler(async (req, res) => {
-    const id = Number(req.params.id);
-    const deletedSurvey = await deleteSurvey(id);
+    const surveyId = Number(req.params.id);
+    const permissionsOk = await userCanEditSurvey(req.user, surveyId);
+    if (!permissionsOk) {
+      throw new ForbiddenError('User not author nor admin of the survey');
+    }
+    const deletedSurvey = await deleteSurvey(surveyId);
     res.status(200).json(deletedSurvey);
   })
 );

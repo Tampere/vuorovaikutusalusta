@@ -194,6 +194,14 @@ export interface Survey {
    */
   authorUnit: string;
   /**
+   * ID of the author (referencing the user table)
+   */
+  authorId: string;
+  /**
+   * Array of administrator user IDs
+   */
+  admins: string[];
+  /**
    * URL of the embedded map component
    */
   mapUrl: string;
