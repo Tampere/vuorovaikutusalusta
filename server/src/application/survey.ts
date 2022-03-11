@@ -768,11 +768,11 @@ function answerEntriesToRows(
           {
             submission_id: submissionID,
             section_id: entry.sectionId,
-            value_text: JSON.stringify(entry.value),
+            value_text: null,
             value_option_id: null,
             value_geometry: null,
             value_numeric: null,
-            value_json: null,
+            value_json: JSON.stringify(entry.value),
           },
         ];
         break;
