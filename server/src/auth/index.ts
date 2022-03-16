@@ -1,4 +1,5 @@
 import logger from '@src/logger';
+import { getUser, upsertUser } from '@src/user';
 import ConnectPgSimple from 'connect-pg-simple';
 import { Express, NextFunction, Request, Response } from 'express';
 import expressSession from 'express-session';
@@ -8,31 +9,21 @@ import { getDb } from '../database';
 import { configureAzureAuth } from './azure';
 import { configureGoogleOAuth } from './google-oauth';
 
-// Object containing logged in users' information.
-const users: { [id: string]: unknown } = {};
-
-/**
- * If user with given ID exists, returns it. Otherwise creates a new user.
- * @param id ID
- * @param user User
- * @returns User
- */
-export function getOrCreateUser(id: string, user: unknown) {
-  if (!users[id]) {
-    users[id] = user;
-  }
-  return users[id];
-}
-
 /**
  * Configures authentication for given Express application.
  * @param app Express application
  */
 export function configureAuth(app: Express) {
-  // User deserialization (common for all auth methods)
-  passport.deserializeUser((id, done) => {
-    // If user doesn't exist (e.g. due to server boot), set user as null - will be redirected to /login
-    done(null, users[String(id)] ?? null);
+  // User serialization
+  passport.serializeUser((user: Express.User, done) => {
+    done(null, user.id);
+  });
+
+  // User deserialization
+  passport.deserializeUser(async (id, done) => {
+    const user = await getUser(String(id));
+    // If user doesn't exist, set user as null - will be redirected to /login
+    done(null, user ?? null);
   });
 
   // Initialize Express session middleware
@@ -81,6 +72,25 @@ export function configureAuth(app: Express) {
           : `Unsupported auth method "${process.env.AUTH_METHOD}"`
       );
   }
+}
+
+/**
+ * Injects mock user to request when actual auth is not enabled
+ */
+export function configureMockAuth(app: Express) {
+  // Create a mock user & persist it in the database
+  const mockUser: Express.User = {
+    id: '12345-67890-abcde-fghij',
+    fullName: 'Teemu Testaaja',
+    email: 'teemu.testaaja@testi.com',
+  };
+  upsertUser(mockUser);
+
+  // Inject the mock user to each request
+  app.use((req, _res, next) => {
+    req.user = mockUser;
+    return next();
+  });
 }
 
 /**

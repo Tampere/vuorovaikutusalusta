@@ -13,6 +13,7 @@ import {
 } from '@src/controllers/SurveyController';
 import { useToasts } from '@src/stores/ToastContext';
 import { makeStyles } from '@material-ui/styles';
+import DataExport from './DataExport';
 
 const useStyles = makeStyles((theme: Theme) => ({
   '@keyframes pulse': {
@@ -107,7 +108,14 @@ export default function SurveyListItem(props: Props) {
               : tr.SurveyList.notPublished}
           </Typography>
         </CardContent>
-        <CardActions>
+        <CardActions
+          style={{
+            width: '100%',
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'flex-start',
+          }}
+        >
           <Button onClick={() => window.open(`/admin/kyselyt/${survey.id}`)}>
             {tr.SurveyList.editSurvey}
           </Button>
@@ -131,6 +139,7 @@ export default function SurveyListItem(props: Props) {
               {tr.SurveyList.unpublish}
             </Button>
           )}
+          <DataExport surveyId={survey.id} />
         </CardActions>
       </Card>
       <ConfirmDialog

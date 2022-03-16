@@ -1,12 +1,12 @@
+import compression from 'compression';
 import express from 'express';
-import * as path from 'path';
 import morgan from 'morgan';
+import * as path from 'path';
+import { configureAuth, configureMockAuth, ensureAuthenticated } from './auth';
 import { initializeDatabase, migrateUp } from './database';
+import { HttpResponseError } from './error';
 import logger from './logger';
 import rootRouter from './routes';
-import { HttpResponseError } from './error';
-import { configureAuth, ensureAuthenticated } from './auth';
-import compression from 'compression';
 
 async function start() {
   const app = express();
@@ -46,7 +46,8 @@ async function start() {
     configureAuth(app);
     logger.info('Authentication configured');
   } else {
-    logger.info('Authentication not enabled');
+    configureMockAuth(app);
+    logger.info('Authentication not enabled, using a mock user');
   }
 
   // Serve static frontend files in production

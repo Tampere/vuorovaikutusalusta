@@ -3,7 +3,7 @@ import { Express } from 'express';
 import session, { Session, SessionData } from 'express-session';
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
-import { getOrCreateUser } from '.';
+import { upsertUser } from '../user';
 
 // Extend the Express session type to contain custom data
 declare module 'express-session' {
@@ -37,13 +37,17 @@ export function configureGoogleOAuth(app: Express) {
         clientSecret: process.env.AUTH_CLIENT_SECRET,
         callbackURL: process.env.AUTH_REDIRECT_URL,
       },
-      (_accessToken, _refreshToken, profile, done) => {
+      async (_accessToken, _refreshToken, profile, done) => {
         // Return error if the user is not whitelisted
         if (!emailWhiteList.includes(profile._json.email.toLocaleLowerCase())) {
           return done(null, null);
         }
-        // Create session entry for the user
-        const user = getOrCreateUser(profile.id, profile);
+        // Insert/update user to database & assign it to the session
+        const user = await upsertUser({
+          id: profile.id,
+          fullName: profile.displayName,
+          email: profile._json.email,
+        });
         return done(null, user);
       }
     )

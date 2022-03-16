@@ -1,8 +1,8 @@
 import { Express } from 'express';
 import passport from 'passport';
 import { OIDCStrategy } from 'passport-azure-ad';
-import { getOrCreateUser } from '.';
 import { decrypt } from '../crypto';
+import { upsertUser } from '../user';
 
 /**
  * Configures authentication for given Express application.
@@ -11,11 +11,6 @@ import { decrypt } from '../crypto';
  * @param app Express application
  */
 export function configureAzureAuth(app: Express) {
-  // User serialization
-  passport.serializeUser((user: Express.User & { oid: string }, done) => {
-    done(null, user.oid);
-  });
-
   // Use OpenID Connect strategy for Azure AD authentication
   passport.use(
     new OIDCStrategy(
@@ -34,9 +29,12 @@ export function configureAzureAuth(app: Express) {
         if (!profile.oid) {
           return done(new Error('No oid found'), null);
         }
-        process.nextTick(function () {
-          const user = getOrCreateUser(profile.oid, profile);
-          console.log('jyyseri', user, profile.oid);
+        process.nextTick(async function () {
+          const user = await upsertUser({
+            id: profile.oid,
+            fullName: profile.displayName,
+            email: profile._json.email,
+          });
           return done(null, user);
         });
       }

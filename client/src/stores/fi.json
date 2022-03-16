@@ -1,4 +1,12 @@
 {
+  "DataExport": {
+    "exportAnswers": "Lataa vastaukset",
+    "surveyAnswerExport": "Kyselyn vastausdatan lataus",
+    "chooseFileFormat": "Valitse haluamasi tiedostomuodot",
+    "download": "lataa",
+    "errorDownloadingCSV": "CSV -tiedoston lataaminen epäonnistui",
+    "errorDownloadingGPKG": "GeoPackage -tiedoston lataaminen epäonnistui"
+  },
   "EditSurvey": {
     "errorFetchingSurvey": "Virhe haettaessa kyselyä. Tarkista osoite tai yritä myöhemmin uudestaan.",
     "untitledPage": "Nimetön sivu",
@@ -34,6 +42,9 @@
     "nameHelperText": "Kyselyn URL-osoitteessa näkyvä nimi. Voi sisältää vain kirjaimia (a-z), numeroita (0-9) ja viivoja (- ja _).",
     "author": "Kyselyn laatija/yhteyshenkilö",
     "authorUnit": "Kyselyn laatijan yksikkö",
+    "admins": "Kyselyn ylläpitäjät",
+    "userFetchFailed": "Käyttäjien haku epäonnistui. Yritä myöhemmin uudestaan.",
+    "adminsHelperText": "Kyselyn alkuperäisen luojan lisäksi määriteltävät käyttäjät, jotka voivat katsella kyselyn vastauksia sekä muokata kyselyä.",
     "mapUrl": "Oskari-karttajulkaisun osoite",
     "mapUrlError": "Karttatasojen haku annetulle osoitteelle epäonnistui. Tarkista osoite ja yritä uudestaan.",
     "availableMapLayers": "Saatavilla olevat karttatasot:",

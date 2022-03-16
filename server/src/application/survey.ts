@@ -11,6 +11,7 @@ import {
   SurveyPageSection,
   SurveyRadioQuestion,
 } from '@interfaces/survey';
+import { User } from '@interfaces/user';
 import {
   getColumnSet,
   getDb,
@@ -37,61 +38,21 @@ const sectionTypesWithOptions: SurveyPageSection['type'][] = [
  * Survey's DB model
  */
 interface DBSurvey {
-  /**
-   * ID of the survey (unique)
-   */
   id: number;
-  /**
-   * Name of the survey (unique): used to generate the public URL of the survey
-   */
   name: string;
-  /**
-   * Title of the survey
-   */
   title: LocalizedText;
-  /**
-   * Subtitle of the survey
-   */
   subtitle: LocalizedText;
-  /**
-   * Author of the survey
-   */
   author: string;
-  /**
-   * Unit under which the author works
-   */
   author_unit: string;
-  /**
-   * URL of the embedded map component
-   */
+  author_id: string;
+  admins: string[];
   map_url: string;
-  /**
-   * Date when the survey is planned to start and go public
-   */
   start_date: Date;
-  /**
-   * Date when the survey is planned to end
-   */
   end_date: Date;
-  /**
-   * Date when the survey was initially created
-   */
   created_at: Date;
-  /**
-   * Date when the survey was modified last time
-   */
   updated_at: Date;
-  /**
-   * Title of the thanks page
-   */
   thanks_page_title: LocalizedText;
-  /**
-   * Text contents of the thanks page (markdown)
-   */
   thanks_page_text: LocalizedText;
-  /**
-   * Survey's background image id
-   */
   background_image_id: number;
 }
 
@@ -99,21 +60,9 @@ interface DBSurvey {
  * DB row of the data.survey_page table
  */
 interface DBSurveyPage {
-  /**
-   * ID of the survey page
-   */
   id: number;
-  /**
-   * Foreign key survey id
-   */
   survey_id: number;
-  /**
-   * Page's index on the survey
-   */
   idx: number;
-  /**
-   * Title of the survey page
-   */
   title: LocalizedText;
   /**
    * IDs of the map layers visible on the page
@@ -126,41 +75,14 @@ interface DBSurveyPage {
  * DB row of the data.page_section
  */
 interface DBSurveyPageSection {
-  /**
-   * ID of the survey page section
-   */
   id: number;
-  /**
-   * ID of the survey page section
-   */
   survey_page_id: number;
-  /**
-   * Type of the section (map question/checkbox/radio etc.)
-   */
   type: string;
-  /**
-   * Section title
-   */
   title: LocalizedText;
-  /**
-   * Body of a text section
-   */
   body: LocalizedText;
-  /**
-   * Section's index on the page
-   */
   idx: number;
-  /**
-   * Details of the section (e.g. how many options the user can choose on multichoice questions)
-   */
   details: object;
-  /**
-   * Parent section ID for subquestions
-   */
   parent_section: number;
-  /**
-   * Additional information related to the section
-   */
   info: LocalizedText;
 }
 
@@ -168,21 +90,9 @@ interface DBSurveyPageSection {
  * DB row of table data.option
  */
 interface DBSectionOption {
-  /**
-   * id of the option
-   */
   id?: number;
-  /**
-   * Ordering index of the option
-   */
   idx: number;
-  /**
-   * Localized text field of the option text
-   */
   text: LocalizedText;
-  /**
-   * Foreign key referencing which section the option belongs into
-   */
   section_id: number;
 }
 
@@ -208,37 +118,13 @@ type DBSurveyJoin = DBSurvey & {
  * DB row of table data.answer_entry
  */
 interface DBAnswerEntry {
-  /**
-   * unique id of the entry
-   */
   id?: number;
-  /**
-   * ID of the submission into which the answer belongs
-   */
   submission_id: number;
-  /**
-   * ID of the section/question the answer is linked to
-   */
   section_id: number;
-  /**
-   * Answer text for a free text question
-   */
   value_text: string;
-  /**
-   * Numeric answer value
-   */
   value_numeric: number;
-  /**
-   * ID of the multichoise option to which the answer points
-   */
   value_option_id: number;
-  /**
-   * Geometry answer value
-   */
   value_geometry: GeoJSON.Geometry;
-  /**
-   * JSON answer value
-   */
   value_json: string;
 }
 
@@ -416,11 +302,12 @@ export async function getSurveys() {
 
 /**
  * Creates a new survey entry into the database
- * @param survey
+ * @param user Author
  */
-export async function createSurvey() {
+export async function createSurvey(user: User) {
   const surveyRow = await getDb().one<DBSurvey>(
-    `INSERT INTO data.survey DEFAULT VALUES RETURNING *`
+    `INSERT INTO data.survey (author_id) VALUES ($1) RETURNING *`,
+    [user.id]
   );
 
   if (!surveyRow) {
@@ -471,7 +358,8 @@ export async function updateSurvey(survey: Survey) {
         end_date = $9,
         thanks_page_title = $10,
         thanks_page_text = $11,
-        background_image_id = $12
+        background_image_id = $12,
+        admins = $13
       WHERE id = $1 RETURNING *`,
       [
         survey.id,
@@ -486,6 +374,7 @@ export async function updateSurvey(survey: Survey) {
         { fi: survey.thanksPage.title },
         { fi: survey.thanksPage.text },
         survey.backgroundImageId,
+        survey.admins,
       ]
     )
     .catch((error) => {
@@ -617,6 +506,8 @@ function dbSurveyToSurvey(
     subtitle: dbSurvey.subtitle?.fi,
     author: dbSurvey.author,
     authorUnit: dbSurvey.author_unit,
+    authorId: dbSurvey.author_id,
+    admins: dbSurvey.admins,
     mapUrl: dbSurvey.map_url,
     startDate: dbSurvey.start_date,
     endDate: dbSurvey.end_date,
@@ -877,11 +768,11 @@ function answerEntriesToRows(
           {
             submission_id: submissionID,
             section_id: entry.sectionId,
-            value_text: JSON.stringify(entry.value),
+            value_text: null,
             value_option_id: null,
             value_geometry: null,
             value_numeric: null,
-            value_json: null,
+            value_json: JSON.stringify(entry.value),
           },
         ];
         break;
@@ -1140,4 +1031,18 @@ export async function removeImage(id: number) {
   `,
     [id]
   );
+}
+
+/**
+ * Checks if given user is allowed to edit the survey with given ID
+ * @param user User
+ * @param surveyId Survey ID
+ * @returns Can the user edit the survey?
+ */
+export async function userCanEditSurvey(user: User, surveyId: number) {
+  const { author_id: authorId, admins } = await getDb().oneOrNone<{
+    author_id: string;
+    admins: string[];
+  }>(`SELECT author_id, admins FROM data.survey WHERE id = $1`, [surveyId]);
+  return user.id === authorId || admins.includes(user.id);
 }
