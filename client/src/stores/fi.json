@@ -192,7 +192,13 @@
       "line": "Aloita piirtäminen klikkaamalla aloituskohtaa. Jatka piirtämistä klikkaamalla kartalla uudestaan, lopeta piirtäminen klikkaamalla viimeistä pistettä uudestaan.",
       "area": "Aloita piirtäminen klikkaamalla aloituskohtaa. Jatka piirtämistä klikkaamalla kartalla uudestaan, lopeta piirtäminen klikkaamalla viimeistä pistettä uudestaan."
     },
-    "clearAnswers": "Poista kaikki karttavastaukset"
+    "clearAnswers": "Poista kaikki karttavastaukset",
+    "removeAnswer": "Poista vastaus",
+    "confirmRemoveAnswer": "Haluatko varmasti poistaa tämän karttavastauksen?"
+  },
+  "SurveyMap": {
+    "editGeometries": "Muokkaa kartalle piirtämiäsi geometrioita",
+    "finishEditingGeometries": "Lopeta kartan geometrioiden muokkaus"
   },
   "MatrixQuestion": {
     "emptyAnswer": "En osaa sanoa"

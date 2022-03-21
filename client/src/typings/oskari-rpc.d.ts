@@ -22,7 +22,7 @@ declare module 'oskari-rpc' {
           modifyControl?: boolean;
           showMeasureOnMap?: boolean;
           selfIntersection?: boolean;
-          geojson?: string;
+          geojson?: GeoJSON.GeoJSON;
         }
       ]
     ) => void;
@@ -58,6 +58,8 @@ declare module 'oskari-rpc' {
           layerId: string;
           clearPrevious: boolean;
           centerTo: boolean;
+          cursor?: string;
+          prio?: number;
           featureStyle?: {
             stroke?: {
               color: string;
@@ -148,6 +150,44 @@ declare module 'oskari-rpc' {
   }
 
   /**
+   * Drawing event handler
+   */
+  export type DrawingEventHandler = (payload: {
+    geojson: GeoJSON.FeatureCollection<
+      GeoJSON.Point | GeoJSON.LineString | GeoJSON.Polygon
+    > & {
+      crs: string;
+    };
+    id: string;
+    isFinished: boolean;
+  }) => void;
+
+  /**
+   * Feature event handler
+   */
+  export type FeatureEventHandler = (payload: {
+    operation: 'add' | 'remove' | 'click' | 'zoom' | 'error';
+    features: {
+      layerId: string;
+      geojson: any;
+    }[];
+  }) => void;
+
+  /**
+   * Infobox action event handler
+   */
+  export type InfoboxActionEventHandler = (payload: {
+    /**
+     * Layer ID
+     */
+    id: string;
+    /**
+     * Action parameters
+     */
+    actionParams: any;
+  }) => void;
+
+  /**
    * All Oskari events
    */
   namespace Event {
@@ -156,15 +196,7 @@ declare module 'oskari-rpc' {
      */
     export type DrawingEvent = (
       name: 'DrawingEvent',
-      callback: (payload: {
-        geojson: GeoJSON.FeatureCollection<
-          GeoJSON.Point | GeoJSON.LineString | GeoJSON.Polygon
-        > & {
-          crs: string;
-        };
-        id: string;
-        isFinished: boolean;
-      }) => void
+      callback: DrawingEventHandler
     ) => void;
 
     /**
@@ -172,13 +204,7 @@ declare module 'oskari-rpc' {
      */
     export type FeatureEvent = (
       name: 'FeatureEvent',
-      callback: (payload: {
-        operation: 'add' | 'remove' | 'click' | 'zoom' | 'error';
-        features: {
-          layerId: string;
-          geojson: any;
-        }[];
-      }) => void
+      callback: FeatureEventHandler
     ) => void;
 
     /**
@@ -186,16 +212,7 @@ declare module 'oskari-rpc' {
      */
     export type InfoboxActionEvent = (
       name: 'InfoboxActionEvent',
-      callback: (payload: {
-        /**
-         * Layer ID
-         */
-        id: string;
-        /**
-         * Action parameters
-         */
-        actionParams: any;
-      }) => void
+      callback: InfoboxActionEventHandler
     ) => void;
   }
 

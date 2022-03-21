@@ -15,6 +15,7 @@ import {
 import { useSurveyMap } from '@src/stores/SurveyMapContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useEffect, useRef, useState } from 'react';
+import ConfirmDialog from './ConfirmDialog';
 import AreaIcon from './icons/AreaIcon';
 import LineIcon from './icons/LineIcon';
 import PointIcon from './icons/PointIcon';
@@ -35,14 +36,40 @@ export default function MapQuestion({ value, onChange, question }: Props) {
   const [subQuestionDialogOpen, setSubQuestionDialogOpen] = useState(false);
   const [handleSubQuestionDialogClose, setHandleSubQuestionDialogClose] =
     useState<(answers: SurveyMapSubQuestionAnswer[]) => void>(null);
+  const [deleteConfirmDialogOpen, setDeleteConfirmDialogOpen] = useState(false);
   const {
     draw,
     isMapReady,
     isMapActive,
     stopDrawing,
     questionId: drawingQuestionId,
+    editingMapAnswer,
+    stopEditingMapAnswer,
+    onModify,
   } = useSurveyMap();
   const { tr } = useTranslations();
+
+  const valueRef = useRef<MapQuestionAnswer[]>();
+  valueRef.current = value;
+
+  // Listen to any geometry changes related to this question
+  useEffect(() => {
+    if (!isMapReady || question.id == null) {
+      return;
+    }
+    const unregisterEventHandler = onModify(question.id, (features) => {
+      onChange(
+        valueRef.current.map((answer, index) => ({
+          ...answer,
+          geometry: features[index],
+        }))
+      );
+    });
+    // On unmount unregister the event handler
+    return () => {
+      unregisterEventHandler();
+    };
+  }, [isMapReady, question.id]);
 
   /**
    * Execute the drawing answer flow when user selects a selection type
@@ -170,8 +197,7 @@ export default function MapQuestion({ value, onChange, question }: Props) {
         <div
           style={{
             display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center',
+            flexDirection: 'column',
           }}
         >
           <ToggleButtonGroup
@@ -210,6 +236,30 @@ export default function MapQuestion({ value, onChange, question }: Props) {
           </div>
         )}
       </div>
+      {/* Editing dialog */}
+      <MapSubQuestionDialog
+        open={editingMapAnswer?.questionId === question.id}
+        title={question.title}
+        answer={value[editingMapAnswer?.index]}
+        subQuestions={question.subQuestions}
+        onSubmit={(answers) => {
+          onChange(
+            value.map((answer, index) =>
+              index === editingMapAnswer.index
+                ? { ...answer, subQuestionAnswers: answers }
+                : answer
+            )
+          );
+          stopEditingMapAnswer();
+        }}
+        onCancel={() => {
+          stopEditingMapAnswer();
+        }}
+        onDelete={() => {
+          setDeleteConfirmDialogOpen(true);
+        }}
+      />
+      {/* New map answer dialog */}
       <MapSubQuestionDialog
         open={subQuestionDialogOpen}
         subQuestions={question.subQuestions}
@@ -218,6 +268,20 @@ export default function MapQuestion({ value, onChange, question }: Props) {
         }}
         onCancel={() => {
           handleSubQuestionDialogClose(null);
+        }}
+      />
+      {/* Confirm dialog for deleting a map answer */}
+      <ConfirmDialog
+        open={deleteConfirmDialogOpen}
+        text={tr.MapQuestion.confirmRemoveAnswer}
+        onClose={(result) => {
+          if (result) {
+            onChange(
+              value.filter((_, index) => index !== editingMapAnswer.index)
+            );
+            stopEditingMapAnswer();
+          }
+          setDeleteConfirmDialogOpen(false);
         }}
       />
     </>
