@@ -23,7 +23,6 @@ import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { getClassList } from '@src/utils/classes';
 import { request } from '@src/utils/request';
-import { InfoBox } from 'oskari-rpc';
 import React, { useEffect, useMemo, useState } from 'react';
 import SplitPane from 'react-split-pane';
 import StepperControls from './StepperControls';
@@ -141,33 +140,10 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
                 ...features,
                 {
                   ...value.geometry,
-                  // Pass info box data via feature properties
+                  // Pass question ID and answer index for reopening the subquestion dialog in edit mode
                   properties: {
-                    infoBox: {
-                      title: tr.MapInfoBox.answer,
-                      contents: [
-                        {
-                          html: `<div>${question.title}</div>`,
-                        },
-                        {
-                          html: `<div>${tr.MapInfoBox.answer} #${index + 1}/${
-                            answer.value.length
-                          }</div>`,
-                        },
-                        {
-                          actions: [
-                            {
-                              name: tr.commands.remove,
-                              type: 'button',
-                              action: {
-                                questionId: question.id,
-                                answerIndex: index,
-                              },
-                            },
-                          ],
-                        },
-                      ] as InfoBox.ContentItem[],
-                    },
+                    questionId: question.id,
+                    index,
                   },
                 },
               ],

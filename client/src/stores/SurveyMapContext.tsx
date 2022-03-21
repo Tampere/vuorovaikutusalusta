@@ -1,6 +1,5 @@
 import { GeoJSONWithCRS } from '@interfaces/geojson';
 import { MapQuestionSelectionType } from '@interfaces/survey';
-import centroid from '@turf/centroid';
 import { Channel } from 'oskari-rpc';
 import React, {
   createContext,
@@ -19,6 +18,10 @@ interface State {
   helperText: string;
   selectionType: MapQuestionSelectionType;
   questionId: number;
+  editingMapAnswer: {
+    questionId: number;
+    index: number;
+  };
 }
 
 type Action =
@@ -49,6 +52,13 @@ type Action =
   | {
       type: 'SET_QUESTION_ID';
       value: number;
+    }
+  | {
+      type: 'SET_EDITING_MAP_ANSWER';
+      value: {
+        questionId: number;
+        index: number;
+      };
     };
 
 type Context = [State, React.Dispatch<Action>];
@@ -61,6 +71,7 @@ const stateDefaults: State = {
   helperText: null,
   selectionType: null,
   questionId: null,
+  editingMapAnswer: null,
 };
 
 /**
@@ -70,9 +81,6 @@ export const SurveyMapContext = createContext<Context>(null);
 
 // Layer ID for answer geometries
 const answerGeometryLayer = 'answers';
-
-// ID for answer info boxes
-const answerInfoBoxId = 'answer_infobox';
 
 // Feature styles for geometry answers (drawing and displaying)
 const featureStyle = {
@@ -152,39 +160,13 @@ export function useSurveyMap() {
           event.features[0].geojson;
         // There should only be one feature
         const feature = featureCollection.features[0];
-        // Calculate info box coordinates from the feature centroid
-        const [lon, lat] = centroid(feature as any).geometry.coordinates;
         // Pick answer data from feature properties
-        const { infoBox } = feature.properties;
-        state.rpcChannel.postRequest('InfoBox.ShowInfoBoxRequest', [
-          answerInfoBoxId,
-          infoBox.title,
-          infoBox.contents,
-          {
-            lat,
-            lon,
-          },
-          {
-            hidePrevious: true,
-          },
-        ]);
-      });
-    },
-    /**
-     * Register a callback that gets called when an answer is to be deleted
-     * @param callback
-     */
-    onDeleteAnswer(
-      callback: (questionId: number, answerIndex: number) => void
-    ) {
-      state.rpcChannel.handleEvent('InfoboxActionEvent', (data) => {
-        // Ignore events from other info boxes
-        if (data.id !== answerInfoBoxId) {
-          return;
-        }
-        const { questionId, answerIndex } = data.actionParams;
-        callback(questionId, answerIndex);
-        state.rpcChannel.postRequest('InfoBox.HideInfoBoxRequest', [data.id]);
+        const { questionId, index } = feature.properties;
+        // Open editing dialog via context
+        dispatch({
+          type: 'SET_EDITING_MAP_ANSWER',
+          value: { questionId, index },
+        });
       });
     },
     /**
@@ -315,6 +297,9 @@ export function useSurveyMap() {
         [null, null, answerGeometryLayer]
       );
     },
+    stopEditingMapAnswer() {
+      dispatch({ type: 'SET_EDITING_MAP_ANSWER', value: null });
+    },
     /**
      * Is map currently active (in drawing state)
      */
@@ -366,6 +351,11 @@ function reducer(state: State, action: Action): State {
       return {
         ...state,
         questionId: action.value,
+      };
+    case 'SET_EDITING_MAP_ANSWER':
+      return {
+        ...state,
+        editingMapAnswer: action.value,
       };
     default:
       throw new Error('Invalid action type');
