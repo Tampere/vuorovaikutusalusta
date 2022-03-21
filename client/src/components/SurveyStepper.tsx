@@ -80,8 +80,8 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
     isMapReady,
     stopDrawing,
     selectionType,
-    showGeometries,
-    clearGeometries,
+    updateGeometries,
+    stopModifying,
   } = useSurveyMap();
   const classes = useStyles();
   const { tr } = useTranslations();
@@ -118,6 +118,10 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
     );
     setDisabled(!mapQuestions.length);
     setVisibleLayers(currentPage.mapLayers);
+    // If modifying, stop it when changing page
+    if (isMapReady) {
+      stopModifying();
+    }
   }, [currentPage]);
 
   // Map answer geometries on the current page
@@ -165,11 +169,7 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
   // TODO: geometries aren't redrawn in either mobile or split pane map when mobile/md breakpoint is reached
   useEffect(() => {
     if (isMapReady && mapAnswerGeometries) {
-      if (!mapAnswerGeometries.features.length) {
-        clearGeometries();
-      } else {
-        showGeometries(mapAnswerGeometries);
-      }
+      updateGeometries(mapAnswerGeometries);
     }
   }, [isMapReady, mapAnswerGeometries]);
 

@@ -45,8 +45,31 @@ export default function MapQuestion({ value, onChange, question }: Props) {
     questionId: drawingQuestionId,
     editingMapAnswer,
     stopEditingMapAnswer,
+    onModify,
   } = useSurveyMap();
   const { tr } = useTranslations();
+
+  const valueRef = useRef<MapQuestionAnswer[]>();
+  valueRef.current = value;
+
+  // Listen to any geometry changes related to this question
+  useEffect(() => {
+    if (!isMapReady || question.id == null) {
+      return;
+    }
+    const unregisterEventHandler = onModify(question.id, (features) => {
+      onChange(
+        valueRef.current.map((answer, index) => ({
+          ...answer,
+          geometry: features[index],
+        }))
+      );
+    });
+    // On unmount unregister the event handler
+    return () => {
+      unregisterEventHandler();
+    };
+  }, [isMapReady, question.id]);
 
   /**
    * Execute the drawing answer flow when user selects a selection type
@@ -174,8 +197,7 @@ export default function MapQuestion({ value, onChange, question }: Props) {
         <div
           style={{
             display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center',
+            flexDirection: 'column',
           }}
         >
           <ToggleButtonGroup

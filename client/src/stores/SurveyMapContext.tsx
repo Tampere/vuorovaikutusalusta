@@ -1,6 +1,7 @@
 import { GeoJSONWithCRS } from '@interfaces/geojson';
 import { MapQuestionSelectionType } from '@interfaces/survey';
-import { Channel } from 'oskari-rpc';
+import { LineString, Point, Polygon } from 'geojson';
+import { Channel, DrawingEventHandler } from 'oskari-rpc';
 import React, {
   createContext,
   ReactNode,
@@ -22,6 +23,8 @@ interface State {
     questionId: number;
     index: number;
   };
+  answerGeometries: GeoJSON.FeatureCollection;
+  modifying: boolean;
 }
 
 type Action =
@@ -59,6 +62,14 @@ type Action =
         questionId: number;
         index: number;
       };
+    }
+  | {
+      type: 'SET_ANSWER_GEOMETRIES';
+      value: GeoJSON.FeatureCollection;
+    }
+  | {
+      type: 'SET_MODIFYING';
+      value: boolean;
     };
 
 type Context = [State, React.Dispatch<Action>];
@@ -72,6 +83,11 @@ const stateDefaults: State = {
   selectionType: null,
   questionId: null,
   editingMapAnswer: null,
+  answerGeometries: {
+    type: 'FeatureCollection',
+    features: [],
+  },
+  modifying: false,
 };
 
 /**
@@ -81,6 +97,9 @@ export const SurveyMapContext = createContext<Context>(null);
 
 // Layer ID for answer geometries
 const answerGeometryLayer = 'answers';
+
+// Drawing ID for modifying existing geometries
+const modifyEventId = 'modify';
 
 // Feature styles for geometry answers (drawing and displaying)
 const featureStyle = {
@@ -120,6 +139,23 @@ export function useSurveyMap() {
     () => Boolean(state.rpcChannel),
     [state.rpcChannel]
   );
+
+  /**
+   * Draws given geometries as features onto the map
+   * @param geometries
+   */
+  function drawAnswerGeometries(geometries: GeoJSON.FeatureCollection) {
+    state.rpcChannel.postRequest('MapModulePlugin.AddFeaturesToMapRequest', [
+      geometries,
+      {
+        layerId: answerGeometryLayer,
+        centerTo: false,
+        clearPrevious: true,
+        cursor: 'pointer',
+        featureStyle,
+      },
+    ]);
+  }
 
   return {
     ...state,
@@ -171,6 +207,10 @@ export function useSurveyMap() {
     },
     /**
      * Enters the draw state and returns the geometry when user has finished drawing.
+     * @param type Selection type (shape)
+     * @param questionId Question ID
+     * @param helperText Helper text (shown in the mobile UI)
+     * @returns Drawn geometry
      */
     async draw(
       type: MapQuestionSelectionType,
@@ -213,45 +253,46 @@ export function useSurveyMap() {
           },
         },
       ]);
+
       // Wait for the matching finished drawing event
+      let handler: DrawingEventHandler = null;
       const geometry = await new Promise<
         GeoJSONWithCRS<
           GeoJSON.Feature<GeoJSON.Point | GeoJSON.LineString | GeoJSON.Polygon>
         >
       >((resolve) => {
-        state.rpcChannel.handleEvent('DrawingEvent', function (event) {
+        handler = (event) => {
           const [, eventQuestionId, eventSelectionType] = event.id.split(':');
           // Skip unfinished events and events for a different question and different selection type (if specified)
           if (
             !event.isFinished ||
             eventQuestionId !== String(questionId) ||
-            (eventSelectionType && eventSelectionType !== type)
+            (eventSelectionType && eventSelectionType !== type) ||
+            !event.geojson.features.length
           ) {
             return;
           }
-          // Resolve the geometry from the event if there are any features
-          resolve(
-            event.geojson.features.length
-              ? {
-                  ...event.geojson.features[0],
-                  crs: {
-                    type: 'name',
-                    properties: { name: event.geojson.crs },
-                  },
-                }
-              : null
-          );
-          state.rpcChannel.unregisterEventHandler('DrawingEvent', this[0]);
-        });
+          // Resolve the geometry from the event
+          resolve({
+            ...event.geojson.features[0],
+            crs: {
+              type: 'name',
+              properties: { name: event.geojson.crs },
+            },
+          });
+        };
+        state.rpcChannel.handleEvent('DrawingEvent', handler);
       });
-      // If no geometry was returned, the drawing was already stopped from the outside
-      // - otherwise stop the drawing with a separate request
-      if (geometry) {
-        state.rpcChannel.postRequest('DrawTools.StopDrawingRequest', [
-          eventId,
-          false,
-        ]);
-      }
+
+      // Drawing is now completed - unregister the event handler
+      state.rpcChannel.unregisterEventHandler('DrawingEvent', handler);
+
+      // Stop the drawing interaction
+      state.rpcChannel.postRequest('DrawTools.StopDrawingRequest', [
+        eventId,
+        false,
+      ]);
+
       return geometry;
     },
     /**
@@ -265,19 +306,118 @@ export function useSurveyMap() {
       ]);
     },
     /**
-     * Show geometries on map. Old geometries will be cleared.
-     * @param geometries Geometries
+     * Starts modifying existing geometries.
      */
-    showGeometries(geometries: GeoJSON.FeatureCollection) {
-      state.rpcChannel.postRequest('MapModulePlugin.AddFeaturesToMapRequest', [
-        geometries,
+    startModifying() {
+      dispatch({ type: 'SET_MODIFYING', value: true });
+      // Remove all static features from the map
+      state.rpcChannel.postRequest(
+        'MapModulePlugin.RemoveFeaturesFromMapRequest',
+        [null, null, answerGeometryLayer]
+      );
+      // Start modifying with currently stored answer geometries
+      state.rpcChannel.postRequest('DrawTools.StartDrawingRequest', [
+        modifyEventId,
+        // This must have some valid value, but shouldnt matter a lot because we aren't drawing new shapes here
+        'Box',
         {
-          layerId: answerGeometryLayer,
-          centerTo: false,
-          clearPrevious: true,
-          featureStyle,
+          drawControl: false,
+          modifyControl: true,
+          geojson: {
+            ...state.answerGeometries,
+            features: state.answerGeometries.features.map((feature) => ({
+              ...feature,
+              // Oskari overwrites GeoJSON properties when entering drawing mode - form an ID to keep the data available in drawing event handler
+              id: `answer:${feature.properties.questionId}:${feature.properties.index}`,
+            })),
+          },
+          style: {
+            // Due to some buggy changes in https://github.com/mozilla/jschannel/pull/15 the recursive object check fails,
+            // unless we do a deep copy of the style object.
+            draw: JSON.parse(JSON.stringify(featureStyle)),
+            modify: JSON.parse(JSON.stringify(featureStyle)),
+          },
         },
       ]);
+    },
+    /**
+     * Stop modifying geometries.
+     */
+    stopModifying() {
+      dispatch({ type: 'SET_MODIFYING', value: false });
+      // Stop the drawing
+      state.rpcChannel.postRequest('DrawTools.StopDrawingRequest', [
+        modifyEventId,
+        true,
+        false,
+      ]);
+      // Draw stored answer geometries to map as static features
+      drawAnswerGeometries(state.answerGeometries);
+    },
+    /**
+     * Register a function listening to changes to geometries during modification.
+     * @param questionId Which question's geometries to listen to?
+     * @param callback Callback when geometries for given question ID have changed
+     * @returns Function for unregistering the event handler
+     */
+    onModify(
+      questionId: number,
+      callback: (
+        features: GeoJSON.Feature<Point | LineString | Polygon>[]
+      ) => void
+    ) {
+      // Create a handler for any modification DrawingEvents
+      const handler: DrawingEventHandler = (event) => {
+        if (event.id !== modifyEventId || !event.isFinished) {
+          return;
+        }
+        const changedFeatures = event.geojson.features
+          // Destructure the question ID and index from feature ID and store them in properties
+          .map((feature) => {
+            const [, questionId, index] = String(feature.id)
+              .split(':')
+              .map(Number);
+            return {
+              ...feature,
+              properties: {
+                questionId,
+                index,
+              },
+            };
+          })
+          // Filter out all features of other questions
+          .filter((feature) => feature.properties.questionId === questionId)
+          // Sort the features by index for assigning the changed features to correct slots
+          .sort((a, b) => a.properties.index - b.properties.index);
+
+        // Only invoke the callback if there were changed features for the given question ID
+        if (changedFeatures.length) {
+          callback(changedFeatures);
+        }
+      };
+      state.rpcChannel.handleEvent('DrawingEvent', handler);
+
+      // Return a function for unregistering the event handler after leaving the page
+      return () => {
+        state.rpcChannel.unregisterEventHandler('DrawingEvent', handler);
+      };
+    },
+    /**
+     * Update geometries shown on the map. If not modifying, the geometries will be redrawn.
+     * The geometries will be stored in context for possible later modifications.
+     * @param geometries Geometries
+     */
+    updateGeometries(geometries: GeoJSON.FeatureCollection) {
+      dispatch({ type: 'SET_ANSWER_GEOMETRIES', value: geometries });
+      // Only update geometries to state if still modifying
+      if (state.modifying) {
+        return;
+      }
+      state.rpcChannel.postRequest(
+        'MapModulePlugin.RemoveFeaturesFromMapRequest',
+        [null, null, answerGeometryLayer]
+      );
+      drawAnswerGeometries(geometries);
     },
     /**
      * Zoom to geometries shown on the answer geometry layer.
@@ -289,14 +429,8 @@ export function useSurveyMap() {
       ]);
     },
     /**
-     * Clears geometries from the map.
+     * Stop editing a map answer in dialog
      */
-    clearGeometries() {
-      state.rpcChannel.postRequest(
-        'MapModulePlugin.RemoveFeaturesFromMapRequest',
-        [null, null, answerGeometryLayer]
-      );
-    },
     stopEditingMapAnswer() {
       dispatch({ type: 'SET_EDITING_MAP_ANSWER', value: null });
     },
@@ -356,6 +490,16 @@ function reducer(state: State, action: Action): State {
       return {
         ...state,
         editingMapAnswer: action.value,
+      };
+    case 'SET_ANSWER_GEOMETRIES':
+      return {
+        ...state,
+        answerGeometries: action.value,
+      };
+    case 'SET_MODIFYING':
+      return {
+        ...state,
+        modifying: action.value,
       };
     default:
       throw new Error('Invalid action type');
