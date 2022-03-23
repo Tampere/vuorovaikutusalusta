@@ -9,7 +9,9 @@ import {
   ImageListItem,
   Theme,
   TextField,
+  Typography,
 } from '@material-ui/core';
+import { PhotoLibrary } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/styles';
 import { request } from '@src/utils/request';
 import React, { useEffect, useState } from 'react';
@@ -57,6 +59,7 @@ export default function SurveyImageList() {
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
   const [imageAttributions, setImageAttributions] = useState<string>('');
 
+  /** Fetch all images from db during component mount */
   useEffect(() => {
     getImages();
   }, []);
@@ -70,7 +73,6 @@ export default function SurveyImageList() {
     setImageDialogOpen((prev) => !prev);
 
     if (!id) {
-      // TODO: Avaa file input kenttä, lisää uusi kuva
       return;
     }
     editSurvey({ ...activeSurvey, backgroundImageId: id });
@@ -116,8 +118,12 @@ export default function SurveyImageList() {
 
   function handleEmptyImage() {
     setImageDialogOpen((prev) => !prev);
-    editSurvey({ ...activeSurvey, backgroundImageId: 0 });
+    editSurvey({ ...activeSurvey, backgroundImageId: null });
   }
+
+  const activeImage =
+    images?.find((image) => image.id === activeSurvey.backgroundImageId) ??
+    null;
 
   return (
     <div>
@@ -125,7 +131,36 @@ export default function SurveyImageList() {
         variant="outlined"
         onClick={() => setImageDialogOpen((prev) => !prev)}
       >
-        {tr.SurveyImageList.selectImage}
+        <PhotoLibrary />
+        <Typography
+          style={{
+            textTransform: 'none',
+            maxWidth: '400px',
+            textOverflow: 'ellipsis',
+            overflow: 'hidden',
+            whiteSpace: 'nowrap',
+            paddingRight: '0.5rem',
+          }}
+        >
+          {tr.SurveyImageList.surveyImage.toUpperCase()}
+          {': '}
+          {activeImage
+            ? ` ${activeImage?.fileName}.${activeImage?.fileFormat}`
+            : ` ${tr.SurveyImageList.noImage.toLowerCase()}`}
+        </Typography>
+        {activeImage && (
+          <img
+            src={`data:image/;base64,${activeImage.data}`}
+            srcSet={`data:image/;base64,${activeImage.data}`}
+            alt={`survey-image-${activeImage.id}`}
+            loading="lazy"
+            style={{
+              height: '60px',
+              width: '60px',
+              filter: 'drop-shadow(0px 0px 4px lightgrey)',
+            }}
+          />
+        )}
       </Button>
       <Dialog onClose={() => closeDialog()} open={imageDialogOpen}>
         <DialogContent>
@@ -180,6 +215,7 @@ export default function SurveyImageList() {
                   srcSet={`data:image/;base64,${image.data}`}
                   alt={`survey-image-${image.id}`}
                   loading="lazy"
+                  style={{ height: '100%' }}
                 />
               </ImageListItem>
             ))}

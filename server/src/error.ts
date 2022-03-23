@@ -50,5 +50,6 @@ export const UnauthorizedError = getHttpErrorClass(
   401 as const,
   'Unauthorized'
 );
+export const ForbiddenError = getHttpErrorClass(403 as const, 'Forbidden');
 export const NotFoundError = getHttpErrorClass(404 as const);
 export const InternalServerError = getHttpErrorClass(500 as const);

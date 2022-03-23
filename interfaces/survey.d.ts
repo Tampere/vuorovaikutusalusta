@@ -13,15 +13,17 @@ export type SurveyQuestion =
   | SurveyRadioQuestion
   | SurveyNumericQuestion
   | SurveyFreeTextQuestion
-  | SurveyMapQuestion;
+  | SurveyMapQuestion
+  | SurveySortingQuestion
+  | SurveySliderQuestion
+  | SurveyMatrixQuestion;
 
 /**
- * Subquestion type for map questions
+ * Subquestion type for map questions.
+ *
+ * Same as SurveyQuestion, but exclude recursive map questions.
  */
-export type SurveyMapSubQuestion =
-  | SurveyCheckboxQuestion
-  | SurveyRadioQuestion
-  | SurveyFreeTextQuestion;
+export type SurveyMapSubQuestion = Exclude<SurveyQuestion, SurveyMapQuestion>;
 
 /**
  * Common fields for survey page sections
@@ -35,6 +37,14 @@ interface CommonSurveyPageSection {
    * Section title
    */
   title: string;
+  /**
+   * Additional information related to the section
+   */
+  info?: string;
+  /**
+   * Toggler whether the section info should be shown
+   */
+  showInfo?: boolean;
 }
 
 /**
@@ -89,6 +99,7 @@ export interface SurveyNumericQuestion extends CommonSurveyPageQuestion {
  */
 export interface SurveyFreeTextQuestion extends CommonSurveyPageQuestion {
   type: 'free-text';
+  maxLength?: number;
 }
 
 /**
@@ -103,6 +114,36 @@ export interface SurveyMapQuestion extends CommonSurveyPageQuestion {
   type: 'map';
   selectionTypes: MapQuestionSelectionType[];
   subQuestions: SurveyMapSubQuestion[];
+}
+
+/**
+ * Sorting question
+ */
+export interface SurveySortingQuestion extends CommonSurveyPageQuestion {
+  type: 'sorting';
+  options: SectionOption[];
+}
+
+/**
+ * Slider question
+ */
+export interface SurveySliderQuestion extends CommonSurveyPageQuestion {
+  type: 'slider';
+  presentationType: 'literal' | 'numeric';
+  minValue: number;
+  maxValue: number;
+  minLabel: LocalizedText;
+  maxLabel: LocalizedText;
+}
+
+/**
+ * Matrix question
+ */
+export interface SurveyMatrixQuestion extends CommonSurveyPageQuestion {
+  type: 'matrix';
+  classes: LocalizedText[];
+  subjects: LocalizedText[];
+  allowEmptyAnswer: boolean;
 }
 
 /**
@@ -152,6 +193,14 @@ export interface Survey {
    * Unit under which the author works
    */
   authorUnit: string;
+  /**
+   * ID of the author (referencing the user table)
+   */
+  authorId: string;
+  /**
+   * Array of administrator user IDs
+   */
+  admins: string[];
   /**
    * URL of the embedded map component
    */
@@ -217,7 +266,7 @@ export interface SectionOption {
 /**
  * Supported language codes
  */
-type LanguageCode = 'fi' | 'en';
+type LanguageCode = 'fi';
 
 /**
  * Type for localization typing
@@ -270,8 +319,24 @@ export type AnswerEntry = {
       value: string | number;
     }
   | {
+      type: 'numeric';
+      value: number;
+    }
+  | {
       type: 'map';
       value: MapQuestionAnswer[];
+    }
+  | {
+      type: 'sorting';
+      value: number[];
+    }
+  | {
+      type: 'slider';
+      value: number;
+    }
+  | {
+      type: 'matrix';
+      value: string[];
     }
 );
 
@@ -305,4 +370,12 @@ export interface SurveyBackgroundImage {
    * Image attributions (= who owns the image rights)
    */
   attributions: string;
+  /**
+   * Image file name
+   */
+  fileName: string;
+  /**
+   * Image file format (e.g. .png, .jpeg)
+   */
+  fileFormat: string;
 }

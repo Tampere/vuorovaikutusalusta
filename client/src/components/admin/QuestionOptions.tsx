@@ -2,7 +2,6 @@ import { SectionOption } from '@interfaces/survey';
 import { Fab, IconButton, TextField, Typography } from '@material-ui/core';
 import { Add, Delete, DragIndicator } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/styles';
-import { useTranslations } from '@src/stores/TranslationContext';
 import React, { createRef, useEffect, useMemo } from 'react';
 
 const useStyles = makeStyles({
@@ -14,7 +13,6 @@ const useStyles = makeStyles({
   row: {
     display: 'flex',
     alignItems: 'center',
-    gap: '1rem',
   },
   option: {
     alignItems: 'center',
@@ -31,15 +29,16 @@ interface Props {
   options: SectionOption[];
   disabled?: boolean;
   onChange: (options: SectionOption[]) => void;
+  title: string;
 }
 
 export default function QuestionOptions({
   options,
   disabled,
   onChange,
+  title,
 }: Props) {
   const classes = useStyles();
-  const { tr } = useTranslations();
 
   // Array of references to the option input elements
   const inputRefs = useMemo(
@@ -58,7 +57,20 @@ export default function QuestionOptions({
 
   return (
     <div className={classes.wrapper}>
-      <Typography>{tr.SurveySections.options}</Typography>
+      <div className={classes.row}>
+        <Fab
+          color="primary"
+          disabled={disabled}
+          aria-label="add-question-option"
+          size="small"
+          onClick={() => {
+            onChange([...options, { text: '' }]);
+          }}
+        >
+          <Add />
+        </Fab>
+        <Typography style={{ paddingLeft: '1rem' }}>{title}</Typography>
+      </div>
       <div>
         {options.map((option, index) => (
           <div className={`${classes.row} ${classes.option}`} key={index}>
@@ -105,20 +117,6 @@ export default function QuestionOptions({
             </IconButton>
           </div>
         ))}
-      </div>
-      <div className={classes.row}>
-        <Fab
-          color="primary"
-          disabled={disabled}
-          aria-label="add-question-option"
-          size="small"
-          onClick={() => {
-            onChange([...options, { text: '' }]);
-          }}
-        >
-          <Add />
-        </Fab>
-        <Typography>{tr.SurveySections.addOption}</Typography>
       </div>
     </div>
   );

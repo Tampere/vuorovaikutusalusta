@@ -1,4 +1,5 @@
 import {
+  MapQuestionAnswer,
   SurveyMapSubQuestion,
   SurveyMapSubQuestionAnswer,
 } from '@interfaces/survey';
@@ -7,6 +8,7 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
+  DialogTitle,
   FormControl,
   FormHelperText,
   FormLabel,
@@ -20,7 +22,12 @@ import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useEffect, useMemo, useState } from 'react';
 import CheckBoxQuestion from './CheckBoxQuestion';
 import FreeTextQuestion from './FreeTextQuestion';
+import MatrixQuestion from './MatrixQuestion';
+import NumericQuestion from './NumericQuestion';
 import RadioQuestion from './RadioQuestion';
+import SectionInfo from './SectionInfo';
+import SliderQuestion from './SliderQuestion';
+import SortingQuestion from './SortingQuestion';
 
 const useStyles = makeStyles({
   content: {
@@ -31,19 +38,48 @@ const useStyles = makeStyles({
 });
 
 interface Props {
+  /**
+   * Is the dialog open?
+   */
   open: boolean;
+  /**
+   * Title of the question - only displayed when editing existing answers
+   */
+  title?: string;
+  /**
+   * Existing subquestion answers - defined only when editing an existing map answer
+   */
+  answer?: MapQuestionAnswer;
+  /**
+   * Map sub questions
+   */
   subQuestions: SurveyMapSubQuestion[];
+  /**
+   * Callback for submitting subquestion answers
+   */
   onSubmit: (answers: SurveyMapSubQuestionAnswer[]) => void;
+  /**
+   * Callback for canceling adding/editing a map answer
+   */
   onCancel: () => void;
+  /**
+   * Callback for deleting the existing map answer (not shown for new answers)
+   */
+  onDelete?: () => void;
 }
 
 export default function MapSubQuestionDialog({
   open,
+  title,
+  answer: existingAnswer,
   subQuestions,
   onSubmit,
   onCancel,
+  onDelete,
 }: Props) {
-  const [answers, setAnswers] = useState<SurveyMapSubQuestionAnswer[]>([]);
+  const [answers, setAnswers] = useState<SurveyMapSubQuestionAnswer[]>([
+    ...(existingAnswer?.subQuestionAnswers ?? []),
+  ]);
   const [dirty, setDirty] = useState<boolean[]>([]);
 
   const classes = useStyles();
@@ -54,13 +90,20 @@ export default function MapSubQuestionDialog({
    * Initialize dirty statuses and answers with empty answers when subquestions are changed and/or the dialog is opened
    */
   useEffect(() => {
-    const answers = subQuestions?.map(
-      (question) => getEmptyAnswer(question) as SurveyMapSubQuestionAnswer
-    );
-    setAnswers(answers);
+    if (existingAnswer) {
+      // Existing answer provided - set subquestion answers from that
+      setAnswers(existingAnswer.subQuestionAnswers);
+    } else {
+      // New map answer - set subquestion answers empty
+      const answers = subQuestions?.map(
+        (question) => getEmptyAnswer(question) as SurveyMapSubQuestionAnswer
+      );
+      setAnswers(answers);
+    }
+    // Clear dirty status for each subquestion
     const dirty = subQuestions?.map(() => false);
     setDirty(dirty);
-  }, [subQuestions, open]);
+  }, [subQuestions, open, existingAnswer]);
 
   const validationErrors = useMemo(() => {
     if (!subQuestions || !answers.length) {
@@ -78,6 +121,7 @@ export default function MapSubQuestionDialog({
       aria-label="subquestion dialog"
       aria-describedby="subquestion-dialog-content"
     >
+      {title && <DialogTitle>{title}</DialogTitle>}
       <DialogContent
         id="subquestion-dialog-content"
         className={classes.content}
@@ -88,9 +132,18 @@ export default function MapSubQuestionDialog({
             error={dirty?.[index] && validationErrors?.[index].length > 0}
             style={{ width: '100%' }}
           >
-            <FormLabel component="legend">
-              {question.title} {question.isRequired && '*'}
-            </FormLabel>
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+              }}
+            >
+              <FormLabel component="legend">
+                {question.title} {question.isRequired && '*'}
+              </FormLabel>
+              {question.info && <SectionInfo infoText={question.info} />}
+            </div>
             {question.type === 'checkbox' ? (
               <CheckBoxQuestion
                 value={answers[index]?.value as (number | string)[]}
@@ -129,6 +182,57 @@ export default function MapSubQuestionDialog({
                   setDirty([...dirty]);
                 }}
               />
+            ) : question.type === 'numeric' ? (
+              <NumericQuestion
+                value={answers[index]?.value as number}
+                onChange={(value) => {
+                  answers[index].value = value;
+                  setAnswers([...answers]);
+                }}
+                setDirty={(value) => {
+                  dirty[index] = value;
+                  setDirty([...dirty]);
+                }}
+              />
+            ) : question.type === 'sorting' ? (
+              <SortingQuestion
+                value={answers[index]?.value as number[]}
+                onChange={(value) => {
+                  answers[index].value = value;
+                  setAnswers([...answers]);
+                }}
+                question={question}
+                setDirty={(value) => {
+                  dirty[index] = value;
+                  setDirty([...dirty]);
+                }}
+              />
+            ) : question.type === 'slider' ? (
+              <SliderQuestion
+                value={answers[index]?.value as number}
+                onChange={(value) => {
+                  answers[index].value = value;
+                  setAnswers([...answers]);
+                }}
+                question={question}
+                setDirty={(value) => {
+                  dirty[index] = value;
+                  setDirty([...dirty]);
+                }}
+              />
+            ) : question.type === 'matrix' ? (
+              <MatrixQuestion
+                value={answers[index]?.value as string[]}
+                onChange={(value) => {
+                  answers[index].value = value;
+                  setAnswers([...answers]);
+                }}
+                question={question}
+                setDirty={(value) => {
+                  dirty[index] = value;
+                  setDirty([...dirty]);
+                }}
+              />
             ) : null}
             {/* Show the required error only for empty values (not when answer limits are broken in checkbox questions) */}
             {dirty?.[index] &&
@@ -141,6 +245,17 @@ export default function MapSubQuestionDialog({
         ))}
       </DialogContent>
       <DialogActions>
+        {existingAnswer && (
+          <Button
+            onClick={() => {
+              onDelete();
+            }}
+            variant="contained"
+          >
+            {tr.MapQuestion.removeAnswer}
+          </Button>
+        )}
+        <div style={{ flexGrow: 1 }} />
         <Button
           onClick={() => {
             onCancel();

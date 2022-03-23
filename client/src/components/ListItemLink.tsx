@@ -1,5 +1,4 @@
-import { Link } from '@material-ui/core';
-import { ListItem } from '@material-ui/core';
+import { Link, ListItem } from '@material-ui/core';
 import { OpenInNew } from '@material-ui/icons';
 import React, { ReactNode } from 'react';
 import { NavLink } from 'react-router-dom';
@@ -15,6 +14,7 @@ export default function ListItemLink(props: Props) {
   return (
     <ListItem
       button
+      style={{ backgroundColor: '#333' }}
       component={props.external ? Link : NavLink}
       {...(!props.external && {
         to: props.to,

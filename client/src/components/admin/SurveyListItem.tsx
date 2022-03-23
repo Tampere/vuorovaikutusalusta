@@ -3,7 +3,6 @@ import { Survey } from '@interfaces/survey';
 import { Button, Card, Link, Theme, Typography } from '@material-ui/core';
 import { CardContent } from '@material-ui/core';
 import { CardActions } from '@material-ui/core';
-import { NavLink, useRouteMatch } from 'react-router-dom';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { format } from 'date-fns';
 import CopyToClipboard from '../CopyToClipboard';
@@ -14,6 +13,7 @@ import {
 } from '@src/controllers/SurveyController';
 import { useToasts } from '@src/stores/ToastContext';
 import { makeStyles } from '@material-ui/styles';
+import DataExport from './DataExport';
 
 const useStyles = makeStyles((theme: Theme) => ({
   '@keyframes pulse': {
@@ -47,7 +47,6 @@ export default function SurveyListItem(props: Props) {
   const [loading, setLoading] = useState(false);
 
   const classes = useStyles();
-  const { url } = useRouteMatch();
   const { tr } = useTranslations();
   const { showToast } = useToasts();
 
@@ -109,8 +108,15 @@ export default function SurveyListItem(props: Props) {
               : tr.SurveyList.notPublished}
           </Typography>
         </CardContent>
-        <CardActions>
-          <Button component={NavLink} to={`${url}kyselyt/${survey.id}`}>
+        <CardActions
+          style={{
+            width: '100%',
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'flex-start',
+          }}
+        >
+          <Button onClick={() => window.open(`/admin/kyselyt/${survey.id}`)}>
             {tr.SurveyList.editSurvey}
           </Button>
           {/* Allow publish only if it isn't yet published and has a name */}
@@ -133,6 +139,7 @@ export default function SurveyListItem(props: Props) {
               {tr.SurveyList.unpublish}
             </Button>
           )}
+          <DataExport surveyId={survey.id} />
         </CardActions>
       </Card>
       <ConfirmDialog

@@ -24,14 +24,23 @@ router.get(
       const responseJson = (await response.json()) as {
         configuration: {
           mapfull: {
-            conf: { layers: MapLayer[] };
+            conf: {
+              layers: MapLayer[];
+            };
           };
         };
       };
       const layers = responseJson.configuration?.mapfull?.conf?.layers?.map(
         ({ id, name }) => ({
           id,
-          name,
+          name:
+            typeof name === 'string'
+              ? name
+              : // For user-created datasets, the name might be a localized object instead of a string.
+              // In this case, just pick the first one available
+              Object.keys(name).length > 0
+              ? name[Object.keys(name)[0]]
+              : '<untitled layer>',
         })
       );
       // For non-existent UUIDs the full layer path won't exist in the response object

@@ -42,6 +42,8 @@ RUN rm -r src
 # Main image build
 ###
 FROM base AS main
+# Install GDAL dependence
+RUN apk update && apk add gdal
 
 WORKDIR ${APPDIR}
 

@@ -11,12 +11,12 @@ import {
   SurveyPageSection,
   SurveyRadioQuestion,
 } from '@interfaces/survey';
+import { User } from '@interfaces/user';
 import {
   getColumnSet,
   getDb,
   getGeoJSONColumn,
   getMultiInsertQuery,
-  getMultiUpdateQuery,
 } from '@src/database';
 import {
   BadRequestError,
@@ -28,65 +28,31 @@ import logger from '@src/logger';
 // TODO: Find a better way to pass the language code when/if the localization is fully implemented
 const languageCode = 'fi';
 
+const sectionTypesWithOptions: SurveyPageSection['type'][] = [
+  'radio',
+  'checkbox',
+  'sorting',
+];
+
 /**
  * Survey's DB model
  */
 interface DBSurvey {
-  /**
-   * ID of the survey (unique)
-   */
   id: number;
-  /**
-   * Name of the survey (unique): used to generate the public URL of the survey
-   */
   name: string;
-  /**
-   * Title of the survey
-   */
   title: LocalizedText;
-  /**
-   * Subtitle of the survey
-   */
   subtitle: LocalizedText;
-  /**
-   * Author of the survey
-   */
   author: string;
-  /**
-   * Unit under which the author works
-   */
   author_unit: string;
-  /**
-   * URL of the embedded map component
-   */
+  author_id: string;
+  admins: string[];
   map_url: string;
-  /**
-   * Date when the survey is planned to start and go public
-   */
   start_date: Date;
-  /**
-   * Date when the survey is planned to end
-   */
   end_date: Date;
-  /**
-   * Date when the survey was initially created
-   */
   created_at: Date;
-  /**
-   * Date when the survey was modified last time
-   */
   updated_at: Date;
-  /**
-   * Title of the thanks page
-   */
   thanks_page_title: LocalizedText;
-  /**
-   * Text contents of the thanks page (markdown)
-   */
   thanks_page_text: LocalizedText;
-  /**
-   * Survey's background image id
-   */
   background_image_id: number;
 }
 
@@ -94,21 +60,9 @@ interface DBSurvey {
  * DB row of the data.survey_page table
  */
 interface DBSurveyPage {
-  /**
-   * ID of the survey page
-   */
   id: number;
-  /**
-   * Foreign key survey id
-   */
   survey_id: number;
-  /**
-   * Page's index on the survey
-   */
   idx: number;
-  /**
-   * Title of the survey page
-   */
   title: LocalizedText;
   /**
    * IDs of the map layers visible on the page
@@ -121,59 +75,24 @@ interface DBSurveyPage {
  * DB row of the data.page_section
  */
 interface DBSurveyPageSection {
-  /**
-   * ID of the survey page section
-   */
   id: number;
-  /**
-   * ID of the survey page section
-   */
   survey_page_id: number;
-  /**
-   * Type of the section (map question/checkbox/radio etc.)
-   */
   type: string;
-  /**
-   * Section title
-   */
   title: LocalizedText;
-  /**
-   * Body of a text section
-   */
   body: LocalizedText;
-  /**
-   * Section's index on the page
-   */
   idx: number;
-  /**
-   * Details of the section (e.g. how many options the user can choose on multichoice questions)
-   */
   details: object;
-  /**
-   * Parent section ID for subquestions
-   */
   parent_section: number;
+  info: LocalizedText;
 }
 
 /**
  * DB row of table data.option
  */
 interface DBSectionOption {
-  /**
-   * id of the option
-   */
   id?: number;
-  /**
-   * Ordering index of the option
-   */
   idx: number;
-  /**
-   * Localized text field of the option text
-   */
   text: LocalizedText;
-  /**
-   * Foreign key referencing which section the option belongs into
-   */
   section_id: number;
 }
 
@@ -190,6 +109,7 @@ type DBSurveyJoin = DBSurvey & {
   section_type: string;
   section_details: object;
   section_parent_section: number;
+  section_info: LocalizedText;
   option_id: number;
   option_text: LocalizedText;
 };
@@ -198,32 +118,14 @@ type DBSurveyJoin = DBSurvey & {
  * DB row of table data.answer_entry
  */
 interface DBAnswerEntry {
-  /**
-   * unique id of the entry
-   */
   id?: number;
-  /**
-   * ID of the submission into which the answer belongs
-   */
   submission_id: number;
-  /**
-   * ID of the survey section
-   */
   section_id: number;
-  /**
-   * Answer text for a free text question
-   */
-  value_text?: string;
-  /**
-   * ID of the multichoise option to which the answer points
-   */
-  value_option_id?: number;
-  /**
-   * Geometry of the answer
-   */
-  value_geometry?: GeoJSON.Feature<
-    GeoJSON.Point | GeoJSON.LineString | GeoJSON.Polygon
-  >;
+  value_text: string;
+  value_numeric: number;
+  value_option_id: number;
+  value_geometry: GeoJSON.Geometry;
+  value_json: string;
 }
 
 /**
@@ -262,6 +164,11 @@ const submissionEntryColumnSet = (inputSRID: number) =>
     'value_text',
     'value_option_id',
     getGeoJSONColumn('value_geometry', inputSRID),
+    'value_numeric',
+    {
+      name: 'value_json',
+      cast: 'json',
+    },
   ]);
 
 /**
@@ -286,7 +193,8 @@ export async function getSurvey(params: { id: number } | { name: string }) {
         section.type as section_type,
         section.details as section_details,
         section.idx as section_idx,
-        section.parent_section as section_parent_section
+        section.parent_section as section_parent_section,
+        section.info as section_info
       FROM (
         SELECT
           survey.*,
@@ -365,8 +273,8 @@ export async function getSurvey(params: { id: number } | { name: string }) {
       }
     }
 
-    // Only look for options in radio & checkbox question sections
-    if (['radio', 'checkbox'].includes(section?.type)) {
+    // Only look for options if the section type allows options
+    if (sectionTypesWithOptions.includes(section?.type)) {
       // For some reason TS cannot infer the section here correctly from the if above - assume the type in the new variable
       const question = section as SurveyRadioQuestion | SurveyCheckboxQuestion;
       // Try to find the pre-existing question option object
@@ -394,11 +302,12 @@ export async function getSurveys() {
 
 /**
  * Creates a new survey entry into the database
- * @param survey
+ * @param user Author
  */
-export async function createSurvey() {
+export async function createSurvey(user: User) {
   const surveyRow = await getDb().one<DBSurvey>(
-    `INSERT INTO data.survey DEFAULT VALUES RETURNING *`
+    `INSERT INTO data.survey (author_id) VALUES ($1) RETURNING *`,
+    [user.id]
   );
 
   if (!surveyRow) {
@@ -414,8 +323,8 @@ export async function createSurvey() {
 async function insertSection(section: DBSurveyPageSection, index: number) {
   return await getDb().one<DBSurveyPageSection>(
     `
-    INSERT INTO data.page_section (survey_page_id, idx, title, type, body, details, parent_section)
-    VALUES ($1, $2, $3::json, $4, $5::json, $6::json, $7) RETURNING id;
+    INSERT INTO data.page_section (survey_page_id, idx, title, type, body, details, parent_section, info)
+    VALUES ($1, $2, $3::json, $4, $5::json, $6::json, $7, $8) RETURNING id;
   `,
     [
       section.survey_page_id,
@@ -425,6 +334,7 @@ async function insertSection(section: DBSurveyPageSection, index: number) {
       section.body,
       section.details,
       section.parent_section,
+      section.info,
     ]
   );
 }
@@ -448,7 +358,8 @@ export async function updateSurvey(survey: Survey) {
         end_date = $9,
         thanks_page_title = $10,
         thanks_page_text = $11,
-        background_image_id = $12
+        background_image_id = $12,
+        admins = $13
       WHERE id = $1 RETURNING *`,
       [
         survey.id,
@@ -463,6 +374,7 @@ export async function updateSurvey(survey: Survey) {
         { fi: survey.thanksPage.title },
         { fi: survey.thanksPage.text },
         survey.backgroundImageId,
+        survey.admins,
       ]
     )
     .catch((error) => {
@@ -479,16 +391,16 @@ export async function updateSurvey(survey: Survey) {
   }
 
   if (survey.pages.length) {
-    // Update pages belonging to the survey
-    // Form a query for updating multiple rows
-    const query =
-      getMultiUpdateQuery(
-        surveyPagesToRows(survey.pages, survey.id),
-        surveyPageColumnSet
-      ) +
-      // PgPromise uses 'v' and 't' aliases for the helper query
-      ' WHERE t.id = v.id';
-
+    // Clear old pages
+    await getDb().none(`DELETE FROM data.survey_page WHERE survey_id = $1;`, [
+      survey.id,
+    ]);
+    // Re-insert pages belonging to the survey
+    // Form a query for inserting multiple rows
+    const query = getMultiInsertQuery(
+      surveyPagesToRows(survey.pages, survey.id),
+      surveyPageColumnSet
+    );
     await getDb().none(query);
   }
 
@@ -594,6 +506,8 @@ function dbSurveyToSurvey(
     subtitle: dbSurvey.subtitle?.fi,
     author: dbSurvey.author,
     authorUnit: dbSurvey.author_unit,
+    authorId: dbSurvey.author_id,
+    admins: dbSurvey.admins,
     mapUrl: dbSurvey.map_url,
     startDate: dbSurvey.start_date,
     endDate: dbSurvey.end_date,
@@ -641,10 +555,11 @@ function dbSurveyJoinToSection(dbSurveyJoin: DBSurveyJoin): SurveyPageSection {
         title: dbSurveyJoin.section_title?.[languageCode],
         type: dbSurveyJoin.section_type as SurveyPageSection['type'],
         body: dbSurveyJoin.section_body?.[languageCode],
+        info: dbSurveyJoin.section_info?.[languageCode],
         // Trust that the JSON in the DB fits the rest of the detail fields
         ...(dbSurveyJoin.section_details as any),
         // Add an initial empty option array if the type allows options
-        ...(['radio', 'checkbox'].includes(type) && { options: [] }),
+        ...(sectionTypesWithOptions.includes(type) && { options: [] }),
       };
 }
 
@@ -769,22 +684,24 @@ function answerEntriesToRows(
   submissionEntries: AnswerEntry[]
 ) {
   return submissionEntries.reduce((entries, entry) => {
-    let newEntry;
+    let newEntries: DBAnswerEntry[];
 
     switch (entry.type) {
       case 'free-text':
-        newEntry = [
+        newEntries = [
           {
             submission_id: submissionID,
             section_id: entry.sectionId,
             value_text: entry.value,
             value_option_id: null,
             value_geometry: null,
-          } as DBAnswerEntry,
+            value_numeric: null,
+            value_json: null,
+          },
         ];
         break;
       case 'radio':
-        newEntry = [
+        newEntries = [
           {
             submission_id: submissionID,
             section_id: entry.sectionId,
@@ -792,11 +709,13 @@ function answerEntriesToRows(
             value_option_id:
               typeof entry.value === 'number' ? entry.value : null,
             value_geometry: null,
+            value_numeric: null,
+            value_json: null,
           },
         ];
         break;
       case 'checkbox':
-        newEntry = [
+        newEntries = [
           ...entry.value.map((value) => {
             return {
               submission_id: submissionID,
@@ -804,19 +723,36 @@ function answerEntriesToRows(
               value_text: typeof value === 'string' ? value : null,
               value_option_id: typeof value === 'number' ? value : null,
               value_geometry: null,
+              value_numeric: null,
+              value_json: null,
             };
           }),
         ];
         break;
+      case 'numeric':
+        newEntries = [
+          {
+            submission_id: submissionID,
+            section_id: entry.sectionId,
+            value_text: null,
+            value_option_id: null,
+            value_geometry: null,
+            value_numeric: entry.value,
+            value_json: null,
+          },
+        ];
+        break;
       case 'map':
-        newEntry = entry.value.reduce((prevEntries, currentValue) => {
+        newEntries = entry.value.reduce((prevEntries, currentValue) => {
           const geometryEntry = {
             submission_id: submissionID,
             section_id: entry.sectionId,
             value_text: null,
             value_option_id: null,
             value_geometry: currentValue.geometry?.geometry,
-          };
+            value_numeric: null,
+            value_json: null,
+          } as DBAnswerEntry;
 
           // Map over different subquestion answers using the same function recursively
           const subquestionEntries = currentValue.subQuestionAnswers
@@ -827,10 +763,49 @@ function answerEntriesToRows(
         }, []);
 
         break;
+      case 'sorting':
+        newEntries = [
+          {
+            submission_id: submissionID,
+            section_id: entry.sectionId,
+            value_text: null,
+            value_option_id: null,
+            value_geometry: null,
+            value_numeric: null,
+            value_json: JSON.stringify(entry.value),
+          },
+        ];
+        break;
+      case 'slider':
+        newEntries = [
+          {
+            submission_id: submissionID,
+            section_id: entry.sectionId,
+            value_text: null,
+            value_option_id: null,
+            value_geometry: null,
+            value_numeric: entry.value,
+            value_json: null,
+          },
+        ];
+        break;
+      case 'matrix':
+        newEntries = [
+          {
+            submission_id: submissionID,
+            section_id: entry.sectionId,
+            value_text: null,
+            value_option_id: null,
+            value_geometry: null,
+            value_numeric: null,
+            value_json: JSON.stringify(entry.value),
+          },
+        ];
+        break;
     }
 
-    return [...entries, ...(newEntry ?? [])];
-  }, []);
+    return [...entries, ...(newEntries ?? [])];
+  }, [] as DBAnswerEntry[]);
 }
 
 /**
@@ -869,7 +844,7 @@ function surveySectionsToRows(
   pageId: number,
   parentSectionId?: number
 ) {
-  return surveySections.map((surveySection, index) => {
+  return surveySections.filter(Boolean).map((surveySection, index) => {
     const {
       id,
       type,
@@ -877,6 +852,7 @@ function surveySectionsToRows(
       body = undefined,
       options = undefined,
       subQuestions = undefined,
+      info = undefined,
       ...details
     } = { ...surveySection };
     return {
@@ -893,6 +869,9 @@ function surveySectionsToRows(
       options,
       subQuestions,
       parent_section: parentSectionId ?? null,
+      info: {
+        fi: info,
+      },
     } as DBSurveyPageSection & {
       options: SectionOption[];
       subQuestions: SurveyMapSubQuestion[];
@@ -981,14 +960,15 @@ export async function unpublishSurvey(surveyId: number) {
 export async function storeImage(
   imageBuffer: Buffer,
   fileName: string,
-  attributions: string
+  attributions: string,
+  fileFormat: string
 ) {
   const imageString = `\\x${imageBuffer.toString('hex')}`;
   const row = await getDb().oneOrNone(
     `
-    INSERT INTO data.images (image, attributions, image_name) values ($1, $2, $3) RETURNING id;
+    INSERT INTO data.images (image, attributions, image_name, file_format) values ($1, $2, $3, $4) RETURNING id;
     `,
-    [imageString, attributions, fileName]
+    [imageString, attributions, fileName, fileFormat]
   );
 
   if (!row) {
@@ -1027,13 +1007,15 @@ export async function getImage(id: number) {
  */
 export async function getImages() {
   const rows = await getDb().manyOrNone(`
-    SELECT id, attributions, image FROM data.images;
-  `); // TODO order by
+    SELECT id, attributions, image, image_name, file_format FROM data.images ORDER BY created_at DESC;
+  `);
 
   return rows.map((row) => ({
     id: row.id,
     data: row.image.toString('base64'),
     attributions: row.attributions,
+    fileName: row.image_name,
+    fileFormat: row.file_format,
   })) as SurveyBackgroundImage[];
 }
 
@@ -1049,4 +1031,18 @@ export async function removeImage(id: number) {
   `,
     [id]
   );
+}
+
+/**
+ * Checks if given user is allowed to edit the survey with given ID
+ * @param user User
+ * @param surveyId Survey ID
+ * @returns Can the user edit the survey?
+ */
+export async function userCanEditSurvey(user: User, surveyId: number) {
+  const { author_id: authorId, admins } = await getDb().oneOrNone<{
+    author_id: string;
+    admins: string[];
+  }>(`SELECT author_id, admins FROM data.survey WHERE id = $1`, [surveyId]);
+  return user.id === authorId || admins.includes(user.id);
 }

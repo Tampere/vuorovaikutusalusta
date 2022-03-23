@@ -1,10 +1,16 @@
-import { FormLabel, Skeleton, TextField } from '@material-ui/core';
+import { User } from '@interfaces/user';
+import {
+  Autocomplete,
+  FormLabel,
+  Skeleton,
+  TextField,
+} from '@material-ui/core';
 import DateTimePicker from '@material-ui/lab/DateTimePicker';
 import { makeStyles } from '@material-ui/styles';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import ConfirmDialog from '../ConfirmDialog';
 import Fieldset from '../Fieldset';
@@ -24,6 +30,8 @@ const useStyles = makeStyles({
 export default function EditSurveyInfo() {
   const [deleteConfirmDialogOpen, setDeleteConfirmDialogOpen] = useState(false);
   const [deleteSurveyLoading, setDeleteSurveyLoading] = useState(false);
+  const [users, setUsers] = useState<User[]>(null);
+  const [usersLoading, setUsersLoading] = useState(true);
 
   const {
     activeSurvey,
@@ -39,6 +47,26 @@ export default function EditSurveyInfo() {
   const history = useHistory();
 
   const classes = useStyles();
+
+  useEffect(() => {
+    async function fetchOtherUsers() {
+      setUsersLoading(true);
+      try {
+        const users = await fetch('/api/users/others').then(
+          (response) => response.json() as Promise<User[]>
+        );
+        setUsers(users);
+      } catch (error) {
+        showToast({
+          severity: 'error',
+          message: tr.EditSurveyInfo.userFetchFailed,
+        });
+      }
+      setUsersLoading(false);
+    }
+
+    fetchOtherUsers();
+  }, []);
 
   return (
     <>
@@ -114,6 +142,30 @@ export default function EditSurveyInfo() {
             validationErrors.includes('survey.mapUrl') &&
             tr.EditSurveyInfo.mapUrlError
           }
+        />
+        <Autocomplete
+          multiple
+          disabled={usersLoading}
+          options={users ?? []}
+          getOptionLabel={(user) => user.fullName}
+          value={
+            users?.filter((user) => activeSurvey.admins?.includes(user.id)) ??
+            []
+          }
+          onChange={(_, value: User[]) => {
+            editSurvey({
+              ...activeSurvey,
+              admins: value.map((user) => user.id),
+            });
+          }}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              variant="standard"
+              label={tr.EditSurveyInfo.admins}
+              helperText={tr.EditSurveyInfo.adminsHelperText}
+            />
+          )}
         />
         {availableMapLayersLoading && (
           <Skeleton variant="rectangular" height={200} width="100%" />

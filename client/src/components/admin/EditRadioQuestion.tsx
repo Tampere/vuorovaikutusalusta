@@ -43,6 +43,7 @@ export default function EditRadioQuestion({
         onChange={(options) => {
           onChange({ ...section, options });
         }}
+        title={tr.SurveySections.options}
       />
       <FormGroup row>
         <FormControlLabel

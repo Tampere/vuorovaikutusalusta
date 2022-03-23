@@ -1,4 +1,12 @@
 {
+  "DataExport": {
+    "exportAnswers": "Lataa vastaukset",
+    "surveyAnswerExport": "Kyselyn vastausdatan lataus",
+    "chooseFileFormat": "Valitse haluamasi tiedostomuodot",
+    "download": "lataa",
+    "errorDownloadingCSV": "CSV -tiedoston lataaminen epäonnistui",
+    "errorDownloadingGPKG": "GeoPackage -tiedoston lataaminen epäonnistui"
+  },
   "EditSurvey": {
     "errorFetchingSurvey": "Virhe haettaessa kyselyä. Tarkista osoite tai yritä myöhemmin uudestaan.",
     "untitledPage": "Nimetön sivu",
@@ -34,6 +42,9 @@
     "nameHelperText": "Kyselyn URL-osoitteessa näkyvä nimi. Voi sisältää vain kirjaimia (a-z), numeroita (0-9) ja viivoja (- ja _).",
     "author": "Kyselyn laatija/yhteyshenkilö",
     "authorUnit": "Kyselyn laatijan yksikkö",
+    "admins": "Kyselyn ylläpitäjät",
+    "userFetchFailed": "Käyttäjien haku epäonnistui. Yritä myöhemmin uudestaan.",
+    "adminsHelperText": "Kyselyn alkuperäisen luojan lisäksi määriteltävät käyttäjät, jotka voivat katsella kyselyn vastauksia sekä muokata kyselyä.",
     "mapUrl": "Oskari-karttajulkaisun osoite",
     "mapUrlError": "Karttatasojen haku annetulle osoitteelle epäonnistui. Tarkista osoite ja yritä uudestaan.",
     "availableMapLayers": "Saatavilla olevat karttatasot:",
@@ -57,16 +68,23 @@
     "numericQuestion": "Lisää numeerinen kysymys",
     "mapQuestion": "Lisää karttakysymys",
     "textSection": "Lisää tekstiosio",
-    "freeTextQuestion": "Lisää vapaatekstikysymys"
+    "freeTextQuestion": "Lisää vapaatekstikysymys",
+    "sortingQuestion": "Lisää järjestyskysymys",
+    "sliderQuestion": "Lisää liukukytkinkysymys",
+    "matrixQuestion": "Lisää likert -kysymys"
   },
   "SurveySections": {
     "limitAnswers": "Rajoita vastauslukumäärää",
     "minAnswers": "Vastauksia vähintään",
     "maxAnswers": "Vastauksia enintään",
+    "classes": "Vastausluokat",
     "options": "Vastausvaihtoehdot",
-    "addOption": "Lisää vaihtoehto",
+    "subjects": "Vastausaiheet",
     "allowCustomAnswer": "Salli “Jokin muu, mikä?” -vaihtoehto",
-    "isRequired": "Vastaus pakollinen"
+    "isRequired": "Vastaus pakollinen",
+    "answerMaxLength": "Maksimi merkkimäärä",
+    "sectionInfo": "Anna lisätietoja kysymykseen liittyen",
+    "allowEmptyAnswer": "Salli “En osaa sanoa” -vaihtoehto"
   },
   "SurveyImageList": {
     "attributions": "Tekijänoikeustiedot",
@@ -86,6 +104,16 @@
     "line": "Viiva",
     "area": "Alue",
     "subQuestions": "Alikysymykset"
+  },
+  "EditSliderQuestion": {
+    "presentationType": "Esitystapa",
+    "literal": "Sanallinen",
+    "numeric": "Numeerinen",
+    "minValue": "Minimiarvo",
+    "maxValue": "Maksimiarvo",
+    "defaultMinLabel": "Täysin eri mieltä",
+    "defaultMaxLabel": "Täysin samaa mieltä",
+    "literalHelperText": "Sanallisen liukukytkinkysymyksen vastaus tallennetaan tietokantaan arvovälillä 0 - 10."
   },
   "EditSurveyThanksPage": {
     "title": "Kiitos-sivun otsikko",
@@ -150,7 +178,8 @@
     "answerLimitsMin": "Valitse vähintään {min} vaihtoehtoa",
     "answerLimitsMax": "Valitse enintään {max} vaihtoehtoa",
     "customAnswer": "Jokin muu, mikä?",
-    "charactersRemaining": "{x} merkki(ä) jäljellä"
+    "charactersRemaining": "{x} merkki(ä) jäljellä",
+    "showInfo": "Näytä lisätietoja"
   },
   "MapQuestion": {
     "selectionTypes": {
@@ -163,7 +192,19 @@
       "line": "Aloita piirtäminen klikkaamalla aloituskohtaa. Jatka piirtämistä klikkaamalla kartalla uudestaan, lopeta piirtäminen klikkaamalla viimeistä pistettä uudestaan.",
       "area": "Aloita piirtäminen klikkaamalla aloituskohtaa. Jatka piirtämistä klikkaamalla kartalla uudestaan, lopeta piirtäminen klikkaamalla viimeistä pistettä uudestaan."
     },
-    "clearAnswers": "Poista kaikki karttavastaukset"
+    "clearAnswers": "Poista kaikki karttavastaukset",
+    "removeAnswer": "Poista vastaus",
+    "confirmRemoveAnswer": "Haluatko varmasti poistaa tämän karttavastauksen?"
+  },
+  "SurveyMap": {
+    "editGeometries": "Muokkaa kartalle piirtämiäsi geometrioita",
+    "finishEditingGeometries": "Lopeta kartan geometrioiden muokkaus"
+  },
+  "MatrixQuestion": {
+    "emptyAnswer": "En osaa sanoa"
+  },
+  "SortingQuestion": {
+    "empty": "Tyhjä"
   },
   "AppBarUserMenu": {
     "logout": "Kirjaudu ulos"
@@ -183,7 +224,8 @@
     "save": "Tallenna",
     "discard": "Peruuta muutokset",
     "edit": "Muokkaa",
-    "copy": "Kopioi"
+    "copy": "Kopioi",
+    "close": "Sulje"
   },
   "options": {
     "yes": "Kyllä",
