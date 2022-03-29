@@ -41,7 +41,7 @@ export default function SurveyQuestion({ question }: Props) {
           alignItems: 'center',
         }}
       >
-        <FormLabel component="legend">
+        <FormLabel component="legend" style={{ color: 'black' }}>
           {question.title} {question.isRequired && '*'}
         </FormLabel>
         {question.info && <SectionInfo infoText={question.info} />}

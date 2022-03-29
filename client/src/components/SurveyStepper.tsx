@@ -57,6 +57,30 @@ const useStyles = makeStyles((theme: Theme) => ({
   section: {
     margin: '1rem 0',
   },
+  stepHeader: {
+    fontWeight: 'bold !important' as any,
+    color: '#22437b !important' as any,
+    cursor: 'pointer',
+  },
+  stepHeaderError: {
+    color: 'red !important' as any,
+  },
+  stepIcon: {
+    '& svg': {
+      color: 'purple !important' as any,
+    },
+    '& text': {
+      fill: 'white !important' as any,
+    },
+  },
+  stepIconUnfinised: {
+    '& svg': {
+      color: 'red' as any,
+    },
+    '& text': {
+      fill: 'black' as any,
+    },
+  },
 }));
 
 interface Props {
@@ -69,6 +93,7 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
   const [loading, setLoading] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
   const [mobileMapOpen, setMobileMapOpen] = useState(false);
+  const [highlightErrorPages, setHighlightErrorPages] = useState(false);
 
   const { isPageValid, answers } = useSurveyAnswers();
   const { showToast } = useToasts();
@@ -180,8 +205,29 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
       orientation="vertical"
     >
       {survey.pages.map((page, index) => (
-        <Step key={page.id}>
-          <StepLabel>{page.title}</StepLabel>
+        <Step key={page.id} completed={isPageValid(page) && pageNumber > index}>
+          <StepLabel
+            onClick={() => {
+              setPageNumber(index);
+            }}
+            classes={{
+              label: `${classes.stepHeader} ${
+                highlightErrorPages && !isPageValid(page)
+                  ? classes.stepHeaderError
+                  : ''
+              }`,
+              iconContainer:
+                index === pageNumber
+                  ? classes.stepIcon
+                  : (highlightErrorPages && !isPageValid(page)) ||
+                    (pageNumber > index && !isPageValid(page))
+                  ? classes.stepIconUnfinised
+                  : null,
+            }}
+            // error={highlightErrorPages && !isPageValid(page)}
+          >
+            {page.title}
+          </StepLabel>
           <StepContent>
             <FormControl style={{ width: '100%' }} component="fieldset">
               {page.sections.map((section) => (
@@ -202,8 +248,21 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
                   setPageNumber(index + 1);
                 }}
                 disabled={loading}
-                nextDisabled={!isPageValid(page)}
+                nextDisabled={false}
                 onSubmit={async () => {
+                  // If a page is not finished, highlight it
+                  const unfinishedPages = survey.pages.filter(
+                    (page) => !isPageValid(page)
+                  );
+                  if (unfinishedPages.length !== 0) {
+                    setHighlightErrorPages(true);
+                    showToast({
+                      severity: 'error',
+                      message: tr.SurveyStepper.unfinishedAnswers,
+                    });
+                    return;
+                  }
+
                   setLoading(true);
                   try {
                     await request(
