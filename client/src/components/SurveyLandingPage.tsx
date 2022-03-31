@@ -4,6 +4,8 @@ import { makeStyles } from '@material-ui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { getClassList } from '@src/utils/classes';
 import React from 'react';
+import TreBanner from './logos/TreBanner';
+import TreLogo from './logos/TreLogo';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: (props: any) => ({
@@ -83,6 +85,15 @@ export default function SurveyLandingPage({
 
   return (
     <Box className={classes.root}>
+      <div
+        style={{
+          position: 'absolute',
+          top: '0',
+          right: '0',
+        }}
+      >
+        <TreLogo width="351px" height="125px" />
+      </div>
       <h1 className={getClassList([classes.heading, classes.title])}>
         <span>{survey.title}</span>
       </h1>
@@ -99,6 +110,17 @@ export default function SurveyLandingPage({
       >
         {tr.SurveyPage.startSurveyLink}
       </Link>
+      <div
+        style={{
+          position: 'absolute',
+          bottom: '0',
+          left: '0',
+          paddingLeft: '1rem',
+          paddingBottom: '0.5rem',
+        }}
+      >
+        <TreBanner />
+      </div>
       {surveyBackgroundImage?.attributions ? (
         <Typography className={classes.imageCopyright} variant="body2">
           {surveyBackgroundImage.attributions}
