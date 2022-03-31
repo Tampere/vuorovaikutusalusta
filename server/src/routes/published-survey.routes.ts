@@ -1,6 +1,6 @@
 import { AnswerEntry } from '@interfaces/survey';
 import { createSurveySubmission, getSurvey } from '@src/application/survey';
-import { NotFoundError } from '@src/error';
+import { ForbiddenError, NotFoundError } from '@src/error';
 import { validateRequest } from '@src/utils';
 import { Router } from 'express';
 import asyncHandler from 'express-async-handler';
@@ -14,7 +14,7 @@ router.get(
     const survey = await getSurvey({ name: req.params.name });
     if (!survey.isPublished) {
       // In case the survey shouldn't be published, throw the same not found error
-      throw new NotFoundError(`Survey with name ${req.params.name} not found`);
+      throw new ForbiddenError(`Survey with name ${req.params.name} not found`);
     }
     res.json(survey);
   })

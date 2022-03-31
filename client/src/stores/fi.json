@@ -160,6 +160,14 @@
     "errorFetchingSurvey": "Kyselyn haussa tapahtui virhe. Yritä myöhemmin uudestaan.",
     "startSurveyLink": "Aloita kysely tästä"
   },
+  "UnavailableSurvey": {
+    "surveyNotPublished": "Kiitos mielenkiinnostasi! Kysely on sulkeutunut eikä siihen voi enää vastata.",
+    "treTopicalInfo": "Tampereen kaupungin ajankohtaisiin asioihin pääset tutustumaan alla olevasta linkistä.",
+    "tre": "Tampereen kaupunki"
+  },
+  "NotFoundPage": {
+    "pageNotFound": "Kyselyä ei löytynyt. Tarkista osoite ja yritä uudelleen"
+  },
   "CopyToClipboard": {
     "tooltip": "Kopioi leikepöydälle",
     "successful": "Arvo kopioitu leikepöydälle!",
