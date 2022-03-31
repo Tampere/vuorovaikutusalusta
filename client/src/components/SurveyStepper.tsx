@@ -101,7 +101,7 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
     setDisabled,
     setVisibleLayers,
     helperText,
-    isMapActive,
+    drawing,
     isMapReady,
     stopDrawing,
     selectionType,
@@ -111,19 +111,18 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
   const classes = useStyles();
   const { tr } = useTranslations();
   const theme = useTheme();
-  // TODO: enable mobile map once event handler problem when resizing the window is fixed!
-  const mdUp = useMediaQuery(theme.breakpoints.up('md')) || true;
+  const mdUp = useMediaQuery(theme.breakpoints.up('md'));
   const currentPage = useMemo(
     () => survey.pages[pageNumber],
     [survey, pageNumber]
   );
 
   /**
-   * Show/hide mobile map when the active status of the map changes
+   * Show/hide mobile map when the drawing status of the map changes
    */
   useEffect(() => {
-    setMobileMapOpen(isMapActive);
-  }, [isMapActive]);
+    setMobileMapOpen(drawing);
+  }, [drawing]);
 
   /**
    * Stop the drawing interaction when the mobile map gets closed
@@ -169,6 +168,8 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
                 ...features,
                 {
                   ...value.geometry,
+                  // Add a unique index to prevent conflicts
+                  id: `feature-${question.id}-${index}`,
                   // Pass question ID and answer index for reopening the subquestion dialog in edit mode
                   properties: {
                     questionId: question.id,
@@ -331,6 +332,7 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
               alignItems: 'center',
               justifyContent: 'center',
               background: '#fff',
+              zIndex: 1,
             }}
           >
             <Chip
@@ -369,7 +371,7 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
               >
                 <Close />
               </IconButton>
-              {isMapActive && (
+              {drawing && (
                 <>
                   <Typography>{helperText}</Typography>
                   <FormHelperText>

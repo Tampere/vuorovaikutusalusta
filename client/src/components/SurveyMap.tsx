@@ -3,7 +3,7 @@ import { Check, Edit } from '@material-ui/icons';
 import { useSurveyMap } from '@src/stores/SurveyMapContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import OskariRPC from 'oskari-rpc';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 interface Props {
   url: string;
@@ -12,7 +12,6 @@ interface Props {
 }
 
 export default function SurveyMap(props: Props) {
-  const [mapInitialized, setMapInitialized] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>();
   const {
     disabled,
@@ -23,6 +22,7 @@ export default function SurveyMap(props: Props) {
     answerGeometries,
     startModifying,
     stopModifying,
+    drawing,
   } = useSurveyMap();
   const { tr } = useTranslations();
 
@@ -47,9 +47,11 @@ export default function SurveyMap(props: Props) {
     if (!iframeRef?.current) {
       return;
     }
+    // Reset RPC channel (i.e. make map "not ready")
+    setRpcChannel(null);
     const channel = OskariRPC.connect(iframeRef.current, getOrigin(props.url));
     channel.onReady(() => {
-      // Set channel to context when ready
+      // Set the RPC channel to context state when ready
       setRpcChannel(channel);
     });
   }, [iframeRef, props.url]);
@@ -58,9 +60,9 @@ export default function SurveyMap(props: Props) {
    * Initialize map only once when it becomes ready
    */
   useEffect(() => {
-    if (isMapReady && !mapInitialized) {
+    // Initialize map whenever it gets ready
+    if (isMapReady) {
       initializeMap();
-      setMapInitialized(true);
     }
   }, [isMapReady]);
 
@@ -84,7 +86,7 @@ export default function SurveyMap(props: Props) {
           allowFullScreen
           loading="lazy"
         />
-        {!modifying && answerGeometries?.features.length && (
+        {!drawing && !modifying && answerGeometries?.features.length && (
           <Tooltip title={tr.SurveyMap.editGeometries}>
             <Fab
               style={{ position: 'absolute', bottom: '1rem', right: '1rem' }}
@@ -99,7 +101,7 @@ export default function SurveyMap(props: Props) {
             </Fab>
           </Tooltip>
         )}
-        {modifying && (
+        {!drawing && modifying && (
           <Tooltip title={tr.SurveyMap.finishEditingGeometries}>
             <Fab
               style={{ position: 'absolute', bottom: '1rem', right: '1rem' }}
