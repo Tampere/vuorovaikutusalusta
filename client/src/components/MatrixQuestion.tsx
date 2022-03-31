@@ -1,9 +1,12 @@
-import { LocalizedText } from '@interfaces/survey';
+import { SurveyMatrixQuestion } from '@interfaces/survey';
 import {
-  FormControlLabel,
   Radio,
-  RadioGroup,
-  Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
@@ -13,7 +16,7 @@ interface Props {
   value: string[];
   onChange: (value: string[]) => void;
   setDirty: (dirty: boolean) => void;
-  question: any;
+  question: SurveyMatrixQuestion;
 }
 
 const useStyles = makeStyles({
@@ -25,12 +28,16 @@ const useStyles = makeStyles({
     width: '100px',
     wordWrap: 'break-word',
     margin: '0',
-    marginLeft: '0.5rem',
     textAlign: 'center',
   },
   matrixText: {
-    marginTop: '0.5rem',
     fontWeight: 'bold',
+  },
+  stickyLeft: {
+    position: 'sticky',
+    left: 0,
+    background: 'white',
+    zIndex: 1,
   },
 });
 
@@ -43,81 +50,88 @@ export default function MatrixQuestion({
   const { tr, language } = useTranslations();
   const classes = useStyles();
 
-  return (
-    <div>
-      <div className={classes.matrixRow}>
-        <div className={classes.matrixCell}></div>
-        {question.classes.map((entry: LocalizedText, index: number) => {
-          return (
-            <Typography
-              className={`${classes.matrixCell} ${classes.matrixText}`}
-              key={`matrix-header-${index}`}
-            >
-              {entry[language] ?? index}
-            </Typography>
-          );
-        })}
-        {question.allowEmptyAnswer && (
-          <Typography className={`${classes.matrixCell} ${classes.matrixText}`}>
-            {tr.MatrixQuestion.emptyAnswer}
-          </Typography>
-        )}
-      </div>
+  function handleChange(
+    subjectIndex: number,
+    event: React.ChangeEvent<HTMLInputElement>
+  ) {
+    // Ignore if the value is false
+    if (!event.target.checked) {
+      return;
+    }
+    // Set the row's value to the selected button's value
+    const values = [...value];
+    values[subjectIndex] = event.target.value;
+    onChange(values);
+    setDirty(true);
+  }
 
-      {question.subjects.map((subject: LocalizedText, index: number) => {
-        return (
-          <div
-            className={classes.matrixRow}
-            key={`matrix-subject-row-${index}`}
-          >
-            <Typography
-              className={`${classes.matrixCell} ${classes.matrixText}`}
-            >
-              {subject[language]}
-            </Typography>
-            <RadioGroup
-              row
-              value={value[index] ?? null}
-              onChange={(event) => {
-                const values = [...value];
-                values[index] = event.target.value;
-                onChange(values);
-                setDirty(true);
-              }}
-            >
-              {question.classes.map((_entry: LocalizedText, index: number) => {
-                return (
-                  <FormControlLabel
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'row',
-                      justifyContent: 'center',
-                    }}
-                    key={`matrix-cell-${index}`}
-                    className={classes.matrixCell}
-                    value={index.toString()}
-                    control={<Radio />}
-                    label=""
-                  />
-                );
-              })}
-              {question.allowEmptyAnswer && (
-                <FormControlLabel
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    justifyContent: 'center',
-                  }}
-                  className={classes.matrixCell}
-                  value={'-1'}
-                  control={<Radio />}
-                  label=""
-                />
-              )}
-            </RadioGroup>
-          </div>
-        );
-      })}
-    </div>
+  return (
+    <TableContainer>
+      <Table size="small">
+        <TableHead>
+          <TableRow>
+            <TableCell className={classes.stickyLeft} />
+            {question.classes.map((entry, index) => {
+              return (
+                <TableCell
+                  key={index}
+                  className={`${classes.matrixCell} ${classes.matrixText}`}
+                >
+                  {entry[language] ?? index}
+                </TableCell>
+              );
+            })}
+            {question.allowEmptyAnswer && (
+              <TableCell
+                className={`${classes.matrixCell} ${classes.matrixText}`}
+              >
+                {tr.MatrixQuestion.emptyAnswer}
+              </TableCell>
+            )}
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {question.subjects.map((subject, subjectIndex) => {
+            return (
+              <TableRow key={subjectIndex}>
+                <TableCell
+                  className={[
+                    classes.stickyLeft,
+                    classes.matrixCell,
+                    classes.matrixText,
+                  ].join(' ')}
+                >
+                  {subject[language]}
+                </TableCell>
+                {question.classes.map((_entry, classIndex) => (
+                  <TableCell key={classIndex} className={classes.matrixCell}>
+                    <Radio
+                      name={`question-${subjectIndex}`}
+                      checked={value[subjectIndex] === classIndex.toString()}
+                      value={classIndex.toString()}
+                      onChange={(event) => {
+                        handleChange(subjectIndex, event);
+                      }}
+                    />
+                  </TableCell>
+                ))}
+                {question.allowEmptyAnswer && (
+                  <TableCell>
+                    <Radio
+                      name={`question-${subjectIndex}`}
+                      checked={value[subjectIndex] === '-1'}
+                      value={'-1'}
+                      onChange={(event) => {
+                        handleChange(subjectIndex, event);
+                      }}
+                    />
+                  </TableCell>
+                )}
+              </TableRow>
+            );
+          })}
+        </TableBody>
+      </Table>
+    </TableContainer>
   );
 }
