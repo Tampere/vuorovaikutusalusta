@@ -247,6 +247,10 @@ export interface Survey {
      */
     text: string;
   };
+  /**
+   * Theme of the survey
+   */
+  theme: SurveyTheme;
 }
 
 /**
@@ -378,4 +382,22 @@ export interface SurveyBackgroundImage {
    * Image file format (e.g. .png, .jpeg)
    */
   fileFormat: string;
+}
+
+/**
+ * Survey theme
+ */
+export interface SurveyTheme<T extends {} = {}> {
+  /**
+   * ID of the theme
+   */
+  id: number;
+  /**
+   * Optional name for the theme
+   */
+  name?: string;
+  /**
+   * Survey configuration object
+   */
+  data: T;
 }

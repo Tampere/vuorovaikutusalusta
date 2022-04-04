@@ -10,6 +10,7 @@ import {
   SurveyPage,
   SurveyPageSection,
   SurveyRadioQuestion,
+  SurveyTheme,
 } from '@interfaces/survey';
 import { User } from '@interfaces/user';
 import {
@@ -112,6 +113,9 @@ type DBSurveyJoin = DBSurvey & {
   section_info: LocalizedText;
   option_id: number;
   option_text: LocalizedText;
+  theme_id: number;
+  theme_name: string;
+  theme_data: SurveyTheme;
 };
 
 /**
@@ -203,7 +207,15 @@ export async function getSurvey(params: { id: number } | { name: string }) {
           page.idx as page_idx,
           page.map_layers as page_map_layers
         FROM
-          data.survey survey
+          (
+            SELECT
+              survey.*,
+              theme.id as theme_id,
+              theme.name as theme_name,
+              theme.data as theme_data
+            FROM data.survey survey
+            LEFT JOIN application.theme theme ON survey.theme_id = theme.id
+          ) survey
           LEFT JOIN data.survey_page page ON survey.id = page.survey_id
         WHERE ${'id' in params ? `survey.id = $1` : `survey.name = $1`}
       ) AS survey_page
@@ -497,7 +509,7 @@ function isPublished(survey: Pick<Survey, 'startDate' | 'endDate'>) {
  * @returns Survey containing the database entries
  */
 function dbSurveyToSurvey(
-  dbSurvey: DBSurvey
+  dbSurvey: DBSurvey | DBSurveyJoin
 ): Omit<Survey, 'createdAt' | 'updatedAt'> {
   const survey = {
     id: dbSurvey.id,
@@ -522,7 +534,23 @@ function dbSurveyToSurvey(
   return {
     ...survey,
     isPublished: isPublished(survey),
+    ...('theme_id' in dbSurvey && {
+      theme: dbSurveyJoinToTheme(dbSurvey),
+    }),
   };
+}
+
+/**
+ * Converts a DB survey join query row into a survey theme.
+ */
+function dbSurveyJoinToTheme(dbSurveyJoin: DBSurveyJoin): SurveyTheme {
+  return dbSurveyJoin.theme_id == null
+    ? null
+    : {
+        id: dbSurveyJoin.theme_id,
+        name: dbSurveyJoin.theme_name,
+        data: dbSurveyJoin.theme_data,
+      };
 }
 
 /**
