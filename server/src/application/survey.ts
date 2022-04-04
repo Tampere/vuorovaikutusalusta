@@ -715,19 +715,32 @@ function answerEntriesToRows(
         ];
         break;
       case 'checkbox':
-        newEntries = [
-          ...entry.value.map((value) => {
-            return {
-              submission_id: submissionID,
-              section_id: entry.sectionId,
-              value_text: typeof value === 'string' ? value : null,
-              value_option_id: typeof value === 'number' ? value : null,
-              value_geometry: null,
-              value_numeric: null,
-              value_json: null,
-            };
-          }),
-        ];
+        newEntries =
+          entry.value.length !== 0
+            ? [
+                ...entry.value.map((value) => {
+                  return {
+                    submission_id: submissionID,
+                    section_id: entry.sectionId,
+                    value_text: typeof value === 'string' ? value : null,
+                    value_option_id: typeof value === 'number' ? value : null,
+                    value_geometry: null,
+                    value_numeric: null,
+                    value_json: null,
+                  };
+                }),
+              ]
+            : [
+                {
+                  submission_id: submissionID,
+                  section_id: entry.sectionId,
+                  value_text: null,
+                  value_option_id: null,
+                  value_geometry: null,
+                  value_numeric: null,
+                  value_json: null,
+                },
+              ];
         break;
       case 'numeric':
         newEntries = [

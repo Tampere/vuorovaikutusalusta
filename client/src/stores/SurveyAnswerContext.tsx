@@ -95,7 +95,7 @@ export function getEmptyAnswer(section: SurveyPageSection): AnswerEntry {
       return {
         sectionId: section.id,
         type: section.type,
-        value: [],
+        value: new Array(section.subjects?.length ?? 1).fill(null),
       };
     default:
       throw new Error(
@@ -144,9 +144,12 @@ export function useSurveyAnswers() {
     }
 
     if (question.isRequired) {
-      // Matrix is considered incomplete, if the answer array doesn't contain as many elements as there are rows in the matrix
+      // Matrix is considered incomplete, if the answer array doesn't contain as many answers (exluding nulls) as there are rows in the matrix
       if (question.type === 'matrix') {
-        if ((answer.value as string[]).length !== question.subjects?.length) {
+        if (
+          (answer.value as string[]).filter((answer) => answer).length !==
+          question.subjects?.length
+        ) {
           errors.push('required');
         }
       }
