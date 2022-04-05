@@ -2,27 +2,18 @@ import { createTheme } from '@material-ui/core/styles';
 import { fiFI } from '@material-ui/core/locale';
 
 /**
- * Creates a simple survey theme with given primary & secondary colors.
- * @param primaryColor Primary color
- * @param secondaryColor Secondary color
- * @returns Survey theme
+ * Default theme - used only when survey doesn't have a theme at all set in DB
  */
-function createSurveyTheme(primaryColor: string, secondaryColor: string) {
-  return createTheme(
-    {
-      palette: {
-        primary: {
-          main: primaryColor,
-        },
-        secondary: {
-          main: secondaryColor,
-        },
+export const defaultSurveyTheme = createTheme(
+  {
+    palette: {
+      primary: {
+        main: '#135b9a',
+      },
+      secondary: {
+        main: '#abc872',
       },
     },
-    fiFI
-  );
-}
-
-export const survey1 = createSurveyTheme('#135b9a', '#abc872');
-export const survey2 = createSurveyTheme('#933457', '#f8de79');
-export const survey3 = createSurveyTheme('#346058', '#bedcd4');
+  },
+  fiFI
+);

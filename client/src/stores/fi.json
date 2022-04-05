@@ -49,7 +49,10 @@
     "mapUrlError": "Karttatasojen haku annetulle osoitteelle epäonnistui. Tarkista osoite ja yritä uudestaan.",
     "availableMapLayers": "Saatavilla olevat karttatasot:",
     "startDate": "Alkamisaika",
-    "endDate": "Loppumisaika"
+    "endDate": "Loppumisaika",
+    "theme": "Teema",
+    "selectTheme": "Valitse teema",
+    "themeFetchFailed": "Teemojen hakemisessa tapahtui virhe. Yritä myöhemmin uudestaan."
   },
   "EditSurveyPage": {
     "name": "Sivun nimi",

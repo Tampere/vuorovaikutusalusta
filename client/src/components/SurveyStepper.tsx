@@ -25,6 +25,7 @@ import { getClassList } from '@src/utils/classes';
 import { request } from '@src/utils/request';
 import React, { useEffect, useMemo, useState } from 'react';
 import SplitPane from 'react-split-pane';
+import PageConnector from './PageConnector';
 import StepperControls from './StepperControls';
 import SurveyMap from './SurveyMap';
 import SurveyQuestion from './SurveyQuestion';
@@ -65,21 +66,25 @@ const useStyles = makeStyles((theme: Theme) => ({
   stepHeaderError: {
     color: 'red !important' as any,
   },
+  stepActive: {
+    fontSize: '1.1rem',
+  },
   stepIcon: {
-    '& svg': {
-      color: 'purple !important' as any,
-    },
     '& text': {
       fill: 'white !important' as any,
     },
   },
   stepIconUnfinised: {
     '& svg': {
-      color: 'red' as any,
+      color: 'red',
     },
     '& text': {
-      fill: 'black' as any,
+      fill: 'black',
     },
+  },
+  stepContent: {
+    borderColor: theme?.palette?.primary?.main ?? 'blue',
+    borderWidth: '3px',
   },
 }));
 
@@ -204,14 +209,16 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
       className={classes.stepper}
       activeStep={pageNumber}
       orientation="vertical"
+      connector={null}
     >
       {survey.pages.map((page, index) => (
-        <Step key={page.id} completed={isPageValid(page) && pageNumber > index}>
+        <Step key={page.id} completed={false}>
           <StepLabel
             onClick={() => {
               setPageNumber(index);
             }}
             classes={{
+              active: classes.stepActive,
               label: `${classes.stepHeader} ${
                 highlightErrorPages && !isPageValid(page)
                   ? classes.stepHeaderError
@@ -225,11 +232,10 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
                   ? classes.stepIconUnfinised
                   : null,
             }}
-            // error={highlightErrorPages && !isPageValid(page)}
           >
             {page.title}
           </StepLabel>
-          <StepContent>
+          <StepContent classes={{ root: classes.stepContent }}>
             <FormControl style={{ width: '100%' }} component="fieldset">
               {page.sections.map((section) => (
                 <div className={classes.section} key={section.id}>
@@ -283,6 +289,16 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
               />
             </FormControl>
           </StepContent>
+          {
+            /** Don't show connector after the final page */
+            index + 1 !== survey?.pages?.length && (
+              <PageConnector
+                activePage={pageNumber}
+                pageIndex={index}
+                theme={theme}
+              />
+            )
+          }
         </Step>
       ))}
     </Stepper>

@@ -36,6 +36,7 @@ interface AnswerEntry {
   details: {
     subjects?: LocalizedText[];
     classes?: LocalizedText[];
+    allowCustomAnswer?: boolean;
   };
   sectionId: number;
   sectionIndex: number;
@@ -191,7 +192,7 @@ export async function getCSVFile(surveyId: number): Promise<string> {
   const rows = await getAnswerDBEntries(surveyId);
   if (!rows) return null;
 
-  return answerEntriesToCSV(await entriesToCSVFormat(rows));
+  return answerEntriesToCSV(await entriesToCSVFormat(rows, surveyId));
 }
 
 /**
@@ -263,19 +264,19 @@ function formatAnswerType(
   questionType: string,
   entryRow: AnswerEntry,
   optionTexts: DBOptionTextRow
-): string | number | [] {
+): string | number | [] | {} {
   switch (questionType) {
     case 'free-text':
       return entryRow.valueText.replace(textSeparator, separatorEscape);
     case 'radio':
     case 'checkbox':
-      // Nullish coalescing handles the 'something else' kind of answer
-      return (
-        optionTexts[entryRow.valueOptionId]?.replace(
-          textSeparator,
-          separatorEscape
-        ) ?? entryRow.valueText.replace(textSeparator, separatorEscape)
-      );
+      // If there is a radio/checkbox answer present, it is interpretet as '1' marking that the option was selected
+      // 'something else' answers are displayed as the answer itself
+      return entryRow.valueOptionId
+        ? 1
+        : entryRow.valueText
+        ? entryRow.valueText
+        : '';
     case 'numeric':
     case 'slider':
       return entryRow.valueNumeric;
@@ -295,11 +296,17 @@ function formatAnswerType(
     case 'matrix':
       return entryRow.valueJson.reduce(
         (prevAnswers, currentAnswer, answerIndex) => {
+          // Handle empty answers and 'don't know' answers along with the proper answers
+          const answer = !currentAnswer
+            ? ''
+            : Number(currentAnswer) === -1
+            ? 'EOS'
+            : entryRow.details.classes[Number(currentAnswer)]['fi'];
+
           return [
             ...prevAnswers,
             {
-              [`${entryRow.sectionId}-m${answerIndex}`]:
-                entryRow.details.classes[Number(currentAnswer)]['fi'],
+              [`${entryRow.sectionId}-m${answerIndex}`]: answer,
             },
           ];
         },
@@ -316,67 +323,111 @@ function formatAnswerType(
  * @returns
  */
 async function entriesToCSVFormat(
-  answerEntries: AnswerEntry[]
+  answerEntries: AnswerEntry[],
+  surveyId: number
 ): Promise<CSVJson> {
   if (!answerEntries) return;
 
   const optionTexts = await getDb().manyOrNone(
     `
-      SELECT * FROM data.option;
-    `
+    SELECT opt.id, opt.text, ps.id as section_id, ps.title, ps.type FROM data.option opt LEFT JOIN data.page_section ps ON opt.section_id = ps.id LEFT JOIN data.survey_page sp ON ps.survey_page_id = sp.id LEFT JOIN data.survey s ON sp.survey_id = s.id WHERE s.id = $1;
+    `,
+    [surveyId]
   );
 
   const refinedOptionTexts = optionTexts.reduce((prevValue, currentValue) => {
-    return {
-      ...prevValue,
-      [Number(currentValue['id'])]: currentValue?.text?.['fi'],
-    };
-  }, {});
+    const previousSection = prevValue
+      ?.map((optionObj) => optionObj.sectionId)
+      .indexOf(currentValue.section_id);
 
-  let checkBoxIndex = 0;
+    if (previousSection !== -1) {
+      const temp = [...prevValue];
+      temp[previousSection].sectionTexts = {
+        ...temp[previousSection].sectionTexts,
+        [Number(currentValue.id)]: currentValue?.text?.['fi'],
+      };
+      return temp;
+    } else {
+      return [
+        ...prevValue,
+        {
+          sectionId: currentValue.section_id,
+          sectionTexts: {
+            [Number(currentValue['id'])]: currentValue?.text?.['fi'],
+          },
+        },
+      ];
+    }
+  }, []);
+
+  let checkboxInitialised = false;
+  let previousSubmissionId = answerEntries[0].submissionId;
+  let previousSectionId = answerEntries[0].sectionId;
   const referenceSubmissionID = answerEntries[0].submissionId;
+  let customHeaders = [];
   return answerEntries.reduce((prevValue, currentValue) => {
-    let customHeaders = [];
+    if (previousSectionId !== currentValue.sectionId) {
+      checkboxInitialised = false;
+      previousSectionId = currentValue.sectionId;
+    }
+    if (previousSubmissionId !== currentValue.submissionId) {
+      checkboxInitialised = false;
+      previousSubmissionId = currentValue.submissionId;
+    }
+
     // Don't include geometry entries on the CSV
     if (currentValue.valueGeometry) return prevValue;
 
-    const answerEntry = formatAnswerType(
-      currentValue.type,
-      currentValue,
-      refinedOptionTexts
-    );
-
-    // If question is a matrix question, create 'n' new headers where n is the number of question rows in the matrix
-    customHeaders = currentValue.details?.subjects?.reduce(
-      (prevHeaders, currentMatrixSubject, subjectIndex) => {
-        return [
-          ...prevHeaders,
-          {
-            [`${currentValue.sectionId}-m${subjectIndex}`]: `${currentValue.title?.fi}_${currentMatrixSubject['fi']}`,
-          },
-        ];
-      },
-      []
-    );
-
-    // Answer types 'checkbox' and 'sorting' need a subheader as there will be multiple rows on the csv for these answer types
+    // Format CSV headers for question types that will generate multiple columns into the CSV file
+    let checkboxOptionTexts;
     let sectionSubmissionKey = currentValue.sectionId.toString();
-    let headerTitle;
-    if (currentValue.type === 'checkbox') {
-      sectionSubmissionKey += `-${checkBoxIndex}`;
-      headerTitle = `${currentValue.title?.fi}_${checkBoxIndex + 1}.`;
-      ++checkBoxIndex;
-    } else if (currentValue.type === 'sorting') {
-      customHeaders = currentValue.valueJson.map((_, index) => ({
-        [`${sectionSubmissionKey}-s${index}`]: `${currentValue.title?.fi}_${
-          index + 1
-        }.`,
-      }));
-    } else {
-      checkBoxIndex = 0;
-      headerTitle = currentValue.title?.fi;
+    switch (currentValue.type) {
+      case 'matrix':
+        // For matrix questions, create 'n' new headers where n is the number of question rows in the matrix
+        customHeaders = currentValue.details?.subjects?.reduce(
+          (prevHeaders, currentMatrixSubject, subjectIndex) => {
+            return [
+              ...prevHeaders,
+              {
+                [`${currentValue.sectionId}-m${subjectIndex}`]: `${currentValue.title?.fi}_${currentMatrixSubject['fi']}`,
+              },
+            ];
+          },
+          []
+        );
+        break;
+      case 'radio':
+      case 'checkbox':
+        // Custom headers for checkbox and radio questions
+        checkboxOptionTexts = refinedOptionTexts?.find(
+          (optionTextObj) => optionTextObj.sectionId === currentValue.sectionId
+        ).sectionTexts;
+        customHeaders = Object.keys(checkboxOptionTexts).map((key) => ({
+          [`${currentValue.sectionId}-cr${key}`]: `${currentValue.title?.fi}_${checkboxOptionTexts[key]}`,
+        }));
+        // Add header for additional freetext answer, if it was allowed
+        if (currentValue.details.allowCustomAnswer) {
+          customHeaders.push({
+            [`${currentValue.sectionId}-cr000`]: `${currentValue.title?.fi}_joku muu, mikä?`,
+          });
+        }
+
+        sectionSubmissionKey += `-cr${
+          currentValue.valueOptionId ? currentValue.valueOptionId : '000'
+        }`;
+        break;
+      case 'sorting':
+        customHeaders = currentValue.valueJson.map((_, index) => ({
+          [`${sectionSubmissionKey}-s${index}`]: `${currentValue.title?.fi}_${
+            index + 1
+          }.`,
+        }));
+        break;
+      default:
+        break;
     }
 
+    // Format submission
     const existingSubmissionIndex = []
       .concat(
         prevValue?.submissions?.map((submissionObj) =>
@@ -395,15 +446,63 @@ async function entriesToCSVFormat(
       submission = prevValue.submissions.splice(existingSubmissionIndex, 1)[0];
     }
 
-    // Add current answer entry under the submission. Matrix and sorting questions behave a bit differently
-    if (currentValue.type === 'matrix') {
-      submission[currentValue.submissionId].push(...(answerEntry as any));
-    } else if (currentValue.type === 'sorting') {
-      submission[currentValue.submissionId].push(...(answerEntry as any));
-    } else {
-      submission[currentValue.submissionId].push({
-        [sectionSubmissionKey]: answerEntry,
-      });
+    const answerEntry = formatAnswerType(
+      currentValue.type,
+      currentValue,
+      refinedOptionTexts?.find(
+        (optionTextObj) => optionTextObj.sectionId === currentValue.sectionId
+      )?.sectionTexts
+    );
+
+    switch (currentValue.type) {
+      case 'matrix':
+      case 'sorting':
+        submission[currentValue.submissionId].push(...(answerEntry as any));
+        break;
+      case 'checkbox': {
+        // Initialise submission with checkbox dummy answers, i.e. add 'null' answers for each checkbox option
+        if (!checkboxInitialised) {
+          const checkBoxTopics = customHeaders.map(
+            (header) => Object.keys(header)[0]
+          );
+          const checkBoxDummyAnswers = checkBoxTopics.map((topic) => ({
+            [topic]: '',
+          }));
+          submission[currentValue.submissionId].push(...checkBoxDummyAnswers);
+          checkboxInitialised = true;
+        }
+        // Find the checkbox topic that the answer entry actually belongs to
+        const checkboxAnswerIndex = submission[currentValue.submissionId]
+          .map((sectionObj) => Object.keys(sectionObj)[0])
+          .indexOf(sectionSubmissionKey);
+        submission[currentValue.submissionId][checkboxAnswerIndex] = {
+          [sectionSubmissionKey]: answerEntry,
+        };
+        break;
+      }
+      case 'radio': {
+        // Initialise submission with radio dummy answers, i.e. add 'null' answers for each radio option
+        const radioDummyAnswers = customHeaders
+          .map((header) => Object.keys(header)[0])
+          .map((topic) => ({
+            [topic]: '',
+          }));
+        submission[currentValue.submissionId].push(...radioDummyAnswers);
+
+        // Find the radio topic that the answer entry actually belongs to
+        const radioAnswerIndex = submission[currentValue.submissionId]
+          .map((sectionObj) => Object.keys(sectionObj)[0])
+          .indexOf(sectionSubmissionKey);
+        submission[currentValue.submissionId][radioAnswerIndex] = {
+          [sectionSubmissionKey]: answerEntry,
+        };
+        break;
+      }
+      default:
+        submission[currentValue.submissionId].push({
+          [sectionSubmissionKey]: answerEntry,
+        });
+        break;
     }
 
     return {
@@ -414,7 +513,9 @@ async function entriesToCSVFormat(
           ? [
               ...(prevValue?.headers ? prevValue.headers : []),
               ...(currentValue.type === 'matrix' ||
-              currentValue.type === 'sorting'
+              currentValue.type === 'sorting' ||
+              currentValue.type === 'checkbox' ||
+              currentValue.type === 'radio'
                 ? customHeaders
                 : [
                     ...([]
@@ -426,11 +527,15 @@ async function entriesToCSVFormat(
                       .map((headerString) => headerString)
                       .includes(sectionSubmissionKey)
                       ? []
-                      : [{ [sectionSubmissionKey]: headerTitle }]),
+                      : [
+                          {
+                            [sectionSubmissionKey]:
+                              currentValue?.title?.fi ?? '',
+                          },
+                        ]),
                   ]),
             ]
           : prevValue.headers,
-      // If
       submissions: [...(prevValue?.submissions ?? []), submission],
     };
   }, {} as CSVJson);

@@ -9,6 +9,7 @@ import SurveyStepper from './SurveyStepper';
 import SurveyThanksPage from './SurveyThanksPage';
 import { UnavailableSurvey } from './UnavailableSurvey';
 import { NotFoundPage } from './NotFoundPage';
+import { useSurveyTheme } from '@src/stores/SurveyThemeProvider';
 
 export default function SurveyPage() {
   const [loading, setLoading] = useState(true);
@@ -19,6 +20,7 @@ export default function SurveyPage() {
 
   const { name } = useParams<{ name: string }>();
   const { setSurvey, survey } = useSurveyAnswers();
+  const { setThemeFromSurvey } = useSurveyTheme();
 
   // Fetch survey data from server
   useEffect(() => {
@@ -32,6 +34,7 @@ export default function SurveyPage() {
           setSurveyBackgroundImage(surveyBackgroundImage);
         }
         setSurvey(survey);
+        setThemeFromSurvey(survey);
         setLoading(false);
       } catch (error) {
         setErrorStatusCode(error.status);
