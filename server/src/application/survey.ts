@@ -371,7 +371,8 @@ export async function updateSurvey(survey: Survey) {
         thanks_page_title = $10,
         thanks_page_text = $11,
         background_image_id = $12,
-        admins = $13
+        admins = $13,
+        theme_id = $14
       WHERE id = $1 RETURNING *`,
       [
         survey.id,
@@ -387,6 +388,7 @@ export async function updateSurvey(survey: Survey) {
         { fi: survey.thanksPage.text },
         survey.backgroundImageId,
         survey.admins,
+        survey.theme?.id ?? null,
       ]
     )
     .catch((error) => {

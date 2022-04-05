@@ -16,6 +16,7 @@ import ConfirmDialog from '../ConfirmDialog';
 import Fieldset from '../Fieldset';
 import LoadingButton from '../LoadingButton';
 import SurveyImageList from './SurveyImageList';
+import ThemeSelect from './ThemeSelect';
 
 const useStyles = makeStyles({
   dateTimePicker: {
@@ -181,6 +182,15 @@ export default function EditSurveyInfo() {
           </div>
         )}
         <SurveyImageList />
+        <ThemeSelect
+          value={activeSurvey.theme?.id}
+          onChange={(theme) => {
+            editSurvey({
+              ...activeSurvey,
+              theme,
+            });
+          }}
+        />
         <DateTimePicker
           label={tr.EditSurveyInfo.startDate}
           value={activeSurvey.startDate}
