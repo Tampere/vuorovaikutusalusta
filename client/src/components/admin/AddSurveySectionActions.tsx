@@ -79,6 +79,7 @@ export default function AddSurveySectionActions(props: Props) {
       type: 'text',
       title: '',
       body: '',
+      bodyColor: '#000000',
       info: null,
     },
     sorting: {

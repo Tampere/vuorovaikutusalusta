@@ -10,6 +10,7 @@ import { makeStyles } from '@material-ui/styles';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useEffect, useState } from 'react';
+import ColorIndicator from './ColorIndicator';
 
 interface Props {
   value: number;
@@ -23,12 +24,6 @@ const useStyles = makeStyles({
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  colorIndicator: {
-    borderRadius: '50%',
-    width: '1rem',
-    height: '1rem',
-    marginLeft: '0.5rem',
   },
 });
 
@@ -58,12 +53,6 @@ export default function ThemeSelect({ value, onChange }: Props) {
     fetchThemes();
   }, []);
 
-  function getColorIndicator(color: string) {
-    return !color ? null : (
-      <div className={classes.colorIndicator} style={{ background: color }} />
-    );
-  }
-
   return (
     <FormControl>
       <InputLabel id="theme-select-label">{tr.EditSurveyInfo.theme}</InputLabel>
@@ -90,8 +79,12 @@ export default function ThemeSelect({ value, onChange }: Props) {
           <MenuItem key={theme.id} value={theme.id}>
             {theme.name}
             <div style={{ flexGrow: 1 }} />
-            {getColorIndicator((theme.data as Theme)?.palette?.primary?.main)}
-            {getColorIndicator((theme.data as Theme)?.palette?.secondary?.main)}
+            <ColorIndicator
+              color={(theme.data as Theme)?.palette?.primary?.main}
+            />
+            <ColorIndicator
+              color={(theme.data as Theme)?.palette?.secondary?.main}
+            />
           </MenuItem>
         ))}
       </Select>

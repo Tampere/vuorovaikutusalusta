@@ -2,6 +2,7 @@ import React from 'react';
 import { SurveyTextSection } from '@interfaces/survey';
 import RichTextEditor from '../RichTextEditor';
 import { useTranslations } from '@src/stores/TranslationContext';
+import ColorSelect from './ColorSelect';
 
 interface Props {
   section: SurveyTextSection;
@@ -17,11 +18,20 @@ export default function EditTextSection({
   const { tr } = useTranslations();
 
   return (
-    <RichTextEditor
-      disabled={disabled}
-      value={section.body}
-      label={tr.EditTextSection.text}
-      onChange={(value) => onChange({ ...section, body: value })}
-    />
+    <>
+      <ColorSelect
+        label={tr.EditTextSection.bodyColor}
+        value={section.bodyColor}
+        onChange={(color) => {
+          onChange({ ...section, bodyColor: color });
+        }}
+      />
+      <RichTextEditor
+        disabled={disabled}
+        value={section.body}
+        label={tr.EditTextSection.text}
+        onChange={(value) => onChange({ ...section, body: value })}
+      />
+    </>
   );
 }

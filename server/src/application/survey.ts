@@ -55,6 +55,7 @@ interface DBSurvey {
   thanks_page_title: LocalizedText;
   thanks_page_text: LocalizedText;
   background_image_id: number;
+  section_title_color: string;
 }
 
 /**
@@ -106,6 +107,7 @@ type DBSurveyJoin = DBSurvey & {
   page_map_layers: number[];
   section_id: number;
   section_title: LocalizedText;
+  section_title_color: string;
   section_body: LocalizedText;
   section_type: string;
   section_details: object;
@@ -372,7 +374,8 @@ export async function updateSurvey(survey: Survey) {
         thanks_page_text = $11,
         background_image_id = $12,
         admins = $13,
-        theme_id = $14
+        theme_id = $14,
+        section_title_color = $15
       WHERE id = $1 RETURNING *`,
       [
         survey.id,
@@ -389,6 +392,7 @@ export async function updateSurvey(survey: Survey) {
         survey.backgroundImageId,
         survey.admins,
         survey.theme?.id ?? null,
+        survey.sectionTitleColor,
       ]
     )
     .catch((error) => {
@@ -530,6 +534,7 @@ function dbSurveyToSurvey(
       text: dbSurvey.thanks_page_text?.fi,
     },
     backgroundImageId: dbSurvey.background_image_id,
+    sectionTitleColor: dbSurvey.section_title_color,
     // Single survey row won't contain pages - they get aggregated from a join query
     pages: [],
   };
