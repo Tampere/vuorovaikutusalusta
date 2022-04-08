@@ -52,7 +52,8 @@
     "endDate": "Loppumisaika",
     "theme": "Teema",
     "selectTheme": "Valitse teema",
-    "themeFetchFailed": "Teemojen hakemisessa tapahtui virhe. Yritä myöhemmin uudestaan."
+    "themeFetchFailed": "Teemojen hakemisessa tapahtui virhe. Yritä myöhemmin uudestaan.",
+    "titleColor": "Osioiden otsikoiden väri"
   },
   "EditSurveyPage": {
     "name": "Sivun nimi",
@@ -99,7 +100,8 @@
     "dropFiles": "Raahaa kuvatiedosto tähän tai klikkaa valitaksesi tiedosto"
   },
   "EditTextSection": {
-    "text": "Teksti"
+    "text": "Teksti",
+    "bodyColor": "Tekstin väri"
   },
   "EditMapQuestion": {
     "selectionTypes": "Sallitut karttavalinnan tyypit",
@@ -135,6 +137,17 @@
     "components.controls.list.list": "Lista",
     "components.controls.list.unordered": "Järjestämätön lista",
     "components.controls.list.ordered": "Järjestetty lista"
+  },
+  "ColorSelect": {
+    "color": "Väri",
+    "colors": {
+      "black": "Musta",
+      "darkGray": "Tumma harmaa",
+      "steelBlue": "Teräksensininen",
+      "atmosphere": "Tunnelma",
+      "berryRed": "Marjanpunainen",
+      "warmGreen": "Lämmin vihreä"
+    }
   },
   "SurveyList": {
     "title": "Vuorovaikutusalusta - Kyselyt",

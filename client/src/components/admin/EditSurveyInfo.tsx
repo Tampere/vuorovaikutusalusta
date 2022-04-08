@@ -15,6 +15,7 @@ import { useHistory } from 'react-router-dom';
 import ConfirmDialog from '../ConfirmDialog';
 import Fieldset from '../Fieldset';
 import LoadingButton from '../LoadingButton';
+import ColorSelect from './ColorSelect';
 import SurveyImageList from './SurveyImageList';
 import ThemeSelect from './ThemeSelect';
 
@@ -188,6 +189,16 @@ export default function EditSurveyInfo() {
             editSurvey({
               ...activeSurvey,
               theme,
+            });
+          }}
+        />
+        <ColorSelect
+          label={tr.EditSurveyInfo.titleColor}
+          value={activeSurvey.sectionTitleColor}
+          onChange={(color) => {
+            editSurvey({
+              ...activeSurvey,
+              sectionTitleColor: color,
             });
           }}
         />

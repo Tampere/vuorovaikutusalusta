@@ -18,7 +18,8 @@ interface Props {
 }
 
 export default function SurveyQuestion({ question }: Props) {
-  const { answers, updateAnswer, getValidationErrors } = useSurveyAnswers();
+  const { answers, updateAnswer, getValidationErrors, survey } =
+    useSurveyAnswers();
   const [dirty, setDirty] = useState(false);
   const { tr } = useTranslations();
 
@@ -41,7 +42,10 @@ export default function SurveyQuestion({ question }: Props) {
           alignItems: 'center',
         }}
       >
-        <FormLabel component="legend" style={{ color: 'black' }}>
+        <FormLabel
+          component="legend"
+          style={{ color: survey.sectionTitleColor ?? '#000000' }}
+        >
           {question.title} {question.isRequired && '*'}
         </FormLabel>
         {question.info && <SectionInfo infoText={question.info} />}

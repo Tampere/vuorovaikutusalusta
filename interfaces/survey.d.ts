@@ -85,6 +85,7 @@ export interface SurveyRadioQuestion extends CommonSurveyPageQuestion {
 export interface SurveyTextSection extends CommonSurveyPageSection {
   type: 'text';
   body: string;
+  bodyColor: string;
 }
 
 /**
@@ -251,6 +252,10 @@ export interface Survey {
    * Theme of the survey
    */
   theme: SurveyTheme;
+  /**
+   * Color of the section titles
+   */
+  sectionTitleColor: string;
 }
 
 /**
