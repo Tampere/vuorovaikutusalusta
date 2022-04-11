@@ -7,7 +7,7 @@ import {
 } from '@material-ui/core';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useEffect, useState } from 'react';
-
+import SectionInfo from './SectionInfo';
 /**
  * Max length of a custom answer in radio/checkbox questions
  */
@@ -55,16 +55,25 @@ export default function RadioQuestion({
           setDirty(true);
         }}
       >
-        {question.options.map((option) => (
-          <FormControlLabel
-            key={option.id}
-            value={option.id}
-            label={option.text}
-            control={
-              <Radio required={question.isRequired} name={option.text} />
-            }
-          />
-        ))}
+        {question.options.map((option, index) => {
+          /** TODO: Remove changes related to option.info when OSBU question is ready for usage */
+          return (
+            <div
+              key={`option-field-${index}`}
+              style={{ display: 'flex', flexDirection: 'row' }}
+            >
+              <FormControlLabel
+                key={option.id}
+                value={option.id}
+                label={option.text}
+                control={
+                  <Radio required={question.isRequired} name={option.text} />
+                }
+              />
+              {option.info && <SectionInfo infoText={option.info} />}
+            </div>
+          );
+        })}
         {question.allowCustomAnswer && (
           <>
             <FormControlLabel
