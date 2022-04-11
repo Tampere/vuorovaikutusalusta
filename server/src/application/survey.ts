@@ -96,6 +96,7 @@ interface DBSectionOption {
   idx: number;
   text: LocalizedText;
   section_id: number;
+  info?: LocalizedText;
 }
 
 /**
@@ -115,6 +116,7 @@ type DBSurveyJoin = DBSurvey & {
   section_info: LocalizedText;
   option_id: number;
   option_text: LocalizedText;
+  option_info: LocalizedText;
   theme_id: number;
   theme_name: string;
   theme_data: SurveyTheme;
@@ -158,6 +160,7 @@ const sectionOptionColumnSet = getColumnSet<DBSectionOption>('option', [
   'section_id',
   'idx',
   { name: 'text', cast: 'json' },
+  { name: 'info', cast: 'json' },
 ]);
 
 /**
@@ -189,7 +192,8 @@ export async function getSurvey(params: { id: number } | { name: string }) {
       survey_page_section.*,
       option.id as option_id,
       option.text as option_text,
-      option.idx as option_idx
+      option.idx as option_idx,
+      option.info as option_info
     FROM (
       SELECT
         survey_page.*,
@@ -609,6 +613,7 @@ function dbSurveyJoinToOption(dbSurveyJoin: DBSurveyJoin): SectionOption {
     : {
         id: dbSurveyJoin.option_id,
         text: dbSurveyJoin.option_text?.[languageCode],
+        info: dbSurveyJoin.option_info?.[languageCode],
       };
 }
 
@@ -945,6 +950,7 @@ function optionsToRows(
       text: {
         fi: option.text,
       },
+      info: option.info ? { fi: option.info } : null,
     } as DBSectionOption;
   });
 }

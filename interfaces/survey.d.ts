@@ -270,6 +270,10 @@ export interface SectionOption {
    * Localized text field of the option
    */
   text: string;
+  /**
+   * Localized text field of the option's info
+   */
+  info?: string;
 }
 
 /**
