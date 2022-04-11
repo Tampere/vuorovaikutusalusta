@@ -338,23 +338,179 @@ export async function createSurvey(user: User) {
   return { ...survey, pages: [page] };
 }
 
-async function insertSection(section: DBSurveyPageSection, index: number) {
+/**
+ * Upserts (updates or inserts) given survey page section with given index.
+ * @param section Section
+ * @param index Index
+ * @returns Updated DB section
+ */
+async function upsertSection(section: DBSurveyPageSection, index: number) {
+  // Negative IDs can be assigned as temporary IDs for e.g. drag and drop - change them to null
   return await getDb().one<DBSurveyPageSection>(
     `
-    INSERT INTO data.page_section (survey_page_id, idx, title, type, body, details, parent_section, info)
-    VALUES ($1, $2, $3::json, $4, $5::json, $6::json, $7, $8) RETURNING id;
+    INSERT INTO data.page_section (id, survey_page_id, idx, title, type, body, details, parent_section, info)
+    VALUES (
+      COALESCE(
+        CASE
+          WHEN $(id) < 0 THEN NULL
+          ELSE $(id)
+        END,
+        NEXTVAL('data.page_section_id_seq')
+      ),
+      $(surveyPageId),
+      $(index),
+      $(title)::json,
+      $(type),
+      $(body)::json,
+      $(details)::json,
+      $(parentSection),
+      $(info)
+    )
+    ON CONFLICT (id) DO
+      UPDATE SET
+        survey_page_id = $(surveyPageId),
+        idx = $(index),
+        title = $(title)::json,
+        body = $(body)::json,
+        details = $(details)::json,
+        parent_section = $(parentSection),
+        info = $(info)
+    RETURNING *
   `,
-    [
-      section.survey_page_id,
+    {
+      id: section.id,
+      surveyPageId: section.survey_page_id,
       index,
-      section.title,
-      section.type,
-      section.body,
-      section.details,
-      section.parent_section,
-      section.info,
-    ]
+      title: section.title,
+      type: section.type,
+      body: section.body,
+      details: section.details,
+      parentSection: section.parent_section,
+      info: section.info,
+    }
   );
+}
+
+/**
+ * Upserts (updates or inserts) given question option with given index.
+ * @param option Option
+ * @param index Index
+ * @returns Updated DB option
+ */
+async function upsertOption(option: DBSectionOption, index: number) {
+  // Negative IDs can be assigned as temporary IDs for e.g. drag and drop - change them to null
+  return await getDb().one<DBSectionOption>(
+    `
+    INSERT INTO data.option (id, text, section_id, idx)
+    VALUES (
+      COALESCE(
+        CASE
+          WHEN $(id) < 0 THEN NULL
+          ELSE $(id)
+        END,
+        NEXTVAL('data.option_id_seq')
+      ),
+      $(text)::json,
+      $(sectionId),
+      $(index)
+    )
+    ON CONFLICT (id) DO
+      UPDATE SET
+        text = $(text)::json,
+        section_id = $(sectionId),
+        idx = $(index)
+    RETURNING *
+  `,
+    {
+      id: option.id,
+      text: option.text,
+      sectionId: option.section_id,
+      index,
+    }
+  );
+}
+
+/**
+ * When updating a survey, deletes all sections that should be removed from DB.
+ * @param surveyId Survey ID
+ * @param newSections New sections
+ */
+async function deleteRemovedSections(
+  surveyId: number,
+  newSections: DBSurveyPageSection[]
+) {
+  // Get all existing sections
+  const rows = await getDb().manyOrNone<{ id: number }>(
+    `SELECT id FROM data.page_section WHERE parent_section IS NULL AND survey_page_id IN (
+       SELECT id FROM data.survey_page WHERE survey_id = $1
+    )`,
+    [surveyId]
+  );
+  const existingSectionIds = rows.map((row) => row.id);
+
+  // All existing sections that aren't included in new sections should be removed
+  const removedSectionIds = existingSectionIds.filter((id) =>
+    (newSections ?? []).every((newSection) => newSection.id !== id)
+  );
+  if (removedSectionIds.length) {
+    await getDb().none(`DELETE FROM data.page_section WHERE id = ANY ($1)`, [
+      removedSectionIds,
+    ]);
+  }
+}
+
+/**
+ * When updating a section, deletes all subquestions that should be removed from DB.
+ * @param parentSectionId Parent section ID
+ * @param newSubQuestions New subquestions
+ */
+async function deleteRemovedSubQuestions(
+  parentSectionId: number,
+  newSubQuestions: SurveyMapSubQuestion[]
+) {
+  // Get all existing sections
+  const rows = await getDb().manyOrNone<{ id: number }>(
+    `SELECT id FROM data.page_section WHERE parent_section = $1`,
+    [parentSectionId]
+  );
+  const existingSubQuestionIds = rows.map((row) => row.id);
+
+  // All existing sections that aren't included in new sections should be removed
+  const removedSubQuestionIds = existingSubQuestionIds.filter((id) =>
+    (newSubQuestions ?? []).every((newSubQuestion) => newSubQuestion.id !== id)
+  );
+  if (removedSubQuestionIds.length) {
+    await getDb().none(`DELETE FROM data.page_section WHERE id = ANY ($1)`, [
+      removedSubQuestionIds,
+    ]);
+  }
+}
+
+/**
+ * When updating a page section, deletes all options that should be removed from DB.
+ * @param sectionId Section ID
+ * @param newOptions New options
+ */
+async function deleteRemovedOptions(
+  sectionId: number,
+  newOptions: SectionOption[]
+) {
+  // Get all existing sections
+  const rows = await getDb().manyOrNone<{ id: number }>(
+    `SELECT id FROM data.option WHERE section_id = $1`,
+    [sectionId]
+  );
+  const existingOptionIds = rows.map((row) => row.id);
+
+  // All existing sections that aren't included in new sections should be removed
+  const removedOptionIds = existingOptionIds.filter((id) =>
+    (newOptions ?? []).every((newOption) => newOption.id !== id)
+  );
+  if (removedOptionIds.length) {
+    await getDb().none(`DELETE FROM data.option WHERE id = ANY ($1)`, [
+      removedOptionIds,
+    ]);
+  }
 }
 
 /**
@@ -412,73 +568,61 @@ export async function updateSurvey(survey: Survey) {
     throw new NotFoundError(`Survey with ID ${survey.id} not found`);
   }
 
-  if (survey.pages.length) {
-    // Clear old pages
-    await getDb().none(`DELETE FROM data.survey_page WHERE survey_id = $1;`, [
-      survey.id,
-    ]);
-    // Re-insert pages belonging to the survey
-    // Form a query for inserting multiple rows
-    const query = getMultiInsertQuery(
-      surveyPagesToRows(survey.pages, survey.id),
-      surveyPageColumnSet
-    );
-    await getDb().none(query);
-  }
-
-  // First delete all previously stored sections that are under the survey at hand, then insert the fresh batch of sections
+  // Form a flat array of all new section rows under each page
   const sections = survey.pages.reduce((result, page) => {
     return [...result, ...surveySectionsToRows(page.sections, page.id)];
   }, [] as ReturnType<typeof surveySectionsToRows>);
 
-  await getDb().none(
-    `
-    DELETE FROM data.page_section WHERE survey_page_id = ANY(
-      SELECT sp.id FROM data.survey s LEFT JOIN data.survey_page sp ON $1 = sp.survey_id WHERE sp.id IS NOT NULL
-    );
-  `,
-    [survey.id]
-  );
+  // Delete sections that were removed from the updated survey
+  await deleteRemovedSections(survey.id, sections);
 
-  // Loop through sections and insert them one at a time to returning the new id of the section.
-  // Use the section id to insert a batch of section options and map subquestions (if present)
-  if (sections.length) {
-    sections.forEach(async (section, index) => {
-      const sectionRow = await insertSection(section, index);
+  // Update all sections
+  await Promise.all(
+    sections.map(async (section, index) => {
+      const sectionRow = await upsertSection(section, index);
+
+      // Delete options that were removed
+      await deleteRemovedOptions(section.id, section.options);
+
+      // Update/insert the remaining options
       if (section.options?.length) {
-        const sectionID = sectionRow.id;
-        const options = optionsToRows(section.options, sectionID);
-
-        await getDb().none(
-          getMultiInsertQuery(options, sectionOptionColumnSet)
-        );
+        const options = optionsToRows(section.options, sectionRow.id);
+        await Promise.all(options.map(upsertOption));
       }
+
+      // Delete removed subquestion sections
+      await deleteRemovedSubQuestions(section.id, section.subQuestions);
+
+      // If there are subquestions, update them
       if (section.subQuestions?.length) {
-        const sectionID = sectionRow.id;
         const subQuestions = surveySectionsToRows(
           section.subQuestions,
           section.survey_page_id,
-          sectionID
+          sectionRow.id
         );
-        // Do this insert in a loop too, to make it possible to add subquestion options with correct foreign key
-        subQuestions.forEach(async (subQuestion, index) => {
-          const subQuestionRow = await insertSection(subQuestion, index);
-          if (subQuestion.options) {
-            const options = optionsToRows(
-              subQuestion.options,
-              subQuestionRow.id
-            );
-            await getDb().none(
-              getMultiInsertQuery(options, sectionOptionColumnSet)
-            );
-          }
-        });
-      }
-    });
-  }
+        // Update each subquestion in its own block
+        await Promise.all(
+          subQuestions.map(async (subQuestion, index) => {
+            const subQuestionRow = await upsertSection(subQuestion, index);
 
-  // TODO pages and sections also from db?
-  return { ...dbSurveyToSurvey(surveyRow), pages: survey.pages } as Survey;
+            // Delete subquestion options that were removed
+            await deleteRemovedOptions(subQuestion.id, subQuestion.options);
+
+            // Update/insert the remaining subquestion options
+            if (subQuestion.options?.length) {
+              const options = optionsToRows(
+                subQuestion.options,
+                subQuestionRow.id
+              );
+              await Promise.all(options.map(upsertOption));
+            }
+          })
+        );
+      }
+    })
+  );
+
+  return await getSurvey({ id: survey.id });
 }
 
 /**
@@ -909,6 +1053,7 @@ function surveySectionsToRows(
       ...details
     } = { ...surveySection };
     return {
+      id,
       survey_page_id: pageId,
       idx: index,
       type: type,

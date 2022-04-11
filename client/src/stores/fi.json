@@ -225,8 +225,8 @@
     "confirmRemoveAnswer": "Haluatko varmasti poistaa tämän karttavastauksen?"
   },
   "SurveyMap": {
-    "editGeometries": "Muokkaa kartalle piirtämiäsi geometrioita",
-    "finishEditingGeometries": "Lopeta kartan geometrioiden muokkaus"
+    "editGeometries": "Muokkaa piirtämiäsi karttamerkintöjä",
+    "finishEditingGeometries": "Lopeta karttamerkintöjen muokkaus"
   },
   "MatrixQuestion": {
     "emptyAnswer": "En osaa sanoa"
