@@ -1,6 +1,7 @@
 import {
   SurveyCheckboxQuestion,
   SurveyFreeTextQuestion,
+  SurveyGroupedCheckboxQuestion,
   SurveyMapQuestion,
   SurveyMatrixQuestion,
   SurveyNumericQuestion,
@@ -20,12 +21,14 @@ import {
   FormGroup,
   TextField,
   Typography,
+  Tooltip,
 } from '@material-ui/core';
 import {
   CheckBox,
   DragIndicator,
   ExpandMore,
   FormatListNumbered,
+  LibraryAddCheck,
   LinearScale,
   Looks4,
   Map,
@@ -49,6 +52,7 @@ import EditSliderQuestion from './EditSliderQuestion';
 import EditSortingQuestion from './EditSortingQuestion';
 import EditTextSection from './EditTextSection';
 import EditMatrixQuestion from './EditMatrixQuestion';
+import EditGroupedCheckBoxQuestion from './EditGroupedCheckBoxQuestion';
 
 const useStyles = makeStyles({
   accordion: {
@@ -87,10 +91,15 @@ export default function SurveySectionAccordion(props: Props) {
   const { tr } = useTranslations();
 
   const accordions: {
-    [type in SurveyPageSection['type']]: { icon: ReactNode; form: ReactNode };
+    [type in SurveyPageSection['type']]: {
+      icon: ReactNode;
+      tooltip: string;
+      form: ReactNode;
+    };
   } = {
     checkbox: {
       icon: <CheckBox />,
+      tooltip: tr.SurveySection.checkBoxQuestion,
       form: (
         <EditCheckBoxQuestion
           disabled={props.disabled}
@@ -103,6 +112,7 @@ export default function SurveySectionAccordion(props: Props) {
     },
     radio: {
       icon: <RadioButtonChecked />,
+      tooltip: tr.SurveySection.radioQuestion,
       form: (
         <EditRadioQuestion
           disabled={props.disabled}
@@ -115,6 +125,7 @@ export default function SurveySectionAccordion(props: Props) {
     },
     numeric: {
       icon: <Looks4 />,
+      tooltip: tr.SurveySection.numericQuestion,
       form: (
         <EditNumericQuestion
           disabled={props.disabled}
@@ -127,6 +138,7 @@ export default function SurveySectionAccordion(props: Props) {
     },
     map: {
       icon: <Map />,
+      tooltip: tr.SurveySection.mapQuestion,
       form: (
         <EditMapQuestion
           disabled={props.disabled}
@@ -139,6 +151,7 @@ export default function SurveySectionAccordion(props: Props) {
     },
     'free-text': {
       icon: <TextFields />,
+      tooltip: tr.SurveySection.freeTextQuestion,
       form: (
         <EditFreeTextQuestion
           disabled={props.disabled}
@@ -151,6 +164,7 @@ export default function SurveySectionAccordion(props: Props) {
     },
     text: {
       icon: <Subject />,
+      tooltip: tr.SurveySection.textSection,
       form: (
         <EditTextSection
           disabled={props.disabled}
@@ -163,6 +177,7 @@ export default function SurveySectionAccordion(props: Props) {
     },
     sorting: {
       icon: <FormatListNumbered />,
+      tooltip: tr.SurveySection.sortingQuestion,
       form: (
         <EditSortingQuestion
           disabled={props.disabled}
@@ -175,6 +190,7 @@ export default function SurveySectionAccordion(props: Props) {
     },
     slider: {
       icon: <LinearScale />,
+      tooltip: tr.SurveySection.sliderQuestion,
       form: (
         <EditSliderQuestion
           disabled={props.disabled}
@@ -187,11 +203,25 @@ export default function SurveySectionAccordion(props: Props) {
     },
     matrix: {
       icon: <ViewComfy />,
+      tooltip: tr.SurveySection.matrixQuestion,
       form: (
         <EditMatrixQuestion
           disabled={props.disabled}
           section={props.section as SurveyMatrixQuestion}
           onChange={(section) => props.onEdit(section)}
+        />
+      ),
+    },
+    'grouped-checkbox': {
+      icon: <LibraryAddCheck />,
+      tooltip: tr.SurveySection.groupedCheckboxQuestion,
+      form: (
+        <EditGroupedCheckBoxQuestion
+          disabled={props.disabled}
+          section={props.section as SurveyGroupedCheckboxQuestion}
+          onChange={(section) => {
+            props.onEdit(section);
+          }}
         />
       ),
     },
@@ -217,7 +247,11 @@ export default function SurveySectionAccordion(props: Props) {
           aria-controls={`${props.name}-content`}
           id={`${props.name}-header`}
         >
-          {accordion.icon}
+          {accordion.tooltip ? (
+            <Tooltip title={accordion.tooltip}>{accordion.icon as any}</Tooltip>
+          ) : (
+            accordion.icon
+          )}
           <Typography className={classes.sectionTitle}>
             {props.section.title || (
               <em>{tr.EditSurveyPage.untitledSection}</em>

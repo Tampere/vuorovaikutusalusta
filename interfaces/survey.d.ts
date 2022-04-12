@@ -16,7 +16,8 @@ export type SurveyQuestion =
   | SurveyMapQuestion
   | SurveySortingQuestion
   | SurveySliderQuestion
-  | SurveyMatrixQuestion;
+  | SurveyMatrixQuestion
+  | SurveyGroupedCheckboxQuestion;
 
 /**
  * Subquestion type for map questions.
@@ -145,6 +146,23 @@ export interface SurveyMatrixQuestion extends CommonSurveyPageQuestion {
   classes: LocalizedText[];
   subjects: LocalizedText[];
   allowEmptyAnswer: boolean;
+}
+
+/**
+ * Grouped checkbox question
+ */
+export interface SurveyGroupedCheckboxQuestion
+  extends CommonSurveyPageQuestion {
+  type: 'grouped-checkbox';
+  answerLimits: {
+    min?: number;
+    max?: number;
+  };
+  groups: {
+    id: number;
+    name: LocalizedText;
+    options: SectionOption[];
+  }[];
 }
 
 /**

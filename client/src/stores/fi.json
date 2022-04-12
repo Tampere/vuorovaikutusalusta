@@ -66,6 +66,12 @@
     "deleteSection": "Poista osio",
     "confirmDeleteSection": "Haluatko varmasti poistaa tämän osion?"
   },
+  "EditGroupedCheckBoxQuestion": {
+    "addGroup": "Lisää ryhmä",
+    "groupName": "Ryhmän nimi",
+    "untitledGroup": "Nimetön ryhmä",
+    "deleteGroup": "Poista ryhmä"
+  },
   "AddSurveySectionActions": {
     "radioQuestion": "Lisää valintakysymys",
     "checkBoxQuestion": "Lisää monivalintakysymys",
@@ -75,7 +81,20 @@
     "freeTextQuestion": "Lisää vapaatekstikysymys",
     "sortingQuestion": "Lisää järjestyskysymys",
     "sliderQuestion": "Lisää liukukytkinkysymys",
-    "matrixQuestion": "Lisää likert -kysymys"
+    "matrixQuestion": "Lisää likert -kysymys",
+    "groupedCheckboxQuestion": "Lisää ryhmitetty monivalintakysymys"
+  },
+  "SurveySection": {
+    "radioQuestion": "Valintakysymys",
+    "checkBoxQuestion": "Monivalintakysymys",
+    "numericQuestion": "Numeerinen kysymys",
+    "mapQuestion": "Karttakysymys",
+    "textSection": "Tekstiosio",
+    "freeTextQuestion": "Vapaatekstikysymys",
+    "sortingQuestion": "Järjestyskysymys",
+    "sliderQuestion": "Liukukytkinkysymys",
+    "matrixQuestion": "Likert -kysymys",
+    "groupedCheckboxQuestion": "Ryhmitetty monivalintakysymys"
   },
   "SurveySections": {
     "limitAnswers": "Rajoita vastauslukumäärää",
@@ -225,8 +244,8 @@
     "confirmRemoveAnswer": "Haluatko varmasti poistaa tämän karttavastauksen?"
   },
   "SurveyMap": {
-    "editGeometries": "Muokkaa kartalle piirtämiäsi geometrioita",
-    "finishEditingGeometries": "Lopeta kartan geometrioiden muokkaus"
+    "editGeometries": "Muokkaa piirtämiäsi karttamerkintöjä",
+    "finishEditingGeometries": "Lopeta karttamerkintöjen muokkaus"
   },
   "MatrixQuestion": {
     "emptyAnswer": "En osaa sanoa"

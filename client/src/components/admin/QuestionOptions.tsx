@@ -135,7 +135,7 @@ export default function QuestionOptions({
                   } else {
                     onChange(
                       options.map((option, i) =>
-                        index === i ? { text: event.target.value } : option
+                        index === i ? { ...option, text: event.target.value } : option
                       )
                     );
                   }
