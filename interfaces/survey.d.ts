@@ -158,11 +158,7 @@ export interface SurveyGroupedCheckboxQuestion
     min?: number;
     max?: number;
   };
-  groups: {
-    id: number;
-    name: LocalizedText;
-    options: SectionOption[];
-  }[];
+  groups: SectionOptionGroup[];
 }
 
 /**
@@ -295,6 +291,24 @@ export interface SectionOption {
 }
 
 /**
+ * A group of options of a grouped checkbox question
+ */
+export interface SectionOptionGroup {
+  /**
+   * Group ID
+   */
+  id: number;
+  /**
+   * Name of the group
+   */
+  name: LocalizedText;
+  /**
+   * Options of the group
+   */
+  options: SectionOption[];
+}
+
+/**
  * Supported language codes
  */
 type LanguageCode = 'fi';
@@ -368,6 +382,10 @@ export type AnswerEntry = {
   | {
       type: 'matrix';
       value: string[];
+    }
+  | {
+      type: 'grouped-checkbox';
+      value: number[];
     }
 );
 
