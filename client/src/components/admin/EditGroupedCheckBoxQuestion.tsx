@@ -11,10 +11,11 @@ import {
   FormControlLabel,
   Checkbox,
 } from '@material-ui/core';
-import { Add, ExpandMore } from '@material-ui/icons';
+import { Add, DragIndicator, ExpandMore } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useState } from 'react';
+import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import QuestionOptions from './QuestionOptions';
 
 interface Props {
@@ -121,73 +122,124 @@ export default function EditGroupedCheckBoxQuestion({
           />
         </FormGroup>
       )}
-      <div>
-        {section.groups.map((group, index) => (
-          <Accordion
-            key={group.id}
-            className={classes.accordion}
-            expanded={openedGroupId === group.id}
-            onChange={(_, isExpanded) => {
-              setOpenedGroupId(isExpanded ? group.id : null);
-            }}
-          >
-            <AccordionSummary
-              expandIcon={<ExpandMore />}
-              aria-controls={`group-${index}-content`}
-              id={`group-${index}-header`}
-            >
-              <Typography>
-                {group.name[language] || (
-                  <em>{tr.EditGroupedCheckBoxQuestion.untitledGroup}</em>
-                )}
-              </Typography>
-            </AccordionSummary>
-            <AccordionDetails className={classes.group}>
-              <TextField
-                autoFocus
-                disabled={disabled}
-                label={tr.EditGroupedCheckBoxQuestion.groupName}
-                value={group.name[language]}
-                variant="standard"
-                onChange={(event) => {
-                  group.name[language] = event.target.value;
-                  onChange({
-                    ...section,
-                  });
-                  // props.onEdit({ ...props.section, title: event.target.value });
-                }}
-              />
-              <QuestionOptions
-                options={group.options}
-                disabled={disabled}
-                onChange={(options) => {
-                  group.options = [...options];
-                  onChange({ ...section });
-                }}
-                title={tr.SurveySections.options}
-                allowOptionInfo
-                enableClipboardImport
-              />
-              <div>
-                <Button
-                  variant="contained"
-                  disabled={disabled}
-                  onClick={() => {
-                    // setDeleteConfirmDialogOpen(true);
-                    console.log('aaa');
-                    onChange({
-                      ...section,
-                      groups: section.groups.filter((_, i) => i !== index),
-                    });
-                  }}
+      <DragDropContext
+        onDragEnd={(event) => {
+          if (!event.destination) {
+            return;
+          }
+          const groupId = Number(event.draggableId);
+          const oldIndex = section.groups.findIndex(
+            (group) => group.id === groupId
+          );
+          const group = section.groups[oldIndex];
+          const newIndex = event.destination.index;
+          const otherGroups = section.groups.filter(
+            (group) => group.id !== groupId
+          );
+          onChange({
+            ...section,
+            groups: [
+              ...otherGroups.slice(0, newIndex),
+              group,
+              ...otherGroups.slice(newIndex),
+            ],
+          });
+          // If the group was expanded, re-expand with the new index
+          if (openedGroupId === oldIndex) {
+            setOpenedGroupId(newIndex);
+          }
+        }}
+      >
+        <Droppable droppableId="option-groups">
+          {(provided) => (
+            <div {...provided.droppableProps} ref={provided.innerRef}>
+              {section.groups.map((group, index) => (
+                <Draggable
+                  key={group.id}
+                  draggableId={String(group.id)}
+                  index={index}
                 >
-                  {tr.EditGroupedCheckBoxQuestion.deleteGroup}
-                </Button>
-              </div>
-            </AccordionDetails>
-          </Accordion>
-        ))}
-      </div>
+                  {(provided) => (
+                    <Accordion
+                      {...provided.draggableProps}
+                      ref={provided.innerRef}
+                      key={group.id}
+                      className={classes.accordion}
+                      expanded={openedGroupId === group.id}
+                      onChange={(_, isExpanded) => {
+                        setOpenedGroupId(isExpanded ? group.id : null);
+                      }}
+                    >
+                      <AccordionSummary
+                        expandIcon={<ExpandMore />}
+                        aria-controls={`group-${index}-content`}
+                        id={`group-${index}-header`}
+                      >
+                        <Typography style={{ flexGrow: 1 }}>
+                          {group.name[language] || (
+                            <em>
+                              {tr.EditGroupedCheckBoxQuestion.untitledGroup}
+                            </em>
+                          )}
+                        </Typography>
+                        <div
+                          {...provided.dragHandleProps}
+                          style={{ display: 'flex' }}
+                        >
+                          <DragIndicator />
+                        </div>
+                      </AccordionSummary>
+                      <AccordionDetails className={classes.group}>
+                        <TextField
+                          autoFocus
+                          disabled={disabled}
+                          label={tr.EditGroupedCheckBoxQuestion.groupName}
+                          value={group.name[language]}
+                          variant="standard"
+                          onChange={(event) => {
+                            group.name[language] = event.target.value;
+                            onChange({
+                              ...section,
+                            });
+                          }}
+                        />
+                        <QuestionOptions
+                          options={group.options}
+                          disabled={disabled}
+                          onChange={(options) => {
+                            group.options = [...options];
+                            onChange({ ...section });
+                          }}
+                          title={tr.SurveySections.options}
+                          allowOptionInfo
+                          enableClipboardImport
+                        />
+                        <div>
+                          <Button
+                            variant="contained"
+                            disabled={disabled}
+                            onClick={() => {
+                              onChange({
+                                ...section,
+                                groups: section.groups.filter(
+                                  (_, i) => i !== index
+                                ),
+                              });
+                            }}
+                          >
+                            {tr.EditGroupedCheckBoxQuestion.deleteGroup}
+                          </Button>
+                        </div>
+                      </AccordionDetails>
+                    </Accordion>
+                  )}
+                </Draggable>
+              ))}
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
+      </DragDropContext>
       <div className={classes.row}>
         <Fab
           color="primary"

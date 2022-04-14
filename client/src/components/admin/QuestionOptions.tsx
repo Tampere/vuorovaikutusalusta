@@ -135,7 +135,9 @@ export default function QuestionOptions({
                   } else {
                     onChange(
                       options.map((option, i) =>
-                        index === i ? { ...option, text: event.target.value } : option
+                        index === i
+                          ? { ...option, text: event.target.value }
+                          : option
                       )
                     );
                   }
@@ -167,16 +169,18 @@ export default function QuestionOptions({
               />
             )}
             <Tooltip title={tr.SurveySections.removeOption}>
-              <IconButton
-                aria-label="delete"
-                disabled={disabled}
-                size="small"
-                onClick={() => {
-                  onChange(options.filter((_, i) => index !== i));
-                }}
-              >
-                <Delete />
-              </IconButton>
+              <span>
+                <IconButton
+                  aria-label="delete"
+                  disabled={disabled}
+                  size="small"
+                  onClick={() => {
+                    onChange(options.filter((_, i) => index !== i));
+                  }}
+                >
+                  <Delete />
+                </IconButton>
+              </span>
             </Tooltip>
           </div>
         ))}

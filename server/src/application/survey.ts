@@ -2,6 +2,7 @@ import {
   AnswerEntry,
   LocalizedText,
   SectionOption,
+  SectionOptionGroup,
   Survey,
   SurveyBackgroundImage,
   SurveyCheckboxQuestion,
@@ -18,6 +19,7 @@ import {
   getDb,
   getGeoJSONColumn,
   getMultiInsertQuery,
+  getMultiUpdateQuery,
 } from '@src/database';
 import {
   BadRequestError,
@@ -97,6 +99,17 @@ interface DBSectionOption {
   text: LocalizedText;
   section_id: number;
   info?: LocalizedText;
+  group_id: number;
+}
+
+/**
+ * DB row of table data.option_group
+ */
+interface DBOptionGroup {
+  id?: number;
+  idx: number;
+  name: LocalizedText;
+  section_id: number;
 }
 
 /**
@@ -116,6 +129,7 @@ type DBSurveyJoin = DBSurvey & {
   section_info: LocalizedText;
   option_id: number;
   option_text: LocalizedText;
+  option_group_id: number;
   option_info: LocalizedText;
   theme_id: number;
   theme_name: string;
@@ -193,6 +207,7 @@ export async function getSurvey(params: { id: number } | { name: string }) {
       option.id as option_id,
       option.text as option_text,
       option.idx as option_idx,
+      option.group_id as option_group_id,
       option.info as option_info
     FROM (
       SELECT
@@ -244,6 +259,25 @@ export async function getSurvey(params: { id: number } | { name: string }) {
         : `Survey with name ${params.name} not found`
     );
   }
+
+  // Get all option groups in its own query if needed
+  const optionGroupIds = Array.from(
+    new Set(rows.map((row) => row.option_group_id).filter(Boolean))
+  );
+  const optionGroups = !optionGroupIds.length
+    ? []
+    : (
+        await getDb().manyOrNone<DBOptionGroup>(
+          `SELECT * FROM data.option_group WHERE id = ANY ($1) ORDER BY idx ASC`,
+          [optionGroupIds]
+        )
+      ).map(
+        (group): SectionOptionGroup => ({
+          id: group.id,
+          name: group.name,
+          options: [],
+        })
+      );
 
   return rows.reduce((survey, row) => {
     // Try to find the pre-existing page object
@@ -305,6 +339,29 @@ export async function getSurvey(params: { id: number } | { name: string }) {
       }
     }
 
+    // Gather grouped options only for grouped checkbox questions
+    if (section?.type === 'grouped-checkbox') {
+      // Try to find the pre-existing option group object
+      let group = section.groups.find(
+        (group) => group?.id === row.option_group_id
+      );
+
+      // If the group wasn't added yet, add it from the different query result
+      if (
+        !group &&
+        (group = optionGroups.find((group) => group.id === row.option_group_id))
+      ) {
+        // Groups may be out of order, so use the index from the other query
+        section.groups[optionGroups.indexOf(group)] = group;
+      }
+
+      // Only add options if the group exists - otherwise there are no options saved for this group
+      if (group) {
+        // Add the single option to the group
+        group.options.push(dbSurveyJoinToOption(row));
+      }
+    }
+
     return survey;
   }, dbSurveyToSurvey(rows[0])) as any;
 }
@@ -353,7 +410,7 @@ async function upsertSection(section: DBSurveyPageSection, index: number) {
       COALESCE(
         CASE
           WHEN $(id) < 0 THEN NULL
-          ELSE $(id)
+          ELSE $(id)::integer
         END,
         NEXTVAL('data.page_section_id_seq')
       ),
@@ -401,30 +458,75 @@ async function upsertOption(option: DBSectionOption, index: number) {
   // Negative IDs can be assigned as temporary IDs for e.g. drag and drop - change them to null
   return await getDb().one<DBSectionOption>(
     `
-    INSERT INTO data.option (id, text, section_id, idx)
+    INSERT INTO data.option (id, text, section_id, idx, group_id, info)
     VALUES (
       COALESCE(
         CASE
           WHEN $(id) < 0 THEN NULL
-          ELSE $(id)
+          ELSE $(id)::integer
         END,
         NEXTVAL('data.option_id_seq')
       ),
       $(text)::json,
       $(sectionId),
-      $(index)
+      $(index),
+      $(groupId),
+      $(info)::json
     )
     ON CONFLICT (id) DO
       UPDATE SET
         text = $(text)::json,
         section_id = $(sectionId),
-        idx = $(index)
+        idx = $(index),
+        group_id = $(groupId),
+        info = $(info)::json
     RETURNING *
   `,
     {
       id: option.id,
       text: option.text,
       sectionId: option.section_id,
+      index,
+      groupId: option.group_id,
+      info: option.info,
+    }
+  );
+}
+
+/**
+ * Upserts (updates or inserts) given option group with given index.
+ * @param group Option group
+ * @param index Index
+ * @returns Updated DB option group
+ */
+async function upsertOptionGroup(group: DBOptionGroup, index: number) {
+  // Negative IDs can be assigned as temporary IDs for e.g. drag and drop - change them to null
+  return await getDb().one<DBOptionGroup>(
+    `
+    INSERT INTO data.option_group (id, name, idx, section_id)
+    VALUES (
+      COALESCE(
+        CASE
+          WHEN $(id) < 0 THEN NULL
+          ELSE $(id)::integer
+        END,
+        NEXTVAL('data.option_group_id_seq')
+      ),
+      $(name)::json,
+      $(index),
+      $(sectionId)
+    )
+    ON CONFLICT (id) DO
+      UPDATE SET
+        name = $(name)::json,
+        idx = $(index),
+        section_id = $(sectionId)
+    RETURNING *
+  `,
+    {
+      id: group.id,
+      name: group.name,
+      sectionId: group.section_id,
       index,
     }
   );
@@ -490,25 +592,61 @@ async function deleteRemovedSubQuestions(
  * When updating a page section, deletes all options that should be removed from DB.
  * @param sectionId Section ID
  * @param newOptions New options
+ * @param optionGroupId Option group ID
  */
 async function deleteRemovedOptions(
   sectionId: number,
-  newOptions: SectionOption[]
+  newOptions: SectionOption[],
+  optionGroupId?: number
 ) {
-  // Get all existing sections
-  const rows = await getDb().manyOrNone<{ id: number }>(
-    `SELECT id FROM data.option WHERE section_id = $1`,
-    [sectionId]
-  );
+  // Get all existing options
+  const rows =
+    optionGroupId != null
+      ? await getDb().manyOrNone<{ id: number }>(
+          `SELECT id FROM data.option WHERE section_id = $1 AND group_id = $2`,
+          [sectionId, optionGroupId]
+        )
+      : await getDb().manyOrNone<{ id: number }>(
+          `SELECT id FROM data.option WHERE section_id = $1`,
+          [sectionId]
+        );
   const existingOptionIds = rows.map((row) => row.id);
 
-  // All existing sections that aren't included in new sections should be removed
+  // All existing options that aren't included in new options should be removed
   const removedOptionIds = existingOptionIds.filter((id) =>
     (newOptions ?? []).every((newOption) => newOption.id !== id)
   );
   if (removedOptionIds.length) {
     await getDb().none(`DELETE FROM data.option WHERE id = ANY ($1)`, [
       removedOptionIds,
+    ]);
+  }
+}
+
+/**
+ * When updating a page section, deletes all option groups that should be removed from DB.
+ * @param sectionId Section ID
+ * @param newGroups New option groups
+ * @param optionGroupId Option group ID
+ */
+async function deleteRemovedOptionGroups(
+  sectionId: number,
+  newGroups: SectionOptionGroup[]
+) {
+  // Get all existing option groups
+  const rows = await getDb().manyOrNone<{ id: number }>(
+    `SELECT id FROM data.option_group WHERE section_id = $1`,
+    [sectionId]
+  );
+  const existingGroupIds = rows.map((row) => row.id);
+
+  // All existing groups that aren't included in new groups should be removed
+  const removedGroupIds = existingGroupIds.filter((id) =>
+    (newGroups ?? []).every((newGroup) => newGroup.id !== id)
+  );
+  if (removedGroupIds.length) {
+    await getDb().none(`DELETE FROM data.option_group WHERE id = ANY ($1)`, [
+      removedGroupIds,
     ]);
   }
 }
@@ -568,6 +706,14 @@ export async function updateSurvey(survey: Survey) {
     throw new NotFoundError(`Survey with ID ${survey.id} not found`);
   }
 
+  // Update the survey pages
+  await getDb().none(
+    getMultiUpdateQuery(
+      surveyPagesToRows(survey.pages, survey.id),
+      surveyPageColumnSet
+    ) + ' WHERE t.id = v.id'
+  );
+
   // Form a flat array of all new section rows under each page
   const sections = survey.pages.reduce((result, page) => {
     return [...result, ...surveySectionsToRows(page.sections, page.id)];
@@ -616,6 +762,37 @@ export async function updateSurvey(survey: Survey) {
               );
               await Promise.all(options.map(upsertOption));
             }
+          })
+        );
+      }
+
+      // Delete removed option groups
+      await deleteRemovedOptionGroups(section.id, section.groups);
+
+      // If there are option groups, update them
+      if (section.groups?.length) {
+        await Promise.all(
+          section.groups.map(async (group, index) => {
+            const groupRow = await upsertOptionGroup(
+              {
+                id: group.id,
+                name: group.name,
+                section_id: sectionRow.id,
+                idx: index,
+              },
+              index
+            );
+
+            // Delete removed options from the group
+            await deleteRemovedOptions(section.id, group.options, groupRow.id);
+
+            // Upsert all options
+            const options = optionsToRows(
+              group.options,
+              sectionRow.id,
+              groupRow.id
+            );
+            await Promise.all(options.map(upsertOption));
           })
         );
       }
@@ -743,6 +920,8 @@ function dbSurveyJoinToSection(dbSurveyJoin: DBSurveyJoin): SurveyPageSection {
         ...(dbSurveyJoin.section_details as any),
         // Add an initial empty option array if the type allows options
         ...(sectionTypesWithOptions.includes(type) && { options: [] }),
+        // Add an initial empty group array if the type allows option groups
+        ...(type === 'grouped-checkbox' && { groups: [] }),
       };
 }
 
@@ -899,6 +1078,7 @@ function answerEntriesToRows(
         ];
         break;
       case 'checkbox':
+      case 'grouped-checkbox':
         newEntries =
           entry.value.length !== 0
             ? [
@@ -1050,6 +1230,7 @@ function surveySectionsToRows(
       options = undefined,
       subQuestions = undefined,
       info = undefined,
+      groups = undefined,
       ...details
     } = { ...surveySection };
     return {
@@ -1066,6 +1247,7 @@ function surveySectionsToRows(
       details,
       options,
       subQuestions,
+      groups,
       parent_section: parentSectionId ?? null,
       info: {
         fi: info,
@@ -1073,6 +1255,7 @@ function surveySectionsToRows(
     } as DBSurveyPageSection & {
       options: SectionOption[];
       subQuestions: SurveyMapSubQuestion[];
+      groups: SectionOptionGroup[];
     };
   });
 }
@@ -1081,11 +1264,13 @@ function surveySectionsToRows(
  * Convert section options to db rows
  * @param sectionOptions
  * @param sectionId
+ * @param optionGroupId
  * @returns DBSectionOption[]
  */
 function optionsToRows(
   sectionOptions: SectionOption[],
-  sectionId: number
+  sectionId: number,
+  optionGroupId?: number
 ): DBSectionOption[] {
   return sectionOptions.map((option, index) => {
     return {
@@ -1096,6 +1281,7 @@ function optionsToRows(
         fi: option.text,
       },
       info: option.info ? { fi: option.info } : null,
+      group_id: optionGroupId ?? null,
     } as DBSectionOption;
   });
 }
