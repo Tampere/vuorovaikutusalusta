@@ -3,7 +3,6 @@ import { parseAsync } from 'json2csv';
 import ogr2ogr from 'ogr2ogr';
 import internal from 'stream';
 import { LocalizedText } from '@interfaces/survey';
-import { GeoJSONWithCRS } from '@interfaces/geojson';
 import moment from 'moment';
 
 const textSeparator = '::';
@@ -22,9 +21,7 @@ interface DBAnswerEntry {
   submission_id: number;
   title: LocalizedText;
   type: string;
-  value_geometry: GeoJSONWithCRS<
-    GeoJSON.Feature<GeoJSON.Point | GeoJSON.LineString | GeoJSON.Polygon>
-  >;
+  value_geometry: GeoJSON.Point | GeoJSON.LineString | GeoJSON.Polygon;
   value_text: string;
   value_json: JSON[];
   value_option_id: number;
@@ -43,9 +40,7 @@ interface AnswerEntry {
   submissionId: number;
   title: LocalizedText;
   type: string;
-  valueGeometry: GeoJSONWithCRS<
-    GeoJSON.Feature<GeoJSON.Point | GeoJSON.LineString | GeoJSON.Polygon>
-  >;
+  valueGeometry: GeoJSON.Point | GeoJSON.LineString | GeoJSON.Polygon;
   valueText: string;
   valueJson: JSON[];
   valueOptionId: number;
@@ -106,37 +101,27 @@ function dbAnswerEntryRowsToAnswerEntries(rows: DBAnswerEntry[]) {
  * @returns
  */
 function dbEntriesToGeoJSON(entries: AnswerEntry[]) {
-  return entries.reduce(
-    (prevValue, currentValue) => {
-      // Skip entries which don't include geometries
-      // TODO: Might be better to create a separate SQL query for the geometry answer entries,
-      // Look into this when the most important use cases for file export have been determined
-      if (!currentValue.valueGeometry) {
-        return prevValue;
-      } else {
-        return {
-          ...prevValue,
-          features: [
-            ...prevValue.features,
-            {
-              type: 'Feature',
-              geometry: currentValue.valueGeometry,
-              properties: {
-                submissionId: currentValue.submissionId,
-                timeStamp: currentValue.createdAt,
-                questionId: currentValue.sectionId,
-                questionTitle: currentValue.title?.fi,
-              },
-            },
-          ],
-        };
-      }
-    },
-    {
-      type: 'FeatureCollection',
-      features: [],
-    }
-  );
+  const features = entries
+    .filter((entry) => entry.valueGeometry)
+    .map((entry) => ({
+      type: 'Feature',
+      geometry: {
+        type: entry.valueGeometry.type,
+        coordinates: entry.valueGeometry.coordinates,
+      },
+      properties: {
+        submissionId: entry.submissionId,
+        timeStamp: entry.createdAt,
+        questionId: entry.sectionId,
+        questionTitle: entry.title?.fi,
+      },
+    }));
+
+  return {
+    type: 'FeatureCollection',
+    features: features,
+    crs: { type: 'name', properties: { name: 'urn:ogc:def:crs:EPSG::3067' } },
+  };
 }
 
 /**
@@ -208,6 +193,7 @@ export async function getGeoPackageFile(
 
   const { stream } = await ogr2ogr(dbEntriesToGeoJSON(rows), {
     format: 'GPKG',
+    options: ['-nln', 'answer-layer'],
   });
   return stream;
 }
