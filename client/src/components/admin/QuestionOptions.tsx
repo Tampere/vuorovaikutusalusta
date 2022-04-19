@@ -156,7 +156,7 @@ export default function QuestionOptions({
                 }}
               />
             </div>
-            {option.info && (
+            {allowOptionInfo && (
               <OptionInfoDialog
                 infoText={option.info}
                 onChangeOptionInfo={(newInfoText) => {

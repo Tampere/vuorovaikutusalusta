@@ -30,6 +30,7 @@ export default function OptionInfoDialog({
           aria-label="option-info"
           size="small"
           onClick={() => setDialogOpen((prev) => !prev)}
+          color={infoText ? 'secondary' : 'default'}
         >
           <HelpIcon />
         </IconButton>
