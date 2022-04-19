@@ -5,6 +5,7 @@ import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useMemo, useState } from 'react';
 import CheckBoxQuestion from './CheckBoxQuestion';
 import FreeTextQuestion from './FreeTextQuestion';
+import GroupedCheckBoxQuestion from './GroupedCheckBoxQuestion';
 import MapQuestion from './MapQuestion';
 import MatrixQuestion from './MatrixQuestion';
 import NumericQuestion from './NumericQuestion';
@@ -158,6 +159,20 @@ export default function SurveyQuestion({ question }: Props) {
       {question.type === 'matrix' && (
         <MatrixQuestion
           value={value as string[]}
+          onChange={(value) => {
+            updateAnswer({
+              sectionId: question.id,
+              type: question.type,
+              value,
+            });
+          }}
+          question={question}
+          setDirty={setDirty}
+        />
+      )}
+      {question.type === 'grouped-checkbox' && (
+        <GroupedCheckBoxQuestion
+          value={value as number[]}
           onChange={(value) => {
             updateAnswer({
               sectionId: question.id,

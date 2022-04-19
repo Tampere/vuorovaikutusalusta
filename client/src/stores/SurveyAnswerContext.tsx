@@ -97,6 +97,12 @@ export function getEmptyAnswer(section: SurveyPageSection): AnswerEntry {
         type: section.type,
         value: new Array(section.subjects?.length ?? 1).fill(null),
       };
+    case 'grouped-checkbox':
+      return {
+        sectionId: section.id,
+        type: section.type,
+        value: [],
+      };
     default:
       throw new Error(
         `No default value defined for questions of type "${section.type}"`
@@ -124,7 +130,7 @@ export function useSurveyAnswers() {
     // Find the answer that corresponds to the question
     const answer = answers.find((answer) => answer.sectionId === question.id);
     // Checkbox question validation - check possible answer limits
-    if (question.type === 'checkbox') {
+    if (question.type === 'checkbox' || question.type === 'grouped-checkbox') {
       const value = answer.value as (number | string)[];
       // Pick only non-empty selections (numbers and non-empty strings) for the check
       const nonEmptySelections = value.filter(
