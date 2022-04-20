@@ -256,7 +256,8 @@ function formatAnswerType(
       return entryRow.valueText.replace(textSeparator, separatorEscape);
     case 'radio':
     case 'checkbox':
-      // If there is a radio/checkbox answer present, it is interpretet as '1' marking that the option was selected
+    case 'grouped-checkbox':
+      // If there is a radio/checkbox/grouped-checkbox answer present, it is interpretet as '1' marking that the option was selected
       // 'something else' answers are displayed as the answer itself
       return entryRow.valueOptionId
         ? 1
@@ -316,7 +317,21 @@ async function entriesToCSVFormat(
 
   const optionTexts = await getDb().manyOrNone(
     `
-    SELECT opt.id, opt.text, ps.id as section_id, ps.title, ps.type FROM data.option opt LEFT JOIN data.page_section ps ON opt.section_id = ps.id LEFT JOIN data.survey_page sp ON ps.survey_page_id = sp.id LEFT JOIN data.survey s ON sp.survey_id = s.id WHERE s.id = $1;
+    SELECT 
+      opt.id,
+      opt.idx as option_index,
+      opt.text,
+      ps.id as section_id,
+      ps.title,
+      ps.type,
+      og.name as group_name,
+      og.idx as group_index
+    FROM data.option opt
+      LEFT JOIN data.option_group og ON opt.group_id = og.id
+      LEFT JOIN data.page_section ps ON opt.section_id = ps.id
+      LEFT JOIN data.survey_page sp ON ps.survey_page_id = sp.id
+      LEFT JOIN data.survey s ON sp.survey_id = s.id WHERE s.id = $1
+      ORDER BY group_index, opt.idx, opt.id;
     `,
     [surveyId]
   );
@@ -326,11 +341,25 @@ async function entriesToCSVFormat(
       ?.map((optionObj) => optionObj.sectionId)
       .indexOf(currentValue.section_id);
 
+    const text =
+      currentValue.type === 'grouped-checkbox' && currentValue.group_name
+        ? `${currentValue.group_name['fi']} - ${currentValue?.text?.['fi']}`
+        : currentValue?.text?.['fi'];
+
+    // Grouped checkbox questions will be ordered on the CSV by 1) group 2) index inside group
+    const optionText =
+      currentValue.type === 'grouped-checkbox'
+        ? {
+            [`${currentValue.group_index}${currentValue.option_index}-${currentValue.id}`]:
+              text,
+          }
+        : { [currentValue.id]: text };
+
     if (previousSection !== -1) {
       const temp = [...prevValue];
       temp[previousSection].sectionTexts = {
         ...temp[previousSection].sectionTexts,
-        [Number(currentValue.id)]: currentValue?.text?.['fi'],
+        ...optionText,
       };
       return temp;
     } else {
@@ -339,7 +368,7 @@ async function entriesToCSVFormat(
         {
           sectionId: currentValue.section_id,
           sectionTexts: {
-            [Number(currentValue['id'])]: currentValue?.text?.['fi'],
+            ...optionText,
           },
         },
       ];
@@ -402,6 +431,24 @@ async function entriesToCSVFormat(
           currentValue.valueOptionId ? currentValue.valueOptionId : '000'
         }`;
         break;
+      case 'grouped-checkbox': {
+        // Custom headers for grouped-checkbox questions
+        checkboxOptionTexts = refinedOptionTexts?.find(
+          (optionTextObj) => optionTextObj.sectionId === currentValue.sectionId
+        ).sectionTexts;
+        customHeaders = Object.keys(checkboxOptionTexts).map((key) => ({
+          [`${currentValue.sectionId}-gc${key}`]: `${checkboxOptionTexts[key]}`,
+        }));
+        const indexOfOptionId = Object.keys(checkboxOptionTexts)
+          .map((key: string) => key.split('-')[1])
+          .indexOf(currentValue.valueOptionId?.toString());
+        sectionSubmissionKey += `-gc${
+          currentValue.valueOptionId
+            ? Object.keys(checkboxOptionTexts)[indexOfOptionId]
+            : '000'
+        }`;
+        break;
+      }
       case 'sorting':
         customHeaders = currentValue.valueJson.map((_, index) => ({
           [`${sectionSubmissionKey}-s${index}`]: `${currentValue.title?.fi}_${
@@ -445,6 +492,7 @@ async function entriesToCSVFormat(
       case 'sorting':
         submission[currentValue.submissionId].push(...(answerEntry as any));
         break;
+      case 'grouped-checkbox':
       case 'checkbox': {
         // Initialise submission with checkbox dummy answers, i.e. add 'null' answers for each checkbox option
         if (!checkboxInitialised) {
@@ -501,6 +549,7 @@ async function entriesToCSVFormat(
               ...(currentValue.type === 'matrix' ||
               currentValue.type === 'sorting' ||
               currentValue.type === 'checkbox' ||
+              currentValue.type === 'grouped-checkbox' ||
               currentValue.type === 'radio'
                 ? customHeaders
                 : [
