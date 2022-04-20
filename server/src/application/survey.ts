@@ -993,11 +993,101 @@ export async function deleteSurveyPage(id: number) {
 }
 
 /**
+ * Validates given answer entries. Rejects the request if any of the entries is invalid, i.e. exceeds answer limits.
+ * @param answerEntries Answer entries to validate
+ */
+async function validateEntriesByAnswerLimits(answerEntries: AnswerEntry[]) {
+  // Get all questions that have answer limits from db
+  const limitedQuestions = await getDb().manyOrNone<{
+    id: number;
+    min: number;
+    max: number;
+  }>(
+    `SELECT
+      id,
+      details->'answerLimits'->'min' as min,
+      details->'answerLimits'->'max' as max
+    FROM data.page_section
+    WHERE
+      id = ANY ($1) AND
+      details->'answerLimits' IS NOT NULL`,
+    [answerEntries.map((entry) => entry.sectionId)]
+  );
+  // Validate each entry against the question answer limits
+  answerEntries.forEach((entry) => {
+    const question = limitedQuestions.find((q) => q.id === entry.sectionId);
+    if (question) {
+      const min = question.min;
+      const max = question.max;
+      const answerCount = (entry.value as (number | string)[]).length;
+      if (
+        (min != null && answerCount < min) ||
+        (max != null && answerCount > max)
+      ) {
+        throw new BadRequestError(
+          `Answer for question ${entry.sectionId} must have between ${min} and ${max} selections`
+        );
+      }
+    }
+  });
+}
+
+/**
+ * Validate answer entries to contain answers required questions
+ * @param answerEntries Answer entries to validate
+ */
+async function validateEntriesByIsRequired(answerEntries: AnswerEntry[]) {
+  // Get all questions that are required from db
+  const requiredQuestions = await getDb().manyOrNone<{
+    id: number;
+  }>(
+    `SELECT
+      id
+    FROM data.page_section
+    WHERE
+      id = ANY ($1) AND
+      (details->>'isRequired')::boolean`,
+    [answerEntries.map((entry) => entry.sectionId)]
+  );
+
+  // Check if there is a non-null answer for each required question
+  requiredQuestions.forEach((question) => {
+    if (
+      !answerEntries.find(
+        (entry) =>
+          entry.value != null &&
+          (typeof entry.value !== 'string' || entry.value !== '') &&
+          entry.sectionId === question.id
+      )
+    ) {
+      throw new BadRequestError(
+        `Answer for question ${question.id} is required`
+      );
+    }
+  });
+}
+
+/**
+ * Check if given answer entries are valid.
+ * @param answerEntries Answer entries to validate
+ */
+async function validateEntries(answerEntries: AnswerEntry[]) {
+  await Promise.all([
+    validateEntriesByAnswerLimits(answerEntries),
+    validateEntriesByIsRequired(answerEntries),
+  ]);
+}
+
+/**
  * Create a submission and related answer entries
  * @param surveyID
  * @param submissionEntries
  */
-export async function createSurveySubmission(surveyID, submissionEntries) {
+export async function createSurveySubmission(
+  surveyID: number,
+  submissionEntries: AnswerEntry[]
+) {
+  await validateEntries(submissionEntries);
   const submissionRow = await getDb().one(
     `
     INSERT INTO data.submission (survey_id) VALUES ($1) RETURNING id;
