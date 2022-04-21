@@ -255,11 +255,11 @@
   },
   "GroupedCheckBoxQuestion": {
     "helperText": "Valitse kohteita alla olevien ryhmien sisältä. Ryhmän viereinen numero kuvastaa ryhmän alta tekemiesi valintojen lukumäärää.",
-    "helperTextMin": "Valitse yhteensä vähintään {min} kohdetta alla olevien ryhmien sisältä. Ryhmän viereinen numero kuvastaa ryhmän alta tekemiesi valintojen lukumäärää.",
-    "helperTextMax": "Valitse yhteensä enintään {max} kohdetta alla olevien ryhmien sisältä. Ryhmän viereinen numero kuvastaa ryhmän alta tekemiesi valintojen lukumäärää.",
-    "helperTextMinMax": "Valitse yhteensä vähintään {min} ja enintään {max} kohdetta alla olevien ryhmien sisältä. Ryhmän viereinen numero kuvastaa ryhmän alta tekemiesi valintojen lukumäärää.",
-    "indicatorText": "Olet valinnut {numbers} kohdetta",
-    "indicatorTextMaxReached": "Olet valinnut kaikki {numbers} kohdetta"
+    "helperTextMin": "Valitse yhteensä vähintään {min} vaihtoehtoa alla olevien ryhmien sisältä. Ryhmän viereinen numero kuvastaa ryhmän alta tekemiesi valintojen lukumäärää.",
+    "helperTextMax": "Valitse yhteensä enintään {max} vaihtoehtoa alla olevien ryhmien sisältä. Ryhmän viereinen numero kuvastaa ryhmän alta tekemiesi valintojen lukumäärää.",
+    "helperTextMinMax": "Valitse yhteensä vähintään {min} ja enintään {max} vaihtoehtoa.",
+    "indicatorText": "Olet valinnut {numbers} vaihtoehtoa",
+    "indicatorTextMaxReached": "Olet valinnut kaikki {numbers} vaihtoehtoa"
   },
   "AppBarUserMenu": {
     "logout": "Kirjaudu ulos"
