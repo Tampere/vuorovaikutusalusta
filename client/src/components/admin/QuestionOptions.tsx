@@ -73,11 +73,18 @@ export default function QuestionOptions({
     const optionFields = clipboardRows
       .map((row: string): { text: string; info?: string } => {
         const optionFields = row.split('\t');
+        let optionInfo = optionFields?.[1] ?? '';
+        if (optionInfo.charAt(0) === '"') {
+          optionInfo = optionInfo.slice(1, optionInfo.length);
+        }
+        if (optionInfo.charAt(optionInfo.length - 1) === '"') {
+          optionInfo = optionInfo.slice(0, optionInfo.length - 1);
+        }
         if (![1, 2].includes(optionFields.length) || optionFields[0] === '')
           return null;
         return {
           text: optionFields[0],
-          ...(allowOptionInfo ? { info: optionFields?.[1] ?? '' } : {}),
+          ...(allowOptionInfo ? { info: optionInfo } : {}),
         };
       })
       .filter((option) => option);
@@ -126,11 +133,7 @@ export default function QuestionOptions({
                   // 1) feature is enabled
                   // 2) the copied fields' format is correct
                   // 3) clipboard is pasted on the last option field
-                  if (
-                    enableClipboardImport &&
-                    event.target.value.includes('\t') &&
-                    index + 1 === options.length
-                  ) {
+                  if (enableClipboardImport && index + 1 === options.length) {
                     handleClipboardInput(event.target.value, index);
                   } else {
                     onChange(
