@@ -607,7 +607,7 @@ async function deleteRemovedOptions(
           [sectionId, optionGroupId]
         )
       : await getDb().manyOrNone<{ id: number }>(
-          `SELECT id FROM data.option WHERE section_id = $1`,
+          `SELECT id FROM data.option WHERE section_id = $1 AND group_id IS NULL`,
           [sectionId]
         );
   const existingOptionIds = rows.map((row) => row.id);
