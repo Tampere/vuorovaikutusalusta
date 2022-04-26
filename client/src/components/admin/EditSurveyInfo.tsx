@@ -15,7 +15,9 @@ import { useHistory } from 'react-router-dom';
 import ConfirmDialog from '../ConfirmDialog';
 import Fieldset from '../Fieldset';
 import LoadingButton from '../LoadingButton';
+import ColorSelect from './ColorSelect';
 import SurveyImageList from './SurveyImageList';
+import ThemeSelect from './ThemeSelect';
 
 const useStyles = makeStyles({
   dateTimePicker: {
@@ -181,6 +183,25 @@ export default function EditSurveyInfo() {
           </div>
         )}
         <SurveyImageList />
+        <ThemeSelect
+          value={activeSurvey.theme?.id}
+          onChange={(theme) => {
+            editSurvey({
+              ...activeSurvey,
+              theme,
+            });
+          }}
+        />
+        <ColorSelect
+          label={tr.EditSurveyInfo.titleColor}
+          value={activeSurvey.sectionTitleColor}
+          onChange={(color) => {
+            editSurvey({
+              ...activeSurvey,
+              sectionTitleColor: color,
+            });
+          }}
+        />
         <DateTimePicker
           label={tr.EditSurveyInfo.startDate}
           value={activeSurvey.startDate}

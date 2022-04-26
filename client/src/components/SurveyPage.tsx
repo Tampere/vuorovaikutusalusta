@@ -1,24 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import { Survey } from '@interfaces/survey';
-import { Box, CircularProgress, Typography } from '@material-ui/core';
-import { useTranslations } from '@src/stores/TranslationContext';
+import { Box, CircularProgress } from '@material-ui/core';
 import { request } from '@src/utils/request';
 import { useParams } from 'react-router-dom';
 import SurveyLandingPage from './SurveyLandingPage';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import SurveyStepper from './SurveyStepper';
 import SurveyThanksPage from './SurveyThanksPage';
+import { UnavailableSurvey } from './UnavailableSurvey';
+import { NotFoundPage } from './NotFoundPage';
+import { useSurveyTheme } from '@src/stores/SurveyThemeProvider';
 
 export default function SurveyPage() {
   const [loading, setLoading] = useState(true);
-  const [errorMessage, setErrorMessage] = useState<string>(null);
   const [showLandingPage, setShowLandingPage] = useState(true);
   const [showThanksPage, setShowThanksPage] = useState(false);
   const [surveyBackgroundImage, setSurveyBackgroundImage] = useState<any>(null);
+  const [errorStatusCode, setErrorStatusCode] = useState<number>(null);
 
   const { name } = useParams<{ name: string }>();
-  const { tr } = useTranslations();
   const { setSurvey, survey } = useSurveyAnswers();
+  const { setThemeFromSurvey } = useSurveyTheme();
 
   // Fetch survey data from server
   useEffect(() => {
@@ -32,13 +34,10 @@ export default function SurveyPage() {
           setSurveyBackgroundImage(surveyBackgroundImage);
         }
         setSurvey(survey);
+        setThemeFromSurvey(survey);
         setLoading(false);
       } catch (error) {
-        setErrorMessage(
-          error.status === 404
-            ? tr.SurveyPage.errorSurveyNotFound
-            : tr.SurveyPage.errorFetchingSurvey
-        );
+        setErrorStatusCode(error.status);
         setLoading(false);
         throw error;
       }
@@ -57,20 +56,22 @@ export default function SurveyPage() {
   }, [survey]);
 
   return !survey ? (
-    <Box
-      sx={{
-        display: 'flex',
-        height: '100vh',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
-      {loading ? (
+    loading ? (
+      <Box
+        sx={{
+          display: 'flex',
+          height: '100vh',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
         <CircularProgress />
-      ) : (
-        <Typography variant="body1">{errorMessage}</Typography>
-      )}
-    </Box>
+      </Box>
+    ) : errorStatusCode === 404 ? (
+      <NotFoundPage />
+    ) : (
+      <UnavailableSurvey />
+    )
   ) : (
     <Box sx={{ height: '100vh', maxHeight: '-webkit-fill-available' }}>
       {/* Landing page */}

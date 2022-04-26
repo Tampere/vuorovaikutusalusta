@@ -3,6 +3,7 @@ import { Fab, Grid, Typography } from '@material-ui/core';
 import {
   CheckBox,
   FormatListNumbered,
+  LibraryAddCheck,
   LinearScale,
   Looks4,
   Map,
@@ -79,6 +80,7 @@ export default function AddSurveySectionActions(props: Props) {
       type: 'text',
       title: '',
       body: '',
+      bodyColor: '#000000',
       info: null,
     },
     sorting: {
@@ -111,6 +113,16 @@ export default function AddSurveySectionActions(props: Props) {
       classes: [],
       subjects: [],
       allowEmptyAnswer: false,
+    },
+    'grouped-checkbox': {
+      type: 'grouped-checkbox',
+      isRequired: false,
+      title: '',
+      answerLimits: {
+        min: 0,
+        max: 2,
+      },
+      groups: [],
     },
   };
 
@@ -184,6 +196,12 @@ export default function AddSurveySectionActions(props: Props) {
       label: tr.AddSurveySectionActions.matrixQuestion,
       ariaLabel: 'add-matrix-question',
       icon: <ViewComfy />,
+    },
+    {
+      type: 'grouped-checkbox',
+      label: tr.AddSurveySectionActions.groupedCheckboxQuestion,
+      ariaLabel: 'add-grouped-checkbox-question',
+      icon: <LibraryAddCheck />,
     },
   ];
 

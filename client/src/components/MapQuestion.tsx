@@ -37,10 +37,11 @@ export default function MapQuestion({ value, onChange, question }: Props) {
   const [handleSubQuestionDialogClose, setHandleSubQuestionDialogClose] =
     useState<(answers: SurveyMapSubQuestionAnswer[]) => void>(null);
   const [deleteConfirmDialogOpen, setDeleteConfirmDialogOpen] = useState(false);
+  const [clearConfirmDialogOpen, setClearConfirmDialogOpen] = useState(false);
   const {
     draw,
     isMapReady,
-    isMapActive,
+    drawing,
     stopDrawing,
     questionId: drawingQuestionId,
     editingMapAnswer,
@@ -75,8 +76,12 @@ export default function MapQuestion({ value, onChange, question }: Props) {
    * Execute the drawing answer flow when user selects a selection type
    */
   useEffect(() => {
+    // Don't start drawing if the map isn't ready yet
     if (!isMapReady) {
-      // Selection type shouldn't change when it's disabled, i.e. map isn't ready yet
+      // If some selection type was selected, deselect it
+      if (selectionType) {
+        setSelectionType(null);
+      }
       return;
     }
     if (!selectionType) {
@@ -130,7 +135,7 @@ export default function MapQuestion({ value, onChange, question }: Props) {
    * reset selection type to null
    */
   useEffect(() => {
-    if (!isMapReady || question.id == null) {
+    if (!isMapReady || question.id == null || drawingQuestionId == null) {
       return;
     }
     if (drawingQuestionId !== question.id) {
@@ -140,13 +145,13 @@ export default function MapQuestion({ value, onChange, question }: Props) {
   }, [drawingQuestionId]);
 
   /**
-   * When map becomes inactive, clear selected selection type
+   * When drawing gets stopped, clear selected selection type
    */
   useEffect(() => {
-    if (!isMapActive) {
+    if (!drawing) {
       setSelectionType(null);
     }
-  }, [isMapActive]);
+  }, [drawing]);
 
   async function getSubQuestionAnswers() {
     // Don't open the dialog at all if there are no subquestions
@@ -194,33 +199,24 @@ export default function MapQuestion({ value, onChange, question }: Props) {
   return (
     <>
       <div style={{ display: 'flex', flexDirection: 'column' }}>
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
+        <ToggleButtonGroup
+          value={selectionType}
+          exclusive
+          onChange={(_, newValue) => {
+            setSelectionType(newValue);
           }}
+          aria-label="map-selection-type"
         >
-          <ToggleButtonGroup
-            value={selectionType}
-            exclusive
-            onChange={(_, newValue) => {
-              setSelectionType(newValue);
-            }}
-            aria-label="map-selection-type"
-          >
-            {question.selectionTypes.includes('point') &&
-              getToggleButton('point')}
-            {question.selectionTypes.includes('line') &&
-              getToggleButton('line')}
-            {question.selectionTypes.includes('area') &&
-              getToggleButton('area')}
-          </ToggleButtonGroup>
-          {selectionType !== null && (
-            <FormHelperText>
-              {tr.MapQuestion.selectionHelperText[selectionType]}
-            </FormHelperText>
-          )}
-        </div>
+          {question.selectionTypes.includes('point') &&
+            getToggleButton('point')}
+          {question.selectionTypes.includes('line') && getToggleButton('line')}
+          {question.selectionTypes.includes('area') && getToggleButton('area')}
+        </ToggleButtonGroup>
+        {selectionType !== null && (
+          <FormHelperText>
+            {tr.MapQuestion.selectionHelperText[selectionType]}
+          </FormHelperText>
+        )}
         {value?.length > 0 && (
           <div>
             <Button
@@ -228,7 +224,8 @@ export default function MapQuestion({ value, onChange, question }: Props) {
               variant="outlined"
               color="primary"
               onClick={() => {
-                onChange([]);
+                setSelectionType(null);
+                setClearConfirmDialogOpen(true);
               }}
             >
               {tr.MapQuestion.clearAnswers}
@@ -282,6 +279,17 @@ export default function MapQuestion({ value, onChange, question }: Props) {
             stopEditingMapAnswer();
           }
           setDeleteConfirmDialogOpen(false);
+        }}
+      />
+      {/* Confirm dialog for clearing all map answers */}
+      <ConfirmDialog
+        open={clearConfirmDialogOpen}
+        text={tr.MapQuestion.confirmClearAnswers}
+        onClose={(result) => {
+          if (result) {
+            onChange([]);
+          }
+          setClearConfirmDialogOpen(false);
         }}
       />
     </>

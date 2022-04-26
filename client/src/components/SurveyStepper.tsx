@@ -25,6 +25,7 @@ import { getClassList } from '@src/utils/classes';
 import { request } from '@src/utils/request';
 import React, { useEffect, useMemo, useState } from 'react';
 import SplitPane from 'react-split-pane';
+import PageConnector from './PageConnector';
 import StepperControls from './StepperControls';
 import SurveyMap from './SurveyMap';
 import SurveyQuestion from './SurveyQuestion';
@@ -57,6 +58,34 @@ const useStyles = makeStyles((theme: Theme) => ({
   section: {
     margin: '1rem 0',
   },
+  stepHeader: {
+    fontWeight: 'bold !important' as any,
+    color: '#22437b !important' as any,
+    cursor: 'pointer',
+  },
+  stepHeaderError: {
+    color: 'red !important' as any,
+  },
+  stepActive: {
+    fontSize: '1.1rem',
+  },
+  stepIcon: {
+    '& text': {
+      fill: 'white !important' as any,
+    },
+  },
+  stepIconUnfinised: {
+    '& svg': {
+      color: 'red',
+    },
+    '& text': {
+      fill: 'black',
+    },
+  },
+  stepContent: {
+    borderColor: theme?.palette?.primary?.main ?? 'blue',
+    borderWidth: '3px',
+  },
 }));
 
 interface Props {
@@ -69,6 +98,7 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
   const [loading, setLoading] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
   const [mobileMapOpen, setMobileMapOpen] = useState(false);
+  const [highlightErrorPages, setHighlightErrorPages] = useState(false);
 
   const { isPageValid, answers } = useSurveyAnswers();
   const { showToast } = useToasts();
@@ -76,7 +106,7 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
     setDisabled,
     setVisibleLayers,
     helperText,
-    isMapActive,
+    drawing,
     isMapReady,
     stopDrawing,
     selectionType,
@@ -86,19 +116,18 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
   const classes = useStyles();
   const { tr } = useTranslations();
   const theme = useTheme();
-  // TODO: enable mobile map once event handler problem when resizing the window is fixed!
-  const mdUp = useMediaQuery(theme.breakpoints.up('md')) || true;
+  const mdUp = useMediaQuery(theme.breakpoints.up('md'));
   const currentPage = useMemo(
     () => survey.pages[pageNumber],
     [survey, pageNumber]
   );
 
   /**
-   * Show/hide mobile map when the active status of the map changes
+   * Show/hide mobile map when the drawing status of the map changes
    */
   useEffect(() => {
-    setMobileMapOpen(isMapActive);
-  }, [isMapActive]);
+    setMobileMapOpen(drawing);
+  }, [drawing]);
 
   /**
    * Stop the drawing interaction when the mobile map gets closed
@@ -144,6 +173,8 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
                 ...features,
                 {
                   ...value.geometry,
+                  // Add a unique index to prevent conflicts
+                  id: `feature-${question.id}-${index}`,
                   // Pass question ID and answer index for reopening the subquestion dialog in edit mode
                   properties: {
                     questionId: question.id,
@@ -178,11 +209,33 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
       className={classes.stepper}
       activeStep={pageNumber}
       orientation="vertical"
+      connector={null}
     >
       {survey.pages.map((page, index) => (
-        <Step key={page.id}>
-          <StepLabel>{page.title}</StepLabel>
-          <StepContent>
+        <Step key={page.id} completed={false}>
+          <StepLabel
+            onClick={() => {
+              setPageNumber(index);
+            }}
+            classes={{
+              active: classes.stepActive,
+              label: `${classes.stepHeader} ${
+                highlightErrorPages && !isPageValid(page)
+                  ? classes.stepHeaderError
+                  : ''
+              }`,
+              iconContainer:
+                index === pageNumber
+                  ? classes.stepIcon
+                  : (highlightErrorPages && !isPageValid(page)) ||
+                    (pageNumber > index && !isPageValid(page))
+                  ? classes.stepIconUnfinised
+                  : null,
+            }}
+          >
+            {page.title}
+          </StepLabel>
+          <StepContent classes={{ root: classes.stepContent }}>
             <FormControl style={{ width: '100%' }} component="fieldset">
               {page.sections.map((section) => (
                 <div className={classes.section} key={section.id}>
@@ -202,8 +255,21 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
                   setPageNumber(index + 1);
                 }}
                 disabled={loading}
-                nextDisabled={!isPageValid(page)}
+                nextDisabled={false}
                 onSubmit={async () => {
+                  // If a page is not finished, highlight it
+                  const unfinishedPages = survey.pages.filter(
+                    (page) => !isPageValid(page)
+                  );
+                  if (unfinishedPages.length !== 0) {
+                    setHighlightErrorPages(true);
+                    showToast({
+                      severity: 'error',
+                      message: tr.SurveyStepper.unfinishedAnswers,
+                    });
+                    return;
+                  }
+
                   setLoading(true);
                   try {
                     await request(
@@ -223,6 +289,16 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
               />
             </FormControl>
           </StepContent>
+          {
+            /** Don't show connector after the final page */
+            index + 1 !== survey?.pages?.length && (
+              <PageConnector
+                activePage={pageNumber}
+                pageIndex={index}
+                theme={theme}
+              />
+            )
+          }
         </Step>
       ))}
     </Stepper>
@@ -272,6 +348,7 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
               alignItems: 'center',
               justifyContent: 'center',
               background: '#fff',
+              zIndex: 1,
             }}
           >
             <Chip
@@ -310,7 +387,7 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
               >
                 <Close />
               </IconButton>
-              {isMapActive && (
+              {drawing && (
                 <>
                   <Typography>{helperText}</Typography>
                   <FormHelperText>

@@ -1,8 +1,16 @@
 import { SectionOption } from '@interfaces/survey';
-import { Fab, IconButton, TextField, Typography } from '@material-ui/core';
+import {
+  Fab,
+  IconButton,
+  TextField,
+  Tooltip,
+  Typography,
+} from '@material-ui/core';
 import { Add, Delete, DragIndicator } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/styles';
+import { useTranslations } from '@src/stores/TranslationContext';
 import React, { createRef, useEffect, useMemo } from 'react';
+import OptionInfoDialog from './OptionInfoDialog';
 
 const useStyles = makeStyles({
   wrapper: {
@@ -30,6 +38,8 @@ interface Props {
   disabled?: boolean;
   onChange: (options: SectionOption[]) => void;
   title: string;
+  enableClipboardImport?: boolean;
+  allowOptionInfo?: boolean;
 }
 
 export default function QuestionOptions({
@@ -37,8 +47,11 @@ export default function QuestionOptions({
   disabled,
   onChange,
   title,
+  enableClipboardImport = false,
+  allowOptionInfo = false,
 }: Props) {
   const classes = useStyles();
+  const { tr } = useTranslations();
 
   // Array of references to the option input elements
   const inputRefs = useMemo(
@@ -54,6 +67,37 @@ export default function QuestionOptions({
     const lastElement = inputRefs[inputRefs.length - 1]?.current;
     lastElement?.focus();
   }, [inputRefs.length]);
+
+  function handleClipboardInput(optionValue: string, optionIndex: number) {
+    const clipboardRows = optionValue.split(/(?!\B"[^"]*)\n(?![^"]*"\B)/);
+    const optionFields = clipboardRows
+      .map((row: string): { text: string; info?: string } => {
+        const optionFields = row.split('\t');
+        let optionInfo = optionFields?.[1] ?? '';
+        if (optionInfo.charAt(0) === '"') {
+          optionInfo = optionInfo.slice(1, optionInfo.length);
+        }
+        if (optionInfo.charAt(optionInfo.length - 1) === '"') {
+          optionInfo = optionInfo.slice(0, optionInfo.length - 1);
+        }
+        if (![1, 2].includes(optionFields.length) || optionFields[0] === '')
+          return null;
+        return {
+          text: optionFields[0],
+          ...(allowOptionInfo ? { info: optionInfo } : {}),
+        };
+      })
+      .filter((option) => option);
+
+    if (!optionFields || !optionFields.length) return;
+    // First add option for the empty option field where focus is currently
+    const updatedOptions = options.map((option, i) =>
+      optionIndex === i ? optionFields[0] : option
+    );
+    // Add other fields
+    const newOptions = optionFields.slice(1, optionFields.length);
+    onChange([...updatedOptions, ...newOptions]);
+  }
 
   return (
     <div className={classes.wrapper}>
@@ -85,11 +129,21 @@ export default function QuestionOptions({
                 size="small"
                 value={option.text}
                 onChange={(event) => {
-                  onChange(
-                    options.map((option, i) =>
-                      index === i ? { text: event.target.value } : option
-                    )
-                  );
+                  // Only allow copying from clipboard if
+                  // 1) feature is enabled
+                  // 2) the copied fields' format is correct
+                  // 3) clipboard is pasted on the last option field
+                  if (enableClipboardImport && index + 1 === options.length) {
+                    handleClipboardInput(event.target.value, index);
+                  } else {
+                    onChange(
+                      options.map((option, i) =>
+                        index === i
+                          ? { ...option, text: event.target.value }
+                          : option
+                      )
+                    );
+                  }
                 }}
                 onKeyDown={(event) => {
                   if (['Enter', 'NumpadEnter'].includes(event.code)) {
@@ -105,16 +159,32 @@ export default function QuestionOptions({
                 }}
               />
             </div>
-            <IconButton
-              aria-label="delete"
-              disabled={disabled}
-              size="small"
-              onClick={() => {
-                onChange(options.filter((_, i) => index !== i));
-              }}
-            >
-              <Delete />
-            </IconButton>
+            {allowOptionInfo && (
+              <OptionInfoDialog
+                infoText={option.info}
+                onChangeOptionInfo={(newInfoText) => {
+                  onChange(
+                    options.map((option, i) =>
+                      index === i ? { ...option, info: newInfoText } : option
+                    )
+                  );
+                }}
+              />
+            )}
+            <Tooltip title={tr.SurveySections.removeOption}>
+              <span>
+                <IconButton
+                  aria-label="delete"
+                  disabled={disabled}
+                  size="small"
+                  onClick={() => {
+                    onChange(options.filter((_, i) => index !== i));
+                  }}
+                >
+                  <Delete />
+                </IconButton>
+              </span>
+            </Tooltip>
           </div>
         ))}
       </div>

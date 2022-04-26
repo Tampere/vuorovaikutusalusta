@@ -95,6 +95,12 @@ export function getEmptyAnswer(section: SurveyPageSection): AnswerEntry {
       return {
         sectionId: section.id,
         type: section.type,
+        value: new Array(section.subjects?.length ?? 1).fill(null),
+      };
+    case 'grouped-checkbox':
+      return {
+        sectionId: section.id,
+        type: section.type,
         value: [],
       };
     default:
@@ -124,7 +130,7 @@ export function useSurveyAnswers() {
     // Find the answer that corresponds to the question
     const answer = answers.find((answer) => answer.sectionId === question.id);
     // Checkbox question validation - check possible answer limits
-    if (question.type === 'checkbox') {
+    if (question.type === 'checkbox' || question.type === 'grouped-checkbox') {
       const value = answer.value as (number | string)[];
       // Pick only non-empty selections (numbers and non-empty strings) for the check
       const nonEmptySelections = value.filter(
@@ -144,9 +150,12 @@ export function useSurveyAnswers() {
     }
 
     if (question.isRequired) {
-      // Matrix is considered incomplete, if the answer array doesn't contain as many elements as there are rows in the matrix
+      // Matrix is considered incomplete, if the answer array doesn't contain as many answers (exluding nulls) as there are rows in the matrix
       if (question.type === 'matrix') {
-        if ((answer.value as string[]).length !== question.subjects?.length) {
+        if (
+          (answer.value as string[]).filter((answer) => answer).length !==
+          question.subjects?.length
+        ) {
           errors.push('required');
         }
       }

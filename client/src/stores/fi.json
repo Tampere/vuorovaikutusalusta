@@ -49,7 +49,11 @@
     "mapUrlError": "Karttatasojen haku annetulle osoitteelle epäonnistui. Tarkista osoite ja yritä uudestaan.",
     "availableMapLayers": "Saatavilla olevat karttatasot:",
     "startDate": "Alkamisaika",
-    "endDate": "Loppumisaika"
+    "endDate": "Loppumisaika",
+    "theme": "Teema",
+    "selectTheme": "Valitse teema",
+    "themeFetchFailed": "Teemojen hakemisessa tapahtui virhe. Yritä myöhemmin uudestaan.",
+    "titleColor": "Osioiden otsikoiden väri"
   },
   "EditSurveyPage": {
     "name": "Sivun nimi",
@@ -62,6 +66,12 @@
     "deleteSection": "Poista osio",
     "confirmDeleteSection": "Haluatko varmasti poistaa tämän osion?"
   },
+  "EditGroupedCheckBoxQuestion": {
+    "addGroup": "Lisää ryhmä",
+    "groupName": "Ryhmän nimi",
+    "untitledGroup": "Nimetön ryhmä",
+    "deleteGroup": "Poista ryhmä"
+  },
   "AddSurveySectionActions": {
     "radioQuestion": "Lisää valintakysymys",
     "checkBoxQuestion": "Lisää monivalintakysymys",
@@ -71,7 +81,20 @@
     "freeTextQuestion": "Lisää vapaatekstikysymys",
     "sortingQuestion": "Lisää järjestyskysymys",
     "sliderQuestion": "Lisää liukukytkinkysymys",
-    "matrixQuestion": "Lisää likert -kysymys"
+    "matrixQuestion": "Lisää likert -kysymys",
+    "groupedCheckboxQuestion": "Lisää ryhmitetty monivalintakysymys"
+  },
+  "SurveySection": {
+    "radioQuestion": "Valintakysymys",
+    "checkBoxQuestion": "Monivalintakysymys",
+    "numericQuestion": "Numeerinen kysymys",
+    "mapQuestion": "Karttakysymys",
+    "textSection": "Tekstiosio",
+    "freeTextQuestion": "Vapaatekstikysymys",
+    "sortingQuestion": "Järjestyskysymys",
+    "sliderQuestion": "Liukukytkinkysymys",
+    "matrixQuestion": "Likert -kysymys",
+    "groupedCheckboxQuestion": "Ryhmitetty monivalintakysymys"
   },
   "SurveySections": {
     "limitAnswers": "Rajoita vastauslukumäärää",
@@ -84,7 +107,9 @@
     "isRequired": "Vastaus pakollinen",
     "answerMaxLength": "Maksimi merkkimäärä",
     "sectionInfo": "Anna lisätietoja kysymykseen liittyen",
-    "allowEmptyAnswer": "Salli “En osaa sanoa” -vaihtoehto"
+    "allowEmptyAnswer": "Salli “En osaa sanoa” -vaihtoehto",
+    "optionInfo": "Kysymysvaihtoehdon lisätiedot",
+    "removeOption": "Poista vastausvaihtoehto"
   },
   "SurveyImageList": {
     "attributions": "Tekijänoikeustiedot",
@@ -96,7 +121,8 @@
     "dropFiles": "Raahaa kuvatiedosto tähän tai klikkaa valitaksesi tiedosto"
   },
   "EditTextSection": {
-    "text": "Teksti"
+    "text": "Teksti",
+    "bodyColor": "Tekstin väri"
   },
   "EditMapQuestion": {
     "selectionTypes": "Sallitut karttavalinnan tyypit",
@@ -133,6 +159,17 @@
     "components.controls.list.unordered": "Järjestämätön lista",
     "components.controls.list.ordered": "Järjestetty lista"
   },
+  "ColorSelect": {
+    "color": "Väri",
+    "colors": {
+      "black": "Musta",
+      "darkGray": "Tumma harmaa",
+      "steelBlue": "Teräksensininen",
+      "atmosphere": "Tunnelma",
+      "berryRed": "Marjanpunainen",
+      "warmGreen": "Lämmin vihreä"
+    }
+  },
   "SurveyList": {
     "title": "Vuorovaikutusalusta - Kyselyt",
     "errorFetchingSurveys": "Virhe haettaessa kyselyitä. Yritä myöhemmin uudestaan.",
@@ -160,6 +197,14 @@
     "errorFetchingSurvey": "Kyselyn haussa tapahtui virhe. Yritä myöhemmin uudestaan.",
     "startSurveyLink": "Aloita kysely tästä"
   },
+  "UnavailableSurvey": {
+    "surveyNotPublished": "Kiitos mielenkiinnostasi! Kysely on sulkeutunut eikä siihen voi enää vastata.",
+    "treTopicalInfo": "Tampereen kaupungin ajankohtaisiin asioihin pääset tutustumaan alla olevasta linkistä.",
+    "tre": "Tampereen kaupunki"
+  },
+  "NotFoundPage": {
+    "pageNotFound": "Kyselyä ei löytynyt. Tarkista osoite ja yritä uudelleen"
+  },
   "CopyToClipboard": {
     "tooltip": "Kopioi leikepöydälle",
     "successful": "Arvo kopioitu leikepöydälle!",
@@ -170,7 +215,8 @@
     "previous": "Edellinen",
     "submit": "Lähetä",
     "errorSubmittingSurvey": "Kyselyn lähettämisessä tapahtui virhe. Ole hyvä ja yritä myöhemmin uudestaan.",
-    "openMap": "Avaa kartta"
+    "openMap": "Avaa kartta",
+    "unfinishedAnswers": "Vastaa kaikkiin pakolliseksi merkittyihin kysymyksiin"
   },
   "SurveyQuestion": {
     "errorFieldIsRequired": "Kenttä on pakollinen",
@@ -193,18 +239,27 @@
       "area": "Aloita piirtäminen klikkaamalla aloituskohtaa. Jatka piirtämistä klikkaamalla kartalla uudestaan, lopeta piirtäminen klikkaamalla viimeistä pistettä uudestaan."
     },
     "clearAnswers": "Poista kaikki karttavastaukset",
+    "confirmClearAnswers": "Haluatko varmasti poistaa tämän kysymyksen kaikki karttavastauksesi?",
     "removeAnswer": "Poista vastaus",
     "confirmRemoveAnswer": "Haluatko varmasti poistaa tämän karttavastauksen?"
   },
   "SurveyMap": {
-    "editGeometries": "Muokkaa kartalle piirtämiäsi geometrioita",
-    "finishEditingGeometries": "Lopeta kartan geometrioiden muokkaus"
+    "editGeometries": "Muokkaa piirtämiäsi karttamerkintöjä",
+    "finishEditingGeometries": "Lopeta karttamerkintöjen muokkaus"
   },
   "MatrixQuestion": {
     "emptyAnswer": "En osaa sanoa"
   },
   "SortingQuestion": {
     "empty": "Tyhjä"
+  },
+  "GroupedCheckBoxQuestion": {
+    "helperText": "Valitse kohteita alla olevien ryhmien sisältä. Ryhmän viereinen numero kuvastaa ryhmän alta tekemiesi valintojen lukumäärää.",
+    "helperTextMin": "Valitse yhteensä vähintään {min} vaihtoehtoa alla olevien ryhmien sisältä. Ryhmän viereinen numero kuvastaa ryhmän alta tekemiesi valintojen lukumäärää.",
+    "helperTextMax": "Valitse yhteensä enintään {max} vaihtoehtoa alla olevien ryhmien sisältä. Ryhmän viereinen numero kuvastaa ryhmän alta tekemiesi valintojen lukumäärää.",
+    "helperTextMinMax": "Valitse yhteensä vähintään {min} ja enintään {max} vaihtoehtoa.",
+    "indicatorText": "Olet valinnut {numbers} vaihtoehtoa",
+    "indicatorTextMaxReached": "Olet valinnut kaikki {numbers} vaihtoehtoa"
   },
   "AppBarUserMenu": {
     "logout": "Kirjaudu ulos"

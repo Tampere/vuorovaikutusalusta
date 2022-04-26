@@ -182,11 +182,13 @@ export function useSurveyMap() {
       dispatch({ type: 'SET_RPC_CHANNEL', rpcChannel });
     },
     /**
-     * Initializes the map instance
+     * Initializes the map instance:
+     * - assigns a feature click handler (previous handlers should be automatically unregistered on unmount)
+     * - Draws current answer geometries on the map (clears any previous)
      */
     initializeMap() {
       // Set handler for clicking features
-      state.rpcChannel.handleEvent('FeatureEvent', function (event) {
+      state.rpcChannel.handleEvent('FeatureEvent', (event) => {
         if (event.operation !== 'click') {
           return;
         }
@@ -204,6 +206,9 @@ export function useSurveyMap() {
           value: { questionId, index },
         });
       });
+
+      // Draw existing answer geometries onto the map
+      drawAnswerGeometries(state.answerGeometries);
     },
     /**
      * Enters the draw state and returns the geometry when user has finished drawing.
@@ -218,7 +223,7 @@ export function useSurveyMap() {
       helperText: string
     ) {
       // Stop the previous drawing if the map is in a draw state
-      if (state.selectionType) {
+      if (state.questionId) {
         const previousEventId = getDrawingEventId(
           state.questionId,
           state.selectionType
@@ -296,14 +301,20 @@ export function useSurveyMap() {
       return geometry;
     },
     /**
-     * Stops the drawing interaction on the map for given event ID
-     * @param questionId Question ID (default current question ID)
+     * Stops the drawing interaction on the map for given question ID (or the currently active question)
+     * @param questionId Question ID (default: current question ID)
      */
-    stopDrawing(questionId?: number) {
+    stopDrawing(questionId = state.questionId) {
       state.rpcChannel.postRequest('DrawTools.StopDrawingRequest', [
-        getDrawingEventId(questionId ?? state.questionId, state.selectionType),
+        getDrawingEventId(questionId, state.selectionType),
         true,
       ]);
+      // If stopping the current drawing (or there was none), clear the internal state
+      if (!state.questionId || questionId === state.questionId) {
+        dispatch({ type: 'SET_SELECTION_TYPE', value: null });
+        dispatch({ type: 'SET_HELPER_TEXT', text: null });
+        dispatch({ type: 'SET_QUESTION_ID', value: null });
+      }
     },
     /**
      * Starts modifying existing geometries.
@@ -435,10 +446,10 @@ export function useSurveyMap() {
       dispatch({ type: 'SET_EDITING_MAP_ANSWER', value: null });
     },
     /**
-     * Is map currently active (in drawing state)
+     * Is map currently in drawing state
      */
-    get isMapActive() {
-      return state.selectionType !== null;
+    get drawing() {
+      return state.questionId !== null;
     },
   };
 }

@@ -16,7 +16,8 @@ export type SurveyQuestion =
   | SurveyMapQuestion
   | SurveySortingQuestion
   | SurveySliderQuestion
-  | SurveyMatrixQuestion;
+  | SurveyMatrixQuestion
+  | SurveyGroupedCheckboxQuestion;
 
 /**
  * Subquestion type for map questions.
@@ -85,6 +86,7 @@ export interface SurveyRadioQuestion extends CommonSurveyPageQuestion {
 export interface SurveyTextSection extends CommonSurveyPageSection {
   type: 'text';
   body: string;
+  bodyColor: string;
 }
 
 /**
@@ -144,6 +146,19 @@ export interface SurveyMatrixQuestion extends CommonSurveyPageQuestion {
   classes: LocalizedText[];
   subjects: LocalizedText[];
   allowEmptyAnswer: boolean;
+}
+
+/**
+ * Grouped checkbox question
+ */
+export interface SurveyGroupedCheckboxQuestion
+  extends CommonSurveyPageQuestion {
+  type: 'grouped-checkbox';
+  answerLimits: {
+    min?: number;
+    max?: number;
+  };
+  groups: SectionOptionGroup[];
 }
 
 /**
@@ -247,6 +262,14 @@ export interface Survey {
      */
     text: string;
   };
+  /**
+   * Theme of the survey
+   */
+  theme: SurveyTheme;
+  /**
+   * Color of the section titles
+   */
+  sectionTitleColor: string;
 }
 
 /**
@@ -261,6 +284,28 @@ export interface SectionOption {
    * Localized text field of the option
    */
   text: string;
+  /**
+   * Localized text field of the option's info
+   */
+  info?: string;
+}
+
+/**
+ * A group of options of a grouped checkbox question
+ */
+export interface SectionOptionGroup {
+  /**
+   * Group ID
+   */
+  id: number;
+  /**
+   * Name of the group
+   */
+  name: LocalizedText;
+  /**
+   * Options of the group
+   */
+  options: SectionOption[];
 }
 
 /**
@@ -338,6 +383,10 @@ export type AnswerEntry = {
       type: 'matrix';
       value: string[];
     }
+  | {
+      type: 'grouped-checkbox';
+      value: number[];
+    }
 );
 
 /**
@@ -378,4 +427,22 @@ export interface SurveyBackgroundImage {
    * Image file format (e.g. .png, .jpeg)
    */
   fileFormat: string;
+}
+
+/**
+ * Survey theme
+ */
+export interface SurveyTheme<T extends {} = {}> {
+  /**
+   * ID of the theme
+   */
+  id: number;
+  /**
+   * Optional name for the theme
+   */
+  name?: string;
+  /**
+   * Survey configuration object
+   */
+  data: T;
 }

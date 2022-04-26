@@ -158,6 +158,8 @@ export default function EditCheckBoxQuestion({
           });
         }}
         title={tr.SurveySections.options}
+        enableClipboardImport={true}
+        allowOptionInfo={false}
       />
       <FormGroup row>
         <FormControlLabel

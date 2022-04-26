@@ -5,6 +5,7 @@ import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useMemo, useState } from 'react';
 import CheckBoxQuestion from './CheckBoxQuestion';
 import FreeTextQuestion from './FreeTextQuestion';
+import GroupedCheckBoxQuestion from './GroupedCheckBoxQuestion';
 import MapQuestion from './MapQuestion';
 import MatrixQuestion from './MatrixQuestion';
 import NumericQuestion from './NumericQuestion';
@@ -18,7 +19,8 @@ interface Props {
 }
 
 export default function SurveyQuestion({ question }: Props) {
-  const { answers, updateAnswer, getValidationErrors } = useSurveyAnswers();
+  const { answers, updateAnswer, getValidationErrors, survey } =
+    useSurveyAnswers();
   const [dirty, setDirty] = useState(false);
   const { tr } = useTranslations();
 
@@ -41,7 +43,10 @@ export default function SurveyQuestion({ question }: Props) {
           alignItems: 'center',
         }}
       >
-        <FormLabel component="legend">
+        <FormLabel
+          component="legend"
+          style={{ color: survey.sectionTitleColor ?? '#000000' }}
+        >
           {question.title} {question.isRequired && '*'}
         </FormLabel>
         {question.info && <SectionInfo infoText={question.info} />}
@@ -154,6 +159,20 @@ export default function SurveyQuestion({ question }: Props) {
       {question.type === 'matrix' && (
         <MatrixQuestion
           value={value as string[]}
+          onChange={(value) => {
+            updateAnswer({
+              sectionId: question.id,
+              type: question.type,
+              value,
+            });
+          }}
+          question={question}
+          setDirty={setDirty}
+        />
+      )}
+      {question.type === 'grouped-checkbox' && (
+        <GroupedCheckBoxQuestion
+          value={value as number[]}
           onChange={(value) => {
             updateAnswer({
               sectionId: question.id,

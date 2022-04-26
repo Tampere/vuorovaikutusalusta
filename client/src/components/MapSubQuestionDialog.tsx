@@ -233,7 +233,8 @@ export default function MapSubQuestionDialog({
                   setDirty([...dirty]);
                 }}
               />
-            ) : null}
+            ) : // TODO: grouped checkbox question
+            null}
             {/* Show the required error only for empty values (not when answer limits are broken in checkbox questions) */}
             {dirty?.[index] &&
               validationErrors?.[index].includes('required') && (

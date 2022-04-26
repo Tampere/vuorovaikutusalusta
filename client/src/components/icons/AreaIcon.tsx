@@ -9,8 +9,8 @@ export default function AreaIcon({ width, height }: Props) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      width={width}
-      height={height}
+      width={width ?? height}
+      height={height ?? width}
       x="0"
       y="0"
       version="1.1"
