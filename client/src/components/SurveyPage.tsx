@@ -27,9 +27,16 @@ export default function SurveyPage() {
     async function fetchSurvey() {
       try {
         const survey = await request<Survey>(`/api/published-surveys/${name}`);
-        if (survey.backgroundImageId && survey.backgroundImageId !== 0) {
+        if (
+          survey.backgroundImagePath &&
+          survey.backgroundImageName &&
+          survey.backgroundImageName !== ''
+        ) {
+          const filePathString = survey.backgroundImagePath.join('/');
           const surveyBackgroundImage = await request<any>(
-            `/api/image/${survey.backgroundImageId}`
+            `/api/file/${filePathString}${filePathString ? '/' : ''}${
+              survey.backgroundImageName
+            }`
           );
           setSurveyBackgroundImage(surveyBackgroundImage);
         }

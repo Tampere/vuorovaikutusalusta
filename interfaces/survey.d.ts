@@ -246,9 +246,13 @@ export interface Survey {
    */
   pages?: SurveyPage[];
   /**
-   * ID of the survey background image
+   * Name of the survey background image
    */
-  backgroundImageId?: number;
+  backgroundImageName?: string;
+  /**
+   * Path of the survey background image
+   */
+  backgroundImagePath?: string[];
   /**
    * Thanks page
    */
@@ -404,29 +408,43 @@ export interface MapLayer {
 }
 
 /**
- * Image used as the background of the survey landing page
+ * File interface
  */
-export interface SurveyBackgroundImage {
+export interface File {
   /**
-   * ID of the image
+   * ID of the file
    */
   id: number;
   /**
-   * Image data as a base64 encoded string
+   * File data as a base64 encoded string
    */
   data: string;
   /**
-   * Image attributions (= who owns the image rights)
+   * Additional file details
    */
-  attributions: string;
+  details?: { [key: string]: any };
   /**
    * Image file name
    */
   fileName: string;
   /**
-   * Image file format (e.g. .png, .jpeg)
+   * Path of the file in the file hierarchy
    */
-  fileFormat: string;
+  filePath: string;
+  /**
+   * File mime type
+   */
+  mimeType: string;
+}
+
+/**
+ * Image used as the background of the survey landing page
+ */
+export interface SurveyBackgroundImage extends File {
+  /**
+   * Image attributions (= who owns the image rights)
+   */
+  attributions: string;
 }
 
 /**

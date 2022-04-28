@@ -1,5 +1,6 @@
 import {
   AnswerEntry,
+  File,
   LocalizedText,
   SectionOption,
   SectionOptionGroup,
@@ -56,7 +57,8 @@ interface DBSurvey {
   updated_at: Date;
   thanks_page_title: LocalizedText;
   thanks_page_text: LocalizedText;
-  background_image_id: number;
+  background_image_name: string;
+  background_image_path: string[];
   section_title_color: string;
 }
 
@@ -670,10 +672,11 @@ export async function updateSurvey(survey: Survey) {
         end_date = $9,
         thanks_page_title = $10,
         thanks_page_text = $11,
-        background_image_id = $12,
-        admins = $13,
-        theme_id = $14,
-        section_title_color = $15
+        background_image_name = $12,
+        background_image_path = $13,
+        admins = $14,
+        theme_id = $15,
+        section_title_color = $16
       WHERE id = $1 RETURNING *`,
       [
         survey.id,
@@ -687,7 +690,8 @@ export async function updateSurvey(survey: Survey) {
         survey.endDate,
         { fi: survey.thanksPage.title },
         { fi: survey.thanksPage.text },
-        survey.backgroundImageId,
+        survey.backgroundImageName ?? null,
+        survey.backgroundImagePath ?? null,
         survey.admins,
         survey.theme?.id ?? null,
         survey.sectionTitleColor,
@@ -858,7 +862,8 @@ function dbSurveyToSurvey(
       title: dbSurvey.thanks_page_title?.fi,
       text: dbSurvey.thanks_page_text?.fi,
     },
-    backgroundImageId: dbSurvey.background_image_id,
+    backgroundImageName: dbSurvey.background_image_name,
+    backgroundImagePath: dbSurvey.background_image_path,
     sectionTitleColor: dbSurvey.section_title_color,
     // Single survey row won't contain pages - they get aggregated from a join query
     pages: [],
@@ -1426,54 +1431,61 @@ export async function unpublishSurvey(surveyId: number) {
 }
 
 /**
- * Store survey image to database to table 'data.images'
- * @param imageBuffer
+ * Store file to database table 'data.files'
+ * @param fileBuffer
  * @param fileName
- * @param attributions
+ * @param details
  * @returns Database row id of the uploaded image
  */
-export async function storeImage(
-  imageBuffer: Buffer,
+export async function storeFile(
+  fileBuffer: Buffer,
   fileName: string,
-  attributions: string,
-  fileFormat: string
+  mimeType: string,
+  details:
+    | {
+        attributions: string;
+      }
+    | { altText: string }
 ) {
-  const imageString = `\\x${imageBuffer.toString('hex')}`;
+  const fileString = `\\x${fileBuffer.toString('hex')}`;
   const row = await getDb().oneOrNone(
     `
-    INSERT INTO data.images (image, attributions, image_name, file_format) values ($1, $2, $3, $4) RETURNING id;
+    INSERT INTO data.files (file, details, file_name, mime_type) values ($1, $2, $3, $4) RETURNING id;
     `,
-    [imageString, attributions, fileName, fileFormat]
+    [fileString, details, fileName, mimeType]
   );
 
   if (!row) {
-    throw new InternalServerError(`Error while inserting survey image to db`);
+    throw new InternalServerError(`Error while inserting file to db`);
   }
 
   return row.id;
 }
 
 /**
- * Get a single image with id from the database
- * @param id
+ * Get a single file with id from the database
+ * @param fileName
+ * @param filePath
  * @returns SurveyBackgroudImage
  */
-export async function getImage(id: number) {
+export async function getFile(fileName: string, filePath: string[]) {
   const row = await getDb().oneOrNone(
     `
-    SELECT image, attributions FROM data.images WHERE id = $1;
+    SELECT file, mime_type FROM data.files WHERE file_name = $1 AND file_path = $2;
   `,
-    [id]
+    [fileName, filePath]
   );
 
   if (!row) {
-    throw new NotFoundError(`Image with ID ${id} not found`);
+    throw new NotFoundError(
+      `File with fileName ${fileName} filePath ${filePath} not found`
+    );
   }
 
   return {
-    data: row.image.toString('base64'),
-    attributions: row.attributions,
-  } as SurveyBackgroundImage;
+    data: row.file,
+    mimeType: row.mimeType,
+  } as File;
 }
 
 /**
@@ -1482,29 +1494,30 @@ export async function getImage(id: number) {
  */
 export async function getImages() {
   const rows = await getDb().manyOrNone(`
-    SELECT id, attributions, image, image_name, file_format FROM data.images ORDER BY created_at DESC;
+    SELECT id, details, file, file_name, file_path FROM data.files ORDER BY created_at DESC;
   `);
 
   return rows.map((row) => ({
     id: row.id,
-    data: row.image.toString('base64'),
-    attributions: row.attributions,
-    fileName: row.image_name,
-    fileFormat: row.file_format,
+    data: row.file.toString('base64'),
+    attributions: row.details?.attributions,
+    fileName: row.file_name,
+    filePath: row.file_path,
   })) as SurveyBackgroundImage[];
 }
 
 /**
- * Delete a single survey background image from the db
- * @param id ID of the image
+ * Delete a single file from the db
+ * @param fileName name of the file
+ * @param filePath path of the file
  * @returns
  */
-export async function removeImage(id: number) {
+export async function removeFile(fileName: string, filePath: string[]) {
   return await getDb().none(
     `
-    DELETE FROM data.images WHERE id = $1;
+    DELETE FROM data.files WHERE file_name = $1 AND file_path = $2;
   `,
-    [id]
+    [fileName, filePath]
   );
 }
 
