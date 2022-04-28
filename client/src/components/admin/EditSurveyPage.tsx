@@ -6,6 +6,8 @@ import {
   FormLabel,
   Skeleton,
   TextField,
+  ToggleButton,
+  ToggleButtonGroup,
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
 import { useSurvey } from '@src/stores/SurveyContext';
@@ -30,8 +32,10 @@ export default function EditSurveyPage() {
   const [expandedSection, setExpandedSection] = useState<number>(null);
 
   const classes = useStyles();
-  const { surveyId, pageId } =
-    useParams<{ surveyId: string; pageId: string }>();
+  const { surveyId, pageId } = useParams<{
+    surveyId: string;
+    pageId: string;
+  }>();
   const {
     activeSurvey,
     activeSurveyLoading,
@@ -89,41 +93,79 @@ export default function EditSurveyPage() {
       >
         {tr.EditSurveyPage.deletePage}
       </Button>
-      {activeSurvey.mapUrl && availableMapLayers.length > 0 && (
-        <div>
-          <FormLabel>{tr.EditSurveyPage.mapLayers}</FormLabel>
-          <FormGroup aria-label="map-layers">
-            {availableMapLayersLoading && (
-              <Skeleton variant="rectangular" height={200} width="100%" />
-            )}
-            {!availableMapLayersLoading &&
-              availableMapLayers.map((layer) => (
-                <FormControlLabel
-                  key={layer.id}
-                  label={layer.name}
-                  control={
-                    <Checkbox
-                      checked={page.mapLayers?.includes(layer.id)}
-                      onChange={(event) => {
-                        const mapLayers = event.target.checked
-                          ? // When adding a new layer, re-sort the array to ensure that
-                            // changes are detected correctly (the order won't matter anyway)
-                            [...page.mapLayers, layer.id].sort()
-                          : page.mapLayers.filter(
-                              (layerId) => layerId !== layer.id
-                            );
-                        editPage({
-                          ...page,
-                          mapLayers,
-                        });
-                      }}
-                      name={layer.name}
-                    />
-                  }
-                />
-              ))}
-          </FormGroup>
-        </div>
+      <FormGroup>
+        <FormLabel>{tr.EditSurveyPage.sidebar}</FormLabel>
+        <ToggleButtonGroup
+          color="primary"
+          exclusive
+          value={page.sidebar.type}
+          onChange={(_, newValue) => {
+            editPage({
+              ...page,
+              sidebar: {
+                ...page.sidebar,
+                type: newValue,
+              },
+            });
+          }}
+        >
+          <ToggleButton value="none">
+            {tr.EditSurveyPage.sidebarType.none}
+          </ToggleButton>
+          <ToggleButton value="map">
+            {tr.EditSurveyPage.sidebarType.map}
+          </ToggleButton>
+          <ToggleButton value="image">
+            {tr.EditSurveyPage.sidebarType.image}
+          </ToggleButton>
+        </ToggleButtonGroup>
+      </FormGroup>
+      {page.sidebar.type === 'map' &&
+        (!activeSurvey.mapUrl ? (
+          <div>{tr.EditSurveyPage.warningNoMapUrl}</div>
+        ) : !availableMapLayers.length ? (
+          <div>{tr.EditSurveyPage.warningNoAvailableMapLayers}</div>
+        ) : (
+          <div>
+            <FormLabel>{tr.EditSurveyPage.mapLayers}</FormLabel>
+            <FormGroup aria-label="map-layers">
+              {availableMapLayersLoading && (
+                <Skeleton variant="rectangular" height={200} width="100%" />
+              )}
+              {!availableMapLayersLoading &&
+                availableMapLayers.map((layer) => (
+                  <FormControlLabel
+                    key={layer.id}
+                    label={layer.name}
+                    control={
+                      <Checkbox
+                        checked={page.sidebar.mapLayers?.includes(layer.id)}
+                        onChange={(event) => {
+                          const mapLayers = event.target.checked
+                            ? // When adding a new layer, re-sort the array to ensure that
+                              // changes are detected correctly (the order won't matter anyway)
+                              [...page.sidebar.mapLayers, layer.id].sort()
+                            : page.sidebar.mapLayers.filter(
+                                (layerId) => layerId !== layer.id
+                              );
+                          editPage({
+                            ...page,
+                            sidebar: {
+                              ...page.sidebar,
+                              mapLayers,
+                            },
+                          });
+                        }}
+                        name={layer.name}
+                      />
+                    }
+                  />
+                ))}
+            </FormGroup>
+          </div>
+        ))}
+      {page.sidebar.type === 'image' && (
+        <div>TODO: kuvan lataaminen ja valinta</div>
       )}
       <SurveySections
         pageId={page.id}

@@ -60,6 +60,14 @@
     "deletePage": "Poista sivu",
     "confirmDeletePage": "Haluatko varmasti poistaa tämän sivun? Toimintoa ei voida perua.",
     "deletePageFailed": "Sivun poistamisessa tapahtui virhe. Yritä myöhemmin uudestaan.",
+    "sidebar": "Sivupalsta",
+    "sidebarType": {
+      "none": "Ei mitään",
+      "map": "Kartta",
+      "image": "Kuva"
+    },
+    "warningNoMapUrl": "Kyselylle ei olla määritetty Oskari-karttajulkaisua.",
+    "warningNoAvailableMapLayers": "Oskari-karttajulkaisusta ei löytynyt näytettäviä karttatasoja.",
     "mapLayers": "Sivulla näytettävät karttatasot",
     "untitledSection": "Nimetön osio",
     "title": "Otsikko",
@@ -216,6 +224,7 @@
     "submit": "Lähetä",
     "errorSubmittingSurvey": "Kyselyn lähettämisessä tapahtui virhe. Ole hyvä ja yritä myöhemmin uudestaan.",
     "openMap": "Avaa kartta",
+    "openImage": "Avaa kuva",
     "unfinishedAnswers": "Vastaa kaikkiin pakolliseksi merkittyihin kysymyksiin"
   },
   "SurveyQuestion": {

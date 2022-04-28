@@ -11,6 +11,7 @@ import {
   SurveyMapSubQuestion,
   SurveyPage,
   SurveyPageSection,
+  SurveyPageSidebarType,
   SurveyRadioQuestion,
   SurveyTheme,
 } from '@interfaces/survey';
@@ -70,11 +71,13 @@ interface DBSurveyPage {
   survey_id: number;
   idx: number;
   title: LocalizedText;
+  sidebar_type: SurveyPageSidebarType;
   /**
    * IDs of the map layers visible on the page
    * For some reason, pg won't be able to cast number[] to json - the array should be JSON.stringified
    */
-  map_layers: string;
+  sidebar_map_layers: string;
+  sidebar_image_url: string;
 }
 
 /**
@@ -120,7 +123,9 @@ interface DBOptionGroup {
 type DBSurveyJoin = DBSurvey & {
   page_id: number;
   page_title: LocalizedText;
-  page_map_layers: number[];
+  page_sidebar_type: SurveyPageSidebarType;
+  page_sidebar_map_layers: number[];
+  page_sidebar_image_url: string;
   section_id: number;
   section_title: LocalizedText;
   section_title_color: string;
@@ -163,10 +168,12 @@ const surveyPageColumnSet = getColumnSet<DBSurveyPage>('survey_page', [
     name: 'title',
     cast: 'json',
   },
+  'sidebar_type',
   {
-    name: 'map_layers',
+    name: 'sidebar_map_layers',
     cast: 'json',
   },
+  'sidebar_image_url',
 ]);
 
 /**
@@ -228,7 +235,9 @@ export async function getSurvey(params: { id: number } | { name: string }) {
           page.id as page_id,
           page.title as page_title,
           page.idx as page_idx,
-          page.map_layers as page_map_layers
+          page.sidebar_type as page_sidebar_type,
+          page.sidebar_map_layers as page_sidebar_map_layers,
+          page.sidebar_image_url as page_sidebar_image_url
         FROM
           (
             SELECT
@@ -902,7 +911,11 @@ function dbSurveyJoinToPage(dbSurveyJoin: DBSurveyJoin): SurveyPage {
         id: dbSurveyJoin.page_id,
         title: dbSurveyJoin.page_title?.[languageCode],
         sections: [],
-        mapLayers: dbSurveyJoin.page_map_layers ?? [],
+        sidebar: {
+          type: dbSurveyJoin.page_sidebar_type,
+          mapLayers: dbSurveyJoin.page_sidebar_map_layers ?? [],
+          imageUrl: dbSurveyJoin.page_sidebar_image_url,
+        },
       };
 }
 
@@ -953,8 +966,8 @@ export async function createSurveyPage(
   surveyId: number,
   partialPage?: Partial<SurveyPage>
 ) {
-  const row = await getDb().one<SurveyPage>(
-    `INSERT INTO data.survey_page (survey_id, idx, title, map_layers)
+  const row = await getDb().one<DBSurveyPage>(
+    `INSERT INTO data.survey_page (survey_id, idx, title, sidebar_map_layers)
      SELECT
        $1 as survey_id,
        COALESCE(MAX(idx) + 1, 0) as idx,
@@ -962,7 +975,7 @@ export async function createSurveyPage(
        $2::json
      FROM data.survey_page WHERE survey_id = $1
      RETURNING *;`,
-    [surveyId, JSON.stringify(partialPage?.mapLayers ?? [])]
+    [surveyId, JSON.stringify(partialPage?.sidebar?.mapLayers ?? [])]
   );
 
   if (!row) {
@@ -973,7 +986,11 @@ export async function createSurveyPage(
     id: row.id,
     title: row.title?.[languageCode],
     sections: [],
-    mapLayers: partialPage?.mapLayers ?? [],
+    sidebar: {
+      type: row.sidebar_type,
+      mapLayers: partialPage?.sidebar?.mapLayers ?? [],
+      imageUrl: null,
+    },
   } as SurveyPage;
 }
 
@@ -1298,7 +1315,9 @@ function surveyPagesToRows(
       title: {
         fi: surveyPage.title,
       },
-      map_layers: JSON.stringify(surveyPage.mapLayers),
+      sidebar_type: surveyPage.sidebar.type,
+      sidebar_map_layers: JSON.stringify(surveyPage.sidebar.mapLayers),
+      sidebar_image_url: surveyPage.sidebar.imageUrl,
     } as DBSurveyPage;
   });
 }

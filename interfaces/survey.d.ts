@@ -162,6 +162,29 @@ export interface SurveyGroupedCheckboxQuestion
 }
 
 /**
+ * Type of the survey page sidebar
+ */
+export type SurveyPageSidebarType = 'none' | 'map' | 'image';
+
+/**
+ * Survey page side bar
+ */
+export interface SurveyPageSidebar {
+  /**
+   * Type of the sidebar
+   */
+  type: SurveyPageSidebarType;
+  /**
+   * IDs of the visible map layers for the page
+   */
+  mapLayers: number[];
+  /**
+   * URL of the sidebar image
+   */
+  imageUrl: string;
+}
+
+/**
  * Survey page
  */
 export interface SurveyPage {
@@ -174,9 +197,9 @@ export interface SurveyPage {
    */
   title: string;
   /**
-   * IDs of the visible map layers for the page
+   * Side bar definition for the survey page
    */
-  mapLayers: number[];
+  sidebar: SurveyPageSidebar;
   /**
    * Page sections
    */
