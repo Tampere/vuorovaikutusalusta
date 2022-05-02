@@ -1500,7 +1500,7 @@ export async function storeFile({
     `
     INSERT INTO data.files (file, details, file_path, file_name, mime_type, survey_id)
     VALUES ($(fileString), $(details), $(path), $(name), $(mimetype), $(surveyId))
-    ON CONFLICT ON CONSTRAINT (pk_files) DO UPDATE SET
+    ON CONFLICT ON CONSTRAINT pk_files DO UPDATE SET
       file = $(fileString),
       details = $(details),
       file_path = $(path),
