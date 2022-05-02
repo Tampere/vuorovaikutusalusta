@@ -18,6 +18,7 @@ import { useHistory, useParams } from 'react-router-dom';
 import ConfirmDialog from '../ConfirmDialog';
 import Fieldset from '../Fieldset';
 import AddSurveySectionActions from './AddSurveySectionActions';
+import FileUpload from './FileUpload';
 import SurveySections from './SurveySections';
 
 const useStyles = makeStyles({
@@ -94,7 +95,7 @@ export default function EditSurveyPage() {
         {tr.EditSurveyPage.deletePage}
       </Button>
       <FormGroup>
-        <FormLabel>{tr.EditSurveyPage.sidebar}</FormLabel>
+        <FormLabel>{tr.EditSurveyPage.selectSidebarType}</FormLabel>
         <ToggleButtonGroup
           color="primary"
           exclusive
@@ -165,7 +166,55 @@ export default function EditSurveyPage() {
           </div>
         ))}
       {page.sidebar.type === 'image' && (
-        <div>TODO: kuvan lataaminen ja valinta</div>
+        <div>
+          <FileUpload
+            targetPath={[String(activeSurvey.id)]}
+            value={
+              !page.sidebar.imageName
+                ? null
+                : [
+                    {
+                      name: page.sidebar.imageName,
+                      path: page.sidebar.imagePath,
+                    },
+                  ]
+            }
+            onUpload={({ name, path }) => {
+              editPage({
+                ...page,
+                sidebar: {
+                  ...page.sidebar,
+                  imagePath: path,
+                  imageName: name,
+                },
+              });
+            }}
+            onDelete={() => {
+              editPage({
+                ...page,
+                sidebar: {
+                  ...page.sidebar,
+                  imagePath: null,
+                  imageName: null,
+                },
+              });
+            }}
+          />
+          <TextField
+            style={{ width: '100%' }}
+            label={tr.EditSurveyPage.imageAltText}
+            value={page.sidebar.imageAltText ?? ''}
+            onChange={(event) => {
+              editPage({
+                ...page,
+                sidebar: {
+                  ...page.sidebar,
+                  imageAltText: event.target.value,
+                },
+              });
+            }}
+          />
+        </div>
       )}
       <SurveySections
         pageId={page.id}

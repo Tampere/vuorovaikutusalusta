@@ -14,7 +14,6 @@ interface Props {
 export default function SurveyMap(props: Props) {
   const iframeRef = useRef<HTMLIFrameElement>();
   const {
-    disabled,
     setRpcChannel,
     isMapReady,
     initializeMap,
@@ -75,11 +74,6 @@ export default function SurveyMap(props: Props) {
             border: 0,
             width: '100%',
             height: '100%',
-            transition: 'filter .2s ease-in-out',
-            ...(disabled && {
-              pointerEvents: 'none',
-              filter: 'grayscale(100%) contrast(70%)',
-            }),
           }}
           src={props.url}
           allow="geolocation"

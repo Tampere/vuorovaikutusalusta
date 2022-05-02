@@ -104,7 +104,6 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
   const { isPageValid, answers } = useSurveyAnswers();
   const { showToast } = useToasts();
   const {
-    setDisabled,
     setVisibleLayers,
     helperText,
     drawing,
@@ -140,13 +139,9 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
   }, [mobileDrawerOpen]);
 
   /**
-   * Update map disabled state and visible layers when page changes
+   * Update map's visible layers when page changes
    */
   useEffect(() => {
-    const mapQuestions = currentPage.sections.filter(
-      (section) => section.type === 'map'
-    );
-    setDisabled(!mapQuestions.length);
     setVisibleLayers(currentPage.sidebar.mapLayers);
     // If modifying, stop it when changing page
     if (isMapReady) {
@@ -319,7 +314,30 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
           />
         );
       case 'image':
-        return <div>TODO: kuvan esittäminen</div>;
+        return (
+          <div
+            style={{
+              height: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              overflow: 'auto',
+            }}
+          >
+            <div style={{ margin: 'auto' }}>
+              {currentPage.sidebar.imageName && (
+                <img
+                  alt={currentPage.sidebar.imageAltText}
+                  src={`/api/file/${
+                    currentPage.sidebar.imagePath?.join('/') ?? ''
+                  }${currentPage.sidebar.imagePath ? '/' : ''}${
+                    currentPage.sidebar.imageName
+                  }`}
+                  style={{ width: '100%' }}
+                />
+              )}
+            </div>
+          </div>
+        );
       case 'none':
       default:
         return <div />;

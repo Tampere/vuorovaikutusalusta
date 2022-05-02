@@ -15,7 +15,9 @@ export default function SurveyPage() {
   const [loading, setLoading] = useState(true);
   const [showLandingPage, setShowLandingPage] = useState(true);
   const [showThanksPage, setShowThanksPage] = useState(false);
-  const [surveyBackgroundImage, setSurveyBackgroundImage] = useState<any>(null);
+  const [surveyBackgroundImage, setSurveyBackgroundImage] = useState<{
+    attributions: string;
+  }>(null);
   const [errorStatusCode, setErrorStatusCode] = useState<number>(null);
 
   const { name } = useParams<{ name: string }>();
@@ -33,12 +35,15 @@ export default function SurveyPage() {
           survey.backgroundImageName !== ''
         ) {
           const filePathString = survey.backgroundImagePath.join('/');
-          const surveyBackgroundImage = await request<any>(
+          const response = await fetch(
             `/api/file/${filePathString}${filePathString ? '/' : ''}${
               survey.backgroundImageName
             }`
           );
-          setSurveyBackgroundImage(surveyBackgroundImage);
+          const details = JSON.parse(
+            response.headers.get('File-details') ?? '{}'
+          );
+          setSurveyBackgroundImage(details);
         }
         setSurvey(survey);
         setThemeFromSurvey(survey);

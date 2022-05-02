@@ -60,19 +60,25 @@
     "deletePage": "Poista sivu",
     "confirmDeletePage": "Haluatko varmasti poistaa tämän sivun? Toimintoa ei voida perua.",
     "deletePageFailed": "Sivun poistamisessa tapahtui virhe. Yritä myöhemmin uudestaan.",
-    "sidebar": "Sivupalsta",
+    "selectSidebarType": "Valitse oikean sivupalstan sisältö",
     "sidebarType": {
       "none": "Ei mitään",
       "map": "Kartta",
       "image": "Kuva"
     },
-    "warningNoMapUrl": "Kyselylle ei olla määritetty Oskari-karttajulkaisua.",
+    "warningNoMapUrl": "Kyselylle ei ole määritetty Oskari-karttajulkaisua.",
     "warningNoAvailableMapLayers": "Oskari-karttajulkaisusta ei löytynyt näytettäviä karttatasoja.",
     "mapLayers": "Sivulla näytettävät karttatasot",
     "untitledSection": "Nimetön osio",
     "title": "Otsikko",
     "deleteSection": "Poista osio",
-    "confirmDeleteSection": "Haluatko varmasti poistaa tämän osion?"
+    "confirmDeleteSection": "Haluatko varmasti poistaa tämän osion?",
+    "imageAltText": "Kuvan vaihtoehtoinen teksti"
+  },
+  "FileUpload": {
+    "deleteFile": "Poista tiedosto",
+    "errorUploadingFile": "Tiedoston lataamisessa tapahtui virhe. Yritä myöhemmin uudestaan.",
+    "errorDeletingFile": "Tiedoston poistamisessa tapahtui virhe. Yritä myöhemmin uudestaan."
   },
   "EditGroupedCheckBoxQuestion": {
     "addGroup": "Lisää ryhmä",

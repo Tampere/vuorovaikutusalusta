@@ -77,7 +77,9 @@ interface DBSurveyPage {
    * For some reason, pg won't be able to cast number[] to json - the array should be JSON.stringified
    */
   sidebar_map_layers: string;
-  sidebar_image_url: string;
+  sidebar_image_path: string[];
+  sidebar_image_name: string;
+  sidebar_image_alt_text: string;
 }
 
 /**
@@ -125,7 +127,9 @@ type DBSurveyJoin = DBSurvey & {
   page_title: LocalizedText;
   page_sidebar_type: SurveyPageSidebarType;
   page_sidebar_map_layers: number[];
-  page_sidebar_image_url: string;
+  page_sidebar_image_path: string[];
+  page_sidebar_image_name: string;
+  page_sidebar_image_alt_text: string;
   section_id: number;
   section_title: LocalizedText;
   section_title_color: string;
@@ -173,7 +177,12 @@ const surveyPageColumnSet = getColumnSet<DBSurveyPage>('survey_page', [
     name: 'sidebar_map_layers',
     cast: 'json',
   },
-  'sidebar_image_url',
+  {
+    name: 'sidebar_image_path',
+    cast: 'text[]',
+  },
+  'sidebar_image_name',
+  'sidebar_image_alt_text',
 ]);
 
 /**
@@ -237,7 +246,9 @@ export async function getSurvey(params: { id: number } | { name: string }) {
           page.idx as page_idx,
           page.sidebar_type as page_sidebar_type,
           page.sidebar_map_layers as page_sidebar_map_layers,
-          page.sidebar_image_url as page_sidebar_image_url
+          page.sidebar_image_path as page_sidebar_image_path,
+          page.sidebar_image_name as page_sidebar_image_name,
+          page.sidebar_image_alt_text as page_sidebar_image_alt_text
         FROM
           (
             SELECT
@@ -914,7 +925,9 @@ function dbSurveyJoinToPage(dbSurveyJoin: DBSurveyJoin): SurveyPage {
         sidebar: {
           type: dbSurveyJoin.page_sidebar_type,
           mapLayers: dbSurveyJoin.page_sidebar_map_layers ?? [],
-          imageUrl: dbSurveyJoin.page_sidebar_image_url,
+          imagePath: dbSurveyJoin.page_sidebar_image_path,
+          imageName: dbSurveyJoin.page_sidebar_image_name,
+          imageAltText: dbSurveyJoin.page_sidebar_image_alt_text,
         },
       };
 }
@@ -989,7 +1002,8 @@ export async function createSurveyPage(
     sidebar: {
       type: row.sidebar_type,
       mapLayers: partialPage?.sidebar?.mapLayers ?? [],
-      imageUrl: null,
+      imagePath: [],
+      imageName: null,
     },
   } as SurveyPage;
 }
@@ -1317,7 +1331,9 @@ function surveyPagesToRows(
       },
       sidebar_type: surveyPage.sidebar.type,
       sidebar_map_layers: JSON.stringify(surveyPage.sidebar.mapLayers),
-      sidebar_image_url: surveyPage.sidebar.imageUrl,
+      sidebar_image_path: surveyPage.sidebar.imagePath,
+      sidebar_image_name: surveyPage.sidebar.imageName,
+      sidebar_image_alt_text: surveyPage.sidebar.imageAltText,
     } as DBSurveyPage;
   });
 }
@@ -1452,33 +1468,62 @@ export async function unpublishSurvey(surveyId: number) {
 /**
  * Store file to database table 'data.files'
  * @param fileBuffer
+ * @param filePath
  * @param fileName
+ * @param mimeType
  * @param details
  * @returns Database row id of the uploaded image
  */
-export async function storeFile(
-  fileBuffer: Buffer,
-  fileName: string,
-  mimeType: string,
-  details:
-    | {
-        attributions: string;
-      }
-    | { altText: string }
-) {
-  const fileString = `\\x${fileBuffer.toString('hex')}`;
-  const row = await getDb().oneOrNone(
+
+/**
+ * Store file to database table 'data.files'
+ * @param param0 File info
+ * @returns Path and name of the uploaded file
+ */
+export async function storeFile({
+  buffer,
+  path,
+  name,
+  mimetype,
+  details,
+  surveyId,
+}: {
+  buffer: Buffer;
+  path: string[];
+  name: string;
+  mimetype: string;
+  details: { [key: string]: any };
+  surveyId: number;
+}) {
+  const fileString = `\\x${buffer.toString('hex')}`;
+  const row = await getDb().oneOrNone<{ path: string[]; name: string }>(
     `
-    INSERT INTO data.files (file, details, file_name, mime_type) values ($1, $2, $3, $4) RETURNING id;
+    INSERT INTO data.files (file, details, file_path, file_name, mime_type, survey_id)
+    VALUES ($(fileString), $(details), $(path), $(name), $(mimetype), $(surveyId))
+    ON CONFLICT ON CONSTRAINT (pk_files) DO UPDATE SET
+      file = $(fileString),
+      details = $(details),
+      file_path = $(path),
+      file_name = $(name),
+      mime_type = $(mimetype),
+      survey_id = $(surveyId)
+    RETURNING file_path AS path, file_name AS name;
     `,
-    [fileString, details, fileName, mimeType]
+    {
+      fileString,
+      details,
+      path,
+      name,
+      mimetype,
+      surveyId,
+    }
   );
 
   if (!row) {
     throw new InternalServerError(`Error while inserting file to db`);
   }
 
-  return row.id;
+  return row;
 }
 
 /**
@@ -1488,9 +1533,13 @@ export async function storeFile(
  * @returns SurveyBackgroudImage
  */
 export async function getFile(fileName: string, filePath: string[]) {
-  const row = await getDb().oneOrNone(
+  const row = await getDb().oneOrNone<{
+    file: string;
+    mime_type: string;
+    details: { [key: string]: any };
+  }>(
     `
-    SELECT file, mime_type FROM data.files WHERE file_name = $1 AND file_path = $2;
+    SELECT file, mime_type, details FROM data.files WHERE file_name = $1 AND file_path = $2;
   `,
     [fileName, filePath]
   );
@@ -1503,7 +1552,8 @@ export async function getFile(fileName: string, filePath: string[]) {
 
   return {
     data: row.file,
-    mimeType: row.mimeType,
+    mimeType: row.mime_type,
+    details: row.details,
   } as File;
 }
 
@@ -1513,7 +1563,7 @@ export async function getFile(fileName: string, filePath: string[]) {
  */
 export async function getImages() {
   const rows = await getDb().manyOrNone(`
-    SELECT id, details, file, file_name, file_path FROM data.files ORDER BY created_at DESC;
+    SELECT id, details, file, file_name, file_path FROM data.files WHERE file_path = array[]::text[] ORDER BY created_at DESC;
   `);
 
   return rows.map((row) => ({

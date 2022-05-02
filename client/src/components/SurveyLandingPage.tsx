@@ -105,7 +105,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 interface Props {
   survey: Survey;
   onStart: () => void;
-  surveyBackgroundImage: any;
+  surveyBackgroundImage?: { attributions: string };
 }
 
 export default function SurveyLandingPage({

@@ -8,7 +8,7 @@ import { ensureAuthenticated } from '@src/auth';
 import { validateRequest } from '@src/utils';
 import { Router } from 'express';
 import asyncHandler from 'express-async-handler';
-import { body, param } from 'express-validator';
+import { param } from 'express-validator';
 import multer from 'multer';
 
 const router = Router();
@@ -18,23 +18,31 @@ const upload = multer();
  * Endpoint for inserting a single file
  */
 router.post(
-  '/',
-  upload.single('file'),
+  '/:filePath?',
   validateRequest([
-    body('attributions')
+    param('filePath')
+      .optional()
       .isString()
-      .optional({ nullable: true })
-      .withMessage('Image attributions must be a string'),
+      .withMessage('filePath must be a string'),
   ]),
+  upload.single('file'),
   ensureAuthenticated(),
   asyncHandler(async (req, res) => {
     const { buffer, originalname, mimetype } = req.file;
-    const { attributions } = req.body;
+    const path = req.params.filePath?.split('/') ?? [];
 
-    const id = await storeFile(buffer, originalname, mimetype, {
-      attributions: attributions,
+    // Pick the survey ID from the request - the rest will be the remaining details/metadata
+    const { surveyId, ...details } = req.body;
+
+    const id = await storeFile({
+      buffer,
+      path,
+      name: originalname,
+      mimetype,
+      details,
+      surveyId: surveyId == null ? null : Number(surveyId),
     });
-    res.status(200).json({ id: id });
+    res.status(200).json({ id });
   })
 );
 
@@ -42,32 +50,20 @@ router.post(
  * Endpoint for fetching a single local file
  */
 router.get(
-  '/:filePath/:fileName',
+  '/:filePath?/:fileName',
   validateRequest([
     param('fileName').isString().withMessage('fileName must be a string'),
-    param('filePath').isString().withMessage('filePath must be a string'),
+    param('filePath')
+      .optional()
+      .isString()
+      .withMessage('filePath must be a string'),
   ]),
   asyncHandler(async (req, res) => {
     const { fileName, filePath } = req.params;
-    const filePathArray = filePath.split('/');
+    const filePathArray = filePath?.split('/') ?? [];
     const row = await getFile(fileName, filePathArray);
     res.set('Content-type', row.mimeType);
-    res.status(200).send(row.data);
-  })
-);
-
-/**
- * Endpoint for fetching a single global file
- */
-router.get(
-  '/:fileName',
-  validateRequest([
-    param('fileName').isString().withMessage('fileName must be a string'),
-  ]),
-  asyncHandler(async (req, res) => {
-    const { fileName } = req.params;
-    const row = await getFile(fileName, []);
-    res.set('Content-type', row.mimeType);
+    res.set('File-details', JSON.stringify(row.details));
     res.status(200).send(row.data);
   })
 );
@@ -88,37 +84,20 @@ router.get(
  * Endpoint for deleting a single file
  */
 router.delete(
-  '/:filePath/:fileName',
+  '/:filePath?/:fileName',
   validateRequest([
     param('fileName').isString().withMessage('fileName must be a string'),
     param('filePath')
-      .isArray()
-      .optional({ nullable: true })
-      .withMessage('filePath must be a string array'),
+      .optional()
+      .isString()
+      .withMessage('filePath must be a string'),
   ]),
   ensureAuthenticated(),
   asyncHandler(async (req, res) => {
     const { fileName, filePath } = req.params;
-    const filePathArray = filePath.split('/');
+    const filePathArray = filePath?.split('/') ?? [];
 
     await removeFile(fileName, filePathArray);
-    res.status(200).send();
-  })
-);
-
-/**
- * Endpoint for deleting a single global file
- */
-router.delete(
-  '/:fileName',
-  validateRequest([
-    param('fileName').isString().withMessage('fileName must be a string'),
-  ]),
-  ensureAuthenticated(),
-  asyncHandler(async (req, res) => {
-    const { fileName } = req.params;
-
-    await removeFile(fileName, []);
     res.status(200).send();
   })
 );

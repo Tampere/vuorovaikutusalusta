@@ -179,9 +179,17 @@ export interface SurveyPageSidebar {
    */
   mapLayers: number[];
   /**
-   * URL of the sidebar image
+   * Path of the sidebar image
    */
-  imageUrl: string;
+  imagePath: string[];
+  /**
+   * Name of the sidebar image
+   */
+  imageName: string;
+  /**
+   * Alternative text for the sidebar image
+   */
+  imageAltText: string;
 }
 
 /**
