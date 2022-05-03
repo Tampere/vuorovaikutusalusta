@@ -88,7 +88,7 @@ export default function FileUpload({
         formData.append('surveyId', String(surveyId));
       }
       try {
-        fetch(`/api/file${targetPath ? `/${targetPath}` : ''}`, {
+        await fetch(`/api/file${targetPath ? `/${targetPath}` : ''}`, {
           method: 'POST',
           body: formData,
         });
