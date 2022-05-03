@@ -168,6 +168,7 @@ export default function EditSurveyPage() {
       {page.sidebar.type === 'image' && (
         <div>
           <FileUpload
+            surveyId={activeSurvey.id}
             targetPath={[String(activeSurvey.id)]}
             value={
               !page.sidebar.imageName
