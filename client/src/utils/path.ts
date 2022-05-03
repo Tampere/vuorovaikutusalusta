@@ -5,5 +5,7 @@
  * @returns Full file path
  */
 export function getFullFilePath(filePath: string[], fileName: string) {
-  return filePath.length === 0 ? fileName : filePath.join('/') + '/' + fileName;
+  return filePath?.length === 0
+    ? fileName
+    : filePath?.join('/') + '/' + fileName;
 }

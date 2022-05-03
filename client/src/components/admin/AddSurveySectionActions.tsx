@@ -12,7 +12,7 @@ import {
   TextFields,
   ViewComfy,
   Image,
-  Article,
+  AttachFile,
 } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
@@ -130,13 +130,13 @@ export default function AddSurveySectionActions(props: Props) {
       type: 'image',
       title: '',
       fileName: null,
-      filePath: null,
+      filePath: [],
       altText: '',
     },
     document: {
       type: 'document',
       title: '',
-      fileName: '',
+      fileName: null,
       filePath: [],
     },
   };
@@ -228,7 +228,7 @@ export default function AddSurveySectionActions(props: Props) {
       type: 'document',
       label: tr.AddSurveySectionActions.documentSection,
       ariaLabel: 'add-document-section',
-      icon: <Article />,
+      icon: <AttachFile />,
     },
   ];
 

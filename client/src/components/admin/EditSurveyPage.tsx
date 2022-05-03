@@ -195,7 +195,7 @@ export default function EditSurveyPage() {
                 ...page,
                 sidebar: {
                   ...page.sidebar,
-                  imagePath: null,
+                  imagePath: [],
                   imageName: null,
                 },
               });

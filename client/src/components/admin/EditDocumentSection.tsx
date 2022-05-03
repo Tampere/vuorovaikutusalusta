@@ -37,7 +37,7 @@ export default function EditDocumentSection({ section, onChange }: Props) {
           onChange({
             ...section,
             fileName: null,
-            filePath: null,
+            filePath: [],
           });
         }}
       />
