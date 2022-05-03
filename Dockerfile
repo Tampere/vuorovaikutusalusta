@@ -38,6 +38,8 @@ COPY server ./
 RUN npm run build
 RUN rm -r src
 
+ENV TZ=Europe/Helsinki
+
 ###
 # Main image build
 ###
