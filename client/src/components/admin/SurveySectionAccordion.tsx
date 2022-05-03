@@ -39,7 +39,7 @@ import {
   TextFields,
   ViewComfy,
   Image,
-  Article,
+  AttachFile,
 } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
@@ -242,7 +242,7 @@ export default function SurveySectionAccordion(props: Props) {
       ),
     },
     document: {
-      icon: <Article />,
+      icon: <AttachFile />,
       tooltip: tr.SurveySection.documentSection,
       form: (
         <EditDocumentSection

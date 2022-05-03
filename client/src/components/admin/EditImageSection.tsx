@@ -40,7 +40,7 @@ export default function EditImageSection({ section, onChange }: Props) {
           onChange({
             ...section,
             fileName: null,
-            filePath: null,
+            filePath: [],
           });
         }}
       />

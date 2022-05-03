@@ -14,5 +14,7 @@ WORKDIR /app/server
 COPY package*.json ./
 RUN npm i
 
+ENV TZ=Europe/Helsinki
+
 # Run migrations before starting the server
 CMD npm run dev

@@ -282,9 +282,9 @@
     "attachment": "Liite"
   },
   "GroupedCheckBoxQuestion": {
-    "helperText": "Valitse kohteita alla olevien ryhmien sisältä. Ryhmän viereinen numero kuvastaa ryhmän alta tekemiesi valintojen lukumäärää.",
-    "helperTextMin": "Valitse yhteensä vähintään {min} vaihtoehtoa alla olevien ryhmien sisältä. Ryhmän viereinen numero kuvastaa ryhmän alta tekemiesi valintojen lukumäärää.",
-    "helperTextMax": "Valitse yhteensä enintään {max} vaihtoehtoa alla olevien ryhmien sisältä. Ryhmän viereinen numero kuvastaa ryhmän alta tekemiesi valintojen lukumäärää.",
+    "helperText": "Valitse kohteita alla olevien ryhmien sisältä.",
+    "helperTextMin": "Valitse yhteensä vähintään {min} vaihtoehtoa.",
+    "helperTextMax": "Valitse yhteensä enintään {max} vaihtoehtoa.",
     "helperTextMinMax": "Valitse yhteensä vähintään {min} ja enintään {max} vaihtoehtoa.",
     "indicatorText": "Olet valinnut {numbers} vaihtoehtoa",
     "indicatorTextMaxReached": "Olet valinnut kaikki {numbers} vaihtoehtoa"

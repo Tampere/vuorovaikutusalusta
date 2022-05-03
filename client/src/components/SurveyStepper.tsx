@@ -345,7 +345,7 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
                 <img
                   alt={currentPage.sidebar.imageAltText}
                   src={`/api/file/${fullSidebarImagePath}`}
-                  style={{ width: '100%' }}
+                  style={{ width: '100%', maxHeight: '100vh' }}
                 />
               )}
             </div>
