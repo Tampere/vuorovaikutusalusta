@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import imageRouter from './image.routes';
+import fileRouter from './file.routes';
 import mapRouter from './map.routes';
 import publishedSurveyRouter from './published-survey.routes';
 import surveyRouter from './survey.routes';
@@ -12,7 +12,7 @@ const router = Router();
 router.use('/surveys', surveyRouter);
 router.use('/published-surveys', publishedSurveyRouter);
 router.use('/map', mapRouter);
-router.use('/image', imageRouter);
+router.use('/file', fileRouter);
 router.use('/users', userRouter);
 router.use('/answers', answersRouter);
 router.use('/themes', themesRouter);

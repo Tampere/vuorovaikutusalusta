@@ -3,7 +3,11 @@ import { GeoJSONWithCRS } from './geojson';
 /**
  * Section of a survey page
  */
-export type SurveyPageSection = SurveyQuestion | SurveyTextSection;
+export type SurveyPageSection =
+  | SurveyQuestion
+  | SurveyTextSection
+  | SurveyImageSection
+  | SurveyDocumentSection;
 
 /**
  * Question section of a survey page
@@ -59,6 +63,14 @@ interface CommonSurveyPageQuestion extends CommonSurveyPageSection {
 }
 
 /**
+ * Section file
+ */
+interface SectionFile {
+  fileName: string;
+  filePath: string[];
+}
+
+/**
  * Checkbox question
  */
 export interface SurveyCheckboxQuestion extends CommonSurveyPageQuestion {
@@ -87,6 +99,25 @@ export interface SurveyTextSection extends CommonSurveyPageSection {
   type: 'text';
   body: string;
   bodyColor: string;
+}
+
+/**
+ * Image section
+ */
+export interface SurveyImageSection
+  extends CommonSurveyPageSection,
+    SectionFile {
+  type: 'image';
+  altText: string;
+}
+
+/**
+ * Document section
+ */
+export interface SurveyDocumentSection
+  extends CommonSurveyPageSection,
+    SectionFile {
+  type: 'document';
 }
 
 /**
@@ -162,6 +193,37 @@ export interface SurveyGroupedCheckboxQuestion
 }
 
 /**
+ * Type of the survey page sidebar
+ */
+export type SurveyPageSidebarType = 'none' | 'map' | 'image';
+
+/**
+ * Survey page side bar
+ */
+export interface SurveyPageSidebar {
+  /**
+   * Type of the sidebar
+   */
+  type: SurveyPageSidebarType;
+  /**
+   * IDs of the visible map layers for the page
+   */
+  mapLayers: number[];
+  /**
+   * Path of the sidebar image
+   */
+  imagePath: string[];
+  /**
+   * Name of the sidebar image
+   */
+  imageName: string;
+  /**
+   * Alternative text for the sidebar image
+   */
+  imageAltText: string;
+}
+
+/**
  * Survey page
  */
 export interface SurveyPage {
@@ -174,9 +236,9 @@ export interface SurveyPage {
    */
   title: string;
   /**
-   * IDs of the visible map layers for the page
+   * Side bar definition for the survey page
    */
-  mapLayers: number[];
+  sidebar: SurveyPageSidebar;
   /**
    * Page sections
    */
@@ -246,9 +308,13 @@ export interface Survey {
    */
   pages?: SurveyPage[];
   /**
-   * ID of the survey background image
+   * Name of the survey background image
    */
-  backgroundImageId?: number;
+  backgroundImageName?: string;
+  /**
+   * Path of the survey background image
+   */
+  backgroundImagePath?: string[];
   /**
    * Thanks page
    */
@@ -404,29 +470,43 @@ export interface MapLayer {
 }
 
 /**
- * Image used as the background of the survey landing page
+ * File interface
  */
-export interface SurveyBackgroundImage {
+export interface File {
   /**
-   * ID of the image
+   * ID of the file
    */
   id: number;
   /**
-   * Image data as a base64 encoded string
+   * File data as a base64 encoded string
    */
   data: string;
   /**
-   * Image attributions (= who owns the image rights)
+   * Additional file details
    */
-  attributions: string;
+  details?: { [key: string]: any };
   /**
    * Image file name
    */
   fileName: string;
   /**
-   * Image file format (e.g. .png, .jpeg)
+   * Path of the file in the file hierarchy
    */
-  fileFormat: string;
+  filePath: string;
+  /**
+   * File mime type
+   */
+  mimeType: string;
+}
+
+/**
+ * Image used as the background of the survey landing page
+ */
+export interface SurveyBackgroundImage extends File {
+  /**
+   * Image attributions (= who owns the image rights)
+   */
+  attributions: string;
 }
 
 /**

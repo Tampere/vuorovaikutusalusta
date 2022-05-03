@@ -12,7 +12,6 @@ import React, {
 } from 'react';
 
 interface State {
-  disabled: boolean;
   visibleLayers: number[];
   allLayers: number[];
   rpcChannel: Channel;
@@ -28,10 +27,6 @@ interface State {
 }
 
 type Action =
-  | {
-      type: 'SET_DISABLED';
-      value: boolean;
-    }
   | {
       type: 'SET_VISIBLE_LAYERS';
       layers: number[];
@@ -75,7 +70,6 @@ type Action =
 type Context = [State, React.Dispatch<Action>];
 
 const stateDefaults: State = {
-  disabled: true,
   visibleLayers: [],
   allLayers: [],
   rpcChannel: null,
@@ -160,13 +154,6 @@ export function useSurveyMap() {
   return {
     ...state,
     isMapReady,
-    /**
-     * Update disabled state
-     * @param value Disabled state
-     */
-    setDisabled(value: boolean) {
-      dispatch({ type: 'SET_DISABLED', value });
-    },
     /**
      * Set visible layers
      * @param layers Visible layers
@@ -462,11 +449,6 @@ export function useSurveyMap() {
  */
 function reducer(state: State, action: Action): State {
   switch (action.type) {
-    case 'SET_DISABLED':
-      return {
-        ...state,
-        disabled: action.value,
-      };
     case 'SET_VISIBLE_LAYERS':
       return {
         ...state,

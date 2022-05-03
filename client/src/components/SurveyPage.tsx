@@ -10,12 +10,15 @@ import SurveyThanksPage from './SurveyThanksPage';
 import { UnavailableSurvey } from './UnavailableSurvey';
 import { NotFoundPage } from './NotFoundPage';
 import { useSurveyTheme } from '@src/stores/SurveyThemeProvider';
+import { getFullFilePath } from '@src/utils/path';
 
 export default function SurveyPage() {
   const [loading, setLoading] = useState(true);
   const [showLandingPage, setShowLandingPage] = useState(true);
   const [showThanksPage, setShowThanksPage] = useState(false);
-  const [surveyBackgroundImage, setSurveyBackgroundImage] = useState<any>(null);
+  const [surveyBackgroundImage, setSurveyBackgroundImage] = useState<{
+    attributions: string;
+  }>(null);
   const [errorStatusCode, setErrorStatusCode] = useState<number>(null);
 
   const { name } = useParams<{ name: string }>();
@@ -27,11 +30,20 @@ export default function SurveyPage() {
     async function fetchSurvey() {
       try {
         const survey = await request<Survey>(`/api/published-surveys/${name}`);
-        if (survey.backgroundImageId && survey.backgroundImageId !== 0) {
-          const surveyBackgroundImage = await request<any>(
-            `/api/image/${survey.backgroundImageId}`
+        if (
+          survey.backgroundImagePath &&
+          survey.backgroundImageName &&
+          survey.backgroundImageName !== ''
+        ) {
+          const fullFilePath = getFullFilePath(
+            survey.backgroundImagePath,
+            survey.backgroundImageName
           );
-          setSurveyBackgroundImage(surveyBackgroundImage);
+          const response = await fetch(`/api/file/${fullFilePath}`);
+          const details = JSON.parse(
+            response.headers.get('File-details') ?? '{}'
+          );
+          setSurveyBackgroundImage(details);
         }
         setSurvey(survey);
         setThemeFromSurvey(survey);

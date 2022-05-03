@@ -19,6 +19,7 @@ import { useTranslations } from '@src/stores/TranslationContext';
 import { Cancel } from '@material-ui/icons';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useDropzone } from 'react-dropzone';
+import { File } from '@interfaces/survey';
 
 const useStyles = makeStyles((theme: Theme) => ({
   noImageBackground: {
@@ -55,7 +56,7 @@ export default function SurveyImageList() {
   const { tr } = useTranslations();
   const { editSurvey, activeSurvey } = useSurvey();
 
-  const [images, setImages] = useState([]);
+  const [images, setImages] = useState<File[]>([]);
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
   const [imageAttributions, setImageAttributions] = useState<string>('');
 
@@ -65,24 +66,29 @@ export default function SurveyImageList() {
   }, []);
 
   async function getImages() {
-    const res = await request<any>(`/api/image/`);
+    const res = await request<File[]>(`/api/file/`);
     setImages(res);
   }
 
-  function handleListItemClick(id?: number) {
+  function handleListItemClick(fileName?: string, filePath?: string[]) {
     setImageDialogOpen((prev) => !prev);
 
-    if (!id) {
+    if (!fileName) {
       return;
     }
-    editSurvey({ ...activeSurvey, backgroundImageId: id });
+    editSurvey({
+      ...activeSurvey,
+      backgroundImageName: fileName,
+      backgroundImagePath: filePath,
+    });
   }
 
-  async function handleDeletingImage(event: React.MouseEvent, id: number) {
+  async function handleDeletingImage(
+    event: React.MouseEvent,
+    fileName: string
+  ) {
     event.stopPropagation();
-    await request(`/api/image/${id}`, {
-      method: 'DELETE',
-    });
+    await fetch(`/api/file/${fileName}`, { method: 'DELETE' });
 
     getImages();
   }
@@ -109,21 +115,28 @@ export default function SurveyImageList() {
     if (!acceptedFiles?.length) return;
 
     const formData = new FormData();
-    formData.append('surveyImage', acceptedFiles[0]);
+    formData.append('file', acceptedFiles[0]);
     formData.append('attributions', imageAttributions);
-    await fetch(`/api/image`, { method: 'POST', body: formData });
+    await fetch(`/api/file`, { method: 'POST', body: formData });
     acceptedFiles.shift();
     getImages();
   }
 
   function handleEmptyImage() {
     setImageDialogOpen((prev) => !prev);
-    editSurvey({ ...activeSurvey, backgroundImageId: null });
+    editSurvey({
+      ...activeSurvey,
+      backgroundImageName: null,
+      backgroundImagePath: [],
+    });
   }
 
   const activeImage =
-    images?.find((image) => image.id === activeSurvey.backgroundImageId) ??
-    null;
+    images?.find(
+      (image) =>
+        image.fileName === activeSurvey.backgroundImageName &&
+        image.filePath.join() === activeSurvey.backgroundImagePath.join()
+    ) ?? null;
 
   return (
     <div>
@@ -145,14 +158,14 @@ export default function SurveyImageList() {
           {tr.SurveyImageList.surveyImage.toUpperCase()}
           {': '}
           {activeImage
-            ? ` ${activeImage?.fileName}.${activeImage?.fileFormat}`
+            ? ` ${activeImage?.fileName}`
             : ` ${tr.SurveyImageList.noImage.toLowerCase()}`}
         </Typography>
         {activeImage && (
           <img
             src={`data:image/;base64,${activeImage.data}`}
             srcSet={`data:image/;base64,${activeImage.data}`}
-            alt={`survey-image-${activeImage.id}`}
+            alt={`survey-image-${activeImage.fileName}`}
             loading="lazy"
             style={{
               height: '60px',
@@ -180,7 +193,7 @@ export default function SurveyImageList() {
             <ImageListItem
               className={classes.noImageBackground}
               style={
-                activeSurvey?.backgroundImageId === 0
+                !activeSurvey?.backgroundImageName
                   ? { border: '4px solid #1976d2' }
                   : null
               }
@@ -198,22 +211,26 @@ export default function SurveyImageList() {
             {images.map((image) => (
               <ImageListItem
                 style={
-                  image.id === activeSurvey?.backgroundImageId
+                  image.fileName === activeSurvey?.backgroundImageName
                     ? { border: '4px solid #1976d2' }
                     : null
                 }
-                key={image.id}
-                onClick={() => handleListItemClick(image.id)}
+                key={image.fileName}
+                onClick={() =>
+                  handleListItemClick(image.fileName, image.filePath)
+                }
               >
                 <Cancel
                   color="error"
                   className={classes.deleteImageIcon}
-                  onClick={(event) => handleDeletingImage(event, image.id)}
+                  onClick={(event) =>
+                    handleDeletingImage(event, image.fileName)
+                  }
                 />
                 <img
                   src={`data:image/;base64,${image.data}`}
                   srcSet={`data:image/;base64,${image.data}`}
-                  alt={`survey-image-${image.id}`}
+                  alt={`survey-image-${image.fileName}`}
                   loading="lazy"
                   style={{ height: '100%' }}
                 />

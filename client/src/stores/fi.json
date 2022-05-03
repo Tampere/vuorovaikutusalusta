@@ -60,11 +60,25 @@
     "deletePage": "Poista sivu",
     "confirmDeletePage": "Haluatko varmasti poistaa tämän sivun? Toimintoa ei voida perua.",
     "deletePageFailed": "Sivun poistamisessa tapahtui virhe. Yritä myöhemmin uudestaan.",
+    "selectSidebarType": "Valitse oikean sivupalstan sisältö",
+    "sidebarType": {
+      "none": "Ei mitään",
+      "map": "Kartta",
+      "image": "Kuva"
+    },
+    "warningNoMapUrl": "Kyselylle ei ole määritetty Oskari-karttajulkaisua.",
+    "warningNoAvailableMapLayers": "Oskari-karttajulkaisusta ei löytynyt näytettäviä karttatasoja.",
     "mapLayers": "Sivulla näytettävät karttatasot",
     "untitledSection": "Nimetön osio",
     "title": "Otsikko",
     "deleteSection": "Poista osio",
-    "confirmDeleteSection": "Haluatko varmasti poistaa tämän osion?"
+    "confirmDeleteSection": "Haluatko varmasti poistaa tämän osion?",
+    "imageAltText": "Kuvan vaihtoehtoinen teksti"
+  },
+  "FileUpload": {
+    "deleteFile": "Poista tiedosto",
+    "errorUploadingFile": "Tiedoston lataamisessa tapahtui virhe. Yritä myöhemmin uudestaan.",
+    "errorDeletingFile": "Tiedoston poistamisessa tapahtui virhe. Yritä myöhemmin uudestaan."
   },
   "EditGroupedCheckBoxQuestion": {
     "addGroup": "Lisää ryhmä",
@@ -82,7 +96,9 @@
     "sortingQuestion": "Lisää järjestyskysymys",
     "sliderQuestion": "Lisää liukukytkinkysymys",
     "matrixQuestion": "Lisää likert -kysymys",
-    "groupedCheckboxQuestion": "Lisää ryhmitetty monivalintakysymys"
+    "groupedCheckboxQuestion": "Lisää ryhmitetty monivalintakysymys",
+    "imageSection": "Lisää kuvaosio",
+    "documentSection": "Lisää liiteosio"
   },
   "SurveySection": {
     "radioQuestion": "Valintakysymys",
@@ -94,7 +110,9 @@
     "sortingQuestion": "Järjestyskysymys",
     "sliderQuestion": "Liukukytkinkysymys",
     "matrixQuestion": "Likert -kysymys",
-    "groupedCheckboxQuestion": "Ryhmitetty monivalintakysymys"
+    "groupedCheckboxQuestion": "Ryhmitetty monivalintakysymys",
+    "imageSection": "Kuvaosio",
+    "documentSection": "Liiteosio"
   },
   "SurveySections": {
     "limitAnswers": "Rajoita vastauslukumäärää",
@@ -118,11 +136,14 @@
     "selectImage": "Valitse taustakuva",
     "addNewImage": "Lisää uusi kuva",
     "files": "Tiedosto",
-    "dropFiles": "Raahaa kuvatiedosto tähän tai klikkaa valitaksesi tiedosto"
+    "dropFiles": "Raahaa tiedosto tähän tai klikkaa valitaksesi tiedosto"
   },
   "EditTextSection": {
     "text": "Teksti",
     "bodyColor": "Tekstin väri"
+  },
+  "EditImageSection": {
+    "altText": "Vaihtoehtoinen teksti kuvalle"
   },
   "EditMapQuestion": {
     "selectionTypes": "Sallitut karttavalinnan tyypit",
@@ -216,6 +237,7 @@
     "submit": "Lähetä",
     "errorSubmittingSurvey": "Kyselyn lähettämisessä tapahtui virhe. Ole hyvä ja yritä myöhemmin uudestaan.",
     "openMap": "Avaa kartta",
+    "openImage": "Avaa kuva",
     "unfinishedAnswers": "Vastaa kaikkiin pakolliseksi merkittyihin kysymyksiin"
   },
   "SurveyQuestion": {
@@ -250,8 +272,14 @@
   "MatrixQuestion": {
     "emptyAnswer": "En osaa sanoa"
   },
+  "ImageSection": {
+    "openInNewTab": "Avaa kuva uudella välilehdellä"
+  },
   "SortingQuestion": {
     "empty": "Tyhjä"
+  },
+  "DocumentSection": {
+    "attachment": "Liite"
   },
   "GroupedCheckBoxQuestion": {
     "helperText": "Valitse kohteita alla olevien ryhmien sisältä. Ryhmän viereinen numero kuvastaa ryhmän alta tekemiesi valintojen lukumäärää.",

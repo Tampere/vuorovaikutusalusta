@@ -40,7 +40,11 @@ const stateDefaults: State = {
 };
 
 // Section types that won't have an answer (e.g. text sections)
-const nonQuestionSectionTypes: SurveyPageSection['type'][] = ['text'];
+const nonQuestionSectionTypes: SurveyPageSection['type'][] = [
+  'text',
+  'image',
+  'document',
+];
 
 /**
  * Context containing the state object and dispatch function.

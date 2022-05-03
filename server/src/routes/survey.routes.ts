@@ -87,10 +87,14 @@ router.put(
       .isString()
       .optional({ nullable: true })
       .withMessage('Author unit must be a string'),
-    body('backgroundImageId')
-      .isNumeric()
+    body('backgroundImageName')
+      .isString()
       .optional({ nullable: true })
-      .withMessage('Background image id must be a number'),
+      .withMessage('Background image name must be a string'),
+    body('backgroundImagePath')
+      .isArray()
+      .optional({ nullable: true })
+      .withMessage('Background image path must be a string'),
     body('startDate')
       .isString()
       .optional({ nullable: true })
