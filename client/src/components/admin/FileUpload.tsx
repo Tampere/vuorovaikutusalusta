@@ -3,6 +3,7 @@ import { Cancel } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/styles';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
+import { getFullFilePath } from '@src/utils/path';
 import React, { useEffect, useMemo } from 'react';
 import { useDropzone } from 'react-dropzone';
 
@@ -50,64 +51,97 @@ export default function FileUpload({
     maxFiles: 1,
   });
 
+  const imageFileFormats = ['jpg', 'jpeg', 'png', 'tiff', 'bmp'];
+
+  async function deleteFile(path: string[], name: string) {
+    const fullFilePath = getFullFilePath(path, name);
+    await fetch(`/api/file/${fullFilePath}`, {
+      method: 'DELETE',
+    });
+  }
+
   useEffect(() => {
-    // Save the file to the server with a POST request
-    if (acceptedFiles.length > 0) {
+    async function doUpload() {
+      if (!acceptedFiles.length) {
+        return;
+      }
+      // Delete previous file(s)
+      if (value) {
+        try {
+          await Promise.all(
+            (value ?? []).map(({ path, name }) => deleteFile(path, name))
+          );
+        } catch (error) {
+          showToast({
+            severity: 'error',
+            message: tr.FileUpload.errorDeletingFile,
+          });
+          return;
+        }
+      }
+
+      // Save the new file to the server with a POST request
       const file = acceptedFiles[0];
       const formData = new FormData();
       formData.append('file', file);
       if (surveyId != null) {
         formData.append('surveyId', String(surveyId));
       }
-      fetch(`/api/file${targetPath ? `/${targetPath}` : ''}`, {
-        method: 'POST',
-        body: formData,
-      })
-        .then(() => {
-          // Upload complete - notify via callback
-          onUpload({ name: file.name, path: targetPath });
-        })
-        .catch(() => {
-          showToast({
-            severity: 'error',
-            message: tr.FileUpload.errorUploadingFile,
-          });
+      try {
+        fetch(`/api/file${targetPath ? `/${targetPath}` : ''}`, {
+          method: 'POST',
+          body: formData,
         });
+        // Upload complete - notify via callback
+        onUpload({ name: file.name, path: targetPath });
+      } catch (error) {
+        showToast({
+          severity: 'error',
+          message: tr.FileUpload.errorUploadingFile,
+        });
+      }
     }
+    doUpload();
   }, [acceptedFiles]);
 
   const filesList = useMemo(() => {
-    return value?.map(({ path, name }) => (
-      <div key={name}>
-        <img
-          src={`/api/file/${path ? path.join('/') + '/' : ''}${name}`}
-          style={{ width: 50, maxHeight: 50, marginRight: '1rem' }}
-        />
-        <span>{name}</span>
-        <Tooltip title={tr.FileUpload.deleteFile}>
-          <IconButton
-            aria-label="delete"
-            size="small"
-            style={{ marginLeft: '1rem' }}
-            onClick={async () => {
-              try {
-                await fetch(`/api/file/${path.join('/')}/${name}`, {
-                  method: 'DELETE',
-                });
-                onDelete({ name, path });
-              } catch (error) {
-                showToast({
-                  severity: 'error',
-                  message: tr.FileUpload.errorDeletingFile,
-                });
-              }
-            }}
-          >
-            <Cancel />
-          </IconButton>
-        </Tooltip>
-      </div>
-    ));
+    return value?.map(({ path, name }) => {
+      const fileFormat = name
+        .substring(name.lastIndexOf('.') + 1, name.length)
+        .toLowerCase();
+      const fullFilePath = getFullFilePath(path, name);
+      return (
+        <div key={name}>
+          {imageFileFormats.includes(fileFormat) && (
+            <img
+              src={`/api/file/${fullFilePath}`}
+              style={{ width: 50, maxHeight: 50, marginRight: '1rem' }}
+            />
+          )}
+          <span>{name}</span>
+          <Tooltip title={tr.FileUpload.deleteFile}>
+            <IconButton
+              aria-label="delete"
+              size="small"
+              style={{ marginLeft: '1rem' }}
+              onClick={async () => {
+                try {
+                  await deleteFile(path, name);
+                  onDelete({ name, path });
+                } catch (error) {
+                  showToast({
+                    severity: 'error',
+                    message: tr.FileUpload.errorDeletingFile,
+                  });
+                }
+              }}
+            >
+              <Cancel />
+            </IconButton>
+          </Tooltip>
+        </div>
+      );
+    });
   }, [value]);
 
   return (

@@ -96,7 +96,9 @@
     "sortingQuestion": "Lisää järjestyskysymys",
     "sliderQuestion": "Lisää liukukytkinkysymys",
     "matrixQuestion": "Lisää likert -kysymys",
-    "groupedCheckboxQuestion": "Lisää ryhmitetty monivalintakysymys"
+    "groupedCheckboxQuestion": "Lisää ryhmitetty monivalintakysymys",
+    "imageSection": "Lisää kuvaosio",
+    "documentSection": "Lisää liiteosio"
   },
   "SurveySection": {
     "radioQuestion": "Valintakysymys",
@@ -108,7 +110,9 @@
     "sortingQuestion": "Järjestyskysymys",
     "sliderQuestion": "Liukukytkinkysymys",
     "matrixQuestion": "Likert -kysymys",
-    "groupedCheckboxQuestion": "Ryhmitetty monivalintakysymys"
+    "groupedCheckboxQuestion": "Ryhmitetty monivalintakysymys",
+    "imageSection": "Kuvaosio",
+    "documentSection": "Liiteosio"
   },
   "SurveySections": {
     "limitAnswers": "Rajoita vastauslukumäärää",
@@ -132,11 +136,14 @@
     "selectImage": "Valitse taustakuva",
     "addNewImage": "Lisää uusi kuva",
     "files": "Tiedosto",
-    "dropFiles": "Raahaa kuvatiedosto tähän tai klikkaa valitaksesi tiedosto"
+    "dropFiles": "Raahaa tiedosto tähän tai klikkaa valitaksesi tiedosto"
   },
   "EditTextSection": {
     "text": "Teksti",
     "bodyColor": "Tekstin väri"
+  },
+  "EditImageSection": {
+    "altText": "Vaihtoehtoinen teksti kuvalle"
   },
   "EditMapQuestion": {
     "selectionTypes": "Sallitut karttavalinnan tyypit",
@@ -265,8 +272,14 @@
   "MatrixQuestion": {
     "emptyAnswer": "En osaa sanoa"
   },
+  "ImageSection": {
+    "openInNewTab": "Avaa kuva uudella välilehdellä"
+  },
   "SortingQuestion": {
     "empty": "Tyhjä"
+  },
+  "DocumentSection": {
+    "attachment": "Liite"
   },
   "GroupedCheckBoxQuestion": {
     "helperText": "Valitse kohteita alla olevien ryhmien sisältä. Ryhmän viereinen numero kuvastaa ryhmän alta tekemiesi valintojen lukumäärää.",

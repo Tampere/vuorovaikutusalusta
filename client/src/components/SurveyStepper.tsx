@@ -25,11 +25,14 @@ import { getClassList } from '@src/utils/classes';
 import { request } from '@src/utils/request';
 import React, { useEffect, useMemo, useState } from 'react';
 import SplitPane from 'react-split-pane';
+import DocumentSection from './DocumentSection';
+import ImageSection from './ImageSection';
 import PageConnector from './PageConnector';
 import StepperControls from './StepperControls';
 import SurveyMap from './SurveyMap';
 import SurveyQuestion from './SurveyQuestion';
 import TextSection from './TextSection';
+import { getFullFilePath } from '@src/utils/path';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -120,6 +123,15 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
   const currentPage = useMemo(
     () => survey.pages[pageNumber],
     [survey, pageNumber]
+  );
+
+  const fullSidebarImagePath = useMemo(
+    () =>
+      getFullFilePath(
+        currentPage.sidebar.imagePath,
+        currentPage.sidebar.imageName
+      ),
+    [currentPage.sidebar]
   );
 
   /**
@@ -234,8 +246,13 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
             <FormControl style={{ width: '100%' }} component="fieldset">
               {page.sections.map((section) => (
                 <div className={classes.section} key={section.id}>
-                  {section.type === 'text' && <TextSection section={section} />}
-                  {section.type !== 'text' && (
+                  {section.type === 'text' ? (
+                    <TextSection section={section} />
+                  ) : section.type === 'image' ? (
+                    <ImageSection section={section} />
+                  ) : section.type === 'document' ? (
+                    <DocumentSection section={section} />
+                  ) : (
                     <SurveyQuestion question={section} />
                   )}
                 </div>
@@ -327,11 +344,7 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
               {currentPage.sidebar.imageName && (
                 <img
                   alt={currentPage.sidebar.imageAltText}
-                  src={`/api/file/${
-                    currentPage.sidebar.imagePath?.join('/') ?? ''
-                  }${currentPage.sidebar.imagePath ? '/' : ''}${
-                    currentPage.sidebar.imageName
-                  }`}
+                  src={`/api/file/${fullSidebarImagePath}`}
                   style={{ width: '100%' }}
                 />
               )}

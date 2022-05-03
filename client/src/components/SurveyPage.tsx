@@ -10,6 +10,7 @@ import SurveyThanksPage from './SurveyThanksPage';
 import { UnavailableSurvey } from './UnavailableSurvey';
 import { NotFoundPage } from './NotFoundPage';
 import { useSurveyTheme } from '@src/stores/SurveyThemeProvider';
+import { getFullFilePath } from '@src/utils/path';
 
 export default function SurveyPage() {
   const [loading, setLoading] = useState(true);
@@ -34,12 +35,11 @@ export default function SurveyPage() {
           survey.backgroundImageName &&
           survey.backgroundImageName !== ''
         ) {
-          const filePathString = survey.backgroundImagePath.join('/');
-          const response = await fetch(
-            `/api/file/${filePathString}${filePathString ? '/' : ''}${
-              survey.backgroundImageName
-            }`
+          const fullFilePath = getFullFilePath(
+            survey.backgroundImagePath,
+            survey.backgroundImageName
           );
+          const response = await fetch(`/api/file/${fullFilePath}`);
           const details = JSON.parse(
             response.headers.get('File-details') ?? '{}'
           );

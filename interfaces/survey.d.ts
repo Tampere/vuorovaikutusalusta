@@ -3,7 +3,11 @@ import { GeoJSONWithCRS } from './geojson';
 /**
  * Section of a survey page
  */
-export type SurveyPageSection = SurveyQuestion | SurveyTextSection;
+export type SurveyPageSection =
+  | SurveyQuestion
+  | SurveyTextSection
+  | SurveyImageSection
+  | SurveyDocumentSection;
 
 /**
  * Question section of a survey page
@@ -59,6 +63,14 @@ interface CommonSurveyPageQuestion extends CommonSurveyPageSection {
 }
 
 /**
+ * Section file
+ */
+interface SectionFile {
+  fileName: string;
+  filePath: string[];
+}
+
+/**
  * Checkbox question
  */
 export interface SurveyCheckboxQuestion extends CommonSurveyPageQuestion {
@@ -87,6 +99,25 @@ export interface SurveyTextSection extends CommonSurveyPageSection {
   type: 'text';
   body: string;
   bodyColor: string;
+}
+
+/**
+ * Image section
+ */
+export interface SurveyImageSection
+  extends CommonSurveyPageSection,
+    SectionFile {
+  type: 'image';
+  altText: string;
+}
+
+/**
+ * Document section
+ */
+export interface SurveyDocumentSection
+  extends CommonSurveyPageSection,
+    SectionFile {
+  type: 'document';
 }
 
 /**

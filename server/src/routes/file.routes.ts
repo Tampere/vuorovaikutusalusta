@@ -12,7 +12,7 @@ import { param } from 'express-validator';
 import multer from 'multer';
 
 const router = Router();
-const upload = multer();
+const upload = multer({ limits: { fileSize: 10 * 1000 * 1000 } });
 
 /**
  * Endpoint for inserting a single file

@@ -1,7 +1,9 @@
 import {
   SurveyCheckboxQuestion,
+  SurveyDocumentSection,
   SurveyFreeTextQuestion,
   SurveyGroupedCheckboxQuestion,
+  SurveyImageSection,
   SurveyMapQuestion,
   SurveyMatrixQuestion,
   SurveyNumericQuestion,
@@ -36,6 +38,8 @@ import {
   Subject,
   TextFields,
   ViewComfy,
+  Image,
+  Article,
 } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
@@ -53,6 +57,8 @@ import EditSortingQuestion from './EditSortingQuestion';
 import EditTextSection from './EditTextSection';
 import EditMatrixQuestion from './EditMatrixQuestion';
 import EditGroupedCheckBoxQuestion from './EditGroupedCheckBoxQuestion';
+import EditImageSection from './EditImageSection';
+import EditDocumentSection from './EditDocumentSection';
 
 const useStyles = makeStyles({
   accordion: {
@@ -222,6 +228,26 @@ export default function SurveySectionAccordion(props: Props) {
           onChange={(section) => {
             props.onEdit(section);
           }}
+        />
+      ),
+    },
+    image: {
+      icon: <Image />,
+      tooltip: tr.SurveySection.imageSection,
+      form: (
+        <EditImageSection
+          section={props.section as SurveyImageSection}
+          onChange={(section) => props.onEdit(section)}
+        />
+      ),
+    },
+    document: {
+      icon: <Article />,
+      tooltip: tr.SurveySection.documentSection,
+      form: (
+        <EditDocumentSection
+          section={props.section as SurveyDocumentSection}
+          onChange={(section) => props.onEdit(section)}
         />
       ),
     },

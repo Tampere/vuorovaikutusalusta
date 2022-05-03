@@ -95,6 +95,8 @@ interface DBSurveyPageSection {
   details: object;
   parent_section: number;
   info: LocalizedText;
+  file_name: string;
+  file_path: string[];
 }
 
 /**
@@ -138,6 +140,8 @@ type DBSurveyJoin = DBSurvey & {
   section_details: object;
   section_parent_section: number;
   section_info: LocalizedText;
+  section_file_name: string;
+  section_file_path: string[];
   option_id: number;
   option_text: LocalizedText;
   option_group_id: number;
@@ -237,7 +241,9 @@ export async function getSurvey(params: { id: number } | { name: string }) {
         section.details as section_details,
         section.idx as section_idx,
         section.parent_section as section_parent_section,
-        section.info as section_info
+        section.info as section_info,
+        section.file_name as section_file_name,
+        section.file_path as section_file_path
       FROM (
         SELECT
           survey.*,
@@ -427,7 +433,7 @@ async function upsertSection(section: DBSurveyPageSection, index: number) {
   // Negative IDs can be assigned as temporary IDs for e.g. drag and drop - change them to null
   return await getDb().one<DBSurveyPageSection>(
     `
-    INSERT INTO data.page_section (id, survey_page_id, idx, title, type, body, details, parent_section, info)
+    INSERT INTO data.page_section (id, survey_page_id, idx, title, type, body, details, parent_section, info, file_name, file_path)
     VALUES (
       COALESCE(
         CASE
@@ -443,7 +449,9 @@ async function upsertSection(section: DBSurveyPageSection, index: number) {
       $(body)::json,
       $(details)::json,
       $(parentSection),
-      $(info)
+      $(info),
+      $(fileName),
+      $(filePath)
     )
     ON CONFLICT (id) DO
       UPDATE SET
@@ -453,7 +461,9 @@ async function upsertSection(section: DBSurveyPageSection, index: number) {
         body = $(body)::json,
         details = $(details)::json,
         parent_section = $(parentSection),
-        info = $(info)
+        info = $(info),
+        file_name = $(fileName),
+        file_path = $(filePath)
     RETURNING *
   `,
     {
@@ -466,6 +476,8 @@ async function upsertSection(section: DBSurveyPageSection, index: number) {
       details: section.details,
       parentSection: section.parent_section,
       info: section.info,
+      fileName: section.file_name,
+      filePath: section.file_path,
     }
   );
 }
@@ -947,6 +959,8 @@ function dbSurveyJoinToSection(dbSurveyJoin: DBSurveyJoin): SurveyPageSection {
         type: dbSurveyJoin.section_type as SurveyPageSection['type'],
         body: dbSurveyJoin.section_body?.[languageCode],
         info: dbSurveyJoin.section_info?.[languageCode],
+        fileName: dbSurveyJoin.section_file_name,
+        filePath: dbSurveyJoin.section_file_path,
         // Trust that the JSON in the DB fits the rest of the detail fields
         ...(dbSurveyJoin.section_details as any),
         // Add an initial empty option array if the type allows options
@@ -1361,6 +1375,8 @@ function surveySectionsToRows(
       subQuestions = undefined,
       info = undefined,
       groups = undefined,
+      fileName = undefined,
+      filePath = undefined,
       ...details
     } = { ...surveySection };
     return {
@@ -1382,6 +1398,8 @@ function surveySectionsToRows(
       info: {
         fi: info,
       },
+      file_name: fileName,
+      file_path: filePath,
     } as DBSurveyPageSection & {
       options: SectionOption[];
       subQuestions: SurveyMapSubQuestion[];
