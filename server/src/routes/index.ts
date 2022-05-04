@@ -6,6 +6,7 @@ import surveyRouter from './survey.routes';
 import userRouter from './user.routes';
 import answersRouter from './answers.routes';
 import themesRouter from './themes.routes';
+import healthRouter from './health.routes';
 
 const router = Router();
 
@@ -16,12 +17,6 @@ router.use('/file', fileRouter);
 router.use('/users', userRouter);
 router.use('/answers', answersRouter);
 router.use('/themes', themesRouter);
-
-// Health check endpoint
-router.get('/health', (_req, res) => {
-  res.status(200).json({
-    status: 'OK',
-  });
-});
+router.use('/health', healthRouter);
 
 export default router;
