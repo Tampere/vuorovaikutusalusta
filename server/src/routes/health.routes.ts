@@ -11,7 +11,8 @@ router.get(
   asyncHandler(async (_req, res) => {
     // Test database connection
     try {
-      await getDb().connect();
+      const connection = await getDb().connect();
+      connection.done();
     } catch (error) {
       logger.error(`Could not connect to database: ${error}`);
       return res.status(500).json({

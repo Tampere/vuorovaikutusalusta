@@ -35,6 +35,10 @@ async function start() {
     morgan('dev', {
       stream: {
         write: (message: string) => {
+          // Skip health check logging
+          if (message.includes('/api/health')) {
+            return;
+          }
           // Message ends with an unnecessary newline - remove it from logs.
           logger.info(message.split('\n')[0]);
         },
