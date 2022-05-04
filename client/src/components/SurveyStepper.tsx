@@ -15,7 +15,7 @@ import {
   useMediaQuery,
   useTheme,
 } from '@material-ui/core';
-import { Close, Map } from '@material-ui/icons';
+import { Close, Image, Map } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/styles';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import { useSurveyMap } from '@src/stores/SurveyMapContext';
@@ -25,11 +25,14 @@ import { getClassList } from '@src/utils/classes';
 import { request } from '@src/utils/request';
 import React, { useEffect, useMemo, useState } from 'react';
 import SplitPane from 'react-split-pane';
+import DocumentSection from './DocumentSection';
+import ImageSection from './ImageSection';
 import PageConnector from './PageConnector';
 import StepperControls from './StepperControls';
 import SurveyMap from './SurveyMap';
 import SurveyQuestion from './SurveyQuestion';
 import TextSection from './TextSection';
+import { getFullFilePath } from '@src/utils/path';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -38,6 +41,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   stepper: {
     width: '100%',
+    maxWidth: '50rem',
     padding: '1rem',
   },
   '@keyframes pulse': {
@@ -97,13 +101,12 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
   const [pageNumber, setPageNumber] = useState(0);
   const [loading, setLoading] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
-  const [mobileMapOpen, setMobileMapOpen] = useState(false);
+  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [highlightErrorPages, setHighlightErrorPages] = useState(false);
 
   const { isPageValid, answers } = useSurveyAnswers();
   const { showToast } = useToasts();
   const {
-    setDisabled,
     setVisibleLayers,
     helperText,
     drawing,
@@ -122,31 +125,36 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
     [survey, pageNumber]
   );
 
+  const fullSidebarImagePath = useMemo(
+    () =>
+      getFullFilePath(
+        currentPage.sidebar.imagePath,
+        currentPage.sidebar.imageName
+      ),
+    [currentPage.sidebar]
+  );
+
   /**
    * Show/hide mobile map when the drawing status of the map changes
    */
   useEffect(() => {
-    setMobileMapOpen(drawing);
+    setMobileDrawerOpen(drawing);
   }, [drawing]);
 
   /**
    * Stop the drawing interaction when the mobile map gets closed
    */
   useEffect(() => {
-    if (!mobileMapOpen && isMapReady) {
+    if (!mobileDrawerOpen && isMapReady) {
       stopDrawing();
     }
-  }, [mobileMapOpen]);
+  }, [mobileDrawerOpen]);
 
   /**
-   * Update map disabled state and visible layers when page changes
+   * Update map's visible layers when page changes
    */
   useEffect(() => {
-    const mapQuestions = currentPage.sections.filter(
-      (section) => section.type === 'map'
-    );
-    setDisabled(!mapQuestions.length);
-    setVisibleLayers(currentPage.mapLayers);
+    setVisibleLayers(currentPage.sidebar.mapLayers);
     // If modifying, stop it when changing page
     if (isMapReady) {
       stopModifying();
@@ -197,7 +205,6 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
   /**
    * Update map geometries when they are changed
    */
-  // TODO: geometries aren't redrawn in either mobile or split pane map when mobile/md breakpoint is reached
   useEffect(() => {
     if (isMapReady && mapAnswerGeometries) {
       updateGeometries(mapAnswerGeometries);
@@ -239,8 +246,13 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
             <FormControl style={{ width: '100%' }} component="fieldset">
               {page.sections.map((section) => (
                 <div className={classes.section} key={section.id}>
-                  {section.type === 'text' && <TextSection section={section} />}
-                  {section.type !== 'text' && (
+                  {section.type === 'text' ? (
+                    <TextSection section={section} />
+                  ) : section.type === 'image' ? (
+                    <ImageSection section={section} />
+                  ) : section.type === 'document' ? (
+                    <DocumentSection section={section} />
+                  ) : (
                     <SurveyQuestion question={section} />
                   )}
                 </div>
@@ -304,13 +316,59 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
     </Stepper>
   );
 
-  const mapPane = (
-    <SurveyMap url={survey.mapUrl} layers={currentPage.mapLayers} />
-  );
+  const sidePane = useMemo(() => {
+    // If none of the pages has a sidebar, hide the pane completely
+    if (survey.pages.every((page) => page.sidebar.type === 'none')) {
+      return null;
+    }
+    // Otherwise return some component to be rendered in the side pane
+    switch (currentPage.sidebar.type) {
+      case 'map':
+        return (
+          <SurveyMap
+            url={survey.mapUrl}
+            layers={currentPage.sidebar.mapLayers}
+          />
+        );
+      case 'image':
+        return (
+          <div
+            style={{
+              height: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              overflow: 'auto',
+            }}
+          >
+            <div style={{ margin: 'auto' }}>
+              {currentPage.sidebar.imageName && (
+                <img
+                  alt={currentPage.sidebar.imageAltText}
+                  src={`/api/file/${fullSidebarImagePath}`}
+                  style={{ width: '100%', maxHeight: '100vh' }}
+                />
+              )}
+            </div>
+          </div>
+        );
+      case 'none':
+      default:
+        return <div />;
+    }
+  }, [survey, currentPage.sidebar.type]);
 
   return (
     <div className={getClassList([classes.root, loading && classes.loading])}>
-      {mdUp && (
+      {/* Side pane doesn't exist on any page - show the page in 1 column */}
+      {!sidePane && (
+        <div
+          style={{ width: '100%', display: 'flex', justifyContent: 'center' }}
+        >
+          {stepperPane}
+        </div>
+      )}
+      {/* Desktop: side pane exists */}
+      {mdUp && sidePane && (
         <SplitPane
           split="vertical"
           defaultSize="50%"
@@ -330,12 +388,21 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
           }}
         >
           {stepperPane}
-          {mapPane}
+          {sidePane}
         </SplitPane>
       )}
-      {!mdUp && (
+      {/* Mobile: side pane exists but current page has none */}
+      {!mdUp && sidePane && currentPage.sidebar.type === 'none' && (
+        <>
+          <div>{stepperPane}</div>
+          <div style={{ flexGrow: 1 }}>{sidePane}</div>
+        </>
+      )}
+      {/* Mobile: side pane exists and current page has some - render the drawer and the button to show it */}
+      {!mdUp && sidePane && currentPage.sidebar.type !== 'none' && (
         <>
           <div style={{ marginTop: 50 }}>{stepperPane}</div>
+
           <Paper
             elevation={3}
             style={{
@@ -351,20 +418,32 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
               zIndex: 1,
             }}
           >
-            <Chip
-              color="secondary"
-              icon={<Map />}
-              label={tr.SurveyStepper.openMap}
-              onClick={() => {
-                setMobileMapOpen(true);
-              }}
-            />
+            {currentPage.sidebar.type === 'map' && (
+              <Chip
+                color="secondary"
+                icon={<Map />}
+                label={tr.SurveyStepper.openMap}
+                onClick={() => {
+                  setMobileDrawerOpen(true);
+                }}
+              />
+            )}
+            {currentPage.sidebar.type === 'image' && (
+              <Chip
+                color="secondary"
+                icon={<Image />}
+                label={tr.SurveyStepper.openImage}
+                onClick={() => {
+                  setMobileDrawerOpen(true);
+                }}
+              />
+            )}
           </Paper>
           <Drawer
             anchor="top"
-            open={mobileMapOpen}
+            open={mobileDrawerOpen}
             onClose={() => {
-              setMobileMapOpen(false);
+              setMobileDrawerOpen(false);
             }}
             PaperProps={{
               style: {
@@ -377,12 +456,18 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
           >
             <Paper
               elevation={3}
-              style={{ minHeight: 50, padding: '1rem', zIndex: 10 }}
+              style={{
+                minHeight: '4rem',
+                padding: '1rem',
+                zIndex: 10,
+                position: 'sticky',
+                top: 0,
+              }}
             >
               <IconButton
                 style={{ float: 'right' }}
                 onClick={() => {
-                  setMobileMapOpen(false);
+                  setMobileDrawerOpen(false);
                 }}
               >
                 <Close />
@@ -396,7 +481,7 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
                 </>
               )}
             </Paper>
-            <div style={{ flexGrow: 1 }}>{mapPane}</div>
+            <div style={{ flexGrow: 1 }}>{sidePane}</div>
           </Drawer>
         </>
       )}

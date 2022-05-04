@@ -50,4 +50,6 @@ WORKDIR ${APPDIR}
 COPY --from=server-build ${APPDIR}/server ./
 COPY --from=client-build ${APPDIR}/client/dist ./static/
 
+ENV TZ=Europe/Helsinki
+
 CMD npm start

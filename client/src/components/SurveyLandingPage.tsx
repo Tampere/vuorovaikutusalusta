@@ -15,8 +15,8 @@ const useStyles = makeStyles((theme: Theme) => ({
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    ...(props?.data && {
-      backgroundImage: `url(data:image/;base64,${props.data})`,
+    ...(props?.imageName && {
+      backgroundImage: `url("/api/file/${props.imageName}")`,
     }),
     backgroundSize: 'cover',
     backgroundPosition: 'center',
@@ -105,7 +105,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 interface Props {
   survey: Survey;
   onStart: () => void;
-  surveyBackgroundImage: any;
+  surveyBackgroundImage?: { attributions: string };
 }
 
 export default function SurveyLandingPage({
@@ -113,7 +113,7 @@ export default function SurveyLandingPage({
   onStart,
   surveyBackgroundImage,
 }: Props) {
-  const classes = useStyles(surveyBackgroundImage ?? {});
+  const classes = useStyles({ imageName: survey?.backgroundImageName ?? '' });
   const { tr } = useTranslations();
 
   return (

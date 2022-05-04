@@ -11,6 +11,8 @@ import {
   Subject,
   TextFields,
   ViewComfy,
+  Image,
+  AttachFile,
 } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
@@ -124,6 +126,19 @@ export default function AddSurveySectionActions(props: Props) {
       },
       groups: [],
     },
+    image: {
+      type: 'image',
+      title: '',
+      fileName: null,
+      filePath: [],
+      altText: '',
+    },
+    document: {
+      type: 'document',
+      title: '',
+      fileName: null,
+      filePath: [],
+    },
   };
 
   function handleAdd(type: SurveyPageSection['type']) {
@@ -202,6 +217,18 @@ export default function AddSurveySectionActions(props: Props) {
       label: tr.AddSurveySectionActions.groupedCheckboxQuestion,
       ariaLabel: 'add-grouped-checkbox-question',
       icon: <LibraryAddCheck />,
+    },
+    {
+      type: 'image',
+      label: tr.AddSurveySectionActions.imageSection,
+      ariaLabel: 'add-image-section',
+      icon: <Image />,
+    },
+    {
+      type: 'document',
+      label: tr.AddSurveySectionActions.documentSection,
+      ariaLabel: 'add-document-section',
+      icon: <AttachFile />,
     },
   ];
 
