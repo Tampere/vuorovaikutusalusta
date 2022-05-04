@@ -22,7 +22,7 @@ const pgp: PgPromise.IMain<{}, IClient> = PgPromise({
   schema,
 });
 let db: PgPromise.IDatabase<{}, IClient> = null;
-let pgClient: Client = null;
+let migrationConnection: PgPromise.IConnected<{}, IClient> = null;
 
 /**
  * Initializes the database.
@@ -35,10 +35,8 @@ export async function initializeDatabase() {
     await retry(
       async () => {
         try {
-          // Test connection
-          const connection = await db.connect();
-          // Store pgClient
-          pgClient = connection.client as any as Client;
+          // Test connection and store it for the migration
+          migrationConnection = await db.connect();
         } catch (error) {
           logger.warn(`Error connecting to database: ${error}`);
           if (retryCount < connectRetries) {
@@ -148,18 +146,20 @@ export function getMultiUpdateQuery<Row>(
  * Execute migrations up
  */
 export async function migrateUp() {
-  if (!pgClient) {
+  if (!migrationConnection) {
     throw new Error('Database not initialized');
   }
   await migrate({
     migrationsTable: 'pgmigrations',
     dir: 'migrations',
     direction: 'up',
-    dbClient: pgClient,
+    dbClient: migrationConnection.client as any as Client,
     count: undefined,
     ignorePattern: '\\.template\\.ts',
     schema: 'application',
     createSchema: true,
     noLock: true,
   });
+  // Release the connection from the pool
+  migrationConnection.done();
 }
