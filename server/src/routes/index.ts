@@ -17,4 +17,11 @@ router.use('/users', userRouter);
 router.use('/answers', answersRouter);
 router.use('/themes', themesRouter);
 
+// Health check endpoint
+router.get('/health', (_req, res) => {
+  res.status(200).json({
+    status: 'OK',
+  });
+});
+
 export default router;
