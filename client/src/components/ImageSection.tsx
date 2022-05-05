@@ -34,7 +34,9 @@ export default function ImageSection({ section }: Props) {
         >
           {section.title}
         </FormLabel>
-        {section.info && <SectionInfo infoText={section.info} />}
+        {section.info && (
+          <SectionInfo infoText={section.info} subject={section.title} />
+        )}
       </div>
       <img
         style={{ maxWidth: '100%' }}

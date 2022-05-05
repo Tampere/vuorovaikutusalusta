@@ -13,23 +13,30 @@ import rehypeExternalLinks from 'rehype-external-links';
 import { useTranslations } from '@src/stores/TranslationContext';
 
 interface Props {
+  subject: string;
   infoText: string;
   style?: React.CSSProperties;
 }
 
-export default function SectionInfo({ infoText, style }: Props) {
+export default function SectionInfo({ subject, infoText, style }: Props) {
   const [infoDialogOpen, setInfoDialogOpen] = useState(false);
   const { tr } = useTranslations();
 
   return (
     <div style={style ?? {}}>
       <Tooltip title={tr.SurveyQuestion.showInfo}>
-        <IconButton aria-label={'info'} onClick={() => setInfoDialogOpen(true)}>
+        <IconButton
+          aria-label={`${tr.SurveyQuestion.showInfo}: ${subject}`}
+          onClick={() => setInfoDialogOpen(true)}
+        >
           <HelpIcon color="primary" fontSize="medium" />
         </IconButton>
       </Tooltip>
       <Dialog onClose={() => setInfoDialogOpen(false)} open={infoDialogOpen}>
-        <DialogContent tabIndex={0}>
+        <DialogContent
+          tabIndex={0}
+          aria-label={`${tr.SurveyQuestion.info}: ${subject}`}
+        >
           <ReactMarkdown rehypePlugins={[rehypeExternalLinks]}>
             {infoText}
           </ReactMarkdown>

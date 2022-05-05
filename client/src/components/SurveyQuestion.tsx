@@ -44,12 +44,14 @@ export default function SurveyQuestion({ question }: Props) {
         }}
       >
         <FormLabel
-          component="legend"
+          htmlFor={`${question.id}-input`}
           style={{ color: survey.sectionTitleColor ?? '#000000' }}
         >
           {question.title} {question.isRequired && '*'}
         </FormLabel>
-        {question.info && <SectionInfo infoText={question.info} />}
+        {question.info && (
+          <SectionInfo infoText={question.info} subject={question.title} />
+        )}
       </div>
 
       {/* Radio question */}
@@ -94,6 +96,7 @@ export default function SurveyQuestion({ question }: Props) {
               value,
             });
           }}
+          question={question}
           setDirty={setDirty}
         />
       )}
@@ -108,6 +111,7 @@ export default function SurveyQuestion({ question }: Props) {
               value,
             });
           }}
+          question={question}
           setDirty={setDirty}
         />
       )}
@@ -186,7 +190,7 @@ export default function SurveyQuestion({ question }: Props) {
       )}
       {/* Show the required error only for empty values (not when answer limits are broken in checkbox questions) */}
       {validationErrors.includes('required') && (
-        <FormHelperText>
+        <FormHelperText id={`${question.id}-required-text`}>
           {tr.SurveyQuestion.errorFieldIsRequired}
         </FormHelperText>
       )}

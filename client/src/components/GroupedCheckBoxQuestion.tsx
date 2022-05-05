@@ -117,7 +117,7 @@ export default function GroupedCheckBoxQuestion({
           : // No limits are set
             tr.GroupedCheckBoxQuestion.helperText}
       </Typography>
-      <Typography style={{ marginTop: '1rem' }}>
+      <Typography style={{ marginTop: '1rem' }} id={`${question.id}-indicator`}>
         {indicatorTextStart}
         <span
           className={[classes.indicatorNumbers, maxReached && 'max-reached']
@@ -158,7 +158,14 @@ export default function GroupedCheckBoxQuestion({
             </AccordionSummary>
             <AccordionDetails className={classes.accordionDetails}>
               <FormGroup
-                aria-label={group.name[language]}
+                // Indicate the amount of selections inside the group for screen readers
+                aria-label={`${
+                  group.name[language]
+                }: ${tr.GroupedCheckBoxQuestion.optionsSelectedInGroup.replace(
+                  '{number}',
+                  String(amountsByGroup[index])
+                )}`}
+                aria-describedby={`${question.id}-indicator`}
                 onBlur={() => {
                   setDirty(true);
                 }}
@@ -189,7 +196,12 @@ export default function GroupedCheckBoxQuestion({
                         />
                       }
                     />
-                    {option.info && <SectionInfo infoText={option.info} />}
+                    {option.info && (
+                      <SectionInfo
+                        infoText={option.info}
+                        subject={option.text}
+                      />
+                    )}
                   </div>
                 ))}
               </FormGroup>

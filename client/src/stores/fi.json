@@ -241,13 +241,14 @@
     "unfinishedAnswers": "Vastaa kaikkiin pakolliseksi merkittyihin kysymyksiin"
   },
   "SurveyQuestion": {
-    "errorFieldIsRequired": "Kenttä on pakollinen",
+    "errorFieldIsRequired": "Kenttä on pakollinen.",
     "answerLimitsMinMax": "Valitse vähintään {min}, enintään {max} vaihtoehtoa",
     "answerLimitsMin": "Valitse vähintään {min} vaihtoehtoa",
     "answerLimitsMax": "Valitse enintään {max} vaihtoehtoa",
     "customAnswer": "Jokin muu, mikä?",
-    "charactersRemaining": "{x} merkki(ä) jäljellä",
-    "showInfo": "Näytä lisätietoja"
+    "charactersRemaining": "{x} merkki(ä) jäljellä.",
+    "showInfo": "Näytä lisätietoja",
+    "info": "Lisätietoja"
   },
   "MapQuestion": {
     "selectionTypes": {
@@ -276,7 +277,9 @@
     "openInNewTab": "Avaa kuva uudella välilehdellä"
   },
   "SortingQuestion": {
-    "empty": "Tyhjä"
+    "empty": "Tyhjä",
+    "rankForOption": "Järjestysnumero vaihtoehdolle: {option}",
+    "sortedOptions": "Vaihtoehdot järjestettyinä"
   },
   "DocumentSection": {
     "attachment": "Liite"
@@ -286,8 +289,9 @@
     "helperTextMin": "Valitse yhteensä vähintään {min} vaihtoehtoa.",
     "helperTextMax": "Valitse yhteensä enintään {max} vaihtoehtoa.",
     "helperTextMinMax": "Valitse yhteensä vähintään {min} ja enintään {max} vaihtoehtoa.",
-    "indicatorText": "Olet valinnut {numbers} vaihtoehtoa",
-    "indicatorTextMaxReached": "Olet valinnut kaikki {numbers} vaihtoehtoa"
+    "indicatorText": "Olet valinnut {numbers} vaihtoehtoa.",
+    "indicatorTextMaxReached": "Olet valinnut kaikki {numbers} vaihtoehtoa.",
+    "optionsSelectedInGroup": "{number} vaihtoehtoa valittu."
   },
   "AppBarUserMenu": {
     "logout": "Kirjaudu ulos"
