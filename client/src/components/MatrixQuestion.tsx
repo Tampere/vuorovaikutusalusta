@@ -103,9 +103,10 @@ export default function MatrixQuestion({
                 >
                   {subject[language]}
                 </TableCell>
-                {question.classes.map((_entry, classIndex) => (
+                {question.classes.map((entry, classIndex) => (
                   <TableCell key={classIndex} className={classes.matrixCell}>
                     <Radio
+                      aria-label={`${question.title} ${subject[language]}: ${entry[language]}`}
                       name={`question-${subjectIndex}`}
                       checked={value[subjectIndex] === classIndex.toString()}
                       value={classIndex.toString()}
@@ -118,6 +119,7 @@ export default function MatrixQuestion({
                 {question.allowEmptyAnswer && (
                   <TableCell>
                     <Radio
+                      aria-label={`${question.title} ${subject[language]}: ${tr.MatrixQuestion.emptyAnswer}`}
                       name={`question-${subjectIndex}`}
                       checked={value[subjectIndex] === '-1'}
                       value={'-1'}

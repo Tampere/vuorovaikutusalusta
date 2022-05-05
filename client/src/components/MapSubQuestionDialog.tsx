@@ -139,10 +139,15 @@ export default function MapSubQuestionDialog({
                 alignItems: 'center',
               }}
             >
-              <FormLabel component="legend">
+              <FormLabel htmlFor={`${question.id}-input`}>
                 {question.title} {question.isRequired && '*'}
               </FormLabel>
-              {question.info && <SectionInfo infoText={question.info} />}
+              {question.info && (
+                <SectionInfo
+                  infoText={question.info}
+                  subject={question.title}
+                />
+              )}
             </div>
             {question.type === 'checkbox' ? (
               <CheckBoxQuestion
@@ -177,6 +182,7 @@ export default function MapSubQuestionDialog({
                   answers[index].value = value;
                   setAnswers([...answers]);
                 }}
+                question={question}
                 setDirty={(value) => {
                   dirty[index] = value;
                   setDirty([...dirty]);
@@ -189,6 +195,7 @@ export default function MapSubQuestionDialog({
                   answers[index].value = value;
                   setAnswers([...answers]);
                 }}
+                question={question}
                 setDirty={(value) => {
                   dirty[index] = value;
                   setDirty([...dirty]);
@@ -238,7 +245,7 @@ export default function MapSubQuestionDialog({
             {/* Show the required error only for empty values (not when answer limits are broken in checkbox questions) */}
             {dirty?.[index] &&
               validationErrors?.[index].includes('required') && (
-                <FormHelperText>
+                <FormHelperText id={`${question.id}-required-text`}>
                   {tr.SurveyQuestion.errorFieldIsRequired}
                 </FormHelperText>
               )}

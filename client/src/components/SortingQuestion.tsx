@@ -5,7 +5,7 @@ import {
   FormGroup,
   MenuItem,
   Paper,
-  Select
+  Select,
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
@@ -33,8 +33,8 @@ const useStyles = makeStyles({
     display: 'inline-block',
     padding: '1rem',
     paddingLeft: 0,
-    margin: '1rem'
-  }
+    margin: '1rem',
+  },
 });
 
 export default function SortingQuestion(props: Props) {
@@ -64,6 +64,10 @@ export default function SortingQuestion(props: Props) {
                 classes={{ label: classes.label }}
                 control={
                   <Select
+                    aria-label={tr.SortingQuestion.rankForOption.replace(
+                      '{option}',
+                      option.text
+                    )}
                     className={classes.select}
                     value={
                       sortedOptionIds.includes(option.id)
@@ -76,8 +80,8 @@ export default function SortingQuestion(props: Props) {
                     onChange={(event) => {
                       props.setDirty(true);
                       // Remove possible previous value
-                      const newSortedOptionIds = sortedOptionIds.map((optionId) =>
-                        optionId === option.id ? null : optionId
+                      const newSortedOptionIds = sortedOptionIds.map(
+                        (optionId) => (optionId === option.id ? null : optionId)
                       );
                       if (event.target.value === '') {
                         // If empty was selected, leave the option ID out of the array
@@ -117,13 +121,14 @@ export default function SortingQuestion(props: Props) {
       </div>
       <div style={{ flexGrow: 1 }}>
         <Paper elevation={3} className={classes.finalListPaper}>
-          <ol>
+          <ol aria-label={tr.SortingQuestion.sortedOptions}>
             {sortedOptionIds.map((optionId, index) => (
               <li key={index}>
                 {optionId == null
                   ? '-'
-                  : props.question.options.find((option) => option.id === optionId)
-                    .text}
+                  : props.question.options.find(
+                      (option) => option.id === optionId
+                    ).text}
               </li>
             ))}
           </ol>

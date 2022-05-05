@@ -16,9 +16,9 @@ const useStyles = makeStyles({
     cursor: 'pointer',
   },
   emptyValue: {
-    color: '#ccc'
-  }
-})
+    color: '#ccc',
+  },
+});
 
 export default function SliderQuestion({
   value,
@@ -31,22 +31,31 @@ export default function SliderQuestion({
   const sliderRef = useRef<HTMLElement>();
 
   const labels = useMemo(() => {
-    return question.presentationType === 'literal' ? {
-      min: question.minLabel[language],
-      max: question.maxLabel[language]
-    } : {
-      min: question.minValue,
-      max: question.maxValue
-    }
+    return question.presentationType === 'literal'
+      ? {
+          min: question.minLabel[language],
+          max: question.maxLabel[language],
+        }
+      : {
+          min: question.minValue,
+          max: question.maxValue,
+        };
   }, [question]);
 
   // "Dummy" value to be displayed (in the middle) before a valid input is given
   const visibleEmptyValue = useMemo(() => {
-    return (question.minValue + question.maxValue) / 2
+    return (question.minValue + question.maxValue) / 2;
   }, [question]);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', width: '100%', maxWidth: '30rem' }}>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        width: '100%',
+        maxWidth: '30rem',
+      }}
+    >
       <div style={{ display: 'flex', flexDirection: 'row' }}>
         <FormLabel
           className={classes.label}
@@ -54,19 +63,26 @@ export default function SliderQuestion({
             onChange(question.minValue);
             sliderRef.current.querySelector('input').focus();
           }}
-        >{labels.min}</FormLabel>
-        <div style={{
-          flexGrow: 1
-        }} />
+        >
+          {labels.min}
+        </FormLabel>
+        <div
+          style={{
+            flexGrow: 1,
+          }}
+        />
         <FormLabel
           className={classes.label}
           onClick={() => {
             onChange(question.maxValue);
             sliderRef.current.querySelector('input').focus();
           }}
-        >{labels.max}</FormLabel>
+        >
+          {labels.max}
+        </FormLabel>
       </div>
       <Slider
+        aria-label={question.title}
         ref={sliderRef}
         className={value == null ? classes.emptyValue : ''}
         value={value ?? visibleEmptyValue}

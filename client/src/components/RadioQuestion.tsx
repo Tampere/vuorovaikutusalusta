@@ -7,7 +7,7 @@ import {
 } from '@material-ui/core';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useEffect, useState } from 'react';
-import SectionInfo from './SectionInfo';
+
 /**
  * Max length of a custom answer in radio/checkbox questions
  */
@@ -55,42 +55,30 @@ export default function RadioQuestion({
           setDirty(true);
         }}
       >
-        {question.options.map((option, index) => {
-          /** TODO: Remove changes related to option.info when OSBU question is ready for usage */
-          return (
-            <div
-              key={`option-field-${index}`}
-              style={{ display: 'flex', flexDirection: 'row' }}
-            >
-              <FormControlLabel
-                key={option.id}
-                value={option.id}
-                label={option.text}
-                control={
-                  <Radio required={question.isRequired} name={option.text} />
-                }
-              />
-              {option.info && <SectionInfo infoText={option.info} />}
-            </div>
-          );
-        })}
+        {question.options.map((option) => (
+          <FormControlLabel
+            key={option.id}
+            value={option.id}
+            label={option.text}
+            control={<Radio required={question.isRequired} />}
+          />
+        ))}
         {question.allowCustomAnswer && (
           <>
             <FormControlLabel
               value={customAnswerValue}
               label={tr.SurveyQuestion.customAnswer}
-              control={
-                <Radio
-                  required={question.isRequired}
-                  name={tr.SurveyQuestion.customAnswer}
-                />
-              }
+              control={<Radio required={question.isRequired} />}
             />
             {/* Value is a number (ID) when a pre-defined option is selected - otherwise it's custom */}
             {typeof value === 'string' && (
               <TextField
                 value={customAnswerValue}
-                inputProps={{ maxLength: customAnswerMaxLength }}
+                required={question.isRequired}
+                inputProps={{
+                  maxLength: customAnswerMaxLength,
+                  'aria-label': tr.SurveyQuestion.customAnswer,
+                }}
                 onChange={(event) => {
                   setCustomAnswerValue(event.currentTarget.value);
                   onChange(event.currentTarget.value);

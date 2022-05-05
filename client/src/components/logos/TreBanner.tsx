@@ -14,7 +14,9 @@ export default function TreBanner() {
       viewBox="0 0 181.685 46.077"
       enableBackground="new 0 0 181.685 46.077"
       xmlSpace="preserve"
+      role="img"
     >
+      <title id="TreBannerTitle">Tampereen vaakunalogo</title>
       <g>
         <defs>
           <rect id="SVGID_1_" y="0" width="181.685" height="46.077" />
@@ -159,7 +161,7 @@ export default function TreBanner() {
         <polygon
           clipPath="url(#SVGID_2_)"
           fill="#FDB924"
-          points="2.627,3.947 12.472,3.947 15.072,6.205 15.072,9.24 10.897,9.24 
+          points="2.627,3.947 12.472,3.947 15.072,6.205 15.072,9.24 10.897,9.24
 		6.056,9.24 2.627,9.24 	"
         />
         <path

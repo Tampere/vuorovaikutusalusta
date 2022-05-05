@@ -1,8 +1,10 @@
+import { SurveyFreeTextQuestion } from '@interfaces/survey';
 import { FormHelperText, TextField } from '@material-ui/core';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React from 'react';
 
 interface Props {
+  question: SurveyFreeTextQuestion;
   value: string;
   onChange: (value: string) => void;
   setDirty: (dirty: boolean) => void;
@@ -10,6 +12,7 @@ interface Props {
 }
 
 export default function FreeTextQuestion({
+  question,
   value,
   onChange,
   setDirty,
@@ -21,7 +24,12 @@ export default function FreeTextQuestion({
       <TextField
         value={value}
         multiline
-        inputProps={{ maxLength: maxLength }}
+        required={question.isRequired}
+        inputProps={{
+          id: `${question.id}-input`,
+          maxLength: maxLength,
+          'aria-describedby': `${question.id}-helper-text ${question.id}-required-text`,
+        }}
         onChange={(event) => {
           setDirty(true);
           onChange(event.target.value);
@@ -30,7 +38,7 @@ export default function FreeTextQuestion({
           setDirty(true);
         }}
       />
-      <FormHelperText>
+      <FormHelperText id={`${question.id}-helper-text`}>
         {tr.SurveyQuestion.charactersRemaining.replace(
           '{x}',
           String(maxLength - value.length)

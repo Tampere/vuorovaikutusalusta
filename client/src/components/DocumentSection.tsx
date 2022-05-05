@@ -34,7 +34,9 @@ export default function DocumentSection({ section }: Props) {
         >
           {section.title}
         </FormLabel>
-        {section.info && <SectionInfo infoText={section.info} />}
+        {section.info && (
+          <SectionInfo infoText={section.info} subject={section.title} />
+        )}
       </div>
       <Link href={`/api/file/${fullFilePath}`} target="_blank" rel="noreferrer">
         {tr.DocumentSection.attachment}: {section.fileName}
