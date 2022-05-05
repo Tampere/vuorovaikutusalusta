@@ -64,6 +64,7 @@ export default function CheckBoxQuestion({
       )}
       <FormGroup
         aria-label={question.title}
+        aria-describedby={answerLimitText}
         onBlur={() => {
           setDirty(true);
         }}
@@ -111,7 +112,11 @@ export default function CheckBoxQuestion({
         {value.includes(customAnswerValue) && (
           <TextField
             value={customAnswerValue}
-            inputProps={{ maxLength: customAnswerMaxLength }}
+            required={question.isRequired}
+            inputProps={{
+              maxLength: customAnswerMaxLength,
+              'aria-label': tr.SurveyQuestion.customAnswer,
+            }}
             onChange={(event) => {
               setCustomAnswerValue(event.currentTarget.value);
               onChange(
