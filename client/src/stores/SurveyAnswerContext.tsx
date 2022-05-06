@@ -130,9 +130,11 @@ export function useSurveyAnswers() {
     question: SurveyQuestion,
     answers = state.answers
   ) {
-    const errors: ('answerLimits' | 'required')[] = [];
+    const errors: ('answerLimits' | 'required' | 'minValue' | 'maxValue')[] =
+      [];
     // Find the answer that corresponds to the question
     const answer = answers.find((answer) => answer.sectionId === question.id);
+
     // Checkbox question validation - check possible answer limits
     if (question.type === 'checkbox' || question.type === 'grouped-checkbox') {
       const value = answer.value as (number | string)[];
@@ -150,6 +152,16 @@ export function useSurveyAnswers() {
           nonEmptySelections.length < question.answerLimits.min)
       ) {
         errors.push('answerLimits');
+      }
+    }
+
+    // Numeric question validation - check min & max values
+    if (question.type === 'numeric') {
+      if (question.minValue != null && answer.value < question.minValue) {
+        errors.push('minValue');
+      }
+      if (question.maxValue != null && answer.value > question.maxValue) {
+        errors.push('maxValue');
       }
     }
 

@@ -129,6 +129,11 @@
     "optionInfo": "Kysymysvaihtoehdon lisätiedot",
     "removeOption": "Poista vastausvaihtoehto"
   },
+  "NumericQuestion": {
+    "minValue": "Arvon pitää olla vähintään {minValue}",
+    "maxValue": "Arvon pitää olla enintään {maxValue}",
+    "minMaxValue": "Arvon pitää olla {minValue} ja {maxValue} välissä"
+  },
   "SurveyImageList": {
     "attributions": "Tekijänoikeustiedot",
     "noImage": "Ei taustakuvaa",

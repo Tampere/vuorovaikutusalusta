@@ -63,6 +63,8 @@ export default function AddSurveySectionActions(props: Props) {
       title: '',
       isRequired: false,
       info: null,
+      minValue: null,
+      maxValue: null,
     },
     map: {
       type: 'map',
