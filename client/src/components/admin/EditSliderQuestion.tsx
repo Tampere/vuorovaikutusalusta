@@ -7,7 +7,7 @@ import {
   FormLabel,
   Radio,
   RadioGroup,
-  TextField
+  TextField,
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
@@ -128,11 +128,13 @@ export default function EditSliderQuestion({
             type="number"
             className={classes.numberField}
             label={tr.EditSliderQuestion.minValue}
-            value={section.minValue}
+            value={section.minValue ?? ''}
             onChange={(event) => {
               onChange({
                 ...section,
-                minValue: Number(event.target.value),
+                minValue: !event.target.value.length
+                  ? null
+                  : Number(event.target.value),
               });
             }}
           />
@@ -140,11 +142,13 @@ export default function EditSliderQuestion({
             type="number"
             className={classes.numberField}
             label={tr.EditSliderQuestion.maxValue}
-            value={section.maxValue}
+            value={section.maxValue ?? ''}
             onChange={(event) => {
               onChange({
                 ...section,
-                maxValue: Number(event.target.value),
+                maxValue: !event.target.value.length
+                  ? null
+                  : Number(event.target.value),
               });
             }}
           />

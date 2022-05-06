@@ -125,6 +125,8 @@ export interface SurveyDocumentSection
  */
 export interface SurveyNumericQuestion extends CommonSurveyPageQuestion {
   type: 'numeric';
+  minValue: number;
+  maxValue: number;
 }
 
 /**

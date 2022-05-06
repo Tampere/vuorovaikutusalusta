@@ -1,5 +1,11 @@
 import { SurveyNumericQuestion } from '@interfaces/survey';
-import { Checkbox, FormControlLabel, FormGroup } from '@material-ui/core';
+import {
+  Checkbox,
+  FormControlLabel,
+  FormGroup,
+  TextField,
+} from '@material-ui/core';
+import { makeStyles } from '@material-ui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React from 'react';
 
@@ -9,12 +15,19 @@ interface Props {
   onChange: (section: SurveyNumericQuestion) => void;
 }
 
+const useStyles = makeStyles({
+  numberField: {
+    maxWidth: '10rem',
+  },
+});
+
 export default function EditNumericQuestion({
   section,
   disabled,
   onChange,
 }: Props) {
   const { tr } = useTranslations();
+  const classes = useStyles();
 
   return (
     <>
@@ -36,6 +49,34 @@ export default function EditNumericQuestion({
           }
         />
       </FormGroup>
+      <TextField
+        type="number"
+        className={classes.numberField}
+        label={tr.EditSliderQuestion.minValue}
+        value={section.minValue ?? ''}
+        onChange={(event) => {
+          onChange({
+            ...section,
+            minValue: !event.target.value.length
+              ? null
+              : Number(event.target.value),
+          });
+        }}
+      />
+      <TextField
+        type="number"
+        className={classes.numberField}
+        label={tr.EditSliderQuestion.maxValue}
+        value={section.maxValue ?? ''}
+        onChange={(event) => {
+          onChange({
+            ...section,
+            maxValue: !event.target.value.length
+              ? null
+              : Number(event.target.value),
+          });
+        }}
+      />
     </>
   );
 }

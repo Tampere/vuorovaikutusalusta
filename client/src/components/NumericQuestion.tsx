@@ -1,5 +1,6 @@
 import { SurveyNumericQuestion } from '@interfaces/survey';
-import { TextField } from '@material-ui/core';
+import { FormHelperText, TextField } from '@material-ui/core';
+import { useTranslations } from '@src/stores/TranslationContext';
 import React from 'react';
 
 interface Props {
@@ -15,22 +16,45 @@ export default function NumericQuestion({
   onChange,
   setDirty,
 }: Props) {
+  const { tr } = useTranslations();
+
   return (
     <>
       <TextField
         value={value ?? ''}
         required={question.isRequired}
         inputProps={{
+          min: question.minValue,
+          max: question.maxValue,
           id: `${question.id}-input`,
           'aria-describedby': `${question.id}-helper-text ${question.id}-required-text`,
         }}
         type="number"
         onChange={(event) => {
           setDirty(true);
-          onChange(Number(event.target.value));
+          onChange(
+            !event.target.value.length ? null : Number(event.target.value)
+          );
         }}
         onBlur={() => setDirty(true)}
-      ></TextField>
+      />
+      {(question.minValue != null || question.maxValue != null) && (
+        <FormHelperText id={`${question.id}-helper-text`}>
+          {question.minValue != null && question.maxValue != null
+            ? tr.NumericQuestion.minMaxValue
+                .replace('{minValue}', String(question.minValue))
+                .replace('{maxValue}', String(question.maxValue))
+            : question.minValue != null
+            ? tr.NumericQuestion.minValue.replace(
+                '{minValue}',
+                String(question.minValue)
+              )
+            : tr.NumericQuestion.maxValue.replace(
+                '{maxValue}',
+                String(question.maxValue)
+              )}
+        </FormHelperText>
+      )}
     </>
   );
 }
