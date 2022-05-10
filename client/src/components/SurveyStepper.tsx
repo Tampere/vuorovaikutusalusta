@@ -355,7 +355,7 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
       default:
         return <div />;
     }
-  }, [survey, currentPage.sidebar.type]);
+  }, [survey, currentPage.sidebar]);
 
   return (
     <div className={getClassList([classes.root, loading && classes.loading])}>
