@@ -1,11 +1,10 @@
 import { IconButton, Tooltip } from '@material-ui/core';
 import { Cancel } from '@material-ui/icons';
-import { makeStyles } from '@material-ui/styles';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { getFullFilePath } from '@src/utils/path';
-import React, { useEffect, useMemo } from 'react';
-import { useDropzone } from 'react-dropzone';
+import React, { useEffect, useMemo, useState } from 'react';
+import DropZone from '../DropZone';
 
 interface Props {
   targetPath?: string[];
@@ -18,24 +17,6 @@ interface Props {
   onDelete: (file: { name: string; path: string[] }) => void;
 }
 
-const useStyles = makeStyles({
-  container: {
-    width: '90%',
-    display: 'flex',
-    alignSelf: 'center',
-    flexDirection: 'column',
-    alignItems: 'center',
-    padding: '10px',
-    marginBottom: '10px',
-    borderWidth: '2px',
-    borderRadius: '2px',
-    borderColor: '#eeeeee',
-    borderStyle: 'dashed',
-    backgroundColor: '#fafafa',
-    transition: 'border .24s ease-in-out',
-  },
-});
-
 export default function FileUpload({
   onUpload,
   targetPath,
@@ -44,12 +25,8 @@ export default function FileUpload({
   surveyId,
 }: Props) {
   const { tr } = useTranslations();
-  const classes = useStyles();
   const { showToast } = useToasts();
-
-  const { acceptedFiles, getRootProps, getInputProps } = useDropzone({
-    maxFiles: 1,
-  });
+  const [acceptedFiles, setAcceptedFiles] = useState([]);
 
   const imageFileFormats = ['jpg', 'jpeg', 'png', 'tiff', 'bmp'];
 
@@ -124,7 +101,8 @@ export default function FileUpload({
               aria-label="delete"
               size="small"
               style={{ marginLeft: '1rem' }}
-              onClick={async () => {
+              onClick={async (event) => {
+                event.stopPropagation();
                 try {
                   await deleteFile(path, name);
                   onDelete({ name, path });
@@ -145,19 +123,15 @@ export default function FileUpload({
   }, [value]);
 
   return (
-    <section className={classes.container}>
-      <div {...getRootProps({ className: 'dropzone' })}>
-        <input {...getInputProps()} />
-        <p style={{ color: 'purple', cursor: 'pointer' }}>
-          {tr.SurveyImageList.dropFiles}
-        </p>
-      </div>
-      {value?.length ? (
-        <aside>
-          <h4>{tr.SurveyImageList.files}</h4>
-          {filesList}
-        </aside>
-      ) : null}
-    </section>
+    <div>
+      <DropZone maxFiles={1} fileCallback={(files) => setAcceptedFiles(files)}>
+        {value?.length ? (
+          <aside>
+            <h4>{tr.FileUpload.addedFile}</h4>
+            {filesList}
+          </aside>
+        ) : null}
+      </DropZone>
+    </div>
   );
 }

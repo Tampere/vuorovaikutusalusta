@@ -40,6 +40,7 @@ import {
   ViewComfy,
   Image,
   AttachFile,
+  Article,
 } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
@@ -59,6 +60,7 @@ import EditMatrixQuestion from './EditMatrixQuestion';
 import EditGroupedCheckBoxQuestion from './EditGroupedCheckBoxQuestion';
 import EditImageSection from './EditImageSection';
 import EditDocumentSection from './EditDocumentSection';
+import EditAttachmentSection from './EditAttachmentSection';
 
 const useStyles = makeStyles({
   accordion: {
@@ -242,7 +244,7 @@ export default function SurveySectionAccordion(props: Props) {
       ),
     },
     document: {
-      icon: <AttachFile />,
+      icon: <Article />,
       tooltip: tr.SurveySection.documentSection,
       form: (
         <EditDocumentSection
@@ -250,6 +252,11 @@ export default function SurveySectionAccordion(props: Props) {
           onChange={(section) => props.onEdit(section)}
         />
       ),
+    },
+    attachment: {
+      icon: <AttachFile />,
+      tooltip: tr.SurveySection.attachmentSection,
+      form: <EditAttachmentSection />,
     },
   };
 

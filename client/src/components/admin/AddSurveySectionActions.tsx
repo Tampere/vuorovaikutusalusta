@@ -13,6 +13,7 @@ import {
   ViewComfy,
   Image,
   AttachFile,
+  Article,
 } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
@@ -141,6 +142,11 @@ export default function AddSurveySectionActions(props: Props) {
       fileName: null,
       filePath: [],
     },
+    attachment: {
+      type: 'attachment',
+      isRequired: false,
+      title: '',
+    },
   };
 
   function handleAdd(type: SurveyPageSection['type']) {
@@ -230,6 +236,12 @@ export default function AddSurveySectionActions(props: Props) {
       type: 'document',
       label: tr.AddSurveySectionActions.documentSection,
       ariaLabel: 'add-document-section',
+      icon: <Article />,
+    },
+    {
+      type: 'attachment',
+      label: tr.AddSurveySectionActions.attachmentSection,
+      ariaLabel: 'add-attachment-section',
       icon: <AttachFile />,
     },
   ];

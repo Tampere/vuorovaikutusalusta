@@ -163,6 +163,8 @@ interface DBAnswerEntry {
   value_option_id: number;
   value_geometry: GeoJSON.Geometry;
   value_json: string;
+  value_file: string;
+  value_file_name: string;
 }
 
 /**
@@ -214,6 +216,8 @@ const submissionEntryColumnSet = (inputSRID: number) =>
       name: 'value_json',
       cast: 'json',
     },
+    'value_file',
+    'value_file_name',
   ]);
 
 /**
@@ -1200,6 +1204,8 @@ function answerEntriesToRows(
             value_geometry: null,
             value_numeric: null,
             value_json: null,
+            value_file: null,
+            value_file_name: null,
           },
         ];
         break;
@@ -1214,6 +1220,8 @@ function answerEntriesToRows(
             value_geometry: null,
             value_numeric: null,
             value_json: null,
+            value_file: null,
+            value_file_name: null,
           },
         ];
         break;
@@ -1231,6 +1239,8 @@ function answerEntriesToRows(
                     value_geometry: null,
                     value_numeric: null,
                     value_json: null,
+                    value_file: null,
+                    value_file_name: null,
                   };
                 }),
               ]
@@ -1243,6 +1253,8 @@ function answerEntriesToRows(
                   value_geometry: null,
                   value_numeric: null,
                   value_json: null,
+                  value_file: null,
+                  value_file_name: null,
                 },
               ];
         break;
@@ -1256,6 +1268,8 @@ function answerEntriesToRows(
             value_geometry: null,
             value_numeric: entry.value,
             value_json: null,
+            value_file: null,
+            value_file_name: null,
           },
         ];
         break;
@@ -1269,6 +1283,8 @@ function answerEntriesToRows(
             value_geometry: currentValue.geometry?.geometry,
             value_numeric: null,
             value_json: null,
+            value_file: null,
+            value_file_name: null,
           } as DBAnswerEntry;
 
           // Map over different subquestion answers using the same function recursively
@@ -1290,6 +1306,8 @@ function answerEntriesToRows(
             value_geometry: null,
             value_numeric: null,
             value_json: JSON.stringify(entry.value),
+            value_file: null,
+            value_file_name: null,
           },
         ];
         break;
@@ -1303,6 +1321,8 @@ function answerEntriesToRows(
             value_geometry: null,
             value_numeric: entry.value,
             value_json: null,
+            value_file: null,
+            value_file_name: null,
           },
         ];
         break;
@@ -1316,8 +1336,24 @@ function answerEntriesToRows(
             value_geometry: null,
             value_numeric: null,
             value_json: JSON.stringify(entry.value),
+            value_file: null,
+            value_file_name: null,
           },
         ];
+        break;
+      case 'attachment':
+        newEntries =
+          entry.value?.map((value) => ({
+            submission_id: submissionID,
+            section_id: entry.sectionId,
+            value_text: null,
+            value_option_id: null,
+            value_geometry: null,
+            value_numeric: null,
+            value_json: null,
+            value_file: value.fileString,
+            value_file_name: value.fileName,
+          })) ?? [];
         break;
     }
 

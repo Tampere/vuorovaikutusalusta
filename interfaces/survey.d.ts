@@ -21,7 +21,8 @@ export type SurveyQuestion =
   | SurveySortingQuestion
   | SurveySliderQuestion
   | SurveyMatrixQuestion
-  | SurveyGroupedCheckboxQuestion;
+  | SurveyGroupedCheckboxQuestion
+  | SurveyAttachmentQuestion;
 
 /**
  * Subquestion type for map questions.
@@ -68,6 +69,14 @@ interface CommonSurveyPageQuestion extends CommonSurveyPageSection {
 interface SectionFile {
   fileName: string;
   filePath: string[];
+}
+
+/**
+ * File attachment answers
+ */
+interface FileAnswer {
+  fileName: string;
+  fileString: string;
 }
 
 /**
@@ -192,6 +201,13 @@ export interface SurveyGroupedCheckboxQuestion
     max?: number;
   };
   groups: SectionOptionGroup[];
+}
+
+/**
+ * Attachment "question"
+ */
+export interface SurveyAttachmentQuestion extends CommonSurveyPageQuestion {
+  type: 'attachment';
 }
 
 /**
@@ -454,6 +470,10 @@ export type AnswerEntry = {
   | {
       type: 'grouped-checkbox';
       value: number[];
+    }
+  | {
+      type: 'attachment';
+      value: { fileString: string; fileName: string }[];
     }
 );
 

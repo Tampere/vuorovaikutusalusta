@@ -107,6 +107,12 @@ export function getEmptyAnswer(section: SurveyPageSection): AnswerEntry {
         type: section.type,
         value: [],
       };
+    case 'attachment':
+      return {
+        sectionId: section.id,
+        type: section.type,
+        value: [],
+      };
     default:
       throw new Error(
         `No default value defined for questions of type "${section.type}"`

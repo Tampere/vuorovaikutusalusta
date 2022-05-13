@@ -5,7 +5,8 @@
     "chooseFileFormat": "Valitse haluamasi tiedostomuodot",
     "download": "lataa",
     "errorDownloadingCSV": "CSV -tiedoston lataaminen epäonnistui",
-    "errorDownloadingGPKG": "GeoPackage -tiedoston lataaminen epäonnistui"
+    "errorDownloadingGPKG": "GeoPackage -tiedoston lataaminen epäonnistui",
+    "attachments": "Vastausliitteet"
   },
   "EditSurvey": {
     "errorFetchingSurvey": "Virhe haettaessa kyselyä. Tarkista osoite tai yritä myöhemmin uudestaan.",
@@ -77,6 +78,7 @@
   },
   "FileUpload": {
     "deleteFile": "Poista tiedosto",
+    "addedFile": "Valittu tiedosto",
     "errorUploadingFile": "Tiedoston lataamisessa tapahtui virhe. Yritä myöhemmin uudestaan.",
     "errorDeletingFile": "Tiedoston poistamisessa tapahtui virhe. Yritä myöhemmin uudestaan."
   },
@@ -98,7 +100,8 @@
     "matrixQuestion": "Lisää likert -kysymys",
     "groupedCheckboxQuestion": "Lisää ryhmitetty monivalintakysymys",
     "imageSection": "Lisää kuvaosio",
-    "documentSection": "Lisää liiteosio"
+    "documentSection": "Lisää liiteosio",
+    "attachmentSection": "Lisää vastausliiteosio"
   },
   "SurveySection": {
     "radioQuestion": "Valintakysymys",
@@ -112,7 +115,8 @@
     "matrixQuestion": "Likert -kysymys",
     "groupedCheckboxQuestion": "Ryhmitetty monivalintakysymys",
     "imageSection": "Kuvaosio",
-    "documentSection": "Liiteosio"
+    "documentSection": "Liiteosio",
+    "attachmentSection": "Vastausliite"
   },
   "SurveySections": {
     "limitAnswers": "Rajoita vastauslukumäärää",
@@ -134,13 +138,22 @@
     "maxValue": "Arvon pitää olla enintään {maxValue}",
     "minMaxValue": "Arvon pitää olla {minValue} ja {maxValue} välissä"
   },
+  "AttachmentQuestion": {
+    "addedFile": "Lisätty tiedosto",
+    "fileUploadError": "Virhe ladattaessa tiedostoa",
+    "fileSizeLimitError": "Ladattavan tiedoston koko ei saa olla yli 10MB",
+    "unsupportedFileFormat": "Tiedostoformaattia ei tueta",
+    "attachmentFileFormats": "Sallitut tiedostoformaatit: jpg, jpeg, png, pdf, docx, xlsx."
+  },
   "SurveyImageList": {
     "attributions": "Tekijänoikeustiedot",
     "noImage": "Ei taustakuvaa",
     "surveyImage": "Kyselyn taustakuva",
     "selectImage": "Valitse taustakuva",
     "addNewImage": "Lisää uusi kuva",
-    "files": "Tiedosto",
+    "files": "Tiedosto"
+  },
+  "DropZone": {
     "dropFiles": "Raahaa tiedosto tähän tai klikkaa valitaksesi tiedosto"
   },
   "EditTextSection": {
