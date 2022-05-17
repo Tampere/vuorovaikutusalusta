@@ -1,16 +1,18 @@
-import React, { useEffect, useState } from 'react';
 import { Survey } from '@interfaces/survey';
 import { Box, CircularProgress } from '@material-ui/core';
-import { request } from '@src/utils/request';
-import { useParams } from 'react-router-dom';
-import SurveyLandingPage from './SurveyLandingPage';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
+import { useSurveyTheme } from '@src/stores/SurveyThemeProvider';
+import { useToasts } from '@src/stores/ToastContext';
+import { useTranslations } from '@src/stores/TranslationContext';
+import { getFullFilePath } from '@src/utils/path';
+import { request } from '@src/utils/request';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useLocation, useParams } from 'react-router-dom';
+import { NotFoundPage } from './NotFoundPage';
+import SurveyLandingPage from './SurveyLandingPage';
 import SurveyStepper from './SurveyStepper';
 import SurveyThanksPage from './SurveyThanksPage';
 import { UnavailableSurvey } from './UnavailableSurvey';
-import { NotFoundPage } from './NotFoundPage';
-import { useSurveyTheme } from '@src/stores/SurveyThemeProvider';
-import { getFullFilePath } from '@src/utils/path';
 
 export default function SurveyPage() {
   const [loading, setLoading] = useState(true);
@@ -22,8 +24,16 @@ export default function SurveyPage() {
   const [errorStatusCode, setErrorStatusCode] = useState<number>(null);
 
   const { name } = useParams<{ name: string }>();
-  const { setSurvey, survey } = useSurveyAnswers();
+  const { setSurvey, survey, loadUnfinishedEntries } = useSurveyAnswers();
   const { setThemeFromSurvey } = useSurveyTheme();
+  const { search } = useLocation();
+  const { tr } = useTranslations();
+  const { showToast } = useToasts();
+
+  const unfinishedToken = useMemo(
+    () => new URLSearchParams(search)?.get('token'),
+    [search]
+  );
 
   // Fetch survey data from server
   useEffect(() => {
@@ -66,6 +76,38 @@ export default function SurveyPage() {
       .filter(Boolean)
       .join(' - ');
   }, [survey]);
+
+  // Try to continue unfinished submission if an unfinished token is provided in query parameters
+  useEffect(() => {
+    if (!survey || !unfinishedToken) {
+      return;
+    }
+    async function continueSubmission() {
+      try {
+        await loadUnfinishedEntries(unfinishedToken);
+        showToast({
+          message: tr.SurveyPage.loadUnfinishedSuccessful,
+          severity: 'success',
+        });
+      } catch (error) {
+        switch (error.status) {
+          case 400:
+          case 404:
+            showToast({
+              message: tr.SurveyPage.errorTokenNotFound,
+              severity: 'error',
+            });
+            break;
+          default:
+            showToast({
+              message: tr.SurveyPage.errorLoadingUnfinished,
+              severity: 'error',
+            });
+        }
+      }
+    }
+    continueSubmission();
+  }, [survey, unfinishedToken]);
 
   return !survey ? (
     loading ? (

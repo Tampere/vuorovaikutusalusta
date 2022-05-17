@@ -12,6 +12,9 @@ import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { request } from '@src/utils/request';
 import React, { useState } from 'react';
+import JSZip from 'jszip';
+import { saveAs } from 'file-saver';
+import { FileAnswer } from '@interfaces/survey';
 
 interface Props {
   surveyId: number;
@@ -22,9 +25,13 @@ export default function DataExport({ surveyId }: Props) {
   const [selectedFileFormats, setSelectedFileFormats] = useState({
     csv: true,
     geopackage: false,
+    attachments: false,
   });
   const { tr } = useTranslations();
   const { showToast } = useToasts();
+
+  const allowedFilesRegex =
+    /^data:(image|application)\/(png|jpg|jpeg|pdf|vnd.openxmlformats-officedocument.spreadsheetml.sheet|xlsx|vnd.openxmlformats-officedocument.wordprocessingml.document|docx);base64,/;
 
   async function exportCSV() {
     try {
@@ -81,6 +88,27 @@ export default function DataExport({ surveyId }: Props) {
     }
   }
 
+  async function exportAttachments() {
+    try {
+      const files = (await request(
+        `/api/answers/${surveyId}/file-export/attachments`
+      )) as FileAnswer[];
+
+      const zip = new JSZip();
+      files.map((file) =>
+        zip.file(
+          file.fileName,
+          file.fileString.replace(allowedFilesRegex, ''),
+          { base64: true }
+        )
+      );
+      const blob = await zip.generateAsync({ type: 'blob' });
+      saveAs(blob, 'vastaukset.zip');
+    } catch (err) {
+      showToast({ severity: 'error', message: err.message });
+    }
+  }
+
   return (
     <>
       <Button
@@ -122,6 +150,20 @@ export default function DataExport({ surveyId }: Props) {
               />
             }
           />
+          <FormControlLabel
+            label={tr.DataExport.attachments}
+            control={
+              <Checkbox
+                checked={selectedFileFormats.attachments}
+                onChange={(event) =>
+                  setSelectedFileFormats({
+                    ...selectedFileFormats,
+                    attachments: event.target.checked,
+                  })
+                }
+              />
+            }
+          />
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setDisplayDialog(false)}>
@@ -132,6 +174,7 @@ export default function DataExport({ surveyId }: Props) {
               setDisplayDialog(false);
               selectedFileFormats.csv && exportCSV();
               selectedFileFormats.geopackage && exportGeoPackage();
+              selectedFileFormats.attachments && exportAttachments();
             }}
           >
             {' '}

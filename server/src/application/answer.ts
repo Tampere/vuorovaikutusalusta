@@ -2,7 +2,7 @@ import { getDb } from '@src/database';
 import { parseAsync } from 'json2csv';
 import ogr2ogr from 'ogr2ogr';
 import internal from 'stream';
-import { LocalizedText } from '@interfaces/survey';
+import { FileAnswer, LocalizedText } from '@interfaces/survey';
 import moment from 'moment';
 
 const textSeparator = '::';
@@ -28,6 +28,15 @@ interface DBAnswerEntry {
   value_option_id: number;
   value_numeric: number;
   created_at: Date;
+}
+
+/**
+ * Interface for data.answer_entry file -entries
+ */
+interface DBFileEntry {
+  value_file: string;
+  value_file_name: string;
+  submission_id: number;
 }
 
 interface AnswerEntry {
@@ -226,6 +235,56 @@ export async function getGeoPackageFile(
     options: ['-nln', 'answer-layer'],
   });
   return stream;
+}
+
+/**
+ * Handler function for downloading survey attachments
+ * @param surveyId
+ */
+export async function getAttachments(surveyId: number): Promise<FileAnswer[]> {
+  const rows = await getAttachmentDBEntries(surveyId);
+  if (!rows) return null;
+
+  return attachmentEntriesToFiles(rows);
+}
+
+async function getAttachmentDBEntries(surveyId: number) {
+  const rows = await getDb().manyOrNone(
+    `
+    SELECT * FROM 
+      (SELECT 
+          ae.submission_id,
+          ae.section_id,
+          ae.value_file,
+          ae.value_file_name
+      FROM data.answer_entry ae 
+      LEFT JOIN data.submission sub ON ae.submission_id = sub.id
+      WHERE sub.survey_id = 16 AND ae.value_file IS NOT NULL) AS temp1 
+        LEFT JOIN 
+          (SELECT 
+            ps.id
+          FROM data.page_section ps 
+          LEFT JOIN data.survey_page sp ON ps.survey_page_id = sp.id 
+          LEFT JOIN data.survey s ON sp.survey_id = s.id WHERE s.id = 16 ORDER BY ps.id) AS temp2
+        ON temp1.section_id = temp2.id;
+    `,
+    [surveyId]
+  );
+
+  if (!rows || rows.length === 0) return null;
+  return rows;
+}
+
+/**
+ * Convert DB rows to file objects
+ * @param rows
+ * @returns
+ */
+function attachmentEntriesToFiles(rows: DBFileEntry[]) {
+  return rows.map((row) => ({
+    fileName: `vastausnro_${row.submission_id}.${row.value_file_name}`,
+    fileString: row.value_file,
+  }));
 }
 
 /**

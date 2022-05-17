@@ -1,5 +1,4 @@
 import {
-  AnswerEntry,
   File,
   LocalizedText,
   SectionOption,
@@ -16,19 +15,12 @@ import {
   SurveyTheme,
 } from '@interfaces/survey';
 import { User } from '@interfaces/user';
-import {
-  getColumnSet,
-  getDb,
-  getGeoJSONColumn,
-  getMultiInsertQuery,
-  getMultiUpdateQuery,
-} from '@src/database';
+import { getColumnSet, getDb, getMultiUpdateQuery } from '@src/database';
 import {
   BadRequestError,
   InternalServerError,
   NotFoundError,
 } from '@src/error';
-import logger from '@src/logger';
 
 // TODO: Find a better way to pass the language code when/if the localization is fully implemented
 const languageCode = 'fi';
@@ -152,20 +144,6 @@ type DBSurveyJoin = DBSurvey & {
 };
 
 /**
- * DB row of table data.answer_entry
- */
-interface DBAnswerEntry {
-  id?: number;
-  submission_id: number;
-  section_id: number;
-  value_text: string;
-  value_numeric: number;
-  value_option_id: number;
-  value_geometry: GeoJSON.Geometry;
-  value_json: string;
-}
-
-/**
  * Helper function for creating survey page column set for database queries
  */
 const surveyPageColumnSet = getColumnSet<DBSurveyPage>('survey_page', [
@@ -198,23 +176,6 @@ const sectionOptionColumnSet = getColumnSet<DBSectionOption>('option', [
   { name: 'text', cast: 'json' },
   { name: 'info', cast: 'json' },
 ]);
-
-/**
- * Helper function for creating answer entry column set for database queries
- */
-const submissionEntryColumnSet = (inputSRID: number) =>
-  getColumnSet<DBAnswerEntry>('answer_entry', [
-    'submission_id',
-    'section_id',
-    'value_text',
-    'value_option_id',
-    getGeoJSONColumn('value_geometry', inputSRID),
-    'value_numeric',
-    {
-      name: 'value_json',
-      cast: 'json',
-    },
-  ]);
 
 /**
  * Gets the survey with given ID or name from the database.
@@ -1040,289 +1001,6 @@ export async function deleteSurveyPage(id: number) {
   }
 
   return row;
-}
-
-/**
- * Validates given answer entries. Rejects the request if any of the entries is invalid, i.e. exceeds answer limits.
- * @param answerEntries Answer entries to validate
- */
-async function validateEntriesByAnswerLimits(answerEntries: AnswerEntry[]) {
-  // Get all questions that have answer limits from db
-  const limitedQuestions = await getDb().manyOrNone<{
-    id: number;
-    min: number;
-    max: number;
-  }>(
-    `SELECT
-      id,
-      details->'answerLimits'->'min' as min,
-      details->'answerLimits'->'max' as max
-    FROM data.page_section
-    WHERE
-      id = ANY ($1) AND
-      details->'answerLimits' IS NOT NULL`,
-    [answerEntries.map((entry) => entry.sectionId)]
-  );
-  // Validate each entry against the question answer limits
-  answerEntries.forEach((entry) => {
-    const question = limitedQuestions.find((q) => q.id === entry.sectionId);
-    if (question) {
-      const min = question.min;
-      const max = question.max;
-      const answerCount = (entry.value as (number | string)[]).length;
-      if (
-        (min != null && answerCount < min) ||
-        (max != null && answerCount > max)
-      ) {
-        throw new BadRequestError(
-          `Answer for question ${entry.sectionId} must have between ${min} and ${max} selections`
-        );
-      }
-    }
-  });
-}
-
-/**
- * Validate answer entries to contain answers required questions
- * @param answerEntries Answer entries to validate
- */
-async function validateEntriesByIsRequired(answerEntries: AnswerEntry[]) {
-  // Get all questions that are required from db
-  const requiredQuestions = await getDb().manyOrNone<{
-    id: number;
-  }>(
-    `SELECT
-      id
-    FROM data.page_section
-    WHERE
-      id = ANY ($1) AND
-      (details->>'isRequired')::boolean`,
-    [answerEntries.map((entry) => entry.sectionId)]
-  );
-
-  // Check if there is a non-null answer for each required question
-  requiredQuestions.forEach((question) => {
-    if (
-      !answerEntries.find(
-        (entry) =>
-          entry.value != null &&
-          (typeof entry.value !== 'string' || entry.value !== '') &&
-          entry.sectionId === question.id
-      )
-    ) {
-      throw new BadRequestError(
-        `Answer for question ${question.id} is required`
-      );
-    }
-  });
-}
-
-/**
- * Check if given answer entries are valid.
- * @param answerEntries Answer entries to validate
- */
-async function validateEntries(answerEntries: AnswerEntry[]) {
-  await Promise.all([
-    validateEntriesByAnswerLimits(answerEntries),
-    validateEntriesByIsRequired(answerEntries),
-  ]);
-}
-
-/**
- * Create a submission and related answer entries
- * @param surveyID
- * @param submissionEntries
- */
-export async function createSurveySubmission(
-  surveyID: number,
-  submissionEntries: AnswerEntry[]
-) {
-  await validateEntries(submissionEntries);
-  const submissionRow = await getDb().one(
-    `
-    INSERT INTO data.submission (survey_id) VALUES ($1) RETURNING id;
-  `,
-    [surveyID]
-  );
-
-  if (!submissionRow) {
-    logger.error(
-      `Error while creating submission for survey with id: ${surveyID}, submission entries: ${submissionEntries}`
-    );
-    throw new InternalServerError(`Error while creating submission for survey`);
-  }
-
-  const submissionID = submissionRow.id;
-  const submissionRows = answerEntriesToRows(submissionID, submissionEntries);
-  const inputSRID = getSRIDFromEntries(submissionEntries);
-  await getDb().none(
-    getMultiInsertQuery(submissionRows, submissionEntryColumnSet(inputSRID))
-  );
-}
-
-/**
- * Parse SRID information from geometry entries
- * @param submissionEntries
- * @returns SRID describing the coordinate reference system in which the geometry entries are described in
- */
-function getSRIDFromEntries(submissionEntries: AnswerEntry[]) {
-  const geometryEntry = submissionEntries.find((entry) => entry.type === 'map');
-  if (!geometryEntry) return null;
-
-  return geometryEntry?.value[0]?.geometry?.crs?.properties?.name
-    ? parseInt(
-        geometryEntry?.value[0]?.geometry?.crs?.properties?.name?.split(':')[1]
-      )
-    : null;
-}
-
-/**
- * Convert array of entries into db row entries
- * @param submissionID
- * @param submission
- * @returns DBAnswerEntry, object describing a single row of the table data.answer_entry
- */
-function answerEntriesToRows(
-  submissionID: number,
-  submissionEntries: AnswerEntry[]
-) {
-  return submissionEntries.reduce((entries, entry) => {
-    let newEntries: DBAnswerEntry[];
-
-    switch (entry.type) {
-      case 'free-text':
-        newEntries = [
-          {
-            submission_id: submissionID,
-            section_id: entry.sectionId,
-            value_text: entry.value,
-            value_option_id: null,
-            value_geometry: null,
-            value_numeric: null,
-            value_json: null,
-          },
-        ];
-        break;
-      case 'radio':
-        newEntries = [
-          {
-            submission_id: submissionID,
-            section_id: entry.sectionId,
-            value_text: typeof entry.value === 'string' ? entry.value : null,
-            value_option_id:
-              typeof entry.value === 'number' ? entry.value : null,
-            value_geometry: null,
-            value_numeric: null,
-            value_json: null,
-          },
-        ];
-        break;
-      case 'checkbox':
-      case 'grouped-checkbox':
-        newEntries =
-          entry.value.length !== 0
-            ? [
-                ...entry.value.map((value) => {
-                  return {
-                    submission_id: submissionID,
-                    section_id: entry.sectionId,
-                    value_text: typeof value === 'string' ? value : null,
-                    value_option_id: typeof value === 'number' ? value : null,
-                    value_geometry: null,
-                    value_numeric: null,
-                    value_json: null,
-                  };
-                }),
-              ]
-            : [
-                {
-                  submission_id: submissionID,
-                  section_id: entry.sectionId,
-                  value_text: null,
-                  value_option_id: null,
-                  value_geometry: null,
-                  value_numeric: null,
-                  value_json: null,
-                },
-              ];
-        break;
-      case 'numeric':
-        newEntries = [
-          {
-            submission_id: submissionID,
-            section_id: entry.sectionId,
-            value_text: null,
-            value_option_id: null,
-            value_geometry: null,
-            value_numeric: entry.value,
-            value_json: null,
-          },
-        ];
-        break;
-      case 'map':
-        newEntries = entry.value.reduce((prevEntries, currentValue) => {
-          const geometryEntry = {
-            submission_id: submissionID,
-            section_id: entry.sectionId,
-            value_text: null,
-            value_option_id: null,
-            value_geometry: currentValue.geometry?.geometry,
-            value_numeric: null,
-            value_json: null,
-          } as DBAnswerEntry;
-
-          // Map over different subquestion answers using the same function recursively
-          const subquestionEntries = currentValue.subQuestionAnswers
-            ? answerEntriesToRows(submissionID, currentValue.subQuestionAnswers)
-            : [];
-
-          return [...prevEntries, geometryEntry, ...subquestionEntries];
-        }, []);
-
-        break;
-      case 'sorting':
-        newEntries = [
-          {
-            submission_id: submissionID,
-            section_id: entry.sectionId,
-            value_text: null,
-            value_option_id: null,
-            value_geometry: null,
-            value_numeric: null,
-            value_json: JSON.stringify(entry.value),
-          },
-        ];
-        break;
-      case 'slider':
-        newEntries = [
-          {
-            submission_id: submissionID,
-            section_id: entry.sectionId,
-            value_text: null,
-            value_option_id: null,
-            value_geometry: null,
-            value_numeric: entry.value,
-            value_json: null,
-          },
-        ];
-        break;
-      case 'matrix':
-        newEntries = [
-          {
-            submission_id: submissionID,
-            section_id: entry.sectionId,
-            value_text: null,
-            value_option_id: null,
-            value_geometry: null,
-            value_numeric: null,
-            value_json: JSON.stringify(entry.value),
-          },
-        ];
-        break;
-    }
-
-    return [...entries, ...(newEntries ?? [])];
-  }, [] as DBAnswerEntry[]);
 }
 
 /**

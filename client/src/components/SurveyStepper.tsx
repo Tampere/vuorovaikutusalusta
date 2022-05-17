@@ -22,6 +22,7 @@ import { useSurveyMap } from '@src/stores/SurveyMapContext';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { getClassList } from '@src/utils/classes';
+import { getFullFilePath } from '@src/utils/path';
 import { request } from '@src/utils/request';
 import React, { useEffect, useMemo, useState } from 'react';
 import SplitPane from 'react-split-pane';
@@ -32,7 +33,6 @@ import StepperControls from './StepperControls';
 import SurveyMap from './SurveyMap';
 import SurveyQuestion from './SurveyQuestion';
 import TextSection from './TextSection';
-import { getFullFilePath } from '@src/utils/path';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -104,7 +104,7 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [highlightErrorPages, setHighlightErrorPages] = useState(false);
 
-  const { isPageValid, answers } = useSurveyAnswers();
+  const { isPageValid, answers, unfinishedToken } = useSurveyAnswers();
   const { showToast } = useToasts();
   const {
     setVisibleLayers,
@@ -285,7 +285,9 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
                   setLoading(true);
                   try {
                     await request(
-                      `/api/published-surveys/${survey.name}/submission`,
+                      `/api/published-surveys/${survey.name}/submission${
+                        unfinishedToken ? `?token=${unfinishedToken}` : ''
+                      }`,
                       { method: 'POST', body: { entries: answers } }
                     );
                     setLoading(false);

@@ -269,7 +269,9 @@ export function useSurveyMap() {
             ...event.geojson.features[0],
             crs: {
               type: 'name',
-              properties: { name: event.geojson.crs },
+              properties: {
+                name: event.geojson.crs,
+              },
             },
           });
         };
@@ -377,6 +379,12 @@ export function useSurveyMap() {
               .map(Number);
             return {
               ...feature,
+              crs: {
+                type: 'name',
+                properties: {
+                  name: event.geojson.crs,
+                },
+              },
               properties: {
                 questionId,
                 index,

@@ -5,6 +5,7 @@ import {
   SurveyPageSection,
   SurveyQuestion,
 } from '@interfaces/survey';
+import { request } from '@src/utils/request';
 import React, {
   createContext,
   ReactNode,
@@ -16,6 +17,7 @@ import React, {
 interface State {
   answers: AnswerEntry[];
   survey: Survey;
+  unfinishedToken: string;
 }
 
 type Action =
@@ -30,6 +32,10 @@ type Action =
   | {
       type: 'SET_ANSWERS';
       answers: AnswerEntry[];
+    }
+  | {
+      type: 'SET_UNFINISHED_TOKEN';
+      token: string;
     };
 
 type Context = [State, React.Dispatch<Action>];
@@ -37,6 +43,7 @@ type Context = [State, React.Dispatch<Action>];
 const stateDefaults: State = {
   answers: [],
   survey: null,
+  unfinishedToken: null,
 };
 
 // Section types that won't have an answer (e.g. text sections)
@@ -102,6 +109,12 @@ export function getEmptyAnswer(section: SurveyPageSection): AnswerEntry {
         value: new Array(section.subjects?.length ?? 1).fill(null),
       };
     case 'grouped-checkbox':
+      return {
+        sectionId: section.id,
+        type: section.type,
+        value: [],
+      };
+    case 'attachment':
       return {
         sectionId: section.id,
         type: section.type,
@@ -243,6 +256,24 @@ export function useSurveyAnswers() {
           (section) => getValidationErrors(section as SurveyQuestion).length
         );
     },
+    /**
+     * Fetch unfinished answer entries by token and set them into the context
+     * @param token Unfinished token
+     */
+    async loadUnfinishedEntries(token: string) {
+      dispatch({ type: 'SET_UNFINISHED_TOKEN', token });
+      const answers = await request<AnswerEntry[]>(
+        `/api/published-surveys/${state.survey.name}/unfinished-submission?token=${token}`
+      );
+      dispatch({ type: 'SET_ANSWERS', answers: answers });
+    },
+    /**
+     * Sets the unfinished token into the context. The next save/submit will replace the unfinished submission.
+     * @param token Unfinished token
+     */
+    setUnfinishedToken(token: string) {
+      dispatch({ type: 'SET_UNFINISHED_TOKEN', token });
+    },
   };
 }
 
@@ -270,6 +301,11 @@ function reducer(state: State, action: Action): State {
       return {
         ...state,
         answers: [...action.answers],
+      };
+    case 'SET_UNFINISHED_TOKEN':
+      return {
+        ...state,
+        unfinishedToken: action.token,
       };
     default:
       throw new Error('Invalid action type');
