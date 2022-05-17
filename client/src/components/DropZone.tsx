@@ -43,9 +43,9 @@ export default function DropZone({ maxFiles, fileCallback, children }: Props) {
     <section className={classes.container}>
       <div {...getRootProps({ className: 'dropzone' })}>
         <input {...getInputProps()} />
-        <p style={{ color: 'purple', cursor: 'pointer' }}>
+        <div style={{ color: 'purple', cursor: 'pointer' }}>
           {children ? children : tr.DropZone.dropFiles}
-        </p>
+        </div>
       </div>
     </section>
   );

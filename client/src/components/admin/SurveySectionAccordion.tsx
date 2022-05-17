@@ -22,14 +22,17 @@ import {
   FormControlLabel,
   FormGroup,
   TextField,
-  Typography,
   Tooltip,
+  Typography,
 } from '@material-ui/core';
 import {
+  Article,
+  AttachFile,
   CheckBox,
   DragIndicator,
   ExpandMore,
   FormatListNumbered,
+  Image,
   LibraryAddCheck,
   LinearScale,
   Looks4,
@@ -38,29 +41,26 @@ import {
   Subject,
   TextFields,
   ViewComfy,
-  Image,
-  AttachFile,
-  Article,
 } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { ReactNode, useMemo, useState } from 'react';
+import React, { ReactNode, useMemo, useRef, useState } from 'react';
 import { DraggableProvided } from 'react-beautiful-dnd';
 import ConfirmDialog from '../ConfirmDialog';
 import RichTextEditor from '../RichTextEditor';
+import EditAttachmentSection from './EditAttachmentSection';
 import EditCheckBoxQuestion from './EditCheckBoxQuestion';
+import EditDocumentSection from './EditDocumentSection';
 import EditFreeTextQuestion from './EditFreeTextQuestion';
+import EditGroupedCheckBoxQuestion from './EditGroupedCheckBoxQuestion';
+import EditImageSection from './EditImageSection';
 import EditMapQuestion from './EditMapQuestion';
+import EditMatrixQuestion from './EditMatrixQuestion';
 import EditNumericQuestion from './EditNumericQuestion';
 import EditRadioQuestion from './EditRadioQuestion';
 import EditSliderQuestion from './EditSliderQuestion';
 import EditSortingQuestion from './EditSortingQuestion';
 import EditTextSection from './EditTextSection';
-import EditMatrixQuestion from './EditMatrixQuestion';
-import EditGroupedCheckBoxQuestion from './EditGroupedCheckBoxQuestion';
-import EditImageSection from './EditImageSection';
-import EditDocumentSection from './EditDocumentSection';
-import EditAttachmentSection from './EditAttachmentSection';
 
 const useStyles = makeStyles({
   accordion: {
@@ -81,14 +81,15 @@ const useStyles = makeStyles({
 });
 
 interface Props {
+  index: number;
   section: SurveyPageSection;
   expanded: boolean;
   className?: string;
   disabled?: boolean;
   onExpandedChange: (isExpanded: boolean) => void;
   name: string;
-  onEdit: (section: SurveyPageSection) => void;
-  onDelete: () => void;
+  onEdit: (index: number, section: SurveyPageSection) => void;
+  onDelete: (index: number) => void;
   provided: DraggableProvided;
 }
 
@@ -97,6 +98,18 @@ export default function SurveySectionAccordion(props: Props) {
 
   const classes = useStyles();
   const { tr } = useTranslations();
+
+  // Index is used inside a callback function -> useRef is required in React to catch all updates
+  const indexRef = useRef<number>();
+  indexRef.current = props.index;
+
+  function handleEdit(section: SurveyPageSection) {
+    props.onEdit(indexRef.current, section);
+  }
+
+  function handleDelete() {
+    props.onDelete(indexRef.current);
+  }
 
   const accordions: {
     [type in SurveyPageSection['type']]: {
@@ -112,9 +125,7 @@ export default function SurveySectionAccordion(props: Props) {
         <EditCheckBoxQuestion
           disabled={props.disabled}
           section={props.section as SurveyCheckboxQuestion}
-          onChange={(section) => {
-            props.onEdit(section);
-          }}
+          onChange={handleEdit}
         />
       ),
     },
@@ -125,9 +136,7 @@ export default function SurveySectionAccordion(props: Props) {
         <EditRadioQuestion
           disabled={props.disabled}
           section={props.section as SurveyRadioQuestion}
-          onChange={(section) => {
-            props.onEdit(section);
-          }}
+          onChange={handleEdit}
         />
       ),
     },
@@ -138,9 +147,7 @@ export default function SurveySectionAccordion(props: Props) {
         <EditNumericQuestion
           disabled={props.disabled}
           section={props.section as SurveyNumericQuestion}
-          onChange={(section) => {
-            props.onEdit(section);
-          }}
+          onChange={handleEdit}
         />
       ),
     },
@@ -151,9 +158,7 @@ export default function SurveySectionAccordion(props: Props) {
         <EditMapQuestion
           disabled={props.disabled}
           section={props.section as SurveyMapQuestion}
-          onChange={(section) => {
-            props.onEdit(section);
-          }}
+          onChange={handleEdit}
         />
       ),
     },
@@ -164,9 +169,7 @@ export default function SurveySectionAccordion(props: Props) {
         <EditFreeTextQuestion
           disabled={props.disabled}
           section={props.section as SurveyFreeTextQuestion}
-          onChange={(section) => {
-            props.onEdit(section);
-          }}
+          onChange={handleEdit}
         />
       ),
     },
@@ -177,9 +180,7 @@ export default function SurveySectionAccordion(props: Props) {
         <EditTextSection
           disabled={props.disabled}
           section={props.section as SurveyTextSection}
-          onChange={(section) => {
-            props.onEdit(section);
-          }}
+          onChange={handleEdit}
         />
       ),
     },
@@ -190,9 +191,7 @@ export default function SurveySectionAccordion(props: Props) {
         <EditSortingQuestion
           disabled={props.disabled}
           section={props.section as SurveySortingQuestion}
-          onChange={(section) => {
-            props.onEdit(section);
-          }}
+          onChange={handleEdit}
         />
       ),
     },
@@ -203,9 +202,7 @@ export default function SurveySectionAccordion(props: Props) {
         <EditSliderQuestion
           disabled={props.disabled}
           section={props.section as SurveySliderQuestion}
-          onChange={(section) => {
-            props.onEdit(section);
-          }}
+          onChange={handleEdit}
         />
       ),
     },
@@ -216,7 +213,7 @@ export default function SurveySectionAccordion(props: Props) {
         <EditMatrixQuestion
           disabled={props.disabled}
           section={props.section as SurveyMatrixQuestion}
-          onChange={(section) => props.onEdit(section)}
+          onChange={handleEdit}
         />
       ),
     },
@@ -227,9 +224,7 @@ export default function SurveySectionAccordion(props: Props) {
         <EditGroupedCheckBoxQuestion
           disabled={props.disabled}
           section={props.section as SurveyGroupedCheckboxQuestion}
-          onChange={(section) => {
-            props.onEdit(section);
-          }}
+          onChange={handleEdit}
         />
       ),
     },
@@ -239,7 +234,7 @@ export default function SurveySectionAccordion(props: Props) {
       form: (
         <EditImageSection
           section={props.section as SurveyImageSection}
-          onChange={(section) => props.onEdit(section)}
+          onChange={handleEdit}
         />
       ),
     },
@@ -249,7 +244,7 @@ export default function SurveySectionAccordion(props: Props) {
       form: (
         <EditDocumentSection
           section={props.section as SurveyDocumentSection}
-          onChange={(section) => props.onEdit(section)}
+          onChange={handleEdit}
         />
       ),
     },
@@ -302,7 +297,10 @@ export default function SurveySectionAccordion(props: Props) {
             value={props.section.title}
             variant="standard"
             onChange={(event) => {
-              props.onEdit({ ...props.section, title: event.target.value });
+              handleEdit({
+                ...props.section,
+                title: event.target.value,
+              });
             }}
           />
           {accordion.form}
@@ -314,7 +312,7 @@ export default function SurveySectionAccordion(props: Props) {
                   name="section-info"
                   checked={props.section.showInfo ?? false}
                   onChange={(event) =>
-                    props.onEdit({
+                    handleEdit({
                       ...props.section,
                       showInfo: event.target.checked,
                       info: !event.target.checked ? '' : props.section.info,
@@ -329,7 +327,10 @@ export default function SurveySectionAccordion(props: Props) {
               value={props.section.info}
               label={tr.EditTextSection.text}
               onChange={(value) =>
-                props.onEdit({ ...props.section, info: value })
+                handleEdit({
+                  ...props.section,
+                  info: value,
+                })
               }
             />
           )}
@@ -352,7 +353,7 @@ export default function SurveySectionAccordion(props: Props) {
         onClose={(result) => {
           setDeleteConfirmDialogOpen(false);
           if (result) {
-            props.onDelete();
+            handleDelete();
           }
         }}
       />

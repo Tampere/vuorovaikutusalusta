@@ -234,7 +234,10 @@
   "SurveyPage": {
     "errorSurveyNotFound": "Kyselyä ei löytynyt, tai se ei ole avoinna. Tarkista osoite ja yritä uudestaan.",
     "errorFetchingSurvey": "Kyselyn haussa tapahtui virhe. Yritä myöhemmin uudestaan.",
-    "startSurveyLink": "Aloita kysely tästä"
+    "startSurveyLink": "Aloita kysely tästä",
+    "loadUnfinishedSuccessful": "Tallennetut vastaukset ladattu onnistuneesti! Voit jatkaa kyselyn täyttämistä.",
+    "errorTokenNotFound": "Antamallasi osoitteella ei löytynyt tallennettuja vastauksia. Tarkista osoite tai aloita kyselyn täyttäminen alusta.",
+    "errorLoadingUnfinished": "Tallennettujen vastausten lataamisessa tapahtui virhe. Yritä myöhemmin uudestaan."
   },
   "UnavailableSurvey": {
     "surveyNotPublished": "Kiitos mielenkiinnostasi! Kysely on sulkeutunut eikä siihen voi enää vastata.",
@@ -256,7 +259,15 @@
     "errorSubmittingSurvey": "Kyselyn lähettämisessä tapahtui virhe. Ole hyvä ja yritä myöhemmin uudestaan.",
     "openMap": "Avaa kartta",
     "openImage": "Avaa kuva",
-    "unfinishedAnswers": "Vastaa kaikkiin pakolliseksi merkittyihin kysymyksiin"
+    "unfinishedAnswers": "Vastaa kaikkiin pakolliseksi merkittyihin kysymyksiin",
+    "saveAsUnfinished": "Tallenna keskeneräisenä"
+  },
+  "SaveAsUnfinishedDialog": {
+    "description": "Voit tallentaa kyselyn keskeneräisenä antamalla sähköpostiosoitteen, johon toimitetaan linkki kyselyn jatkamista varten.",
+    "disclaimer": "Sähköpostiosoitetta ei tallenneta eikä käytetä muihin tarkoituksiin.",
+    "email": "Sähköpostiosoite",
+    "saveSuccessful": "Vastauksesi tallennettiin onnistuneesti! Saat hetken kuluttua sähköpostiisi linkin, jolla voit jatkaa kyselyä.",
+    "errorSaving": "Vastaustesi tallennuksessa tapahtui virhe. Ole hyvä ja yritä myöhemmin uudestaan."
   },
   "SurveyQuestion": {
     "errorFieldIsRequired": "Kenttä on pakollinen.",
