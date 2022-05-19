@@ -1,9 +1,9 @@
+import { FileAnswer, LocalizedText } from '@interfaces/survey';
 import { getDb } from '@src/database';
 import { parseAsync } from 'json2csv';
+import moment from 'moment';
 import ogr2ogr from 'ogr2ogr';
 import internal from 'stream';
-import { FileAnswer, LocalizedText } from '@interfaces/survey';
-import moment from 'moment';
 
 const textSeparator = '::';
 const separatorEscape = '//';
@@ -251,20 +251,20 @@ export async function getAttachments(surveyId: number): Promise<FileAnswer[]> {
 async function getAttachmentDBEntries(surveyId: number) {
   const rows = await getDb().manyOrNone(
     `
-    SELECT * FROM 
-      (SELECT 
+    SELECT * FROM
+      (SELECT
           ae.submission_id,
           ae.section_id,
           ae.value_file,
           ae.value_file_name
-      FROM data.answer_entry ae 
+      FROM data.answer_entry ae
       LEFT JOIN data.submission sub ON ae.submission_id = sub.id
-      WHERE sub.survey_id = 16 AND ae.value_file IS NOT NULL) AS temp1 
-        LEFT JOIN 
-          (SELECT 
+      WHERE sub.survey_id = 16 AND ae.value_file IS NOT NULL) AS temp1
+        LEFT JOIN
+          (SELECT
             ps.id
-          FROM data.page_section ps 
-          LEFT JOIN data.survey_page sp ON ps.survey_page_id = sp.id 
+          FROM data.page_section ps
+          LEFT JOIN data.survey_page sp ON ps.survey_page_id = sp.id
           LEFT JOIN data.survey s ON sp.survey_id = s.id WHERE s.id = 16 ORDER BY ps.id) AS temp2
         ON temp1.section_id = temp2.id;
     `,
@@ -295,29 +295,29 @@ function attachmentEntriesToFiles(rows: DBFileEntry[]) {
 async function getAnswerDBEntries(surveyId: number): Promise<AnswerEntry[]> {
   const rows = (await getDb().manyOrNone(
     `
-    SELECT * FROM 
-      (SELECT 
+    SELECT * FROM
+      (SELECT
           ae.submission_id,
           ae.section_id,
-          ae.value_text, 
-          ae.value_option_id, 
+          ae.value_text,
+          ae.value_option_id,
           public.ST_AsGeoJSON(public.ST_Transform(ae.value_geometry, 3067))::json as value_geometry,
           ae.value_numeric,
           ae.value_json,
           sub.created_at
-      FROM data.answer_entry ae 
+      FROM data.answer_entry ae
       LEFT JOIN data.submission sub ON ae.submission_id = sub.id
-      WHERE sub.survey_id = $1) AS temp1 
-        LEFT JOIN 
-          (SELECT 
+      WHERE sub.survey_id = $1) AS temp1
+        LEFT JOIN
+          (SELECT
             ps.id,
             ps.idx as section_index,
-            ps.title, 
-            ps.type, 
-            ps.details, 
-            ps.parent_section 
-          FROM data.page_section ps 
-          LEFT JOIN data.survey_page sp ON ps.survey_page_id = sp.id 
+            ps.title,
+            ps.type,
+            ps.details,
+            ps.parent_section
+          FROM data.page_section ps
+          LEFT JOIN data.survey_page sp ON ps.survey_page_id = sp.id
           LEFT JOIN data.survey s ON sp.survey_id = s.id WHERE s.id = $1 ORDER BY ps.id) AS temp2
     ON temp1.section_id = temp2.id;
   `,
@@ -395,7 +395,7 @@ function formatAnswerType(
 async function getOptionTexts(surveyId: number) {
   const optionTexts = await getDb().manyOrNone(
     `
-    SELECT 
+    SELECT
       opt.id,
       opt.idx as option_index,
       opt.text,
@@ -609,14 +609,10 @@ async function entriesToCSVFormat(
     }
 
     // Format submission
-    const existingSubmissionIndex = []
-      .concat(
-        prevValue?.submissions?.map((submissionObj) =>
-          Object.keys(submissionObj)
-        )
-      )
-      .map((submissionString) => parseInt(submissionString))
-      .indexOf(currentValue.submissionId);
+    const existingSubmissionIndex =
+      prevValue?.submissions?.findIndex((s) =>
+        s.hasOwnProperty(currentValue.submissionId.toString())
+      ) ?? -1;
 
     let submission = {
       [currentValue.submissionId]: [],
