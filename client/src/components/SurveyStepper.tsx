@@ -159,6 +159,7 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
     if (isMapReady) {
       stopModifying();
     }
+    // TODO scroll to beginning of the step? or only when "next" is clicked, and not on "previous"?
   }, [currentPage]);
 
   // Map answer geometries on the current page
@@ -403,7 +404,7 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
       {/* Mobile: side pane exists and current page has some - render the drawer and the button to show it */}
       {!mdUp && sidePane && currentPage.sidebar.type !== 'none' && (
         <>
-          <div style={{ marginTop: 50 }}>{stepperPane}</div>
+          <div style={{ marginTop: 50, width: '100%' }}>{stepperPane}</div>
 
           <Paper
             elevation={3}

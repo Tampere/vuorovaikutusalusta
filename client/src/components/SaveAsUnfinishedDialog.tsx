@@ -93,6 +93,7 @@ export default function SaveAsUnfinishedDialog({
           error={emailDirty && !email.length}
           value={email}
           inputProps={{ type: 'email' }}
+          style={{ width: '25rem', maxWidth: '100%' }}
           onChange={(event) => {
             setEmail(event.target.value);
           }}

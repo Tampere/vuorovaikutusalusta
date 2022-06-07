@@ -235,6 +235,7 @@
     "errorSurveyNotFound": "Kyselyä ei löytynyt, tai se ei ole avoinna. Tarkista osoite ja yritä uudestaan.",
     "errorFetchingSurvey": "Kyselyn haussa tapahtui virhe. Yritä myöhemmin uudestaan.",
     "startSurveyLink": "Aloita kysely tästä",
+    "continueSurveyLink": "Jatka kyselyä tästä",
     "loadUnfinishedSuccessful": "Tallennetut vastaukset ladattu onnistuneesti! Voit jatkaa kyselyn täyttämistä.",
     "errorTokenNotFound": "Antamallasi osoitteella ei löytynyt tallennettuja vastauksia. Tarkista osoite tai aloita kyselyn täyttäminen alusta.",
     "errorLoadingUnfinished": "Tallennettujen vastausten lataamisessa tapahtui virhe. Yritä myöhemmin uudestaan."

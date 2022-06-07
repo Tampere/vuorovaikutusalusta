@@ -1230,7 +1230,7 @@ export async function storeFile({
  */
 export async function getFile(fileName: string, filePath: string[]) {
   const row = await getDb().oneOrNone<{
-    file: string;
+    file: Buffer;
     mime_type: string;
     details: { [key: string]: any };
   }>(
@@ -1298,4 +1298,30 @@ export async function userCanEditSurvey(user: User, surveyId: number) {
     admins: string[];
   }>(`SELECT author_id, admins FROM data.survey WHERE id = $1`, [surveyId]);
   return user.id === authorId || admins.includes(user.id);
+}
+
+/**
+ * Get all options for a given survey
+ * @param surveyId Survey ID
+ * @returns Options
+ */
+export async function getOptionsForSurvey(surveyId: number) {
+  const rows = await getDb().manyOrNone<DBSectionOption>(
+    `
+    SELECT o.* FROM
+      data.option o
+      INNER JOIN data.page_section ps ON ps.id = o.section_id
+      INNER JOIN data.survey_page sp ON sp.id = ps.survey_page_id
+    WHERE sp.survey_id = $1
+  `,
+    [surveyId]
+  );
+
+  return rows.map(
+    (row): SectionOption => ({
+      id: row.id,
+      text: row.text?.[languageCode],
+      info: row.info?.[languageCode],
+    })
+  );
 }

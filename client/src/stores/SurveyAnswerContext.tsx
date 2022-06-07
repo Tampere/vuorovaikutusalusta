@@ -30,6 +30,10 @@ type Action =
       answer: AnswerEntry;
     }
   | {
+      type: 'UPDATE_ANSWERS';
+      answers: AnswerEntry[];
+    }
+  | {
       type: 'SET_ANSWERS';
       answers: AnswerEntry[];
     }
@@ -265,7 +269,10 @@ export function useSurveyAnswers() {
       const answers = await request<AnswerEntry[]>(
         `/api/published-surveys/${state.survey.name}/unfinished-submission?token=${token}`
       );
-      dispatch({ type: 'SET_ANSWERS', answers: answers });
+      dispatch({
+        type: 'UPDATE_ANSWERS',
+        answers,
+      });
     },
     /**
      * Sets the unfinished token into the context. The next save/submit will replace the unfinished submission.
@@ -295,6 +302,15 @@ function reducer(state: State, action: Action): State {
         ...state,
         answers: state.answers.map((answer) =>
           answer.sectionId === action.answer.sectionId ? action.answer : answer
+        ),
+      };
+    case 'UPDATE_ANSWERS':
+      return {
+        ...state,
+        answers: state.answers.map(
+          (answer) =>
+            action.answers.find((a) => a.sectionId === answer.sectionId) ??
+            answer
         ),
       };
     case 'SET_ANSWERS':

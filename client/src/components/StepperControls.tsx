@@ -65,6 +65,7 @@ export default function StepperControls(props: Props) {
         )}
         <div style={{ flexGrow: 1 }} />
         <Button
+          variant="outlined"
           onClick={() => {
             setSaveDialogOpen(true);
           }}

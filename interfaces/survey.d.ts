@@ -502,7 +502,7 @@ export interface File {
   /**
    * File data as a base64 encoded string
    */
-  data: string;
+  data: Buffer;
   /**
    * Additional file details
    */

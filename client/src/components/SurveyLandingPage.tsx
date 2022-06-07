@@ -104,12 +104,14 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 interface Props {
   survey: Survey;
+  continueUnfinished: boolean;
   onStart: () => void;
   surveyBackgroundImage?: { attributions: string };
 }
 
 export default function SurveyLandingPage({
   survey,
+  continueUnfinished,
   onStart,
   surveyBackgroundImage,
 }: Props) {
@@ -146,7 +148,9 @@ export default function SurveyLandingPage({
           className={classes.start}
           onClick={onStart}
         >
-          {tr.SurveyPage.startSurveyLink}
+          {continueUnfinished
+            ? tr.SurveyPage.continueSurveyLink
+            : tr.SurveyPage.startSurveyLink}
         </Link>
       </div>
       <div className={classes.footer}>

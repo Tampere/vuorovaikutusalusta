@@ -50,7 +50,12 @@ router.post(
     }
     const answerEntries: AnswerEntry[] = req.body.entries;
     const unfinishedToken = req.query.token ? String(req.query.token) : null;
-    await createSurveySubmission(survey.id, answerEntries, unfinishedToken);
+    const { id } = await createSurveySubmission(
+      survey.id,
+      answerEntries,
+      unfinishedToken
+    );
+    // TODO send email
     res.status(201).send();
   })
 );
@@ -82,14 +87,14 @@ router.post(
     }
     const answerEntries: AnswerEntry[] = req.body.entries;
     const unfinishedToken = req.query.token ? String(req.query.token) : null;
-    const token = await createSurveySubmission(
+    const { unfinishedToken: newToken } = await createSurveySubmission(
       survey.id,
       answerEntries,
       unfinishedToken,
       true
     );
-    // TODO send email
-    res.json({ token });
+    // TODO send confirmation email
+    res.json({ token: newToken });
   })
 );
 
@@ -111,5 +116,24 @@ router.get(
     res.json(entries);
   })
 );
+
+// TODO remove this endpoint! only for testing
+// router.get(
+//   '/:name/submission/:id',
+//   asyncHandler(async (req, res) => {
+//     const [survey, answerEntries] = await Promise.all([
+//       getSurvey({ name: req.params.name }),
+//       getAnswerEntries(Number(req.params.id)),
+//     ]);
+//     // TODO: fetch options from DB by survey id
+//     const options = await getOptionsForSurvey(survey.id);
+//     const pdfBuffer = await generatePdf(survey, answerEntries, options);
+//     res.writeHead(200, {
+//       'Content-Type': 'application/pdf',
+//       'Content-Length': pdfBuffer.length,
+//     });
+//     res.end(pdfBuffer);
+//   })
+// );
 
 export default router;
