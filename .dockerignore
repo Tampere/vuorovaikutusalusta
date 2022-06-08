@@ -16,6 +16,7 @@ server/*
 !server/.npmrc
 !server/src
 !server/migrations
+!server/email-templates
 !server/entrypoint.sh
 !server/migration.config.js
 !server/jest.config.json
