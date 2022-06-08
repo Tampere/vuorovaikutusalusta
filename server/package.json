@@ -61,6 +61,7 @@
     "pdfmake": "^0.2.5",
     "pg": "^8.6.0",
     "pg-promise": "^10.10.2",
+    "pug": "^3.0.2",
     "puppeteer": "^14.1.0",
     "puppeteer-cluster": "^0.23.0",
     "ts-node": "^10.0.0",
