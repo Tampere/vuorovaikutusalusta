@@ -101,7 +101,7 @@
     "groupedCheckboxQuestion": "Lisää ryhmitetty monivalintakysymys",
     "imageSection": "Lisää kuvaosio",
     "documentSection": "Lisää liiteosio",
-    "attachmentSection": "Lisää vastausliiteosio"
+    "attachmentSection": "Lisää vastausliite"
   },
   "SurveySection": {
     "radioQuestion": "Valintakysymys",

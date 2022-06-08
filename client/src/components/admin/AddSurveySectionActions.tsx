@@ -160,18 +160,12 @@ export default function AddSurveySectionActions(props: Props) {
     };
   }
 
-  const buttons: {
+  const questionButtons: {
     type: SurveyPageSection['type'];
     label: string;
     ariaLabel: string;
     icon: ReactNode;
   }[] = [
-    {
-      type: 'text',
-      label: tr.AddSurveySectionActions.textSection,
-      ariaLabel: 'add-text-section',
-      icon: <Subject />,
-    },
     {
       type: 'radio',
       label: tr.AddSurveySectionActions.radioQuestion,
@@ -227,6 +221,26 @@ export default function AddSurveySectionActions(props: Props) {
       icon: <LibraryAddCheck />,
     },
     {
+      type: 'attachment',
+      label: tr.AddSurveySectionActions.attachmentSection,
+      ariaLabel: 'add-attachment-section',
+      icon: <AttachFile />,
+    },
+  ];
+
+  const sectionButtons: {
+    type: SurveyPageSection['type'];
+    label: string;
+    ariaLabel: string;
+    icon: ReactNode;
+  }[] = [
+    {
+      type: 'text',
+      label: tr.AddSurveySectionActions.textSection,
+      ariaLabel: 'add-text-section',
+      icon: <Subject />,
+    },
+    {
       type: 'image',
       label: tr.AddSurveySectionActions.imageSection,
       ariaLabel: 'add-image-section',
@@ -238,34 +252,51 @@ export default function AddSurveySectionActions(props: Props) {
       ariaLabel: 'add-document-section',
       icon: <Article />,
     },
-    {
-      type: 'attachment',
-      label: tr.AddSurveySectionActions.attachmentSection,
-      ariaLabel: 'add-attachment-section',
-      icon: <AttachFile />,
-    },
   ];
 
   return (
-    <Grid container spacing={3}>
-      {(props.types ?? buttons.map((button) => button.type))
-        .map((type) => buttons.find((button) => button.type === type))
-        .map((button) => (
-          <Grid key={button.type} item xs={12} md={6}>
-            <div className={classes.actionItem}>
-              <Fab
-                color="primary"
-                aria-label={button.ariaLabel}
-                size="small"
-                onClick={handleAdd(button.type)}
-                disabled={props.disabled}
-              >
-                {button.icon}
-              </Fab>
-              <Typography>{button.label}</Typography>
-            </div>
+    <Grid container>
+      {props.types ?? (
+        <Grid container direction="row">
+          <Grid item xs={12} md={6}>
+            {questionButtons.map((button) => (
+              <Grid item key={button.type} style={{ padding: '0.5rem' }}>
+                <div className={classes.actionItem}>
+                  <Fab
+                    color="primary"
+                    aria-label={button.ariaLabel}
+                    size="small"
+                    onClick={handleAdd(button.type)}
+                    disabled={props.disabled}
+                    style={{ minWidth: '40px' }}
+                  >
+                    {button.icon}
+                  </Fab>
+                  <Typography>{button.label}</Typography>
+                </div>
+              </Grid>
+            ))}
           </Grid>
-        ))}
+          <Grid item xs={12} md={6}>
+            {sectionButtons.map((button) => (
+              <Grid item key={button.type} style={{ padding: '0.5rem' }}>
+                <div className={classes.actionItem}>
+                  <Fab
+                    color="primary"
+                    aria-label={button.ariaLabel}
+                    size="small"
+                    onClick={handleAdd(button.type)}
+                    disabled={props.disabled}
+                  >
+                    {button.icon}
+                  </Fab>
+                  <Typography>{button.label}</Typography>
+                </div>
+              </Grid>
+            ))}
+          </Grid>
+        </Grid>
+      )}
     </Grid>
   );
 }
