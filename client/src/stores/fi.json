@@ -24,6 +24,7 @@
     },
     "toFrontPage": "Etusivulle",
     "info": "Kyselyn perustiedot",
+    "email": "Sähköposti",
     "newPage": "Uusi sivu",
     "newPageFailed": "Uuden sivun luomisessa tapahtui virhe. Yritä myöhemmin uudestaan.",
     "thanksPage": "Kiitos-sivu",
@@ -55,6 +56,14 @@
     "selectTheme": "Valitse teema",
     "themeFetchFailed": "Teemojen hakemisessa tapahtui virhe. Yritä myöhemmin uudestaan.",
     "titleColor": "Osioiden otsikoiden väri"
+  },
+  "EditSurveyEmail": {
+    "enable": "Salli vastausten raportointi sähköpostitse",
+    "enableHelperText": "Jos valittu, yksittäiset vastaukset lähetetään raportteina määritettäviin osoitteisiin. Myös vastaajalta kysytään kyselyn lopuksi sähköpostiosoitetta vastauksen lähettämistä varten.",
+    "autoSendTo": "Vastaanottajien sähköpostiosoitteet",
+    "autoSendToHelperText": "Näihin osoitteisiin lähetetään jokaisesta vastauksesta raportti sähköpostin liitteenä (vastaajan lisäksi).",
+    "emailSubject": "Viestin aihe",
+    "emailBody": "Viestin sisältö"
   },
   "EditSurveyPage": {
     "name": "Sivun nimi",
@@ -330,6 +339,11 @@
     "indicatorText": "Olet valinnut {numbers} vaihtoehtoa.",
     "indicatorTextMaxReached": "Olet valinnut kaikki {numbers} vaihtoehtoa.",
     "optionsSelectedInGroup": "{number} vaihtoehtoa valittu."
+  },
+  "SubmissionInfoDialog": {
+    "title": "Lähetä vastaus",
+    "text": "Jos haluat saada kopion vastauksestasi, anna sähköpostiosoitteesi oheiseen kenttään.",
+    "email": "Sähköposti (valinnainen)"
   },
   "AppBarUserMenu": {
     "logout": "Kirjaudu ulos"

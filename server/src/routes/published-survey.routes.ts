@@ -1,9 +1,12 @@
-import { AnswerEntry } from '@interfaces/survey';
+import { AnswerEntry, SubmissionInfo } from '@interfaces/survey';
+import { generatePdf } from '@src/application/pdf-generator';
 import {
   createSurveySubmission,
   getUnfinishedAnswerEntries,
 } from '@src/application/submission';
 import { getSurvey } from '@src/application/survey';
+import { sendSubmissionReport } from '@src/email/submission-report';
+import { sendUnfinishedSubmissionLink } from '@src/email/unfinished-submission';
 import { ForbiddenError, NotFoundError } from '@src/error';
 import { validateRequest } from '@src/utils';
 import { Router } from 'express';
@@ -40,6 +43,10 @@ router.post(
     body('entries.*.value')
       .exists()
       .withMessage('Entry values must be provided'),
+    body('info.email')
+      .optional({ nullable: true })
+      .isEmail()
+      .withMessage('Email must be valid'),
     query('token').optional().isString().withMessage('Token must be a string'),
   ]),
   asyncHandler(async (req, res) => {
@@ -50,13 +57,44 @@ router.post(
     }
     const answerEntries: AnswerEntry[] = req.body.entries;
     const unfinishedToken = req.query.token ? String(req.query.token) : null;
-    const { id } = await createSurveySubmission(
+    const { id: submissionId } = await createSurveySubmission(
       survey.id,
       answerEntries,
       unfinishedToken
     );
-    // TODO send email
+    // We are done with this request - start sending the emails in the background
     res.status(201).send();
+
+    // Return if email is not enabled for this survey
+    if (!survey.email.enabled) {
+      return;
+    }
+
+    // Generate the PDF
+    const pdfFile = await generatePdf(survey, answerEntries);
+
+    // Send the report to the submitter, if they provided their email address
+    const submissionInfo: SubmissionInfo = req.body.info;
+    if (submissionInfo?.email) {
+      sendSubmissionReport({
+        to: submissionInfo.email,
+        language: 'fi',
+        survey,
+        pdfFile,
+        submissionId,
+      });
+    }
+
+    // Send the report to all auto send recipients
+    (survey.email?.autoSendTo ?? []).map((email) => {
+      sendSubmissionReport({
+        to: email,
+        language: 'fi',
+        survey,
+        pdfFile,
+        submissionId,
+      });
+    });
   })
 );
 
@@ -93,8 +131,14 @@ router.post(
       unfinishedToken,
       true
     );
-    // TODO send confirmation email
     res.json({ token: newToken });
+
+    // Send the email in the background
+    sendUnfinishedSubmissionLink({
+      to: req.body.email,
+      token: newToken,
+      survey,
+    });
   })
 );
 
@@ -116,24 +160,5 @@ router.get(
     res.json(entries);
   })
 );
-
-// TODO remove this endpoint! only for testing
-// router.get(
-//   '/:name/submission/:id',
-//   asyncHandler(async (req, res) => {
-//     const [survey, answerEntries] = await Promise.all([
-//       getSurvey({ name: req.params.name }),
-//       getAnswerEntries(Number(req.params.id)),
-//     ]);
-//     // TODO: fetch options from DB by survey id
-//     const options = await getOptionsForSurvey(survey.id);
-//     const pdfBuffer = await generatePdf(survey, answerEntries, options);
-//     res.writeHead(200, {
-//       'Content-Type': 'application/pdf',
-//       'Content-Length': pdfBuffer.length,
-//     });
-//     res.end(pdfBuffer);
-//   })
-// );
 
 export default router;

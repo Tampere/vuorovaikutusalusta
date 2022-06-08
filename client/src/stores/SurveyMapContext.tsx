@@ -9,6 +9,7 @@ import React, {
   useEffect,
   useMemo,
   useReducer,
+  useRef,
 } from 'react';
 
 interface State {
@@ -129,6 +130,9 @@ export function useSurveyMap() {
 
   const [state, dispatch] = context;
 
+  const drawingRef = useRef<boolean>();
+  drawingRef.current = state.questionId != null;
+
   const isMapReady = useMemo(
     () => Boolean(state.rpcChannel),
     [state.rpcChannel]
@@ -176,7 +180,7 @@ export function useSurveyMap() {
     initializeMap() {
       // Set handler for clicking features
       state.rpcChannel.handleEvent('FeatureEvent', (event) => {
-        if (event.operation !== 'click') {
+        if (event.operation !== 'click' || drawingRef.current) {
           return;
         }
         // TODO: tuleeko klikki-eventit läpi jos on drawing-mode päällä? eli voiko pitää muokkaus-moodia jatkuvasti kartalla (pl. uusien piirtomoodi)?
@@ -221,9 +225,12 @@ export function useSurveyMap() {
         ]);
       }
       const eventId = getDrawingEventId(questionId, type);
-      dispatch({ type: 'SET_HELPER_TEXT', text: helperText });
-      dispatch({ type: 'SET_QUESTION_ID', value: questionId });
-      dispatch({ type: 'SET_SELECTION_TYPE', value: type });
+      // These events need to be delayed - otherwise there might be an extraneous feature click event from Oskari
+      setTimeout(() => {
+        dispatch({ type: 'SET_HELPER_TEXT', text: helperText });
+        dispatch({ type: 'SET_QUESTION_ID', value: questionId });
+        dispatch({ type: 'SET_SELECTION_TYPE', value: type });
+      }, 0);
 
       // Start the new drawing
       state.rpcChannel.postRequest('DrawTools.StartDrawingRequest', [

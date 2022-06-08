@@ -53,6 +53,10 @@ interface DBSurvey {
   background_image_name: string;
   background_image_path: string[];
   section_title_color: string;
+  email_enabled: boolean;
+  email_auto_send_to: string[];
+  email_subject: string;
+  email_body: string;
 }
 
 /**
@@ -352,7 +356,7 @@ export async function getSurvey(params: { id: number } | { name: string }) {
     }
 
     return survey;
-  }, dbSurveyToSurvey(rows[0])) as any;
+  }, dbSurveyToSurvey(rows[0])) as Survey;
 }
 
 /**
@@ -669,7 +673,11 @@ export async function updateSurvey(survey: Survey) {
         background_image_path = $13,
         admins = $14,
         theme_id = $15,
-        section_title_color = $16
+        section_title_color = $16,
+        email_enabled = $17,
+        email_auto_send_to = $18,
+        email_subject = $19,
+        email_body = $20
       WHERE id = $1 RETURNING *`,
       [
         survey.id,
@@ -688,6 +696,10 @@ export async function updateSurvey(survey: Survey) {
         survey.admins,
         survey.theme?.id ?? null,
         survey.sectionTitleColor,
+        survey.email.enabled,
+        survey.email.autoSendTo,
+        survey.email.subject,
+        survey.email.body,
       ]
     )
     .catch((error) => {
@@ -858,6 +870,12 @@ function dbSurveyToSurvey(
     backgroundImageName: dbSurvey.background_image_name,
     backgroundImagePath: dbSurvey.background_image_path,
     sectionTitleColor: dbSurvey.section_title_color,
+    email: {
+      enabled: dbSurvey.email_enabled,
+      autoSendTo: dbSurvey.email_auto_send_to,
+      subject: dbSurvey.email_subject,
+      body: dbSurvey.email_body,
+    },
     // Single survey row won't contain pages - they get aggregated from a join query
     pages: [],
   };
@@ -1324,4 +1342,15 @@ export async function getOptionsForSurvey(surveyId: number) {
       info: row.info?.[languageCode],
     })
   );
+}
+
+/**
+ * Get all distinct email addresses used for report auto sending
+ * @returns Distinct email addresses
+ */
+export async function getDistinctAutoSendToEmails() {
+  const rows = await getDb().manyOrNone<{ email: string }>(`
+    SELECT DISTINCT UNNEST(email_auto_send_to) AS email FROM data.survey
+  `);
+  return rows.map((row) => row.email);
 }

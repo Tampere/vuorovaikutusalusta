@@ -1,4 +1,4 @@
-import { AnswerEntry, Survey } from '@interfaces/survey';
+import { AnswerEntry, SubmissionInfo, Survey } from '@interfaces/survey';
 import {
   Chip,
   Drawer,
@@ -30,6 +30,7 @@ import DocumentSection from './DocumentSection';
 import ImageSection from './ImageSection';
 import PageConnector from './PageConnector';
 import StepperControls from './StepperControls';
+import SubmissionInfoDialog from './SubmissionInfoDialog';
 import SurveyMap from './SurveyMap';
 import SurveyQuestion from './SurveyQuestion';
 import TextSection from './TextSection';
@@ -103,6 +104,8 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
   const [isResizing, setIsResizing] = useState(false);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [highlightErrorPages, setHighlightErrorPages] = useState(false);
+  const [submissionInfoDialogOpen, setSubmissionInfoDialogOpen] =
+    useState(false);
 
   const { isPageValid, answers, unfinishedToken } = useSurveyAnswers();
   const { showToast } = useToasts();
@@ -221,6 +224,40 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
     }
   }, [isMapReady, mapAnswerGeometries]);
 
+  function validateSurvey() {
+    // If a page is not finished, highlight it
+    const unfinishedPages = survey.pages.filter((page) => !isPageValid(page));
+    if (unfinishedPages.length !== 0) {
+      setHighlightErrorPages(true);
+      showToast({
+        severity: 'error',
+        message: tr.SurveyStepper.unfinishedAnswers,
+      });
+      return false;
+    }
+    return true;
+  }
+
+  async function doSubmit(info?: SubmissionInfo) {
+    setLoading(true);
+    try {
+      await request(
+        `/api/published-surveys/${survey.name}/submission${
+          unfinishedToken ? `?token=${unfinishedToken}` : ''
+        }`,
+        { method: 'POST', body: { entries: answers, info } }
+      );
+      setLoading(false);
+      onComplete();
+    } catch (error) {
+      showToast({
+        severity: 'error',
+        message: tr.SurveyStepper.errorSubmittingSurvey,
+      });
+      setLoading(false);
+    }
+  }
+
   const stepperPane = (
     <Stepper
       className={classes.stepper}
@@ -282,36 +319,14 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
                 }}
                 disabled={loading}
                 nextDisabled={false}
-                onSubmit={async () => {
-                  // If a page is not finished, highlight it
-                  const unfinishedPages = survey.pages.filter(
-                    (page) => !isPageValid(page)
-                  );
-                  if (unfinishedPages.length !== 0) {
-                    setHighlightErrorPages(true);
-                    showToast({
-                      severity: 'error',
-                      message: tr.SurveyStepper.unfinishedAnswers,
-                    });
+                onSubmit={() => {
+                  if (!validateSurvey()) {
                     return;
                   }
-
-                  setLoading(true);
-                  try {
-                    await request(
-                      `/api/published-surveys/${survey.name}/submission${
-                        unfinishedToken ? `?token=${unfinishedToken}` : ''
-                      }`,
-                      { method: 'POST', body: { entries: answers } }
-                    );
-                    setLoading(false);
-                    onComplete();
-                  } catch (error) {
-                    showToast({
-                      severity: 'error',
-                      message: tr.SurveyStepper.errorSubmittingSurvey,
-                    });
-                    setLoading(false);
+                  if (survey.email.enabled) {
+                    setSubmissionInfoDialogOpen(true);
+                  } else {
+                    doSubmit();
                   }
                 }}
               />
@@ -501,6 +516,13 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
           </Drawer>
         </>
       )}
+      <SubmissionInfoDialog
+        open={submissionInfoDialogOpen}
+        onCancel={() => {
+          setSubmissionInfoDialogOpen(false);
+        }}
+        onSubmit={doSubmit}
+      />
     </div>
   );
 }

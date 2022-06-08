@@ -570,7 +570,7 @@ function dbAnswerEntriesToAnswerEntries(
           entries.push({
             sectionId: row.section_id,
             type: 'slider',
-            value: row.value_numeric,
+            value: row.value_numeric != null ? Number(row.value_numeric) : null,
           });
           break;
         }
@@ -642,7 +642,6 @@ export async function getUnfinishedAnswerEntries(token: string) {
   if (!rows.length) {
     throw new NotFoundError(`Token not found`);
   }
-  // TODO check token expiration in query or before proceeding, if necessary
   return dbAnswerEntriesToAnswerEntries(rows);
 }
 

@@ -354,6 +354,27 @@ export interface Survey {
    * Color of the section titles
    */
   sectionTitleColor: string;
+  /**
+   * Mail configurations
+   */
+  email: {
+    /**
+     * Is email reporting for single submissions enabled?
+     */
+    enabled: boolean;
+    /**
+     * Fixed recipient addresses for the automatic sending
+     */
+    autoSendTo: string[];
+    /**
+     * Subject of the email
+     */
+    subject: string;
+    /**
+     * Body of the email
+     */
+    body: string;
+  };
 }
 
 /**
@@ -547,4 +568,14 @@ export interface SurveyTheme<T extends {} = {}> {
    * Survey configuration object
    */
   data: T;
+}
+
+/**
+ * Info about the submitter
+ */
+export interface SubmissionInfo {
+  /**
+   * Email address
+   */
+  email: string;
 }

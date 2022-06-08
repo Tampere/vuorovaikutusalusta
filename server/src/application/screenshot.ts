@@ -34,16 +34,21 @@ async function generateScreenshots({
   page: Page;
   data: ScreenshotJobData;
 }) {
-  const start = Date.now();
   const { mapUrl, answers } = data;
   const returnData: ScreenshotJobReturnData[] = [];
+
+  // Setting a real user agent _might_ make requests flow faster
+  await page.setUserAgent(
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36'
+  );
 
   page.setViewport({ width: 800, height: 600 });
   await page.goto(mapUrl, { waitUntil: 'networkidle0' });
 
   // Open the index map if enabled
   await page.evaluate(() => {
-    document.querySelector<HTMLDivElement>('.indexmapToggle')?.click();
+    // @ts-ignore
+    document.querySelector('.indexmapToggle')?.click();
   });
   await page.waitForNetworkIdle();
 
@@ -63,7 +68,6 @@ async function generateScreenshots({
               [layerId, visibleLayerIds.includes(layerId)]
             );
           });
-
         sandbox.postRequestByName('MapModulePlugin.AddFeaturesToMapRequest', [
           { type: 'FeatureCollection', features: [feature] },
           {
@@ -76,27 +80,31 @@ async function generateScreenshots({
             },
           },
         ]);
-        sandbox.postRequestByName('MapModulePlugin.ZoomToFeaturesRequest', []);
+        sandbox.postRequestByName('MapModulePlugin.ZoomToFeaturesRequest', [
+          { maxZoomLevel: 12 },
+        ]);
       },
       {
         visibleLayerIds: answer.visibleLayerIds,
         feature: answer.feature as any,
       }
     );
-    await page.waitForNetworkIdle();
+    try {
+      await page.waitForNetworkIdle({ timeout: 10000 });
+    } catch (error) {
+      // Ignore timeout errors
+    }
+
+    const image = (await page.screenshot({
+      type: 'png',
+      fullPage: true,
+    })) as Buffer;
     returnData.push({
       sectionId: answer.sectionId,
       index: answer.index,
-      image: (await page.screenshot({
-        type: 'png',
-        fullPage: true,
-      })) as Buffer,
+      image,
     });
   }
-
-  console.log(
-    `Took all ${answers.length} screenshots in ${Date.now() - start}ms`
-  );
 
   return returnData;
 }
@@ -119,6 +127,7 @@ export async function initializePuppeteerCluster() {
   cluster = await Cluster.launch({
     concurrency: Cluster.CONCURRENCY_CONTEXT,
     maxConcurrency,
+    timeout: 600000,
     puppeteerOptions: {
       args: [
         '--no-sandbox',
@@ -127,6 +136,8 @@ export async function initializePuppeteerCluster() {
         '--disable-accelerated-2d-canvas',
         '--no-first-run',
         '--no-zygote',
+        '--proxy-server=direct://',
+        '--proxy-bypass-list=*',
       ],
     },
   });
@@ -142,6 +153,11 @@ export async function initializePuppeteerCluster() {
 export async function getScreenshots(jobData: ScreenshotJobData) {
   if (!cluster) {
     throw new Error('Puppeteer cluster not initialized');
+  }
+  // Don't bother starting Puppeteer if there are no map answers
+  if (!jobData.answers.length) {
+    console.log('No map answers!');
+    return [];
   }
   const images = await cluster.execute(jobData);
   return images;

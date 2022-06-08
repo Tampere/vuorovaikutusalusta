@@ -7,6 +7,7 @@ import {
   SurveyPage,
   SurveyPageSection,
 } from '@interfaces/survey';
+import logger from '@src/logger';
 import PDFDocument from 'pdfkit';
 import PdfPrinter from 'pdfmake';
 import { Content } from 'pdfmake/interfaces';
@@ -15,7 +16,7 @@ import {
   ScreenshotJobData,
   ScreenshotJobReturnData,
 } from './screenshot';
-import { getFile } from './survey';
+import { getFile, getOptionsForSurvey } from './survey';
 
 const fonts = {
   Courier: {
@@ -146,6 +147,9 @@ function getContent(
   options: SectionOption[],
   isSubQuestion = false
 ): Content[] {
+  if (!answerEntry) {
+    return null;
+  }
   const sectionIndex = sections.findIndex(
     (section) => answerEntry.sectionId === section.id
   );
@@ -201,7 +205,7 @@ function getContent(
       return [
         heading,
         {
-          text: String(answerEntry.value),
+          text: answerEntry.value == null ? '-' : String(answerEntry.value),
           style,
         },
       ];
@@ -215,6 +219,8 @@ function getContent(
             text: `${subject.fi}: ${
               answerEntry.value[index] === '-1'
                 ? 'En osaa sanoa'
+                : answerEntry.value[index] == null
+                ? '-'
                 : question.classes[Number(answerEntry.value[index])]?.fi ?? '-'
             }`,
             style,
@@ -234,6 +240,9 @@ function getContent(
       ];
     }
     case 'map': {
+      if (!answerEntry.value.length) {
+        return [heading, { text: '-', style }];
+      }
       return [
         heading,
         ...answerEntry.value.map((answer, index) => {
@@ -273,15 +282,14 @@ function getContent(
  * Generates a PDF for a single submission.
  * @param survey Survey
  * @param answerEntries Answer entries for the submission
- * @param options
  * @returns
  */
 export async function generatePdf(
   survey: Survey,
-  answerEntries: AnswerEntry[],
-  options: SectionOption[]
+  answerEntries: AnswerEntry[]
 ) {
   const start = Date.now();
+  const options = await getOptionsForSurvey(survey.id);
 
   const sections = survey.pages.reduce(
     (sections, page) => [...sections, ...page.sections],
@@ -290,7 +298,7 @@ export async function generatePdf(
   const screenshotJobData = prepareMapAnswers(survey, answerEntries);
   const screenshots = await getScreenshots(screenshotJobData);
 
-  console.log(
+  logger.debug(
     `Fetched ${screenshots.length} screenshots in ${Date.now() - start}ms`
   );
 

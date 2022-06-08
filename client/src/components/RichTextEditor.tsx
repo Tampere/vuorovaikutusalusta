@@ -1,3 +1,4 @@
+import { FormLabel } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { convertFromRaw, convertToRaw, EditorState } from 'draft-js';
@@ -114,6 +115,7 @@ export default function RichTextEditor(props: Props) {
 
   return (
     <div className={classes.root}>
+      {props.label && <FormLabel>{props.label}</FormLabel>}
       <Editor
         readOnly={props.disabled}
         toolbar={{

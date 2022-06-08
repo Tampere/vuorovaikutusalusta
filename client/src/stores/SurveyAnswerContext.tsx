@@ -173,7 +173,7 @@ export function useSurveyAnswers() {
     }
 
     // Numeric question validation - check min & max values
-    if (question.type === 'numeric') {
+    if (question.type === 'numeric' && answer.value != null) {
       if (question.minValue != null && answer.value < question.minValue) {
         errors.push('minValue');
       }
@@ -255,10 +255,11 @@ export function useSurveyAnswers() {
     isPageValid(page: SurveyPage) {
       return !page.sections
         // Skip sections that shouldn't get answers
-        .filter((section) => !nonQuestionSectionTypes.includes(section.type))
-        .some(
-          (section) => getValidationErrors(section as SurveyQuestion).length
-        );
+        .filter(
+          (section): section is SurveyQuestion =>
+            !nonQuestionSectionTypes.includes(section.type)
+        )
+        .some((section) => getValidationErrors(section).length);
     },
     /**
      * Fetch unfinished answer entries by token and set them into the context
