@@ -204,6 +204,15 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
   }, [currentPage, answers]);
 
   /**
+   * Scroll to page header (=StepLabel) when page changes
+   */
+  useEffect(() => {
+    const element = document.getElementById(`${pageNumber}-page-top`);
+    if (!element) return;
+    element.scrollIntoView();
+  }, [pageNumber]);
+
+  /**
    * Update map geometries when they are changed
    */
   useEffect(() => {
@@ -222,6 +231,7 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
       {survey.pages.map((page, index) => (
         <Step key={page.id} completed={false}>
           <StepLabel
+            id={`${index}-page-top`}
             onClick={() => {
               setPageNumber(index);
             }}
@@ -243,7 +253,10 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
           >
             {page.title}
           </StepLabel>
-          <StepContent classes={{ root: classes.stepContent }}>
+          <StepContent
+            transitionDuration={0}
+            classes={{ root: classes.stepContent }}
+          >
             <FormControl style={{ width: '100%' }} component="fieldset">
               {page.sections.map((section) => (
                 <div className={classes.section} key={section.id}>
