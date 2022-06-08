@@ -30,7 +30,7 @@ export default function SurveyQuestion({ question }: Props) {
   const { tr } = useTranslations();
 
   const value = useMemo(
-    () => answers.find((answer) => answer.sectionId === question.id).value,
+    () => answers.find((answer) => answer.sectionId === question.id)?.value,
     [answers, question]
   );
 

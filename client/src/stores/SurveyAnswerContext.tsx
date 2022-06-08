@@ -30,6 +30,10 @@ type Action =
       answer: AnswerEntry;
     }
   | {
+      type: 'UPDATE_ANSWERS';
+      answers: AnswerEntry[];
+    }
+  | {
       type: 'SET_ANSWERS';
       answers: AnswerEntry[];
     }
@@ -169,7 +173,7 @@ export function useSurveyAnswers() {
     }
 
     // Numeric question validation - check min & max values
-    if (question.type === 'numeric') {
+    if (question.type === 'numeric' && answer.value != null) {
       if (question.minValue != null && answer.value < question.minValue) {
         errors.push('minValue');
       }
@@ -251,10 +255,11 @@ export function useSurveyAnswers() {
     isPageValid(page: SurveyPage) {
       return !page.sections
         // Skip sections that shouldn't get answers
-        .filter((section) => !nonQuestionSectionTypes.includes(section.type))
-        .some(
-          (section) => getValidationErrors(section as SurveyQuestion).length
-        );
+        .filter(
+          (section): section is SurveyQuestion =>
+            !nonQuestionSectionTypes.includes(section.type)
+        )
+        .some((section) => getValidationErrors(section).length);
     },
     /**
      * Fetch unfinished answer entries by token and set them into the context
@@ -265,7 +270,10 @@ export function useSurveyAnswers() {
       const answers = await request<AnswerEntry[]>(
         `/api/published-surveys/${state.survey.name}/unfinished-submission?token=${token}`
       );
-      dispatch({ type: 'SET_ANSWERS', answers: answers });
+      dispatch({
+        type: 'UPDATE_ANSWERS',
+        answers,
+      });
     },
     /**
      * Sets the unfinished token into the context. The next save/submit will replace the unfinished submission.
@@ -295,6 +303,15 @@ function reducer(state: State, action: Action): State {
         ...state,
         answers: state.answers.map((answer) =>
           answer.sectionId === action.answer.sectionId ? action.answer : answer
+        ),
+      };
+    case 'UPDATE_ANSWERS':
+      return {
+        ...state,
+        answers: state.answers.map(
+          (answer) =>
+            action.answers.find((a) => a.sectionId === answer.sectionId) ??
+            answer
         ),
       };
     case 'SET_ANSWERS':

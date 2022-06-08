@@ -4,6 +4,7 @@ import {
   createSurveyPage,
   deleteSurvey,
   deleteSurveyPage,
+  getDistinctAutoSendToEmails,
   getSurvey,
   getSurveys,
   publishSurvey,
@@ -19,6 +20,18 @@ import { body, param } from 'express-validator';
 import { validateRequest } from '../utils';
 
 const router = Router();
+
+/**
+ * Endpoint for getting all email addresses that are used as report recipients
+ */
+router.get(
+  '/report-emails',
+  ensureAuthenticated(),
+  asyncHandler(async (req, res) => {
+    const emails = await getDistinctAutoSendToEmails();
+    res.json(emails);
+  })
+);
 
 /**
  * Endpoint for getting all surveys.

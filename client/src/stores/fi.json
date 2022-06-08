@@ -24,6 +24,7 @@
     },
     "toFrontPage": "Etusivulle",
     "info": "Kyselyn perustiedot",
+    "email": "Sähköposti",
     "newPage": "Uusi sivu",
     "newPageFailed": "Uuden sivun luomisessa tapahtui virhe. Yritä myöhemmin uudestaan.",
     "thanksPage": "Kiitos-sivu",
@@ -55,6 +56,14 @@
     "selectTheme": "Valitse teema",
     "themeFetchFailed": "Teemojen hakemisessa tapahtui virhe. Yritä myöhemmin uudestaan.",
     "titleColor": "Osioiden otsikoiden väri"
+  },
+  "EditSurveyEmail": {
+    "enable": "Salli vastausten raportointi sähköpostitse",
+    "enableHelperText": "Jos valittu, yksittäiset vastaukset lähetetään raportteina määritettäviin osoitteisiin. Myös vastaajalta kysytään kyselyn lopuksi sähköpostiosoitetta vastauksen lähettämistä varten.",
+    "autoSendTo": "Vastaanottajien sähköpostiosoitteet",
+    "autoSendToHelperText": "Näihin osoitteisiin lähetetään jokaisesta vastauksesta raportti sähköpostin liitteenä (vastaajan lisäksi).",
+    "emailSubject": "Viestin aihe",
+    "emailBody": "Viestin sisältö"
   },
   "EditSurveyPage": {
     "name": "Sivun nimi",
@@ -101,7 +110,7 @@
     "groupedCheckboxQuestion": "Lisää ryhmitetty monivalintakysymys",
     "imageSection": "Lisää kuvaosio",
     "documentSection": "Lisää liiteosio",
-    "attachmentSection": "Lisää vastausliiteosio"
+    "attachmentSection": "Lisää vastausliite"
   },
   "SurveySection": {
     "radioQuestion": "Valintakysymys",
@@ -235,6 +244,7 @@
     "errorSurveyNotFound": "Kyselyä ei löytynyt, tai se ei ole avoinna. Tarkista osoite ja yritä uudestaan.",
     "errorFetchingSurvey": "Kyselyn haussa tapahtui virhe. Yritä myöhemmin uudestaan.",
     "startSurveyLink": "Aloita kysely tästä",
+    "continueSurveyLink": "Jatka kyselyä tästä",
     "loadUnfinishedSuccessful": "Tallennetut vastaukset ladattu onnistuneesti! Voit jatkaa kyselyn täyttämistä.",
     "errorTokenNotFound": "Antamallasi osoitteella ei löytynyt tallennettuja vastauksia. Tarkista osoite tai aloita kyselyn täyttäminen alusta.",
     "errorLoadingUnfinished": "Tallennettujen vastausten lataamisessa tapahtui virhe. Yritä myöhemmin uudestaan."
@@ -313,6 +323,14 @@
   "DocumentSection": {
     "attachment": "Liite"
   },
+  "DeleteSurveyDialog": {
+    "dialogTitle": "Kyselyn poistaminen",
+    "surveyName": "kyselyn nimi",
+    "surveyAuthor": "kyselyn laatija/yhteyshenkilö",
+    "warningMessage": "HUOM! Kun kysely poistetaan, samalla poistetaan kaikki kyselyyn tehdyt vastaukset. Vastaukset poistetaan lopullisesti, eikä niihin ole enää kyselyn poiston jälkeen pääsyä.",
+    "activateDeleting": "Aktivoidaksesi kyselyn poisto kirjoita alla olevaan kenttään kyselyn nimi",
+    "surveyToBeDeleted": "poistettavan kyselyn nimi"
+  },
   "GroupedCheckBoxQuestion": {
     "helperText": "Valitse kohteita alla olevien ryhmien sisältä.",
     "helperTextMin": "Valitse yhteensä vähintään {min} vaihtoehtoa.",
@@ -321,6 +339,11 @@
     "indicatorText": "Olet valinnut {numbers} vaihtoehtoa.",
     "indicatorTextMaxReached": "Olet valinnut kaikki {numbers} vaihtoehtoa.",
     "optionsSelectedInGroup": "{number} vaihtoehtoa valittu."
+  },
+  "SubmissionInfoDialog": {
+    "title": "Lähetä vastaus",
+    "text": "Jos haluat saada kopion vastauksestasi, anna sähköpostiosoitteesi oheiseen kenttään.",
+    "email": "Sähköposti (valinnainen)"
   },
   "AppBarUserMenu": {
     "logout": "Kirjaudu ulos"

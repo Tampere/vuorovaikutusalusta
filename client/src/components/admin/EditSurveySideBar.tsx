@@ -13,6 +13,7 @@ import {
   FavoriteBorder,
   InfoOutlined,
   InsertDriveFileOutlined,
+  Mail,
   Preview,
 } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/styles';
@@ -87,6 +88,12 @@ export default function EditSurveySideBar(props: Props) {
             <InfoOutlined />
           </ListItemIcon>
           <ListItemText primary={tr.EditSurvey.info} />
+        </ListItemLink>
+        <ListItemLink to={`${url}/sähköpostit`}>
+          <ListItemIcon>
+            <Mail />
+          </ListItemIcon>
+          <ListItemText primary={tr.EditSurvey.email} />
         </ListItemLink>
       </List>
       <Divider />

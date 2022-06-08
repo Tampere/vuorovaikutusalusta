@@ -29,7 +29,7 @@ interface DBAnswerEntry {
   value_numeric: number;
   value_option_id: number;
   value_geometry: GeoJSON.Geometry;
-  value_json: string;
+  value_json: unknown;
   parent_entry_id: number;
   value_file: string;
   value_file_name: string;
@@ -234,8 +234,11 @@ export async function createSurveySubmission(
     })
   );
 
-  // If the submission was unfinished, return the newly created token
-  return unfinished ? unfinished_token : null;
+  return {
+    id,
+    // If the submission was unfinished, return the newly created token
+    unfinishedToken: unfinished ? unfinished_token : null,
+  };
 }
 
 /**
@@ -560,14 +563,14 @@ function dbAnswerEntriesToAnswerEntries(
           entries.push({
             sectionId: row.section_id,
             type: 'sorting',
-            value: JSON.parse(row.value_json),
+            value: row.value_json as number[],
           });
           break;
         case 'slider': {
           entries.push({
             sectionId: row.section_id,
             type: 'slider',
-            value: row.value_numeric,
+            value: row.value_numeric != null ? Number(row.value_numeric) : null,
           });
           break;
         }
@@ -575,7 +578,7 @@ function dbAnswerEntriesToAnswerEntries(
           entries.push({
             sectionId: row.section_id,
             type: 'matrix',
-            value: JSON.parse(row.value_json),
+            value: row.value_json as string[],
           });
           break;
         }
@@ -639,6 +642,49 @@ export async function getUnfinishedAnswerEntries(token: string) {
   if (!rows.length) {
     throw new NotFoundError(`Token not found`);
   }
-  // TODO check token expiration in query or before proceeding, if necessary
+  return dbAnswerEntriesToAnswerEntries(rows);
+}
+
+/**
+ * Gets answer entries for given submission ID.
+ * @param submissionId Submission ID
+ * @returns Answer entries
+ */
+export async function getAnswerEntries(submissionId: number) {
+  const rows = await getDb().manyOrNone<
+    DBAnswerEntry & {
+      section_type: SurveyPageSection['type'];
+      parent_section?: number;
+      value_geometry: Point | LineString | Polygon;
+    }
+  >(
+    `
+    SELECT
+      ae.id,
+      ae.submission_id,
+      ae.section_id,
+      ae.parent_entry_id,
+      ae.value_text,
+      ae.value_option_id,
+      public.ST_AsGeoJSON(public.ST_Transform(ae.value_geometry, 3067))::json as value_geometry,
+      ae.value_numeric,
+      ae.value_json,
+      ae.value_file,
+      ae.value_file_name,
+      ps.type AS section_type,
+      ps.parent_section AS parent_section
+    FROM
+      data.submission s
+      INNER JOIN data.answer_entry ae ON ae.submission_id = s.id
+      INNER JOIN data.page_section ps ON ps.id = ae.section_id
+      INNER JOIN data.survey_page sp ON sp.id = ps.survey_page_id
+    WHERE s.id = $1
+    ORDER BY sp.idx, ps.idx ASC
+  `,
+    [submissionId]
+  );
+  if (!rows.length) {
+    throw new Error(`Submission with ID ${submissionId} not found`);
+  }
   return dbAnswerEntriesToAnswerEntries(rows);
 }

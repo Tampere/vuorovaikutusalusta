@@ -1,3 +1,8 @@
+import { Box, CircularProgress, Toolbar, Typography } from '@material-ui/core';
+import { useSurvey } from '@src/stores/SurveyContext';
+import { useToasts } from '@src/stores/ToastContext';
+import { useTranslations } from '@src/stores/TranslationContext';
+import { usePreventUnload } from '@src/utils/usePreventUnload';
 import React, { useEffect, useState } from 'react';
 import {
   Redirect,
@@ -7,20 +12,14 @@ import {
   useParams,
   useRouteMatch,
 } from 'react-router-dom';
-import { Box, Toolbar } from '@material-ui/core';
+import EditSurveyControls from './EditSurveyControls';
+import EditSurveyEmail from './EditSurveyEmail';
 import EditSurveyHeader from './EditSurveyHeader';
-import EditSurveySideBar from './EditSurveySideBar';
 import EditSurveyInfo from './EditSurveyInfo';
 import EditSurveyPage from './EditSurveyPage';
+import EditSurveySideBar from './EditSurveySideBar';
 import EditSurveyThanksPage from './EditSurveyThanksPage';
 import EditSurveyTranslations from './EditSurveyTranslations';
-import { useSurvey } from '@src/stores/SurveyContext';
-import { CircularProgress } from '@material-ui/core';
-import { Typography } from '@material-ui/core';
-import { useTranslations } from '@src/stores/TranslationContext';
-import EditSurveyControls from './EditSurveyControls';
-import { useToasts } from '@src/stores/ToastContext';
-import { usePreventUnload } from '@src/utils/usePreventUnload';
 
 const sideBarWidth = 320;
 
@@ -104,6 +103,9 @@ export default function EditSurvey() {
         <Switch>
           <Route path={`${path}/perustiedot`}>
             <EditSurveyInfo />
+          </Route>
+          <Route path={`${path}/sähköpostit`}>
+            <EditSurveyEmail />
           </Route>
           <Route path={`${path}/sivut/:pageId`}>
             <EditSurveyPage />

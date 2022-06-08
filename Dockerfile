@@ -30,6 +30,9 @@ FROM base AS server-build
 
 WORKDIR ${APPDIR}/server
 
+# Tell Puppeteer to skip installing Chrome. We'll be using the installed package.
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+
 COPY server/package*.json ./
 RUN npm ci
 
@@ -42,8 +45,16 @@ RUN rm -r src
 # Main image build
 ###
 FROM base AS main
-# Install GDAL dependence
-RUN apk update && apk add gdal
+
+# Install all dependencies (GDAL & others for Puppeteer)
+RUN apk update && apk add \
+  gdal \
+  chromium \
+  nss \
+  freetype \
+  harfbuzz \
+  ca-certificates \
+  ttf-freefont
 
 WORKDIR ${APPDIR}
 
@@ -51,5 +62,8 @@ COPY --from=server-build ${APPDIR}/server ./
 COPY --from=client-build ${APPDIR}/client/dist ./static/
 
 ENV TZ=Europe/Helsinki
+
+# Define Chromium path, as it was not installed in the previous phase
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 
 CMD npm start

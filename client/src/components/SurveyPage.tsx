@@ -22,6 +22,7 @@ export default function SurveyPage() {
     attributions: string;
   }>(null);
   const [errorStatusCode, setErrorStatusCode] = useState<number>(null);
+  const [continueUnfinished, setContinueUnfinished] = useState(false);
 
   const { name } = useParams<{ name: string }>();
   const { setSurvey, survey, loadUnfinishedEntries } = useSurveyAnswers();
@@ -89,6 +90,7 @@ export default function SurveyPage() {
           message: tr.SurveyPage.loadUnfinishedSuccessful,
           severity: 'success',
         });
+        setContinueUnfinished(true);
       } catch (error) {
         switch (error.status) {
           case 400:
@@ -132,6 +134,7 @@ export default function SurveyPage() {
       {showLandingPage && (
         <SurveyLandingPage
           survey={survey}
+          continueUnfinished={continueUnfinished}
           surveyBackgroundImage={surveyBackgroundImage}
           onStart={() => {
             setShowLandingPage(false);
