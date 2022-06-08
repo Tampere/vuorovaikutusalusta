@@ -1,8 +1,11 @@
 import { SurveyPageSection } from '@interfaces/survey';
 import { Fab, Grid, Typography } from '@material-ui/core';
 import {
+  Article,
+  AttachFile,
   CheckBox,
   FormatListNumbered,
+  Image,
   LibraryAddCheck,
   LinearScale,
   Looks4,
@@ -11,9 +14,6 @@ import {
   Subject,
   TextFields,
   ViewComfy,
-  Image,
-  AttachFile,
-  Article,
 } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
@@ -256,10 +256,13 @@ export default function AddSurveySectionActions(props: Props) {
 
   return (
     <Grid container>
-      {props.types ?? (
-        <Grid container direction="row">
-          <Grid item xs={12} md={6}>
-            {questionButtons.map((button) => (
+      <Grid container direction="row">
+        <Grid item xs={12} md={6}>
+          {questionButtons
+            .filter(
+              (button) => !props.types || props.types.includes(button.type)
+            )
+            .map((button) => (
               <Grid item key={button.type} style={{ padding: '0.5rem' }}>
                 <div className={classes.actionItem}>
                   <Fab
@@ -276,9 +279,13 @@ export default function AddSurveySectionActions(props: Props) {
                 </div>
               </Grid>
             ))}
-          </Grid>
-          <Grid item xs={12} md={6}>
-            {sectionButtons.map((button) => (
+        </Grid>
+        <Grid item xs={12} md={6}>
+          {sectionButtons
+            .filter(
+              (button) => !props.types || props.types.includes(button.type)
+            )
+            .map((button) => (
               <Grid item key={button.type} style={{ padding: '0.5rem' }}>
                 <div className={classes.actionItem}>
                   <Fab
@@ -294,9 +301,8 @@ export default function AddSurveySectionActions(props: Props) {
                 </div>
               </Grid>
             ))}
-          </Grid>
         </Grid>
-      )}
+      </Grid>
     </Grid>
   );
 }
