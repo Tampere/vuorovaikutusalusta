@@ -63,6 +63,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     [theme.breakpoints.down(600)]: {
       fontSize: '6vw',
     },
+    textTransform: 'none',
   },
   start: {
     fontFamily: '"Montserrat", sans-serif',

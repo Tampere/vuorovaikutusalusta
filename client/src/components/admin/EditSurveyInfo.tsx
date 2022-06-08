@@ -12,7 +12,7 @@ import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import ConfirmDialog from '../ConfirmDialog';
+import DeleteSurveyDialog from '../DeleteSurveyDialog';
 import Fieldset from '../Fieldset';
 import LoadingButton from '../LoadingButton';
 import ColorSelect from './ColorSelect';
@@ -245,9 +245,9 @@ export default function EditSurveyInfo() {
           </LoadingButton>
         </div>
       </Fieldset>
-      <ConfirmDialog
+      <DeleteSurveyDialog
         open={deleteConfirmDialogOpen}
-        text={tr.EditSurvey.deleteSurveyConfirm}
+        survey={activeSurvey}
         onClose={async (result) => {
           setDeleteConfirmDialogOpen(false);
           if (result) {

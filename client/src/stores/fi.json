@@ -314,6 +314,14 @@
   "DocumentSection": {
     "attachment": "Liite"
   },
+  "DeleteSurveyDialog": {
+    "dialogTitle": "Kyselyn poistaminen",
+    "surveyName": "kyselyn nimi",
+    "surveyAuthor": "kyselyn laatija/yhteyshenkilö",
+    "warningMessage": "HUOM! Kun kysely poistetaan, samalla poistetaan kaikki kyselyyn tehdyt vastaukset. Vastaukset poistetaan lopullisesti, eikä niihin ole enää kyselyn poiston jälkeen pääsyä.",
+    "activateDeleting": "Aktivoidaksesi kyselyn poisto kirjoita alla olevaan kenttään kyselyn nimi",
+    "surveyToBeDeleted": "poistettavan kyselyn nimi"
+  },
   "GroupedCheckBoxQuestion": {
     "helperText": "Valitse kohteita alla olevien ryhmien sisältä.",
     "helperTextMin": "Valitse yhteensä vähintään {min} vaihtoehtoa.",
