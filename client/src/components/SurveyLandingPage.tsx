@@ -64,6 +64,7 @@ const useStyles = makeStyles((theme: Theme & { [customKey: string]: any }) => ({
   subtitle: {
     fontFamily: '"Montserrat", sans-serif',
     fontSize: '2rem',
+    textTransform: 'none',
     ...theme.landingPage?.subtitle,
     [theme.breakpoints.down(600)]: {
       fontSize: '6vw',
