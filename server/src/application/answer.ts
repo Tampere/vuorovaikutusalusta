@@ -5,19 +5,18 @@ import moment from 'moment';
 import ogr2ogr from 'ogr2ogr';
 import internal from 'stream';
 
-const textSeparator = '::';
-const separatorEscape = '//';
-
 /**
  * Interface for answer entry db row
  */
 interface DBAnswerEntry {
+  answer_id: number;
   details: {
     subjects?: LocalizedText[];
     classes?: LocalizedText[];
   };
   section_id: number;
   parent_section?: number;
+  parent_entry_id?: number;
   section_index: number;
   submission_id: number;
   title: LocalizedText;
@@ -28,6 +27,7 @@ interface DBAnswerEntry {
   value_option_id: number;
   value_numeric: number;
   created_at: Date;
+  option_text: string;
 }
 
 /**
@@ -40,6 +40,7 @@ interface DBFileEntry {
 }
 
 interface AnswerEntry {
+  answerId: number;
   details: {
     subjects?: LocalizedText[];
     classes?: LocalizedText[];
@@ -47,6 +48,7 @@ interface AnswerEntry {
   };
   sectionId: number;
   parentSectionId?: number;
+  parentEntryId?: number;
   sectionIndex: number;
   submissionId: number;
   title: LocalizedText;
@@ -57,14 +59,9 @@ interface AnswerEntry {
   valueOptionId: number;
   valueNumeric: number;
   createdAt: Date;
-}
-
-/**
- * Option text localizations
- */
-interface DBOptionTextRow {
-  section_id: number;
-  text: LocalizedText;
+  groupIndex: number;
+  optionIndex: number;
+  optionText?: string;
 }
 
 /**
@@ -72,6 +69,15 @@ interface DBOptionTextRow {
  */
 interface TextCell {
   [key: string]: string;
+}
+
+/**
+ * GeoJSON Feature interface
+ */
+interface Feature {
+  type: string;
+  geometry: JSON;
+  properties: JSON;
 }
 
 /**
@@ -83,6 +89,34 @@ interface CSVJson {
 }
 
 /**
+ * Interface for section details
+ */
+interface TypeDetails {
+  type: string;
+  details: JSON;
+  optionTexts?: TextCell;
+  pageIndex: number;
+}
+
+/**
+ * Interface for section header
+ */
+interface SectionHeader {
+  optionId: number;
+  optionIndex: number;
+  text: LocalizedText;
+  sectionId: number;
+  title: LocalizedText;
+  type: string;
+  details: JSON;
+  parentSection: number;
+  groupName: LocalizedText;
+  groupIndex: number;
+  pageIndex: number;
+  sectionIndex: number;
+}
+
+/**
  * Convert db answer row to js format
  * @param rows
  * @returns
@@ -91,9 +125,11 @@ function dbAnswerEntryRowsToAnswerEntries(rows: DBAnswerEntry[]) {
   if (!rows) return null;
 
   return rows.map((row) => ({
+    answerId: row.answer_id,
     details: row.details,
     sectionId: row.section_id,
     parentSectionId: row?.parent_section,
+    parentEntryId: row?.parent_entry_id,
     sectionIndex: row.section_index,
     submissionId: row.submission_id,
     title: row.title,
@@ -103,8 +139,29 @@ function dbAnswerEntryRowsToAnswerEntries(rows: DBAnswerEntry[]) {
     valueJson: row.value_json,
     valueOptionId: row.value_option_id,
     valueNumeric: row.value_numeric,
+    optionText: row?.option_text,
     createdAt: row.created_at,
   })) as AnswerEntry[];
+}
+
+/**
+ * Helper function for converting answer entries into a GeoJSON Feature
+ * @param answer
+ * @returns
+ */
+function geometryAnswerToFeature(answer: AnswerEntry) {
+  return {
+    type: 'Feature',
+    geometry: {
+      type: answer.valueGeometry.type,
+      coordinates: answer.valueGeometry.coordinates,
+    },
+    properties: {
+      ['Vastaustunniste']: answer.submissionId,
+      ['Aikaleima']: moment(answer.createdAt).format('DD-MM-YYYY, HH:mm'),
+      ['Kysymys']: answer.title?.['fi'] ?? '',
+    },
+  };
 }
 
 /**
@@ -113,21 +170,43 @@ function dbAnswerEntryRowsToAnswerEntries(rows: DBAnswerEntry[]) {
  * @returns
  */
 function dbEntriesToGeoJSON(entries: AnswerEntry[]) {
-  const features = entries
-    .filter((entry) => entry.valueGeometry)
-    .map((entry) => ({
-      type: 'Feature',
-      geometry: {
-        type: entry.valueGeometry.type,
-        coordinates: entry.valueGeometry.coordinates,
-      },
-      properties: {
-        submissionId: entry.submissionId,
-        timeStamp: entry.createdAt,
-        questionId: entry.sectionId,
-        questionTitle: entry.title?.fi,
-      },
-    }));
+  // Sort entries first by submission, then by sectionId
+  // Each sectionId instance (separated by submission) will represent a single Feature
+
+  const answersToSubmissions = entries.reduce((submissionGroup, answer) => {
+    const { submissionId } = answer;
+    submissionGroup[submissionId] = submissionGroup[submissionId] ?? {};
+    // If answer doesn't have parentEntryId, it is the parent itself. Store following answers under the parent
+    if (!answer.parentEntryId) {
+      submissionGroup[submissionId][answer.answerId] =
+        geometryAnswerToFeature(answer);
+    } else {
+      // Initialize place for the sub questions under the parent feature
+      submissionGroup[submissionId][answer.parentEntryId].properties[
+        'Alikysymykset'
+      ] =
+        submissionGroup[submissionId][answer.parentEntryId].properties[
+          'Alikysymykset'
+        ] ?? {};
+
+      // Add subquestion answer
+      submissionGroup[submissionId][answer.parentEntryId].properties[
+        'Alikysymykset'
+      ][answer.title?.['fi'] ?? 'Kysymys'] =
+        answer.valueNumeric ??
+        answer.valueText ??
+        answer.optionText['fi'] ??
+        '';
+    }
+    return submissionGroup;
+  }, {});
+
+  const features = Object.values(answersToSubmissions).reduce(
+    (featuresArray: Feature[], submissionObj) => {
+      return [...featuresArray, ...Object.values(submissionObj)];
+    },
+    []
+  );
 
   return {
     type: 'FeatureCollection',
@@ -142,71 +221,44 @@ function dbEntriesToGeoJSON(entries: AnswerEntry[]) {
  * @returns Promise resolving to csv formatted string
  */
 async function answerEntriesToCSV(entries: CSVJson): Promise<string> {
-  const headers = [
-    'Vastauksen tunniste',
+  const { submissions, headers } = entries;
+
+  const headersData = [
+    'Vastaustunniste',
     'Aikaleima',
-    ...entries.headers.map((headerObj) => Object.values(headerObj)[0]),
+    ...headers.map((headerObj) => Object.values(headerObj)[0]),
   ];
 
-  const data = entries.submissions.map((submission) => {
-    const answers = (Object.values(submission)[0] as TextCell[]).map(
-      (answerObj) => {
-        return Object.keys(answerObj).map((key) => {
-          return {
-            [entries.headers.find((headerObj) =>
-              Object.keys(headerObj).includes(key)
-            )?.[key]]: answerObj[key],
-          };
-        })[0];
-      }
+  const submissionData = submissions.map((submission) => {
+    const answers = {};
+    const [submissionId, submissionAnswers] = Object.entries(submission)[0];
+    answers['Vastaustunniste'] = submissionId;
+    answers['Aikaleima'] = moment(submission.timeStamp).format(
+      'DD-MM-YYYY, HH:mm'
     );
 
-    return Object.assign(
-      {
-        'Vastauksen tunniste': Number(Object.keys(submission)[0]),
-      },
-      {
-        Aikaleima: moment(submission.timeStamp).format('DD-MM-YYYY, HH:mm'),
-      },
-      ...answers
-    );
-  });
-
-  // The following is mainly to get answers via CSV from test surveys whose structure change:
-  // if the structure of the survey changes between answers
-  // all submissions have to be gone through and nullish answers are to be added for the questions
-  // that the submission didn't previously have.
-  const everyQuestionTopic = Array.from(
-    new Set([].concat(...data.map((submission) => Object.keys(submission))))
-  );
-
-  let questionTopicsToAdd = [];
-  data.forEach((submission) => {
-    questionTopicsToAdd = [];
-    everyQuestionTopic.map((topic) => {
-      if (!Object.keys(submission).includes(topic)) {
-        questionTopicsToAdd.push(topic);
+    headers.forEach((headerObj) => {
+      for (const [headerKey, headerValue] of Object.entries(headerObj)) {
+        answers[headerValue as string] = submissionAnswers.hasOwnProperty(
+          headerKey
+        )
+          ? submissionAnswers[headerKey]
+          : '';
       }
     });
-    questionTopicsToAdd.map((topic) => {
-      submission[topic] = '';
-    });
+
+    return answers;
   });
 
   try {
-    const csv = await parseAsync(data.sort(sortByTimestamp), {
-      headers,
+    const csv = await parseAsync(submissionData, {
+      headersData,
     } as any);
     return csv;
   } catch (err) {
     console.error(err);
   }
 }
-
-function sortByTimestamp(a, b) {
-  return a['Vastauksen tunniste'] > b['Vastauksen tunniste'] ? 1 : -1;
-}
-
 /**
  * Handler function for downloading csv file
  * @param surveyId
@@ -227,7 +279,7 @@ export async function getCSVFile(surveyId: number): Promise<string> {
 export async function getGeoPackageFile(
   surveyId: number
 ): Promise<internal.Readable> {
-  const rows = await getAnswerDBEntries(surveyId);
+  const rows = await getGeometryDBEntries(surveyId);
   if (!rows) return null;
 
   const { stream } = await ogr2ogr(dbEntriesToGeoJSON(rows), {
@@ -295,32 +347,28 @@ function attachmentEntriesToFiles(rows: DBFileEntry[]) {
 async function getAnswerDBEntries(surveyId: number): Promise<AnswerEntry[]> {
   const rows = (await getDb().manyOrNone(
     `
-    SELECT * FROM
-      (SELECT
-          ae.submission_id,
-          ae.section_id,
-          ae.value_text,
-          ae.value_option_id,
-          public.ST_AsGeoJSON(public.ST_Transform(ae.value_geometry, 3067))::json as value_geometry,
-          ae.value_numeric,
-          ae.value_json,
-          sub.created_at
-      FROM data.answer_entry ae
-      LEFT JOIN data.submission sub ON ae.submission_id = sub.id
-      WHERE sub.survey_id = $1) AS temp1
-        LEFT JOIN
-          (SELECT
-            ps.id,
-            ps.idx as section_index,
-            ps.title,
-            ps.type,
-            ps.details,
-            ps.parent_section
-          FROM data.page_section ps
+      SELECT
+        ae.submission_id,
+        ae.section_id,
+        ae.value_text,
+        ae.value_option_id,
+        ae.value_numeric,
+        ae.value_json,
+        ps.type,
+        ps.idx as section_index,
+        sub.created_at
+          FROM data.answer_entry ae
+          LEFT JOIN data.submission sub ON ae.submission_id = sub.id
+          LEFT JOIN data.page_section ps ON ps.id = ae.section_id
           LEFT JOIN data.survey_page sp ON ps.survey_page_id = sp.id
-          LEFT JOIN data.survey s ON sp.survey_id = s.id WHERE s.id = $1 ORDER BY ps.id) AS temp2
-    ON temp1.section_id = temp2.id;
-  `,
+          LEFT JOIN data.survey s ON sp.survey_id = s.id
+          WHERE ps.type <> 'map'
+            AND ps.type <> 'attachment'
+            AND ps.type <> 'document'
+            AND ps.type <> 'text'
+            AND ps.type <> 'image'
+            AND ps.parent_section IS NULL AND sub.survey_id = $1;
+    `,
     [surveyId]
   )) as DBAnswerEntry[];
 
@@ -329,131 +377,308 @@ async function getAnswerDBEntries(surveyId: number): Promise<AnswerEntry[]> {
 }
 
 /**
- * Format different answer entry types so that they are presentable for the CSV
- * @param questionType
- * @param entryRow
- * @param optionTexts
- * @returns
- */
-function formatAnswerType(
-  questionType: string,
-  entryRow: AnswerEntry,
-  isSectionPreviouslyAnswered: boolean,
-  answersToSameQuestion: number,
-  optionTexts: DBOptionTextRow
-): string | number | [] | {} {
-  switch (questionType) {
-    case 'free-text':
-      return entryRow.valueText.replace(textSeparator, separatorEscape);
-    case 'radio':
-    case 'checkbox':
-    case 'grouped-checkbox':
-      // If there is a radio/checkbox/grouped-checkbox answer present, it is interpretet as '1' marking that the option was selected
-      // 'something else' answers are displayed as the answer itself
-      return entryRow.valueOptionId
-        ? 1
-        : entryRow.valueText
-        ? entryRow.valueText
-        : '';
-    case 'numeric':
-    case 'slider':
-      return entryRow.valueNumeric;
-    case 'sorting': {
-      return entryRow.valueJson.map((value, index) => {
-        return {
-          [`${entryRow.sectionId}-s${index}${
-            isSectionPreviouslyAnswered ? `-sub${answersToSameQuestion}` : ''
-          }`]: value ? optionTexts[`-${value}`] : '',
-        };
-      });
-    }
-    case 'matrix':
-      return entryRow.valueJson.map((value, index) => {
-        // Handle empty answers and 'don't know' answers along with the proper answers
-        const answer = !value
-          ? ''
-          : Number(value) === -1
-          ? 'EOS'
-          : entryRow.details.classes[Number(value)]['fi'];
-
-        return {
-          [`${entryRow.sectionId}-m${index}${
-            isSectionPreviouslyAnswered ? `-sub${answersToSameQuestion}` : ''
-          }`]: answer,
-        };
-      });
-    default:
-      return null;
-  }
-}
-
-/**
- * Get option texts for the given survey
+ * Get all DB answer entries for the given survey id
  * @param surveyId
  * @returns
  */
-async function getOptionTexts(surveyId: number) {
-  const optionTexts = await getDb().manyOrNone(
-    `
-    SELECT
-      opt.id,
-      opt.idx as option_index,
-      opt.text,
-      ps.id as section_id,
-      ps.title,
+async function getGeometryDBEntries(surveyId: number): Promise<AnswerEntry[]> {
+  const rows = (await getDb().manyOrNone(
+    `SELECT
+      ae.submission_id,
+      ae.id as answer_id,
+      ae.section_id,
+      ae.value_text,
+      ae.value_option_id,
+      opt.text as option_text,
+      public.ST_AsGeoJSON(public.ST_Transform(ae.value_geometry, 3067))::json as value_geometry,
+      ae.value_numeric,
+      ae.value_json,
+      ae.parent_entry_id,
       ps.type,
-      og.name as group_name,
-      og.idx as group_index
-    FROM data.option opt
-      LEFT JOIN data.option_group og ON opt.group_id = og.id
-      LEFT JOIN data.page_section ps ON opt.section_id = ps.id
-      LEFT JOIN data.survey_page sp ON ps.survey_page_id = sp.id
-      LEFT JOIN data.survey s ON sp.survey_id = s.id WHERE s.id = $1
-      ORDER BY group_index, opt.idx, opt.id;
-    `,
+      ps.title,
+      ps.details,
+      ps.parent_section,
+      sub.created_at
+        FROM data.answer_entry ae
+        LEFT JOIN data.submission sub ON ae.submission_id = sub.id
+        LEFT JOIN data.page_section ps ON ps.id = ae.section_id
+        LEFT JOIN data.survey_page sp ON ps.survey_page_id = sp.id
+        LEFT JOIN data.survey s ON sp.survey_id = s.id
+        LEFT JOIN data.option opt ON opt.id = ae.value_option_id
+        WHERE (type = 'map' OR parent_section IS NOT NULL) AND sub.survey_id = $1`,
+    [surveyId]
+  )) as DBAnswerEntry[];
+
+  if (!rows || rows.length === 0) return null;
+  return dbAnswerEntryRowsToAnswerEntries(rows);
+}
+
+/**
+ * Get survey section, options and optiongroups for CSV headers
+ * @param surveyId
+ * @returns
+ */
+const getSectionHeaders = async (surveyId: number) =>
+  getDb().manyOrNone<SectionHeader>(
+    `
+  SELECT
+    opt.id as "optionId",
+    opt.idx as "optionIndex",
+    opt.text,
+    ps.id as "sectionId",
+    ps.idx as "sectionIndex",
+    ps.title,
+    ps.type,
+    ps.details,
+    ps.parent_section as "parentSection",
+    og.name as "groupName",
+    og.idx as "groupIndex",
+    sp.idx as "pageIndex"
+  FROM data.page_section ps
+    LEFT JOIN data.option opt ON ps.id = opt.section_id
+    LEFT JOIN data.option_group og ON opt.group_id = og.id
+    LEFT JOIN data.survey_page sp ON ps.survey_page_id = sp.id
+    LEFT JOIN data.survey s ON sp.survey_id = s.id
+    WHERE s.id = $1 
+      AND ps.type <> 'map'
+      AND ps.type <> 'attachment'
+      AND ps.type <> 'document'
+      AND ps.type <> 'text'
+      AND ps.type <> 'image'
+      AND ps.parent_section IS NULL
+    ORDER BY "pageIndex", "sectionIndex", og.idx, opt.idx;
+`,
     [surveyId]
   );
 
-  if (!optionTexts) return [];
+/**
+ * Create key for CSV headers and submissions
+ * @pageIndex pageIndex
+ * @param sectionIndex
+ * @param groupIndex
+ * @param optionIndex
+ * @returns
+ */
+function getHeaderKey(
+  pageIndex: number,
+  sectionIndex: number,
+  groupIndex?: number,
+  optionIndex?: number
+) {
+  return `${pageIndex}-${sectionIndex}${groupIndex ? '-' + groupIndex : ''}${
+    optionIndex ? '-' + optionIndex : ''
+  }`;
+}
 
-  return optionTexts.reduce((prevValue, currentValue) => {
-    const previousSection = prevValue
-      ?.map((optionObj) => optionObj.sectionId)
-      .indexOf(currentValue.section_id);
+/**
+ * Format headers for the CSV file
+ * @param sectionMetadata
+ * @returns
+ */
+function createCSVHeaders(sectionMetadata: SectionHeader[]) {
+  const indexesToSections = sectionMetadata.reduce((group, section) => {
+    const { pageIndex, sectionIndex } = section;
+    group[`${pageIndex}-${sectionIndex}`] =
+      group[`${pageIndex}-${sectionIndex}`] ?? [];
+    group[`${pageIndex}-${sectionIndex}`].push(section);
+    return group;
+  }, {});
 
-    const text =
-      currentValue.type === 'grouped-checkbox' && currentValue.group_name
-        ? `${currentValue.group_name['fi']} - ${currentValue?.text?.['fi']}`
-        : currentValue?.text?.['fi'];
+  const allHeaders = [];
+  Object.keys(indexesToSections).map((indexKey) => {
+    const sectionGroup = indexesToSections[indexKey];
+    const sectionHead = sectionGroup[0];
+    switch (sectionHead.type) {
+      case 'radio':
+      case 'checkbox':
+      case 'grouped-checkbox':
+        sectionGroup.forEach((section) => {
+          const key = getHeaderKey(
+            section.pageIndex,
+            section.sectionIndex,
+            section.groupIndex,
+            section.optionId
+          );
 
-    // Grouped checkbox questions will be ordered on the CSV by 1) group 2) index inside group
-    const optionText =
-      currentValue.type === 'grouped-checkbox'
-        ? {
-            [`${currentValue.group_index}${currentValue.option_index}-${currentValue.id}`]:
-              text,
+          allHeaders.push({
+            [key]: `${section.title?.['fi'] ?? ''}${
+              section.groupName ? ' - ' + section.groupName['fi'] : ''
+            } - ${section.text?.['fi'] ?? ''}`,
+          });
+        });
+        if (sectionHead.details.allowCustomAnswer) {
+          const key = getHeaderKey(
+            sectionHead.pageIndex,
+            sectionHead.sectionIndex,
+            null,
+            -1
+          );
+          allHeaders.push({
+            [key]: `${sectionHead.title['fi']} - joku muu, mikä?`,
+          });
+        }
+        break;
+      case 'matrix':
+        sectionHead.details.subjects.forEach(
+          (subject: LocalizedText, idx: number) => {
+            const key = getHeaderKey(
+              sectionHead.pageIndex,
+              sectionHead.sectionIndex,
+              idx + 1
+            );
+            allHeaders.push({
+              [key]: `${sectionHead.title['fi']} - ${subject['fi']}`,
+            });
           }
-        : { [`-${currentValue.id}`]: text };
-
-    if (previousSection !== -1) {
-      const temp = [...prevValue];
-      temp[previousSection].sectionTexts = {
-        ...temp[previousSection].sectionTexts,
-        ...optionText,
-      };
-      return temp;
-    } else {
-      return [
-        ...prevValue,
-        {
-          sectionId: currentValue.section_id,
-          sectionTexts: {
-            ...optionText,
-          },
-        },
-      ];
+        );
+        break;
+      case 'sorting':
+        sectionGroup.forEach((section) => {
+          const key = getHeaderKey(
+            section.pageIndex,
+            section.sectionIndex,
+            null,
+            section.optionIndex + 1
+          );
+          allHeaders.push({
+            [key]: `${section.title['fi']} - ${section.optionIndex + 1}.`,
+          });
+        });
+        break;
+      // numeric, free-text, slider
+      default:
+        allHeaders.push({
+          [getHeaderKey(sectionHead.pageIndex, sectionHead.sectionIndex)]:
+            sectionHead.title?.['fi'] ?? '',
+        });
     }
-  }, []);
+  });
+
+  return allHeaders;
+}
+
+/**
+ * Create CSV submissions from grouped submission data
+ * @param answerEntries
+ * @param sectionMetadata
+ * @returns
+ */
+function createCSVSubmissions(
+  answerEntries: AnswerEntry[],
+  sectionMetadata: SectionHeader[]
+) {
+  const sectionIdToDetails = sectionMetadata.reduce((group, section) => {
+    const { sectionId, optionId, text } = section;
+    group[sectionId] = {
+      type: section.type,
+      details: section.details,
+      optionTexts: {
+        ...(group[sectionId]?.optionTexts ?? {}),
+        [optionId]: text?.['fi'] ?? '',
+      },
+      pageIndex: section.pageIndex,
+    } as TypeDetails;
+    return group;
+  }, {});
+
+  // Group answer entries by submissionId
+  const answersToSubmissionId = answerEntries.reduce((group, answer) => {
+    const { submissionId } = answer;
+    group[submissionId] = group[submissionId] ?? [];
+    group[submissionId].push(answer);
+    return group;
+  }, {});
+
+  const allAnswers = [];
+
+  Object.entries(answersToSubmissionId).forEach(([key, value]) => {
+    allAnswers.push({
+      [key]: submissionAnswersToJson(
+        value as AnswerEntry[],
+        sectionIdToDetails
+      ),
+      timeStamp: value[0].createdAt,
+    });
+  });
+
+  return allAnswers;
+}
+
+/**
+ * Create JSON formatted answers for each answer under a submission
+ * @param answerEntries
+ * @param sectionIdToDetails
+ * @returns
+ */
+function submissionAnswersToJson(
+  answerEntries: AnswerEntry[],
+  sectionIdToDetails
+) {
+  const ret = {};
+
+  answerEntries.forEach((answer) => {
+    const sectionDetails = sectionIdToDetails[answer.sectionId];
+
+    switch (sectionDetails.type) {
+      case 'radio':
+      case 'checkbox':
+      case 'grouped-checkbox':
+        ret[
+          getHeaderKey(
+            sectionDetails.pageIndex,
+            answer.sectionIndex,
+            answer.groupIndex,
+            answer.valueOptionId ?? -1
+          )
+        ] = answer.valueOptionId ? 1 : answer.valueText ?? '';
+        break;
+      case 'matrix':
+        sectionDetails.details.subjects.forEach((_subject, index) => {
+          const classIndex = answer.valueJson[index];
+          ret[
+            getHeaderKey(
+              sectionDetails.pageIndex,
+              answer.sectionIndex,
+              index + 1
+            )
+          ] = !classIndex
+            ? ''
+            : Number(classIndex) === -1
+            ? 'EOS'
+            : sectionDetails.details.classes[Number(classIndex)]['fi'];
+        });
+        break;
+      case 'sorting':
+        answer.valueJson.forEach((optionId, index) => {
+          ret[
+            getHeaderKey(
+              sectionDetails.pageIndex,
+              answer.sectionIndex,
+              null,
+              index + 1
+            )
+          ] = optionId ? sectionDetails?.optionTexts[String(optionId)] : '';
+        });
+        break;
+      // numeric, free-text, slider
+      default:
+        ret[getHeaderKey(sectionDetails.pageIndex, answer.sectionIndex)] =
+          getValue(answer, sectionDetails.type);
+        break;
+    }
+  });
+
+  return ret;
+}
+
+function getValue(answer: AnswerEntry, answerType: string) {
+  switch (answerType) {
+    case 'slider':
+    case 'numeric':
+      return answer.valueNumeric;
+    case 'free-text':
+      return answer.valueText;
+  }
 }
 
 /**
@@ -467,262 +692,10 @@ async function entriesToCSVFormat(
 ): Promise<CSVJson> {
   if (!answerEntries) return;
 
-  const refinedOptionTexts = (await getOptionTexts(surveyId)) ?? [];
+  const sectionMetadata = await getSectionHeaders(surveyId);
 
-  let checkboxInitialised = false;
-  let previousSubmissionId = answerEntries[0].submissionId;
-  let previousSectionId = answerEntries[0].sectionId;
-  let customHeaders = [];
-  let previousSectionIDs = [];
-  let isSectionPreviouslyAnswered = false;
-  let answersToSameQuestion = 0;
-  return answerEntries.reduce((prevValue, currentValue) => {
-    if (previousSubmissionId !== currentValue.submissionId) {
-      previousSectionIDs = [];
-      answersToSameQuestion = 0;
-      isSectionPreviouslyAnswered = false;
-      checkboxInitialised = false;
-      previousSubmissionId = currentValue.submissionId;
-    }
-    if (previousSectionId !== currentValue.sectionId) {
-      checkboxInitialised = false;
-      previousSectionId = currentValue.sectionId;
-    }
-
-    // Question has already been answered under the current submission
-    if (
-      previousSectionIDs.includes(currentValue.sectionId) &&
-      previousSubmissionId === currentValue.submissionId
-    ) {
-      if (currentValue.type === 'map') {
-        checkboxInitialised = false;
-        isSectionPreviouslyAnswered = true;
-        ++answersToSameQuestion;
-      }
-    } else {
-      previousSectionIDs.push(currentValue.sectionId);
-      answersToSameQuestion = 0;
-      isSectionPreviouslyAnswered = false;
-    }
-
-    // Don't include geometry entries on the CSV
-    if (currentValue.type === 'map') return prevValue;
-
-    // Format CSV headers for question types that will generate multiple columns into the CSV file
-    let checkboxOptionTexts;
-    let sectionSubmissionKey = currentValue.sectionId.toString();
-    switch (currentValue.type) {
-      case 'matrix':
-        // For matrix questions, create 'n' new headers where n is the number of question rows in the matrix
-        customHeaders = currentValue.details?.subjects?.reduce(
-          (prevHeaders, currentMatrixSubject, subjectIndex) => {
-            return [
-              ...prevHeaders,
-              {
-                [`${currentValue.sectionId}-m${subjectIndex}${
-                  isSectionPreviouslyAnswered
-                    ? `-sub${answersToSameQuestion}`
-                    : ''
-                }`]: `${currentValue.title?.fi}_${currentMatrixSubject['fi']}${
-                  isSectionPreviouslyAnswered
-                    ? ' - ' + (answersToSameQuestion + 1) + '. karttavastaus'
-                    : ''
-                }`,
-              },
-            ];
-          },
-          []
-        );
-        break;
-      case 'radio':
-      case 'checkbox':
-        // Custom headers for checkbox and radio questions
-        checkboxOptionTexts = refinedOptionTexts?.find(
-          (optionTextObj) => optionTextObj.sectionId === currentValue.sectionId
-        ).sectionTexts;
-        customHeaders = Object.keys(checkboxOptionTexts).map((key) => ({
-          [`${currentValue.sectionId}-cr${key}${
-            isSectionPreviouslyAnswered ? `-sub${answersToSameQuestion}` : ''
-          }`]: `${currentValue.title?.fi}_${checkboxOptionTexts[key]}${
-            isSectionPreviouslyAnswered
-              ? ' - ' + (answersToSameQuestion + 1) + '. karttavastaus'
-              : ''
-          }`,
-        }));
-        // Add header for additional freetext answer, if it was allowed
-        if (currentValue.details.allowCustomAnswer) {
-          customHeaders.push({
-            [`${currentValue.sectionId}-cr000${
-              isSectionPreviouslyAnswered ? `-sub${answersToSameQuestion}` : ''
-            }`]: `${currentValue.title?.fi}${
-              isSectionPreviouslyAnswered
-                ? ' - ' + (answersToSameQuestion + 1) + '. karttavastaus'
-                : ''
-            }_joku muu, mikä?`,
-          });
-        }
-
-        sectionSubmissionKey += `-cr${
-          currentValue.valueOptionId ? `-${currentValue.valueOptionId}` : '000'
-        }${isSectionPreviouslyAnswered ? `-sub${answersToSameQuestion}` : ''}`;
-        break;
-      case 'grouped-checkbox': {
-        // Custom headers for grouped-checkbox questions
-        checkboxOptionTexts = refinedOptionTexts?.find(
-          (optionTextObj) => optionTextObj.sectionId === currentValue.sectionId
-        ).sectionTexts;
-        customHeaders = Object.keys(checkboxOptionTexts).map((key) => ({
-          [`${currentValue.sectionId}-gc${key}${
-            isSectionPreviouslyAnswered ? `-sub${answersToSameQuestion}` : ''
-          }`]: `${checkboxOptionTexts[key]}${
-            isSectionPreviouslyAnswered
-              ? ' - ' + (answersToSameQuestion + 1) + '. karttavastaus'
-              : ''
-          }`,
-        }));
-        const indexOfOptionId = Object.keys(checkboxOptionTexts)
-          .map((key: string) => key.split('-')[1])
-          .indexOf(currentValue.valueOptionId?.toString());
-        sectionSubmissionKey += `-gc${
-          currentValue.valueOptionId
-            ? Object.keys(checkboxOptionTexts)[indexOfOptionId]
-            : '000'
-        }${isSectionPreviouslyAnswered ? `-sub${answersToSameQuestion}` : ''}`;
-        break;
-      }
-      case 'sorting':
-        customHeaders = currentValue.valueJson.map((_, index) => ({
-          [`${sectionSubmissionKey}-s${index}${
-            isSectionPreviouslyAnswered ? `-sub${answersToSameQuestion}` : ''
-          }`]: `${currentValue.title?.fi}_${index + 1}.${
-            isSectionPreviouslyAnswered
-              ? ' - ' + (answersToSameQuestion + 1) + '. karttavastaus'
-              : ''
-          }`,
-        }));
-        break;
-      default:
-        sectionSubmissionKey += `${
-          isSectionPreviouslyAnswered ? `-sub${answersToSameQuestion}` : ''
-        }`;
-        break;
-    }
-
-    // Format submission
-    const existingSubmissionIndex =
-      prevValue?.submissions?.findIndex((s) =>
-        s.hasOwnProperty(currentValue.submissionId.toString())
-      ) ?? -1;
-
-    let submission = {
-      [currentValue.submissionId]: [],
-      timeStamp: currentValue.createdAt,
-    };
-    if (existingSubmissionIndex !== -1) {
-      // Get previous entries under the submission
-      submission = prevValue.submissions.splice(existingSubmissionIndex, 1)[0];
-    }
-
-    const answerEntry = formatAnswerType(
-      currentValue.type,
-      currentValue,
-      isSectionPreviouslyAnswered,
-      answersToSameQuestion,
-      refinedOptionTexts?.find(
-        (optionTextObj) => optionTextObj.sectionId === currentValue.sectionId
-      )?.sectionTexts
-    );
-
-    switch (currentValue.type) {
-      case 'matrix':
-      case 'sorting':
-        submission[currentValue.submissionId].push(...(answerEntry as any));
-        break;
-      case 'grouped-checkbox':
-      case 'checkbox': {
-        // Initialise submission with checkbox dummy answers, i.e. add 'null' answers for each checkbox option
-        if (!checkboxInitialised) {
-          const checkBoxTopics = customHeaders.map(
-            (header) => Object.keys(header)[0]
-          );
-          const checkBoxDummyAnswers = checkBoxTopics.map((topic) => ({
-            [topic]: '',
-          }));
-          submission[currentValue.submissionId].push(...checkBoxDummyAnswers);
-          checkboxInitialised = true;
-        }
-        // Find the checkbox topic that the answer entry actually belongs to
-        const checkboxAnswerIndex = submission[currentValue.submissionId]
-          .map((sectionObj) => Object.keys(sectionObj)[0])
-          .indexOf(sectionSubmissionKey);
-        submission[currentValue.submissionId][checkboxAnswerIndex] = {
-          [sectionSubmissionKey]: answerEntry,
-        };
-        break;
-      }
-      case 'radio': {
-        // Initialise submission with radio dummy answers, i.e. add 'null' answers for each radio option
-        const radioDummyAnswers = customHeaders
-          .map((header) => Object.keys(header)[0])
-          .map((topic) => ({
-            [topic]: '',
-          }));
-        submission[currentValue.submissionId].push(...radioDummyAnswers);
-
-        // Find the radio topic that the answer entry actually belongs to
-        const radioAnswerIndex = submission[currentValue.submissionId]
-          .map((sectionObj) => Object.keys(sectionObj)[0])
-          .indexOf(sectionSubmissionKey);
-        submission[currentValue.submissionId][radioAnswerIndex] = {
-          [sectionSubmissionKey]: answerEntry,
-        };
-        break;
-      }
-      default:
-        submission[currentValue.submissionId].push({
-          [sectionSubmissionKey]: answerEntry,
-        });
-        break;
-    }
-
-    const headerAlreadyExists = []
-      .concat(prevValue?.headers?.map((headerObj) => Object.keys(headerObj)[0]))
-      .includes(sectionSubmissionKey);
-
-    return {
-      // Headers are objects { [sectionID]: sectionTitle }: we have to find out if a header object
-      // with current sectionId already exists in the headers array
-      headers: !headerAlreadyExists
-        ? [
-            ...(prevValue?.headers ? prevValue.headers : []),
-            ...([
-              'matrix',
-              'sorting',
-              'checkbox',
-              'grouped-checkbox',
-              'radio',
-            ].includes(currentValue.type)
-              ? customHeaders
-              : [
-                  ...(headerAlreadyExists
-                    ? []
-                    : [
-                        {
-                          [sectionSubmissionKey]: currentValue?.title?.fi
-                            ? `${currentValue.title.fi}${
-                                isSectionPreviouslyAnswered
-                                  ? ' - ' +
-                                    (answersToSameQuestion + 1) +
-                                    '. karttavastaus'
-                                  : ''
-                              }`
-                            : '',
-                        },
-                      ]),
-                ]),
-          ]
-        : prevValue.headers,
-      submissions: [...(prevValue?.submissions ?? []), submission],
-    };
-  }, {} as CSVJson);
+  return {
+    headers: createCSVHeaders(sectionMetadata),
+    submissions: createCSVSubmissions(answerEntries, sectionMetadata),
+  };
 }
