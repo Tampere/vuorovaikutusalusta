@@ -18,7 +18,7 @@ import { ensureAuthenticated } from '@src/auth';
 import { ForbiddenError } from '@src/error';
 import { Router } from 'express';
 import asyncHandler from 'express-async-handler';
-import { body, param } from 'express-validator';
+import { body, param, query } from 'express-validator';
 import { validateRequest } from '../utils';
 
 const router = Router();
@@ -40,9 +40,24 @@ router.get(
  */
 router.get(
   '/',
+  validateRequest([
+    query('filterByAuthored')
+      .toBoolean()
+      .isBoolean()
+      .withMessage('filterByAuthored must be a boolean'),
+    query('filterByPublished')
+      .toBoolean()
+      .isBoolean()
+      .withMessage('filterByPublished must be a boolean'),
+  ]),
   ensureAuthenticated(),
   asyncHandler(async (req, res) => {
-    const surveys = await getSurveys();
+    const userId = req.user.id;
+    const { filterByAuthored, filterByPublished } = req.query;
+    const surveys = await getSurveys(
+      filterByAuthored ? userId : null,
+      Boolean(filterByPublished)
+    );
     res.status(200).json(surveys);
   })
 );

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { createNewSurvey, getSurveys } from '@src/controllers/SurveyController';
 import { useToasts } from '@src/stores/ToastContext';
 import SurveyListItem from './SurveyListItem';
-import { Skeleton } from '@material-ui/core';
+import { FormControlLabel, Skeleton, Switch } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import LoadingButton from '../LoadingButton';
@@ -17,7 +17,7 @@ const useStyles = makeStyles({
   },
   actions: {
     display: 'flex',
-    justifyContent: 'flex-end',
+    justifyContent: 'space-between',
   },
 });
 
@@ -25,6 +25,8 @@ export default function SurveyList() {
   const [surveysLoading, setSurveysLoading] = useState(true);
   const [surveys, setSurveys] = useState<Survey[]>([]);
   const [newSurveyLoading, setNewSurveyLoading] = useState(false);
+  const [showAuthoredOnly, setShowAuthoredOnly] = useState<boolean>(false);
+  const [showPublishedOnly, setShowPublishedOnly] = useState<boolean>(false);
 
   const classes = useStyles();
   const { showToast } = useToasts();
@@ -34,7 +36,9 @@ export default function SurveyList() {
     let abortController = new AbortController();
     async function updateSurveys() {
       try {
-        setSurveys(await getSurveys(abortController));
+        setSurveys(
+          await getSurveys(abortController, showAuthoredOnly, showPublishedOnly)
+        );
         abortController = null;
       } catch (error) {
         showToast({
@@ -51,11 +55,33 @@ export default function SurveyList() {
     return () => {
       abortController?.abort();
     };
-  }, []);
+  }, [showAuthoredOnly, showPublishedOnly]);
 
   return (
     <div className={classes.root}>
       <div className={classes.actions}>
+        <FormControlLabel
+          value="showAuthored"
+          control={
+            <Switch
+              checked={showAuthoredOnly}
+              onChange={(event) => setShowAuthoredOnly(event.target.checked)}
+            />
+          }
+          label={tr.SurveyList.showAuthoredOnly}
+        />
+      </div>
+      <div className={classes.actions}>
+        <FormControlLabel
+          value="showPublished"
+          control={
+            <Switch
+              checked={showPublishedOnly}
+              onChange={(event) => setShowPublishedOnly(event.target.checked)}
+            />
+          }
+          label={tr.SurveyList.showPublishedOnly}
+        />
         <LoadingButton
           variant="contained"
           loading={newSurveyLoading}

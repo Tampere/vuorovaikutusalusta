@@ -20,10 +20,17 @@ function deserializeSurvey(survey: SerializedSurvey): Survey {
 /**
  * Get all premade surveys
  */
-export async function getSurveys(abortController?: AbortController) {
-  const surveys = await request<SerializedSurvey[]>(apiURL, {
-    signal: abortController?.signal,
-  });
+export async function getSurveys(
+  abortController?: AbortController,
+  showAuthoredOnly?: boolean,
+  showPublishedOnly?: boolean
+) {
+  const surveys = await request<SerializedSurvey[]>(
+    `${apiURL}?filterByAuthored=${showAuthoredOnly}&filterByPublished=${showPublishedOnly}`,
+    {
+      signal: abortController?.signal,
+    }
+  );
   return surveys ? surveys.map(deserializeSurvey) : [];
 }
 
