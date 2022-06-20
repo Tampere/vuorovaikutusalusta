@@ -113,15 +113,7 @@ export default function EditMapQuestion({
         }}
       />
       <AddSurveySectionActions
-        types={[
-          'radio',
-          'checkbox',
-          'free-text',
-          'numeric',
-          'sorting',
-          'slider',
-          'matrix',
-        ]}
+        types={['radio', 'checkbox', 'free-text', 'numeric']}
         onAdd={(newSection: SurveyMapSubQuestion) => {
           onChange({
             ...section,
