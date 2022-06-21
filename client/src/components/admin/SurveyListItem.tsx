@@ -8,12 +8,14 @@ import { format } from 'date-fns';
 import CopyToClipboard from '../CopyToClipboard';
 import ConfirmDialog from '../ConfirmDialog';
 import {
+  creteSurveyFromPrevious,
   publishSurvey,
   unpublishSurvey,
 } from '@src/controllers/SurveyController';
 import { useToasts } from '@src/stores/ToastContext';
 import { makeStyles } from '@material-ui/styles';
 import DataExport from './DataExport';
+import LoadingButton from '../LoadingButton';
 
 const useStyles = makeStyles((theme: Theme) => ({
   '@keyframes pulse': {
@@ -151,6 +153,16 @@ export default function SurveyListItem(props: Props) {
               {tr.SurveyList.unpublish}
             </Button>
           )}
+          <LoadingButton
+            onClick={async () => {
+              const newSurveyId = await creteSurveyFromPrevious(survey.id);
+              if (!newSurveyId) return;
+              window.open(`/admin/kyselyt/${newSurveyId}`);
+            }}
+          >
+            {' '}
+            {tr.SurveyList.copySurvey}{' '}
+          </LoadingButton>
           <DataExport surveyId={survey.id} />
         </CardActions>
       </Card>

@@ -18,6 +18,15 @@ function deserializeSurvey(survey: SerializedSurvey): Survey {
 }
 
 /**
+ * Create new survey
+ */
+export async function creteSurveyFromPrevious(baseSurveyId: number) {
+  return await request<number>(`${apiURL}/${baseSurveyId}/copy`, {
+    method: 'POST',
+  });
+}
+
+/**
  * Get all premade surveys
  */
 export async function getSurveys(

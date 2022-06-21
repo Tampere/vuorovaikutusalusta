@@ -56,13 +56,17 @@ export default function DeleteSurveyDialog({ survey, onClose, open }: Props) {
           {tr.DeleteSurveyDialog.warningMessage}
         </Typography>
         <br />
-        <Typography>{tr.DeleteSurveyDialog.activateDeleting}: </Typography>
-        <TextField
-          style={{ minWidth: '50%' }}
-          variant="standard"
-          onChange={(event) => setTypedSurveyName(event.target.value)}
-          placeholder={tr.DeleteSurveyDialog.surveyToBeDeleted}
-        />
+        {survey.name && (
+          <>
+            <Typography>{tr.DeleteSurveyDialog.activateDeleting}: </Typography>
+            <TextField
+              style={{ minWidth: '50%' }}
+              variant="standard"
+              onChange={(event) => setTypedSurveyName(event.target.value)}
+              placeholder={tr.DeleteSurveyDialog.surveyToBeDeleted}
+            />
+          </>
+        )}
       </DialogContent>
       <DialogActions>
         <Button
@@ -75,7 +79,7 @@ export default function DeleteSurveyDialog({ survey, onClose, open }: Props) {
           {tr.commands.cancel}
         </Button>
         <Button
-          disabled={typedSurveyName !== survey.name}
+          disabled={survey.name ? typedSurveyName !== survey.name : false}
           onClick={() => {
             setTypedSurveyName('');
             onClose(true);

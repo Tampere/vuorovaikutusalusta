@@ -269,7 +269,8 @@
     "published": "Julkaistu",
     "notPublished": "Ei julkaistu",
     "showAuthoredOnly": "Näytä vain omat kyselyt",
-    "showPublishedOnly": "Näytä vain avoinna olevat kyselyt"
+    "showPublishedOnly": "Näytä vain avoinna olevat kyselyt",
+    "copySurvey": "Kopioi"
   },
   "SurveyPage": {
     "errorSurveyNotFound": "Kyselyä ei löytynyt, tai se ei ole avoinna. Tarkista osoite ja yritä uudestaan.",

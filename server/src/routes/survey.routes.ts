@@ -20,7 +20,6 @@ import { Router } from 'express';
 import asyncHandler from 'express-async-handler';
 import { body, param, query } from 'express-validator';
 import { validateRequest } from '../utils';
-
 const router = Router();
 
 /**
@@ -191,6 +190,73 @@ router.delete(
     }
     const deletedSurvey = await deleteSurvey(surveyId);
     res.status(200).json(deletedSurvey);
+  })
+);
+
+/**
+ * Endpoint for creating a new survey from the data of a previous survey
+ */
+router.post(
+  '/:id/copy',
+  ensureAuthenticated(),
+  validateRequest([
+    param('id').isNumeric().toInt().withMessage('ID must be a number'),
+  ]),
+  asyncHandler(async (req, res) => {
+    const id = Number(req.params.id);
+    // Create a new empty survey
+    const createdSurvey = await createSurvey(req.user);
+    // Get data of the survey that were copied
+    const copiedSurveyData = await getSurvey({ id });
+    if (!copiedSurveyData || !createdSurvey) {
+      return res.status(500).json('Error while copying survey');
+    }
+
+    // Just in case: change every 'id' -field found on the copied survey into null to prevent overwriting anything
+    function eachRecursive(obj) {
+      for (const key in obj) {
+        if (typeof obj[key] == 'object' && obj[key] !== null) {
+          eachRecursive(obj[key]);
+        } else {
+          if (obj.hasOwnProperty('id')) {
+            obj.id = null;
+          }
+        }
+      }
+    }
+
+    eachRecursive(copiedSurveyData);
+
+    // For every page that exist on the copied survey's data, create a new page skeleton
+    // createdSurvey.pages will already include one page on it by default
+    const pageSkeletons = createdSurvey.pages;
+    if (copiedSurveyData.pages.length > 1) {
+      const additionalPages = await Promise.all(
+        Array(copiedSurveyData.pages.length - 1)
+          .fill(null)
+          .map(() => createSurveyPage(createdSurvey.id))
+      );
+      pageSkeletons.push(...additionalPages);
+    }
+
+    const newPages = copiedSurveyData.pages.map((page, index) => ({
+      ...page,
+      id: pageSkeletons[index].id,
+    }));
+
+    const newSurvey = {
+      ...createdSurvey,
+      mapUrl: copiedSurveyData.mapUrl,
+      pages: newPages,
+    } as Survey;
+
+    // Just to make sure that we are not overwriting the previous survey
+    if (newSurvey.name === null && newSurvey.id !== id) {
+      await updateSurvey(newSurvey);
+      return res.status(200).json(newSurvey.id);
+    } else {
+      return res.status(500).json('Error while copying survey');
+    }
   })
 );
 
