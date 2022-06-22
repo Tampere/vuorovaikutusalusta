@@ -54,6 +54,14 @@ export async function sendMail(emailOptions: EmailOptions) {
       from: `${sender.name ?? sender.address} <${sender.address}>`,
     },
     transport,
+    // Configure Juice to inline CSS styles using the relative path
+    juice: true,
+    juiceResources: {
+      preserveImportant: true,
+      webResources: {
+        relativeTo: resolve(__dirname, '../..', 'email-templates'),
+      },
+    },
     send: process.env.EMAIL_ENABLED === 'true',
   });
   await email.send(emailOptions);
