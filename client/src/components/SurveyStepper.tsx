@@ -1,4 +1,9 @@
-import { AnswerEntry, SubmissionInfo, Survey } from '@interfaces/survey';
+import {
+  AnswerEntry,
+  SubmissionInfo,
+  Survey,
+  SurveyMapQuestion,
+} from '@interfaces/survey';
 import {
   Chip,
   Drawer,
@@ -168,7 +173,7 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
   // Map answer geometries on the current page
   const mapAnswerGeometries = useMemo(() => {
     const mapQuestions = currentPage.sections.filter(
-      (section) => section.type === 'map'
+      (section): section is SurveyMapQuestion => section.type === 'map'
     );
     // Reduce all geometries from map question answers into a feature collection
     return mapQuestions.reduce(
@@ -187,9 +192,9 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
                   ...value.geometry,
                   // Add a unique index to prevent conflicts
                   id: `feature-${question.id}-${index}`,
-                  // Pass question ID and answer index for reopening the subquestion dialog in edit mode
+                  // Pass entires question and answer index for reopening the subquestion dialog in edit mode
                   properties: {
-                    questionId: question.id,
+                    question,
                     index,
                   },
                 },

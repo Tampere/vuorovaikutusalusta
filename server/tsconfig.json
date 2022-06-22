@@ -4,6 +4,7 @@
     "esModuleInterop": true,
     "outDir": "dist",
     "baseUrl": ".",
+    "skipLibCheck": true,
     "paths": {
       "@src/*": ["src/*", "dist/*"],
       "@interfaces/*": ["../interfaces/*"]

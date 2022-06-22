@@ -73,6 +73,19 @@ export default function AddSurveySectionActions(props: Props) {
       isRequired: false,
       info: null,
       selectionTypes: [],
+      featureStyles: {
+        point: {
+          markerIcon: null,
+        },
+        line: {
+          strokeStyle: null,
+          strokeColor: null,
+        },
+        area: {
+          strokeStyle: null,
+          strokeColor: null,
+        },
+      },
       subQuestions: [],
     },
     'free-text': {

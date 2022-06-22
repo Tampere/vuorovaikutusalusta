@@ -4,7 +4,6 @@ import {
   Survey,
   SurveyMapQuestion,
   SurveyMatrixQuestion,
-  SurveyPage,
   SurveyPageSection,
 } from '@interfaces/survey';
 import logger from '@src/logger';
@@ -74,8 +73,7 @@ function prepareMapAnswers(
     )
     .reduce(
       (jobData, entry) => {
-        // TODO: Not sure why TS couldn't infer the type here...
-        const page: SurveyPage = survey.pages.find((page) =>
+        const page = survey.pages.find((page) =>
           page.sections.some((section) => section.id === entry.sectionId)
         );
         return {
@@ -87,6 +85,10 @@ function prepareMapAnswers(
               index,
               feature: answer.geometry,
               visibleLayerIds: page.sidebar.mapLayers,
+              question: page.sections.find(
+                (section): section is SurveyMapQuestion =>
+                  section.id === entry.sectionId
+              ),
             })),
           ],
         };

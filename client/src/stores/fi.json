@@ -218,6 +218,23 @@
       "warmGreen": "Lämmin vihreä"
     }
   },
+  "MarkerIconSelect": {
+    "icon": "Ikoni",
+    "selectIcon": "Valitse ikoni",
+    "errorFetchingIcons": "Ikonien haussa tapahtui virhe. Yritä myöhemmin uudelleen."
+  },
+  "StrokeStyleSelect": {
+    "strokeStyle": "Viivan tyyli",
+    "selectStrokeStyle": "Valitse viivan tyyli",
+    "solid": "Yhtenäinen",
+    "dashed": "Katkoviiva",
+    "dotted": "Pisteviiva"
+  },
+  "StrokeColorSelect": {
+    "strokeColor": "Viivan väri",
+    "selectStrokeColor": "Valitse viivan väri",
+    "errorFetchingColors": "Värien haussa tapahtui virhe. Yritä myöhemmin uudelleen."
+  },
   "SurveyList": {
     "title": "Vuorovaikutusalusta - Kyselyt",
     "errorFetchingSurveys": "Virhe haettaessa kyselyitä. Yritä myöhemmin uudestaan.",

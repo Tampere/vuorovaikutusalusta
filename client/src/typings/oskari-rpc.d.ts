@@ -100,6 +100,32 @@ declare module 'oskari-rpc' {
         layerId: string
       ]
     ) => void;
+
+    /**
+     * Add markers request
+     */
+    export type AddMarkerRequest = (
+      name: 'MapModulePlugin.AddMarkerRequest',
+      params: [
+        marker: {
+          x: number;
+          y: number;
+          shape: string | number;
+          offsetX: number;
+          offsetY: number;
+          size: number;
+        },
+        id: string
+      ]
+    ) => void;
+
+    /**
+     * Remove markers request
+     */
+    export type RemoveMarkersRequest = (
+      name: 'MapModulePlugin.RemoveMarkersRequest',
+      params: number[]
+    ) => void;
   }
 
   /**
@@ -174,6 +200,11 @@ declare module 'oskari-rpc' {
   }) => void;
 
   /**
+   * Marker click event handler
+   */
+  export type MarkerClickEventHandler = (payload: { id: string }) => void;
+
+  /**
    * Infobox action event handler
    */
   export type InfoboxActionEventHandler = (payload: {
@@ -208,6 +239,14 @@ declare module 'oskari-rpc' {
     ) => void;
 
     /**
+     * Oskari marker click event
+     */
+    export type MarkerClickEvent = (
+      name: 'MarkerClickEvent',
+      callback: MarkerClickEventHandler
+    ) => void;
+
+    /**
      * Oskari infobox action event
      */
     export type InfoboxActionEvent = (
@@ -232,6 +271,8 @@ declare module 'oskari-rpc' {
       MapModulePlugin.AddFeaturesToMapRequest &
       MapModulePlugin.ZoomToFeaturesRequest &
       MapModulePlugin.RemoveFeaturesFromMapRequest &
+      MapModulePlugin.AddMarkerRequest &
+      MapModulePlugin.RemoveMarkersRequest &
       InfoBox.ShowInfoBoxRequest &
       InfoBox.HideInfoBoxRequest;
     /**
@@ -239,6 +280,7 @@ declare module 'oskari-rpc' {
      */
     handleEvent: Event.DrawingEvent &
       Event.FeatureEvent &
+      Event.MarkerClickEvent &
       Event.InfoboxActionEvent;
     /**
      * Unregister any registered event handler
