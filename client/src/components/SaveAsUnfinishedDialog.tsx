@@ -59,6 +59,7 @@ export default function SaveAsUnfinishedDialog({
       showToast({
         message: tr.SaveAsUnfinishedDialog.saveSuccessful,
         severity: 'success',
+        autoHideDuration: 30000,
       });
       setUnfinishedToken(token);
       onSave(token);

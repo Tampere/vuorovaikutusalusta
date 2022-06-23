@@ -235,7 +235,7 @@ export default function EditSurveyInfo() {
         <div className={classes.actions}>
           <LoadingButton
             variant="contained"
-            color="secondary"
+            color="error"
             loading={deleteSurveyLoading}
             onClick={() => {
               setDeleteConfirmDialogOpen(true);

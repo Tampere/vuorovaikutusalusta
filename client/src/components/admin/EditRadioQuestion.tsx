@@ -45,7 +45,7 @@ export default function EditRadioQuestion({
         }}
         title={tr.SurveySections.options}
         enableClipboardImport={true}
-        allowOptionInfo={true}
+        allowOptionInfo={false}
       />
       <FormGroup row>
         <FormControlLabel

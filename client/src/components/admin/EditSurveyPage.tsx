@@ -85,7 +85,14 @@ export default function EditSurveyPage() {
         }}
       />
       <Button
+        style={{
+          display: 'flex',
+          position: 'fixed',
+          right: '2rem',
+          zIndex: 10,
+        }}
         disabled={loading}
+        color="error"
         variant="contained"
         className={classes.button}
         onClick={() => {

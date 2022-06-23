@@ -290,10 +290,10 @@
     "saveAsUnfinished": "Tallenna keskeneräisenä"
   },
   "SaveAsUnfinishedDialog": {
-    "description": "Voit tallentaa kyselyn keskeneräisenä antamalla sähköpostiosoitteen, johon toimitetaan linkki kyselyn jatkamista varten.",
-    "disclaimer": "Sähköpostiosoitetta ei tallenneta eikä käytetä muihin tarkoituksiin.",
+    "description": "Voit tallentaa kyselyn keskeneräisenä antamalla sähköpostiosoitteesi. Sähköpostiisi toimitetaan linkki, josta pääset jatkamaan vastaamista kyselyn ollessa auki.",
+    "disclaimer": "Sähköpostiosoitettasi ei tallenneta eikä käytetä muihin tarkoituksiin.",
     "email": "Sähköpostiosoite",
-    "saveSuccessful": "Vastauksesi tallennettiin onnistuneesti! Saat hetken kuluttua sähköpostiisi linkin, jolla voit jatkaa kyselyä.",
+    "saveSuccessful": "Vastauksesi tallennettiin onnistuneesti! Saat hetken kuluttua sähköpostiisi linkin, jolla voit jatkaa kyselyä. Voit nyt sulkea selaimen. Jos käytät julkista tietokonetta, muista tyhjentää selaimen välimuisti.",
     "errorSaving": "Vastaustesi tallennuksessa tapahtui virhe. Ole hyvä ja yritä myöhemmin uudestaan."
   },
   "SurveyQuestion": {
