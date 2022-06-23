@@ -14,6 +14,7 @@ import { Close } from '@material-ui/icons';
 export interface Toast {
   severity: AlertProps['severity'];
   message: string;
+  autoHideDuration?: number;
 }
 
 /**
@@ -156,7 +157,7 @@ export default function ToastProvider({ children }: { children: ReactNode }) {
       {children}
       <Snackbar
         open={state.open}
-        autoHideDuration={6000}
+        autoHideDuration={state.currentToast?.autoHideDuration ?? 8000}
         onClose={closeCurrentToast}
       >
         <Alert

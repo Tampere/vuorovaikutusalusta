@@ -1,5 +1,10 @@
 import { GeoJSONWithCRS } from '@interfaces/geojson';
+import {
+  MapQuestionSelectionType,
+  SurveyMapQuestion,
+} from '@interfaces/survey';
 import { Feature, LineString, Point, Polygon } from 'geojson';
+import parseCSSColor from 'parse-css-color';
 import { Page } from 'puppeteer';
 import { Cluster } from 'puppeteer-cluster';
 
@@ -11,6 +16,10 @@ declare const Oskari: any;
 
 let cluster: Cluster<ScreenshotJobData, ScreenshotJobReturnData[]>;
 
+const networkIdleTimeout = process.env.PUPPETEER_NETWORK_IDLE_TIMEOUT
+  ? Number(process.env.PUPPETEER_NETWORK_IDLE_TIMEOUT)
+  : 10000;
+
 export interface ScreenshotJobData {
   mapUrl: string;
   answers?: {
@@ -18,6 +27,7 @@ export interface ScreenshotJobData {
     index: number;
     feature: GeoJSONWithCRS<Feature<Point | LineString | Polygon>>;
     visibleLayerIds: number[];
+    question: SurveyMapQuestion;
   }[];
 }
 
@@ -25,6 +35,54 @@ export interface ScreenshotJobReturnData {
   sectionId: number;
   index: number;
   image: Buffer;
+}
+
+// Default feature style
+const defaultFeatureStyle = {
+  stroke: {
+    color: 'rgba(0,0,0)',
+    width: 10,
+  },
+  fill: {
+    color: 'rgba(0,0,0,0.3)',
+  },
+};
+
+function getFeatureStyle(
+  selectionType: MapQuestionSelectionType,
+  question: SurveyMapQuestion
+) {
+  // Use default style for points
+  if (selectionType === 'point') {
+    return defaultFeatureStyle;
+  }
+  // Get feature style from question
+  const style = question.featureStyles?.[selectionType];
+  // If no style is defined, use default
+  if (!style) {
+    return defaultFeatureStyle;
+  }
+  // Parse & calculate fill color with a fixed opacity from the stroke color
+  const parsedStrokeColor = parseCSSColor(style.strokeColor);
+  const fillColor = parsedStrokeColor
+    ? `rgba(${parsedStrokeColor.values.join(',')}, 0.3)`
+    : defaultFeatureStyle.fill.color;
+  return {
+    stroke: {
+      color: style.strokeColor || defaultFeatureStyle.stroke.color,
+      width: 10,
+      lineDash:
+        style.strokeStyle === 'dashed'
+          ? [30, 10]
+          : style.strokeStyle === 'dotted'
+          ? [0, 14]
+          : null,
+      lineCap: style.strokeStyle === 'dashed' ? 'butt' : 'round',
+    },
+    fill: {
+      color: fillColor,
+    },
+  };
 }
 
 async function generateScreenshots({
@@ -42,20 +100,20 @@ async function generateScreenshots({
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36'
   );
 
-  page.setViewport({ width: 800, height: 600 });
+  page.setViewport({ width: 800, height: 600, deviceScaleFactor: 3 });
   await page.goto(mapUrl, { waitUntil: 'networkidle0' });
 
   // Open the index map if enabled
   await page.evaluate(() => {
     // @ts-ignore
     document.querySelector('.indexmapToggle')?.click();
+    document.querySelector('.indexmapToggle')?.remove();
   });
-  await page.waitForNetworkIdle();
 
   for (const answer of answers) {
     // Prepare the window for the next screenshot
     await page.evaluate(
-      ({ visibleLayerIds, feature }) => {
+      ({ visibleLayerIds, feature, featureStyle, question }) => {
         const sandbox = Oskari.getSandbox();
 
         sandbox
@@ -68,29 +126,60 @@ async function generateScreenshots({
               [layerId, visibleLayerIds.includes(layerId)]
             );
           });
-        sandbox.postRequestByName('MapModulePlugin.AddFeaturesToMapRequest', [
-          { type: 'FeatureCollection', features: [feature] },
-          {
-            clearPrevious: true,
-            featureStyle: {
-              stroke: {
-                color: 'rgba(0,0,0,0.5)',
-                width: 10,
-              },
+        // Clear any previous features or markers
+        sandbox.postRequestByName(
+          'MapModulePlugin.RemoveFeaturesFromMapRequest',
+          []
+        );
+        sandbox.postRequestByName('MapModulePlugin.RemoveMarkersRequest', []);
+
+        if (feature.geometry.type === 'Point') {
+          // In case of adding a point, create a marker and zoom to it
+          sandbox.postRequestByName('MapModulePlugin.AddMarkerRequest', [
+            {
+              x: feature.geometry.coordinates[0],
+              y: feature.geometry.coordinates[1],
+              shape: question.featureStyles?.point?.markerIcon ?? 0,
+              offsetX: 0,
+              offsetY: 0,
+              size: question.featureStyles?.point?.markerIcon ? 64 : 12,
             },
-          },
-        ]);
-        sandbox.postRequestByName('MapModulePlugin.ZoomToFeaturesRequest', [
-          { maxZoomLevel: 12 },
-        ]);
+          ]);
+          sandbox.postRequestByName('MapMoveRequest', [
+            feature.geometry.coordinates[0],
+            feature.geometry.coordinates[1],
+            12,
+          ]);
+        } else {
+          // Otherwise, add the feature to the map and zoom to it
+          sandbox.postRequestByName('MapModulePlugin.AddFeaturesToMapRequest', [
+            { type: 'FeatureCollection', features: [feature] },
+            {
+              clearPrevious: true,
+              featureStyle,
+            },
+          ]);
+          sandbox.postRequestByName('MapModulePlugin.ZoomToFeaturesRequest', [
+            { maxZoomLevel: 12 },
+          ]);
+        }
       },
       {
         visibleLayerIds: answer.visibleLayerIds,
         feature: answer.feature as any,
+        featureStyle: getFeatureStyle(
+          answer.feature.geometry.type === 'Point'
+            ? 'point'
+            : answer.feature.geometry.type === 'LineString'
+            ? 'line'
+            : 'area',
+          answer.question
+        ),
+        question: answer.question as any,
       }
     );
     try {
-      await page.waitForNetworkIdle({ timeout: 10000 });
+      await page.waitForNetworkIdle({ timeout: networkIdleTimeout });
     } catch (error) {
       // Ignore timeout errors
     }
@@ -156,7 +245,6 @@ export async function getScreenshots(jobData: ScreenshotJobData) {
   }
   // Don't bother starting Puppeteer if there are no map answers
   if (!jobData.answers.length) {
-    console.log('No map answers!');
     return [];
   }
   const images = await cluster.execute(jobData);

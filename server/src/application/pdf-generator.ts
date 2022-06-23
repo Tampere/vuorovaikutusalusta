@@ -4,10 +4,10 @@ import {
   Survey,
   SurveyMapQuestion,
   SurveyMatrixQuestion,
-  SurveyPage,
   SurveyPageSection,
 } from '@interfaces/survey';
 import logger from '@src/logger';
+import moment from 'moment';
 import PDFDocument from 'pdfkit';
 import PdfPrinter from 'pdfmake';
 import { Content } from 'pdfmake/interfaces';
@@ -74,8 +74,7 @@ function prepareMapAnswers(
     )
     .reduce(
       (jobData, entry) => {
-        // TODO: Not sure why TS couldn't infer the type here...
-        const page: SurveyPage = survey.pages.find((page) =>
+        const page = survey.pages.find((page) =>
           page.sections.some((section) => section.id === entry.sectionId)
         );
         return {
@@ -87,6 +86,10 @@ function prepareMapAnswers(
               index,
               feature: answer.geometry,
               visibleLayerIds: page.sidebar.mapLayers,
+              question: page.sections.find(
+                (section): section is SurveyMapQuestion =>
+                  section.id === entry.sectionId
+              ),
             })),
           ],
         };
@@ -98,10 +101,22 @@ function prepareMapAnswers(
     );
 }
 
-async function getFrontPage(survey: Survey): Promise<Content> {
+async function getFrontPage(
+  survey: Survey,
+  submissionId: number,
+  timestamp: Date,
+  answerEntries: AnswerEntry[]
+): Promise<Content> {
   const image = survey.backgroundImageName
     ? await getFile(survey.backgroundImageName, survey.backgroundImagePath)
     : null;
+  const attachmentFileNames = answerEntries
+    .filter(
+      (entry): entry is AnswerEntry & { type: 'attachment' } =>
+        entry.type === 'attachment'
+    )
+    .map((entry) => entry.value[0]?.fileName)
+    .filter(Boolean);
   return [
     // TODO header logo from DB
     image && {
@@ -122,10 +137,25 @@ async function getFrontPage(survey: Survey): Promise<Content> {
       fontSize: 12,
       bold: true,
       margin: [0, 0, 0, 10],
-      pageBreak: 'after',
     },
-    // TODO metadata fields
+    // Add the remaining "info fields" from one array as they have identical styling
+    [
+      ...(survey.email?.info ?? []).map(
+        (item) => `${item.name}: ${item.value}`
+      ),
+      `Vastauksen tunniste: ${submissionId}`,
+      `Tallennusaika: ${moment(timestamp).format('DD.MM.YYYY HH:mm')}`,
+      attachmentFileNames.length > 0 &&
+        `Liitteet: ${attachmentFileNames.join(', ')}`,
+    ]
+      .filter(Boolean)
+      .map((text) => ({
+        text,
+        fontSize: 12,
+        margin: [0, 0, 0, 10],
+      })),
     // TODO footer logo from DB
+    { text: '', pageBreak: 'after' },
   ];
 }
 
@@ -281,11 +311,13 @@ function getContent(
 /**
  * Generates a PDF for a single submission.
  * @param survey Survey
+ * @param submission Info about the newly created submission
  * @param answerEntries Answer entries for the submission
  * @returns
  */
 export async function generatePdf(
   survey: Survey,
+  submission: { id: number; timestamp: Date },
   answerEntries: AnswerEntry[]
 ) {
   const start = Date.now();
@@ -303,7 +335,12 @@ export async function generatePdf(
   );
 
   const content: Content = [
-    await getFrontPage(survey),
+    await getFrontPage(
+      survey,
+      submission.id,
+      submission.timestamp,
+      answerEntries
+    ),
     ...sections.map((section) =>
       getContent(
         answerEntries.find((entry) => entry.sectionId === section.id),

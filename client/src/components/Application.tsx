@@ -40,6 +40,9 @@ const Application = () => {
             <Route path="/:name" exact>
               <SurveyPage />
             </Route>
+            <Route path="/:name/testi">
+              <SurveyPage isTestSurvey />
+            </Route>
             <Route>
               <NotFoundPage />
             </Route>

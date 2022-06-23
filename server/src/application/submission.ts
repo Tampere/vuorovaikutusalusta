@@ -174,20 +174,21 @@ export async function createSurveySubmission(
   const submissionRow = await getDb().one<{
     id: number;
     unfinished_token?: string;
+    updated_at: Date;
   }>(
     !unfinished
       ? `
     INSERT INTO data.submission (survey_id, created_at) VALUES (
       $1,
       COALESCE($2, NOW())
-    ) RETURNING id;
+    ) RETURNING id, updated_at;
   `
       : `
     INSERT INTO data.submission (survey_id, created_at, unfinished_token) VALUES (
         $1,
         COALESCE($2, NOW()),
         COALESCE($3, gen_random_uuid())
-    ) RETURNING id, unfinished_token;`,
+    ) RETURNING id, unfinished_token, updated_at;`,
     [surveyID, oldRow?.created_at ?? null, unfinishedToken ?? null]
   );
 
@@ -198,7 +199,7 @@ export async function createSurveySubmission(
     throw new InternalServerError(`Error while creating submission for survey`);
   }
 
-  const { id, unfinished_token } = submissionRow;
+  const { id, unfinished_token, updated_at } = submissionRow;
   const entryRows = answerEntriesToRows(id, answerEntries);
   const inputSRID = getSRIDFromEntries(answerEntries);
   // While inserting the entries, pick all entry IDs for linking subquestion answers where needed
@@ -236,6 +237,8 @@ export async function createSurveySubmission(
 
   return {
     id,
+    // Timestamp of the submission = timestamp of the last update
+    timestamp: updated_at,
     // If the submission was unfinished, return the newly created token
     unfinishedToken: unfinished ? unfinished_token : null,
   };
@@ -247,7 +250,9 @@ export async function createSurveySubmission(
  * @returns SRID describing the coordinate reference system in which the geometry entries are described in
  */
 function getSRIDFromEntries(submissionEntries: AnswerEntry[]) {
-  const geometryEntry = submissionEntries.find((entry) => entry.type === 'map');
+  const geometryEntry = submissionEntries.find(
+    (entry) => entry.type === 'map' && entry.value.length > 0
+  );
   if (!geometryEntry) return null;
 
   const crsName =
@@ -687,4 +692,17 @@ export async function getAnswerEntries(submissionId: number) {
     throw new Error(`Submission with ID ${submissionId} not found`);
   }
   return dbAnswerEntriesToAnswerEntries(rows);
+}
+
+/**
+ * Get timestamp of the given submission (=updated at)
+ * @param submissionId Submission ID
+ * @returns Timestamp
+ */
+export async function getTimestamp(submissionId: number) {
+  const { updated_at } = await getDb().one<{ updated_at: Date }>(
+    `SELECT updated_at FROM data.submission WHERE id = $1`,
+    [submissionId]
+  );
+  return updated_at;
 }

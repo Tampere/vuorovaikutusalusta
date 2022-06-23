@@ -1,4 +1,9 @@
-import { AnswerEntry, SubmissionInfo, Survey } from '@interfaces/survey';
+import {
+  AnswerEntry,
+  SubmissionInfo,
+  Survey,
+  SurveyMapQuestion,
+} from '@interfaces/survey';
 import {
   Chip,
   Drawer,
@@ -38,7 +43,7 @@ import TextSection from './TextSection';
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
     display: 'flex',
-    height: '100vh',
+    height: '100%',
   },
   stepper: {
     width: '100%',
@@ -96,9 +101,14 @@ const useStyles = makeStyles((theme: Theme) => ({
 interface Props {
   survey: Survey;
   onComplete: () => void;
+  isTestSurvey: boolean;
 }
 
-export default function SurveyStepper({ survey, onComplete }: Props) {
+export default function SurveyStepper({
+  survey,
+  onComplete,
+  isTestSurvey,
+}: Props) {
   const [pageNumber, setPageNumber] = useState(0);
   const [loading, setLoading] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
@@ -168,7 +178,7 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
   // Map answer geometries on the current page
   const mapAnswerGeometries = useMemo(() => {
     const mapQuestions = currentPage.sections.filter(
-      (section) => section.type === 'map'
+      (section): section is SurveyMapQuestion => section.type === 'map'
     );
     // Reduce all geometries from map question answers into a feature collection
     return mapQuestions.reduce(
@@ -187,9 +197,9 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
                   ...value.geometry,
                   // Add a unique index to prevent conflicts
                   id: `feature-${question.id}-${index}`,
-                  // Pass question ID and answer index for reopening the subquestion dialog in edit mode
+                  // Pass entires question and answer index for reopening the subquestion dialog in edit mode
                   properties: {
-                    questionId: question.id,
+                    question,
                     index,
                   },
                 },
@@ -239,6 +249,10 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
   }
 
   async function doSubmit(info?: SubmissionInfo) {
+    if (isTestSurvey) {
+      onComplete();
+      return;
+    }
     setLoading(true);
     try {
       await request(
@@ -309,6 +323,7 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
                 </div>
               ))}
               <StepperControls
+                isTestSurvey={isTestSurvey}
                 activeStep={index}
                 totalSteps={survey.pages.length}
                 onPrevious={() => {
@@ -329,6 +344,7 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
                     doSubmit();
                   }
                 }}
+                allowSavingUnfinished={survey.allowSavingUnfinished}
               />
             </FormControl>
           </StepContent>
@@ -403,6 +419,7 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
         <SplitPane
           split="vertical"
           defaultSize="50%"
+          style={{ position: 'static' }}
           minSize={200}
           maxSize={-200}
           // Allow scrolling for the stepper pane

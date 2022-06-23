@@ -195,7 +195,7 @@ function dbEntriesToGeoJSON(entries: AnswerEntry[]) {
       ][answer.title?.['fi'] ?? 'Kysymys'] =
         answer.valueNumeric ??
         answer.valueText ??
-        answer.optionText['fi'] ??
+        answer.optionText?.['fi'] ??
         '';
     }
     return submissionGroup;
@@ -439,7 +439,7 @@ const getSectionHeaders = async (surveyId: number) =>
     LEFT JOIN data.option_group og ON opt.group_id = og.id
     LEFT JOIN data.survey_page sp ON ps.survey_page_id = sp.id
     LEFT JOIN data.survey s ON sp.survey_id = s.id
-    WHERE s.id = $1 
+    WHERE s.id = $1
       AND ps.type <> 'map'
       AND ps.type <> 'attachment'
       AND ps.type <> 'document'
@@ -634,7 +634,7 @@ function submissionAnswersToJson(
         break;
       case 'matrix':
         sectionDetails.details.subjects.forEach((_subject, index) => {
-          const classIndex = answer.valueJson[index];
+          const classIndex = answer.valueJson?.[index];
           ret[
             getHeaderKey(
               sectionDetails.pageIndex,
@@ -649,7 +649,7 @@ function submissionAnswersToJson(
         });
         break;
       case 'sorting':
-        answer.valueJson.forEach((optionId, index) => {
+        answer.valueJson?.forEach((optionId, index) => {
           ret[
             getHeaderKey(
               sectionDetails.pageIndex,

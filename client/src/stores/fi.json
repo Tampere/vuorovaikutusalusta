@@ -35,7 +35,8 @@
     "deleteSurvey": "Poista kysely",
     "deleteSurveyConfirm": "Haluatko varmasti poistaa koko kyselyn? Toimintoa ei voi perua.",
     "deleteSurveyFailed": "Kyselyn poistamisessa tapahtui virhe. Yritä myöhemmin uudestaan.",
-    "deleteSurveySuccessful": "Kysely poistettiin onnistuneesti!"
+    "deleteSurveySuccessful": "Kysely poistettiin onnistuneesti!",
+    "allowSavingUnfinished": "Salli kyselyn tallentaminen keskeneräisenä"
   },
   "EditSurveyInfo": {
     "title": "Kyselyn otsikko",
@@ -55,7 +56,10 @@
     "theme": "Teema",
     "selectTheme": "Valitse teema",
     "themeFetchFailed": "Teemojen hakemisessa tapahtui virhe. Yritä myöhemmin uudestaan.",
-    "titleColor": "Osioiden otsikoiden väri"
+    "titleColor": "Osioiden otsikoiden väri",
+    "allowTestSurvey": "Julkaise testikysely",
+    "allowTestSurveyHelperText": "Kyselystä julkaistaan testiversio oman osoitteen taakse. Testikyselystä ei tallenneta vastauksia.",
+    "testSurveyUrl": "Testikyselyn osoite"
   },
   "EditSurveyEmail": {
     "enable": "Salli vastausten raportointi sähköpostitse",
@@ -63,7 +67,15 @@
     "autoSendTo": "Vastaanottajien sähköpostiosoitteet",
     "autoSendToHelperText": "Näihin osoitteisiin lähetetään jokaisesta vastauksesta raportti sähköpostin liitteenä (vastaajan lisäksi).",
     "emailSubject": "Viestin aihe",
-    "emailBody": "Viestin sisältö"
+    "emailBody": "Viestin sisältö",
+    "info": "Lisätiedot",
+    "infoHelperText": "Lisätiedot esitetään sähköpostitse lähetettävän vastausraportin etusivulla."
+  },
+  "KeyValueForm": {
+    "key": "Nimi",
+    "value": "Arvo",
+    "addEntry": "Lisää rivi",
+    "deleteEntry": "Poista rivi"
   },
   "EditSurveyPage": {
     "name": "Sivun nimi",
@@ -218,6 +230,23 @@
       "warmGreen": "Lämmin vihreä"
     }
   },
+  "MarkerIconSelect": {
+    "icon": "Ikoni",
+    "selectIcon": "Valitse ikoni",
+    "errorFetchingIcons": "Ikonien haussa tapahtui virhe. Yritä myöhemmin uudelleen."
+  },
+  "StrokeStyleSelect": {
+    "strokeStyle": "Viivan tyyli",
+    "selectStrokeStyle": "Valitse viivan tyyli",
+    "solid": "Yhtenäinen",
+    "dashed": "Katkoviiva",
+    "dotted": "Pisteviiva"
+  },
+  "StrokeColorSelect": {
+    "strokeColor": "Viivan väri",
+    "selectStrokeColor": "Valitse viivan väri",
+    "errorFetchingColors": "Värien haussa tapahtui virhe. Yritä myöhemmin uudelleen."
+  },
   "SurveyList": {
     "title": "Vuorovaikutusalusta - Kyselyt",
     "errorFetchingSurveys": "Virhe haettaessa kyselyitä. Yritä myöhemmin uudestaan.",
@@ -273,10 +302,10 @@
     "saveAsUnfinished": "Tallenna keskeneräisenä"
   },
   "SaveAsUnfinishedDialog": {
-    "description": "Voit tallentaa kyselyn keskeneräisenä antamalla sähköpostiosoitteen, johon toimitetaan linkki kyselyn jatkamista varten.",
-    "disclaimer": "Sähköpostiosoitetta ei tallenneta eikä käytetä muihin tarkoituksiin.",
+    "description": "Voit tallentaa kyselyn keskeneräisenä antamalla sähköpostiosoitteesi. Sähköpostiisi toimitetaan linkki, josta pääset jatkamaan vastaamista kyselyn ollessa auki.",
+    "disclaimer": "Sähköpostiosoitettasi ei tallenneta eikä käytetä muihin tarkoituksiin. Vastauksesi otetaan huomioon vasta, kun olet vastannut kyselyn loppuun ja lähettänyt lopullisen vastauksesi.",
     "email": "Sähköpostiosoite",
-    "saveSuccessful": "Vastauksesi tallennettiin onnistuneesti! Saat hetken kuluttua sähköpostiisi linkin, jolla voit jatkaa kyselyä.",
+    "saveSuccessful": "Vastauksesi tallennettiin onnistuneesti! Saat hetken kuluttua sähköpostiisi linkin, jolla voit jatkaa kyselyä. Voit nyt sulkea selaimen. Jos käytät julkista tietokonetta, muista tyhjentää selaimen välimuisti.",
     "errorSaving": "Vastaustesi tallennuksessa tapahtui virhe. Ole hyvä ja yritä myöhemmin uudestaan."
   },
   "SurveyQuestion": {
@@ -350,6 +379,9 @@
   },
   "MapInfoBox": {
     "answer": "Vastaus"
+  },
+  "TestSurveyFrame": {
+    "text": "Tämä on testikysely. Vastauksia ei tallenneta, eikä niistä lähetetä sähköpostia."
   },
   "navigation": {
     "next": "Seuraava",

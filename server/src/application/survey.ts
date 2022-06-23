@@ -6,6 +6,7 @@ import {
   Survey,
   SurveyBackgroundImage,
   SurveyCheckboxQuestion,
+  SurveyEmailInfoItem,
   SurveyMapQuestion,
   SurveyMapSubQuestion,
   SurveyPage,
@@ -46,6 +47,7 @@ interface DBSurvey {
   map_url: string;
   start_date: Date;
   end_date: Date;
+  allow_test_survey: boolean;
   created_at: Date;
   updated_at: Date;
   thanks_page_title: LocalizedText;
@@ -57,6 +59,8 @@ interface DBSurvey {
   email_auto_send_to: string[];
   email_subject: string;
   email_body: string;
+  email_info: SurveyEmailInfoItem[];
+  allow_saving_unfinished: boolean;
 }
 
 /**
@@ -667,17 +671,20 @@ export async function updateSurvey(survey: Survey) {
         map_url = $7,
         start_date = $8,
         end_date = $9,
-        thanks_page_title = $10,
-        thanks_page_text = $11,
-        background_image_name = $12,
-        background_image_path = $13,
-        admins = $14,
-        theme_id = $15,
-        section_title_color = $16,
-        email_enabled = $17,
-        email_auto_send_to = $18,
-        email_subject = $19,
-        email_body = $20
+        allow_test_survey = $10,
+        thanks_page_title = $11,
+        thanks_page_text = $12,
+        background_image_name = $13,
+        background_image_path = $14,
+        admins = $15,
+        theme_id = $16,
+        section_title_color = $17,
+        email_enabled = $18,
+        email_auto_send_to = $19,
+        email_subject = $20,
+        email_body = $21,
+        email_info = $22::json,
+        allow_saving_unfinished = $23
       WHERE id = $1 RETURNING *`,
       [
         survey.id,
@@ -689,6 +696,7 @@ export async function updateSurvey(survey: Survey) {
         survey.mapUrl,
         survey.startDate,
         survey.endDate,
+        survey.allowTestSurvey,
         { fi: survey.thanksPage.title },
         { fi: survey.thanksPage.text },
         survey.backgroundImageName ?? null,
@@ -700,6 +708,8 @@ export async function updateSurvey(survey: Survey) {
         survey.email.autoSendTo,
         survey.email.subject,
         survey.email.body,
+        JSON.stringify(survey.email.info),
+        survey.allowSavingUnfinished,
       ]
     )
     .catch((error) => {
@@ -863,6 +873,7 @@ function dbSurveyToSurvey(
     mapUrl: dbSurvey.map_url,
     startDate: dbSurvey.start_date,
     endDate: dbSurvey.end_date,
+    allowTestSurvey: dbSurvey.allow_test_survey,
     thanksPage: {
       title: dbSurvey.thanks_page_title?.fi,
       text: dbSurvey.thanks_page_text?.fi,
@@ -875,7 +886,9 @@ function dbSurveyToSurvey(
       autoSendTo: dbSurvey.email_auto_send_to,
       subject: dbSurvey.email_subject,
       body: dbSurvey.email_body,
+      info: dbSurvey.email_info,
     },
+    allowSavingUnfinished: dbSurvey.allow_saving_unfinished,
     // Single survey row won't contain pages - they get aggregated from a join query
     pages: [],
   };

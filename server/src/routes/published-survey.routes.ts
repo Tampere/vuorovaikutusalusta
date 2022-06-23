@@ -17,10 +17,12 @@ const router = Router();
 
 router.get(
   '/:name',
+  validateRequest([query('test').optional().isString()]),
   asyncHandler(async (req, res) => {
+    const test = req.query.test === 'true';
     const survey = await getSurvey({ name: req.params.name });
-    if (!survey.isPublished) {
-      // In case the survey shouldn't be published, throw the same not found error
+    if ((!test && !survey.isPublished) || (test && !survey.allowTestSurvey)) {
+      // In case the survey shouldn't be published (or test survey not allowed if requested), throw the same not found error
       throw new ForbiddenError(`Survey with name ${req.params.name} not found`);
     }
     res.json(survey);
@@ -57,7 +59,7 @@ router.post(
     }
     const answerEntries: AnswerEntry[] = req.body.entries;
     const unfinishedToken = req.query.token ? String(req.query.token) : null;
-    const { id: submissionId } = await createSurveySubmission(
+    const { id: submissionId, timestamp } = await createSurveySubmission(
       survey.id,
       answerEntries,
       unfinishedToken
@@ -71,7 +73,11 @@ router.post(
     }
 
     // Generate the PDF
-    const pdfFile = await generatePdf(survey, answerEntries);
+    const pdfFile = await generatePdf(
+      survey,
+      { id: submissionId, timestamp },
+      answerEntries
+    );
 
     // Send the report to the submitter, if they provided their email address
     const submissionInfo: SubmissionInfo = req.body.info;
@@ -82,6 +88,8 @@ router.post(
         survey,
         pdfFile,
         submissionId,
+        answerEntries,
+        includeAttachments: false,
       });
     }
 
@@ -93,6 +101,8 @@ router.post(
         survey,
         pdfFile,
         submissionId,
+        answerEntries,
+        includeAttachments: true,
       });
     });
   })

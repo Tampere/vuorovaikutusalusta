@@ -152,11 +152,29 @@ export interface SurveyFreeTextQuestion extends CommonSurveyPageQuestion {
 export type MapQuestionSelectionType = 'point' | 'line' | 'area';
 
 /**
+ * Stroke style of map features
+ */
+export type FeatureStrokeStyle = 'solid' | 'dashed' | 'dotted';
+
+/**
  * Map question
  */
 export interface SurveyMapQuestion extends CommonSurveyPageQuestion {
   type: 'map';
   selectionTypes: MapQuestionSelectionType[];
+  featureStyles: {
+    point: {
+      /**
+       * Marker icon in SVG format
+       */
+      markerIcon: string;
+    };
+    line: { strokeStyle: FeatureStrokeStyle; strokeColor: string };
+    area: {
+      strokeStyle: FeatureStrokeStyle;
+      strokeColor: string;
+    };
+  };
   subQuestions: SurveyMapSubQuestion[];
 }
 
@@ -309,6 +327,10 @@ export interface Survey {
    */
   endDate: Date;
   /**
+   * Publish a "dummy" test survey on save?
+   */
+  allowTestSurvey: boolean;
+  /**
    * Is the survey currently published?
    * Computed server-side from startDate and endDate timestamp values - cannot be updated.
    */
@@ -374,7 +396,15 @@ export interface Survey {
      * Body of the email
      */
     body: string;
+    /**
+     * Optional free-form information to be shown on the front page of the report
+     */
+    info: SurveyEmailInfoItem[];
   };
+  /**
+   * Should the survey be able to be saved as unfinished
+   */
+  allowSavingUnfinished?: boolean;
 }
 
 /**
@@ -578,4 +608,29 @@ export interface SubmissionInfo {
    * Email address
    */
   email: string;
+}
+
+/**
+ * Map marker icon
+ */
+export interface MapMarkerIcon {
+  id: number;
+  name: string;
+  svg: string;
+}
+
+/**
+ * Map stroke color
+ */
+export interface MapStrokeColor {
+  name: string;
+  value: string;
+}
+
+/**
+ * A single item in survey email info
+ */
+export interface SurveyEmailInfoItem {
+  name: string;
+  value: string;
 }

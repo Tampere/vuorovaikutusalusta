@@ -1,4 +1,6 @@
 import { Survey, SurveyPage } from '@interfaces/survey';
+import { generatePdf } from '@src/application/pdf-generator';
+import { getAnswerEntries, getTimestamp } from '@src/application/submission';
 import {
   createSurvey,
   createSurveyPage,
@@ -239,6 +241,38 @@ router.delete(
     const id = Number(req.params.id);
     const deletedSurveyPage = await deleteSurveyPage(id);
     res.status(200).json(deletedSurveyPage);
+  })
+);
+
+/**
+ * Endpoint for getting the PDF report for a single submission
+ */
+router.get(
+  '/:surveyId/report/:submissionId',
+  ensureAuthenticated(),
+  asyncHandler(async (req, res) => {
+    const surveyId = Number(req.params.surveyId);
+    const submissionId = Number(req.params.submissionId);
+    const permissionsOk = await userCanEditSurvey(req.user, surveyId);
+    if (!permissionsOk) {
+      throw new ForbiddenError('User not author nor admin of the survey');
+    }
+
+    const [survey, answerEntries, timestamp] = await Promise.all([
+      getSurvey({ id: surveyId }),
+      getAnswerEntries(submissionId),
+      getTimestamp(submissionId),
+    ]);
+    const pdfBuffer = await generatePdf(
+      survey,
+      { id: submissionId, timestamp },
+      answerEntries
+    );
+    res.writeHead(200, {
+      'Content-Type': 'application/pdf',
+      'Content-Length': pdfBuffer.length,
+    });
+    res.end(pdfBuffer);
   })
 );
 

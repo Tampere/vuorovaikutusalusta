@@ -55,6 +55,7 @@
     "node-pg-migrate": "^5.10.0",
     "nodemailer": "^6.7.5",
     "ogr2ogr": "^3.1.1",
+    "parse-css-color": "^0.2.1",
     "passport": "^0.4.1",
     "passport-azure-ad": "^4.3.2",
     "passport-google-oauth20": "^2.0.0",

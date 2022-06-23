@@ -106,10 +106,18 @@ const useStyles = makeStyles((theme: Theme & { [customKey: string]: any }) => ({
     color: theme.palette.primary.contrastText,
     padding: '1rem',
   },
+  testSurveyHeader: {
+    padding: '1rem',
+    width: '100%',
+    background: 'red',
+    color: 'white',
+    textAlign: 'center',
+  },
 }));
 
 interface Props {
   survey: Survey;
+  isTestSurvey: boolean;
   continueUnfinished: boolean;
   onStart: () => void;
   surveyBackgroundImage?: { attributions: string };
@@ -117,6 +125,7 @@ interface Props {
 
 export default function SurveyLandingPage({
   survey,
+  isTestSurvey,
   continueUnfinished,
   onStart,
   surveyBackgroundImage,
@@ -126,6 +135,11 @@ export default function SurveyLandingPage({
 
   return (
     <Box className={classes.root}>
+      {isTestSurvey && (
+        <div className={classes.testSurveyHeader}>
+          {tr.TestSurveyFrame.text}
+        </div>
+      )}
       <div className={classes.header}>
         <div className={classes.headerLogo}>
           <TreLogo />

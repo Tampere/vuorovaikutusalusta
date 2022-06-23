@@ -80,7 +80,7 @@ export default function SurveyMap(props: Props) {
           allowFullScreen
           loading="lazy"
         />
-        {!drawing && !modifying && answerGeometries?.features.length && (
+        {!drawing && !modifying && answerGeometries?.features.length > 0 && (
           <Tooltip title={tr.SurveyMap.editGeometries}>
             <Fab
               style={{ position: 'absolute', bottom: '1rem', right: '1rem' }}

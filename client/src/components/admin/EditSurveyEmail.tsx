@@ -11,6 +11,7 @@ import { request } from '@src/utils/request';
 import React, { useEffect, useState } from 'react';
 import Fieldset from '../Fieldset';
 import RichTextEditor from '../RichTextEditor';
+import KeyValueForm from './KeyValueForm';
 
 export default function EditSurveyEmail() {
   const [autocompleteEmailsLoading, setAutocompleteEmailsLoading] =
@@ -113,6 +114,24 @@ export default function EditSurveyEmail() {
                 });
               }}
             />
+            <div>
+              <KeyValueForm
+                label={tr.EditSurveyEmail.info}
+                value={activeSurvey.email.info ?? []}
+                onChange={(value) => {
+                  editSurvey({
+                    ...activeSurvey,
+                    email: {
+                      ...activeSurvey.email,
+                      info: value,
+                    },
+                  });
+                }}
+              />
+              <FormHelperText>
+                {tr.EditSurveyEmail.infoHelperText}
+              </FormHelperText>
+            </div>
           </>
         )}
       </Fieldset>
