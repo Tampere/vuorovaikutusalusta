@@ -46,6 +46,7 @@ interface DBSurvey {
   map_url: string;
   start_date: Date;
   end_date: Date;
+  allow_test_survey: boolean;
   created_at: Date;
   updated_at: Date;
   thanks_page_title: LocalizedText;
@@ -668,18 +669,19 @@ export async function updateSurvey(survey: Survey) {
         map_url = $7,
         start_date = $8,
         end_date = $9,
-        thanks_page_title = $10,
-        thanks_page_text = $11,
-        background_image_name = $12,
-        background_image_path = $13,
-        admins = $14,
-        theme_id = $15,
-        section_title_color = $16,
-        email_enabled = $17,
-        email_auto_send_to = $18,
-        email_subject = $19,
-        email_body = $20,
-        allow_saving_unfinished = $21
+        allow_test_survey = $10,
+        thanks_page_title = $11,
+        thanks_page_text = $12,
+        background_image_name = $13,
+        background_image_path = $14,
+        admins = $15,
+        theme_id = $16,
+        section_title_color = $17,
+        email_enabled = $18,
+        email_auto_send_to = $19,
+        email_subject = $20,
+        email_body = $21,
+        allow_saving_unfinished = $22
       WHERE id = $1 RETURNING *`,
       [
         survey.id,
@@ -691,6 +693,7 @@ export async function updateSurvey(survey: Survey) {
         survey.mapUrl,
         survey.startDate,
         survey.endDate,
+        survey.allowTestSurvey,
         { fi: survey.thanksPage.title },
         { fi: survey.thanksPage.text },
         survey.backgroundImageName ?? null,
@@ -866,6 +869,7 @@ function dbSurveyToSurvey(
     mapUrl: dbSurvey.map_url,
     startDate: dbSurvey.start_date,
     endDate: dbSurvey.end_date,
+    allowTestSurvey: dbSurvey.allow_test_survey,
     thanksPage: {
       title: dbSurvey.thanks_page_title?.fi,
       text: dbSurvey.thanks_page_text?.fi,

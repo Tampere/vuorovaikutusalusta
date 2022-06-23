@@ -16,6 +16,7 @@ import React, { useState } from 'react';
 
 interface Props {
   open: boolean;
+  isTestSurvey: boolean;
   onCancel: () => void;
   onSave: (token: string) => void;
 }
@@ -28,6 +29,7 @@ const useStyles = makeStyles({
 
 export default function SaveAsUnfinishedDialog({
   open,
+  isTestSurvey,
   onCancel,
   onSave,
 }: Props) {
@@ -42,6 +44,10 @@ export default function SaveAsUnfinishedDialog({
   const { showToast } = useToasts();
 
   async function handleSave() {
+    if (isTestSurvey) {
+      onSave(null);
+      return;
+    }
     setLoading(true);
     try {
       const { token } = await request<{ token: string }>(

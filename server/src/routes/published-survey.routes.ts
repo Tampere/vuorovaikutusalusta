@@ -17,10 +17,12 @@ const router = Router();
 
 router.get(
   '/:name',
+  validateRequest([query('test').optional().isString()]),
   asyncHandler(async (req, res) => {
+    const test = req.query.test === 'true';
     const survey = await getSurvey({ name: req.params.name });
-    if (!survey.isPublished) {
-      // In case the survey shouldn't be published, throw the same not found error
+    if ((!test && !survey.isPublished) || (test && !survey.allowTestSurvey)) {
+      // In case the survey shouldn't be published (or test survey not allowed if requested), throw the same not found error
       throw new ForbiddenError(`Survey with name ${req.params.name} not found`);
     }
     res.json(survey);

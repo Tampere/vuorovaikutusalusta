@@ -327,6 +327,10 @@ export interface Survey {
    */
   endDate: Date;
   /**
+   * Publish a "dummy" test survey on save?
+   */
+  allowTestSurvey: boolean;
+  /**
    * Is the survey currently published?
    * Computed server-side from startDate and endDate timestamp values - cannot be updated.
    */

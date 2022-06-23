@@ -12,9 +12,14 @@ import { NotFoundPage } from './NotFoundPage';
 import SurveyLandingPage from './SurveyLandingPage';
 import SurveyStepper from './SurveyStepper';
 import SurveyThanksPage from './SurveyThanksPage';
+import TestSurveyFrame from './TestSurveyFrame';
 import { UnavailableSurvey } from './UnavailableSurvey';
 
-export default function SurveyPage() {
+interface Props {
+  isTestSurvey?: boolean;
+}
+
+export default function SurveyPage({ isTestSurvey }: Props) {
   const [loading, setLoading] = useState(true);
   const [showLandingPage, setShowLandingPage] = useState(true);
   const [showThanksPage, setShowThanksPage] = useState(false);
@@ -40,7 +45,9 @@ export default function SurveyPage() {
   useEffect(() => {
     async function fetchSurvey() {
       try {
-        const survey = await request<Survey>(`/api/published-surveys/${name}`);
+        const survey = await request<Survey>(
+          `/api/published-surveys/${name}${isTestSurvey ? '?test=true' : ''}`
+        );
         if (
           survey.backgroundImagePath &&
           survey.backgroundImageName &&
@@ -129,31 +136,41 @@ export default function SurveyPage() {
       <UnavailableSurvey />
     )
   ) : (
-    <Box sx={{ height: '100vh', maxHeight: '-webkit-fill-available' }}>
-      {/* Landing page */}
-      {showLandingPage && (
-        <SurveyLandingPage
-          survey={survey}
-          continueUnfinished={continueUnfinished}
-          surveyBackgroundImage={surveyBackgroundImage}
-          onStart={() => {
-            setShowLandingPage(false);
-          }}
-        />
-      )}
-      {/* Survey page */}
-      {!showLandingPage && !showThanksPage && (
-        <SurveyStepper
-          survey={survey}
-          onComplete={() => {
-            setShowThanksPage(true);
-          }}
-        />
-      )}
-      {/* Thanks page */}
-      {!showLandingPage && showThanksPage && (
-        <SurveyThanksPage survey={survey} />
-      )}
-    </Box>
+    <>
+      <Box
+        sx={{
+          height: '100vh',
+          maxHeight: '-webkit-fill-available',
+        }}
+      >
+        {/* Landing page */}
+        {showLandingPage && (
+          <SurveyLandingPage
+            survey={survey}
+            isTestSurvey={isTestSurvey}
+            continueUnfinished={continueUnfinished}
+            surveyBackgroundImage={surveyBackgroundImage}
+            onStart={() => {
+              setShowLandingPage(false);
+            }}
+          />
+        )}
+        {/* Survey page */}
+        {!showLandingPage && !showThanksPage && (
+          <SurveyStepper
+            survey={survey}
+            isTestSurvey={isTestSurvey}
+            onComplete={() => {
+              setShowThanksPage(true);
+            }}
+          />
+        )}
+        {/* Thanks page */}
+        {!showLandingPage && showThanksPage && (
+          <SurveyThanksPage survey={survey} isTestSurvey={isTestSurvey} />
+        )}
+      </Box>
+      {isTestSurvey && <TestSurveyFrame />}
+    </>
   );
 }

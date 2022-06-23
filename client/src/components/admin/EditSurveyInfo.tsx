@@ -1,19 +1,23 @@
 import { User } from '@interfaces/user';
 import {
   Autocomplete,
+  Checkbox,
   FormControlLabel,
   FormLabel,
+  Link,
   Skeleton,
   TextField,
-  Checkbox,
+  FormHelperText,
+  Typography,
 } from '@material-ui/core';
 import DateTimePicker from '@material-ui/lab/DateTimePicker';
 import { makeStyles } from '@material-ui/styles';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useHistory } from 'react-router-dom';
+import CopyToClipboard from '../CopyToClipboard';
 import DeleteSurveyDialog from '../DeleteSurveyDialog';
 import Fieldset from '../Fieldset';
 import LoadingButton from '../LoadingButton';
@@ -40,6 +44,7 @@ export default function EditSurveyInfo() {
   const {
     activeSurvey,
     activeSurveyLoading,
+    originalActiveSurvey,
     editSurvey,
     validationErrors,
     deleteActiveSurvey,
@@ -51,6 +56,10 @@ export default function EditSurveyInfo() {
   const history = useHistory();
 
   const classes = useStyles();
+
+  const testSurveyUrl = useMemo(() => {
+    return `${window.location.origin}/${originalActiveSurvey.name}/testi`;
+  }, [originalActiveSurvey.name]);
 
   useEffect(() => {
     async function fetchOtherUsers() {
@@ -249,6 +258,43 @@ export default function EditSurveyInfo() {
           }
           label={tr.EditSurvey.allowSavingUnfinished}
         />
+        <div>
+          <FormControlLabel
+            label={tr.EditSurveyInfo.allowTestSurvey}
+            control={
+              <Checkbox
+                checked={activeSurvey.allowTestSurvey}
+                onChange={(event) => {
+                  editSurvey({
+                    ...activeSurvey,
+                    allowTestSurvey: event.target.checked,
+                  });
+                }}
+              />
+            }
+          />
+          {activeSurvey.allowTestSurvey && (
+            <div
+              style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}
+            >
+              <Typography>
+                {tr.EditSurveyInfo.testSurveyUrl}:{' '}
+                <Link
+                  href={testSurveyUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {testSurveyUrl}
+                </Link>
+              </Typography>
+              <CopyToClipboard data={testSurveyUrl} />
+            </div>
+          )}
+          <FormHelperText>
+            {tr.EditSurveyInfo.allowTestSurveyHelperText}
+          </FormHelperText>
+        </div>
+
         <div className={classes.actions}>
           <LoadingButton
             variant="contained"

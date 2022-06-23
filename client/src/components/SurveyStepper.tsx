@@ -43,7 +43,7 @@ import TextSection from './TextSection';
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
     display: 'flex',
-    height: '100vh',
+    height: '100%',
   },
   stepper: {
     width: '100%',
@@ -101,9 +101,14 @@ const useStyles = makeStyles((theme: Theme) => ({
 interface Props {
   survey: Survey;
   onComplete: () => void;
+  isTestSurvey: boolean;
 }
 
-export default function SurveyStepper({ survey, onComplete }: Props) {
+export default function SurveyStepper({
+  survey,
+  onComplete,
+  isTestSurvey,
+}: Props) {
   const [pageNumber, setPageNumber] = useState(0);
   const [loading, setLoading] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
@@ -244,6 +249,10 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
   }
 
   async function doSubmit(info?: SubmissionInfo) {
+    if (isTestSurvey) {
+      onComplete();
+      return;
+    }
     setLoading(true);
     try {
       await request(
@@ -314,6 +323,7 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
                 </div>
               ))}
               <StepperControls
+                isTestSurvey={isTestSurvey}
                 activeStep={index}
                 totalSteps={survey.pages.length}
                 onPrevious={() => {
@@ -409,6 +419,7 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
         <SplitPane
           split="vertical"
           defaultSize="50%"
+          style={{ position: 'static' }}
           minSize={200}
           maxSize={-200}
           // Allow scrolling for the stepper pane

@@ -56,7 +56,10 @@
     "theme": "Teema",
     "selectTheme": "Valitse teema",
     "themeFetchFailed": "Teemojen hakemisessa tapahtui virhe. Yritä myöhemmin uudestaan.",
-    "titleColor": "Osioiden otsikoiden väri"
+    "titleColor": "Osioiden otsikoiden väri",
+    "allowTestSurvey": "Julkaise testikysely",
+    "allowTestSurveyHelperText": "Kyselystä julkaistaan testiversio oman osoitteen taakse. Testikyselystä ei tallenneta vastauksia.",
+    "testSurveyUrl": "Testikyselyn osoite"
   },
   "EditSurveyEmail": {
     "enable": "Salli vastausten raportointi sähköpostitse",
@@ -368,6 +371,9 @@
   },
   "MapInfoBox": {
     "answer": "Vastaus"
+  },
+  "TestSurveyFrame": {
+    "text": "Tämä on testikysely. Vastauksia ei tallenneta, eikä niistä lähetetä sähköpostia."
   },
   "navigation": {
     "next": "Seuraava",

@@ -19,6 +19,7 @@ interface Props {
   totalSteps: number;
   disabled: boolean;
   nextDisabled: boolean;
+  isTestSurvey: boolean;
   onPrevious: () => void;
   onNext: () => void;
   onSubmit: () => void;
@@ -79,6 +80,7 @@ export default function StepperControls(props: Props) {
       {props.allowSavingUnfinished && (
         <SaveAsUnfinishedDialog
           open={saveDialogOpen}
+          isTestSurvey={props.isTestSurvey}
           onCancel={() => {
             setSaveDialogOpen(false);
           }}
