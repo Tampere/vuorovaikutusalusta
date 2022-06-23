@@ -47,7 +47,7 @@ export default function SurveyList() {
     updateSurveys();
 
     // Abort request if component gets unmounted
-    // TODO: still some problems on unmount when creating a new survey...
+    // TODO: still some problems on unmount when creating a new survey....
     return () => {
       abortController?.abort();
     };
