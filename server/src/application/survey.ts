@@ -6,6 +6,7 @@ import {
   Survey,
   SurveyBackgroundImage,
   SurveyCheckboxQuestion,
+  SurveyEmailInfoItem,
   SurveyMapQuestion,
   SurveyMapSubQuestion,
   SurveyPage,
@@ -58,6 +59,7 @@ interface DBSurvey {
   email_auto_send_to: string[];
   email_subject: string;
   email_body: string;
+  email_info: SurveyEmailInfoItem[];
   allow_saving_unfinished: boolean;
 }
 
@@ -681,7 +683,8 @@ export async function updateSurvey(survey: Survey) {
         email_auto_send_to = $19,
         email_subject = $20,
         email_body = $21,
-        allow_saving_unfinished = $22
+        email_info = $22::json,
+        allow_saving_unfinished = $23
       WHERE id = $1 RETURNING *`,
       [
         survey.id,
@@ -705,6 +708,7 @@ export async function updateSurvey(survey: Survey) {
         survey.email.autoSendTo,
         survey.email.subject,
         survey.email.body,
+        JSON.stringify(survey.email.info),
         survey.allowSavingUnfinished,
       ]
     )
@@ -882,6 +886,7 @@ function dbSurveyToSurvey(
       autoSendTo: dbSurvey.email_auto_send_to,
       subject: dbSurvey.email_subject,
       body: dbSurvey.email_body,
+      info: dbSurvey.email_info,
     },
     allowSavingUnfinished: dbSurvey.allow_saving_unfinished,
     // Single survey row won't contain pages - they get aggregated from a join query

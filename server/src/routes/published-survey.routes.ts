@@ -59,7 +59,7 @@ router.post(
     }
     const answerEntries: AnswerEntry[] = req.body.entries;
     const unfinishedToken = req.query.token ? String(req.query.token) : null;
-    const { id: submissionId } = await createSurveySubmission(
+    const { id: submissionId, timestamp } = await createSurveySubmission(
       survey.id,
       answerEntries,
       unfinishedToken
@@ -73,7 +73,11 @@ router.post(
     }
 
     // Generate the PDF
-    const pdfFile = await generatePdf(survey, answerEntries);
+    const pdfFile = await generatePdf(
+      survey,
+      { id: submissionId, timestamp },
+      answerEntries
+    );
 
     // Send the report to the submitter, if they provided their email address
     const submissionInfo: SubmissionInfo = req.body.info;
@@ -84,6 +88,8 @@ router.post(
         survey,
         pdfFile,
         submissionId,
+        answerEntries,
+        includeAttachments: false,
       });
     }
 
@@ -95,6 +101,8 @@ router.post(
         survey,
         pdfFile,
         submissionId,
+        answerEntries,
+        includeAttachments: true,
       });
     });
   })

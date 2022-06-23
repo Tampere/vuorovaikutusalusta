@@ -16,6 +16,10 @@ declare const Oskari: any;
 
 let cluster: Cluster<ScreenshotJobData, ScreenshotJobReturnData[]>;
 
+const networkIdleTimeout = process.env.PUPPETEER_NETWORK_IDLE_TIMEOUT
+  ? Number(process.env.PUPPETEER_NETWORK_IDLE_TIMEOUT)
+  : 10000;
+
 export interface ScreenshotJobData {
   mapUrl: string;
   answers?: {
@@ -53,7 +57,7 @@ function getFeatureStyle(
     return defaultFeatureStyle;
   }
   // Get feature style from question
-  const style = question.featureStyles[selectionType];
+  const style = question.featureStyles?.[selectionType];
   // If no style is defined, use default
   if (!style) {
     return defaultFeatureStyle;
@@ -103,8 +107,8 @@ async function generateScreenshots({
   await page.evaluate(() => {
     // @ts-ignore
     document.querySelector('.indexmapToggle')?.click();
+    document.querySelector('.indexmapToggle')?.remove();
   });
-  await page.waitForNetworkIdle();
 
   for (const answer of answers) {
     // Prepare the window for the next screenshot
@@ -175,7 +179,7 @@ async function generateScreenshots({
       }
     );
     try {
-      await page.waitForNetworkIdle({ timeout: 10000 });
+      await page.waitForNetworkIdle({ timeout: networkIdleTimeout });
     } catch (error) {
       // Ignore timeout errors
     }

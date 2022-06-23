@@ -396,6 +396,10 @@ export interface Survey {
      * Body of the email
      */
     body: string;
+    /**
+     * Optional free-form information to be shown on the front page of the report
+     */
+    info: SurveyEmailInfoItem[];
   };
   /**
    * Should the survey be able to be saved as unfinished
@@ -619,6 +623,14 @@ export interface MapMarkerIcon {
  * Map stroke color
  */
 export interface MapStrokeColor {
+  name: string;
+  value: string;
+}
+
+/**
+ * A single item in survey email info
+ */
+export interface SurveyEmailInfoItem {
   name: string;
   value: string;
 }

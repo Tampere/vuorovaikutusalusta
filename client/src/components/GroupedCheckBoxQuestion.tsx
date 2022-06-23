@@ -1,4 +1,3 @@
-import React, { useMemo, useState } from 'react';
 import { SurveyGroupedCheckboxQuestion } from '@interfaces/survey';
 import {
   Accordion,
@@ -11,9 +10,10 @@ import {
   Theme,
   Typography,
 } from '@material-ui/core';
-import { useTranslations } from '@src/stores/TranslationContext';
-import { makeStyles } from '@material-ui/styles';
 import { ArrowForwardIosSharp } from '@material-ui/icons';
+import { makeStyles } from '@material-ui/styles';
+import { useTranslations } from '@src/stores/TranslationContext';
+import React, { useMemo, useState } from 'react';
 import SectionInfo from './SectionInfo';
 
 interface Props {
@@ -82,7 +82,7 @@ export default function GroupedCheckBoxQuestion({
   );
 
   const maxReached = useMemo(() => {
-    return value.length >= question.answerLimits.max;
+    return question.answerLimits && value.length >= question.answerLimits.max;
   }, [question.answerLimits, value]);
 
   // Split the indicator text into two parts for displaying a colored indicator in between
@@ -97,18 +97,18 @@ export default function GroupedCheckBoxQuestion({
   return (
     <>
       <Typography style={{ marginTop: '1rem' }}>
-        {question.answerLimits.min && question.answerLimits.max
+        {question.answerLimits?.min && question.answerLimits?.max
           ? // Both min & max limits are set
             tr.GroupedCheckBoxQuestion.helperTextMinMax
               .replace('{min}', question.answerLimits.min.toString())
               .replace('{max}', question.answerLimits.max.toString())
-          : question.answerLimits.min
+          : question.answerLimits?.min
           ? // Only min limit is set
             tr.GroupedCheckBoxQuestion.helperTextMin.replace(
               '{min}',
               question.answerLimits.min.toString()
             )
-          : question.answerLimits.max
+          : question.answerLimits?.max
           ? // Only max limit is set
             tr.GroupedCheckBoxQuestion.helperTextMax.replace(
               '{max}',
@@ -125,7 +125,7 @@ export default function GroupedCheckBoxQuestion({
             .join(' ')}
         >
           {value.length}
-          {question.answerLimits.max && `/${question.answerLimits.max}`}
+          {question.answerLimits?.max && `/${question.answerLimits.max}`}
         </span>
         {indicatorTextEnd}
       </Typography>

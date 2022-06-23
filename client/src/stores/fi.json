@@ -67,7 +67,15 @@
     "autoSendTo": "Vastaanottajien sähköpostiosoitteet",
     "autoSendToHelperText": "Näihin osoitteisiin lähetetään jokaisesta vastauksesta raportti sähköpostin liitteenä (vastaajan lisäksi).",
     "emailSubject": "Viestin aihe",
-    "emailBody": "Viestin sisältö"
+    "emailBody": "Viestin sisältö",
+    "info": "Lisätiedot",
+    "infoHelperText": "Lisätiedot esitetään sähköpostitse lähetettävän vastausraportin etusivulla."
+  },
+  "KeyValueForm": {
+    "key": "Nimi",
+    "value": "Arvo",
+    "addEntry": "Lisää rivi",
+    "deleteEntry": "Poista rivi"
   },
   "EditSurveyPage": {
     "name": "Sivun nimi",
