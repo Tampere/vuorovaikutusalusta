@@ -17,7 +17,7 @@ import { NotFoundPage } from './NotFoundPage';
 import './react-split-pane.css';
 import SurveyPage from './SurveyPage';
 
-/** Application entry point wrapper */
+/** Application entry point wrapper component */
 const Application = () => {
   return (
     <Compose
