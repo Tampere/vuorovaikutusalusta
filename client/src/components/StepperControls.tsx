@@ -22,6 +22,7 @@ interface Props {
   onPrevious: () => void;
   onNext: () => void;
   onSubmit: () => void;
+  allowSavingUnfinished?: boolean;
   onSaveUnfinished?: (token: string) => void;
 }
 
@@ -64,25 +65,29 @@ export default function StepperControls(props: Props) {
           </Button>
         )}
         <div style={{ flexGrow: 1 }} />
-        <Button
-          variant="outlined"
-          onClick={() => {
-            setSaveDialogOpen(true);
-          }}
-        >
-          {tr.SurveyStepper.saveAsUnfinished}
-        </Button>
+        {props.allowSavingUnfinished && (
+          <Button
+            variant="outlined"
+            onClick={() => {
+              setSaveDialogOpen(true);
+            }}
+          >
+            {tr.SurveyStepper.saveAsUnfinished}
+          </Button>
+        )}
       </div>
-      <SaveAsUnfinishedDialog
-        open={saveDialogOpen}
-        onCancel={() => {
-          setSaveDialogOpen(false);
-        }}
-        onSave={async (token) => {
-          props.onSaveUnfinished?.(token);
-          setSaveDialogOpen(false);
-        }}
-      />
+      {props.allowSavingUnfinished && (
+        <SaveAsUnfinishedDialog
+          open={saveDialogOpen}
+          onCancel={() => {
+            setSaveDialogOpen(false);
+          }}
+          onSave={async (token) => {
+            props.onSaveUnfinished?.(token);
+            setSaveDialogOpen(false);
+          }}
+        />
+      )}
     </>
   );
 }

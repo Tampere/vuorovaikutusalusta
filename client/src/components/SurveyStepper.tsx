@@ -334,6 +334,7 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
                     doSubmit();
                   }
                 }}
+                allowSavingUnfinished={survey.allowSavingUnfinished}
               />
             </FormControl>
           </StepContent>

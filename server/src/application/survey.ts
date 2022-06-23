@@ -57,6 +57,7 @@ interface DBSurvey {
   email_auto_send_to: string[];
   email_subject: string;
   email_body: string;
+  allow_saving_unfinished: boolean;
 }
 
 /**
@@ -677,7 +678,8 @@ export async function updateSurvey(survey: Survey) {
         email_enabled = $17,
         email_auto_send_to = $18,
         email_subject = $19,
-        email_body = $20
+        email_body = $20,
+        allow_saving_unfinished = $21
       WHERE id = $1 RETURNING *`,
       [
         survey.id,
@@ -700,6 +702,7 @@ export async function updateSurvey(survey: Survey) {
         survey.email.autoSendTo,
         survey.email.subject,
         survey.email.body,
+        survey.allowSavingUnfinished,
       ]
     )
     .catch((error) => {
@@ -876,6 +879,7 @@ function dbSurveyToSurvey(
       subject: dbSurvey.email_subject,
       body: dbSurvey.email_body,
     },
+    allowSavingUnfinished: dbSurvey.allow_saving_unfinished,
     // Single survey row won't contain pages - they get aggregated from a join query
     pages: [],
   };

@@ -35,7 +35,8 @@
     "deleteSurvey": "Poista kysely",
     "deleteSurveyConfirm": "Haluatko varmasti poistaa koko kyselyn? Toimintoa ei voi perua.",
     "deleteSurveyFailed": "Kyselyn poistamisessa tapahtui virhe. Yritä myöhemmin uudestaan.",
-    "deleteSurveySuccessful": "Kysely poistettiin onnistuneesti!"
+    "deleteSurveySuccessful": "Kysely poistettiin onnistuneesti!",
+    "allowSavingUnfinished": "Salli kyselyn tallentaminen keskeneräisenä"
   },
   "EditSurveyInfo": {
     "title": "Kyselyn otsikko",
@@ -291,7 +292,7 @@
   },
   "SaveAsUnfinishedDialog": {
     "description": "Voit tallentaa kyselyn keskeneräisenä antamalla sähköpostiosoitteesi. Sähköpostiisi toimitetaan linkki, josta pääset jatkamaan vastaamista kyselyn ollessa auki.",
-    "disclaimer": "Sähköpostiosoitettasi ei tallenneta eikä käytetä muihin tarkoituksiin.",
+    "disclaimer": "Sähköpostiosoitettasi ei tallenneta eikä käytetä muihin tarkoituksiin. Vastauksesi otetaan huomioon vasta, kun olet vastannut kyselyn loppuun ja lähettänyt lopullisen vastauksesi.",
     "email": "Sähköpostiosoite",
     "saveSuccessful": "Vastauksesi tallennettiin onnistuneesti! Saat hetken kuluttua sähköpostiisi linkin, jolla voit jatkaa kyselyä. Voit nyt sulkea selaimen. Jos käytät julkista tietokonetta, muista tyhjentää selaimen välimuisti.",
     "errorSaving": "Vastaustesi tallennuksessa tapahtui virhe. Ole hyvä ja yritä myöhemmin uudestaan."

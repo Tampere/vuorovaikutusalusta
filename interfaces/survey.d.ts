@@ -393,6 +393,10 @@ export interface Survey {
      */
     body: string;
   };
+  /**
+   * Should the survey be able to be saved as unfinished
+   */
+  allowSavingUnfinished?: boolean;
 }
 
 /**

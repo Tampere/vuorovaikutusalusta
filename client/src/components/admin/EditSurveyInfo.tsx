@@ -1,9 +1,11 @@
 import { User } from '@interfaces/user';
 import {
   Autocomplete,
+  FormControlLabel,
   FormLabel,
   Skeleton,
   TextField,
+  Checkbox,
 } from '@material-ui/core';
 import DateTimePicker from '@material-ui/lab/DateTimePicker';
 import { makeStyles } from '@material-ui/styles';
@@ -231,6 +233,21 @@ export default function EditSurveyInfo() {
           renderInput={(params: any) => (
             <TextField className={classes.dateTimePicker} {...params} />
           )}
+        />
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={activeSurvey.allowSavingUnfinished}
+              onChange={(event) =>
+                editSurvey({
+                  ...activeSurvey,
+                  allowSavingUnfinished: event.target.checked,
+                })
+              }
+              inputProps={{ 'aria-label': 'allow-unfinished' }}
+            />
+          }
+          label={tr.EditSurvey.allowSavingUnfinished}
         />
         <div className={classes.actions}>
           <LoadingButton
