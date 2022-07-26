@@ -367,9 +367,17 @@ export async function getSurvey(params: { id: number } | { name: string }) {
  * Get all surveys from the db
  * @returns Array of Surveys
  */
-export async function getSurveys() {
-  const rows = await getDb().manyOrNone<DBSurvey>(`SELECT * FROM data.survey`); // TODO order by
-  return rows.map((row) => dbSurveyToSurvey(row));
+export async function getSurveys(
+  authorId?: string,
+  filterByPublished?: boolean
+) {
+  const rows = await getDb().manyOrNone<DBSurvey>(
+    `SELECT * FROM data.survey WHERE ($1 IS NULL OR author_id = $1) ORDER BY updated_at DESC`,
+    [authorId, filterByPublished]
+  );
+  return rows
+    .map((row) => dbSurveyToSurvey(row))
+    .filter((survey) => (filterByPublished ? isPublished(survey) : survey));
 }
 
 /**

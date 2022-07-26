@@ -81,7 +81,7 @@ export function getColumnSet<Row>(
   columns: (keyof Row | Partial<PgPromise.Column>)[]
 ) {
   return new pgp.helpers.ColumnSet(columns, {
-    table: tableName,
+    table: { table: tableName, schema: 'data' },
   });
 }
 

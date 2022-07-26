@@ -8,12 +8,14 @@ import { format } from 'date-fns';
 import CopyToClipboard from '../CopyToClipboard';
 import ConfirmDialog from '../ConfirmDialog';
 import {
+  creteSurveyFromPrevious,
   publishSurvey,
   unpublishSurvey,
 } from '@src/controllers/SurveyController';
 import { useToasts } from '@src/stores/ToastContext';
 import { makeStyles } from '@material-ui/styles';
 import DataExport from './DataExport';
+import LoadingButton from '../LoadingButton';
 
 const useStyles = makeStyles((theme: Theme) => ({
   '@keyframes pulse': {
@@ -31,6 +33,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     animation: `$pulse 1s ${theme.transitions.easing.easeIn} infinite`,
     pointerEvents: 'none',
     filter: 'grayscale(100%)',
+  },
+  cardRoot: {
+    paddingBottom: '8px',
   },
 }));
 
@@ -61,21 +66,21 @@ export default function SurveyListItem(props: Props) {
 
   return (
     <>
-      <Card className={loading ? classes.loading : ''}>
-        <CardContent>
-          <Typography variant="h5" component="h2">
+      <Card
+        className={loading ? classes.loading : ''}
+        style={
+          survey.isPublished ? { filter: 'drop-shadow(0 0 0.15rem green)' } : {}
+        }
+      >
+        <CardContent classes={{ root: classes.cardRoot }}>
+          <Typography variant="h6" component="h3">
             {!survey.title ? (
               <em>{tr.SurveyList.untitledSurvey}</em>
             ) : (
               survey.title
             )}
           </Typography>
-          <Typography
-            variant="h6"
-            color="textSecondary"
-            component="h3"
-            gutterBottom
-          >
+          <Typography color="textSecondary" component="h4" gutterBottom>
             {survey.subtitle}
           </Typography>
           <Typography variant="body1" color="textSecondary" gutterBottom>
@@ -90,26 +95,35 @@ export default function SurveyListItem(props: Props) {
               <CopyToClipboard data={surveyUrl} />
             </Typography>
           )}
-          {/* Scheduling info (start/end dates) */}
-          {survey.startDate && survey.endDate ? (
-            <Typography variant="body1" color="textSecondary" gutterBottom>
-              {tr.SurveyList.open} {format(survey.startDate, 'd.M.yyyy')} -{' '}
-              {format(survey.endDate, 'd.M.yyyy')}
-            </Typography>
-          ) : survey.startDate ? (
-            <Typography variant="body1" color="textSecondary" gutterBottom>
-              {tr.SurveyList.openFrom} {format(survey.startDate, 'd.M.yyyy')}
-            </Typography>
-          ) : null}
-          {/* Current publish status */}
-          <Typography variant="body1">
-            {survey.isPublished
-              ? tr.SurveyList.published
-              : tr.SurveyList.notPublished}
-          </Typography>
+          <div style={{ display: 'flex', flexDirection: 'row' }}>
+            {/* Scheduling info (start/end dates) */}
+            {survey.startDate && survey.endDate ? (
+              <Typography variant="body1" color="textSecondary" gutterBottom>
+                {tr.SurveyList.open} {format(survey.startDate, 'd.M.yyyy')} -{' '}
+                {format(survey.endDate, 'd.M.yyyy')}
+              </Typography>
+            ) : survey.startDate ? (
+              <Typography variant="body1" color="textSecondary" gutterBottom>
+                {tr.SurveyList.openFrom} {format(survey.startDate, 'd.M.yyyy')}
+              </Typography>
+            ) : null}
+            {/* Current publish status */}
+            {survey.isPublished ? (
+              <Typography style={{ paddingLeft: '0.5rem', color: 'green' }}>
+                {' '}
+                - {tr.SurveyList.published}
+              </Typography>
+            ) : (
+              <Typography style={{ paddingLeft: '0.5rem' }}>
+                {' '}
+                - {tr.SurveyList.notPublished}
+              </Typography>
+            )}
+          </div>
         </CardContent>
         <CardActions
           style={{
+            paddingTop: '0',
             width: '100%',
             display: 'flex',
             flexDirection: 'row',
@@ -139,6 +153,16 @@ export default function SurveyListItem(props: Props) {
               {tr.SurveyList.unpublish}
             </Button>
           )}
+          <LoadingButton
+            onClick={async () => {
+              const newSurveyId = await creteSurveyFromPrevious(survey.id);
+              if (!newSurveyId) return;
+              window.open(`/admin/kyselyt/${newSurveyId}`);
+            }}
+          >
+            {' '}
+            {tr.SurveyList.copySurvey}{' '}
+          </LoadingButton>
           <DataExport surveyId={survey.id} />
         </CardActions>
       </Card>
