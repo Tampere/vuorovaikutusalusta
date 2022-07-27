@@ -1,9 +1,9 @@
 import { FileAnswer, LocalizedText } from '@interfaces/survey';
 import { getDb } from '@src/database';
+import { readFileSync, rmSync } from 'fs';
 import { parseAsync } from 'json2csv';
 import moment from 'moment';
 import ogr2ogr from 'ogr2ogr';
-import internal from 'stream';
 
 /**
  * Interface for answer entry db row
@@ -165,11 +165,11 @@ function geometryAnswerToFeature(answer: AnswerEntry) {
 }
 
 /**
- * Reduce DB query rows to a GeoJSON FeatureCollection
+ * Reduce DB query rows to GeoJSON features
  * @param entries DB answer entry rows
  * @returns
  */
-function dbEntriesToGeoJSON(entries: AnswerEntry[]) {
+function dbEntriesToFeatures(entries: AnswerEntry[]) {
   // Sort entries first by submission, then by sectionId
   // Each sectionId instance (separated by submission) will represent a single Feature
 
@@ -181,18 +181,10 @@ function dbEntriesToGeoJSON(entries: AnswerEntry[]) {
       submissionGroup[submissionId][answer.answerId] =
         geometryAnswerToFeature(answer);
     } else {
-      // Initialize place for the sub questions under the parent feature
-      submissionGroup[submissionId][answer.parentEntryId].properties[
-        'Alikysymykset'
-      ] =
-        submissionGroup[submissionId][answer.parentEntryId].properties[
-          'Alikysymykset'
-        ] ?? {};
-
       // Add subquestion answer
       submissionGroup[submissionId][answer.parentEntryId].properties[
-        'Alikysymykset'
-      ][answer.title?.['fi'] ?? 'Kysymys'] =
+        answer.title?.['fi'] ?? 'Nimetön alikysymys'
+      ] =
         answer.valueNumeric ??
         answer.valueText ??
         answer.optionText?.['fi'] ??
@@ -201,18 +193,12 @@ function dbEntriesToGeoJSON(entries: AnswerEntry[]) {
     return submissionGroup;
   }, {});
 
-  const features = Object.values(answersToSubmissions).reduce(
-    (featuresArray: Feature[], submissionObj) => {
+  return Object.values(answersToSubmissions).reduce<Feature[]>(
+    (featuresArray, submissionObj) => {
       return [...featuresArray, ...Object.values(submissionObj)];
     },
     []
   );
-
-  return {
-    type: 'FeatureCollection',
-    features: features,
-    crs: { type: 'name', properties: { name: 'urn:ogc:def:crs:EPSG::3067' } },
-  };
 }
 
 /**
@@ -276,17 +262,66 @@ export async function getCSVFile(surveyId: number): Promise<string> {
  * @param surveyId
  * @returns Promise resolving to readable stream streaming geopackage data
  */
-export async function getGeoPackageFile(
-  surveyId: number
-): Promise<internal.Readable> {
+export async function getGeoPackageFile(surveyId: number): Promise<Buffer> {
   const rows = await getGeometryDBEntries(surveyId);
   if (!rows) return null;
 
-  const { stream } = await ogr2ogr(dbEntriesToGeoJSON(rows), {
-    format: 'GPKG',
-    options: ['-nln', 'answer-layer'],
-  });
-  return stream;
+  const features = dbEntriesToFeatures(rows);
+
+  // Group features by question to add them to separate layers
+  const featuresByQuestion = features.reduce((questions, feature) => {
+    const { properties } = feature;
+    const questionTitle = properties['Kysymys'];
+    questions[questionTitle] = questions[questionTitle] ?? [];
+    questions[questionTitle].push(feature);
+    return questions;
+  }, {} as { [key: string]: Feature[] });
+
+  const tmpFilePath = `/tmp/geopackage_${Date.now()}.gpkg`;
+
+  const [[firstQuestion, firstFeatures], ...rest] =
+    Object.entries(featuresByQuestion);
+
+  // The first question needs to be created first - the remaining questions will be added to it via -update
+  // Tried to conditionally add the "-update" flag but there was some race condition and I couldn't figure it out
+  await ogr2ogr(
+    {
+      type: 'FeatureCollection',
+      features: firstFeatures,
+      crs: {
+        type: 'name',
+        properties: { name: 'urn:ogc:def:crs:EPSG::3067' },
+      },
+    },
+    {
+      format: 'GPKG',
+      destination: tmpFilePath,
+      options: ['-nln', firstQuestion],
+    }
+  );
+
+  for (const [question, features] of rest) {
+    await ogr2ogr(
+      {
+        type: 'FeatureCollection',
+        features,
+        crs: {
+          type: 'name',
+          properties: { name: 'urn:ogc:def:crs:EPSG::3067' },
+        },
+      },
+      {
+        format: 'GPKG',
+        destination: tmpFilePath,
+        options: ['-nln', question, '-update'],
+      }
+    );
+  }
+
+  // Read the file contents and remove it from the disk
+  const file = readFileSync(tmpFilePath);
+  rmSync(tmpFilePath);
+  return file;
 }
 
 /**

@@ -1,15 +1,15 @@
-import { Router } from 'express';
-import { ensureAuthenticated } from '@src/auth';
-import asyncHandler from 'express-async-handler';
-import { param } from 'express-validator';
-import { validateRequest } from '../utils';
 import {
   getAttachments,
   getCSVFile,
   getGeoPackageFile,
 } from '@src/application/answer';
 import { userCanEditSurvey } from '@src/application/survey';
+import { ensureAuthenticated } from '@src/auth';
 import { BadRequestError, ForbiddenError } from '@src/error';
+import { Router } from 'express';
+import asyncHandler from 'express-async-handler';
+import { param } from 'express-validator';
+import { validateRequest } from '../utils';
 
 const router = Router();
 
@@ -55,18 +55,12 @@ router.post(
       throw new ForbiddenError('User not author nor admin of the survey');
     }
 
-    const geopackageStream = await getGeoPackageFile(surveyId);
-    if (!geopackageStream) {
+    const geopackageBuffer = await getGeoPackageFile(surveyId);
+    if (!geopackageBuffer) {
       throw new BadRequestError('No answers available');
     } else {
       res.status(200);
-      geopackageStream.on('data', (buffer) => {
-        res.write(buffer);
-      });
-
-      geopackageStream.on('end', () => {
-        res.end();
-      });
+      res.end(geopackageBuffer);
     }
   })
 );
