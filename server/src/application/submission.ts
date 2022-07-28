@@ -161,7 +161,10 @@ export async function createSurveySubmission(
   unfinishedToken: string,
   unfinished = false
 ) {
-  await validateEntries(answerEntries);
+  // Only validate the entries if saving the final submission (not unfinished)
+  if (!unfinished) {
+    await validateEntries(answerEntries);
+  }
   // If unfinished token was provided, delete the old submission and pick the old "created at" timestamp
   const oldRow = unfinishedToken
     ? await getDb().oneOrNone<{ created_at: Date }>(

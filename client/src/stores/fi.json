@@ -63,7 +63,7 @@
   },
   "EditSurveyEmail": {
     "enable": "Salli vastausten raportointi sähköpostitse",
-    "enableHelperText": "Jos valittu, yksittäiset vastaukset lähetetään raportteina määritettäviin osoitteisiin. Myös vastaajalta kysytään kyselyn lopuksi sähköpostiosoitetta vastauksen lähettämistä varten.",
+    "enableHelperText": "Jos sallit vastausten raportoinnin sähköpostitse, lähetetään yksittäiset vastaukset pdf-raportteina alla määrittelemiisi osoitteisiin. Lisäksi vastaajalta kysytään kyselyn lopussa hänen sähköpostiosoitettaan, johon pdf-raportti voidaan toimittaa.",
     "autoSendTo": "Vastaanottajien sähköpostiosoitteet",
     "autoSendToHelperText": "Näihin osoitteisiin lähetetään jokaisesta vastauksesta raportti sähköpostin liitteenä (vastaajan lisäksi).",
     "emailSubject": "Viestin aihe",
