@@ -150,6 +150,10 @@ function dbAnswerEntryRowsToAnswerEntries(rows: DBAnswerEntry[]) {
  * @returns
  */
 function geometryAnswerToFeature(answer: AnswerEntry) {
+  // Some erroneous data might not have a geometry - return null for them to avoid further errors
+  if (!answer.valueGeometry) {
+    return null;
+  }
   return {
     type: 'Feature',
     geometry: {
@@ -180,7 +184,7 @@ function dbEntriesToFeatures(entries: AnswerEntry[]) {
     if (!answer.parentEntryId) {
       submissionGroup[submissionId][answer.answerId] =
         geometryAnswerToFeature(answer);
-    } else {
+    } else if (submissionGroup[submissionId][answer.parentEntryId]) {
       // Add subquestion answer
       submissionGroup[submissionId][answer.parentEntryId].properties[
         answer.title?.['fi'] ?? 'Nimetön alikysymys'
@@ -440,7 +444,8 @@ async function getGeometryDBEntries(surveyId: number): Promise<AnswerEntry[]> {
         LEFT JOIN data.survey_page sp ON ps.survey_page_id = sp.id
         LEFT JOIN data.survey s ON sp.survey_id = s.id
         LEFT JOIN data.option opt ON opt.id = ae.value_option_id
-        WHERE (type = 'map' OR parent_section IS NOT NULL) AND sub.survey_id = $1`,
+        WHERE (type = 'map' OR parent_section IS NOT NULL) AND sub.survey_id = $1
+        ORDER BY ae.parent_entry_id ASC NULLS FIRST`,
     [surveyId]
   )) as DBAnswerEntry[];
 
