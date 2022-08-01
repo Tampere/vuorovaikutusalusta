@@ -2,6 +2,7 @@ import compression from 'compression';
 import express from 'express';
 import morgan from 'morgan';
 import * as path from 'path';
+import { initializePuppeteerCluster } from './application/screenshot';
 import { configureAuth, configureMockAuth, ensureAuthenticated } from './auth';
 import { initializeDatabase, migrateUp } from './database';
 import { HttpResponseError } from './error';
@@ -23,12 +24,15 @@ async function start() {
   // Execute migrations
   await migrateUp();
 
+  // Start up Puppeteer cluster for taking screenshots
+  await initializePuppeteerCluster();
+
   // Add compression
   app.use(compression());
 
   // For body parsing
-  app.use(express.json());
-  app.use(express.urlencoded({ extended: true }));
+  app.use(express.json({ limit: '10mb' }));
+  app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
   // Use logging middleware for HTTP requests
   app.use(

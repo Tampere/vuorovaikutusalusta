@@ -91,7 +91,7 @@ export default function MapQuestion({ value, onChange, question }: Props) {
 
     setDrawingCancelled(false);
     async function handleMapDraw() {
-      const geometry = await draw(selectionType, question.id, question.title);
+      const geometry = await draw(selectionType, question);
 
       // The state variable isn't updated inside this async function - access its current value via ref
       if (drawingCancelledRef.current) {

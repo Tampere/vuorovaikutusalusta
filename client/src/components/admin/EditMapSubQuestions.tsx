@@ -58,6 +58,7 @@ export default function EditMapSubQuestions(props: Props) {
               >
                 {(provided, _snapshot) => (
                   <SurveySectionAccordion
+                    index={index}
                     provided={provided}
                     key={index}
                     className={classes.accordion}
@@ -68,14 +69,14 @@ export default function EditMapSubQuestions(props: Props) {
                     onExpandedChange={(isExpanded) => {
                       props.onExpandedSectionChange(isExpanded ? index : null);
                     }}
-                    onEdit={(editedSection: SurveyMapSubQuestion) => {
+                    onEdit={(index, editedSection: SurveyMapSubQuestion) => {
                       // Replace the edited subquestion in the array
                       const subQuestions = props.mapQuestion.subQuestions.map(
                         (section, i) => (i === index ? editedSection : section)
                       );
                       props.onChange(subQuestions);
                     }}
-                    onDelete={() => {
+                    onDelete={(index) => {
                       // Filter out the subquestion from the array
                       const subQuestions =
                         props.mapQuestion.subQuestions.filter(

@@ -1,8 +1,13 @@
-import { MapQuestionAnswer, SurveyQuestion } from '@interfaces/survey';
+import {
+  FileAnswer,
+  MapQuestionAnswer,
+  SurveyQuestion,
+} from '@interfaces/survey';
 import { FormControl, FormHelperText, FormLabel } from '@material-ui/core';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useMemo, useState } from 'react';
+import AttachmentQuestion from './AttachmentQuestion';
 import CheckBoxQuestion from './CheckBoxQuestion';
 import FreeTextQuestion from './FreeTextQuestion';
 import GroupedCheckBoxQuestion from './GroupedCheckBoxQuestion';
@@ -25,7 +30,7 @@ export default function SurveyQuestion({ question }: Props) {
   const { tr } = useTranslations();
 
   const value = useMemo(
-    () => answers.find((answer) => answer.sectionId === question.id).value,
+    () => answers.find((answer) => answer.sectionId === question.id)?.value,
     [answers, question]
   );
 
@@ -186,6 +191,19 @@ export default function SurveyQuestion({ question }: Props) {
           }}
           question={question}
           setDirty={setDirty}
+        />
+      )}
+      {question.type === 'attachment' && (
+        <AttachmentQuestion
+          value={value as FileAnswer[]}
+          setDirty={setDirty}
+          onChange={(value) =>
+            updateAnswer({
+              sectionId: question.id,
+              type: question.type,
+              value: value,
+            })
+          }
         />
       )}
       {/* Show the required error only for empty values (not when answer limits are broken in checkbox questions) */}

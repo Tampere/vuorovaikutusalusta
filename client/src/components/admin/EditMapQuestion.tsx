@@ -13,6 +13,9 @@ import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useState } from 'react';
 import AddSurveySectionActions from './AddSurveySectionActions';
 import EditMapSubQuestions from './EditMapSubQuestions';
+import MarkerIconSelect from './MarkerIconSelect';
+import StrokeColorSelect from './StrokeColorSelect';
+import StrokeStyleSelect from './StrokeStyleSelect';
 
 interface Props {
   section: SurveyMapQuestion;
@@ -61,45 +64,135 @@ export default function EditMapQuestion({
       </FormGroup>
       <FormGroup>
         <FormLabel>{tr.EditMapQuestion.selectionTypes}</FormLabel>
-        <FormControlLabel
-          label={tr.EditMapQuestion.point}
-          control={
-            <Checkbox
-              name="point"
-              disabled={disabled}
-              checked={section.selectionTypes?.includes('point') ?? false}
-              onChange={() => {
-                toggleSelectionType('point');
+        <div style={{ display: 'flex', marginTop: '0.5rem' }}>
+          <FormControlLabel
+            label={tr.EditMapQuestion.point}
+            control={
+              <Checkbox
+                name="point"
+                disabled={disabled}
+                checked={section.selectionTypes?.includes('point') ?? false}
+                onChange={() => {
+                  toggleSelectionType('point');
+                }}
+              />
+            }
+          />
+          {section.selectionTypes?.includes('point') && (
+            <MarkerIconSelect
+              value={section.featureStyles?.point?.markerIcon}
+              onChange={(icon) => {
+                onChange({
+                  ...section,
+                  featureStyles: {
+                    ...section.featureStyles,
+                    point: {
+                      markerIcon: icon,
+                    },
+                  },
+                });
               }}
             />
-          }
-        />
-        <FormControlLabel
-          label={tr.EditMapQuestion.line}
-          control={
-            <Checkbox
-              name="line"
-              disabled={disabled}
-              checked={section.selectionTypes?.includes('line') ?? false}
-              onChange={() => {
-                toggleSelectionType('line');
-              }}
-            />
-          }
-        />
-        <FormControlLabel
-          label={tr.EditMapQuestion.area}
-          control={
-            <Checkbox
-              name="area"
-              disabled={disabled}
-              checked={section.selectionTypes?.includes('area') ?? false}
-              onChange={() => {
-                toggleSelectionType('area');
-              }}
-            />
-          }
-        />
+          )}
+        </div>
+        <div style={{ display: 'flex', marginTop: '0.5rem' }}>
+          <FormControlLabel
+            label={tr.EditMapQuestion.line}
+            control={
+              <Checkbox
+                name="line"
+                disabled={disabled}
+                checked={section.selectionTypes?.includes('line') ?? false}
+                onChange={() => {
+                  toggleSelectionType('line');
+                }}
+              />
+            }
+          />
+          {section.selectionTypes?.includes('line') && (
+            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+              <StrokeStyleSelect
+                value={section.featureStyles?.line?.strokeStyle}
+                onChange={(value) => {
+                  onChange({
+                    ...section,
+                    featureStyles: {
+                      ...section.featureStyles,
+                      line: {
+                        ...section.featureStyles?.line,
+                        strokeStyle: value,
+                      },
+                    },
+                  });
+                }}
+              />
+              <StrokeColorSelect
+                value={section.featureStyles?.line?.strokeColor}
+                onChange={(value) => {
+                  onChange({
+                    ...section,
+                    featureStyles: {
+                      ...section.featureStyles,
+                      line: {
+                        ...section.featureStyles?.line,
+                        strokeColor: value,
+                      },
+                    },
+                  });
+                }}
+              />
+            </div>
+          )}
+        </div>
+        <div style={{ display: 'flex', marginTop: '0.5rem' }}>
+          <FormControlLabel
+            label={tr.EditMapQuestion.area}
+            control={
+              <Checkbox
+                name="area"
+                disabled={disabled}
+                checked={section.selectionTypes?.includes('area') ?? false}
+                onChange={() => {
+                  toggleSelectionType('area');
+                }}
+              />
+            }
+          />
+          {section.selectionTypes?.includes('area') && (
+            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+              <StrokeStyleSelect
+                value={section.featureStyles?.area?.strokeStyle}
+                onChange={(value) => {
+                  onChange({
+                    ...section,
+                    featureStyles: {
+                      ...section.featureStyles,
+                      area: {
+                        ...section.featureStyles?.area,
+                        strokeStyle: value,
+                      },
+                    },
+                  });
+                }}
+              />
+              <StrokeColorSelect
+                value={section.featureStyles?.area?.strokeColor}
+                onChange={(value) => {
+                  onChange({
+                    ...section,
+                    featureStyles: {
+                      ...section.featureStyles,
+                      area: {
+                        ...section.featureStyles?.area,
+                        strokeColor: value,
+                      },
+                    },
+                  });
+                }}
+              />
+            </div>
+          )}
+        </div>
       </FormGroup>
       <FormLabel>{tr.EditMapQuestion.subQuestions}</FormLabel>
       <EditMapSubQuestions
@@ -113,15 +206,7 @@ export default function EditMapQuestion({
         }}
       />
       <AddSurveySectionActions
-        types={[
-          'radio',
-          'checkbox',
-          'free-text',
-          'numeric',
-          'sorting',
-          'slider',
-          'matrix',
-        ]}
+        types={['radio', 'checkbox', 'free-text', 'numeric']}
         onAdd={(newSection: SurveyMapSubQuestion) => {
           onChange({
             ...section,

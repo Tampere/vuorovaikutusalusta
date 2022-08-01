@@ -1,7 +1,11 @@
 import { GeoJSONWithCRS } from '@interfaces/geojson';
-import { MapQuestionSelectionType } from '@interfaces/survey';
+import {
+  MapQuestionSelectionType,
+  SurveyMapQuestion,
+} from '@interfaces/survey';
 import { LineString, Point, Polygon } from 'geojson';
 import { Channel, DrawingEventHandler } from 'oskari-rpc';
+import parseCSSColor from 'parse-css-color';
 import React, {
   createContext,
   ReactNode,
@@ -9,6 +13,7 @@ import React, {
   useEffect,
   useMemo,
   useReducer,
+  useRef,
 } from 'react';
 
 interface State {
@@ -95,13 +100,53 @@ const answerGeometryLayer = 'answers';
 // Drawing ID for modifying existing geometries
 const modifyEventId = 'modify';
 
-// Feature styles for geometry answers (drawing and displaying)
-const featureStyle = {
+// Default feature style
+const defaultFeatureStyle = {
   stroke: {
-    color: 'rgba(0,0,0,0.5)',
+    color: '#000000',
     width: 10,
   },
+  fill: {
+    color: 'rgba(0,0,0,0.3)',
+  },
 };
+
+function getFeatureStyle(
+  selectionType: MapQuestionSelectionType,
+  question: SurveyMapQuestion
+) {
+  // Use default style for points
+  if (selectionType === 'point') {
+    return defaultFeatureStyle;
+  }
+  // Get feature style from question
+  const style = question.featureStyles?.[selectionType];
+  // If no style is defined, use default
+  if (!style) {
+    return defaultFeatureStyle;
+  }
+  // Parse & calculate fill color with a fixed opacity from the stroke color
+  const parsedStrokeColor = parseCSSColor(style.strokeColor);
+  const fillColor = parsedStrokeColor
+    ? `rgba(${parsedStrokeColor.values.join(',')}, 0.3)`
+    : defaultFeatureStyle.fill.color;
+  return {
+    stroke: {
+      color: style.strokeColor || defaultFeatureStyle.stroke.color,
+      width: 10,
+      lineDash:
+        style.strokeStyle === 'dashed'
+          ? [30, 10]
+          : style.strokeStyle === 'dotted'
+          ? [0, 14]
+          : null,
+      lineCap: style.strokeStyle === 'dashed' ? 'butt' : 'round',
+    },
+    fill: {
+      color: fillColor,
+    },
+  };
+}
 
 /**
  * Generates a unique ID for question and selection type combination.
@@ -129,6 +174,9 @@ export function useSurveyMap() {
 
   const [state, dispatch] = context;
 
+  const drawingRef = useRef<boolean>();
+  drawingRef.current = state.questionId != null;
+
   const isMapReady = useMemo(
     () => Boolean(state.rpcChannel),
     [state.rpcChannel]
@@ -139,16 +187,53 @@ export function useSurveyMap() {
    * @param geometries
    */
   function drawAnswerGeometries(geometries: GeoJSON.FeatureCollection) {
-    state.rpcChannel.postRequest('MapModulePlugin.AddFeaturesToMapRequest', [
-      geometries,
-      {
-        layerId: answerGeometryLayer,
-        centerTo: false,
-        clearPrevious: true,
-        cursor: 'pointer',
-        featureStyle,
-      },
-    ]);
+    // Clear previous geometries
+    state.rpcChannel.postRequest(
+      'MapModulePlugin.RemoveFeaturesFromMapRequest',
+      [null, null, answerGeometryLayer]
+    );
+    state.rpcChannel.postRequest('MapModulePlugin.RemoveMarkersRequest', []);
+    // Add current features one by one to get the correct styles
+    geometries.features.forEach((feature) => {
+      if (['Polygon', 'LineString'].includes(feature.geometry.type)) {
+        state.rpcChannel.postRequest(
+          'MapModulePlugin.AddFeaturesToMapRequest',
+          [
+            {
+              type: 'FeatureCollection',
+              features: [feature],
+            },
+            {
+              layerId: answerGeometryLayer,
+              centerTo: false,
+              clearPrevious: false,
+              cursor: 'pointer',
+              featureStyle: getFeatureStyle(
+                feature.geometry.type === 'Polygon' ? 'area' : 'line',
+                feature.properties.question
+              ),
+            },
+          ]
+        );
+      } else {
+        state.rpcChannel.postRequest('MapModulePlugin.AddMarkerRequest', [
+          {
+            x: (feature.geometry as any).coordinates[0],
+            y: (feature.geometry as any).coordinates[1],
+            shape:
+              feature.properties.question.featureStyles?.point?.markerIcon ?? 0,
+            offsetX: 0,
+            offsetY: 0,
+            // Different sizes for custom SVG vs the default marker icon
+            // TODO both should be in pixels but they're not - some problems with SVG viewport size?
+            size: feature.properties.question.featureStyles?.point?.markerIcon
+              ? 64
+              : 12,
+          },
+          `answer:${feature.properties.question.id}:${feature.properties.index}`,
+        ]);
+      }
+    });
   }
 
   return {
@@ -176,7 +261,7 @@ export function useSurveyMap() {
     initializeMap() {
       // Set handler for clicking features
       state.rpcChannel.handleEvent('FeatureEvent', (event) => {
-        if (event.operation !== 'click') {
+        if (event.operation !== 'click' || drawingRef.current) {
           return;
         }
         // TODO: tuleeko klikki-eventit läpi jos on drawing-mode päällä? eli voiko pitää muokkaus-moodia jatkuvasti kartalla (pl. uusien piirtomoodi)?
@@ -186,8 +271,16 @@ export function useSurveyMap() {
         // There should only be one feature
         const feature = featureCollection.features[0];
         // Pick answer data from feature properties
-        const { questionId, index } = feature.properties;
+        const { question, index } = feature.properties;
         // Open editing dialog via context
+        dispatch({
+          type: 'SET_EDITING_MAP_ANSWER',
+          value: { questionId: question.id, index },
+        });
+      });
+
+      state.rpcChannel.handleEvent('MarkerClickEvent', (event) => {
+        const [, questionId, index] = event.id.split(':').map(Number);
         dispatch({
           type: 'SET_EDITING_MAP_ANSWER',
           value: { questionId, index },
@@ -200,15 +293,10 @@ export function useSurveyMap() {
     /**
      * Enters the draw state and returns the geometry when user has finished drawing.
      * @param type Selection type (shape)
-     * @param questionId Question ID
-     * @param helperText Helper text (shown in the mobile UI)
+     * @param question Map question
      * @returns Drawn geometry
      */
-    async draw(
-      type: MapQuestionSelectionType,
-      questionId: number,
-      helperText: string
-    ) {
+    async draw(type: MapQuestionSelectionType, question: SurveyMapQuestion) {
       // Stop the previous drawing if the map is in a draw state
       if (state.questionId) {
         const previousEventId = getDrawingEventId(
@@ -220,11 +308,16 @@ export function useSurveyMap() {
           true,
         ]);
       }
-      const eventId = getDrawingEventId(questionId, type);
-      dispatch({ type: 'SET_HELPER_TEXT', text: helperText });
-      dispatch({ type: 'SET_QUESTION_ID', value: questionId });
-      dispatch({ type: 'SET_SELECTION_TYPE', value: type });
+      const eventId = getDrawingEventId(question.id, type);
+      // These events need to be delayed - otherwise there might be an extraneous feature click event from Oskari
+      setTimeout(() => {
+        dispatch({ type: 'SET_HELPER_TEXT', text: question.title });
+        dispatch({ type: 'SET_QUESTION_ID', value: question.id });
+        dispatch({ type: 'SET_SELECTION_TYPE', value: type });
+      }, 0);
 
+      const featureStyle =
+        getFeatureStyle(type, question) ?? defaultFeatureStyle;
       // Start the new drawing
       state.rpcChannel.postRequest('DrawTools.StartDrawingRequest', [
         eventId,
@@ -258,7 +351,7 @@ export function useSurveyMap() {
           // Skip unfinished events and events for a different question and different selection type (if specified)
           if (
             !event.isFinished ||
-            eventQuestionId !== String(questionId) ||
+            eventQuestionId !== String(question.id) ||
             (eventSelectionType && eventSelectionType !== type) ||
             !event.geojson.features.length
           ) {
@@ -269,7 +362,9 @@ export function useSurveyMap() {
             ...event.geojson.features[0],
             crs: {
               type: 'name',
-              properties: { name: event.geojson.crs },
+              properties: {
+                name: event.geojson.crs,
+              },
             },
           });
         };
@@ -313,6 +408,9 @@ export function useSurveyMap() {
         'MapModulePlugin.RemoveFeaturesFromMapRequest',
         [null, null, answerGeometryLayer]
       );
+      state.rpcChannel.postRequest('MapModulePlugin.RemoveMarkersRequest', []);
+
+      // TODO in modify mode, all feature styles will be replaced even when adding them one by one - so just use the default style in this case
       // Start modifying with currently stored answer geometries
       state.rpcChannel.postRequest('DrawTools.StartDrawingRequest', [
         modifyEventId,
@@ -325,15 +423,17 @@ export function useSurveyMap() {
             ...state.answerGeometries,
             features: state.answerGeometries.features.map((feature) => ({
               ...feature,
+              // Leave properties from modify mode to prevent passing recursive data structures
+              properties: {},
               // Oskari overwrites GeoJSON properties when entering drawing mode - form an ID to keep the data available in drawing event handler
-              id: `answer:${feature.properties.questionId}:${feature.properties.index}`,
+              id: `answer:${feature.properties.question.id}:${feature.properties.index}`,
             })),
           },
           style: {
             // Due to some buggy changes in https://github.com/mozilla/jschannel/pull/15 the recursive object check fails,
             // unless we do a deep copy of the style object.
-            draw: JSON.parse(JSON.stringify(featureStyle)),
-            modify: JSON.parse(JSON.stringify(featureStyle)),
+            draw: JSON.parse(JSON.stringify(defaultFeatureStyle)),
+            modify: JSON.parse(JSON.stringify(defaultFeatureStyle)),
           },
         },
       ]);
@@ -377,7 +477,14 @@ export function useSurveyMap() {
               .map(Number);
             return {
               ...feature,
+              crs: {
+                type: 'name',
+                properties: {
+                  name: event.geojson.crs,
+                },
+              },
               properties: {
+                ...feature.properties,
                 questionId,
                 index,
               },

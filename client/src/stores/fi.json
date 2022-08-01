@@ -5,7 +5,8 @@
     "chooseFileFormat": "Valitse haluamasi tiedostomuodot",
     "download": "lataa",
     "errorDownloadingCSV": "CSV -tiedoston lataaminen epäonnistui",
-    "errorDownloadingGPKG": "GeoPackage -tiedoston lataaminen epäonnistui"
+    "errorDownloadingGPKG": "GeoPackage -tiedoston lataaminen epäonnistui",
+    "attachments": "Vastausliitteet"
   },
   "EditSurvey": {
     "errorFetchingSurvey": "Virhe haettaessa kyselyä. Tarkista osoite tai yritä myöhemmin uudestaan.",
@@ -23,6 +24,7 @@
     },
     "toFrontPage": "Etusivulle",
     "info": "Kyselyn perustiedot",
+    "email": "Sähköposti",
     "newPage": "Uusi sivu",
     "newPageFailed": "Uuden sivun luomisessa tapahtui virhe. Yritä myöhemmin uudestaan.",
     "thanksPage": "Kiitos-sivu",
@@ -33,7 +35,8 @@
     "deleteSurvey": "Poista kysely",
     "deleteSurveyConfirm": "Haluatko varmasti poistaa koko kyselyn? Toimintoa ei voi perua.",
     "deleteSurveyFailed": "Kyselyn poistamisessa tapahtui virhe. Yritä myöhemmin uudestaan.",
-    "deleteSurveySuccessful": "Kysely poistettiin onnistuneesti!"
+    "deleteSurveySuccessful": "Kysely poistettiin onnistuneesti!",
+    "allowSavingUnfinished": "Salli kyselyn tallentaminen keskeneräisenä"
   },
   "EditSurveyInfo": {
     "title": "Kyselyn otsikko",
@@ -53,7 +56,26 @@
     "theme": "Teema",
     "selectTheme": "Valitse teema",
     "themeFetchFailed": "Teemojen hakemisessa tapahtui virhe. Yritä myöhemmin uudestaan.",
-    "titleColor": "Osioiden otsikoiden väri"
+    "titleColor": "Osioiden otsikoiden väri",
+    "allowTestSurvey": "Julkaise testikysely",
+    "allowTestSurveyHelperText": "Kyselystä julkaistaan testiversio oman osoitteen taakse. Testikyselystä ei tallenneta vastauksia.",
+    "testSurveyUrl": "Testikyselyn osoite"
+  },
+  "EditSurveyEmail": {
+    "enable": "Salli vastausten raportointi sähköpostitse",
+    "enableHelperText": "Jos sallit vastausten raportoinnin sähköpostitse, lähetetään yksittäiset vastaukset pdf-raportteina alla määrittelemiisi osoitteisiin. Lisäksi vastaajalta kysytään kyselyn lopussa hänen sähköpostiosoitettaan, johon pdf-raportti voidaan toimittaa.",
+    "autoSendTo": "Vastaanottajien sähköpostiosoitteet",
+    "autoSendToHelperText": "Näihin osoitteisiin lähetetään jokaisesta vastauksesta raportti sähköpostin liitteenä (vastaajan lisäksi).",
+    "emailSubject": "Viestin aihe",
+    "emailBody": "Viestin sisältö",
+    "info": "Lisätiedot",
+    "infoHelperText": "Lisätiedot esitetään sähköpostitse lähetettävän vastausraportin etusivulla."
+  },
+  "KeyValueForm": {
+    "key": "Nimi",
+    "value": "Arvo",
+    "addEntry": "Lisää rivi",
+    "deleteEntry": "Poista rivi"
   },
   "EditSurveyPage": {
     "name": "Sivun nimi",
@@ -77,6 +99,7 @@
   },
   "FileUpload": {
     "deleteFile": "Poista tiedosto",
+    "addedFile": "Valittu tiedosto",
     "errorUploadingFile": "Tiedoston lataamisessa tapahtui virhe. Yritä myöhemmin uudestaan.",
     "errorDeletingFile": "Tiedoston poistamisessa tapahtui virhe. Yritä myöhemmin uudestaan."
   },
@@ -98,7 +121,8 @@
     "matrixQuestion": "Lisää likert -kysymys",
     "groupedCheckboxQuestion": "Lisää ryhmitetty monivalintakysymys",
     "imageSection": "Lisää kuvaosio",
-    "documentSection": "Lisää liiteosio"
+    "documentSection": "Lisää liiteosio",
+    "attachmentSection": "Lisää vastausliite"
   },
   "SurveySection": {
     "radioQuestion": "Valintakysymys",
@@ -112,7 +136,8 @@
     "matrixQuestion": "Likert -kysymys",
     "groupedCheckboxQuestion": "Ryhmitetty monivalintakysymys",
     "imageSection": "Kuvaosio",
-    "documentSection": "Liiteosio"
+    "documentSection": "Liiteosio",
+    "attachmentSection": "Vastausliite"
   },
   "SurveySections": {
     "limitAnswers": "Rajoita vastauslukumäärää",
@@ -134,13 +159,22 @@
     "maxValue": "Arvon pitää olla enintään {maxValue}",
     "minMaxValue": "Arvon pitää olla {minValue} ja {maxValue} välissä"
   },
+  "AttachmentQuestion": {
+    "addedFile": "Lisätty tiedosto",
+    "fileUploadError": "Virhe ladattaessa tiedostoa",
+    "fileSizeLimitError": "Ladattavan tiedoston koko ei saa olla yli 10MB",
+    "unsupportedFileFormat": "Tiedostoformaattia ei tueta",
+    "attachmentFileFormats": "Sallitut tiedostoformaatit: jpg, jpeg, png, pdf, docx, xlsx."
+  },
   "SurveyImageList": {
     "attributions": "Tekijänoikeustiedot",
     "noImage": "Ei taustakuvaa",
     "surveyImage": "Kyselyn taustakuva",
     "selectImage": "Valitse taustakuva",
     "addNewImage": "Lisää uusi kuva",
-    "files": "Tiedosto",
+    "files": "Tiedosto"
+  },
+  "DropZone": {
     "dropFiles": "Raahaa tiedosto tähän tai klikkaa valitaksesi tiedosto"
   },
   "EditTextSection": {
@@ -196,6 +230,23 @@
       "warmGreen": "Lämmin vihreä"
     }
   },
+  "MarkerIconSelect": {
+    "icon": "Ikoni",
+    "selectIcon": "Valitse ikoni",
+    "errorFetchingIcons": "Ikonien haussa tapahtui virhe. Yritä myöhemmin uudelleen."
+  },
+  "StrokeStyleSelect": {
+    "strokeStyle": "Viivan tyyli",
+    "selectStrokeStyle": "Valitse viivan tyyli",
+    "solid": "Yhtenäinen",
+    "dashed": "Katkoviiva",
+    "dotted": "Pisteviiva"
+  },
+  "StrokeColorSelect": {
+    "strokeColor": "Viivan väri",
+    "selectStrokeColor": "Valitse viivan väri",
+    "errorFetchingColors": "Värien haussa tapahtui virhe. Yritä myöhemmin uudelleen."
+  },
   "SurveyList": {
     "title": "Vuorovaikutusalusta - Kyselyt",
     "errorFetchingSurveys": "Virhe haettaessa kyselyitä. Yritä myöhemmin uudestaan.",
@@ -216,12 +267,19 @@
     "open": "Avoinna",
     "openFrom": "Avoinna alkaen",
     "published": "Julkaistu",
-    "notPublished": "Ei julkaistu"
+    "notPublished": "Ei julkaistu",
+    "showAuthoredOnly": "Näytä vain omat kyselyt",
+    "showPublishedOnly": "Näytä vain avoinna olevat kyselyt",
+    "copySurvey": "Kopioi"
   },
   "SurveyPage": {
     "errorSurveyNotFound": "Kyselyä ei löytynyt, tai se ei ole avoinna. Tarkista osoite ja yritä uudestaan.",
     "errorFetchingSurvey": "Kyselyn haussa tapahtui virhe. Yritä myöhemmin uudestaan.",
-    "startSurveyLink": "Aloita kysely tästä"
+    "startSurveyLink": "Aloita kysely tästä",
+    "continueSurveyLink": "Jatka kyselyä tästä",
+    "loadUnfinishedSuccessful": "Tallennetut vastaukset ladattu onnistuneesti! Voit jatkaa kyselyn täyttämistä.",
+    "errorTokenNotFound": "Antamallasi osoitteella ei löytynyt tallennettuja vastauksia. Tarkista osoite tai aloita kyselyn täyttäminen alusta.",
+    "errorLoadingUnfinished": "Tallennettujen vastausten lataamisessa tapahtui virhe. Yritä myöhemmin uudestaan."
   },
   "UnavailableSurvey": {
     "surveyNotPublished": "Kiitos mielenkiinnostasi! Kysely on sulkeutunut eikä siihen voi enää vastata.",
@@ -243,7 +301,15 @@
     "errorSubmittingSurvey": "Kyselyn lähettämisessä tapahtui virhe. Ole hyvä ja yritä myöhemmin uudestaan.",
     "openMap": "Avaa kartta",
     "openImage": "Avaa kuva",
-    "unfinishedAnswers": "Vastaa kaikkiin pakolliseksi merkittyihin kysymyksiin"
+    "unfinishedAnswers": "Vastaa kaikkiin pakolliseksi merkittyihin kysymyksiin",
+    "saveAsUnfinished": "Tallenna keskeneräisenä"
+  },
+  "SaveAsUnfinishedDialog": {
+    "description": "Voit tallentaa kyselyn keskeneräisenä antamalla sähköpostiosoitteesi. Sähköpostiisi toimitetaan linkki, josta pääset jatkamaan vastaamista kyselyn ollessa auki.",
+    "disclaimer": "Sähköpostiosoitettasi ei tallenneta eikä käytetä muihin tarkoituksiin. Vastauksesi otetaan huomioon vasta, kun olet vastannut kyselyn loppuun ja lähettänyt lopullisen vastauksesi.",
+    "email": "Sähköpostiosoite",
+    "saveSuccessful": "Vastauksesi tallennettiin onnistuneesti! Saat hetken kuluttua sähköpostiisi linkin, jolla voit jatkaa kyselyä. Voit nyt sulkea selaimen. Jos käytät julkista tietokonetta, muista tyhjentää selaimen välimuisti.",
+    "errorSaving": "Vastaustesi tallennuksessa tapahtui virhe. Ole hyvä ja yritä myöhemmin uudestaan."
   },
   "SurveyQuestion": {
     "errorFieldIsRequired": "Kenttä on pakollinen.",
@@ -289,6 +355,14 @@
   "DocumentSection": {
     "attachment": "Liite"
   },
+  "DeleteSurveyDialog": {
+    "dialogTitle": "Kyselyn poistaminen",
+    "surveyName": "kyselyn nimi",
+    "surveyAuthor": "kyselyn laatija/yhteyshenkilö",
+    "warningMessage": "HUOM! Kun kysely poistetaan, samalla poistetaan kaikki kyselyyn tehdyt vastaukset. Vastaukset poistetaan lopullisesti, eikä niihin ole enää kyselyn poiston jälkeen pääsyä.",
+    "activateDeleting": "Aktivoidaksesi kyselyn poisto kirjoita alla olevaan kenttään kyselyn nimi",
+    "surveyToBeDeleted": "poistettavan kyselyn nimi"
+  },
   "GroupedCheckBoxQuestion": {
     "helperText": "Valitse kohteita alla olevien ryhmien sisältä.",
     "helperTextMin": "Valitse yhteensä vähintään {min} vaihtoehtoa.",
@@ -298,11 +372,19 @@
     "indicatorTextMaxReached": "Olet valinnut kaikki {numbers} vaihtoehtoa.",
     "optionsSelectedInGroup": "{number} vaihtoehtoa valittu."
   },
+  "SubmissionInfoDialog": {
+    "title": "Lähetä vastaus",
+    "text": "Jos haluat saada kopion vastauksestasi, anna sähköpostiosoitteesi oheiseen kenttään.",
+    "email": "Sähköposti (valinnainen)"
+  },
   "AppBarUserMenu": {
     "logout": "Kirjaudu ulos"
   },
   "MapInfoBox": {
     "answer": "Vastaus"
+  },
+  "TestSurveyFrame": {
+    "text": "Tämä on testikysely. Vastauksia ei tallenneta, eikä niistä lähetetä sähköpostia."
   },
   "navigation": {
     "next": "Seuraava",

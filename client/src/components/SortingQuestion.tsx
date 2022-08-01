@@ -40,7 +40,7 @@ const useStyles = makeStyles({
 export default function SortingQuestion(props: Props) {
   const { tr } = useTranslations();
   const [sortedOptionIds, setSortedOptionIds] = useState(
-    new Array(props.question.options.length).fill(null)
+    props.value ?? new Array(props.question.options.length).fill(null)
   );
 
   const classes = useStyles();

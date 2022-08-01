@@ -1,18 +1,25 @@
-import React, { useEffect, useState } from 'react';
 import { Survey } from '@interfaces/survey';
 import { Box, CircularProgress } from '@material-ui/core';
-import { request } from '@src/utils/request';
-import { useParams } from 'react-router-dom';
-import SurveyLandingPage from './SurveyLandingPage';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
+import { useSurveyTheme } from '@src/stores/SurveyThemeProvider';
+import { useToasts } from '@src/stores/ToastContext';
+import { useTranslations } from '@src/stores/TranslationContext';
+import { getFullFilePath } from '@src/utils/path';
+import { request } from '@src/utils/request';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useLocation, useParams } from 'react-router-dom';
+import { NotFoundPage } from './NotFoundPage';
+import SurveyLandingPage from './SurveyLandingPage';
 import SurveyStepper from './SurveyStepper';
 import SurveyThanksPage from './SurveyThanksPage';
+import TestSurveyFrame from './TestSurveyFrame';
 import { UnavailableSurvey } from './UnavailableSurvey';
-import { NotFoundPage } from './NotFoundPage';
-import { useSurveyTheme } from '@src/stores/SurveyThemeProvider';
-import { getFullFilePath } from '@src/utils/path';
 
-export default function SurveyPage() {
+interface Props {
+  isTestSurvey?: boolean;
+}
+
+export default function SurveyPage({ isTestSurvey }: Props) {
   const [loading, setLoading] = useState(true);
   const [showLandingPage, setShowLandingPage] = useState(true);
   const [showThanksPage, setShowThanksPage] = useState(false);
@@ -20,16 +27,27 @@ export default function SurveyPage() {
     attributions: string;
   }>(null);
   const [errorStatusCode, setErrorStatusCode] = useState<number>(null);
+  const [continueUnfinished, setContinueUnfinished] = useState(false);
 
   const { name } = useParams<{ name: string }>();
-  const { setSurvey, survey } = useSurveyAnswers();
+  const { setSurvey, survey, loadUnfinishedEntries } = useSurveyAnswers();
   const { setThemeFromSurvey } = useSurveyTheme();
+  const { search } = useLocation();
+  const { tr } = useTranslations();
+  const { showToast } = useToasts();
+
+  const unfinishedToken = useMemo(
+    () => new URLSearchParams(search)?.get('token'),
+    [search]
+  );
 
   // Fetch survey data from server
   useEffect(() => {
     async function fetchSurvey() {
       try {
-        const survey = await request<Survey>(`/api/published-surveys/${name}`);
+        const survey = await request<Survey>(
+          `/api/published-surveys/${name}${isTestSurvey ? '?test=true' : ''}`
+        );
         if (
           survey.backgroundImagePath &&
           survey.backgroundImageName &&
@@ -67,6 +85,39 @@ export default function SurveyPage() {
       .join(' - ');
   }, [survey]);
 
+  // Try to continue unfinished submission if an unfinished token is provided in query parameters
+  useEffect(() => {
+    if (!survey || !unfinishedToken) {
+      return;
+    }
+    async function continueSubmission() {
+      try {
+        await loadUnfinishedEntries(unfinishedToken);
+        showToast({
+          message: tr.SurveyPage.loadUnfinishedSuccessful,
+          severity: 'success',
+        });
+        setContinueUnfinished(true);
+      } catch (error) {
+        switch (error.status) {
+          case 400:
+          case 404:
+            showToast({
+              message: tr.SurveyPage.errorTokenNotFound,
+              severity: 'error',
+            });
+            break;
+          default:
+            showToast({
+              message: tr.SurveyPage.errorLoadingUnfinished,
+              severity: 'error',
+            });
+        }
+      }
+    }
+    continueSubmission();
+  }, [survey, unfinishedToken]);
+
   return !survey ? (
     loading ? (
       <Box
@@ -85,30 +136,41 @@ export default function SurveyPage() {
       <UnavailableSurvey />
     )
   ) : (
-    <Box sx={{ height: '100vh', maxHeight: '-webkit-fill-available' }}>
-      {/* Landing page */}
-      {showLandingPage && (
-        <SurveyLandingPage
-          survey={survey}
-          surveyBackgroundImage={surveyBackgroundImage}
-          onStart={() => {
-            setShowLandingPage(false);
-          }}
-        />
-      )}
-      {/* Survey page */}
-      {!showLandingPage && !showThanksPage && (
-        <SurveyStepper
-          survey={survey}
-          onComplete={() => {
-            setShowThanksPage(true);
-          }}
-        />
-      )}
-      {/* Thanks page */}
-      {!showLandingPage && showThanksPage && (
-        <SurveyThanksPage survey={survey} />
-      )}
-    </Box>
+    <>
+      <Box
+        sx={{
+          height: '100vh',
+          maxHeight: '-webkit-fill-available',
+        }}
+      >
+        {/* Landing page */}
+        {showLandingPage && (
+          <SurveyLandingPage
+            survey={survey}
+            isTestSurvey={isTestSurvey}
+            continueUnfinished={continueUnfinished}
+            surveyBackgroundImage={surveyBackgroundImage}
+            onStart={() => {
+              setShowLandingPage(false);
+            }}
+          />
+        )}
+        {/* Survey page */}
+        {!showLandingPage && !showThanksPage && (
+          <SurveyStepper
+            survey={survey}
+            isTestSurvey={isTestSurvey}
+            onComplete={() => {
+              setShowThanksPage(true);
+            }}
+          />
+        )}
+        {/* Thanks page */}
+        {!showLandingPage && showThanksPage && (
+          <SurveyThanksPage survey={survey} isTestSurvey={isTestSurvey} />
+        )}
+      </Box>
+      {isTestSurvey && <TestSurveyFrame />}
+    </>
   );
 }

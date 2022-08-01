@@ -1,5 +1,6 @@
 // @ts-nocheck
 
+import { File } from '@interfaces/survey';
 import {
   Button,
   Dialog,
@@ -7,19 +8,17 @@ import {
   DialogContent,
   ImageList,
   ImageListItem,
-  Theme,
   TextField,
+  Theme,
   Typography,
 } from '@material-ui/core';
-import { PhotoLibrary } from '@material-ui/icons';
+import { Cancel, PhotoLibrary } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/styles';
+import { useSurvey } from '@src/stores/SurveyContext';
+import { useTranslations } from '@src/stores/TranslationContext';
 import { request } from '@src/utils/request';
 import React, { useEffect, useState } from 'react';
-import { useTranslations } from '@src/stores/TranslationContext';
-import { Cancel } from '@material-ui/icons';
-import { useSurvey } from '@src/stores/SurveyContext';
 import { useDropzone } from 'react-dropzone';
-import { File } from '@interfaces/survey';
 
 const useStyles = makeStyles((theme: Theme) => ({
   noImageBackground: {
@@ -242,7 +241,7 @@ export default function SurveyImageList() {
           <div {...getRootProps({ className: 'dropzone' })}>
             <input {...getInputProps()} />
             <p style={{ color: 'purple', cursor: 'pointer' }}>
-              {tr.SurveyImageList.dropFiles}
+              {tr.DropZone.dropFiles}
             </p>
           </div>
           {acceptedFiles?.length ? (

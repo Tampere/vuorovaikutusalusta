@@ -1,5 +1,4 @@
 import {
-  AnswerEntry,
   File,
   LocalizedText,
   SectionOption,
@@ -7,6 +6,7 @@ import {
   Survey,
   SurveyBackgroundImage,
   SurveyCheckboxQuestion,
+  SurveyEmailInfoItem,
   SurveyMapQuestion,
   SurveyMapSubQuestion,
   SurveyPage,
@@ -16,19 +16,12 @@ import {
   SurveyTheme,
 } from '@interfaces/survey';
 import { User } from '@interfaces/user';
-import {
-  getColumnSet,
-  getDb,
-  getGeoJSONColumn,
-  getMultiInsertQuery,
-  getMultiUpdateQuery,
-} from '@src/database';
+import { getColumnSet, getDb, getMultiUpdateQuery } from '@src/database';
 import {
   BadRequestError,
   InternalServerError,
   NotFoundError,
 } from '@src/error';
-import logger from '@src/logger';
 
 // TODO: Find a better way to pass the language code when/if the localization is fully implemented
 const languageCode = 'fi';
@@ -54,6 +47,7 @@ interface DBSurvey {
   map_url: string;
   start_date: Date;
   end_date: Date;
+  allow_test_survey: boolean;
   created_at: Date;
   updated_at: Date;
   thanks_page_title: LocalizedText;
@@ -61,6 +55,12 @@ interface DBSurvey {
   background_image_name: string;
   background_image_path: string[];
   section_title_color: string;
+  email_enabled: boolean;
+  email_auto_send_to: string[];
+  email_subject: string;
+  email_body: string;
+  email_info: SurveyEmailInfoItem[];
+  allow_saving_unfinished: boolean;
 }
 
 /**
@@ -152,20 +152,6 @@ type DBSurveyJoin = DBSurvey & {
 };
 
 /**
- * DB row of table data.answer_entry
- */
-interface DBAnswerEntry {
-  id?: number;
-  submission_id: number;
-  section_id: number;
-  value_text: string;
-  value_numeric: number;
-  value_option_id: number;
-  value_geometry: GeoJSON.Geometry;
-  value_json: string;
-}
-
-/**
  * Helper function for creating survey page column set for database queries
  */
 const surveyPageColumnSet = getColumnSet<DBSurveyPage>('survey_page', [
@@ -198,23 +184,6 @@ const sectionOptionColumnSet = getColumnSet<DBSectionOption>('option', [
   { name: 'text', cast: 'json' },
   { name: 'info', cast: 'json' },
 ]);
-
-/**
- * Helper function for creating answer entry column set for database queries
- */
-const submissionEntryColumnSet = (inputSRID: number) =>
-  getColumnSet<DBAnswerEntry>('answer_entry', [
-    'submission_id',
-    'section_id',
-    'value_text',
-    'value_option_id',
-    getGeoJSONColumn('value_geometry', inputSRID),
-    'value_numeric',
-    {
-      name: 'value_json',
-      cast: 'json',
-    },
-  ]);
 
 /**
  * Gets the survey with given ID or name from the database.
@@ -391,16 +360,24 @@ export async function getSurvey(params: { id: number } | { name: string }) {
     }
 
     return survey;
-  }, dbSurveyToSurvey(rows[0])) as any;
+  }, dbSurveyToSurvey(rows[0])) as Survey;
 }
 
 /**
  * Get all surveys from the db
  * @returns Array of Surveys
  */
-export async function getSurveys() {
-  const rows = await getDb().manyOrNone<DBSurvey>(`SELECT * FROM data.survey`); // TODO order by
-  return rows.map((row) => dbSurveyToSurvey(row));
+export async function getSurveys(
+  authorId?: string,
+  filterByPublished?: boolean
+) {
+  const rows = await getDb().manyOrNone<DBSurvey>(
+    `SELECT * FROM data.survey WHERE ($1 IS NULL OR author_id = $1) ORDER BY updated_at DESC`,
+    [authorId, filterByPublished]
+  );
+  return rows
+    .map((row) => dbSurveyToSurvey(row))
+    .filter((survey) => (filterByPublished ? isPublished(survey) : survey));
 }
 
 /**
@@ -702,13 +679,20 @@ export async function updateSurvey(survey: Survey) {
         map_url = $7,
         start_date = $8,
         end_date = $9,
-        thanks_page_title = $10,
-        thanks_page_text = $11,
-        background_image_name = $12,
-        background_image_path = $13,
-        admins = $14,
-        theme_id = $15,
-        section_title_color = $16
+        allow_test_survey = $10,
+        thanks_page_title = $11,
+        thanks_page_text = $12,
+        background_image_name = $13,
+        background_image_path = $14,
+        admins = $15,
+        theme_id = $16,
+        section_title_color = $17,
+        email_enabled = $18,
+        email_auto_send_to = $19,
+        email_subject = $20,
+        email_body = $21,
+        email_info = $22::json,
+        allow_saving_unfinished = $23
       WHERE id = $1 RETURNING *`,
       [
         survey.id,
@@ -720,6 +704,7 @@ export async function updateSurvey(survey: Survey) {
         survey.mapUrl,
         survey.startDate,
         survey.endDate,
+        survey.allowTestSurvey,
         { fi: survey.thanksPage.title },
         { fi: survey.thanksPage.text },
         survey.backgroundImageName ?? null,
@@ -727,6 +712,12 @@ export async function updateSurvey(survey: Survey) {
         survey.admins,
         survey.theme?.id ?? null,
         survey.sectionTitleColor,
+        survey.email.enabled,
+        survey.email.autoSendTo,
+        survey.email.subject,
+        survey.email.body,
+        JSON.stringify(survey.email.info),
+        survey.allowSavingUnfinished,
       ]
     )
     .catch((error) => {
@@ -890,6 +881,7 @@ function dbSurveyToSurvey(
     mapUrl: dbSurvey.map_url,
     startDate: dbSurvey.start_date,
     endDate: dbSurvey.end_date,
+    allowTestSurvey: dbSurvey.allow_test_survey,
     thanksPage: {
       title: dbSurvey.thanks_page_title?.fi,
       text: dbSurvey.thanks_page_text?.fi,
@@ -897,6 +889,14 @@ function dbSurveyToSurvey(
     backgroundImageName: dbSurvey.background_image_name,
     backgroundImagePath: dbSurvey.background_image_path,
     sectionTitleColor: dbSurvey.section_title_color,
+    email: {
+      enabled: dbSurvey.email_enabled,
+      autoSendTo: dbSurvey.email_auto_send_to,
+      subject: dbSurvey.email_subject,
+      body: dbSurvey.email_body,
+      info: dbSurvey.email_info,
+    },
+    allowSavingUnfinished: dbSurvey.allow_saving_unfinished,
     // Single survey row won't contain pages - they get aggregated from a join query
     pages: [],
   };
@@ -1040,289 +1040,6 @@ export async function deleteSurveyPage(id: number) {
   }
 
   return row;
-}
-
-/**
- * Validates given answer entries. Rejects the request if any of the entries is invalid, i.e. exceeds answer limits.
- * @param answerEntries Answer entries to validate
- */
-async function validateEntriesByAnswerLimits(answerEntries: AnswerEntry[]) {
-  // Get all questions that have answer limits from db
-  const limitedQuestions = await getDb().manyOrNone<{
-    id: number;
-    min: number;
-    max: number;
-  }>(
-    `SELECT
-      id,
-      details->'answerLimits'->'min' as min,
-      details->'answerLimits'->'max' as max
-    FROM data.page_section
-    WHERE
-      id = ANY ($1) AND
-      details->'answerLimits' IS NOT NULL`,
-    [answerEntries.map((entry) => entry.sectionId)]
-  );
-  // Validate each entry against the question answer limits
-  answerEntries.forEach((entry) => {
-    const question = limitedQuestions.find((q) => q.id === entry.sectionId);
-    if (question) {
-      const min = question.min;
-      const max = question.max;
-      const answerCount = (entry.value as (number | string)[]).length;
-      if (
-        (min != null && answerCount < min) ||
-        (max != null && answerCount > max)
-      ) {
-        throw new BadRequestError(
-          `Answer for question ${entry.sectionId} must have between ${min} and ${max} selections`
-        );
-      }
-    }
-  });
-}
-
-/**
- * Validate answer entries to contain answers required questions
- * @param answerEntries Answer entries to validate
- */
-async function validateEntriesByIsRequired(answerEntries: AnswerEntry[]) {
-  // Get all questions that are required from db
-  const requiredQuestions = await getDb().manyOrNone<{
-    id: number;
-  }>(
-    `SELECT
-      id
-    FROM data.page_section
-    WHERE
-      id = ANY ($1) AND
-      (details->>'isRequired')::boolean`,
-    [answerEntries.map((entry) => entry.sectionId)]
-  );
-
-  // Check if there is a non-null answer for each required question
-  requiredQuestions.forEach((question) => {
-    if (
-      !answerEntries.find(
-        (entry) =>
-          entry.value != null &&
-          (typeof entry.value !== 'string' || entry.value !== '') &&
-          entry.sectionId === question.id
-      )
-    ) {
-      throw new BadRequestError(
-        `Answer for question ${question.id} is required`
-      );
-    }
-  });
-}
-
-/**
- * Check if given answer entries are valid.
- * @param answerEntries Answer entries to validate
- */
-async function validateEntries(answerEntries: AnswerEntry[]) {
-  await Promise.all([
-    validateEntriesByAnswerLimits(answerEntries),
-    validateEntriesByIsRequired(answerEntries),
-  ]);
-}
-
-/**
- * Create a submission and related answer entries
- * @param surveyID
- * @param submissionEntries
- */
-export async function createSurveySubmission(
-  surveyID: number,
-  submissionEntries: AnswerEntry[]
-) {
-  await validateEntries(submissionEntries);
-  const submissionRow = await getDb().one(
-    `
-    INSERT INTO data.submission (survey_id) VALUES ($1) RETURNING id;
-  `,
-    [surveyID]
-  );
-
-  if (!submissionRow) {
-    logger.error(
-      `Error while creating submission for survey with id: ${surveyID}, submission entries: ${submissionEntries}`
-    );
-    throw new InternalServerError(`Error while creating submission for survey`);
-  }
-
-  const submissionID = submissionRow.id;
-  const submissionRows = answerEntriesToRows(submissionID, submissionEntries);
-  const inputSRID = getSRIDFromEntries(submissionEntries);
-  await getDb().none(
-    getMultiInsertQuery(submissionRows, submissionEntryColumnSet(inputSRID))
-  );
-}
-
-/**
- * Parse SRID information from geometry entries
- * @param submissionEntries
- * @returns SRID describing the coordinate reference system in which the geometry entries are described in
- */
-function getSRIDFromEntries(submissionEntries: AnswerEntry[]) {
-  const geometryEntry = submissionEntries.find((entry) => entry.type === 'map');
-  if (!geometryEntry) return null;
-
-  return geometryEntry?.value[0]?.geometry?.crs?.properties?.name
-    ? parseInt(
-        geometryEntry?.value[0]?.geometry?.crs?.properties?.name?.split(':')[1]
-      )
-    : null;
-}
-
-/**
- * Convert array of entries into db row entries
- * @param submissionID
- * @param submission
- * @returns DBAnswerEntry, object describing a single row of the table data.answer_entry
- */
-function answerEntriesToRows(
-  submissionID: number,
-  submissionEntries: AnswerEntry[]
-) {
-  return submissionEntries.reduce((entries, entry) => {
-    let newEntries: DBAnswerEntry[];
-
-    switch (entry.type) {
-      case 'free-text':
-        newEntries = [
-          {
-            submission_id: submissionID,
-            section_id: entry.sectionId,
-            value_text: entry.value,
-            value_option_id: null,
-            value_geometry: null,
-            value_numeric: null,
-            value_json: null,
-          },
-        ];
-        break;
-      case 'radio':
-        newEntries = [
-          {
-            submission_id: submissionID,
-            section_id: entry.sectionId,
-            value_text: typeof entry.value === 'string' ? entry.value : null,
-            value_option_id:
-              typeof entry.value === 'number' ? entry.value : null,
-            value_geometry: null,
-            value_numeric: null,
-            value_json: null,
-          },
-        ];
-        break;
-      case 'checkbox':
-      case 'grouped-checkbox':
-        newEntries =
-          entry.value.length !== 0
-            ? [
-                ...entry.value.map((value) => {
-                  return {
-                    submission_id: submissionID,
-                    section_id: entry.sectionId,
-                    value_text: typeof value === 'string' ? value : null,
-                    value_option_id: typeof value === 'number' ? value : null,
-                    value_geometry: null,
-                    value_numeric: null,
-                    value_json: null,
-                  };
-                }),
-              ]
-            : [
-                {
-                  submission_id: submissionID,
-                  section_id: entry.sectionId,
-                  value_text: null,
-                  value_option_id: null,
-                  value_geometry: null,
-                  value_numeric: null,
-                  value_json: null,
-                },
-              ];
-        break;
-      case 'numeric':
-        newEntries = [
-          {
-            submission_id: submissionID,
-            section_id: entry.sectionId,
-            value_text: null,
-            value_option_id: null,
-            value_geometry: null,
-            value_numeric: entry.value,
-            value_json: null,
-          },
-        ];
-        break;
-      case 'map':
-        newEntries = entry.value.reduce((prevEntries, currentValue) => {
-          const geometryEntry = {
-            submission_id: submissionID,
-            section_id: entry.sectionId,
-            value_text: null,
-            value_option_id: null,
-            value_geometry: currentValue.geometry?.geometry,
-            value_numeric: null,
-            value_json: null,
-          } as DBAnswerEntry;
-
-          // Map over different subquestion answers using the same function recursively
-          const subquestionEntries = currentValue.subQuestionAnswers
-            ? answerEntriesToRows(submissionID, currentValue.subQuestionAnswers)
-            : [];
-
-          return [...prevEntries, geometryEntry, ...subquestionEntries];
-        }, []);
-
-        break;
-      case 'sorting':
-        newEntries = [
-          {
-            submission_id: submissionID,
-            section_id: entry.sectionId,
-            value_text: null,
-            value_option_id: null,
-            value_geometry: null,
-            value_numeric: null,
-            value_json: JSON.stringify(entry.value),
-          },
-        ];
-        break;
-      case 'slider':
-        newEntries = [
-          {
-            submission_id: submissionID,
-            section_id: entry.sectionId,
-            value_text: null,
-            value_option_id: null,
-            value_geometry: null,
-            value_numeric: entry.value,
-            value_json: null,
-          },
-        ];
-        break;
-      case 'matrix':
-        newEntries = [
-          {
-            submission_id: submissionID,
-            section_id: entry.sectionId,
-            value_text: null,
-            value_option_id: null,
-            value_geometry: null,
-            value_numeric: null,
-            value_json: JSON.stringify(entry.value),
-          },
-        ];
-        break;
-    }
-
-    return [...entries, ...(newEntries ?? [])];
-  }, [] as DBAnswerEntry[]);
 }
 
 /**
@@ -1552,7 +1269,7 @@ export async function storeFile({
  */
 export async function getFile(fileName: string, filePath: string[]) {
   const row = await getDb().oneOrNone<{
-    file: string;
+    file: Buffer;
     mime_type: string;
     details: { [key: string]: any };
   }>(
@@ -1620,4 +1337,41 @@ export async function userCanEditSurvey(user: User, surveyId: number) {
     admins: string[];
   }>(`SELECT author_id, admins FROM data.survey WHERE id = $1`, [surveyId]);
   return user.id === authorId || admins.includes(user.id);
+}
+
+/**
+ * Get all options for a given survey
+ * @param surveyId Survey ID
+ * @returns Options
+ */
+export async function getOptionsForSurvey(surveyId: number) {
+  const rows = await getDb().manyOrNone<DBSectionOption>(
+    `
+    SELECT o.* FROM
+      data.option o
+      INNER JOIN data.page_section ps ON ps.id = o.section_id
+      INNER JOIN data.survey_page sp ON sp.id = ps.survey_page_id
+    WHERE sp.survey_id = $1
+  `,
+    [surveyId]
+  );
+
+  return rows.map(
+    (row): SectionOption => ({
+      id: row.id,
+      text: row.text?.[languageCode],
+      info: row.info?.[languageCode],
+    })
+  );
+}
+
+/**
+ * Get all distinct email addresses used for report auto sending
+ * @returns Distinct email addresses
+ */
+export async function getDistinctAutoSendToEmails() {
+  const rows = await getDb().manyOrNone<{ email: string }>(`
+    SELECT DISTINCT UNNEST(email_auto_send_to) AS email FROM data.survey
+  `);
+  return rows.map((row) => row.email);
 }

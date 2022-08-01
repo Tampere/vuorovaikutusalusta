@@ -5,6 +5,7 @@ import {
   SurveyPageSection,
   SurveyQuestion,
 } from '@interfaces/survey';
+import { request } from '@src/utils/request';
 import React, {
   createContext,
   ReactNode,
@@ -16,6 +17,7 @@ import React, {
 interface State {
   answers: AnswerEntry[];
   survey: Survey;
+  unfinishedToken: string;
 }
 
 type Action =
@@ -28,8 +30,16 @@ type Action =
       answer: AnswerEntry;
     }
   | {
+      type: 'UPDATE_ANSWERS';
+      answers: AnswerEntry[];
+    }
+  | {
       type: 'SET_ANSWERS';
       answers: AnswerEntry[];
+    }
+  | {
+      type: 'SET_UNFINISHED_TOKEN';
+      token: string;
     };
 
 type Context = [State, React.Dispatch<Action>];
@@ -37,6 +47,7 @@ type Context = [State, React.Dispatch<Action>];
 const stateDefaults: State = {
   answers: [],
   survey: null,
+  unfinishedToken: null,
 };
 
 // Section types that won't have an answer (e.g. text sections)
@@ -107,6 +118,12 @@ export function getEmptyAnswer(section: SurveyPageSection): AnswerEntry {
         type: section.type,
         value: [],
       };
+    case 'attachment':
+      return {
+        sectionId: section.id,
+        type: section.type,
+        value: [],
+      };
     default:
       throw new Error(
         `No default value defined for questions of type "${section.type}"`
@@ -156,7 +173,7 @@ export function useSurveyAnswers() {
     }
 
     // Numeric question validation - check min & max values
-    if (question.type === 'numeric') {
+    if (question.type === 'numeric' && answer.value != null) {
       if (question.minValue != null && answer.value < question.minValue) {
         errors.push('minValue');
       }
@@ -238,10 +255,32 @@ export function useSurveyAnswers() {
     isPageValid(page: SurveyPage) {
       return !page.sections
         // Skip sections that shouldn't get answers
-        .filter((section) => !nonQuestionSectionTypes.includes(section.type))
-        .some(
-          (section) => getValidationErrors(section as SurveyQuestion).length
-        );
+        .filter(
+          (section): section is SurveyQuestion =>
+            !nonQuestionSectionTypes.includes(section.type)
+        )
+        .some((section) => getValidationErrors(section).length);
+    },
+    /**
+     * Fetch unfinished answer entries by token and set them into the context
+     * @param token Unfinished token
+     */
+    async loadUnfinishedEntries(token: string) {
+      dispatch({ type: 'SET_UNFINISHED_TOKEN', token });
+      const answers = await request<AnswerEntry[]>(
+        `/api/published-surveys/${state.survey.name}/unfinished-submission?token=${token}`
+      );
+      dispatch({
+        type: 'UPDATE_ANSWERS',
+        answers,
+      });
+    },
+    /**
+     * Sets the unfinished token into the context. The next save/submit will replace the unfinished submission.
+     * @param token Unfinished token
+     */
+    setUnfinishedToken(token: string) {
+      dispatch({ type: 'SET_UNFINISHED_TOKEN', token });
     },
   };
 }
@@ -266,10 +305,24 @@ function reducer(state: State, action: Action): State {
           answer.sectionId === action.answer.sectionId ? action.answer : answer
         ),
       };
+    case 'UPDATE_ANSWERS':
+      return {
+        ...state,
+        answers: state.answers.map(
+          (answer) =>
+            action.answers.find((a) => a.sectionId === answer.sectionId) ??
+            answer
+        ),
+      };
     case 'SET_ANSWERS':
       return {
         ...state,
         answers: [...action.answers],
+      };
+    case 'SET_UNFINISHED_TOKEN':
+      return {
+        ...state,
+        unfinishedToken: action.token,
       };
     default:
       throw new Error('Invalid action type');

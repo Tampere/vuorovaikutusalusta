@@ -44,6 +44,7 @@ export default function SurveySections(props: Props) {
               >
                 {(provided, _snapshot) => (
                   <SurveySectionAccordion
+                    index={index}
                     provided={provided}
                     disabled={props.disabled}
                     section={section}
@@ -52,10 +53,10 @@ export default function SurveySections(props: Props) {
                     onExpandedChange={(isExpanded) => {
                       props.onExpandedSectionChange(isExpanded ? index : null);
                     }}
-                    onEdit={(section) => {
+                    onEdit={(index, section) => {
                       editSection(props.pageId, index, section);
                     }}
-                    onDelete={() => {
+                    onDelete={(index) => {
                       deleteSection(props.pageId, index);
                       // Reset expanded section to null
                       props.onExpandedSectionChange(null);

@@ -22,12 +22,9 @@ import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useEffect, useMemo, useState } from 'react';
 import CheckBoxQuestion from './CheckBoxQuestion';
 import FreeTextQuestion from './FreeTextQuestion';
-import MatrixQuestion from './MatrixQuestion';
 import NumericQuestion from './NumericQuestion';
 import RadioQuestion from './RadioQuestion';
 import SectionInfo from './SectionInfo';
-import SliderQuestion from './SliderQuestion';
-import SortingQuestion from './SortingQuestion';
 
 const useStyles = makeStyles({
   content: {
@@ -201,47 +198,7 @@ export default function MapSubQuestionDialog({
                   setDirty([...dirty]);
                 }}
               />
-            ) : question.type === 'sorting' ? (
-              <SortingQuestion
-                value={answers[index]?.value as number[]}
-                onChange={(value) => {
-                  answers[index].value = value;
-                  setAnswers([...answers]);
-                }}
-                question={question}
-                setDirty={(value) => {
-                  dirty[index] = value;
-                  setDirty([...dirty]);
-                }}
-              />
-            ) : question.type === 'slider' ? (
-              <SliderQuestion
-                value={answers[index]?.value as number}
-                onChange={(value) => {
-                  answers[index].value = value;
-                  setAnswers([...answers]);
-                }}
-                question={question}
-                setDirty={(value) => {
-                  dirty[index] = value;
-                  setDirty([...dirty]);
-                }}
-              />
-            ) : question.type === 'matrix' ? (
-              <MatrixQuestion
-                value={answers[index]?.value as string[]}
-                onChange={(value) => {
-                  answers[index].value = value;
-                  setAnswers([...answers]);
-                }}
-                question={question}
-                setDirty={(value) => {
-                  dirty[index] = value;
-                  setDirty([...dirty]);
-                }}
-              />
-            ) : // TODO: grouped checkbox question
-            null}
+            ) : null}
             {/* Show the required error only for empty values (not when answer limits are broken in checkbox questions) */}
             {dirty?.[index] &&
               validationErrors?.[index].includes('required') && (

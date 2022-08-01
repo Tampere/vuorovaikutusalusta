@@ -7,7 +7,7 @@ import React from 'react';
 import TreBanner from './logos/TreBanner';
 import TreLogo from './logos/TreLogo';
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles((theme: Theme & { [customKey: string]: any }) => ({
   root: (props: any) => ({
     display: 'flex',
     width: '100%',
@@ -21,6 +21,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     backgroundSize: 'cover',
     backgroundPosition: 'center',
     backgroundAttachment: 'fixed',
+    backgroundColor: theme.landingPage?.backgroundColor ?? '#fff',
   }),
   header: {
     display: 'flex',
@@ -34,7 +35,6 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   heading: {
     textTransform: 'uppercase',
-    fontFamily: '"Montserrat", sans-serif',
     fontSize: '2rem',
     wordBreak: 'break-word',
     hyphens: 'auto',
@@ -47,35 +47,41 @@ const useStyles = makeStyles((theme: Theme) => ({
       color: theme.palette.primary.contrastText,
       padding: '1rem',
       boxDecorationBreak: 'clone',
+      ...theme.landingPage?.title,
       [theme.breakpoints.down(600)]: {
         padding: '2vw',
       },
     },
   },
   title: {
+    fontFamily: '"Montserrat", sans-serif',
     fontSize: '3rem',
+    ...theme.landingPage?.title,
     [theme.breakpoints.down(600)]: {
       fontSize: '9vw',
     },
   },
   subtitle: {
+    fontFamily: '"Montserrat", sans-serif',
     fontSize: '2rem',
+    textTransform: 'none',
+    ...theme.landingPage?.subtitle,
     [theme.breakpoints.down(600)]: {
       fontSize: '6vw',
     },
   },
   start: {
     fontFamily: '"Montserrat", sans-serif',
-    fontWeight: 600,
+    fontSize: '2rem',
     backgroundColor: theme.palette.secondary.main,
     color: theme.palette.secondary.contrastText,
-    fontSize: '2rem',
     padding: '0.5rem',
     textDecoration: 'none',
     marginTop: '1.5rem',
     '&:hover': {
       // TODO: hover effect for start button?
     },
+    ...theme.landingPage?.start,
     [theme.breakpoints.down(600)]: {
       fontSize: '6vw',
     },
@@ -100,16 +106,27 @@ const useStyles = makeStyles((theme: Theme) => ({
     color: theme.palette.primary.contrastText,
     padding: '1rem',
   },
+  testSurveyHeader: {
+    padding: '1rem',
+    width: '100%',
+    background: 'red',
+    color: 'white',
+    textAlign: 'center',
+  },
 }));
 
 interface Props {
   survey: Survey;
+  isTestSurvey: boolean;
+  continueUnfinished: boolean;
   onStart: () => void;
   surveyBackgroundImage?: { attributions: string };
 }
 
 export default function SurveyLandingPage({
   survey,
+  isTestSurvey,
+  continueUnfinished,
   onStart,
   surveyBackgroundImage,
 }: Props) {
@@ -118,6 +135,11 @@ export default function SurveyLandingPage({
 
   return (
     <Box className={classes.root}>
+      {isTestSurvey && (
+        <div className={classes.testSurveyHeader}>
+          {tr.TestSurveyFrame.text}
+        </div>
+      )}
       <div className={classes.header}>
         <div className={classes.headerLogo}>
           <TreLogo />
@@ -146,7 +168,9 @@ export default function SurveyLandingPage({
           className={classes.start}
           onClick={onStart}
         >
-          {tr.SurveyPage.startSurveyLink}
+          {continueUnfinished
+            ? tr.SurveyPage.continueSurveyLink
+            : tr.SurveyPage.startSurveyLink}
         </Link>
       </div>
       <div className={classes.footer}>

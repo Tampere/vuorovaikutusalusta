@@ -1,4 +1,9 @@
-import { AnswerEntry, Survey } from '@interfaces/survey';
+import {
+  AnswerEntry,
+  SubmissionInfo,
+  Survey,
+  SurveyMapQuestion,
+} from '@interfaces/survey';
 import {
   Chip,
   Drawer,
@@ -22,6 +27,7 @@ import { useSurveyMap } from '@src/stores/SurveyMapContext';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { getClassList } from '@src/utils/classes';
+import { getFullFilePath } from '@src/utils/path';
 import { request } from '@src/utils/request';
 import React, { useEffect, useMemo, useState } from 'react';
 import SplitPane from 'react-split-pane';
@@ -29,15 +35,15 @@ import DocumentSection from './DocumentSection';
 import ImageSection from './ImageSection';
 import PageConnector from './PageConnector';
 import StepperControls from './StepperControls';
+import SubmissionInfoDialog from './SubmissionInfoDialog';
 import SurveyMap from './SurveyMap';
 import SurveyQuestion from './SurveyQuestion';
 import TextSection from './TextSection';
-import { getFullFilePath } from '@src/utils/path';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
     display: 'flex',
-    height: '100vh',
+    height: '100%',
   },
   stepper: {
     width: '100%',
@@ -95,16 +101,23 @@ const useStyles = makeStyles((theme: Theme) => ({
 interface Props {
   survey: Survey;
   onComplete: () => void;
+  isTestSurvey: boolean;
 }
 
-export default function SurveyStepper({ survey, onComplete }: Props) {
+export default function SurveyStepper({
+  survey,
+  onComplete,
+  isTestSurvey,
+}: Props) {
   const [pageNumber, setPageNumber] = useState(0);
   const [loading, setLoading] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [highlightErrorPages, setHighlightErrorPages] = useState(false);
+  const [submissionInfoDialogOpen, setSubmissionInfoDialogOpen] =
+    useState(false);
 
-  const { isPageValid, answers } = useSurveyAnswers();
+  const { isPageValid, answers, unfinishedToken } = useSurveyAnswers();
   const { showToast } = useToasts();
   const {
     setVisibleLayers,
@@ -159,12 +172,13 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
     if (isMapReady) {
       stopModifying();
     }
+    // TODO scroll to beginning of the step? or only when "next" is clicked, and not on "previous"?
   }, [currentPage]);
 
   // Map answer geometries on the current page
   const mapAnswerGeometries = useMemo(() => {
     const mapQuestions = currentPage.sections.filter(
-      (section) => section.type === 'map'
+      (section): section is SurveyMapQuestion => section.type === 'map'
     );
     // Reduce all geometries from map question answers into a feature collection
     return mapQuestions.reduce(
@@ -183,9 +197,9 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
                   ...value.geometry,
                   // Add a unique index to prevent conflicts
                   id: `feature-${question.id}-${index}`,
-                  // Pass question ID and answer index for reopening the subquestion dialog in edit mode
+                  // Pass entires question and answer index for reopening the subquestion dialog in edit mode
                   properties: {
-                    questionId: question.id,
+                    question,
                     index,
                   },
                 },
@@ -203,6 +217,15 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
   }, [currentPage, answers]);
 
   /**
+   * Scroll to page header (=StepLabel) when page changes
+   */
+  useEffect(() => {
+    const element = document.getElementById(`${pageNumber}-page-top`);
+    if (!element) return;
+    element.scrollIntoView();
+  }, [pageNumber]);
+
+  /**
    * Update map geometries when they are changed
    */
   useEffect(() => {
@@ -210,6 +233,44 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
       updateGeometries(mapAnswerGeometries);
     }
   }, [isMapReady, mapAnswerGeometries]);
+
+  function validateSurvey() {
+    // If a page is not finished, highlight it
+    const unfinishedPages = survey.pages.filter((page) => !isPageValid(page));
+    if (unfinishedPages.length !== 0) {
+      setHighlightErrorPages(true);
+      showToast({
+        severity: 'error',
+        message: tr.SurveyStepper.unfinishedAnswers,
+      });
+      return false;
+    }
+    return true;
+  }
+
+  async function doSubmit(info?: SubmissionInfo) {
+    if (isTestSurvey) {
+      onComplete();
+      return;
+    }
+    setLoading(true);
+    try {
+      await request(
+        `/api/published-surveys/${survey.name}/submission${
+          unfinishedToken ? `?token=${unfinishedToken}` : ''
+        }`,
+        { method: 'POST', body: { entries: answers, info } }
+      );
+      setLoading(false);
+      onComplete();
+    } catch (error) {
+      showToast({
+        severity: 'error',
+        message: tr.SurveyStepper.errorSubmittingSurvey,
+      });
+      setLoading(false);
+    }
+  }
 
   const stepperPane = (
     <Stepper
@@ -221,6 +282,7 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
       {survey.pages.map((page, index) => (
         <Step key={page.id} completed={false}>
           <StepLabel
+            id={`${index}-page-top`}
             onClick={() => {
               setPageNumber(index);
             }}
@@ -242,7 +304,10 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
           >
             {page.title}
           </StepLabel>
-          <StepContent classes={{ root: classes.stepContent }}>
+          <StepContent
+            transitionDuration={0}
+            classes={{ root: classes.stepContent }}
+          >
             <FormControl style={{ width: '100%' }} component="fieldset">
               {page.sections.map((section) => (
                 <div className={classes.section} key={section.id}>
@@ -258,6 +323,7 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
                 </div>
               ))}
               <StepperControls
+                isTestSurvey={isTestSurvey}
                 activeStep={index}
                 totalSteps={survey.pages.length}
                 onPrevious={() => {
@@ -268,36 +334,17 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
                 }}
                 disabled={loading}
                 nextDisabled={false}
-                onSubmit={async () => {
-                  // If a page is not finished, highlight it
-                  const unfinishedPages = survey.pages.filter(
-                    (page) => !isPageValid(page)
-                  );
-                  if (unfinishedPages.length !== 0) {
-                    setHighlightErrorPages(true);
-                    showToast({
-                      severity: 'error',
-                      message: tr.SurveyStepper.unfinishedAnswers,
-                    });
+                onSubmit={() => {
+                  if (!validateSurvey()) {
                     return;
                   }
-
-                  setLoading(true);
-                  try {
-                    await request(
-                      `/api/published-surveys/${survey.name}/submission`,
-                      { method: 'POST', body: { entries: answers } }
-                    );
-                    setLoading(false);
-                    onComplete();
-                  } catch (error) {
-                    showToast({
-                      severity: 'error',
-                      message: tr.SurveyStepper.errorSubmittingSurvey,
-                    });
-                    setLoading(false);
+                  if (survey.email.enabled) {
+                    setSubmissionInfoDialogOpen(true);
+                  } else {
+                    doSubmit();
                   }
                 }}
+                allowSavingUnfinished={survey.allowSavingUnfinished}
               />
             </FormControl>
           </StepContent>
@@ -372,6 +419,7 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
         <SplitPane
           split="vertical"
           defaultSize="50%"
+          style={{ position: 'static' }}
           minSize={200}
           maxSize={-200}
           // Allow scrolling for the stepper pane
@@ -401,7 +449,7 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
       {/* Mobile: side pane exists and current page has some - render the drawer and the button to show it */}
       {!mdUp && sidePane && currentPage.sidebar.type !== 'none' && (
         <>
-          <div style={{ marginTop: 50 }}>{stepperPane}</div>
+          <div style={{ marginTop: 50, width: '100%' }}>{stepperPane}</div>
 
           <Paper
             elevation={3}
@@ -485,6 +533,13 @@ export default function SurveyStepper({ survey, onComplete }: Props) {
           </Drawer>
         </>
       )}
+      <SubmissionInfoDialog
+        open={submissionInfoDialogOpen}
+        onCancel={() => {
+          setSubmissionInfoDialogOpen(false);
+        }}
+        onSubmit={doSubmit}
+      />
     </div>
   );
 }

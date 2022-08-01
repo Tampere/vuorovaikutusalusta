@@ -1,9 +1,12 @@
 import { Survey, SurveyPage } from '@interfaces/survey';
+import { generatePdf } from '@src/application/pdf-generator';
+import { getAnswerEntries, getTimestamp } from '@src/application/submission';
 import {
   createSurvey,
   createSurveyPage,
   deleteSurvey,
   deleteSurveyPage,
+  getDistinctAutoSendToEmails,
   getSurvey,
   getSurveys,
   publishSurvey,
@@ -15,19 +18,45 @@ import { ensureAuthenticated } from '@src/auth';
 import { ForbiddenError } from '@src/error';
 import { Router } from 'express';
 import asyncHandler from 'express-async-handler';
-import { body, param } from 'express-validator';
+import { body, param, query } from 'express-validator';
 import { validateRequest } from '../utils';
-
 const router = Router();
+
+/**
+ * Endpoint for getting all email addresses that are used as report recipients
+ */
+router.get(
+  '/report-emails',
+  ensureAuthenticated(),
+  asyncHandler(async (req, res) => {
+    const emails = await getDistinctAutoSendToEmails();
+    res.json(emails);
+  })
+);
 
 /**
  * Endpoint for getting all surveys.
  */
 router.get(
   '/',
+  validateRequest([
+    query('filterByAuthored')
+      .toBoolean()
+      .isBoolean()
+      .withMessage('filterByAuthored must be a boolean'),
+    query('filterByPublished')
+      .toBoolean()
+      .isBoolean()
+      .withMessage('filterByPublished must be a boolean'),
+  ]),
   ensureAuthenticated(),
   asyncHandler(async (req, res) => {
-    const surveys = await getSurveys();
+    const userId = req.user.id;
+    const { filterByAuthored, filterByPublished } = req.query;
+    const surveys = await getSurveys(
+      filterByAuthored ? userId : null,
+      Boolean(filterByPublished)
+    );
     res.status(200).json(surveys);
   })
 );
@@ -165,6 +194,73 @@ router.delete(
 );
 
 /**
+ * Endpoint for creating a new survey from the data of a previous survey
+ */
+router.post(
+  '/:id/copy',
+  ensureAuthenticated(),
+  validateRequest([
+    param('id').isNumeric().toInt().withMessage('ID must be a number'),
+  ]),
+  asyncHandler(async (req, res) => {
+    const id = Number(req.params.id);
+    // Create a new empty survey
+    const createdSurvey = await createSurvey(req.user);
+    // Get data of the survey that were copied
+    const copiedSurveyData = await getSurvey({ id });
+    if (!copiedSurveyData || !createdSurvey) {
+      return res.status(500).json('Error while copying survey');
+    }
+
+    // Just in case: change every 'id' -field found on the copied survey into null to prevent overwriting anything
+    function eachRecursive(obj) {
+      for (const key in obj) {
+        if (typeof obj[key] == 'object' && obj[key] !== null) {
+          eachRecursive(obj[key]);
+        } else {
+          if (obj.hasOwnProperty('id')) {
+            obj.id = null;
+          }
+        }
+      }
+    }
+
+    eachRecursive(copiedSurveyData);
+
+    // For every page that exist on the copied survey's data, create a new page skeleton
+    // createdSurvey.pages will already include one page on it by default
+    const pageSkeletons = createdSurvey.pages;
+    if (copiedSurveyData.pages.length > 1) {
+      const additionalPages = await Promise.all(
+        Array(copiedSurveyData.pages.length - 1)
+          .fill(null)
+          .map(() => createSurveyPage(createdSurvey.id))
+      );
+      pageSkeletons.push(...additionalPages);
+    }
+
+    const newPages = copiedSurveyData.pages.map((page, index) => ({
+      ...page,
+      id: pageSkeletons[index].id,
+    }));
+
+    const newSurvey = {
+      ...createdSurvey,
+      mapUrl: copiedSurveyData.mapUrl,
+      pages: newPages,
+    } as Survey;
+
+    // Just to make sure that we are not overwriting the previous survey
+    if (newSurvey.name === null && newSurvey.id !== id) {
+      await updateSurvey(newSurvey);
+      return res.status(200).json(newSurvey.id);
+    } else {
+      return res.status(500).json('Error while copying survey');
+    }
+  })
+);
+
+/**
  * Endpoint for publishing the survey
  */
 router.post(
@@ -226,6 +322,38 @@ router.delete(
     const id = Number(req.params.id);
     const deletedSurveyPage = await deleteSurveyPage(id);
     res.status(200).json(deletedSurveyPage);
+  })
+);
+
+/**
+ * Endpoint for getting the PDF report for a single submission
+ */
+router.get(
+  '/:surveyId/report/:submissionId',
+  ensureAuthenticated(),
+  asyncHandler(async (req, res) => {
+    const surveyId = Number(req.params.surveyId);
+    const submissionId = Number(req.params.submissionId);
+    const permissionsOk = await userCanEditSurvey(req.user, surveyId);
+    if (!permissionsOk) {
+      throw new ForbiddenError('User not author nor admin of the survey');
+    }
+
+    const [survey, answerEntries, timestamp] = await Promise.all([
+      getSurvey({ id: surveyId }),
+      getAnswerEntries(submissionId),
+      getTimestamp(submissionId),
+    ]);
+    const pdfBuffer = await generatePdf(
+      survey,
+      { id: submissionId, timestamp },
+      answerEntries
+    );
+    res.writeHead(200, {
+      'Content-Type': 'application/pdf',
+      'Content-Length': pdfBuffer.length,
+    });
+    res.end(pdfBuffer);
   })
 );
 
