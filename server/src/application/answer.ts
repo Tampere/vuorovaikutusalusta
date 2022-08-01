@@ -199,7 +199,10 @@ function dbEntriesToFeatures(entries: AnswerEntry[]) {
 
   return Object.values(answersToSubmissions).reduce<Feature[]>(
     (featuresArray, submissionObj) => {
-      return [...featuresArray, ...Object.values(submissionObj)];
+      return [
+        ...featuresArray,
+        ...Object.values(submissionObj).filter(Boolean),
+      ];
     },
     []
   );
@@ -271,6 +274,8 @@ export async function getGeoPackageFile(surveyId: number): Promise<Buffer> {
   if (!rows) return null;
 
   const features = dbEntriesToFeatures(rows);
+  // There could be rows where the parent map answer (erroneously) has null geometry - if there are no valid map answers, return null from here too
+  if (!features.length) return null;
 
   // Group features by question to add them to separate layers
   const featuresByQuestion = features.reduce((questions, feature) => {

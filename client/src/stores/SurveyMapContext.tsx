@@ -103,7 +103,7 @@ const modifyEventId = 'modify';
 // Default feature style
 const defaultFeatureStyle = {
   stroke: {
-    color: 'rgba(0,0,0)',
+    color: '#000000',
     width: 10,
   },
   fill: {
