@@ -48,8 +48,9 @@ export function configureAuth(app: Express) {
   // Logout route
   app.get('/logout', (req, res) => {
     req.session.destroy((error) => {
-      req.logOut();
-      res.redirect(process.env.AUTH_LOGOUT_URL);
+      req.logOut(() => {
+        res.redirect(process.env.AUTH_LOGOUT_URL);
+      });
     });
   });
 
@@ -118,8 +119,9 @@ export function ensureAuthenticated(options?: { redirectToLogin?: boolean }) {
       }
     };
     req.session?.destroy(() => {
-      req.logOut();
-      fail();
+      req.logOut(() => {
+        fail();
+      });
     }) ?? fail();
   };
 }
