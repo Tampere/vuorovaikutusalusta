@@ -263,17 +263,9 @@ export async function getSurvey(params: { id: number } | { name: string }) {
   );
   const optionGroups = !optionGroupIds.length
     ? []
-    : (
-        await getDb().manyOrNone<DBOptionGroup>(
-          `SELECT * FROM data.option_group WHERE id = ANY ($1) ORDER BY idx ASC`,
-          [optionGroupIds]
-        )
-      ).map(
-        (group): SectionOptionGroup => ({
-          id: group.id,
-          name: group.name,
-          options: [],
-        })
+    : await getDb().manyOrNone<DBOptionGroup>(
+        `SELECT * FROM data.option_group WHERE id = ANY ($1) ORDER BY idx ASC`,
+        [optionGroupIds]
       );
 
   return rows.reduce((survey, row) => {
@@ -338,18 +330,22 @@ export async function getSurvey(params: { id: number } | { name: string }) {
 
     // Gather grouped options only for grouped checkbox questions
     if (section?.type === 'grouped-checkbox') {
-      // Try to find the pre-existing option group object
       let group = section.groups.find(
         (group) => group?.id === row.option_group_id
       );
 
       // If the group wasn't added yet, add it from the different query result
-      if (
-        !group &&
-        (group = optionGroups.find((group) => group.id === row.option_group_id))
-      ) {
+      if (!group) {
+        const dbGroup = optionGroups.find(
+          (group) => group.id === row.option_group_id
+        );
+        group = {
+          id: dbGroup?.id,
+          name: dbGroup?.name,
+          options: [],
+        };
         // Groups may be out of order, so use the index from the other query
-        section.groups[optionGroups.indexOf(group)] = group;
+        section.groups[dbGroup.idx] = group;
       }
 
       // Only add options if the group exists - otherwise there are no options saved for this group
