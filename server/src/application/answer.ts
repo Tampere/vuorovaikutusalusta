@@ -186,13 +186,16 @@ function dbEntriesToFeatures(entries: AnswerEntry[]) {
         geometryAnswerToFeature(answer);
     } else if (submissionGroup[submissionId][answer.parentEntryId]) {
       // Add subquestion answer
-      submissionGroup[submissionId][answer.parentEntryId].properties[
-        answer.title?.['fi'] ?? 'Nimetön alikysymys'
-      ] =
+      const key = answer.title?.['fi'] ?? 'Nimetön alikysymys';
+      const newAnswer =
         answer.valueNumeric ??
         answer.valueText ??
         answer.optionText?.['fi'] ??
         '';
+      const oldAnswer =
+        submissionGroup[submissionId][answer.parentEntryId].properties[key];
+      submissionGroup[submissionId][answer.parentEntryId].properties[key] =
+        oldAnswer ? `${oldAnswer}, ${newAnswer}` : newAnswer;
     }
     return submissionGroup;
   }, {});
