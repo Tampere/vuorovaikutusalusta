@@ -339,13 +339,16 @@ export async function getSurvey(params: { id: number } | { name: string }) {
         const dbGroup = optionGroups.find(
           (group) => group.id === row.option_group_id
         );
-        group = {
-          id: dbGroup?.id,
-          name: dbGroup?.name,
-          options: [],
-        };
-        // Groups may be out of order, so use the index from the other query
-        section.groups[dbGroup.idx] = group;
+        // Add option group if it was found (otherwise ignore)
+        if (dbGroup) {
+          group = {
+            id: dbGroup?.id,
+            name: dbGroup?.name,
+            options: [],
+          };
+          // Groups may be out of order, so use the index from the other query
+          section.groups[dbGroup.idx] = group;
+        }
       }
 
       // Only add options if the group exists - otherwise there are no options saved for this group
