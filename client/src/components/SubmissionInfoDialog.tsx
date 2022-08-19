@@ -49,7 +49,7 @@ export default function SubmissionInfoDialog({
         <TextField
           aria-label={tr.SubmissionInfoDialog.email}
           label={tr.SubmissionInfoDialog.email}
-          error={emailDirty && !email.length}
+          error={emailDirty && !email?.length}
           value={email ?? ''}
           inputProps={{ type: 'email' }}
           style={{ width: '25rem', maxWidth: '100%' }}
