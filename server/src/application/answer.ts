@@ -358,7 +358,7 @@ async function getAttachmentDBEntries(surveyId: number) {
           ae.value_file_name
       FROM data.answer_entry ae
       LEFT JOIN data.submission sub ON ae.submission_id = sub.id
-      WHERE sub.survey_id = $1 AND ae.value_file IS NOT NULL) AS temp1
+      WHERE sub.survey_id = $1 AND ae.value_file IS NOT NULL AND sub.unfinished_token IS NULL) AS temp1
         LEFT JOIN
           (SELECT
             ps.id
@@ -414,6 +414,7 @@ async function getAnswerDBEntries(surveyId: number): Promise<AnswerEntry[]> {
             AND ps.type <> 'document'
             AND ps.type <> 'text'
             AND ps.type <> 'image'
+            AND sub.unfinished_token IS NULL
             AND ps.parent_section IS NULL AND sub.survey_id = $1;
     `,
     [surveyId]
@@ -452,7 +453,9 @@ async function getGeometryDBEntries(surveyId: number): Promise<AnswerEntry[]> {
         LEFT JOIN data.survey_page sp ON ps.survey_page_id = sp.id
         LEFT JOIN data.survey s ON sp.survey_id = s.id
         LEFT JOIN data.option opt ON opt.id = ae.value_option_id
-        WHERE (type = 'map' OR parent_section IS NOT NULL) AND sub.survey_id = $1
+        WHERE (type = 'map' OR parent_section IS NOT NULL)
+          AND sub.unfinished_token IS NULL
+          AND sub.survey_id = $1
         ORDER BY ae.parent_entry_id ASC NULLS FIRST`,
     [surveyId]
   )) as DBAnswerEntry[];
