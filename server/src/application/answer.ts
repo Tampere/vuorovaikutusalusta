@@ -28,6 +28,7 @@ interface DBAnswerEntry {
   value_numeric: number;
   created_at: Date;
   option_text: string;
+  option_group_index: number;
 }
 
 /**
@@ -141,6 +142,7 @@ function dbAnswerEntryRowsToAnswerEntries(rows: DBAnswerEntry[]) {
     valueNumeric: row.value_numeric,
     optionText: row?.option_text,
     createdAt: row.created_at,
+    groupIndex: row.option_group_index,
   })) as AnswerEntry[];
 }
 
@@ -394,28 +396,31 @@ function attachmentEntriesToFiles(rows: DBFileEntry[]) {
 async function getAnswerDBEntries(surveyId: number): Promise<AnswerEntry[]> {
   const rows = (await getDb().manyOrNone(
     `
-      SELECT
-        ae.submission_id,
-        ae.section_id,
-        ae.value_text,
-        ae.value_option_id,
-        ae.value_numeric,
-        ae.value_json,
-        ps.type,
-        ps.idx as section_index,
-        sub.created_at
-          FROM data.answer_entry ae
-          LEFT JOIN data.submission sub ON ae.submission_id = sub.id
-          LEFT JOIN data.page_section ps ON ps.id = ae.section_id
-          LEFT JOIN data.survey_page sp ON ps.survey_page_id = sp.id
-          LEFT JOIN data.survey s ON sp.survey_id = s.id
-          WHERE ps.type <> 'map'
-            AND ps.type <> 'attachment'
-            AND ps.type <> 'document'
-            AND ps.type <> 'text'
-            AND ps.type <> 'image'
-            AND sub.unfinished_token IS NULL
-            AND ps.parent_section IS NULL AND sub.survey_id = $1;
+    SELECT
+      ae.submission_id,
+      ae.section_id,
+      ae.value_text,
+      ae.value_option_id,
+      ae.value_numeric,
+      ae.value_json,
+      ps.type,
+      ps.idx as section_index,
+      og.idx as option_group_index,
+      sub.created_at
+        FROM data.answer_entry ae
+        LEFT JOIN data.submission sub ON ae.submission_id = sub.id
+        LEFT JOIN data.page_section ps ON ps.id = ae.section_id
+        LEFT JOIN data.option opt ON ps.id = opt.section_id
+        LEFT JOIN data.option_group og ON opt.group_id = og.id
+        LEFT JOIN data.survey_page sp ON ps.survey_page_id = sp.id
+        LEFT JOIN data.survey s ON sp.survey_id = s.id
+      WHERE ps.type <> 'map'
+        AND ps.type <> 'attachment'
+        AND ps.type <> 'document'
+        AND ps.type <> 'text'
+        AND ps.type <> 'image'
+        AND sub.unfinished_token IS NULL
+        AND ps.parent_section IS NULL AND sub.survey_id = $1;
     `,
     [surveyId]
   )) as DBAnswerEntry[];
