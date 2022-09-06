@@ -8,6 +8,7 @@ const oauth = {
   clientId: process.env.EMAIL_OAUTH_CLIENT_ID,
   clientSecret: process.env.EMAIL_OAUTH_CLIENT_SECRET,
   refreshToken: process.env.EMAIL_OAUTH_REFRESH_TOKEN,
+  accessUrl: process.env.EMAIL_OAUTH_ACCESS_URL,
 };
 
 // Email sender
@@ -23,13 +24,14 @@ const config = {
 
 // Nodemailer transport object
 const transport = createTransport({
-  service: 'gmail',
+  service: process.env.EMAIL_SERVICE ?? 'gmail',
   auth: {
     type: 'OAuth2',
     user: sender.address,
     clientId: oauth.clientId,
     clientSecret: oauth.clientSecret,
     refreshToken: oauth.refreshToken,
+    accessUrl: oauth.accessUrl,
   },
 });
 
