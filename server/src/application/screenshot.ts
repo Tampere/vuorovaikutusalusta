@@ -100,7 +100,7 @@ async function generateScreenshots({
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36'
   );
 
-  page.setViewport({ width: 800, height: 600, deviceScaleFactor: 3 });
+  page.setViewport({ width: 800, height: 600, deviceScaleFactor: 1 });
   await page.goto(mapUrl, { waitUntil: 'networkidle0' });
 
   // Open the index map if enabled
@@ -184,10 +184,13 @@ async function generateScreenshots({
       // Ignore timeout errors
     }
 
+    // Make sure the tiles get rendered after network becomes idle
+    await page.waitForTimeout(3000);
     const image = (await page.screenshot({
       type: 'png',
-      fullPage: true,
+      captureBeyondViewport: false,
     })) as Buffer;
+
     returnData.push({
       sectionId: answer.sectionId,
       index: answer.index,
@@ -218,6 +221,7 @@ export async function initializePuppeteerCluster() {
     maxConcurrency,
     timeout: 600000,
     puppeteerOptions: {
+      defaultViewport: null,
       args: [
         '--no-sandbox',
         '--disable-dev-shm-usage',
