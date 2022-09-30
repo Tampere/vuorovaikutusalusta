@@ -12,6 +12,7 @@ import AdapterDateFns from '@material-ui/lab/AdapterDateFns';
 import ToastProvider from '@src/stores/ToastContext';
 import AdminFrontPage from './AdminFrontPage';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
+import LanguageRouter from '../LanguageRouter';
 
 export default function AdminApplication() {
   return (
@@ -29,6 +30,7 @@ export default function AdminApplication() {
     >
       <CssBaseline />
       <BrowserRouter basename="/admin">
+        <LanguageRouter />
         <Switch>
           <Route path="/kyselyt/:surveyId">
             <EditSurvey />

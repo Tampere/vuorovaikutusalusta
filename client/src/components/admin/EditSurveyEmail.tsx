@@ -19,7 +19,7 @@ export default function EditSurveyEmail() {
   const [autocompleteEmails, setAutocompleteEmails] = useState<string[]>([]);
 
   const { activeSurvey, activeSurveyLoading, editSurvey } = useSurvey();
-  const { tr } = useTranslations();
+  const { tr, surveyLanguage } = useTranslations();
 
   useEffect(() => {
     async function fetchAutocompleteEmails() {
@@ -90,26 +90,32 @@ export default function EditSurveyEmail() {
             />
             <TextField
               label={tr.EditSurveyEmail.emailSubject}
-              value={activeSurvey.email.subject ?? ''}
+              value={activeSurvey.email.subject?.[surveyLanguage] ?? ''}
               onChange={(event) => {
                 editSurvey({
                   ...activeSurvey,
                   email: {
                     ...activeSurvey.email,
-                    subject: event.target.value,
+                    subject: {
+                      ...activeSurvey.email.subject,
+                      [surveyLanguage]: event.target.value,
+                    },
                   },
                 });
               }}
             />
             <RichTextEditor
               label={tr.EditSurveyEmail.emailBody}
-              value={activeSurvey.email.body ?? ''}
+              value={activeSurvey.email.body?.[surveyLanguage] ?? ''}
               onChange={(value) => {
                 editSurvey({
                   ...activeSurvey,
                   email: {
                     ...activeSurvey.email,
-                    body: value,
+                    body: {
+                      ...activeSurvey.email.body,
+                      [surveyLanguage]: value,
+                    },
                   },
                 });
               }}

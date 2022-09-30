@@ -2,6 +2,7 @@ import { AnswerEntry, SubmissionInfo } from '@interfaces/survey';
 import { generatePdf } from '@src/application/pdf-generator';
 import {
   createSurveySubmission,
+  getSurveyAnswerLanguage,
   getUnfinishedAnswerEntries,
 } from '@src/application/submission';
 import { getSurvey } from '@src/application/survey';
@@ -49,6 +50,7 @@ router.post(
       .optional({ nullable: true })
       .isEmail()
       .withMessage('Email must be valid'),
+    body('language').isString().withMessage('Language must be a string'),
     query('token').optional().isString().withMessage('Token must be a string'),
   ]),
   asyncHandler(async (req, res) => {
@@ -58,11 +60,14 @@ router.post(
       throw new NotFoundError(`Survey with name ${req.params.name} not found`);
     }
     const answerEntries: AnswerEntry[] = req.body.entries;
+    const answerLanguage = req.body.language;
     const unfinishedToken = req.query.token ? String(req.query.token) : null;
     const { id: submissionId, timestamp } = await createSurveySubmission(
       survey.id,
       answerEntries,
-      unfinishedToken
+      unfinishedToken,
+      false,
+      answerLanguage
     );
     // We are done with this request - start sending the emails in the background
     res.status(201).send();
@@ -76,7 +81,8 @@ router.post(
     const pdfFile = await generatePdf(
       survey,
       { id: submissionId, timestamp },
-      answerEntries
+      answerEntries,
+      answerLanguage
     );
 
     // Send the report to the submitter, if they provided their email address
@@ -84,7 +90,7 @@ router.post(
     if (submissionInfo?.email) {
       sendSubmissionReport({
         to: submissionInfo.email,
-        language: 'fi',
+        language: answerLanguage,
         survey,
         pdfFile,
         submissionId,
@@ -97,7 +103,7 @@ router.post(
     (survey.email?.autoSendTo ?? []).map((email) => {
       sendSubmissionReport({
         to: email,
-        language: 'fi',
+        language: answerLanguage,
         survey,
         pdfFile,
         submissionId,
@@ -125,6 +131,7 @@ router.post(
       .exists()
       .withMessage('Entry values must be provided'),
     body('email').isEmail().withMessage('Email must be valid'),
+    body('language').isString().withMessage('Language must be a string'),
     query('token').optional().isString().withMessage('Token must be a string'),
   ]),
   asyncHandler(async (req, res) => {
@@ -134,12 +141,14 @@ router.post(
       throw new NotFoundError(`Survey with name ${req.params.name} not found`);
     }
     const answerEntries: AnswerEntry[] = req.body.entries;
+    const language = req.body.language;
     const unfinishedToken = req.query.token ? String(req.query.token) : null;
     const { unfinishedToken: newToken } = await createSurveySubmission(
       survey.id,
       answerEntries,
       unfinishedToken,
-      true
+      true,
+      language
     );
     res.json({ token: newToken });
 
@@ -148,6 +157,7 @@ router.post(
       to: req.body.email,
       token: newToken,
       survey,
+      language,
     });
   })
 );
@@ -166,8 +176,9 @@ router.get(
       // In case the survey shouldn't be published, throw the same not found error
       throw new NotFoundError(`Survey with name ${req.params.name} not found`);
     }
-    const entries = await getUnfinishedAnswerEntries(String(req.query.token));
-    res.json(entries);
+    const answers = await getUnfinishedAnswerEntries(String(req.query.token));
+    const language = await getSurveyAnswerLanguage(String(req.query.token));
+    res.json({ answers, language });
   })
 );
 

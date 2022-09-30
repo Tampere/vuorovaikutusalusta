@@ -7,7 +7,6 @@ import { useTranslations } from '@src/stores/TranslationContext';
 const useStyles = makeStyles({
   root: {
     display: 'flex',
-    flexGrow: 1,
     justifyContent: 'flex-end',
   },
 });

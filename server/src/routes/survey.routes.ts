@@ -1,4 +1,4 @@
-import { Survey, SurveyPage } from '@interfaces/survey';
+import { LanguageCode, Survey, SurveyPage } from '@interfaces/survey';
 import { generatePdf } from '@src/application/pdf-generator';
 import { getAnswerEntries, getTimestamp } from '@src/application/submission';
 import {
@@ -101,11 +101,11 @@ router.put(
       .optional({ nullable: true })
       .withMessage('Name must be a string'),
     body('title')
-      .isString()
+      .isObject()
       .optional({ nullable: true })
       .withMessage('Title must be a string'),
     body('subtitle')
-      .isString()
+      .isObject()
       .optional({ nullable: true })
       .withMessage('Subtitle must be a string'),
     body('author')
@@ -140,7 +140,7 @@ router.put(
       .withMessage('Page id must be a number'),
     body('pages.*.title')
       .optional()
-      .isString()
+      .isObject()
       .withMessage('Page title must be a string'),
     body('pages.*.sections')
       .optional()
@@ -248,6 +248,7 @@ router.post(
       ...createdSurvey,
       mapUrl: copiedSurveyData.mapUrl,
       pages: newPages,
+      thanksPage: copiedSurveyData.thanksPage,
     } as Survey;
 
     // Just to make sure that we are not overwriting the previous survey
@@ -329,12 +330,13 @@ router.delete(
  * Endpoint for getting the PDF report for a single submission
  */
 router.get(
-  '/:surveyId/report/:submissionId',
+  '/:surveyId/report/:submissionId/:lang',
   ensureAuthenticated(),
   asyncHandler(async (req, res) => {
     const surveyId = Number(req.params.surveyId);
     const submissionId = Number(req.params.submissionId);
     const permissionsOk = await userCanEditSurvey(req.user, surveyId);
+    const language = req.params.language as LanguageCode;
     if (!permissionsOk) {
       throw new ForbiddenError('User not author nor admin of the survey');
     }
@@ -347,7 +349,8 @@ router.get(
     const pdfBuffer = await generatePdf(
       survey,
       { id: submissionId, timestamp },
-      answerEntries
+      answerEntries,
+      language
     );
     res.writeHead(200, {
       'Content-Type': 'application/pdf',

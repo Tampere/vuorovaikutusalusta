@@ -7,31 +7,37 @@ import RichTextEditor from '../RichTextEditor';
 
 export default function EditSurveyThanksPage() {
   const { activeSurvey, activeSurveyLoading, editSurvey } = useSurvey();
-  const { tr } = useTranslations();
+  const { tr, surveyLanguage } = useTranslations();
   return (
     <Fieldset loading={activeSurveyLoading}>
       <TextField
         label={tr.EditSurveyThanksPage.title}
-        value={activeSurvey.thanksPage.title ?? ''}
+        value={activeSurvey.thanksPage?.title?.[surveyLanguage] ?? ''}
         onChange={(event) => {
           editSurvey({
             ...activeSurvey,
             thanksPage: {
               ...activeSurvey.thanksPage,
-              title: event.target.value,
+              title: {
+                ...activeSurvey.thanksPage.title,
+                [surveyLanguage]: event.target.value,
+              },
             },
           });
         }}
       />
       <RichTextEditor
         label={tr.EditSurveyThanksPage.text}
-        value={activeSurvey.thanksPage.text ?? ''}
+        value={activeSurvey.thanksPage.text?.[surveyLanguage] ?? ''}
         onChange={(value) => {
           editSurvey({
             ...activeSurvey,
             thanksPage: {
               ...activeSurvey.thanksPage,
-              text: value,
+              text: {
+                ...activeSurvey.thanksPage.text,
+                [surveyLanguage]: value,
+              },
             },
           });
         }}

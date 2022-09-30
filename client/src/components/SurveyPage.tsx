@@ -10,6 +10,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 import { NotFoundPage } from './NotFoundPage';
 import SurveyLandingPage from './SurveyLandingPage';
+import SurveyLanguageMenu from './SurveyLanguageMenu';
 import SurveyStepper from './SurveyStepper';
 import SurveyThanksPage from './SurveyThanksPage';
 import TestSurveyFrame from './TestSurveyFrame';
@@ -33,7 +34,7 @@ export default function SurveyPage({ isTestSurvey }: Props) {
   const { setSurvey, survey, loadUnfinishedEntries } = useSurveyAnswers();
   const { setThemeFromSurvey } = useSurveyTheme();
   const { search } = useLocation();
-  const { tr } = useTranslations();
+  const { tr, language } = useTranslations();
   const { showToast } = useToasts();
 
   const unfinishedToken = useMemo(
@@ -80,7 +81,7 @@ export default function SurveyPage({ isTestSurvey }: Props) {
     if (!survey) {
       return;
     }
-    document.title = [survey.title, survey.subtitle]
+    document.title = [survey.title[language], survey.subtitle[language]]
       .filter(Boolean)
       .join(' - ');
   }, [survey]);
@@ -143,6 +144,17 @@ export default function SurveyPage({ isTestSurvey }: Props) {
           maxHeight: '-webkit-fill-available',
         }}
       >
+        {(showLandingPage || showThanksPage) && survey.localisationEnabled && (
+          <SurveyLanguageMenu
+            changeUILanguage={true}
+            style={{
+              position: 'absolute',
+              top: '1rem',
+              left: '1rem',
+              zIndex: 10,
+            }}
+          />
+        )}
         {/* Landing page */}
         {showLandingPage && (
           <SurveyLandingPage

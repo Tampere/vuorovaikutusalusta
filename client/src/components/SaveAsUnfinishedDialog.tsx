@@ -33,7 +33,7 @@ export default function SaveAsUnfinishedDialog({
   onCancel,
   onSave,
 }: Props) {
-  const { tr } = useTranslations();
+  const { tr, language } = useTranslations();
   const classes = useStyles();
   const [email, setEmail] = useState('');
   const [emailDirty, setEmailDirty] = useState(false);
@@ -59,6 +59,7 @@ export default function SaveAsUnfinishedDialog({
           body: {
             email,
             entries: answers,
+            language,
           },
         }
       );

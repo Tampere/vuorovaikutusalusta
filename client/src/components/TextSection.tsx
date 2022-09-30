@@ -1,5 +1,6 @@
 import { SurveyTextSection } from '@interfaces/survey';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
+import { useTranslations } from '@src/stores/TranslationContext';
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import rehypeExternalLinks from 'rehype-external-links';
@@ -11,12 +12,13 @@ interface Props {
 
 export default function TextSection({ section }: Props) {
   const { survey } = useSurveyAnswers();
+  const { surveyLanguage } = useTranslations();
 
   return (
     <>
-      {section.title && (
+      {section.title?.[surveyLanguage] && (
         <h2 style={{ color: survey.sectionTitleColor ?? '#000000' }}>
-          {section.title}
+          {section.title?.[surveyLanguage]}
         </h2>
       )}
       <div style={{ color: section.bodyColor ?? '#000000' }}>
@@ -24,7 +26,7 @@ export default function TextSection({ section }: Props) {
           rehypePlugins={[rehypeExternalLinks]}
           remarkPlugins={[remarkBreaks]}
         >
-          {section.body}
+          {section.body?.[surveyLanguage]}
         </ReactMarkdown>
       </div>
     </>

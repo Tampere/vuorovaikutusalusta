@@ -51,7 +51,7 @@ export default function EditSurveyInfo() {
     availableMapLayers,
     availableMapLayersLoading,
   } = useSurvey();
-  const { tr } = useTranslations();
+  const { tr, surveyLanguage } = useTranslations();
   const { showToast } = useToasts();
   const history = useHistory();
 
@@ -88,21 +88,27 @@ export default function EditSurveyInfo() {
           required
           error={validationErrors.includes('survey.title')}
           label={tr.EditSurveyInfo.title}
-          value={activeSurvey.title ?? ''}
+          value={activeSurvey.title?.[surveyLanguage] ?? ''}
           onChange={(event) => {
             editSurvey({
               ...activeSurvey,
-              title: event.target.value,
+              title: {
+                ...activeSurvey.title,
+                [surveyLanguage]: event.target.value,
+              },
             });
           }}
         />
         <TextField
           label={tr.EditSurveyInfo.subtitle}
-          value={activeSurvey.subtitle ?? ''}
+          value={activeSurvey.subtitle?.[surveyLanguage] ?? ''}
           onChange={(event) => {
             editSurvey({
               ...activeSurvey,
-              subtitle: event.target.value,
+              subtitle: {
+                ...activeSurvey.subtitle,
+                [surveyLanguage]: event.target.value,
+              },
             });
           }}
         />

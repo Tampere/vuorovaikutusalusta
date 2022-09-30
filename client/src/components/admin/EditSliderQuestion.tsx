@@ -30,7 +30,7 @@ export default function EditSliderQuestion({
   disabled,
   onChange,
 }: Props) {
-  const { tr } = useTranslations();
+  const { tr, surveyLanguage } = useTranslations();
 
   const classes = useStyles();
 
@@ -95,24 +95,32 @@ export default function EditSliderQuestion({
         <>
           <TextField
             label={tr.EditSliderQuestion.minValue}
-            value={section.minLabel.fi}
+            value={
+              section.minLabel?.[surveyLanguage] ??
+              tr.EditSliderQuestion.defaultMinLabel
+            }
             onChange={(event) => {
               onChange({
                 ...section,
                 minLabel: {
-                  fi: event.target.value,
+                  ...section.maxLabel,
+                  [surveyLanguage]: event.target.value,
                 },
               });
             }}
           />
           <TextField
             label={tr.EditSliderQuestion.maxValue}
-            value={section.maxLabel.fi}
+            value={
+              section.maxLabel?.[surveyLanguage] ??
+              tr.EditSliderQuestion.defaultMaxLabel
+            }
             onChange={(event) => {
               onChange({
                 ...section,
                 maxLabel: {
-                  fi: event.target.value,
+                  ...section.maxLabel,
+                  [surveyLanguage]: event.target.value,
                 },
               });
             }}

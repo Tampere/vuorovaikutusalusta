@@ -3,6 +3,7 @@ import logger from '@src/logger';
 import MarkdownIt from 'markdown-it';
 import { Attachment } from 'nodemailer/lib/mailer';
 import { sendMail } from './email';
+import useTranslations from '@src/translations/useTranslations';
 
 // Markdown renderer
 const md = new MarkdownIt({ breaks: true });
@@ -63,8 +64,10 @@ export async function sendSubmissionReport({
   answerEntries: AnswerEntry[];
   includeAttachments: boolean;
 }) {
-  const subject = survey.email.subject ?? survey.title;
-  const body = md.render(survey.email.body ?? '');
+  const subject = survey.email.subject[language] ?? survey.title[language];
+  const body = md.render(survey.email.body[language] ?? '');
+  const tr = useTranslations(language);
+  const noReply = tr.noReply;
   const attachments: Attachment[] = [
     { filename: `${survey.name}-${submissionId}.pdf`, content: pdfFile },
     ...(includeAttachments ? getAttachments(answerEntries) : []),
@@ -79,6 +82,7 @@ export async function sendSubmissionReport({
       locals: {
         body,
         subject,
+        noReply,
       },
     });
   } catch (error) {

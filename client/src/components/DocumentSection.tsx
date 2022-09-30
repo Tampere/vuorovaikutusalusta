@@ -12,7 +12,7 @@ interface Props {
 
 export default function DocumentSection({ section }: Props) {
   const { survey } = useSurveyAnswers();
-  const { tr } = useTranslations();
+  const { tr, surveyLanguage } = useTranslations();
 
   const fullFilePath = useMemo(
     () => getFullFilePath(section.filePath, section.fileName),
@@ -32,10 +32,13 @@ export default function DocumentSection({ section }: Props) {
           component="legend"
           style={{ color: survey.sectionTitleColor ?? '#000000' }}
         >
-          {section.title}
+          {section.title?.[surveyLanguage]}
         </FormLabel>
         {section.info && (
-          <SectionInfo infoText={section.info} subject={section.title} />
+          <SectionInfo
+            infoText={section.info?.[surveyLanguage]}
+            subject={section.title?.[surveyLanguage]}
+          />
         )}
       </div>
       <Link href={`/api/file/${fullFilePath}`} target="_blank" rel="noreferrer">

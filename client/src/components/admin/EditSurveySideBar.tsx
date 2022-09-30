@@ -13,6 +13,7 @@ import {
   FavoriteBorder,
   InfoOutlined,
   InsertDriveFileOutlined,
+  Language,
   Mail,
   Preview,
 } from '@material-ui/icons';
@@ -67,7 +68,7 @@ export default function EditSurveySideBar(props: Props) {
     activeSurveyLoading,
     movePage,
   } = useSurvey();
-  const { tr } = useTranslations();
+  const { tr, surveyLanguage, language } = useTranslations();
   const { showToast } = useToasts();
 
   return (
@@ -77,19 +78,25 @@ export default function EditSurveySideBar(props: Props) {
       onDrawerToggle={props.onDrawerToggle}
     >
       <List>
-        <ListItemLink external to={'/admin'}>
+        <ListItemLink external to={`/admin?lang=${language}`}>
           <ListItemIcon>
             <ArrowBack />
           </ListItemIcon>
           <ListItemText primary={tr.EditSurvey.toFrontPage} />
         </ListItemLink>
-        <ListItemLink to={`${url}/perustiedot`}>
+        <ListItemLink to={`${url}/perustiedot?lang=${language}`}>
           <ListItemIcon>
             <InfoOutlined />
           </ListItemIcon>
           <ListItemText primary={tr.EditSurvey.info} />
         </ListItemLink>
-        <ListItemLink to={`${url}/sähköpostit`}>
+        <ListItemLink to={`${url}/käännökset?lang=${language}`}>
+          <ListItemIcon>
+            <Language />
+          </ListItemIcon>
+          <ListItemText primary={tr.EditSurvey.translations}></ListItemText>
+        </ListItemLink>
+        <ListItemLink to={`${url}/sähköpostit?lang=${language}`}>
           <ListItemIcon>
             <Mail />
           </ListItemIcon>
@@ -117,13 +124,15 @@ export default function EditSurveySideBar(props: Props) {
                   >
                     {(provided) => (
                       <div ref={provided.innerRef} {...provided.draggableProps}>
-                        <ListItemLink to={`${url}/sivut/${page.id}`}>
+                        <ListItemLink
+                          to={`${url}/sivut/${page.id}?lang=${language}`}
+                        >
                           <ListItemIcon>
                             <InsertDriveFileOutlined />
                           </ListItemIcon>
                           <ListItemText
                             primary={
-                              page.title || (
+                              page.title?.[surveyLanguage] || (
                                 <em>{tr.EditSurvey.untitledPage}</em>
                               )
                             }
@@ -150,7 +159,7 @@ export default function EditSurveySideBar(props: Props) {
             setNewPageDisabled(true);
             try {
               const page = await createPage();
-              history.push(`${url}/sivut/${page.id}`);
+              history.push(`${url}/sivut/${page.id}?lang=${language}`);
               setNewPageDisabled(false);
             } catch (error) {
               showToast({
@@ -170,13 +179,21 @@ export default function EditSurveySideBar(props: Props) {
       </List>
       <Divider />
       <List>
-        <ListItemLink to={`${url}/kiitos-sivu`}>
+        <ListItemLink to={`${url}/kiitos-sivu?lang=${language}`}>
           <ListItemIcon>
             <FavoriteBorder />
           </ListItemIcon>
           <ListItemText primary={tr.EditSurvey.thanksPage} />
         </ListItemLink>
-        <ListItemLink external newTab to={`/${originalActiveSurvey.name}`}>
+        <ListItemLink
+          external
+          newTab
+          to={`/${originalActiveSurvey.name}${
+            originalActiveSurvey?.localisationEnabled
+              ? '?lang=' + surveyLanguage
+              : ''
+          }`}
+        >
           <ListItemIcon>
             <Preview />
           </ListItemIcon>

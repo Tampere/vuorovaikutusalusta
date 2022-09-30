@@ -1,0 +1,435 @@
+{
+  "DataExport": {
+    "exportAnswers": "Export response data",
+    "surveyAnswerExport": "Export survey response data",
+    "chooseFileFormat": "Choose files to export",
+    "download": "download",
+    "errorDownloadingCSV": "Failed to export CSV -file",
+    "errorDownloadingGPKG": "Failed to export GeoPackage -file",
+    "attachments": "Survey response data attachments"
+  },
+  "EditSurvey": {
+    "errorFetchingSurvey": "Unable to access the survey. Please check the address or try again later.",
+    "untitledPage": "Untitled page",
+    "fetchFailed": "Unable to access the survey. Please try again later.",
+    "saveSuccessful": "Survey saved successfully!",
+    "saveFailed": "Failed to save the survey. Please try again later.",
+    "saveFailedDuplicateName": "Survey with the same name already exists. Please choose another name and try again.",
+    "invalidFields": "The following fields have invalid values:",
+    "validationError": {
+      "survey.title": "Survey title",
+      "survey.name": "Survey name",
+      "survey.author": "Survey author / contact person",
+      "survey.mapUrl": "URL for the Oskari map publication"
+    },
+    "toFrontPage": "Back to the front page",
+    "info": "Basic information",
+    "email": "Email",
+    "newPage": "New page",
+    "newPageFailed": "Error while creating a new page. Please try again later.",
+    "thanksPage": "Thanks page",
+    "translations": "Translations",
+    "preview": "Preview",
+    "toSurveyPage": "Go to survey",
+    "preventUnloadConfirm": "You have unsaved changes. Are you sure you want to continue?",
+    "deleteSurvey": "Delete survey",
+    "deleteSurveyConfirm": "Are you sure you want to delete the survey? This action cannot be reversed.",
+    "deleteSurveyFailed": "Error while deleting the survey. Please try again later.",
+    "deleteSurveySuccessful": "Survey successfully deleted!",
+    "allowSavingUnfinished": "Allow saving an unfinished survey"
+  },
+  "EditSurveyInfo": {
+    "title": "Survey title",
+    "subtitle": "Survey subtitle",
+    "name": "Survey name",
+    "nameHelperText": "The name displayed on the survey URL-address. This can only include characters (a-z), numbers (0-9), hyphen (-) and underline (_).",
+    "author": "Survey author / contact person",
+    "authorUnit": "Survey author's / contact person's unit",
+    "admins": "Survey admins",
+    "userFetchFailed": "Failed to fetch users. Try again later.",
+    "adminsHelperText": "Users besides the original author of the survey, who will have access to the survey answers and who can modify the survey.",
+    "mapUrl": "URL for the Oskari map publication",
+    "mapUrlError": "Failed to fetch map layers with given url. Check the url and try again later.",
+    "availableMapLayers": "Available map layers:",
+    "startDate": "Start date",
+    "endDate": "End date",
+    "theme": "Theme",
+    "selectTheme": "Choose a theme",
+    "themeFetchFailed": "Failed to access survey themes. Please try again later.",
+    "titleColor": "Color for the section titles",
+    "allowTestSurvey": "Publish test survey",
+    "allowTestSurveyHelperText": "Test survey will be published under its own url. Test survey answers are not saved.",
+    "testSurveyUrl": "Test survey url"
+  },
+  "EditSurveyEmail": {
+    "enable": "Enable sending reports of the survey answers via email",
+    "enableHelperText": "If you enable sending answer reports via email, reports of individual respondent's answers will be send as pdf-reports to the mailing list described below. At the end of the survey, the respondent is asked for an email address where the answer report can be sent to.",
+    "autoSendTo": "Email recipients",
+    "autoSendToHelperText": "The answer report will be sent as an attachment to each of these email recipients (in addition to the respondent)",
+    "emailSubject": "Email subject",
+    "emailBody": "Email content",
+    "info": "Additional information",
+    "infoHelperText": "Additional information will be displayed on the front page of the answer report."
+  },
+  "KeyValueForm": {
+    "key": "Key",
+    "value": "Value",
+    "addEntry": "Add a new row",
+    "deleteEntry": "Delete row"
+  },
+  "EditSurveyPage": {
+    "name": "Page title",
+    "deletePage": "Delete page",
+    "confirmDeletePage": "Are you sure you want to delete this page? The action cannot be reversed.",
+    "deletePageFailed": "Error while deleting the survey page. Please try again later.",
+    "selectSidebarType": "Select content for the side column of the page",
+    "sidebarType": {
+      "none": "Nothing",
+      "map": "Map",
+      "image": "Image"
+    },
+    "warningNoMapUrl": "Oskari map publication url has not been set.",
+    "warningNoAvailableMapLayers": "No available map layers found from the Oskari map publication.",
+    "mapLayers": "Map layers shown on the survey page",
+    "untitledSection": "Untitled section",
+    "title": "Title",
+    "deleteSection": "Delete section",
+    "confirmDeleteSection": "Are you sure you want to delete this section?",
+    "imageAltText": "Alternative text for the image"
+  },
+  "FileUpload": {
+    "deleteFile": "Delete file",
+    "addedFile": "Uploaded file",
+    "errorUploadingFile": "Failed to upload the file. Please try again later.",
+    "errorDeletingFile": "Failed to delete the file. Please try again later."
+  },
+  "EditGroupedCheckBoxQuestion": {
+    "addGroup": "Add group",
+    "groupName": "Group's name",
+    "untitledGroup": "Untitled group",
+    "deleteGroup": "Delete group"
+  },
+  "AddSurveySectionActions": {
+    "radioQuestion": "Add radio button question (single choice)",
+    "checkBoxQuestion": "Add checkbox question (multiple choice)",
+    "numericQuestion": "Add numeric question",
+    "mapQuestion": "Add map question",
+    "textSection": "Add text section",
+    "freeTextQuestion": "Add free text question",
+    "sortingQuestion": "Add sorting question",
+    "sliderQuestion": "Add slider question",
+    "matrixQuestion": "Add likert scale question",
+    "groupedCheckboxQuestion": "Add grouped checkbox question",
+    "imageSection": "Add image section",
+    "documentSection": "Add document section",
+    "attachmentSection": "Add attachment section"
+  },
+  "SurveySection": {
+    "radioQuestion": "Radio button question (single choice)",
+    "checkBoxQuestion": "Radio button question (single choice)",
+    "numericQuestion": "Numeric question",
+    "mapQuestion": "Map question",
+    "textSection": "Text section",
+    "freeTextQuestion": "Free text question",
+    "sortingQuestion": "Sorting question",
+    "sliderQuestion": "Slider question",
+    "matrixQuestion": "Likert scale question",
+    "groupedCheckboxQuestion": "Grouped checkbox question",
+    "imageSection": "Image section",
+    "documentSection": "Document section",
+    "attachmentSection": "Attachment section"
+  },
+  "SurveySections": {
+    "limitAnswers": "Limit the number of answers",
+    "minAnswers": "Minimum number of answers",
+    "maxAnswers": "Maximum number of answers",
+    "classes": "Answer classes",
+    "options": "Answer options",
+    "subjects": "Answer subjects",
+    "allowCustomAnswer": "Allow 'Something else, what?' -answers",
+    "isRequired": "Answer required",
+    "answerMaxLength": "Maximum length of answer",
+    "sectionInfo": "Additional information related to the section",
+    "allowEmptyAnswer": "Allow 'I don't know' -answers",
+    "optionInfo": "Answer option information",
+    "removeOption": "Delete answer option"
+  },
+  "NumericQuestion": {
+    "minValue": "Minimum value {minValue}",
+    "maxValue": "Maximum value {maxValue}",
+    "minMaxValue": "The value has to be between {minValue} and {maxValue}"
+  },
+  "AttachmentQuestion": {
+    "addedFile": "Added file",
+    "fileUploadError": "Error while uploading file",
+    "fileSizeLimitError": "File size cannot exceed 10MB",
+    "unsupportedFileFormat": "Unsupported file format",
+    "attachmentFileFormats": "Supported file formats: jpg, jpeg, png, pdf, docx, xlsx."
+  },
+  "SurveyImageList": {
+    "attributions": "Copyright & attributions",
+    "noImage": "No background image",
+    "surveyImage": "Survey background image",
+    "selectImage": "Choose background image",
+    "addNewImage": "Add a new image",
+    "files": "File"
+  },
+  "DropZone": {
+    "dropFiles": "Drop file here or click to choose the file"
+  },
+  "EditTextSection": {
+    "text": "Text",
+    "bodyColor": "Color of the text"
+  },
+  "EditImageSection": {
+    "altText": "Alternative text for the image"
+  },
+  "EditMapQuestion": {
+    "selectionTypes": "Allowed geometry types for the map markings",
+    "point": "Point",
+    "line": "Line",
+    "area": "Area",
+    "subQuestions": "Subquestions"
+  },
+  "EditSliderQuestion": {
+    "presentationType": "Slider question labels",
+    "literal": "Verbal",
+    "numeric": "Numeric",
+    "minValue": "Minimum value",
+    "maxValue": "Maximum value",
+    "defaultMinLabel": "Strongly disagree",
+    "defaultMaxLabel": "Strongly agree",
+    "literalHelperText": "Answer data from slider questions with verbal labels will be stored in the database as numerical values from 1 to 10."
+  },
+  "EditSurveyThanksPage": {
+    "title": "Title for the Thank You page",
+    "text": "Text for the Thank You page"
+  },
+  "RichTextEditor": {
+    "generic.add": "Add",
+    "generic.cancel": "Cancel",
+    "components.controls.inline.bold": "Bold",
+    "components.controls.inline.italic": "Italic",
+    "components.controls.link.linkTitle": "Link title",
+    "components.controls.link.linkTarget": "URL",
+    "components.controls.link.linkTargetOption": "Open link in a new window",
+    "components.controls.link.link": "Add link",
+    "components.controls.link.unlink": "Remove link",
+    "components.controls.list.list": "List",
+    "components.controls.list.unordered": "Unordered list",
+    "components.controls.list.ordered": "Ordered list"
+  },
+  "ColorSelect": {
+    "color": "Color",
+    "colors": {
+      "black": "Black",
+      "darkGray": "Dark grey",
+      "steelBlue": "Steel blue",
+      "atmosphere": "Atmosphere",
+      "berryRed": "Berry red",
+      "warmGreen": "Warm green"
+    }
+  },
+  "MarkerIconSelect": {
+    "icon": "Icon",
+    "selectIcon": "Select an icon",
+    "errorFetchingIcons": "Error while accessing icons. Please try again later."
+  },
+  "StrokeStyleSelect": {
+    "strokeStyle": "Stroke style",
+    "selectStrokeStyle": "Select stroke style",
+    "solid": "Solid line",
+    "dashed": "Dashed line",
+    "dotted": "Dotted line"
+  },
+  "StrokeColorSelect": {
+    "strokeColor": "Stroke color",
+    "selectStrokeColor": "Select stroke color",
+    "errorFetchingColors": "Error while accessing colors. Please try again later."
+  },
+  "SurveyList": {
+    "title": "Interaction platform - Surveys",
+    "errorFetchingSurveys": "Error while accessing surveys. Please try again later.",
+    "editSurvey": "Edit survey",
+    "publishNow": "Publish now",
+    "confirmPublish": "Are you sure you want to publish the survey?",
+    "publishSuccessful": "Survey published!",
+    "publishFailed": "Failed to publish survey. Please try again later.",
+    "unpublish": "Unpublish survey",
+    "confirmUnpublish": "Are you sure you want to unpublish the survey?",
+    "unpublishSuccessful": "Survey unpublished successfully!",
+    "unpublishFailed": "Failed to unpublish the survey. Please try again later.",
+    "createNewSurvey": "Create a new survey",
+    "errorCreatingNewSurvey": "Error while creating a new survey. Please try again later.",
+    "untitledSurvey": "Untitled survey",
+    "author": "Author / contact person",
+    "url": "Survey url address",
+    "open": "Open",
+    "openFrom": "Open from",
+    "published": "Published",
+    "notPublished": "Unpublished",
+    "showAuthoredOnly": "Show authored surveys only",
+    "showPublishedOnly": "Show published surveys only",
+    "copySurvey": "Copy survey"
+  },
+  "SurveyPage": {
+    "errorSurveyNotFound": "Survey was not found, or it is not published. Please check the address and try again.",
+    "errorFetchingSurvey": "Error while accessing the survey. Please try again later.",
+    "startSurveyLink": "Start the survey",
+    "continueSurveyLink": "Continue the survey",
+    "loadUnfinishedSuccessful": "Previous answers were loaded successfully! You can now continue answering the survey.",
+    "errorTokenNotFound": "Previous answers were not found with the provided address. Please check the address and try again, or start the survey from the beginning.",
+    "errorLoadingUnfinished": "Failed to load previously stored answers. Please try again later."
+  },
+  "UnavailableSurvey": {
+    "surveyNotPublished": "The survey is closed and answering is not possible anymore. Thank You for your interest on the survey!",
+    "treTopicalInfo": "You can access topical issues of the city of Tampere from the link below.",
+    "tre": "The city of Tampere"
+  },
+  "NotFoundPage": {
+    "pageNotFound": "Survey not found. Please check the address and try again later."
+  },
+  "CopyToClipboard": {
+    "tooltip": "Copy to clipboard",
+    "successful": "Value successfully copied to clipboard!",
+    "fail": "Failed to copy the value to the clipboard. Please try again later."
+  },
+  "SurveyStepper": {
+    "next": "Next",
+    "previous": "Previous",
+    "submit": "Submit",
+    "errorSubmittingSurvey": "Error while submitting the survey. Please try again later.",
+    "openMap": "Open the map",
+    "openImage": "Open the image",
+    "unfinishedAnswers": "Please, answer all mandatory questions",
+    "saveAsUnfinished": "Save unfinished survey"
+  },
+  "SaveAsUnfinishedDialog": {
+    "description": "You can save the unfinished survey by providing your email address. A link will be sent to your email, from which you can access your unfinished survey provided that the survey is still open.",
+    "disclaimer": "Your email address will not be stored or used for other purposes. Your answers will be taken into account only when you have finished answering the survey and submitted your answers.",
+    "email": "Email address",
+    "saveSuccessful": "Your answers are saved successfully! You will soon receive an email with the link to continue the survey. You can now close your browser window. If you are using a public computer, please, remember to clear the browser's cache.",
+    "errorSaving": "Error while saving answers. Please try again later."
+  },
+  "SurveyQuestion": {
+    "errorFieldIsRequired": "Field is mandatory.",
+    "answerLimitsMinMax": "Choose a minimum of {min} and a maximum of {max} options",
+    "answerLimitsMin": "Choose a minimum of {min} options",
+    "answerLimitsMax": "Choose a maximum of {max} options",
+    "customAnswer": "Something else, what?",
+    "charactersRemaining": "{x} character(s) left.",
+    "showInfo": "Show additional information",
+    "info": "Additional information"
+  },
+  "MapQuestion": {
+    "selectionTypes": {
+      "point": "Point",
+      "line": "Line",
+      "area": "Area"
+    },
+    "selectionHelperText": {
+      "point": "Draw point on the desired location by clicking the map on that location.",
+      "line": "Start drawing by clicking the starting point on the map. Continue drawing by clicking on the next point on the map. Stop drawing by clicking the last point of the line again.",
+      "area": "Start drawing by clicking the starting point on the map. Continue drawing by clicking on the next point on the map. Stop drawing by clicking the last point of the area again."
+    },
+    "clearAnswers": "Clear all map answers",
+    "confirmClearAnswers": "Are you sure you want to clear all your map answers to this question?",
+    "removeAnswer": "Remove answer",
+    "confirmRemoveAnswer": "Are you sure you want to delete this answer?"
+  },
+  "SurveyMap": {
+    "editGeometries": "Modify your previous map answers",
+    "finishEditingGeometries": "Stop modifying map answers"
+  },
+  "MatrixQuestion": {
+    "emptyAnswer": "I don't know"
+  },
+  "ImageSection": {
+    "openInNewTab": "Open image on a new tab"
+  },
+  "SortingQuestion": {
+    "empty": "Empty",
+    "rankForOption": "Rank for the option: {option}",
+    "sortedOptions": "Options sorted"
+  },
+  "DocumentSection": {
+    "attachment": "Attachment"
+  },
+  "DeleteSurveyDialog": {
+    "dialogTitle": "Delete survey",
+    "surveyName": "survey name",
+    "surveyAuthor": "survey author / contact person",
+    "warningMessage": "Note! When the survey is deleted, all the response data related to the survey is also deleted. The response data is permanently deleted and it cannot be accessed anymore after the survey is deleted.",
+    "activateDeleting": "To delete the survey, write the name of the survey to the field below",
+    "surveyToBeDeleted": "name of the survey to be deleted"
+  },
+  "GroupedCheckBoxQuestion": {
+    "helperText": "Choose options from the groups listed below.",
+    "helperTextMin": "Choose a minimum of {min} options.",
+    "helperTextMax": "Choose a maximum of {max} options.",
+    "helperTextMinMax": "Choose a minimum of {min} and a maximum of {max} options.",
+    "indicatorText": "You have chosen {numbers} options.",
+    "indicatorTextMaxReached": "You have chosen all {numbers} options.",
+    "optionsSelectedInGroup": "{number} options chosen."
+  },
+  "SubmissionInfoDialog": {
+    "title": "Submit answers",
+    "text": "If you want a copy of your answers, please write your email address in the provided field.",
+    "email": "Email address (optional)"
+  },
+  "AppBarUserMenu": {
+    "logout": "Logout"
+  },
+  "MapInfoBox": {
+    "answer": "Answer"
+  },
+  "TestSurveyFrame": {
+    "text": "This is a test survey. Survey answers are not saved nor are any email reports sent."
+  },
+  "LanguageMenu": {
+    "changeLanguage": "Change service language",
+    "fi": "Suomi",
+    "en": "English"
+  },
+  "SurveyLanguageMenu": {
+    "changeSurveyLanguage": "Change language of the survey",
+    "surveyLanguage": "Survey language"
+  },
+  "EditSurveyTranslations": {
+    "enableLocalisation": "Allow publishing the survey with multiple languages",
+    "provideTranslations": "If the survey is ment to support different languages, the translations for each text are to be provided here. Fill in the translation to the missing fields on the list below.",
+    "surveyInformation": "Survey basic information",
+    "copyTextFields": "Copy text fields to be translated to clipboard",
+    "supportedLanguages": "Supported languages",
+    "surveyPages": "Survey pages",
+    "surveyTitle": "Survey title",
+    "surveySubtitle": "Survey subtitle",
+    "fi": "finnish",
+    "en": "english",
+    "page": "page",
+    "missingTranslation": "Missing translation",
+    "optionInfo": "Option info",
+    "emailInfo": "Email",
+    "thanksPage": "Thank you -page"
+  },
+  "navigation": {
+    "next": "Next",
+    "back": "Back"
+  },
+  "commands": {
+    "finish": "Finish",
+    "cancel": "Cancel",
+    "select": "Select",
+    "remove": "Remove",
+    "save": "Save",
+    "discard": "Discard changes",
+    "edit": "Edit",
+    "copy": "Copy",
+    "close": "Close"
+  },
+  "options": {
+    "yes": "Yes",
+    "no": "No",
+    "ok": "OK"
+  }
+}
