@@ -1,8 +1,4 @@
-import {
-  LocalizedText,
-  SectionOption,
-  SurveyMatrixQuestion,
-} from '@interfaces/survey';
+import { LocalizedText, SurveyMatrixQuestion } from '@interfaces/survey';
 import {
   Checkbox,
   Fab,
@@ -25,7 +21,7 @@ interface Props {
 }
 
 export default function EditMatrixQuestion({ section, onChange }: Props) {
-  const { tr, language } = useTranslations();
+  const { tr, surveyLanguage, initializeLocalizedObject } = useTranslations();
 
   return (
     <>
@@ -55,7 +51,7 @@ export default function EditMatrixQuestion({ section, onChange }: Props) {
             onClick={() => {
               onChange({
                 ...section,
-                classes: [...section.classes, { [language]: null }],
+                classes: [...section.classes, initializeLocalizedObject(null)],
               });
             }}
           >
@@ -70,20 +66,20 @@ export default function EditMatrixQuestion({ section, onChange }: Props) {
         {section.classes?.map((entry: LocalizedText, index) => {
           return (
             <div key={`matrix-class-${index}`} style={{ position: 'relative' }}>
-              <Tooltip title={entry[language] ?? ''}>
+              <Tooltip title={entry[surveyLanguage] ?? ''}>
                 <TextField
                   style={{
                     marginRight: '0.25rem',
                     backgroundColor: 'rgba(0,0,0,0.2)',
                   }}
-                  value={entry[language] ?? ''}
+                  value={entry[surveyLanguage] ?? ''}
                   onChange={(event) => {
                     const updatedClasses = [...section.classes];
-                    updatedClasses[index][language] = event.target.value;
+                    updatedClasses[index][surveyLanguage] = event.target.value;
                     onChange({ ...section, classes: updatedClasses });
                   }}
                 >
-                  {entry[language]}
+                  {entry[surveyLanguage]}
                 </TextField>
               </Tooltip>
               <IconButton
@@ -106,13 +102,11 @@ export default function EditMatrixQuestion({ section, onChange }: Props) {
         })}
       </div>
       <QuestionOptions
-        options={section.subjects.map((entry) => ({ text: entry[language] }))}
+        options={section.subjects.map((subject) => ({ text: subject }))}
         onChange={(subjects: any) => {
           onChange({
             ...section,
-            subjects: subjects.map((entry: SectionOption) => ({
-              [language]: entry.text,
-            })),
+            subjects: subjects.map((subject: any) => ({ ...subject.text })),
           });
         }}
         title={tr.SurveySections.subjects}

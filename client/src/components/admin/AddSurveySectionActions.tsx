@@ -35,7 +35,7 @@ interface Props {
 
 export default function AddSurveySectionActions(props: Props) {
   const classes = useStyles();
-  const { tr } = useTranslations();
+  const { tr, initializeLocalizedObject } = useTranslations();
   // Sequence for making each section ID unique before they're added to database
   const [sectionSequence, setSectionSequence] = useState(-1);
 
@@ -44,24 +44,24 @@ export default function AddSurveySectionActions(props: Props) {
   } = {
     checkbox: {
       type: 'checkbox',
-      title: '',
+      title: initializeLocalizedObject(''),
       isRequired: false,
       info: null,
-      options: [{ text: '' }],
+      options: [{ text: initializeLocalizedObject('') }],
       answerLimits: null,
       allowCustomAnswer: false,
     },
     radio: {
       type: 'radio',
-      title: '',
+      title: initializeLocalizedObject(''),
       isRequired: false,
       info: null,
-      options: [{ text: '' }],
+      options: [{ text: initializeLocalizedObject('') }],
       allowCustomAnswer: false,
     },
     numeric: {
       type: 'numeric',
-      title: '',
+      title: initializeLocalizedObject(''),
       isRequired: false,
       info: null,
       minValue: null,
@@ -69,7 +69,7 @@ export default function AddSurveySectionActions(props: Props) {
     },
     map: {
       type: 'map',
-      title: '',
+      title: initializeLocalizedObject(''),
       isRequired: false,
       info: null,
       selectionTypes: [],
@@ -92,19 +92,19 @@ export default function AddSurveySectionActions(props: Props) {
       type: 'free-text',
       isRequired: false,
       info: null,
-      title: '',
+      title: initializeLocalizedObject(''),
     },
     text: {
       type: 'text',
-      title: '',
-      body: '',
+      title: initializeLocalizedObject(''),
+      body: initializeLocalizedObject(''),
       bodyColor: '#000000',
       info: null,
     },
     sorting: {
       type: 'sorting',
-      title: '',
-      options: [{ text: '' }],
+      title: initializeLocalizedObject(''),
+      options: [{ text: initializeLocalizedObject('') }],
       isRequired: false,
       info: null,
     },
@@ -112,21 +112,17 @@ export default function AddSurveySectionActions(props: Props) {
       type: 'slider',
       isRequired: false,
       info: null,
-      title: '',
+      title: initializeLocalizedObject(''),
       presentationType: 'literal',
       minValue: 0,
       maxValue: 10,
-      minLabel: {
-        fi: tr.EditSliderQuestion.defaultMinLabel,
-      },
-      maxLabel: {
-        fi: tr.EditSliderQuestion.defaultMaxLabel,
-      },
+      minLabel: null,
+      maxLabel: null,
     },
     matrix: {
       type: 'matrix',
       isRequired: false,
-      title: '',
+      title: initializeLocalizedObject(''),
       info: null,
       classes: [],
       subjects: [],
@@ -135,7 +131,7 @@ export default function AddSurveySectionActions(props: Props) {
     'grouped-checkbox': {
       type: 'grouped-checkbox',
       isRequired: false,
-      title: '',
+      title: initializeLocalizedObject(''),
       answerLimits: {
         min: 0,
         max: 2,
@@ -144,21 +140,21 @@ export default function AddSurveySectionActions(props: Props) {
     },
     image: {
       type: 'image',
-      title: '',
+      title: initializeLocalizedObject(''),
       fileName: null,
       filePath: [],
       altText: '',
     },
     document: {
       type: 'document',
-      title: '',
+      title: initializeLocalizedObject(''),
       fileName: null,
       filePath: [],
     },
     attachment: {
       type: 'attachment',
       isRequired: false,
-      title: '',
+      title: initializeLocalizedObject(''),
     },
   };
 

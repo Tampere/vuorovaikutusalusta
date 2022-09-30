@@ -141,7 +141,8 @@ const validationMap = {
   },
   'survey.author': (survey: Survey) =>
     survey.author && survey.author.length > 0,
-  'survey.title': (survey: Survey) => survey.title && survey.title.length > 0,
+  'survey.title': (survey: Survey) =>
+    survey.title && survey.title['fi'].length > 0,
   'survey.mapUrl': (survey: Survey, state: State) =>
     !survey.mapUrl || !state.availableMapLayersError,
 };

@@ -68,7 +68,7 @@ export default function GroupedCheckBoxQuestion({
 }: Props) {
   const [expanded, setExpanded] = useState<number>(null);
 
-  const { tr, language } = useTranslations();
+  const { tr, surveyLanguage } = useTranslations();
   const classes = useStyles();
 
   const amountsByGroup = useMemo(
@@ -146,7 +146,7 @@ export default function GroupedCheckBoxQuestion({
               className={classes.accordionSummary}
               expandIcon={<ArrowForwardIosSharp sx={{ fontSize: '0.9rem' }} />}
             >
-              {group.name[language]}
+              {group.name?.[surveyLanguage]}
               {amountsByGroup[index] > 0 && (
                 <Chip
                   style={{ marginLeft: '1rem' }}
@@ -160,7 +160,7 @@ export default function GroupedCheckBoxQuestion({
               <FormGroup
                 // Indicate the amount of selections inside the group for screen readers
                 aria-label={`${
-                  group.name[language]
+                  group.name?.[surveyLanguage]
                 }: ${tr.GroupedCheckBoxQuestion.optionsSelectedInGroup.replace(
                   '{number}',
                   String(amountsByGroup[index])
@@ -176,7 +176,7 @@ export default function GroupedCheckBoxQuestion({
                     style={{ display: 'flex', flexDirection: 'row' }}
                   >
                     <FormControlLabel
-                      label={option.text}
+                      label={option.text?.[surveyLanguage] ?? ''}
                       control={
                         <Checkbox
                           checked={value.includes(option.id)}
@@ -192,14 +192,14 @@ export default function GroupedCheckBoxQuestion({
                                 );
                             onChange(newValue);
                           }}
-                          name={option.text}
+                          name={option.text?.[surveyLanguage]}
                         />
                       }
                     />
-                    {option.info && (
+                    {option.info?.[surveyLanguage] && (
                       <SectionInfo
-                        infoText={option.info}
-                        subject={option.text}
+                        infoText={option.info?.[surveyLanguage]}
+                        subject={option.text?.[surveyLanguage]}
                       />
                     )}
                   </div>

@@ -1,5 +1,6 @@
 import {
   AnswerEntry,
+  LanguageCode,
   Survey,
   SurveyPage,
   SurveyPageSection,
@@ -13,6 +14,7 @@ import React, {
   useMemo,
   useReducer,
 } from 'react';
+import { useTranslations } from './TranslationContext';
 
 interface State {
   answers: AnswerEntry[];
@@ -137,6 +139,7 @@ export function getEmptyAnswer(section: SurveyPageSection): AnswerEntry {
  */
 export function useSurveyAnswers() {
   const context = useContext(SurveyAnswerContext);
+  const { setLanguage } = useTranslations();
   if (!context) {
     throw new Error('useSurvey must be used within the SurveyProvider');
   }
@@ -267,13 +270,18 @@ export function useSurveyAnswers() {
      */
     async loadUnfinishedEntries(token: string) {
       dispatch({ type: 'SET_UNFINISHED_TOKEN', token });
-      const answers = await request<AnswerEntry[]>(
+      const response = await request<{
+        answers: AnswerEntry[];
+        language: LanguageCode;
+      }>(
         `/api/published-surveys/${state.survey.name}/unfinished-submission?token=${token}`
       );
+      const { answers, language } = response;
       dispatch({
         type: 'UPDATE_ANSWERS',
         answers,
       });
+      setLanguage(language);
     },
     /**
      * Sets the unfinished token into the context. The next save/submit will replace the unfinished submission.

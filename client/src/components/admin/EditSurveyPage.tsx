@@ -47,7 +47,7 @@ export default function EditSurveyPage() {
     availableMapLayersLoading,
   } = useSurvey();
   const history = useHistory();
-  const { tr } = useTranslations();
+  const { tr, surveyLanguage } = useTranslations();
   const { showToast } = useToasts();
 
   const page = useMemo(() => {
@@ -76,11 +76,11 @@ export default function EditSurveyPage() {
       <TextField
         label={tr.EditSurveyPage.name}
         required
-        value={page.title}
+        value={page?.title?.[surveyLanguage] ?? ''}
         onChange={(event) => {
           editPage({
             ...page,
-            title: event.target.value,
+            title: { ...page.title, [surveyLanguage]: event.target.value },
           });
         }}
       />

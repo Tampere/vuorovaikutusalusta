@@ -42,11 +42,11 @@ interface CommonSurveyPageSection {
   /**
    * Section title
    */
-  title: string;
+  title: LocalizedText;
   /**
    * Additional information related to the section
    */
-  info?: string;
+  info?: LocalizedText;
   /**
    * Toggler whether the section info should be shown
    */
@@ -106,7 +106,7 @@ export interface SurveyRadioQuestion extends CommonSurveyPageQuestion {
  */
 export interface SurveyTextSection extends CommonSurveyPageSection {
   type: 'text';
-  body: string;
+  body: LocalizedText;
   bodyColor: string;
 }
 
@@ -270,7 +270,7 @@ export interface SurveyPage {
   /**
    * Title of the survey page
    */
-  title: string;
+  title: LocalizedText;
   /**
    * Side bar definition for the survey page
    */
@@ -293,11 +293,11 @@ export interface Survey {
   /**
    * Title of the survey
    */
-  title: string;
+  title: LocalizedText;
   /**
    * Subtitle of the survey
    */
-  subtitle: string;
+  subtitle: LocalizedText;
   /**
    * Author of the survey
    */
@@ -362,11 +362,11 @@ export interface Survey {
     /**
      * Title of the thanks page
      */
-    title: string;
+    title: LocalizedText;
     /**
      * Text in markdown format
      */
-    text: string;
+    text: LocalizedText;
   };
   /**
    * Theme of the survey
@@ -391,11 +391,11 @@ export interface Survey {
     /**
      * Subject of the email
      */
-    subject: string;
+    subject: LocalizedText;
     /**
      * Body of the email
      */
-    body: string;
+    body: LocalizedText;
     /**
      * Optional free-form information to be shown on the front page of the report
      */
@@ -405,6 +405,10 @@ export interface Survey {
    * Should the survey be able to be saved as unfinished
    */
   allowSavingUnfinished?: boolean;
+  /**
+   * Allow publishing surveys with different languages
+   */
+  localisationEnabled: boolean;
 }
 
 /**
@@ -418,11 +422,11 @@ export interface SectionOption {
   /**
    * Localized text field of the option
    */
-  text: string;
+  text: LocalizedText;
   /**
    * Localized text field of the option's info
    */
-  info?: string;
+  info?: LocalizedText;
 }
 
 /**
@@ -446,7 +450,7 @@ export interface SectionOptionGroup {
 /**
  * Supported language codes
  */
-type LanguageCode = 'fi';
+type LanguageCode = 'fi' | 'en';
 
 /**
  * Type for localization typing

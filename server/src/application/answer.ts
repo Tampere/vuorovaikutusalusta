@@ -1,4 +1,4 @@
-import { FileAnswer, LocalizedText } from '@interfaces/survey';
+import { FileAnswer, LanguageCode, LocalizedText } from '@interfaces/survey';
 import { getDb } from '@src/database';
 import { readFileSync, rmSync } from 'fs';
 import { parseAsync } from 'json2csv';
@@ -19,6 +19,7 @@ interface DBAnswerEntry {
   parent_entry_id?: number;
   section_index: number;
   submission_id: number;
+  language: LanguageCode;
   title: LocalizedText;
   type: string;
   value_geometry: GeoJSON.Point | GeoJSON.LineString | GeoJSON.Polygon;
@@ -52,6 +53,7 @@ interface AnswerEntry {
   parentEntryId?: number;
   sectionIndex: number;
   submissionId: number;
+  submissionLanguage: LanguageCode;
   title: LocalizedText;
   type: string;
   valueGeometry: GeoJSON.Point | GeoJSON.LineString | GeoJSON.Polygon;
@@ -86,7 +88,11 @@ interface Feature {
  */
 interface CSVJson {
   headers: TextCell[];
-  submissions: { [key: number]: TextCell[]; timeStamp: Date }[];
+  submissions: {
+    [key: number]: TextCell[];
+    timeStamp: Date;
+    submissionLanguage: LanguageCode;
+  }[];
 }
 
 /**
@@ -133,6 +139,7 @@ function dbAnswerEntryRowsToAnswerEntries(rows: DBAnswerEntry[]) {
     parentEntryId: row?.parent_entry_id,
     sectionIndex: row.section_index,
     submissionId: row.submission_id,
+    submissionLanguage: row?.language,
     title: row.title,
     type: row.type,
     valueGeometry: row.value_geometry,
@@ -223,6 +230,7 @@ async function answerEntriesToCSV(entries: CSVJson): Promise<string> {
 
   const headersData = [
     'Vastaustunniste',
+    'Vastauskieli',
     'Aikaleima',
     ...headers.map((headerObj) => Object.values(headerObj)[0]),
   ];
@@ -231,6 +239,7 @@ async function answerEntriesToCSV(entries: CSVJson): Promise<string> {
     const answers = {};
     const [submissionId, submissionAnswers] = Object.entries(submission)[0];
     answers['Vastaustunniste'] = submissionId;
+    answers['Vastauskieli'] = submission.submissionLanguage;
     answers['Aikaleima'] = moment(submission.timeStamp).format(
       'DD-MM-YYYY, HH:mm'
     );
@@ -406,7 +415,8 @@ async function getAnswerDBEntries(surveyId: number): Promise<AnswerEntry[]> {
       ps.type,
       ps.idx as section_index,
       og.idx as option_group_index,
-      sub.created_at
+      sub.created_at,
+      sub.language
         FROM data.answer_entry ae
         LEFT JOIN data.submission sub ON ae.submission_id = sub.id
         LEFT JOIN data.page_section ps ON ps.id = ae.section_id
@@ -654,6 +664,7 @@ function createCSVSubmissions(
         sectionIdToDetails
       ),
       timeStamp: value[0].createdAt,
+      submissionLanguage: value[0].submissionLanguage,
     });
   });
 

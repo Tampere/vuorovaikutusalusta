@@ -15,7 +15,7 @@ export default function EditTextSection({
   disabled,
   onChange,
 }: Props) {
-  const { tr } = useTranslations();
+  const { tr, language } = useTranslations();
 
   return (
     <>
@@ -28,9 +28,11 @@ export default function EditTextSection({
       />
       <RichTextEditor
         disabled={disabled}
-        value={section.body}
+        value={section.body[language]}
         label={tr.EditTextSection.text}
-        onChange={(value) => onChange({ ...section, body: value })}
+        onChange={(value) =>
+          onChange({ ...section, body: { ...section.body, [language]: value } })
+        }
       />
     </>
   );

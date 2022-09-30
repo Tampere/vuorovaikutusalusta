@@ -52,7 +52,7 @@ export default function SurveyListItem(props: Props) {
   const [loading, setLoading] = useState(false);
 
   const classes = useStyles();
-  const { tr } = useTranslations();
+  const { tr, language, surveyLanguage } = useTranslations();
   const { showToast } = useToasts();
 
   const surveyUrl = useMemo(() => {
@@ -74,14 +74,14 @@ export default function SurveyListItem(props: Props) {
       >
         <CardContent classes={{ root: classes.cardRoot }}>
           <Typography variant="h6" component="h3">
-            {!survey.title ? (
+            {!survey.title?.[surveyLanguage] ? (
               <em>{tr.SurveyList.untitledSurvey}</em>
             ) : (
-              survey.title
+              survey?.title?.[surveyLanguage] ?? ''
             )}
           </Typography>
           <Typography color="textSecondary" component="h4" gutterBottom>
-            {survey.subtitle}
+            {survey.subtitle?.[surveyLanguage]}
           </Typography>
           <Typography variant="body1" color="textSecondary" gutterBottom>
             {survey.author}
@@ -89,10 +89,22 @@ export default function SurveyListItem(props: Props) {
           </Typography>
           {surveyUrl && (
             <Typography variant="body1" color="textSecondary" gutterBottom>
-              <Link href={surveyUrl} target="_blank" rel="noopener noreferrer">
-                {surveyUrl}
+              <Link
+                href={`${surveyUrl}${
+                  survey.localisationEnabled ? '?lang=' + surveyLanguage : ''
+                }`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {`${surveyUrl}${
+                  survey.localisationEnabled ? '?lang=' + surveyLanguage : ''
+                }`}
               </Link>
-              <CopyToClipboard data={surveyUrl} />
+              <CopyToClipboard
+                data={`${surveyUrl}${
+                  survey.localisationEnabled ? '?lang=' + surveyLanguage : ''
+                }`}
+              />
             </Typography>
           )}
           <div style={{ display: 'flex', flexDirection: 'row' }}>
@@ -130,7 +142,13 @@ export default function SurveyListItem(props: Props) {
             justifyContent: 'flex-start',
           }}
         >
-          <Button onClick={() => window.open(`/admin/kyselyt/${survey.id}`)}>
+          <Button
+            onClick={() =>
+              window.open(
+                `/admin/kyselyt/${survey.id}/perustiedot?lang=${language}`
+              )
+            }
+          >
             {tr.SurveyList.editSurvey}
           </Button>
           {/* Allow publish only if it isn't yet published and has a name */}
@@ -168,7 +186,7 @@ export default function SurveyListItem(props: Props) {
       </Card>
       <ConfirmDialog
         open={publishConfirmDialogOpen}
-        title={survey.title}
+        title={survey.title?.[surveyLanguage] ?? ''}
         text={tr.SurveyList.confirmPublish}
         onClose={async (result) => {
           setPublishConfirmDialogOpen(false);
@@ -194,7 +212,7 @@ export default function SurveyListItem(props: Props) {
       />
       <ConfirmDialog
         open={unpublishConfirmDialogOpen}
-        title={survey.title}
+        title={survey.title?.[surveyLanguage] ?? ''}
         text={tr.SurveyList.confirmUnpublish}
         onClose={async (result) => {
           setUnpublishConfirmDialogOpen(false);

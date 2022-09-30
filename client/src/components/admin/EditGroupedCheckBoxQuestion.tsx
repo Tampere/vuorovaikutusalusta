@@ -49,7 +49,7 @@ export default function EditGroupedCheckBoxQuestion({
 }: Props) {
   const [openedGroupId, setOpenedGroupId] = useState<number>(null);
 
-  const { tr, language } = useTranslations();
+  const { tr, surveyLanguage } = useTranslations();
   const classes = useStyles();
 
   return (
@@ -176,7 +176,7 @@ export default function EditGroupedCheckBoxQuestion({
                         id={`group-${index}-header`}
                       >
                         <Typography style={{ flexGrow: 1 }}>
-                          {group.name[language] || (
+                          {group.name[surveyLanguage] || (
                             <em>
                               {tr.EditGroupedCheckBoxQuestion.untitledGroup}
                             </em>
@@ -194,10 +194,10 @@ export default function EditGroupedCheckBoxQuestion({
                           autoFocus
                           disabled={disabled}
                           label={tr.EditGroupedCheckBoxQuestion.groupName}
-                          value={group.name[language]}
+                          value={group.name[surveyLanguage]}
                           variant="standard"
                           onChange={(event) => {
-                            group.name[language] = event.target.value;
+                            group.name[surveyLanguage] = event.target.value;
                             onChange({
                               ...section,
                             });
@@ -256,7 +256,7 @@ export default function EditGroupedCheckBoxQuestion({
                 ...section.groups,
                 {
                   id,
-                  name: { fi: '' },
+                  name: { fi: '', en: '' },
                   options: [],
                 },
               ],

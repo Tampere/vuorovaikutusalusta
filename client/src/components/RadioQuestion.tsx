@@ -27,7 +27,7 @@ export default function RadioQuestion({
   setDirty,
 }: Props) {
   const [customAnswerValue, setCustomAnswerValue] = useState('');
-  const { tr } = useTranslations();
+  const { tr, surveyLanguage } = useTranslations();
 
   // Update custom answer value if value from context is string
   useEffect(() => {
@@ -38,7 +38,7 @@ export default function RadioQuestion({
   return (
     <>
       <RadioGroup
-        aria-label={question.title}
+        aria-label={question.title?.[surveyLanguage]}
         value={value}
         onChange={(event) => {
           setDirty(true);
@@ -59,7 +59,7 @@ export default function RadioQuestion({
           <FormControlLabel
             key={option.id}
             value={option.id}
-            label={option.text}
+            label={option.text?.[surveyLanguage] ?? ''}
             control={<Radio required={question.isRequired} />}
           />
         ))}

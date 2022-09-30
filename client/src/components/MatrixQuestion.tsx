@@ -47,7 +47,7 @@ export default function MatrixQuestion({
   setDirty,
   question,
 }: Props) {
-  const { tr, language } = useTranslations();
+  const { tr, surveyLanguage } = useTranslations();
   const classes = useStyles();
 
   function handleChange(
@@ -77,7 +77,7 @@ export default function MatrixQuestion({
                   key={index}
                   className={`${classes.matrixCell} ${classes.matrixText}`}
                 >
-                  {entry[language] ?? index}
+                  {entry?.[surveyLanguage] ?? index}
                 </TableCell>
               );
             })}
@@ -101,12 +101,12 @@ export default function MatrixQuestion({
                     classes.matrixText,
                   ].join(' ')}
                 >
-                  {subject[language]}
+                  {subject?.[surveyLanguage]}
                 </TableCell>
                 {question.classes.map((entry, classIndex) => (
                   <TableCell key={classIndex} className={classes.matrixCell}>
                     <Radio
-                      aria-label={`${question.title} ${subject[language]}: ${entry[language]}`}
+                      aria-label={`${question.title} ${subject?.[surveyLanguage]}: ${entry?.[surveyLanguage]}`}
                       name={`question-${subjectIndex}`}
                       checked={value[subjectIndex] === classIndex.toString()}
                       value={classIndex.toString()}
@@ -119,7 +119,7 @@ export default function MatrixQuestion({
                 {question.allowEmptyAnswer && (
                   <TableCell>
                     <Radio
-                      aria-label={`${question.title} ${subject[language]}: ${tr.MatrixQuestion.emptyAnswer}`}
+                      aria-label={`${question.title} ${subject?.[surveyLanguage]}: ${tr.MatrixQuestion.emptyAnswer}`}
                       name={`question-${subjectIndex}`}
                       checked={value[subjectIndex] === '-1'}
                       value={'-1'}
