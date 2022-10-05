@@ -81,7 +81,7 @@ export default function SurveyPage({ isTestSurvey }: Props) {
     if (!survey) {
       return;
     }
-    document.title = [survey.title[language], survey.subtitle[language]]
+    document.title = [survey.title?.[language], survey.subtitle?.[language]]
       .filter(Boolean)
       .join(' - ');
   }, [survey]);
