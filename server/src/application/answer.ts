@@ -4,6 +4,9 @@ import { readFileSync, rmSync } from 'fs';
 import { parseAsync } from 'json2csv';
 import moment from 'moment';
 import ogr2ogr from 'ogr2ogr';
+import useTranslations from '@src/translations/useTranslations';
+
+const tr = useTranslations('fi');
 
 /**
  * Interface for answer entry db row
@@ -172,6 +175,7 @@ function geometryAnswerToFeature(answer: AnswerEntry) {
     properties: {
       ['Vastaustunniste']: answer.submissionId,
       ['Aikaleima']: moment(answer.createdAt).format('DD-MM-YYYY, HH:mm'),
+      ['Vastauskieli']: tr[answer?.submissionLanguage ?? 'fi'],
       ['Kysymys']: answer.title?.['fi'] ?? '',
     },
   };
@@ -461,7 +465,8 @@ async function getGeometryDBEntries(surveyId: number): Promise<AnswerEntry[]> {
       ps.title,
       ps.details,
       ps.parent_section,
-      sub.created_at
+      sub.created_at,
+      sub.language
         FROM data.answer_entry ae
         LEFT JOIN data.submission sub ON ae.submission_id = sub.id
         LEFT JOIN data.page_section ps ON ps.id = ae.section_id
