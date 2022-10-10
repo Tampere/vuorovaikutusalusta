@@ -336,7 +336,7 @@ router.get(
     const surveyId = Number(req.params.surveyId);
     const submissionId = Number(req.params.submissionId);
     const permissionsOk = await userCanEditSurvey(req.user, surveyId);
-    const language = req.params.language as LanguageCode;
+    const language = req.params.lang as LanguageCode;
     if (!permissionsOk) {
       throw new ForbiddenError('User not author nor admin of the survey');
     }

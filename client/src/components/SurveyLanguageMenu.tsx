@@ -49,7 +49,7 @@ export default function SurveyLanguageMenu({
         >
           <Typography>
             {tr.SurveyLanguageMenu.surveyLanguage} (
-            {surveyLanguage.toLocaleUpperCase()})
+            {surveyLanguage?.toLocaleUpperCase()})
           </Typography>
           <ArrowDropDownIcon />
         </div>

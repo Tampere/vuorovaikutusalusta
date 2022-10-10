@@ -194,8 +194,8 @@ export async function createSurveySubmission(
     INSERT INTO data.submission (survey_id, created_at, unfinished_token, language) VALUES (
         $1,
         COALESCE($2, NOW()),
-        COALESCE($3, gen_random_uuid(),
-        $4)
+        COALESCE($3, gen_random_uuid()),
+        $4
     ) RETURNING id, unfinished_token, updated_at;`,
     [surveyID, oldRow?.created_at ?? null, unfinishedToken ?? null, language]
   );
