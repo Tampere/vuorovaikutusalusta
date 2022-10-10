@@ -130,7 +130,7 @@ async function getFrontPage(
     },
     {
       headlineLevel: 1,
-      text: survey.title[language]?.toLocaleUpperCase(),
+      text: survey.title?.[language]?.toLocaleUpperCase(),
       fontSize: 15,
       bold: true,
       margin: [0, 0, 0, 10],
@@ -197,7 +197,7 @@ function getContent(
   const heading: Content = {
     text: `${isSubQuestion ? tr.subquestion : tr.question} #${
       sectionIndex + 1
-    }: ${section.title}`,
+    }: ${section.title?.[language]}`,
     style: isSubQuestion ? 'subQuestionTitle' : 'questionTitle',
   };
 
@@ -255,12 +255,14 @@ function getContent(
         heading,
         {
           ul: question.subjects.map((subject, index) => ({
-            text: `${subject.fi}: ${
+            text: `${subject?.[language]}: ${
               answerEntry.value[index] === '-1'
                 ? tr.dontKnow
                 : answerEntry.value[index] == null
                 ? '-'
-                : question.classes[Number(answerEntry.value[index])]?.fi ?? '-'
+                : question.classes[Number(answerEntry.value[index])]?.[
+                    language
+                  ] ?? '-'
             }`,
             style,
           })),

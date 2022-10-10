@@ -198,7 +198,7 @@ export default function EditSurveySectionTranslations({
         </div>
       )}
       {section.type === 'map' &&
-        section.subQuestions.map((subquestion, questionIndex) => (
+        section.subQuestions?.map((subquestion, questionIndex) => (
           <EditSurveySectionTranslations
             key={`subquestion-index-${questionIndex}`}
             languageCode={languageCode}
@@ -210,6 +210,19 @@ export default function EditSurveySectionTranslations({
             section={subquestion}
           />
         ))}
+      {section.type === 'text' && (
+        <RichTextEditor
+          value={section.body?.[languageCode]}
+          missingValue={Boolean(section.body?.[languageCode])}
+          onChange={(value) => {
+            onEdit({
+              ...section,
+              body: { ...section.body, [languageCode]: value },
+            });
+          }}
+          editorHeight={'100px'}
+        ></RichTextEditor>
+      )}
       {/* Section info */}
       {section.info && (
         <div
