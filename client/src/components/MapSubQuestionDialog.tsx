@@ -184,6 +184,7 @@ export default function MapSubQuestionDialog({
                   dirty[index] = value;
                   setDirty([...dirty]);
                 }}
+                maxLength={question.maxLength ?? 500}
               />
             ) : question.type === 'numeric' ? (
               <NumericQuestion
