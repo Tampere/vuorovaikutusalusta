@@ -3,11 +3,11 @@ import {
   Autocomplete,
   Checkbox,
   FormControlLabel,
+  FormHelperText,
   FormLabel,
   Link,
   Skeleton,
   TextField,
-  FormHelperText,
   Typography,
 } from '@material-ui/core';
 import DateTimePicker from '@material-ui/lab/DateTimePicker';
@@ -117,6 +117,7 @@ export default function EditSurveyInfo() {
           error={validationErrors.includes('survey.name')}
           label={tr.EditSurveyInfo.name}
           value={activeSurvey.name ?? ''}
+          inputProps={{ maxLength: 100 }}
           onChange={(event) => {
             editSurvey({
               ...activeSurvey,
