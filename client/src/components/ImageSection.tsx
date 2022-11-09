@@ -12,7 +12,7 @@ interface Props {
 
 export default function ImageSection({ section }: Props) {
   const { survey } = useSurveyAnswers();
-  const { tr, surveyLanguage } = useTranslations();
+  const { tr, surveyLanguage, language } = useTranslations();
 
   const fullFilePath = useMemo(
     () => getFullFilePath(section.filePath, section.fileName),
@@ -44,7 +44,7 @@ export default function ImageSection({ section }: Props) {
       <img
         style={{ maxWidth: '100%' }}
         src={`/api/file/${fullFilePath}`}
-        alt={section.altText}
+        alt={section.altText[language]}
       />
       <div style={{ display: 'flex', flexDirection: 'row' }}>
         <Link href={`/api/file/${fullFilePath}`} target={'__blank'}>

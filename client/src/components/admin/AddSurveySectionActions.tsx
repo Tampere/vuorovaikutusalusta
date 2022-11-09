@@ -143,7 +143,7 @@ export default function AddSurveySectionActions(props: Props) {
       title: initializeLocalizedObject(''),
       fileName: null,
       filePath: [],
-      altText: '',
+      altText: initializeLocalizedObject(''),
     },
     document: {
       type: 'document',

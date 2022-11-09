@@ -110,11 +110,11 @@ export default function RichTextEditor(props: Props) {
     markdownToEditorState(props.value)
   );
 
-  const { language } = useTranslations();
+  const { language, surveyLanguage } = useTranslations();
 
   useEffect(
     () => setEditorState(markdownToEditorState(props.value)),
-    [language]
+    [language, surveyLanguage]
   );
 
   const classes = useStyles(props);
