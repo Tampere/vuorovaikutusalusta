@@ -223,6 +223,20 @@ export default function EditSurveySectionTranslations({
           editorHeight={'100px'}
         ></RichTextEditor>
       )}
+      {section.type === 'image' && (
+        <TranslationField
+          value={section.altText[languageCode] ?? ''}
+          onChange={(event) => {
+            onEdit({
+              ...section,
+              altText: {
+                ...section.altText,
+                [languageCode]: event.target.value,
+              },
+            });
+          }}
+        />
+      )}
       {/* Section info */}
       {section.info && (
         <div

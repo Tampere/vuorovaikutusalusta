@@ -117,7 +117,7 @@ export interface SurveyImageSection
   extends CommonSurveyPageSection,
     SectionFile {
   type: 'image';
-  altText: string;
+  altText: LocalizedText;
 }
 
 /**
