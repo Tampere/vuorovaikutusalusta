@@ -563,9 +563,10 @@ async function deleteRemovedSections(
     (newSections ?? []).every((newSection) => newSection.id !== id)
   );
   if (removedSectionIds.length) {
-    await getDb().none(`DELETE FROM data.page_section WHERE id = ANY ($1)`, [
-      removedSectionIds,
-    ]);
+    await getDb().none(
+      `DELETE FROM data.page_section WHERE id = ANY ($1) OR parent_section = ANY ($1)`,
+      [removedSectionIds]
+    );
   }
 }
 
