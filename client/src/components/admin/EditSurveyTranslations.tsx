@@ -252,10 +252,29 @@ export default function EditSurveyTranslations() {
                                   title: {
                                     ...page.title,
                                     [lang]: event.target.value,
-                                  } as any,
+                                  },
                                 })
                               }
                             />
+                            {page.sidebar.type == 'image' && (
+                              <TranslationField
+                                variant="standard"
+                                color="primary"
+                                value={page.sidebar?.imageAltText?.[lang] ?? ''}
+                                onChange={(event) =>
+                                  editPage({
+                                    ...page,
+                                    sidebar: {
+                                      ...page.sidebar,
+                                      imageAltText: {
+                                        ...page.sidebar.imageAltText,
+                                        [lang]: event.target.value,
+                                      },
+                                    },
+                                  })
+                                }
+                              />
+                            )}
                             {page.sections.map((section, sectionIndex) => (
                               <EditSurveySectionTranslations
                                 key={`survey-section-${sectionIndex}`}

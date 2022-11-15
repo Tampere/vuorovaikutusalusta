@@ -131,7 +131,7 @@ export default function SurveyStepper({
     stopModifying,
   } = useSurveyMap();
   const classes = useStyles();
-  const { tr, language } = useTranslations();
+  const { tr, language, surveyLanguage } = useTranslations();
   const theme = useTheme();
   const mdUp = useMediaQuery(theme.breakpoints.up('md'));
   const currentPage = useMemo(
@@ -404,7 +404,7 @@ export default function SurveyStepper({
             <div style={{ margin: 'auto' }}>
               {currentPage.sidebar.imageName && (
                 <img
-                  alt={currentPage.sidebar.imageAltText}
+                  alt={currentPage.sidebar?.imageAltText?.[surveyLanguage]}
                   src={`/api/file/${fullSidebarImagePath}`}
                   style={{ width: '100%', maxHeight: '100vh' }}
                 />
@@ -416,7 +416,7 @@ export default function SurveyStepper({
       default:
         return <div />;
     }
-  }, [survey, currentPage.sidebar]);
+  }, [survey, currentPage.sidebar, surveyLanguage]);
 
   return (
     <div className={getClassList([classes.root, loading && classes.loading])}>

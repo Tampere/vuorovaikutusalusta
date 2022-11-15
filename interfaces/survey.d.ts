@@ -256,7 +256,7 @@ export interface SurveyPageSidebar {
   /**
    * Alternative text for the sidebar image
    */
-  imageAltText: string;
+  imageAltText: LocalizedText;
 }
 
 /**
