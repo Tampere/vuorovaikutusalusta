@@ -77,7 +77,7 @@ interface DBSurveyPage {
   sidebar_map_layers: string;
   sidebar_image_path: string[];
   sidebar_image_name: string;
-  sidebar_image_alt_text: string;
+  sidebar_image_alt_text: LocalizedText;
 }
 
 /**
@@ -129,7 +129,7 @@ type DBSurveyJoin = DBSurvey & {
   page_sidebar_map_layers: number[];
   page_sidebar_image_path: string[];
   page_sidebar_image_name: string;
-  page_sidebar_image_alt_text: string;
+  page_sidebar_image_alt_text: LocalizedText;
   section_id: number;
   section_title: LocalizedText;
   section_title_color: string;
@@ -170,7 +170,10 @@ const surveyPageColumnSet = getColumnSet<DBSurveyPage>('survey_page', [
     cast: 'text[]',
   },
   'sidebar_image_name',
-  'sidebar_image_alt_text',
+  {
+    name: 'sidebar_image_alt_text',
+    cast: 'json',
+  },
 ]);
 
 /**

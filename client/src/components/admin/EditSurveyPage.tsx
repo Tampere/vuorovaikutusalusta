@@ -211,13 +211,16 @@ export default function EditSurveyPage() {
           <TextField
             style={{ width: '100%' }}
             label={tr.EditSurveyPage.imageAltText}
-            value={page.sidebar.imageAltText ?? ''}
+            value={page.sidebar?.imageAltText?.[surveyLanguage] ?? ''}
             onChange={(event) => {
               editPage({
                 ...page,
                 sidebar: {
                   ...page.sidebar,
-                  imageAltText: event.target.value,
+                  imageAltText: {
+                    ...page.sidebar.imageAltText,
+                    [surveyLanguage]: event.target.value,
+                  },
                 },
               });
             }}
