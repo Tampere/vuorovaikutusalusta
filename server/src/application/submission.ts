@@ -624,6 +624,8 @@ export async function getSurveyAnswerLanguage(token: string) {
   `,
     [token]
   );
+
+  return row?.language;
 }
 
 /**
