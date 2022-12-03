@@ -1,7 +1,7 @@
 import React, { ReactNode, useContext, useMemo, useReducer } from 'react';
-import fi from './fi.json';
-import en from './en.json';
 import { useHistory } from 'react-router-dom';
+import en from './en.json';
+import fi from './fi.json';
 
 // Object containing all translations
 const translations = {
@@ -65,8 +65,11 @@ export function useTranslations() {
   const [state, dispatch] = context;
 
   const setLanguage = (language: Language) => {
-    history.push(`?lang=${language}`);
-    dispatch({ type: 'SET_LANGUAGE', language });
+    history.push(`?lang=${language ?? stateDefaults.surveyLanguage}`);
+    dispatch({
+      type: 'SET_LANGUAGE',
+      language: language ?? stateDefaults.surveyLanguage,
+    });
   };
 
   const setSurveyLanguage = (language: Language) => {
