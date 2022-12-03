@@ -213,7 +213,7 @@ export default function EditSurveySectionTranslations({
       {section.type === 'text' && (
         <RichTextEditor
           value={section.body?.[languageCode]}
-          missingValue={Boolean(section.body?.[languageCode])}
+          missingValue={Boolean(!section.body?.[languageCode])}
           onChange={(value) => {
             onEdit({
               ...section,
