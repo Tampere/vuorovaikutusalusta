@@ -23,7 +23,7 @@ interface Props {
 }
 
 export default function KeyValueForm({ label, value, onChange }: Props) {
-  const { tr } = useTranslations();
+  const { tr, surveyLanguage, initializeLocalizedObject } = useTranslations();
 
   return (
     <div>
@@ -43,9 +43,12 @@ export default function KeyValueForm({ label, value, onChange }: Props) {
                 <TableCell>
                   <TextField
                     variant="standard"
-                    value={row.name}
+                    value={row.name?.[surveyLanguage]}
                     onChange={(event) => {
-                      value[index].name = event.target.value;
+                      value[index].name = {
+                        ...value[index].name,
+                        [surveyLanguage]: event.target.value,
+                      };
                       onChange(value);
                     }}
                   />
@@ -53,9 +56,12 @@ export default function KeyValueForm({ label, value, onChange }: Props) {
                 <TableCell>
                   <TextField
                     variant="standard"
-                    value={row.value}
+                    value={row.value?.[surveyLanguage]}
                     onChange={(event) => {
-                      value[index].value = event.target.value;
+                      value[index].value = {
+                        ...value[index].value,
+                        [surveyLanguage]: event.target.value,
+                      };
                       onChange(value);
                     }}
                   />
@@ -84,7 +90,13 @@ export default function KeyValueForm({ label, value, onChange }: Props) {
           size="small"
           style={{ margin: '1rem 0' }}
           onClick={() => {
-            onChange([...value, { name: '', value: '' }]);
+            onChange([
+              ...value,
+              {
+                name: initializeLocalizedObject(''),
+                value: initializeLocalizedObject(''),
+              },
+            ]);
           }}
         >
           <Add />

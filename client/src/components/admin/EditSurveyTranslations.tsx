@@ -1,4 +1,4 @@
-import { Survey } from '@interfaces/survey';
+import { Survey, SurveyEmailInfoItem } from '@interfaces/survey';
 import {
   Checkbox,
   FormControlLabel,
@@ -39,6 +39,12 @@ const useStyles = makeStyles({
   },
   titleText: {
     color: 'grey',
+  },
+  keyValueContainer: {
+    padding: '1rem',
+    marginTop: '0.5rem',
+    border: '1px solid lightgrey',
+    borderRadius: '0.5rem',
   },
 });
 
@@ -221,6 +227,61 @@ export default function EditSurveyTranslations() {
                           }
                           editorHeight={'100px'}
                         />
+                        {activeSurvey.email.info.map(
+                          (infoRow: SurveyEmailInfoItem, index) => (
+                            <div
+                              key={`email-info-${index}`}
+                              className={classes.keyValueContainer}
+                            >
+                              <TranslationField
+                                variant="standard"
+                                color="primary"
+                                value={infoRow.name?.[lang] ?? ''}
+                                onChange={(event) => {
+                                  const updatedInfoRow = {
+                                    ...infoRow,
+                                    name: {
+                                      ...infoRow.name,
+                                      [lang]: event.target.value,
+                                    },
+                                  };
+                                  const infoRows = [...activeSurvey.email.info];
+                                  infoRows[index] = updatedInfoRow;
+                                  editSurvey({
+                                    ...activeSurvey,
+                                    email: {
+                                      ...activeSurvey.email,
+                                      info: infoRows,
+                                    },
+                                  });
+                                }}
+                              />
+                              <TranslationField
+                                variant="standard"
+                                color="primary"
+                                value={infoRow.value?.[lang] ?? ''}
+                                onChange={(event) => {
+                                  const updatedInfoRow = {
+                                    ...infoRow,
+                                    value: {
+                                      ...infoRow.value,
+                                      [lang]: event.target.value,
+                                    },
+                                  };
+                                  const infoRows = [...activeSurvey.email.info];
+                                  infoRows[index] = updatedInfoRow;
+                                  editSurvey({
+                                    ...activeSurvey,
+                                    email: {
+                                      ...activeSurvey.email,
+                                      info: infoRows,
+                                    },
+                                  });
+                                }}
+                              />
+                            </div>
+                          )
+                        )}
                       </>
                     )}
                     <br />

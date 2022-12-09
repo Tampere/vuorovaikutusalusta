@@ -124,6 +124,10 @@
     "documentSection": "Add document section",
     "attachmentSection": "Add attachment section"
   },
+  "SliderQuestion": {
+    "defaultMinLabel": "Strongly disagree",
+    "defaultMaxLabel": "Strongly agree"
+  },
   "SurveySection": {
     "radioQuestion": "Radio button question (single choice)",
     "checkBoxQuestion": "Radio button question (single choice)",
