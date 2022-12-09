@@ -124,6 +124,10 @@
     "documentSection": "Lisää liiteosio",
     "attachmentSection": "Lisää vastausliite"
   },
+  "SliderQuestion": {
+    "defaultMinLabel": "Täysin eri mieltä",
+    "defaultMaxLabel": "Täysin samaa mieltä"
+  },
   "SurveySection": {
     "radioQuestion": "Valintakysymys",
     "checkBoxQuestion": "Monivalintakysymys",

@@ -635,6 +635,6 @@ export interface MapStrokeColor {
  * A single item in survey email info
  */
 export interface SurveyEmailInfoItem {
-  name: string;
-  value: string;
+  name: LocalizedText;
+  value: LocalizedText;
 }

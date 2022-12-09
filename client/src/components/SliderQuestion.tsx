@@ -29,12 +29,17 @@ export default function SliderQuestion({
   const { surveyLanguage } = useTranslations();
   const classes = useStyles();
   const sliderRef = useRef<HTMLElement>();
+  const { tr } = useTranslations();
 
   const labels = useMemo(() => {
     return question.presentationType === 'literal'
       ? {
-          min: question.minLabel?.[surveyLanguage],
-          max: question.maxLabel?.[surveyLanguage],
+          min:
+            question.minLabel?.[surveyLanguage] ??
+            tr.SliderQuestion.defaultMinLabel,
+          max:
+            question.maxLabel?.[surveyLanguage] ??
+            tr.SliderQuestion.defaultMaxLabel,
         }
       : {
           min: question.minValue,

@@ -145,7 +145,7 @@ async function getFrontPage(
     // Add the remaining "info fields" from one array as they have identical styling
     [
       ...(survey.email?.info ?? []).map(
-        (item) => `${item.name}: ${item.value}`
+        (item) => `${item.name?.[language]}: ${item.value?.[language]}`
       ),
       `${tr.submissionId}: ${submissionId}`,
       `${tr.responseTime}: ${moment(timestamp).format('DD.MM.YYYY HH:mm')}`,

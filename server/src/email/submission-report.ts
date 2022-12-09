@@ -72,6 +72,7 @@ export async function sendSubmissionReport({
     { filename: `${survey.name}-${submissionId}.pdf`, content: pdfFile },
     ...(includeAttachments ? getAttachments(answerEntries) : []),
   ];
+
   try {
     await sendMail({
       message: {

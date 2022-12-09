@@ -68,10 +68,14 @@ export default function QuestionOptions({
     lastElement?.focus();
   }, [inputRefs.length]);
 
-  function handleClipboardInput(optionValue: string, optionIndex: number) {
+  function handleClipboardInput(
+    optionValue: string,
+    optionIndex: number,
+    optionToChange: SectionOption
+  ) {
     const clipboardRows = optionValue.split(/(?!\B"[^"]*)\n(?![^"]*"\B)/);
     const optionFields = clipboardRows
-      .map((row): { text: LocalizedText; info?: LocalizedText } => {
+      .map((row, index): { text: LocalizedText; info?: LocalizedText } => {
         const optionFields = row.split('\t');
         let optionInfo = optionFields?.[1] ?? '';
         if (optionInfo.charAt(0) === '"') {
@@ -87,7 +91,9 @@ export default function QuestionOptions({
           return null;
         return {
           text: {
-            ...initializeLocalizedObject(null),
+            ...(index === 0
+              ? optionToChange.text
+              : initializeLocalizedObject(null)),
             [surveyLanguage]: optionFields[0],
           },
           ...(allowOptionInfo
@@ -147,7 +153,7 @@ export default function QuestionOptions({
                   // 2) the copied fields' format is correct
                   // 3) clipboard is pasted on the last option field
                   if (enableClipboardImport && index + 1 === options.length) {
-                    handleClipboardInput(event.target.value, index);
+                    handleClipboardInput(event.target.value, index, option);
                   } else {
                     onChange(
                       options.map((option, i) =>
