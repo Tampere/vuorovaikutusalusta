@@ -48,7 +48,7 @@ export default function MapQuestion({ value, onChange, question }: Props) {
     stopEditingMapAnswer,
     onModify,
   } = useSurveyMap();
-  const { tr } = useTranslations();
+  const { tr, surveyLanguage } = useTranslations();
 
   const valueRef = useRef<MapQuestionAnswer[]>();
   valueRef.current = value;
@@ -236,7 +236,7 @@ export default function MapQuestion({ value, onChange, question }: Props) {
       {/* Editing dialog */}
       <MapSubQuestionDialog
         open={editingMapAnswer?.questionId === question.id}
-        title={question.title}
+        title={question.title?.[surveyLanguage]}
         answer={value[editingMapAnswer?.index]}
         subQuestions={question.subQuestions}
         onSubmit={(answers) => {

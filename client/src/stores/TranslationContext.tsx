@@ -1,10 +1,12 @@
 import React, { ReactNode, useContext, useMemo, useReducer } from 'react';
+import { useHistory } from 'react-router-dom';
+import en from './en.json';
 import fi from './fi.json';
 
 // Object containing all translations
-// TODO: add other language translations here
 const translations = {
   fi,
+  en,
 };
 
 /**
@@ -17,13 +19,15 @@ type Language = keyof typeof translations;
  */
 type State = {
   language: Language;
+  surveyLanguage: Language;
+  languages: Language[];
 };
 
 /**
  * Reducer action type
  */
 type Action = {
-  type: 'SET_LANGUAGE';
+  type: 'SET_LANGUAGE' | 'SET_SURVEY_LANGUAGE';
   language: Language;
 };
 
@@ -42,6 +46,8 @@ interface Props {
 /** Translation context initial values */
 const stateDefaults: State = {
   language: 'fi',
+  surveyLanguage: 'fi',
+  languages: ['fi', 'en'],
 };
 
 export const TranslationContext = React.createContext<Context>(null);
@@ -49,6 +55,8 @@ export const TranslationContext = React.createContext<Context>(null);
 /** Custom hook for accessing the workspace context */
 export function useTranslations() {
   const context = useContext(TranslationContext);
+  const history = useHistory();
+
   if (!context) {
     throw new Error(
       'useTranslations must be used within the TranslationProvider'
@@ -56,13 +64,33 @@ export function useTranslations() {
   }
   const [state, dispatch] = context;
 
-  const setLanguage = (language: Language) =>
-    dispatch({ type: 'SET_LANGUAGE', language });
+  const setLanguage = (language: Language) => {
+    history.push(`?lang=${language ?? stateDefaults.surveyLanguage}`);
+    dispatch({
+      type: 'SET_LANGUAGE',
+      language: language ?? stateDefaults.surveyLanguage,
+    });
+  };
+
+  const setSurveyLanguage = (language: Language) => {
+    dispatch({ type: 'SET_SURVEY_LANGUAGE', language });
+  };
 
   return {
     setLanguage,
+    setSurveyLanguage,
     language: state.language,
+    surveyLanguage: state.surveyLanguage,
     tr: translations[state.language],
+    initializeLocalizedObject: (initialValue: string | null): any => {
+      return state.languages.reduce((prevValue, currentValue) => {
+        return {
+          ...prevValue,
+          [currentValue]: initialValue,
+        };
+      }, {});
+    },
+    languages: state.languages,
   };
 }
 
@@ -73,6 +101,11 @@ function reducer(state: State, action: Action): State {
       return {
         ...state,
         language: action.language,
+      };
+    case 'SET_SURVEY_LANGUAGE':
+      return {
+        ...state,
+        surveyLanguage: action.language,
       };
     default:
       throw new Error('Invalid action type');

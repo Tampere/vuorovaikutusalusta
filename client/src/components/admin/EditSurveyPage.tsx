@@ -47,7 +47,7 @@ export default function EditSurveyPage() {
     availableMapLayersLoading,
   } = useSurvey();
   const history = useHistory();
-  const { tr } = useTranslations();
+  const { tr, surveyLanguage } = useTranslations();
   const { showToast } = useToasts();
 
   const page = useMemo(() => {
@@ -76,11 +76,11 @@ export default function EditSurveyPage() {
       <TextField
         label={tr.EditSurveyPage.name}
         required
-        value={page.title}
+        value={page?.title?.[surveyLanguage] ?? ''}
         onChange={(event) => {
           editPage({
             ...page,
-            title: event.target.value,
+            title: { ...page.title, [surveyLanguage]: event.target.value },
           });
         }}
       />
@@ -211,13 +211,16 @@ export default function EditSurveyPage() {
           <TextField
             style={{ width: '100%' }}
             label={tr.EditSurveyPage.imageAltText}
-            value={page.sidebar.imageAltText ?? ''}
+            value={page.sidebar?.imageAltText?.[surveyLanguage] ?? ''}
             onChange={(event) => {
               editPage({
                 ...page,
                 sidebar: {
                   ...page.sidebar,
-                  imageAltText: event.target.value,
+                  imageAltText: {
+                    ...page.sidebar.imageAltText,
+                    [surveyLanguage]: event.target.value,
+                  },
                 },
               });
             }}

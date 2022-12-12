@@ -27,7 +27,7 @@ export default function SurveyQuestion({ question }: Props) {
   const { answers, updateAnswer, getValidationErrors, survey } =
     useSurveyAnswers();
   const [dirty, setDirty] = useState(false);
-  const { tr } = useTranslations();
+  const { tr, surveyLanguage } = useTranslations();
 
   const value = useMemo(
     () => answers.find((answer) => answer.sectionId === question.id)?.value,
@@ -52,10 +52,13 @@ export default function SurveyQuestion({ question }: Props) {
           htmlFor={`${question.id}-input`}
           style={{ color: survey.sectionTitleColor ?? '#000000' }}
         >
-          {question.title} {question.isRequired && '*'}
+          {question.title?.[surveyLanguage]} {question.isRequired && '*'}
         </FormLabel>
         {question.info && (
-          <SectionInfo infoText={question.info} subject={question.title} />
+          <SectionInfo
+            infoText={question.info?.[surveyLanguage]}
+            subject={question.title?.[surveyLanguage]}
+          />
         )}
       </div>
 

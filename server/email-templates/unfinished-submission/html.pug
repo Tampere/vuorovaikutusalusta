@@ -1,10 +1,10 @@
 link(rel="stylesheet" href="/unfinished-submission/style.css")
 
-p Vastauksesi kyselyyn "#{surveyTitle}" on tallennettu keskeneräisenä. Vastauksesi otetaan huomioon vasta, kun olet vastannut kyselyn loppuun ja lähettänyt lopullisen vastauksesi.
+p #{unfinishedSurveyInfo}
 
-p Voit jatkaa vastaamista kyselyn ollessa auki avaamalla seuraavan linkin:
+p #{continuewithLink}
 
 p
   a(href=`${url}`) #{url}
 
-p.footer Tämä on automaattisesti luotu viesti. Älä vastaa tähän viestiin.
+p.footer #{noReply}

@@ -1,4 +1,4 @@
-import { SectionOption } from '@interfaces/survey';
+import { LocalizedText, SectionOption } from '@interfaces/survey';
 import {
   Fab,
   IconButton,
@@ -51,7 +51,7 @@ export default function QuestionOptions({
   allowOptionInfo = false,
 }: Props) {
   const classes = useStyles();
-  const { tr } = useTranslations();
+  const { tr, surveyLanguage, initializeLocalizedObject } = useTranslations();
 
   // Array of references to the option input elements
   const inputRefs = useMemo(
@@ -68,10 +68,14 @@ export default function QuestionOptions({
     lastElement?.focus();
   }, [inputRefs.length]);
 
-  function handleClipboardInput(optionValue: string, optionIndex: number) {
+  function handleClipboardInput(
+    optionValue: string,
+    optionIndex: number,
+    optionToChange: SectionOption
+  ) {
     const clipboardRows = optionValue.split(/(?!\B"[^"]*)\n(?![^"]*"\B)/);
     const optionFields = clipboardRows
-      .map((row): { text: string; info?: string } => {
+      .map((row, index): { text: LocalizedText; info?: LocalizedText } => {
         const optionFields = row.split('\t');
         let optionInfo = optionFields?.[1] ?? '';
         if (optionInfo.charAt(0) === '"') {
@@ -86,8 +90,20 @@ export default function QuestionOptions({
         )
           return null;
         return {
-          text: optionFields[0],
-          ...(allowOptionInfo ? { info: optionInfo } : {}),
+          text: {
+            ...(index === 0
+              ? optionToChange.text
+              : initializeLocalizedObject(null)),
+            [surveyLanguage]: optionFields[0],
+          },
+          ...(allowOptionInfo
+            ? {
+                info: {
+                  ...initializeLocalizedObject(null),
+                  [surveyLanguage]: optionInfo,
+                },
+              }
+            : {}),
         };
       })
       .filter((option) => option);
@@ -111,7 +127,7 @@ export default function QuestionOptions({
           aria-label="add-question-option"
           size="small"
           onClick={() => {
-            onChange([...options, { text: '' }]);
+            onChange([...options, { text: initializeLocalizedObject('') }]);
           }}
         >
           <Add />
@@ -130,19 +146,25 @@ export default function QuestionOptions({
                 variant="standard"
                 disabled={disabled}
                 size="small"
-                value={option.text}
+                value={option.text?.[surveyLanguage] ?? ''}
                 onChange={(event) => {
                   // Only allow copying from clipboard if
                   // 1) feature is enabled
                   // 2) the copied fields' format is correct
                   // 3) clipboard is pasted on the last option field
                   if (enableClipboardImport && index + 1 === options.length) {
-                    handleClipboardInput(event.target.value, index);
+                    handleClipboardInput(event.target.value, index, option);
                   } else {
                     onChange(
                       options.map((option, i) =>
                         index === i
-                          ? { ...option, text: event.target.value }
+                          ? {
+                              ...option,
+                              text: {
+                                ...option.text,
+                                [surveyLanguage]: event.target.value,
+                              },
+                            }
                           : option
                       )
                     );
@@ -153,7 +175,10 @@ export default function QuestionOptions({
                     event.preventDefault();
                     if (index === options.length - 1) {
                       // Last item on list - add new option
-                      onChange([...options, { text: '' }]);
+                      onChange([
+                        ...options,
+                        { text: initializeLocalizedObject('') },
+                      ]);
                     } else {
                       // Focus on the next item
                       inputRefs[index + 1].current.focus();
@@ -164,11 +189,19 @@ export default function QuestionOptions({
             </div>
             {allowOptionInfo && (
               <OptionInfoDialog
-                infoText={option.info}
+                infoText={option?.info?.[surveyLanguage]}
                 onChangeOptionInfo={(newInfoText) => {
                   onChange(
                     options.map((option, i) =>
-                      index === i ? { ...option, info: newInfoText } : option
+                      index === i
+                        ? {
+                            ...option,
+                            info: {
+                              ...option.info,
+                              [surveyLanguage]: newInfoText,
+                            },
+                          }
+                        : option
                     )
                   );
                 }}

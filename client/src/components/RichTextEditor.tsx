@@ -3,7 +3,7 @@ import { makeStyles } from '@material-ui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { convertFromRaw, convertToRaw, EditorState } from 'draft-js';
 import { draftToMarkdown, markdownToDraft } from 'markdown-draft-js';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Editor } from 'react-draft-wysiwyg';
 
 const useStyles = makeStyles({
@@ -24,8 +24,14 @@ const useStyles = makeStyles({
     opacity: 0.4,
     background: '#ddd',
   },
-  wrapper: {},
+  wrapper: {
+    border: '1px solid transparent',
+  },
+  missingValue: {
+    border: '1px solid red',
+  },
   editor: {
+    height: (props: { editorHeight?: string }) => props.editorHeight,
     background: '#fff',
     padding: '0 1rem',
     border: '1px solid #ccc',
@@ -73,6 +79,8 @@ interface Props {
   disabled?: boolean;
   label?: string;
   onChange: (value: string) => void;
+  editorHeight?: string;
+  missingValue?: boolean;
 }
 
 /**
@@ -102,7 +110,14 @@ export default function RichTextEditor(props: Props) {
     markdownToEditorState(props.value)
   );
 
-  const classes = useStyles();
+  const { language, surveyLanguage } = useTranslations();
+
+  useEffect(
+    () => setEditorState(markdownToEditorState(props.value)),
+    [language, surveyLanguage]
+  );
+
+  const classes = useStyles(props);
   const { tr } = useTranslations();
 
   function handleEditorStateChange(editorState: EditorState) {
@@ -130,9 +145,9 @@ export default function RichTextEditor(props: Props) {
             defaultTargetOption: '_blank',
           },
         }}
-        wrapperClassName={`${classes.wrapper}${
+        wrapperClassName={`${props.missingValue ? classes.missingValue : ''} ${
           props.disabled ? ` ${classes.disabled}` : ''
-        }`}
+        } ${classes.wrapper}`}
         editorClassName={classes.editor}
         toolbarClassName={classes.toolbar}
         localization={{ translations: tr.RichTextEditor }}

@@ -12,7 +12,7 @@ interface Props {
 
 export default function EditImageSection({ section, onChange }: Props) {
   const { activeSurvey } = useSurvey();
-  const { tr } = useTranslations();
+  const { tr, surveyLanguage } = useTranslations();
 
   return (
     <>
@@ -45,10 +45,16 @@ export default function EditImageSection({ section, onChange }: Props) {
         }}
       />
       <TextField
-        value={section.altText}
+        value={section.altText[surveyLanguage]}
         label={tr.EditImageSection.altText}
         onChange={(event) =>
-          onChange({ ...section, altText: event.target.value })
+          onChange({
+            ...section,
+            altText: {
+              ...section.altText,
+              [surveyLanguage]: event.target.value,
+            },
+          })
         }
       ></TextField>
     </>

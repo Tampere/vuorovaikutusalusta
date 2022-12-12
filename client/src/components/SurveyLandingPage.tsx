@@ -131,7 +131,7 @@ export default function SurveyLandingPage({
   surveyBackgroundImage,
 }: Props) {
   const classes = useStyles({ imageName: survey?.backgroundImageName ?? '' });
-  const { tr } = useTranslations();
+  const { tr, surveyLanguage } = useTranslations();
 
   return (
     <Box className={classes.root}>
@@ -155,11 +155,11 @@ export default function SurveyLandingPage({
         }}
       >
         <h1 className={getClassList([classes.heading, classes.title])}>
-          <span>{survey.title}</span>
+          <span>{survey.title?.[surveyLanguage]}</span>
         </h1>
-        {survey.subtitle && (
+        {survey.subtitle?.[surveyLanguage] && (
           <h2 className={getClassList([classes.heading, classes.subtitle])}>
-            <span>{survey.subtitle}</span>
+            <span>{survey.subtitle?.[surveyLanguage]}</span>
           </h2>
         )}
         <Link

@@ -1,5 +1,6 @@
 import {
   AnswerEntry,
+  LanguageCode,
   SectionOption,
   Survey,
   SurveyMapQuestion,
@@ -7,6 +8,7 @@ import {
   SurveyPageSection,
 } from '@interfaces/survey';
 import logger from '@src/logger';
+import useTranslations from '@src/translations/useTranslations';
 import moment from 'moment';
 import PDFDocument from 'pdfkit';
 import PdfPrinter from 'pdfmake';
@@ -105,8 +107,10 @@ async function getFrontPage(
   survey: Survey,
   submissionId: number,
   timestamp: Date,
-  answerEntries: AnswerEntry[]
+  answerEntries: AnswerEntry[],
+  language: LanguageCode
 ): Promise<Content> {
+  const tr = useTranslations(language);
   const image = survey.backgroundImageName
     ? await getFile(survey.backgroundImageName, survey.backgroundImagePath)
     : null;
@@ -126,14 +130,14 @@ async function getFrontPage(
     },
     {
       headlineLevel: 1,
-      text: survey.title.toLocaleUpperCase(),
+      text: survey.title?.[language]?.toLocaleUpperCase(),
       fontSize: 15,
       bold: true,
       margin: [0, 0, 0, 10],
     },
     {
       headlineLevel: 2,
-      text: survey.subtitle,
+      text: survey.subtitle?.[language],
       fontSize: 12,
       bold: true,
       margin: [0, 0, 0, 10],
@@ -141,12 +145,12 @@ async function getFrontPage(
     // Add the remaining "info fields" from one array as they have identical styling
     [
       ...(survey.email?.info ?? []).map(
-        (item) => `${item.name}: ${item.value}`
+        (item) => `${item.name?.[language]}: ${item.value?.[language]}`
       ),
-      `Vastauksen tunniste: ${submissionId}`,
-      `Tallennusaika: ${moment(timestamp).format('DD.MM.YYYY HH:mm')}`,
+      `${tr.submissionId}: ${submissionId}`,
+      `${tr.responseTime}: ${moment(timestamp).format('DD.MM.YYYY HH:mm')}`,
       attachmentFileNames.length > 0 &&
-        `Liitteet: ${attachmentFileNames.join(', ')}`,
+        `${tr.attachments}: ${attachmentFileNames.join(', ')}`,
     ]
       .filter(Boolean)
       .map((text) => ({
@@ -161,13 +165,16 @@ async function getFrontPage(
 
 function getOptionSelectionText(
   value: string | number,
-  options: SectionOption[]
+  options: SectionOption[],
+  language: LanguageCode
 ) {
+  const tr = useTranslations(language);
+
   if (typeof value === 'string') {
-    return `Joku muu, mikä: ${value}`;
+    return `${tr.somethingElse}: ${value}`;
   }
   const option = options.find((option) => option.id === value);
-  return option?.text ?? '-';
+  return option?.text[language] ?? '-';
 }
 
 function getContent(
@@ -175,20 +182,22 @@ function getContent(
   sections: SurveyPageSection[],
   screenshots: ScreenshotJobReturnData[],
   options: SectionOption[],
-  isSubQuestion = false
+  isSubQuestion = false,
+  language: LanguageCode
 ): Content[] {
   if (!answerEntry) {
     return null;
   }
+  const tr = useTranslations(language);
   const sectionIndex = sections.findIndex(
     (section) => answerEntry.sectionId === section.id
   );
   const section = sections[sectionIndex];
 
   const heading: Content = {
-    text: `${isSubQuestion ? 'Alikysymys' : 'Kysymys'} #${sectionIndex + 1}: ${
-      section.title
-    }`,
+    text: `${isSubQuestion ? tr.subquestion : tr.question} #${
+      sectionIndex + 1
+    }: ${section.title?.[language]}`,
     style: isSubQuestion ? 'subQuestionTitle' : 'questionTitle',
   };
 
@@ -207,7 +216,7 @@ function getContent(
       return [
         heading,
         {
-          text: getOptionSelectionText(answerEntry.value, options),
+          text: getOptionSelectionText(answerEntry.value, options, language),
           style,
         },
       ];
@@ -216,7 +225,7 @@ function getContent(
       return [
         heading,
         ...answerEntry.value.map((value) => ({
-          text: getOptionSelectionText(value, options),
+          text: getOptionSelectionText(value, options, language),
           style,
         })),
       ];
@@ -225,7 +234,7 @@ function getContent(
       return [
         heading,
         ...answerEntry.value.map((value) => ({
-          text: getOptionSelectionText(value, options),
+          text: getOptionSelectionText(value, options, language),
           style,
         })),
       ];
@@ -246,12 +255,14 @@ function getContent(
         heading,
         {
           ul: question.subjects.map((subject, index) => ({
-            text: `${subject.fi}: ${
+            text: `${subject?.[language]}: ${
               answerEntry.value[index] === '-1'
-                ? 'En osaa sanoa'
+                ? tr.dontKnow
                 : answerEntry.value[index] == null
                 ? '-'
-                : question.classes[Number(answerEntry.value[index])]?.fi ?? '-'
+                : question.classes[Number(answerEntry.value[index])]?.[
+                    language
+                  ] ?? '-'
             }`,
             style,
           })),
@@ -263,7 +274,7 @@ function getContent(
         heading,
         {
           ol: answerEntry.value.map((value) => ({
-            text: `${getOptionSelectionText(value, options)}`,
+            text: `${getOptionSelectionText(value, options, language)}`,
             style,
           })),
         },
@@ -295,7 +306,8 @@ function getContent(
                 mapQuestion.subQuestions,
                 [],
                 options,
-                true
+                true,
+                language
               );
             }),
           ];
@@ -318,7 +330,8 @@ function getContent(
 export async function generatePdf(
   survey: Survey,
   submission: { id: number; timestamp: Date },
-  answerEntries: AnswerEntry[]
+  answerEntries: AnswerEntry[],
+  language: LanguageCode
 ) {
   const start = Date.now();
   const options = await getOptionsForSurvey(survey.id);
@@ -339,14 +352,17 @@ export async function generatePdf(
       survey,
       submission.id,
       submission.timestamp,
-      answerEntries
+      answerEntries,
+      language
     ),
     ...sections.map((section) =>
       getContent(
         answerEntries.find((entry) => entry.sectionId === section.id),
         sections,
         screenshots,
-        options
+        options,
+        false,
+        language
       )
     ),
   ];

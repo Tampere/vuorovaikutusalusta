@@ -1,5 +1,6 @@
 import {
   AnswerEntry,
+  LanguageCode,
   MapQuestionAnswer,
   SurveyMapSubQuestionAnswer,
   SurveyPageSection,
@@ -154,12 +155,14 @@ async function validateEntries(answerEntries: AnswerEntry[]) {
  * @param answerEntries Answer entries
  * @param unfinishedToken Token for previous unfinished submission
  * @param unfinished Save as unfinished?
+ * @param language Language used when answering the survey
  */
 export async function createSurveySubmission(
   surveyID: number,
   answerEntries: AnswerEntry[],
   unfinishedToken: string,
-  unfinished = false
+  unfinished = false,
+  language: LanguageCode
 ) {
   // Only validate the entries if saving the final submission (not unfinished)
   if (!unfinished) {
@@ -181,18 +184,20 @@ export async function createSurveySubmission(
   }>(
     !unfinished
       ? `
-    INSERT INTO data.submission (survey_id, created_at) VALUES (
+    INSERT INTO data.submission (survey_id, created_at, language) VALUES (
       $1,
-      COALESCE($2, NOW())
+      COALESCE($2, NOW()),
+      $4
     ) RETURNING id, updated_at;
   `
       : `
-    INSERT INTO data.submission (survey_id, created_at, unfinished_token) VALUES (
+    INSERT INTO data.submission (survey_id, created_at, unfinished_token, language) VALUES (
         $1,
         COALESCE($2, NOW()),
-        COALESCE($3, gen_random_uuid())
+        COALESCE($3, gen_random_uuid()),
+        $4
     ) RETURNING id, unfinished_token, updated_at;`,
-    [surveyID, oldRow?.created_at ?? null, unfinishedToken ?? null]
+    [surveyID, oldRow?.created_at ?? null, unfinishedToken ?? null, language]
   );
 
   if (!submissionRow) {
@@ -605,6 +610,22 @@ function dbAnswerEntriesToAnswerEntries(
       }
       return entries;
     }, [] as AnswerEntry[]);
+}
+
+/**
+ * Get the language used for submitting an unfinished survey
+ * @param token
+ * @returns LanguageCode
+ */
+export async function getSurveyAnswerLanguage(token: string) {
+  const row = await getDb().oneOrNone<{ language: LanguageCode }>(
+    `
+    SELECT language FROM data.submission WHERE submission.unfinished_token = $1;
+  `,
+    [token]
+  );
+
+  return row?.language;
 }
 
 /**

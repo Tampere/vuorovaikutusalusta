@@ -1,0 +1,16 @@
+{
+  "timestamp": "Aikaleima",
+  "noReply": "Tämä on automaattisesti luotu viesti. Älä vastaa tähän viestiin.",
+  "somethingElse": "Joku muu, mikä",
+  "question": "Kysymys",
+  "subquestion": "Alikysymys",
+  "dontKnow": "En osaa sanoa",
+  "unfinishedSubmission": "Keskeneräinen vastaus",
+  "unfinishedSurveyInfo": "Vastauksesi kyselyyn {surveyTitle} on tallennettu keskeneräisenä. Vastauksesi otetaan huomioon vasta, kun olet vastannut kyselyn loppuun ja lähettänyt lopullisen vastauksesi.",
+  "continueWithLink": "Voit jatkaa vastaamista kyselyn ollessa auki avaamalla seuraavan linkin:",
+  "submissionId": "Vastaustunniste",
+  "responseTime": "Tallennusaika",
+  "attachments": "Liitteet",
+  "fi": "suomi",
+  "en": "englanti"
+}

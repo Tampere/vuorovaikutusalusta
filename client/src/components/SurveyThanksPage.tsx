@@ -35,7 +35,7 @@ interface Props {
 
 export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
   const classes = useStyles();
-  const { tr } = useTranslations();
+  const { tr, surveyLanguage } = useTranslations();
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
@@ -55,9 +55,11 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
           {' '}
           <TreLogo width="351px" height="125px" />
         </div>
-        <Typography variant="h5">{survey.thanksPage.title}</Typography>
+        <Typography variant="h5">
+          {survey.thanksPage.title?.[surveyLanguage]}
+        </Typography>
         <ReactMarkdown rehypePlugins={[rehypeExternalLinks]}>
-          {survey.thanksPage.text}
+          {survey.thanksPage.text?.[surveyLanguage]}
         </ReactMarkdown>
         <div
           style={{

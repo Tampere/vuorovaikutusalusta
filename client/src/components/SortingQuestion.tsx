@@ -38,7 +38,7 @@ const useStyles = makeStyles({
 });
 
 export default function SortingQuestion(props: Props) {
-  const { tr } = useTranslations();
+  const { tr, surveyLanguage } = useTranslations();
   const [sortedOptionIds, setSortedOptionIds] = useState(
     props.value ?? new Array(props.question.options.length).fill(null)
   );
@@ -59,14 +59,14 @@ export default function SortingQuestion(props: Props) {
           <FormGroup row key={option.id} className={classes.fieldRow}>
             <FormControl>
               <FormControlLabel
-                label={option.text}
+                label={option.text?.[surveyLanguage] ?? ''}
                 labelPlacement="end"
                 classes={{ label: classes.label }}
                 control={
                   <Select
                     aria-label={tr.SortingQuestion.rankForOption.replace(
                       '{option}',
-                      option.text
+                      option.text?.[surveyLanguage]
                     )}
                     className={classes.select}
                     value={
@@ -128,7 +128,7 @@ export default function SortingQuestion(props: Props) {
                   ? '-'
                   : props.question.options.find(
                       (option) => option.id === optionId
-                    ).text}
+                    ).text?.[surveyLanguage]}
               </li>
             ))}
           </ol>

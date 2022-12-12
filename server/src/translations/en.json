@@ -1,0 +1,16 @@
+{
+  "timestamp": "Timestamp",
+  "noReply": "This is an automatically generated email. Please do not reply to this message.",
+  "somethingElse": "Something else, what",
+  "question": "Question",
+  "subquestion": "Subquestion",
+  "dontKnow": "I don't know",
+  "unfinishedSubmission": "Unfinished submission",
+  "unfinishedSurveyInfo": "Your submission to the survey {surveyTitle} has been saved as unfinished. Your answers will be taken into account only when you have finished answering the survey and submitted your answers.",
+  "continueWithLink": "You can continue answering the survey while it is open via the following link: <linkki>.",
+  "submissionId": "Submission identifier",
+  "responseTime": "Time of the response",
+  "attachments": "Attachments",
+  "fi": "finnish",
+  "en": "english"
+}

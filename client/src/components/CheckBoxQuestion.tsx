@@ -28,7 +28,7 @@ export default function CheckBoxQuestion({
   setDirty,
 }: Props) {
   const [customAnswerValue, setCustomAnswerValue] = useState('');
-  const { tr } = useTranslations();
+  const { tr, surveyLanguage } = useTranslations();
 
   const answerLimitText = useMemo(() => {
     if (!question.answerLimits) {
@@ -45,7 +45,7 @@ export default function CheckBoxQuestion({
     )
       .replace('{min}', `${question.answerLimits.min}`)
       .replace('{max}', `${question.answerLimits.max}`);
-  }, [question.answerLimits]);
+  }, [question.answerLimits, surveyLanguage]);
 
   // Update custom answer value if value from context is string
   useEffect(() => {
@@ -63,7 +63,7 @@ export default function CheckBoxQuestion({
         </FormHelperText>
       )}
       <FormGroup
-        aria-label={question.title}
+        aria-label={question.title?.[surveyLanguage]}
         aria-describedby={answerLimitText}
         onBlur={() => {
           setDirty(true);
@@ -72,7 +72,7 @@ export default function CheckBoxQuestion({
         {question.options.map((option) => (
           <FormControlLabel
             key={option.id}
-            label={option.text}
+            label={option.text?.[surveyLanguage] ?? ''}
             control={
               <Checkbox
                 // TS can't infer the precise memoized value type from question.type, but for checkboxes it's always an array
@@ -86,7 +86,7 @@ export default function CheckBoxQuestion({
                       value.filter((optionId) => optionId !== option.id);
                   onChange(newValue);
                 }}
-                name={option.text}
+                name={option.text?.[surveyLanguage]}
               />
             }
           />

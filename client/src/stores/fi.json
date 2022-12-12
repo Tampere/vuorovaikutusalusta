@@ -124,6 +124,10 @@
     "documentSection": "Lisää liiteosio",
     "attachmentSection": "Lisää vastausliite"
   },
+  "SliderQuestion": {
+    "defaultMinLabel": "Täysin eri mieltä",
+    "defaultMaxLabel": "Täysin samaa mieltä"
+  },
   "SurveySection": {
     "radioQuestion": "Valintakysymys",
     "checkBoxQuestion": "Monivalintakysymys",
@@ -199,6 +203,14 @@
     "maxValue": "Maksimiarvo",
     "defaultMinLabel": "Täysin eri mieltä",
     "defaultMaxLabel": "Täysin samaa mieltä",
+    "defaultTranslatedMinLabel": {
+      "en": "Strongly disagree",
+      "fi": "Täysin eri mieltä"
+    },
+    "defaultTranslatedMaxLabel": {
+      "en": "Strongly agree",
+      "fi": "Täysin samaa mieltä"
+    },
     "literalHelperText": "Sanallisen liukukytkinkysymyksen vastaus tallennetaan tietokantaan arvovälillä 0 - 10."
   },
   "EditSurveyThanksPage": {
@@ -385,6 +397,32 @@
   },
   "TestSurveyFrame": {
     "text": "Tämä on testikysely. Vastauksia ei tallenneta, eikä niistä lähetetä sähköpostia."
+  },
+  "LanguageMenu": {
+    "changeLanguage": "Vaihda palvelun kieltä",
+    "fi": "Suomi",
+    "en": "English"
+  },
+  "SurveyLanguageMenu": {
+    "changeSurveyLanguage": "Vaihda kyselyn kieltä",
+    "surveyLanguage": "Kyselyn kieli"
+  },
+  "EditSurveyTranslations": {
+    "enableLocalisation": "Salli kyselyn julkaiseminen usealla kielellä",
+    "provideTranslations": "Mikäli kysely julkaistaan usealla eri kielellä, tulee kaikki kyselyssä esiintyvät tekstit kääntää ko. kielille. Anna alla olevassa listassa kielikäännös jokaiseen puuttuvaan kohtaan.",
+    "surveyInformation": "Kyselyn perustiedot",
+    "copyTextFields": "Kopioi käännettävät tietueet leikepöydälle",
+    "supportedLanguages": "Kyselyssä tuetut kielet",
+    "surveyPages": "Kyselyn sivut",
+    "surveyTitle": "Kyselyn otsikko",
+    "surveySubtitle": "Kyselyn aliotsikko",
+    "fi": "suomi",
+    "en": "englanti",
+    "page": "sivu",
+    "missingTranslation": "Käännös puuttuu",
+    "optionInfo": "Vaihtoehdon lisätiedot",
+    "emailInfo": "Sähköposti",
+    "thanksPage": "Kiitos-sivu"
   },
   "navigation": {
     "next": "Seuraava",

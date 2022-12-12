@@ -23,9 +23,6 @@ import {
   NotFoundError,
 } from '@src/error';
 
-// TODO: Find a better way to pass the language code when/if the localization is fully implemented
-const languageCode = 'fi';
-
 const sectionTypesWithOptions: SurveyPageSection['type'][] = [
   'radio',
   'checkbox',
@@ -57,10 +54,11 @@ interface DBSurvey {
   section_title_color: string;
   email_enabled: boolean;
   email_auto_send_to: string[];
-  email_subject: string;
-  email_body: string;
+  email_subject: LocalizedText;
+  email_body: LocalizedText;
   email_info: SurveyEmailInfoItem[];
   allow_saving_unfinished: boolean;
+  localisation_enabled: boolean;
 }
 
 /**
@@ -79,7 +77,7 @@ interface DBSurveyPage {
   sidebar_map_layers: string;
   sidebar_image_path: string[];
   sidebar_image_name: string;
-  sidebar_image_alt_text: string;
+  sidebar_image_alt_text: LocalizedText;
 }
 
 /**
@@ -131,7 +129,7 @@ type DBSurveyJoin = DBSurvey & {
   page_sidebar_map_layers: number[];
   page_sidebar_image_path: string[];
   page_sidebar_image_name: string;
-  page_sidebar_image_alt_text: string;
+  page_sidebar_image_alt_text: LocalizedText;
   section_id: number;
   section_title: LocalizedText;
   section_title_color: string;
@@ -172,7 +170,10 @@ const surveyPageColumnSet = getColumnSet<DBSurveyPage>('survey_page', [
     cast: 'text[]',
   },
   'sidebar_image_name',
-  'sidebar_image_alt_text',
+  {
+    name: 'sidebar_image_alt_text',
+    cast: 'json',
+  },
 ]);
 
 /**
@@ -565,9 +566,10 @@ async function deleteRemovedSections(
     (newSections ?? []).every((newSection) => newSection.id !== id)
   );
   if (removedSectionIds.length) {
-    await getDb().none(`DELETE FROM data.page_section WHERE id = ANY ($1)`, [
-      removedSectionIds,
-    ]);
+    await getDb().none(
+      `DELETE FROM data.page_section WHERE id = ANY ($1) OR parent_section = ANY ($1)`,
+      [removedSectionIds]
+    );
   }
 }
 
@@ -691,21 +693,22 @@ export async function updateSurvey(survey: Survey) {
         email_subject = $20,
         email_body = $21,
         email_info = $22::json,
-        allow_saving_unfinished = $23
+        allow_saving_unfinished = $23,
+        localisation_enabled = $24
       WHERE id = $1 RETURNING *`,
       [
         survey.id,
         survey.name,
-        { fi: survey.title },
-        { fi: survey.subtitle },
+        survey.title,
+        survey.subtitle,
         survey.author,
         survey.authorUnit,
         survey.mapUrl,
         survey.startDate,
         survey.endDate,
         survey.allowTestSurvey,
-        { fi: survey.thanksPage.title },
-        { fi: survey.thanksPage.text },
+        survey.thanksPage.title,
+        survey.thanksPage.text,
         survey.backgroundImageName ?? null,
         survey.backgroundImagePath ?? null,
         survey.admins,
@@ -717,6 +720,7 @@ export async function updateSurvey(survey: Survey) {
         survey.email.body,
         JSON.stringify(survey.email.info),
         survey.allowSavingUnfinished,
+        survey.localisationEnabled,
       ]
     )
     .catch((error) => {
@@ -871,8 +875,8 @@ function dbSurveyToSurvey(
   const survey = {
     id: dbSurvey.id,
     name: dbSurvey.name,
-    title: dbSurvey.title?.fi,
-    subtitle: dbSurvey.subtitle?.fi,
+    title: dbSurvey.title,
+    subtitle: dbSurvey.subtitle,
     author: dbSurvey.author,
     authorUnit: dbSurvey.author_unit,
     authorId: dbSurvey.author_id,
@@ -882,8 +886,8 @@ function dbSurveyToSurvey(
     endDate: dbSurvey.end_date,
     allowTestSurvey: dbSurvey.allow_test_survey,
     thanksPage: {
-      title: dbSurvey.thanks_page_title?.fi,
-      text: dbSurvey.thanks_page_text?.fi,
+      title: dbSurvey.thanks_page_title,
+      text: dbSurvey.thanks_page_text,
     },
     backgroundImageName: dbSurvey.background_image_name,
     backgroundImagePath: dbSurvey.background_image_path,
@@ -896,6 +900,7 @@ function dbSurveyToSurvey(
       info: dbSurvey.email_info,
     },
     allowSavingUnfinished: dbSurvey.allow_saving_unfinished,
+    localisationEnabled: dbSurvey.localisation_enabled,
     // Single survey row won't contain pages - they get aggregated from a join query
     pages: [],
   };
@@ -931,7 +936,7 @@ function dbSurveyJoinToPage(dbSurveyJoin: DBSurveyJoin): SurveyPage {
     ? null
     : {
         id: dbSurveyJoin.page_id,
-        title: dbSurveyJoin.page_title?.[languageCode],
+        title: dbSurveyJoin.page_title,
         sections: [],
         sidebar: {
           type: dbSurveyJoin.page_sidebar_type,
@@ -954,10 +959,10 @@ function dbSurveyJoinToSection(dbSurveyJoin: DBSurveyJoin): SurveyPageSection {
     ? null
     : {
         id: dbSurveyJoin.section_id,
-        title: dbSurveyJoin.section_title?.[languageCode],
+        title: dbSurveyJoin.section_title,
         type: dbSurveyJoin.section_type as SurveyPageSection['type'],
-        body: dbSurveyJoin.section_body?.[languageCode],
-        info: dbSurveyJoin.section_info?.[languageCode],
+        body: dbSurveyJoin.section_body,
+        info: dbSurveyJoin.section_info,
         fileName: dbSurveyJoin.section_file_name,
         filePath: dbSurveyJoin.section_file_path,
         // Trust that the JSON in the DB fits the rest of the detail fields
@@ -979,8 +984,8 @@ function dbSurveyJoinToOption(dbSurveyJoin: DBSurveyJoin): SectionOption {
     ? null
     : {
         id: dbSurveyJoin.option_id,
-        text: dbSurveyJoin.option_text?.[languageCode],
-        info: dbSurveyJoin.option_info?.[languageCode],
+        text: dbSurveyJoin.option_text,
+        info: dbSurveyJoin.option_info,
       };
 }
 
@@ -1010,7 +1015,7 @@ export async function createSurveyPage(
 
   return {
     id: row.id,
-    title: row.title?.[languageCode],
+    title: row.title,
     sections: [],
     sidebar: {
       type: row.sidebar_type,
@@ -1056,9 +1061,7 @@ function surveyPagesToRows(
       id: surveyPage.id,
       idx: index,
       survey_id: surveyId,
-      title: {
-        fi: surveyPage.title,
-      },
+      title: surveyPage.title,
       sidebar_type: surveyPage.sidebar.type,
       sidebar_map_layers: JSON.stringify(surveyPage.sidebar.mapLayers),
       sidebar_image_path: surveyPage.sidebar.imagePath,
@@ -1100,20 +1103,14 @@ function surveySectionsToRows(
       survey_page_id: pageId,
       idx: index,
       type: type,
-      title: {
-        fi: title,
-      },
-      body: {
-        fi: body,
-      },
+      title: title,
+      body: body,
       details,
       options,
       subQuestions,
       groups,
       parent_section: parentSectionId ?? null,
-      info: {
-        fi: info,
-      },
+      info: info,
       file_name: fileName,
       file_path: filePath,
     } as DBSurveyPageSection & {
@@ -1141,10 +1138,8 @@ function optionsToRows(
       section_id: sectionId,
       id: option.id ?? null,
       idx: index,
-      text: {
-        fi: option.text,
-      },
-      info: option.info ? { fi: option.info } : null,
+      text: option.text,
+      info: option.info,
       group_id: optionGroupId ?? null,
     } as DBSectionOption;
   });
@@ -1358,8 +1353,8 @@ export async function getOptionsForSurvey(surveyId: number) {
   return rows.map(
     (row): SectionOption => ({
       id: row.id,
-      text: row.text?.[languageCode],
-      info: row.info?.[languageCode],
+      text: row.text,
+      info: row.info,
     })
   );
 }

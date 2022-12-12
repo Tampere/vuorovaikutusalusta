@@ -1,5 +1,6 @@
-import { Survey } from '@interfaces/survey';
+import { LanguageCode, Survey } from '@interfaces/survey';
 import logger from '@src/logger';
+import useTranslations from '@src/translations/useTranslations';
 import { sendMail } from './email';
 
 /**
@@ -9,12 +10,15 @@ export async function sendUnfinishedSubmissionLink({
   to,
   token,
   survey,
+  language,
 }: {
   to: string;
   token: string;
   survey: Survey;
+  language: LanguageCode;
 }) {
-  const subject = `${survey.title} - Keskeneräinen vastaus`;
+  const tr = useTranslations(language);
+  const subject = `${survey.title[language]} - ${tr.unfinishedSubmission}`;
   const url = `${process.env.EMAIL_APP_URL}/${survey.name}?token=${token}`;
   try {
     await sendMail({
@@ -23,9 +27,14 @@ export async function sendUnfinishedSubmissionLink({
       },
       template: 'unfinished-submission',
       locals: {
-        surveyTitle: survey.title,
         url,
         subject,
+        noReply: tr.noReply,
+        unfinishedSurveyInfo: tr.unfinishedSurveyInfo.replace(
+          '{surveyTitle}',
+          survey.title[language]
+        ),
+        continueWithLink: tr.continueWithLink,
       },
     });
   } catch (error) {

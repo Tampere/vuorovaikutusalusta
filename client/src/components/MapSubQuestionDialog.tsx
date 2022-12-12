@@ -81,7 +81,7 @@ export default function MapSubQuestionDialog({
 
   const classes = useStyles();
   const { getValidationErrors } = useSurveyAnswers();
-  const { tr } = useTranslations();
+  const { tr, surveyLanguage } = useTranslations();
 
   /**
    * Initialize dirty statuses and answers with empty answers when subquestions are changed and/or the dialog is opened
@@ -137,12 +137,12 @@ export default function MapSubQuestionDialog({
               }}
             >
               <FormLabel htmlFor={`${question.id}-input`}>
-                {question.title} {question.isRequired && '*'}
+                {question.title?.[surveyLanguage]} {question.isRequired && '*'}
               </FormLabel>
               {question.info && (
                 <SectionInfo
-                  infoText={question.info}
-                  subject={question.title}
+                  infoText={question.info?.[surveyLanguage]}
+                  subject={question.title?.[surveyLanguage]}
                 />
               )}
             </div>

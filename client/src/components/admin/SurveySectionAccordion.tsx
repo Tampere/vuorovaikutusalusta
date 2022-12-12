@@ -97,7 +97,7 @@ export default function SurveySectionAccordion(props: Props) {
   const [deleteConfirmDialogOpen, setDeleteConfirmDialogOpen] = useState(false);
 
   const classes = useStyles();
-  const { tr } = useTranslations();
+  const { tr, surveyLanguage, initializeLocalizedObject } = useTranslations();
 
   // Index is used inside a callback function -> useRef is required in React to catch all updates
   const indexRef = useRef<number>();
@@ -281,7 +281,7 @@ export default function SurveySectionAccordion(props: Props) {
             accordion.icon
           )}
           <Typography className={classes.sectionTitle}>
-            {props.section.title || (
+            {props.section.title?.[surveyLanguage] || (
               <em>{tr.EditSurveyPage.untitledSection}</em>
             )}
           </Typography>
@@ -294,12 +294,15 @@ export default function SurveySectionAccordion(props: Props) {
             autoFocus
             disabled={props.disabled}
             label={tr.EditSurveyPage.title}
-            value={props.section.title}
+            value={props.section.title?.[surveyLanguage] ?? null}
             variant="standard"
             onChange={(event) => {
               handleEdit({
                 ...props.section,
-                title: event.target.value,
+                title: {
+                  ...props.section.title,
+                  [surveyLanguage]: event.target.value,
+                },
               });
             }}
           />
@@ -315,7 +318,9 @@ export default function SurveySectionAccordion(props: Props) {
                     handleEdit({
                       ...props.section,
                       showInfo: event.target.checked,
-                      info: !event.target.checked ? '' : props.section.info,
+                      info: !event.target.checked
+                        ? initializeLocalizedObject(null)
+                        : props.section.info,
                     })
                   }
                 />
@@ -324,12 +329,12 @@ export default function SurveySectionAccordion(props: Props) {
           </FormGroup>
           {props.section.showInfo && (
             <RichTextEditor
-              value={props.section.info}
+              value={props.section.info?.[surveyLanguage] ?? ''}
               label={tr.EditTextSection.text}
               onChange={(value) =>
                 handleEdit({
                   ...props.section,
-                  info: value,
+                  info: { ...props.section.info, [surveyLanguage]: value },
                 })
               }
             />

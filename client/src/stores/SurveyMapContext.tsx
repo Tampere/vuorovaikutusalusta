@@ -15,6 +15,7 @@ import React, {
   useReducer,
   useRef,
 } from 'react';
+import { useTranslations } from './TranslationContext';
 
 interface State {
   visibleLayers: number[];
@@ -168,6 +169,8 @@ function getDrawingEventId(
  */
 export function useSurveyMap() {
   const context = useContext(SurveyMapContext);
+  const { language } = useTranslations();
+
   if (!context) {
     throw new Error('useSurveyMap must be used within the SurveyMapProvider');
   }
@@ -311,7 +314,7 @@ export function useSurveyMap() {
       const eventId = getDrawingEventId(question.id, type);
       // These events need to be delayed - otherwise there might be an extraneous feature click event from Oskari
       setTimeout(() => {
-        dispatch({ type: 'SET_HELPER_TEXT', text: question.title });
+        dispatch({ type: 'SET_HELPER_TEXT', text: question.title[language] });
         dispatch({ type: 'SET_QUESTION_ID', value: question.id });
         dispatch({ type: 'SET_SELECTION_TYPE', value: type });
       }, 0);
