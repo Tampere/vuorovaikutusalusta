@@ -203,6 +203,14 @@
     "maxValue": "Maksimiarvo",
     "defaultMinLabel": "Täysin eri mieltä",
     "defaultMaxLabel": "Täysin samaa mieltä",
+    "defaultTranslatedMinLabel": {
+      "en": "Strongly disagree",
+      "fi": "Täysin eri mieltä"
+    },
+    "defaultTranslatedMaxLabel": {
+      "en": "Strongly agree",
+      "fi": "Täysin samaa mieltä"
+    },
     "literalHelperText": "Sanallisen liukukytkinkysymyksen vastaus tallennetaan tietokantaan arvovälillä 0 - 10."
   },
   "EditSurveyThanksPage": {

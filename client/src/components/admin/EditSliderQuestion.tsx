@@ -97,7 +97,7 @@ export default function EditSliderQuestion({
             label={tr.EditSliderQuestion.minValue}
             value={
               section.minLabel?.[surveyLanguage] ??
-              tr.EditSliderQuestion.defaultMinLabel
+              tr.EditSliderQuestion.defaultTranslatedMinLabel?.[surveyLanguage]
             }
             onChange={(event) => {
               onChange({
@@ -113,7 +113,7 @@ export default function EditSliderQuestion({
             label={tr.EditSliderQuestion.maxValue}
             value={
               section.maxLabel?.[surveyLanguage] ??
-              tr.EditSliderQuestion.defaultMaxLabel
+              tr.EditSliderQuestion.defaultTranslatedMaxLabel?.[surveyLanguage]
             }
             onChange={(event) => {
               onChange({

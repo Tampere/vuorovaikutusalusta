@@ -203,6 +203,14 @@
     "maxValue": "Maximum value",
     "defaultMinLabel": "Strongly disagree",
     "defaultMaxLabel": "Strongly agree",
+    "defaultTranslatedMinLabel": {
+      "en": "Strongly disagree",
+      "fi": "Täysin eri mieltä"
+    },
+    "defaultTranslatedMaxLabel": {
+      "en": "Strongly agree",
+      "fi": "Täysin samaa mieltä"
+    },
     "literalHelperText": "Answer data from slider questions with verbal labels will be stored in the database as numerical values from 1 to 10."
   },
   "EditSurveyThanksPage": {
