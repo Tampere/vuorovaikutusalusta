@@ -139,7 +139,7 @@ export default function MapSubQuestionDialog({
               <FormLabel htmlFor={`${question.id}-input`}>
                 {question.title?.[surveyLanguage]} {question.isRequired && '*'}
               </FormLabel>
-              {question.info && (
+              {question.info && question.info?.[surveyLanguage] && (
                 <SectionInfo
                   infoText={question.info?.[surveyLanguage]}
                   subject={question.title?.[surveyLanguage]}

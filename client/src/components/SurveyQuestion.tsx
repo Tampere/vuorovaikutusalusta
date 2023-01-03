@@ -54,7 +54,7 @@ export default function SurveyQuestion({ question }: Props) {
         >
           {question.title?.[surveyLanguage]} {question.isRequired && '*'}
         </FormLabel>
-        {question.info && (
+        {question.info && question.info?.[surveyLanguage] && (
           <SectionInfo
             infoText={question.info?.[surveyLanguage]}
             subject={question.title?.[surveyLanguage]}

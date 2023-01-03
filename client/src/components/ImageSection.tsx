@@ -34,7 +34,7 @@ export default function ImageSection({ section }: Props) {
         >
           {section.title?.[surveyLanguage]}
         </FormLabel>
-        {section.info && (
+        {section.info && section.info?.[surveyLanguage] && (
           <SectionInfo
             infoText={section.info?.[surveyLanguage]}
             subject={section.title?.[surveyLanguage]}

@@ -211,17 +211,20 @@ export default function EditSurveySectionTranslations({
           />
         ))}
       {section.type === 'text' && (
-        <RichTextEditor
-          value={section.body?.[languageCode]}
-          missingValue={Boolean(!section.body?.[languageCode])}
-          onChange={(value) => {
-            onEdit({
-              ...section,
-              body: { ...section.body, [languageCode]: value },
-            });
-          }}
-          editorHeight={'100px'}
-        ></RichTextEditor>
+        <>
+          <RichTextEditor
+            value={section.body?.[languageCode]}
+            missingValue={Boolean(!section.body?.[languageCode])}
+            onChange={(value) => {
+              onEdit({
+                ...section,
+                body: { ...section.body, [languageCode]: value },
+              });
+            }}
+            editorHeight={'100px'}
+          ></RichTextEditor>
+          <br />
+        </>
       )}
       {section.type === 'image' && (
         <TranslationField
@@ -245,6 +248,7 @@ export default function EditSurveySectionTranslations({
             overflow: 'hidden',
             whiteSpace: 'nowrap',
             position: 'relative',
+            minWidth: '250px',
           }}
         >
           <RichTextEditor
