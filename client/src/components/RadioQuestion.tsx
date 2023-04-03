@@ -5,8 +5,17 @@ import {
   RadioGroup,
   TextField,
 } from '@material-ui/core';
+import { makeStyles } from '@material-ui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useEffect, useState } from 'react';
+
+const useStyles = makeStyles({
+  labelStyles: {
+    lineHeight: 1.2,
+    marginBottom: '0.5em',
+    marginTop: '0.5em',
+  },
+});
 
 /**
  * Max length of a custom answer in radio/checkbox questions
@@ -28,6 +37,7 @@ export default function RadioQuestion({
 }: Props) {
   const [customAnswerValue, setCustomAnswerValue] = useState('');
   const { tr, surveyLanguage } = useTranslations();
+  const classes = useStyles();
 
   // Update custom answer value if value from context is string
   useEffect(() => {
@@ -61,6 +71,7 @@ export default function RadioQuestion({
             value={option.id}
             label={option.text?.[surveyLanguage] ?? ''}
             control={<Radio required={question.isRequired} />}
+            classes={{ label: classes.labelStyles }}
           />
         ))}
         {question.allowCustomAnswer && (
