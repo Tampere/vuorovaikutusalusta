@@ -58,6 +58,11 @@ const useStyles = makeStyles((theme: Theme) => ({
       color: '#22437b',
     },
   },
+  labelStyles: {
+    lineHeight: 1.2,
+    marginBottom: '0.5em',
+    marginTop: '0.5em',
+  },
 }));
 
 export default function GroupedCheckBoxQuestion({
@@ -195,6 +200,7 @@ export default function GroupedCheckBoxQuestion({
                           name={option.text?.[surveyLanguage]}
                         />
                       }
+                      classes={{ label: classes.labelStyles }}
                     />
                     {option.info?.[surveyLanguage] && (
                       <SectionInfo
