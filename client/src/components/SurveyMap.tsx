@@ -78,7 +78,6 @@ export default function SurveyMap(props: Props) {
           src={props.url}
           allow="geolocation"
           allowFullScreen
-          loading="lazy"
         />
         {!drawing && !modifying && answerGeometries?.features.length > 0 && (
           <Tooltip title={tr.SurveyMap.editGeometries}>
