@@ -1,5 +1,5 @@
 import { SurveyPageSection } from '@interfaces/survey';
-import { Fab, Grid, Typography } from '@material-ui/core';
+import { Fab, Grid, Typography } from '@mui/material';
 import {
   Article,
   AttachFile,
@@ -14,8 +14,8 @@ import {
   Subject,
   TextFields,
   ViewComfy,
-} from '@material-ui/icons';
-import { makeStyles } from '@material-ui/styles';
+} from '@mui/icons-material';
+import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { ReactNode, useState } from 'react';
 

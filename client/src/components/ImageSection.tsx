@@ -1,5 +1,5 @@
 import { SurveyImageSection } from '@interfaces/survey';
-import { FormLabel, Link } from '@material-ui/core';
+import { FormLabel, Link } from '@mui/material';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { getFullFilePath } from '@src/utils/path';

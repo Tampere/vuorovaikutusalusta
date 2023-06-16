@@ -1,7 +1,7 @@
 import { Survey } from '@interfaces/survey';
-import { createTheme, Theme } from '@material-ui/core';
-import { fiFI } from '@material-ui/core/locale';
-import { ThemeProvider } from '@material-ui/styles';
+import { createTheme, Theme } from '@mui/material';
+import { fiFI } from '@mui/material/locale';
+import { ThemeProvider } from '@mui/styles';
 import { defaultSurveyTheme } from '@src/themes/survey';
 import React, { ReactNode, useContext, useMemo, useReducer } from 'react';
 

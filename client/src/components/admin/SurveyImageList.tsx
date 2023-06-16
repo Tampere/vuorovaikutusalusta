@@ -11,9 +11,9 @@ import {
   TextField,
   Theme,
   Typography,
-} from '@material-ui/core';
-import { Cancel, PhotoLibrary } from '@material-ui/icons';
-import { makeStyles } from '@material-ui/styles';
+} from '@mui/material';
+import { Cancel, PhotoLibrary } from '@mui/icons-material';
+import { makeStyles } from '@mui/styles';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { request } from '@src/utils/request';

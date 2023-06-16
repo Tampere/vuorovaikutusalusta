@@ -4,7 +4,7 @@ import {
   SurveyMapSubQuestion,
   SurveyPageSection,
 } from '@interfaces/survey';
-import { makeStyles } from '@material-ui/styles';
+import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React from 'react';
 import RichTextEditor from '../RichTextEditor';

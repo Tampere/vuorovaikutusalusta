@@ -1,5 +1,5 @@
 import { SurveyDocumentSection } from '@interfaces/survey';
-import { FormLabel, Link } from '@material-ui/core';
+import { FormLabel, Link } from '@mui/material';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import React, { useMemo } from 'react';
 import SectionInfo from './SectionInfo';

@@ -1,8 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { Survey } from '@interfaces/survey';
-import { Button, Card, Link, Theme, Typography } from '@material-ui/core';
-import { CardContent } from '@material-ui/core';
-import { CardActions } from '@material-ui/core';
+import { Button, Card, Link, Theme, Typography } from '@mui/material';
+import { CardContent } from '@mui/material';
+import { CardActions } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { format } from 'date-fns';
 import CopyToClipboard from '../CopyToClipboard';
@@ -13,7 +13,7 @@ import {
   unpublishSurvey,
 } from '@src/controllers/SurveyController';
 import { useToasts } from '@src/stores/ToastContext';
-import { makeStyles } from '@material-ui/styles';
+import { makeStyles } from '@mui/styles';
 import DataExport from './DataExport';
 import LoadingButton from '../LoadingButton';
 

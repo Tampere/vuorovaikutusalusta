@@ -1,13 +1,7 @@
 import { LocalizedText, SectionOption } from '@interfaces/survey';
-import {
-  Fab,
-  IconButton,
-  TextField,
-  Tooltip,
-  Typography,
-} from '@material-ui/core';
-import { Add, Delete, DragIndicator } from '@material-ui/icons';
-import { makeStyles } from '@material-ui/styles';
+import { Fab, IconButton, TextField, Tooltip, Typography } from '@mui/material';
+import { Add, Delete, DragIndicator } from '@mui/icons-material';
+import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { createRef, useEffect, useMemo } from 'react';
 import OptionInfoDialog from './OptionInfoDialog';

@@ -1,15 +1,9 @@
 import React, { useState } from 'react';
-import {
-  IconButton,
-  Menu,
-  MenuItem,
-  Tooltip,
-  Typography,
-} from '@material-ui/core';
+import { IconButton, Menu, MenuItem, Tooltip, Typography } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { LanguageCode } from '@interfaces/survey';
-import { makeStyles } from '@material-ui/styles';
-import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
+import { makeStyles } from '@mui/styles';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
 interface Props {
   style?: React.CSSProperties;

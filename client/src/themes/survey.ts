@@ -1,5 +1,5 @@
-import { createTheme } from '@material-ui/core/styles';
-import { fiFI } from '@material-ui/core/locale';
+import { createTheme } from '@mui/material/styles';
+import { fiFI } from '@mui/material/locale';
 
 /**
  * Default theme - used only when survey doesn't have a theme at all set in DB

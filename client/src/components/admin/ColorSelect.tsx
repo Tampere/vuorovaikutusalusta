@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
-import { Select, FormControl, MenuItem, InputLabel } from '@material-ui/core';
+import { Select, FormControl, MenuItem, InputLabel } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
-import { makeStyles } from '@material-ui/styles';
+import { makeStyles } from '@mui/styles';
 import ColorIndicator from './ColorIndicator';
 
 interface Props {

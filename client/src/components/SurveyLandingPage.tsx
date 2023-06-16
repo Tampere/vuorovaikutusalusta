@@ -1,6 +1,6 @@
 import { Survey } from '@interfaces/survey';
-import { Box, Link, Theme, Typography } from '@material-ui/core';
-import { makeStyles } from '@material-ui/styles';
+import { Box, Link, Theme, Typography } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { getClassList } from '@src/utils/classes';
 import React from 'react';

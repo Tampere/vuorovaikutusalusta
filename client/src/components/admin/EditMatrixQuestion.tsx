@@ -8,8 +8,8 @@ import {
   TextField,
   Tooltip,
   Typography,
-} from '@material-ui/core';
-import { Add, Cancel } from '@material-ui/icons';
+} from '@mui/material';
+import { Add, Cancel } from '@mui/icons-material';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React from 'react';
 import QuestionOptions from './QuestionOptions';

@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
 import { useSurvey } from '@src/stores/SurveyContext';
-import { makeStyles } from '@material-ui/styles';
-import { Fab, Tooltip } from '@material-ui/core';
-import { Save, Undo } from '@material-ui/icons';
+import { makeStyles } from '@mui/styles';
+import { Fab, Tooltip } from '@mui/material';
+import { Save, Undo } from '@mui/icons-material';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 

@@ -1,6 +1,6 @@
 import { SurveySliderQuestion } from '@interfaces/survey';
-import { FormLabel, Slider } from '@material-ui/core';
-import { makeStyles } from '@material-ui/styles';
+import { FormLabel, Slider } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useMemo, useRef } from 'react';
 

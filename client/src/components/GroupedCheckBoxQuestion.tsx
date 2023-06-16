@@ -9,9 +9,9 @@ import {
   FormGroup,
   Theme,
   Typography,
-} from '@material-ui/core';
-import { ArrowForwardIosSharp } from '@material-ui/icons';
-import { makeStyles } from '@material-ui/styles';
+} from '@mui/material';
+import { ArrowForwardIosSharp } from '@mui/icons-material';
+import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useMemo, useState } from 'react';
 import SectionInfo from './SectionInfo';

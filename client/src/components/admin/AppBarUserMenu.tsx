@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { IconButton, Menu, MenuItem } from '@material-ui/core';
-import { AccountCircle } from '@material-ui/icons';
-import { makeStyles } from '@material-ui/styles';
+import { IconButton, Menu, MenuItem } from '@mui/material';
+import { AccountCircle } from '@mui/icons-material';
+import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 
 const useStyles = makeStyles({

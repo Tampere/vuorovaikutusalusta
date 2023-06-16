@@ -1,5 +1,5 @@
-import { Fab, Tooltip } from '@material-ui/core';
-import { Check, Edit } from '@material-ui/icons';
+import { Fab, Tooltip } from '@mui/material';
+import { Check, Edit } from '@mui/icons-material';
 import { useSurveyMap } from '@src/stores/SurveyMapContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import OskariRPC from 'oskari-rpc';

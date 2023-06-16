@@ -5,9 +5,9 @@ import {
   DialogContent,
   IconButton,
   Tooltip,
-} from '@material-ui/core';
+} from '@mui/material';
 import React, { useState } from 'react';
-import { Help as HelpIcon } from '@material-ui/icons';
+import { Help as HelpIcon } from '@mui/icons-material';
 import ReactMarkdown from 'react-markdown';
 import rehypeExternalLinks from 'rehype-external-links';
 import { useTranslations } from '@src/stores/TranslationContext';

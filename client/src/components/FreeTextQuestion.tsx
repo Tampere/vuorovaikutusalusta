@@ -1,5 +1,5 @@
 import { SurveyFreeTextQuestion } from '@interfaces/survey';
-import { FormHelperText, TextField } from '@material-ui/core';
+import { FormHelperText, TextField } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React from 'react';
 

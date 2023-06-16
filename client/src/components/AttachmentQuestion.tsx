@@ -1,6 +1,6 @@
 import { FileAnswer } from '@interfaces/survey';
-import { IconButton, Typography } from '@material-ui/core';
-import { Delete } from '@material-ui/icons';
+import { IconButton, Typography } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React from 'react';
@@ -62,7 +62,7 @@ export default function AttachmentQuestion({
                 onChange(value);
               }}
             >
-              <Delete />
+              <DeleteIcon />
             </IconButton>
           </div>
         );

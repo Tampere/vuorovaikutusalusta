@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react';
-import { Box, Divider, Drawer, Toolbar } from '@material-ui/core';
-import { makeStyles } from '@material-ui/styles';
+import { Box, Divider, Drawer, Toolbar } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 
 const useStyles = makeStyles({
   paper: {

@@ -9,9 +9,9 @@ import {
   Skeleton,
   TextField,
   Typography,
-} from '@material-ui/core';
-import DateTimePicker from '@material-ui/lab/DateTimePicker';
-import { makeStyles } from '@material-ui/styles';
+} from '@mui/material';
+import DateTimePicker from '@mui/lab/DateTimePicker';
+import { makeStyles } from '@mui/styles';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
@@ -225,7 +225,7 @@ export default function EditSurveyInfo() {
           value={activeSurvey.startDate}
           inputFormat="dd.MM.yyyy HH:mm"
           mask="__.__.____ __:__"
-          onChange={(value) => {
+          onChange={(value: any) => {
             editSurvey({
               ...activeSurvey,
               startDate: value,
@@ -240,7 +240,7 @@ export default function EditSurveyInfo() {
           value={activeSurvey.endDate}
           inputFormat="dd.MM.yyyy HH:mm"
           mask="__.__.____ __:__"
-          onChange={(value) => {
+          onChange={(value: any) => {
             editSurvey({
               ...activeSurvey,
               endDate: value,
