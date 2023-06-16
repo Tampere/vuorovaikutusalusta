@@ -225,7 +225,7 @@ export default function EditSurveyInfo() {
           value={activeSurvey.startDate}
           inputFormat="dd.MM.yyyy HH:mm"
           mask="__.__.____ __:__"
-          onChange={(value: any) => {
+          onChange={(value: Date) => {
             editSurvey({
               ...activeSurvey,
               startDate: value,
@@ -240,7 +240,7 @@ export default function EditSurveyInfo() {
           value={activeSurvey.endDate}
           inputFormat="dd.MM.yyyy HH:mm"
           mask="__.__.____ __:__"
-          onChange={(value: any) => {
+          onChange={(value: Date) => {
             editSurvey({
               ...activeSurvey,
               endDate: value,
