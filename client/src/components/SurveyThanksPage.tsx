@@ -1,6 +1,6 @@
 import { Survey } from '@interfaces/survey';
-import { Typography } from '@material-ui/core';
-import { makeStyles } from '@material-ui/styles';
+import { Typography } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React from 'react';
 import ReactMarkdown from 'react-markdown';

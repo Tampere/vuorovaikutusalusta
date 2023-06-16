@@ -1,5 +1,5 @@
 import { MapMarkerIcon } from '@interfaces/survey';
-import { FormControl, InputLabel, MenuItem, Select } from '@material-ui/core';
+import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { request } from '@src/utils/request';

@@ -1,4 +1,4 @@
-import { Box, CircularProgress, Toolbar, Typography } from '@material-ui/core';
+import { Box, CircularProgress, Toolbar, Typography } from '@mui/material';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';

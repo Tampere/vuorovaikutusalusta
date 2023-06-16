@@ -1,4 +1,4 @@
-import { createTheme } from '@material-ui/core/styles';
-import { fiFI } from '@material-ui/core/locale';
+import { createTheme } from '@mui/material/styles';
+import { fiFI } from '@mui/material/locale';
 
 export const theme = createTheme({}, fiFI);

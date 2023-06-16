@@ -1,4 +1,4 @@
-import { TextField } from '@material-ui/core';
+import { TextField } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React from 'react';
 

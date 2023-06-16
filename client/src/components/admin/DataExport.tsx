@@ -7,7 +7,7 @@ import {
   DialogTitle,
   FormControlLabel,
   Typography,
-} from '@material-ui/core';
+} from '@mui/material';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { request } from '@src/utils/request';

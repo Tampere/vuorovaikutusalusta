@@ -1,11 +1,6 @@
 import { SurveyRadioQuestion } from '@interfaces/survey';
-import {
-  FormControlLabel,
-  Radio,
-  RadioGroup,
-  TextField,
-} from '@material-ui/core';
-import { makeStyles } from '@material-ui/styles';
+import { FormControlLabel, Radio, RadioGroup, TextField } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useEffect, useState } from 'react';
 

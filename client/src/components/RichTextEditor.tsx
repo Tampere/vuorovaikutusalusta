@@ -1,5 +1,5 @@
-import { FormLabel } from '@material-ui/core';
-import { makeStyles } from '@material-ui/styles';
+import { FormLabel } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { convertFromRaw, convertToRaw, EditorState } from 'draft-js';
 import { draftToMarkdown, markdownToDraft } from 'markdown-draft-js';

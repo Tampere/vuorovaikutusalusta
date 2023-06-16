@@ -1,5 +1,5 @@
 import React from 'react';
-import { AppBar, Box, Toolbar, Typography } from '@material-ui/core';
+import { AppBar, Box, Toolbar, Typography } from '@mui/material';
 import SurveyList from './SurveyList';
 import { useTranslations } from '@src/stores/TranslationContext';
 import AppBarUserMenu from './AppBarUserMenu';

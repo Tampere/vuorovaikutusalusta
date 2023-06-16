@@ -7,7 +7,7 @@ import {
   DialogTitle,
   TextField,
   Typography,
-} from '@material-ui/core';
+} from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { Survey } from '@interfaces/survey';
 

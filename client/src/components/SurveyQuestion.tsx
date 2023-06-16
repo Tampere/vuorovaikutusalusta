@@ -3,7 +3,7 @@ import {
   MapQuestionAnswer,
   SurveyQuestion,
 } from '@interfaces/survey';
-import { FormControl, FormHelperText, FormLabel } from '@material-ui/core';
+import { FormControl, FormHelperText, FormLabel } from '@mui/material';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useMemo, useState } from 'react';

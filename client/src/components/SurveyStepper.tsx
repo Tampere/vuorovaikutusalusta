@@ -19,9 +19,9 @@ import {
   Typography,
   useMediaQuery,
   useTheme,
-} from '@material-ui/core';
-import { Close, Image, Map } from '@material-ui/icons';
-import { makeStyles } from '@material-ui/styles';
+} from '@mui/material';
+import { Close, Image, Map } from '@mui/icons-material';
+import { makeStyles } from '@mui/styles';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import { useSurveyMap } from '@src/stores/SurveyMapContext';
 import { useToasts } from '@src/stores/ToastContext';

@@ -5,7 +5,7 @@ import {
   ListItemIcon,
   ListItemText,
   Theme,
-} from '@material-ui/core';
+} from '@mui/material';
 import {
   AddCircle,
   ArrowBack,
@@ -16,8 +16,8 @@ import {
   Language,
   Mail,
   Preview,
-} from '@material-ui/icons';
-import { makeStyles } from '@material-ui/styles';
+} from '@mui/icons-material';
+import { makeStyles } from '@mui/styles';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';

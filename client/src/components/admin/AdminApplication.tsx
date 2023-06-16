@@ -1,14 +1,14 @@
 import React from 'react';
 import fiLocale from 'date-fns/locale/fi';
-import { CssBaseline, ThemeProvider } from '@material-ui/core';
+import { CssBaseline, ThemeProvider } from '@mui/material';
 import { theme } from '@src/themes/admin';
 import Compose from '../Compose';
 import EditSurvey from './EditSurvey';
 import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
 import SurveyProvider from '@src/stores/SurveyContext';
 import TranslationProvider from '@src/stores/TranslationContext';
-import LocalizationProvider from '@material-ui/lab/LocalizationProvider';
-import AdapterDateFns from '@material-ui/lab/AdapterDateFns';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import ToastProvider from '@src/stores/ToastContext';
 import AdminFrontPage from './AdminFrontPage';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';

@@ -1,5 +1,5 @@
 import { SurveySortingQuestion } from '@interfaces/survey';
-import { Checkbox, FormControlLabel, FormGroup } from '@material-ui/core';
+import { Checkbox, FormControlLabel, FormGroup } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React from 'react';
 import QuestionOptions from './QuestionOptions';

@@ -1,5 +1,5 @@
-import { IconButton, Tooltip } from '@material-ui/core';
-import { Cancel } from '@material-ui/icons';
+import { IconButton, Tooltip } from '@mui/material';
+import { Cancel } from '@mui/icons-material';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { getFullFilePath } from '@src/utils/path';

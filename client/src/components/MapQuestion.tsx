@@ -11,7 +11,7 @@ import {
   ToggleButton,
   ToggleButtonGroup,
   Typography,
-} from '@material-ui/core';
+} from '@mui/material';
 import { useSurveyMap } from '@src/stores/SurveyMapContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useEffect, useRef, useState } from 'react';

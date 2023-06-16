@@ -1,5 +1,5 @@
-import { IconButton, Tooltip } from '@material-ui/core';
-import { FileCopy } from '@material-ui/icons';
+import { IconButton, Tooltip } from '@mui/material';
+import FileCopyIcon from '@mui/icons-material/FileCopy';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React from 'react';
@@ -32,7 +32,7 @@ export default function CopyToClipboard({ data, tooltip }: Props) {
           }
         }}
       >
-        <FileCopy />
+        <FileCopyIcon />
       </IconButton>
     </Tooltip>
   );

@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { createNewSurvey, getSurveys } from '@src/controllers/SurveyController';
 import { useToasts } from '@src/stores/ToastContext';
 import SurveyListItem from './SurveyListItem';
-import { FormControlLabel, Skeleton, Switch } from '@material-ui/core';
-import { makeStyles } from '@material-ui/styles';
+import { FormControlLabel, Skeleton, Switch } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import LoadingButton from '../LoadingButton';
 

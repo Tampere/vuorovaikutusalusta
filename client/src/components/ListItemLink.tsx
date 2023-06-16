@@ -1,6 +1,6 @@
-import { Link, ListItem } from '@material-ui/core';
-import { OpenInNew } from '@material-ui/icons';
-import { makeStyles } from '@material-ui/styles';
+import { Link, ListItem } from '@mui/material';
+import { OpenInNew } from '@mui/icons-material';
+import { makeStyles } from '@mui/styles';
 import React, { ReactNode } from 'react';
 import { NavLink } from 'react-router-dom';
 

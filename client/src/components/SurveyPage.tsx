@@ -1,5 +1,5 @@
 import { Survey } from '@interfaces/survey';
-import { Box, CircularProgress } from '@material-ui/core';
+import { Box, CircularProgress } from '@mui/material';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import { useSurveyTheme } from '@src/stores/SurveyThemeProvider';
 import { useToasts } from '@src/stores/ToastContext';

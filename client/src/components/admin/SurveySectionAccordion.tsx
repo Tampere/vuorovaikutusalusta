@@ -24,7 +24,7 @@ import {
   TextField,
   Tooltip,
   Typography,
-} from '@material-ui/core';
+} from '@mui/material';
 import {
   Article,
   AttachFile,
@@ -41,8 +41,8 @@ import {
   Subject,
   TextFields,
   ViewComfy,
-} from '@material-ui/icons';
-import { makeStyles } from '@material-ui/styles';
+} from '@mui/icons-material';
+import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { ReactNode, useMemo, useRef, useState } from 'react';
 import { DraggableProvided } from 'react-beautiful-dnd';

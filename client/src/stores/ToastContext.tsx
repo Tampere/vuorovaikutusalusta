@@ -6,10 +6,10 @@ import React, {
   useMemo,
   useReducer,
 } from 'react';
-import { Alert, AlertProps } from '@material-ui/core';
-import { Snackbar } from '@material-ui/core';
-import { IconButton } from '@material-ui/core';
-import { Close } from '@material-ui/icons';
+import { Alert, AlertProps } from '@mui/material';
+import { Snackbar } from '@mui/material';
+import { IconButton } from '@mui/material';
+import { Close } from '@mui/icons-material';
 
 export interface Toast {
   severity: AlertProps['severity'];

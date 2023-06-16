@@ -5,18 +5,9 @@ import {
   FormGroup,
   FormHelperText,
   TextField,
-} from '@material-ui/core';
-import { makeStyles } from '@material-ui/styles';
+} from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useEffect, useMemo, useState } from 'react';
-
-const useStyles = makeStyles({
-  labelStyles: {
-    lineHeight: 1.2,
-    marginBottom: '0.5em',
-    marginTop: '0.5em',
-  },
-});
 
 /**
  * Max length of a custom answer in radio/checkbox questions
@@ -38,7 +29,6 @@ export default function CheckBoxQuestion({
 }: Props) {
   const [customAnswerValue, setCustomAnswerValue] = useState('');
   const { tr, surveyLanguage } = useTranslations();
-  const classes = useStyles();
 
   const answerLimitText = useMemo(() => {
     if (!question.answerLimits) {
@@ -99,7 +89,11 @@ export default function CheckBoxQuestion({
                 name={option.text?.[surveyLanguage]}
               />
             }
-            classes={{ label: classes.labelStyles }}
+            sx={{
+              lineHeight: 1.2,
+              marginBottom: '0.5em',
+              marginTop: '0.5em',
+            }}
           />
         ))}
         {question.allowCustomAnswer && (
@@ -118,7 +112,11 @@ export default function CheckBoxQuestion({
               />
             }
             label={tr.SurveyQuestion.customAnswer}
-            classes={{ label: classes.labelStyles }}
+            sx={{
+              lineHeight: 1.2,
+              marginBottom: '0.5em',
+              marginTop: '0.5em',
+            }}
           />
         )}
         {value.includes(customAnswerValue) && (

@@ -1,5 +1,5 @@
-import { AppBar, IconButton, Toolbar, Typography } from '@material-ui/core';
-import { Menu as MenuIcon } from '@material-ui/icons';
+import { AppBar, IconButton, Toolbar, Typography } from '@mui/material';
+import { Menu as MenuIcon } from '@mui/icons-material';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React from 'react';

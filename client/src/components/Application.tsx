@@ -1,9 +1,9 @@
 import '@fontsource/montserrat/600.css';
 import '@fontsource/montserrat/800.css';
 import '@fontsource/open-sans';
-import { CssBaseline, StyledEngineProvider } from '@material-ui/core';
-import AdapterDateFns from '@material-ui/lab/AdapterDateFns';
-import LocalizationProvider from '@material-ui/lab/LocalizationProvider';
+import { CssBaseline, StyledEngineProvider } from '@mui/material';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import SurveyAnswerProvider from '@src/stores/SurveyAnswerContext';
 import SurveyMapProvider from '@src/stores/SurveyMapContext';
 import SurveyThemeProvider from '@src/stores/SurveyThemeProvider';
