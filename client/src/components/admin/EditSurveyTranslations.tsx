@@ -1,4 +1,11 @@
-import { Survey, SurveyEmailInfoItem } from '@interfaces/survey';
+import {
+  //LocalizedText,
+  //SectionOption,
+  //SectionOptionGroup,
+  Survey,
+  SurveyEmailInfoItem,
+  //SurveyPageSection,
+} from '@interfaces/survey';
 import {
   Checkbox,
   FormControlLabel,
@@ -48,37 +55,50 @@ const useStyles = makeStyles({
   },
 });
 
-function surveyToTranslationJSON(survey: Survey): string {
-  const surveyPages = survey.pages.map((page) => {
-    return {
-      title: page.title,
-      sections: page.sections.map((section: any) => {
-        return {
-          title: section.title,
-          ...(section?.info && { info: section.info }),
-          ...(section?.body && { body: section.body }),
-          ...(section?.options && {
-            options: { text: section.options.text, info: section.options.info },
-          }),
-          ...(section?.classes && { classes: section.classes }),
-          ...(section?.subjects && { subjects: section.subjects }),
-        };
-      }),
-    };
-  });
-  return JSON.stringify({
-    title: survey.title,
-    subtitle: survey.subtitle,
-    thanksPage: {
-      title: survey.thanksPage,
-      text: survey.thanksPage,
-    },
-    email: {
-      subject: survey.email.subject,
-      body: survey.email.body,
-    },
-    pages: surveyPages,
-  });
+function surveyToTranslationString(survey: Survey): string {
+  const columnHeaders = 'Label \t fi \t en \n';
+  const surveyStrings: string[] = [];
+
+  function isLocalizedText(value: any): boolean {
+    return (
+      typeof value === 'object' &&
+      value !== null &&
+      'fi' in value &&
+      'en' in value
+    );
+  }
+
+  function getRowString(
+    label: string,
+    valueFi: string,
+    valueEn: string
+  ): string {
+    if (label == '' || valueFi == '' || valueEn == '') {
+      return '';
+    }
+    return `${label} \t ${valueFi} \t ${valueEn} \n`;
+  }
+  // Uses recursion to loop through the entire Survey object and to add all values of objects of type LocalizedText
+  function addRowString(obj: any, label: string) {
+    Object.keys(obj).forEach((key: string) => {
+      if (!obj[key]) {
+        return;
+      } else if (Array.isArray(obj[key])) {
+        obj[key].forEach((array: [any]) =>
+          addRowString(array, `${label}.${key}`)
+        );
+      } else if (typeof obj[key] === 'object' && !isLocalizedText(obj[key])) {
+        addRowString(obj[key], `${label}.${key}`);
+      } else if (isLocalizedText(obj[key])) {
+        surveyStrings.push(
+          getRowString(`${label}.${key}`, obj[key].fi, obj[key].en)
+        );
+      }
+    });
+  }
+
+  addRowString(survey, 'Survey');
+  return [columnHeaders, ...surveyStrings].join('');
 }
 
 export default function EditSurveyTranslations() {
@@ -125,7 +145,7 @@ export default function EditSurveyTranslations() {
               <Typography>
                 {tr.EditSurveyTranslations.copyTextFields}
               </Typography>
-              <CopyToClipboard data={surveyToTranslationJSON(activeSurvey)} />
+              <CopyToClipboard data={surveyToTranslationString(activeSurvey)} />
             </div>
             <Typography variant="h5">
               {tr.EditSurveyTranslations.supportedLanguages}:{' '}
