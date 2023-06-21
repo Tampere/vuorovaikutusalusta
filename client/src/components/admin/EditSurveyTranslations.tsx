@@ -1,11 +1,4 @@
-import {
-  //LocalizedText,
-  //SectionOption,
-  //SectionOptionGroup,
-  Survey,
-  SurveyEmailInfoItem,
-  //SurveyPageSection,
-} from '@interfaces/survey';
+import { Survey, SurveyEmailInfoItem } from '@interfaces/survey';
 import {
   Checkbox,
   FormControlLabel,
