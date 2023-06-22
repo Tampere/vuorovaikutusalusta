@@ -32,6 +32,7 @@ import { request } from '@src/utils/request';
 import React, { useEffect, useMemo, useState } from 'react';
 import SplitPane from 'react-split-pane';
 import DocumentSection from './DocumentSection';
+import Footer from './Footer';
 import ImageSection from './ImageSection';
 import PageConnector from './PageConnector';
 import StepperControls from './StepperControls';
@@ -50,6 +51,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     width: '100%',
     maxWidth: '50rem',
     padding: '1rem',
+    minHeight: 'calc(100vh - 55px)', // Leave room for the footer
   },
   '@keyframes pulse': {
     '0%': {
@@ -374,6 +376,7 @@ export default function SurveyStepper({
           </Step>
         ))}
       </Stepper>
+      <Footer />
     </>
   );
 
