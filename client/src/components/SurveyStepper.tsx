@@ -381,11 +381,7 @@ export default function SurveyStepper({
   );
 
   const sidePane = useMemo(() => {
-    // If none of the pages has a sidebar, hide the pane completely
-    if (survey.pages.every((page) => page.sidebar.type === 'none')) {
-      return null;
-    }
-    // Otherwise return some component to be rendered in the side pane
+    // Return some component to be rendered in the side pane if a page has a sidebar
     switch (currentPage.sidebar.type) {
       case 'map':
         return (
@@ -416,6 +412,7 @@ export default function SurveyStepper({
           </div>
         );
       case 'none':
+        return null;
       default:
         return <div />;
     }
@@ -423,13 +420,9 @@ export default function SurveyStepper({
 
   return (
     <div className={getClassList([classes.root, loading && classes.loading])}>
-      {/* Side pane doesn't exist on any page - show the page in 1 column */}
+      {/* Side pane doesn't exist on any page - show the page in 1 column aligned to left */}
       {!sidePane && (
-        <div
-          style={{ width: '100%', display: 'flex', justifyContent: 'center' }}
-        >
-          {stepperPane}
-        </div>
+        <div style={{ width: '100%', display: 'flex' }}>{stepperPane}</div>
       )}
       {/* Desktop: side pane exists */}
       {mdUp && sidePane && (
