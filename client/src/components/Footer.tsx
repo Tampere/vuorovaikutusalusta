@@ -1,7 +1,9 @@
 import React from 'react';
 import Box from '@mui/material/Box';
+import { useTranslations } from '@src/stores/TranslationContext';
 
 export default function Footer() {
+    const { tr } = useTranslations();
     return (
         <Box component="footer" sx={{
             fontSize: '.8rem',
@@ -22,7 +24,7 @@ export default function Footer() {
             <nav>
                 <ul>
                     <li>
-                        <a href="https://www.tampere.fi/asioi-kaupungin-kanssa/oskari-karttakyselypalvelun-saavutettavuusseloste">Saavutettavuusseloste</a>
+                        <a href="https://www.tampere.fi/asioi-kaupungin-kanssa/oskari-karttakyselypalvelun-saavutettavuusseloste">{tr.FooterLinks.accessibility}</a>
                     </li>
                 </ul>
             </nav>

@@ -51,7 +51,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     width: '100%',
     maxWidth: '50rem',
     padding: '1rem',
-    minHeight: 'calc(100vh - 55px)', // Leave room for the footer
   },
   '@keyframes pulse': {
     '0%': {
@@ -422,7 +421,13 @@ export default function SurveyStepper({
     <div className={getClassList([classes.root, loading && classes.loading])}>
       {/* Side pane doesn't exist on any page - show the page in 1 column aligned to left */}
       {!sidePane && (
-        <div style={{ width: '100%', display: 'flex' }}>{stepperPane}</div>
+        <div style={{
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between' 
+        }}>{stepperPane}</div>
       )}
       {/* Desktop: side pane exists */}
       {mdUp && sidePane && (

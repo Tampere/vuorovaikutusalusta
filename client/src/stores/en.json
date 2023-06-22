@@ -443,5 +443,8 @@
     "yes": "Yes",
     "no": "No",
     "ok": "OK"
+  },
+  "FooterLinks": {
+    "accessibility": "Accessibility report"
   }
 }
