@@ -66,9 +66,6 @@ function surveyToTranslationString(survey: Survey): string {
     valueFi: string,
     valueEn: string
   ): string {
-    if (label == '' || valueFi == '' || valueEn == '') {
-      return '';
-    }
     return `${label} \t ${valueFi} \t ${valueEn} \n`;
   }
   // Uses recursion to loop through the entire Survey object and to add all values of objects of type LocalizedText
