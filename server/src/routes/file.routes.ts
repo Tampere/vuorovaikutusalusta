@@ -5,7 +5,7 @@ import {
   storeFile,
 } from '@src/application/survey';
 import { ensureAuthenticated } from '@src/auth';
-import { validateRequest } from '@src/utils';
+import { parseImageType, validateRequest } from '@src/utils';
 import { Router } from 'express';
 import asyncHandler from 'express-async-handler';
 import { param } from 'express-validator';
@@ -47,6 +47,21 @@ router.post(
 );
 
 /**
+ * Endpoint for fetching all available survey images with certain type specified by filepath
+ */
+router.get(
+  '/:filePath?',
+  ensureAuthenticated(),
+  asyncHandler(async (req, res) => {
+    const { filePath } = req.params;
+    const filePathArray = filePath?.split('/') ?? [];
+    const row = await getImages(filePathArray);
+
+    res.status(200).json(row);
+  })
+);
+
+/**
  * Endpoint for fetching a single local file
  */
 router.get(
@@ -65,18 +80,6 @@ router.get(
     res.set('Content-type', row.mimeType);
     res.set('File-details', JSON.stringify(row.details));
     res.status(200).send(row.data);
-  })
-);
-
-/**
- * Endpoint for fetching all available survey background images
- */
-router.get(
-  '/',
-  ensureAuthenticated(),
-  asyncHandler(async (req, res) => {
-    const row = await getImages();
-    res.status(200).json(row);
   })
 );
 
