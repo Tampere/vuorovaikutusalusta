@@ -2,7 +2,7 @@ import { Survey } from '@interfaces/survey';
 import { Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import rehypeExternalLinks from 'rehype-external-links';
 import TreBanner from './logos/TreBanner';
@@ -34,6 +34,27 @@ interface Props {
 }
 
 export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
+  const [image, setImage] = useState<{
+    url: string;
+    alt: string;
+  } | null>(null);
+
+  useEffect(() => {
+    async function getThanksPageImage() {
+      const res = await fetch(
+        `api/file/${survey.thanksPage.imagePath[0]}/${survey.thanksPage.imageName}`
+      );
+      const blob = await res.blob();
+
+      const altText: string = JSON.parse(
+        res.headers.get('File-details')
+      ).imageAltText;
+
+      setImage({ url: URL.createObjectURL(blob), alt: altText });
+    }
+    getThanksPageImage();
+  }, []);
+
   const classes = useStyles();
   const { tr, surveyLanguage } = useTranslations();
 
@@ -61,6 +82,10 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
         <ReactMarkdown rehypePlugins={[rehypeExternalLinks]}>
           {survey.thanksPage.text?.[surveyLanguage]}
         </ReactMarkdown>
+        {image && (
+          <img style={{ maxHeight: '800px' }} src={image.url} alt={image.alt} />
+        )}
+
         <div
           style={{
             position: 'absolute',
