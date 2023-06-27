@@ -52,7 +52,9 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
 
       setImage({ url: URL.createObjectURL(blob), alt: altText });
     }
-    getThanksPageImage();
+    survey.thanksPage.imagePath.length > 0 &&
+      survey.thanksPage.imageName &&
+      getThanksPageImage();
   }, []);
 
   const classes = useStyles();
