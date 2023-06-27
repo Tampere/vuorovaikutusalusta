@@ -4,6 +4,7 @@ import { File, ImageType } from '@interfaces/survey';
 import {
   Box,
   Button,
+  Container,
   Dialog,
   DialogActions,
   DialogContent,
@@ -299,20 +300,28 @@ export default function SurveyImageList({ imageType }: Props) {
               }
               onClick={() => handleEmptyImage()}
             >
-              <span
+              <Container
                 style={{
-                  marginTop: '70px',
                   display: 'flex',
-                  textAlign: 'center',
+                  padding: '0px 4px',
+                  height: '100%',
+                  maxWidth: '155px',
+                  flexDirection: 'column',
                   justifyContent: 'center',
                 }}
               >
-                {imageType === 'backgroundImage'
-                  ? tr.SurveyImageList.noBackgroundImage
-                  : imageType === 'thanksPageImage'
-                  ? tr.SurveyImageList.noThanksPageImage
-                  : tr.SurveyImageList.noImage}
-              </span>
+                <Typography
+                  style={{
+                    textAlign: 'center',
+                  }}
+                >
+                  {imageType === 'backgroundImage'
+                    ? tr.SurveyImageList.noBackgroundImage
+                    : imageType === 'thanksPageImage'
+                    ? tr.SurveyImageList.noThanksPageImage
+                    : tr.SurveyImageList.noImage}
+                </Typography>
+              </Container>
             </ImageListItem>
             {images.map((image) => (
               <ImageListItem
