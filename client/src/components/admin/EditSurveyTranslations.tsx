@@ -68,17 +68,18 @@ function surveyToTranslationString(survey: Survey): string {
   ): string {
     return `${label} \t ${valueFi} \t ${valueEn} \n`;
   }
-  // Uses recursion to loop through the entire Survey object and to add all values of objects of type LocalizedText
-  function addRowString(obj: any, label: string) {
+  // Uses recursion to loop through the entire Survey object and to add all values of objects of type LocalizedText to the clipboard
+  function addRowString(obj: any, label: string, index: number = 0) {
     Object.keys(obj).forEach((key: string) => {
       if (!obj[key]) {
         return;
       } else if (Array.isArray(obj[key])) {
+        index = 1;
         obj[key].forEach((array: [any]) =>
-          addRowString(array, `${label}.${key}`)
+          addRowString(array, `${label}.${key}[${index}]`, index++)
         );
       } else if (typeof obj[key] === 'object' && !isLocalizedText(obj[key])) {
-        addRowString(obj[key], `${label}.${key}`);
+        addRowString(obj[key], `${label}.${key}[${index}]`, index);
       } else if (isLocalizedText(obj[key])) {
         surveyStrings.push(
           getRowString(`${label}.${key}`, obj[key].fi, obj[key].en)
