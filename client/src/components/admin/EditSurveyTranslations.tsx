@@ -48,7 +48,7 @@ const useStyles = makeStyles({
   },
 });
 
-function surveyToTranslationString(survey: Survey): string {
+function surveyToTranslationString(survey: Survey) {
   const columnHeaders = 'Label \t fi \t en \n';
   const surveyStrings: string[] = [];
 
