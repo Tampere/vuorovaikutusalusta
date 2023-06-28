@@ -1,4 +1,4 @@
-import { Survey, SurveyEmailInfoItem } from '@interfaces/survey';
+import { LocalizedText, Survey, SurveyEmailInfoItem } from '@interfaces/survey';
 import {
   Checkbox,
   FormControlLabel,
@@ -49,6 +49,7 @@ const useStyles = makeStyles({
 });
 
 function surveyToTranslationString(survey: Survey) {
+  console.log(survey);
   const columnHeaders = 'Label \t fi \t en \n';
   const surveyStrings: string[] = [];
 
@@ -61,6 +62,10 @@ function surveyToTranslationString(survey: Survey) {
     );
   }
 
+  function isObject(value: unknown): value is object {
+    return !!value && typeof value === 'object';
+  }
+
   function getRowString(
     label: string,
     valueFi: string,
@@ -69,21 +74,27 @@ function surveyToTranslationString(survey: Survey) {
     return `${label} \t ${valueFi} \t ${valueEn} \n`;
   }
   // Uses recursion to loop through the entire Survey object and to add all values of objects of type LocalizedText to the clipboard
-  function addRowString(obj: any, label: string, index: number = 0) {
-    Object.keys(obj).forEach((key: string) => {
-      if (!obj[key]) {
+  function addRowString(obj: unknown, label: string, index: number = 0) {
+    if (Array.isArray(obj)) {
+      index = 1;
+      obj.forEach((item) => addRowString(item, `${label}.[${index}]`, index++));
+    }
+    if (!isObject(obj)) {
+      return;
+    }
+
+    Object.entries(obj).forEach(([key, value]) => {
+      if (!value) {
         return;
-      } else if (Array.isArray(obj[key])) {
+      } else if (Array.isArray(value)) {
         index = 1;
-        obj[key].forEach((array: [any]) =>
-          addRowString(array, `${label}.${key}[${index}]`, index++)
+        value.forEach((item) =>
+          addRowString(item, `${label}.${key}[${index}]`, index++)
         );
-      } else if (typeof obj[key] === 'object' && !isLocalizedText(obj[key])) {
-        addRowString(obj[key], `${label}.${key}[${index}]`, index);
-      } else if (isLocalizedText(obj[key])) {
-        surveyStrings.push(
-          getRowString(`${label}.${key}`, obj[key].fi, obj[key].en)
-        );
+      } else if (typeof value === 'object' && !isLocalizedText(value)) {
+        addRowString(value, `${label}.${key}[${index}]`, index);
+      } else if (isLocalizedText(value)) {
+        surveyStrings.push(getRowString(`${label}.${key}`, value.fi, value.en));
       }
     });
   }
