@@ -198,7 +198,6 @@ export default function SurveyImageList({ imageType }: Props) {
               image.filePath.join() === activeSurvey.backgroundImagePath.join()
           ) ?? null
         );
-        break;
       case 'thanksPageImage':
         return (
           images?.find(
