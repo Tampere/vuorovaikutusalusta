@@ -200,7 +200,7 @@ export default function EditSurveyInfo() {
             </ul>
           </div>
         )}
-        <SurveyImageList />
+        <SurveyImageList imageType={'backgroundImage'} />
         <ThemeSelect
           value={activeSurvey.theme?.id}
           onChange={(theme) => {

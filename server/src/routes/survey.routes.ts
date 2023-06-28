@@ -123,7 +123,15 @@ router.put(
     body('backgroundImagePath')
       .isArray()
       .optional({ nullable: true })
-      .withMessage('Background image path must be a string'),
+      .withMessage('Background image path must be an array'),
+    body('thanksPageImageName')
+      .isString()
+      .optional({ nullable: true })
+      .withMessage('Thanks page image name must be a string'),
+    body('thanksPageImagePath')
+      .isArray()
+      .optional({ nullable: true })
+      .withMessage('Thanks page image path must be an array'),
     body('startDate')
       .isString()
       .optional({ nullable: true })

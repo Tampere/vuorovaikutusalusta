@@ -367,6 +367,14 @@ export interface Survey {
      * Text in markdown format
      */
     text: LocalizedText;
+    /**
+     * Name of the thanks page image
+     */
+    imageName?: string;
+    /**
+     * Path of the thanks page image
+     */
+    imagePath?: string[];
   };
   /**
    * Theme of the survey
@@ -577,13 +585,17 @@ export interface File {
 }
 
 /**
- * Image used as the background of the survey landing page
+ * Image used as the background of the survey landing page or in the thank you page
  */
-export interface SurveyBackgroundImage extends File {
+export interface SurveyImage extends File {
   /**
    * Image attributions (= who owns the image rights)
    */
   attributions: string;
+  /**
+   * Alternative text for the picture entered by the user
+   */
+  altText: string;
 }
 
 /**
@@ -638,3 +650,5 @@ export interface SurveyEmailInfoItem {
   name: LocalizedText;
   value: LocalizedText;
 }
+
+export type ImageType = 'backgroundImage' | 'thanksPageImage';

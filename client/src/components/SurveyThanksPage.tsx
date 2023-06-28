@@ -2,7 +2,7 @@ import { Survey } from '@interfaces/survey';
 import { Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import rehypeExternalLinks from 'rehype-external-links';
 import TreBanner from './logos/TreBanner';
@@ -34,6 +34,26 @@ interface Props {
 }
 
 export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
+  const [imageAltText, setImageAltText] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function getImageHeaders() {
+      const res = await fetch(
+        `api/file/${survey.thanksPage.imagePath[0]}/${survey.thanksPage.imageName}`,
+        { method: 'HEAD' }
+      );
+
+      const altText: string = JSON.parse(
+        res.headers.get('File-details')
+      ).imageAltText;
+
+      setImageAltText(altText);
+    }
+    survey.thanksPage.imagePath.length > 0 &&
+      survey.thanksPage.imageName &&
+      getImageHeaders();
+  }, []);
+
   const classes = useStyles();
   const { tr, surveyLanguage } = useTranslations();
 
@@ -61,6 +81,14 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
         <ReactMarkdown rehypePlugins={[rehypeExternalLinks]}>
           {survey.thanksPage.text?.[surveyLanguage]}
         </ReactMarkdown>
+        {imageAltText && (
+          <img
+            style={{ maxHeight: '800px' }}
+            src={`api/file/${survey.thanksPage.imagePath[0]}/${survey.thanksPage.imageName}`}
+            alt={imageAltText}
+          />
+        )}
+
         <div
           style={{
             position: 'absolute',

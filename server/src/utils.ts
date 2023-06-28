@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { ValidationChain, validationResult } from 'express-validator';
 import { BadRequestError } from './error';
+import { ImageType } from '@interfaces/survey';
 
 /**
  * Middleware function for validating a request against provided validation rules.
@@ -36,4 +37,19 @@ export function base64Encode(str: string) {
  */
 export function base64Decode(str: string) {
   return Buffer.from(str, 'base64').toString('ascii');
+}
+
+function isString(text: unknown): text is string {
+  return typeof text === 'string' || text instanceof String;
+}
+
+function isImageType(val: string): val is ImageType {
+  return val === 'backgroundImage' || val === 'thanksPageImage';
+}
+
+export function parseImageType(val: unknown): ImageType | null {
+  if (!isString(val) || !isImageType(val)) {
+    throw new Error('Invalid value for imagetype');
+  }
+  return val;
 }
