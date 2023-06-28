@@ -52,7 +52,7 @@ function surveyToTranslationString(survey: Survey) {
   const columnHeaders = 'Label \t fi \t en \n';
   const surveyStrings: string[] = [];
 
-  function isLocalizedText(value: any): boolean {
+  function isLocalizedText(value: unknown): value is LocalizedText {
     return (
       typeof value === 'object' &&
       value !== null &&
