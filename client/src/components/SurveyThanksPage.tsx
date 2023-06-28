@@ -34,27 +34,24 @@ interface Props {
 }
 
 export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
-  const [image, setImage] = useState<{
-    url: string;
-    alt: string;
-  } | null>(null);
+  const [imageAltText, setImageAltText] = useState<string | null>(null);
 
   useEffect(() => {
-    async function getThanksPageImage() {
+    async function getImageHeaders() {
       const res = await fetch(
-        `api/file/${survey.thanksPage.imagePath[0]}/${survey.thanksPage.imageName}`
+        `api/file/${survey.thanksPage.imagePath[0]}/${survey.thanksPage.imageName}`,
+        { method: 'HEAD' }
       );
-      const blob = await res.blob();
 
       const altText: string = JSON.parse(
         res.headers.get('File-details')
       ).imageAltText;
 
-      setImage({ url: URL.createObjectURL(blob), alt: altText });
+      setImageAltText(altText);
     }
     survey.thanksPage.imagePath.length > 0 &&
       survey.thanksPage.imageName &&
-      getThanksPageImage();
+      getImageHeaders();
   }, []);
 
   const classes = useStyles();
@@ -84,8 +81,12 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
         <ReactMarkdown rehypePlugins={[rehypeExternalLinks]}>
           {survey.thanksPage.text?.[surveyLanguage]}
         </ReactMarkdown>
-        {image && (
-          <img style={{ maxHeight: '800px' }} src={image.url} alt={image.alt} />
+        {imageAltText && (
+          <img
+            style={{ maxHeight: '800px' }}
+            src={`api/file/${survey.thanksPage.imagePath[0]}/${survey.thanksPage.imageName}`}
+            alt={imageAltText}
+          />
         )}
 
         <div
