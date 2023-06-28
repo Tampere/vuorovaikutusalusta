@@ -189,25 +189,25 @@ export default function SurveyImageList({ imageType }: Props) {
   }
 
   function getActiveImage() {
-    const activeImage;
     switch (imageType) {
       case 'backgroundImage':
-        activeImage =
+        return (
           images?.find(
             (image) =>
               image.fileName === activeSurvey.backgroundImageName &&
               image.filePath.join() === activeSurvey.backgroundImagePath.join()
-          ) ?? null;
+          ) ?? null
+        );
         break;
       case 'thanksPageImage':
-        activeImage =
+        return (
           images?.find(
             (image) =>
               image.fileName === activeSurvey.thanksPage.imageName &&
               image.filePath.join() === activeSurvey.thanksPage.imagePath.join()
-          ) ?? null;
+          ) ?? null
+        );
     }
-    return activeImage;
   }
 
   function getImageBorderStyle(image: File) {
