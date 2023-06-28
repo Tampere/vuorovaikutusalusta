@@ -95,7 +95,12 @@
     "title": "Otsikko",
     "deleteSection": "Poista osio",
     "confirmDeleteSection": "Haluatko varmasti poistaa tämän osion?",
-    "imageAltText": "Kuvan vaihtoehtoinen teksti"
+    "imageAltText": "Kuvan vaihtoehtoinen teksti",
+    "imageScaling": "Kuvan skaalaus",
+    "imageScalingLabel": {
+      "original": "Alkuperäinen koko",
+      "fitted": "Sivuun sovitettu koko"
+    }
   },
   "FileUpload": {
     "deleteFile": "Poista tiedosto",

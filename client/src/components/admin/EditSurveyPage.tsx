@@ -8,6 +8,9 @@ import {
   TextField,
   ToggleButton,
   ToggleButtonGroup,
+  FormControl,
+  Radio,
+  RadioGroup,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useSurvey } from '@src/stores/SurveyContext';
@@ -20,6 +23,7 @@ import Fieldset from '../Fieldset';
 import AddSurveySectionActions from './AddSurveySectionActions';
 import FileUpload from './FileUpload';
 import SurveySections from './SurveySections';
+import { SurveyPageSidebarImageSize } from '@interfaces/survey';
 
 const useStyles = makeStyles({
   button: {
@@ -53,7 +57,7 @@ export default function EditSurveyPage() {
   const page = useMemo(() => {
     return activeSurvey.pages.find((page) => page.id === Number(pageId));
   }, [activeSurvey, pageId]);
-
+  console.log(page);
   // If page ID in URL doesn't exist, redirect to survey front page
   useEffect(() => {
     if (activeSurvey && !page) {
@@ -174,6 +178,33 @@ export default function EditSurveyPage() {
         ))}
       {page.sidebar.type === 'image' && (
         <div>
+          <FormControl sx={{ marginBottom: 2 }}>
+            <FormLabel>{tr.EditSurveyPage.imageScaling}</FormLabel>
+            <RadioGroup
+              row
+              onChange={(event) =>
+                editPage({
+                  ...page,
+                  sidebar: {
+                    ...page.sidebar,
+                    imageSize: event.target.value as SurveyPageSidebarImageSize,
+                  },
+                })
+              }
+            >
+              <FormControlLabel
+                checked={page.sidebar?.imageSize === 'fitted'}
+                value="fitted"
+                control={<Radio />}
+                label={tr.EditSurveyPage.imageScalingLabel.fitted}
+              />
+              <FormControlLabel
+                value="original"
+                control={<Radio />}
+                label={tr.EditSurveyPage.imageScalingLabel.original}
+              />
+            </RadioGroup>
+          </FormControl>
           <FileUpload
             surveyId={activeSurvey.id}
             targetPath={[String(activeSurvey.id)]}
@@ -194,6 +225,7 @@ export default function EditSurveyPage() {
                   ...page.sidebar,
                   imagePath: path,
                   imageName: name,
+                  imageSize: 'fitted',
                 },
               });
             }}
@@ -204,6 +236,7 @@ export default function EditSurveyPage() {
                   ...page.sidebar,
                   imagePath: [],
                   imageName: null,
+                  imageSize: null,
                 },
               });
             }}

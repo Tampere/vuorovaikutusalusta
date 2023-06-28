@@ -390,19 +390,49 @@ export default function SurveyStepper({
       case 'image':
         return (
           <div
-            style={{
-              height: '100%',
-              display: 'flex',
-              flexDirection: 'column',
-              overflow: 'auto',
-            }}
+            style={
+              currentPage.sidebar.imageSize === 'original'
+                ? {
+                    position: 'relative',
+                    height: '100vh',
+                  }
+                : currentPage.sidebar.imageSize === 'fitted'
+                ? {
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    overflow: 'auto',
+                  }
+                : null
+            }
           >
-            <div style={{ margin: 'auto' }}>
+            <div
+              style={
+                currentPage.sidebar.imageSize === 'original'
+                  ? {
+                      position: 'absolute',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      maxHeight: '100%',
+                      maxWidth: '100%',
+                      overflow: 'auto',
+                    }
+                  : currentPage.sidebar.imageSize === 'fitted'
+                  ? { margin: 'auto' }
+                  : null
+              }
+            >
               {currentPage.sidebar.imageName && (
                 <img
+                  style={
+                    currentPage.sidebar.imageSize === 'original'
+                      ? { verticalAlign: 'middle' }
+                      : currentPage.sidebar.imageSize === 'fitted'
+                      ? { width: '100%', maxHeight: '100vh' }
+                      : null
+                  }
                   alt={currentPage.sidebar?.imageAltText?.[surveyLanguage]}
                   src={`/api/file/${fullSidebarImagePath}`}
-                  style={{ width: '100%', maxHeight: '100vh' }}
                 />
               )}
             </div>
