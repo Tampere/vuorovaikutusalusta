@@ -156,7 +156,8 @@
     "sectionInfo": "Additional information related to the section",
     "allowEmptyAnswer": "Allow 'I don't know' -answers",
     "optionInfo": "Answer option information",
-    "removeOption": "Delete answer option"
+    "removeOption": "Delete answer option",
+    "selectAnswer": "Select an answer"
   },
   "NumericQuestion": {
     "minValue": "Minimum value {minValue}",
