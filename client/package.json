@@ -44,7 +44,6 @@
     "@mui/material": "^5.13.5",
     "@mui/styles": "^5.13.2",
     "@mui/x-date-pickers": "^6.7.0",
-    "@react-hook/resize-observer": "^1.2.6",
     "@turf/centroid": "^6.5.0",
     "assert": "^2.0.0",
     "date-fns": "^2.23.0",
