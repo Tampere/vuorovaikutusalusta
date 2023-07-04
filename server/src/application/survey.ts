@@ -4,9 +4,9 @@ import {
   SectionOption,
   SectionOptionGroup,
   Survey,
-  SurveyBackgroundImage,
   SurveyCheckboxQuestion,
   SurveyEmailInfoItem,
+  SurveyImage,
   SurveyMapQuestion,
   SurveyMapSubQuestion,
   SurveyPage,
@@ -49,6 +49,8 @@ interface DBSurvey {
   updated_at: Date;
   thanks_page_title: LocalizedText;
   thanks_page_text: LocalizedText;
+  thanks_page_image_name: string;
+  thanks_page_image_path: string[];
   background_image_name: string;
   background_image_path: string[];
   section_title_color: string;
@@ -685,16 +687,18 @@ export async function updateSurvey(survey: Survey) {
         thanks_page_text = $12,
         background_image_name = $13,
         background_image_path = $14,
-        admins = $15,
-        theme_id = $16,
-        section_title_color = $17,
-        email_enabled = $18,
-        email_auto_send_to = $19,
-        email_subject = $20,
-        email_body = $21,
-        email_info = $22::json,
-        allow_saving_unfinished = $23,
-        localisation_enabled = $24
+        thanks_page_image_name = $15,
+        thanks_page_image_path = $16,
+        admins = $17,
+        theme_id = $18,
+        section_title_color = $19,
+        email_enabled = $20,
+        email_auto_send_to = $21,
+        email_subject = $22,
+        email_body = $23,
+        email_info = $24::json,
+        allow_saving_unfinished = $25,
+        localisation_enabled = $26
       WHERE id = $1 RETURNING *`,
       [
         survey.id,
@@ -711,6 +715,8 @@ export async function updateSurvey(survey: Survey) {
         survey.thanksPage.text,
         survey.backgroundImageName ?? null,
         survey.backgroundImagePath ?? null,
+        survey.thanksPage.imageName ?? null,
+        survey.thanksPage.imagePath ?? null,
         survey.admins,
         survey.theme?.id ?? null,
         survey.sectionTitleColor,
@@ -888,6 +894,8 @@ function dbSurveyToSurvey(
     thanksPage: {
       title: dbSurvey.thanks_page_title,
       text: dbSurvey.thanks_page_text,
+      imageName: dbSurvey.thanks_page_image_name,
+      imagePath: dbSurvey.thanks_page_image_path,
     },
     backgroundImageName: dbSurvey.background_image_name,
     backgroundImagePath: dbSurvey.background_image_path,
@@ -1288,20 +1296,24 @@ export async function getFile(fileName: string, filePath: string[]) {
 
 /**
  * Get all survey images from the database
- * @returns SurveyBackgroundImage[]
+ * @returns SurveyImage[]
  */
-export async function getImages() {
-  const rows = await getDb().manyOrNone(`
-    SELECT id, details, file, file_name, file_path FROM data.files WHERE file_path = array[]::text[] ORDER BY created_at DESC;
-  `);
+export async function getImages(imagePath: string[]) {
+  const rows = await getDb().manyOrNone(
+    `
+    SELECT id, details, file, file_name, file_path FROM data.files WHERE file_path = $1;
+  `,
+    [imagePath]
+  );
 
   return rows.map((row) => ({
     id: row.id,
     data: row.file.toString('base64'),
     attributions: row.details?.attributions,
+    altText: row.details?.imageAltText,
     fileName: row.file_name,
     filePath: row.file_path,
-  })) as SurveyBackgroundImage[];
+  })) as SurveyImage[];
 }
 
 /**

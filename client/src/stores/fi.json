@@ -172,8 +172,12 @@
   },
   "SurveyImageList": {
     "attributions": "Tekijänoikeustiedot",
-    "noImage": "Ei taustakuvaa",
+    "noBackgroundImage": "Ei taustakuvaa",
+    "noThanksPageImage": "Ei Kiitos-sivun kuvaa",
+    "noImage": "Ei kuvaa",
     "surveyImage": "Kyselyn taustakuva",
+    "thanksPageImage": "Kiitos-sivun kuva",
+    "image": "Kuva",
     "selectImage": "Valitse taustakuva",
     "addNewImage": "Lisää uusi kuva",
     "files": "Tiedosto"

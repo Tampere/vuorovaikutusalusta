@@ -172,8 +172,12 @@
   },
   "SurveyImageList": {
     "attributions": "Copyright & attributions",
-    "noImage": "No background image",
+    "noBackgroundImage": "No background image",
+    "noThanksPageImage": "No thank you page image",
+    "noImage": "No image",
     "surveyImage": "Survey background image",
+    "thanksPageImage": "Image for thank you page",
+    "image": "Image",
     "selectImage": "Choose background image",
     "addNewImage": "Add a new image",
     "files": "File"
@@ -294,7 +298,7 @@
     "errorLoadingUnfinished": "Failed to load previously stored answers. Please try again later."
   },
   "UnavailableSurvey": {
-    "surveyNotPublished": "The survey is closed and answering is not possible anymore. Thank You for your interest on the survey!",
+    "surveyNotPublished": "The survey is not available at the moment. Thank You for your interest on the survey!",
     "treTopicalInfo": "You can access topical issues of the city of Tampere from the link below.",
     "tre": "The city of Tampere"
   },
