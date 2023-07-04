@@ -176,7 +176,12 @@ export function useSurveyAnswers() {
     }
 
     // Numeric question validation - check min & max values
-    if (question.type === 'numeric' && answer.value != null) {
+    if (
+      question.type === 'numeric' &&
+      answer.value != null &&
+      typeof answer.value === 'number' &&
+      !isNaN(answer.value)
+    ) {
       if (question.minValue != null && answer.value < question.minValue) {
         errors.push('minValue');
       }

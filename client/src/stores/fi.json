@@ -156,7 +156,8 @@
     "sectionInfo": "Anna lisätietoja kysymykseen liittyen",
     "allowEmptyAnswer": "Salli “En osaa sanoa” -vaihtoehto",
     "optionInfo": "Kysymysvaihtoehdon lisätiedot",
-    "removeOption": "Poista vastausvaihtoehto"
+    "removeOption": "Poista vastausvaihtoehto",
+    "selectAnswer": "Valitse vastaus"
   },
   "NumericQuestion": {
     "minValue": "Arvon pitää olla vähintään {minValue}",
