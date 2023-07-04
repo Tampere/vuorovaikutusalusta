@@ -360,7 +360,14 @@ export default function SurveyImageList({ imageType }: Props) {
             </p>
           </div>
           {acceptedFiles?.length ? (
-            <aside>
+            <aside
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignSelf: 'flex-start',
+                marginLeft: 2,
+              }}
+            >
               <h4>{tr.SurveyImageList.files}</h4>
               {files}
 
