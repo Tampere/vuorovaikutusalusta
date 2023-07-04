@@ -29,7 +29,7 @@ interface Props {
   question: SurveyMatrixQuestion;
 }
 
-interface ComponentStateProps {
+interface ComponentState {
   isOverflow: boolean;
   breakPoint: number;
 }
@@ -65,7 +65,7 @@ export default function MatrixQuestion({
   const { tr, surveyLanguage } = useTranslations();
   const classes = useStyles();
   const isMobileWidth = useMediaQuery('(max-width:430px)');
-  const [componentState, setComponentState] = useState<ComponentStateProps>({
+  const [componentState, setComponentState] = useState<ComponentState>({
     isOverflow: false,
     breakPoint: 0,
   });
@@ -82,14 +82,10 @@ export default function MatrixQuestion({
       const entry = entries[0];
 
       setComponentState((prev) => {
-        if (entry === null) {
-          return {
-            isOverflow: true,
-            breakPoint: prev.isOverflow
-              ? prev.breakPoint
-              : entry.target.scrollWidth,
-          };
-        } else if (entry.target.clientWidth < entry.target.scrollWidth) {
+        if (
+          entry === null ||
+          entry.target.clientWidth < entry.target.scrollWidth
+        ) {
           return {
             isOverflow: true,
             breakPoint: prev.isOverflow
