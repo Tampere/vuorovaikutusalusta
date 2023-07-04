@@ -57,7 +57,7 @@ export default function EditSurveyPage() {
   const page = useMemo(() => {
     return activeSurvey.pages.find((page) => page.id === Number(pageId));
   }, [activeSurvey, pageId]);
-  console.log(page);
+
   // If page ID in URL doesn't exist, redirect to survey front page
   useEffect(() => {
     if (activeSurvey && !page) {
