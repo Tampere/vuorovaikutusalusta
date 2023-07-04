@@ -390,52 +390,27 @@ export default function SurveyStepper({
       case 'image':
         return (
           <div
-            style={
-              currentPage.sidebar.imageSize === 'original'
-                ? {
-                    position: 'relative',
-                    height: '100vh',
-                  }
-                : currentPage.sidebar.imageSize === 'fitted'
-                ? {
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    overflow: 'auto',
-                  }
-                : null
-            }
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              overflow: 'auto',
+              height: '100%',
+              width: '100%',
+            }}
           >
-            <div
-              style={
-                currentPage.sidebar.imageSize === 'original'
-                  ? {
-                      position: 'absolute',
-                      top: '50%',
-                      transform: 'translateY(-50%)',
-                      maxHeight: '100%',
-                      maxWidth: '100%',
-                      overflow: 'auto',
-                    }
-                  : currentPage.sidebar.imageSize === 'fitted'
-                  ? { margin: 'auto' }
-                  : null
-              }
-            >
-              {currentPage.sidebar.imageName && (
-                <img
-                  style={
-                    currentPage.sidebar.imageSize === 'original'
-                      ? { verticalAlign: 'middle' }
-                      : currentPage.sidebar.imageSize === 'fitted'
-                      ? { width: '100%', maxHeight: '100vh' }
-                      : null
-                  }
-                  alt={currentPage.sidebar?.imageAltText?.[surveyLanguage]}
-                  src={`/api/file/${fullSidebarImagePath}`}
-                />
-              )}
-            </div>
+            {currentPage.sidebar.imageName && (
+              <img
+                style={
+                  currentPage.sidebar.imageSize === 'original'
+                    ? { margin: '0 auto' }
+                    : currentPage.sidebar.imageSize === 'fitted'
+                    ? { margin: '0 auto', maxWidth: '100%' }
+                    : null
+                }
+                alt={currentPage.sidebar?.imageAltText?.[surveyLanguage]}
+                src={`/api/file/${fullSidebarImagePath}`}
+              />
+            )}
           </div>
         );
       case 'none':
@@ -464,7 +439,11 @@ export default function SurveyStepper({
           // Dirty hack to fix iframe resizing issues with the split pane library
           // Issue: https://github.com/tomkp/react-split-pane/issues/361
           // Workaround: https://github.com/tomkp/react-split-pane/issues/241#issuecomment-677091968
-          pane2Style={{ pointerEvents: isResizing ? 'none' : 'auto' }}
+          pane2Style={{
+            pointerEvents: isResizing ? 'none' : 'auto',
+            overflowX:
+              currentPage.sidebar.type === 'image' ? 'auto' : 'visible',
+          }}
           onDragStarted={() => {
             setIsResizing(true);
           }}
