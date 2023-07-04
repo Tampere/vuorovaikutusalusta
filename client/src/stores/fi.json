@@ -99,7 +99,7 @@
     "imageScaling": "Kuvan skaalaus",
     "imageScalingLabel": {
       "original": "Alkuperäinen koko",
-      "fitted": "Sivuun sovitettu koko"
+      "fitted": "Sovita näkymään"
     }
   },
   "FileUpload": {

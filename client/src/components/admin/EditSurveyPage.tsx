@@ -178,33 +178,6 @@ export default function EditSurveyPage() {
         ))}
       {page.sidebar.type === 'image' && (
         <div>
-          <FormControl sx={{ marginBottom: 2 }}>
-            <FormLabel>{tr.EditSurveyPage.imageScaling}</FormLabel>
-            <RadioGroup
-              row
-              onChange={(event) =>
-                editPage({
-                  ...page,
-                  sidebar: {
-                    ...page.sidebar,
-                    imageSize: event.target.value as SurveyPageSidebarImageSize,
-                  },
-                })
-              }
-            >
-              <FormControlLabel
-                checked={page.sidebar?.imageSize === 'fitted'}
-                value="fitted"
-                control={<Radio />}
-                label={tr.EditSurveyPage.imageScalingLabel.fitted}
-              />
-              <FormControlLabel
-                value="original"
-                control={<Radio />}
-                label={tr.EditSurveyPage.imageScalingLabel.original}
-              />
-            </RadioGroup>
-          </FormControl>
           <FileUpload
             surveyId={activeSurvey.id}
             targetPath={[String(activeSurvey.id)]}
@@ -242,7 +215,7 @@ export default function EditSurveyPage() {
             }}
           />
           <TextField
-            style={{ width: '100%' }}
+            style={{ width: '100%', marginTop: 2 }}
             label={tr.EditSurveyPage.imageAltText}
             value={page.sidebar?.imageAltText?.[surveyLanguage] ?? ''}
             onChange={(event) => {
@@ -258,6 +231,35 @@ export default function EditSurveyPage() {
               });
             }}
           />
+          <FormControl sx={{ marginTop: 2 }}>
+            <FormLabel>{tr.EditSurveyPage.imageScaling}</FormLabel>
+            <RadioGroup
+              row
+              onChange={(event) =>
+                editPage({
+                  ...page,
+                  sidebar: {
+                    ...page.sidebar,
+                    imageSize: event.target.value as SurveyPageSidebarImageSize,
+                  },
+                })
+              }
+            >
+              <FormControlLabel
+                sx={{ marginRight: 4 }}
+                checked={page.sidebar?.imageSize === 'fitted'}
+                value="fitted"
+                control={<Radio />}
+                label={tr.EditSurveyPage.imageScalingLabel.fitted}
+              />
+              <FormControlLabel
+                checked={page.sidebar?.imageSize === 'original'}
+                value="original"
+                control={<Radio />}
+                label={tr.EditSurveyPage.imageScalingLabel.original}
+              />
+            </RadioGroup>
+          </FormControl>
         </div>
       )}
       <SurveySections
