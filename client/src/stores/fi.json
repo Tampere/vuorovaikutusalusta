@@ -364,7 +364,9 @@
     "finishEditingGeometries": "Lopeta karttamerkintöjen muokkaus"
   },
   "MatrixQuestion": {
-    "emptyAnswer": "En osaa sanoa"
+    "emptyAnswer": "En osaa sanoa",
+    "subject": "Aihe",
+    "response": "Vastaus"
   },
   "ImageSection": {
     "openInNewTab": "Avaa kuva uudella välilehdellä"

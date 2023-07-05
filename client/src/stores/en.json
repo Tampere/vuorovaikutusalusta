@@ -364,7 +364,9 @@
     "finishEditingGeometries": "Stop modifying map answers"
   },
   "MatrixQuestion": {
-    "emptyAnswer": "I don't know"
+    "emptyAnswer": "I don't know",
+    "subject": "Subject",
+    "response": "Response"
   },
   "ImageSection": {
     "openInNewTab": "Open image on a new tab"

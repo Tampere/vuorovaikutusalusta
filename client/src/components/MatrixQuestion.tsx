@@ -2,7 +2,6 @@ import { SurveyMatrixQuestion } from '@interfaces/survey';
 import {
   FormControl,
   FormLabel,
-  InputLabel,
   MenuItem,
   Radio,
   Select,
@@ -16,6 +15,7 @@ import {
   TableRow,
   useMediaQuery,
 } from '@mui/material';
+import { visuallyHidden } from '@mui/utils';
 
 import { makeStyles } from '@mui/styles';
 
@@ -51,8 +51,8 @@ const useStyles = makeStyles({
   stickyLeft: {
     position: 'sticky',
     left: 0,
-    background: 'white',
     zIndex: 1,
+    textAlign: 'left',
   },
 });
 
@@ -149,12 +149,13 @@ export default function MatrixQuestion({
       {!componentState.isOverflow && (
         <TableContainer ref={radioRef}>
           <Table size="small">
+            {question.title && <caption style={visuallyHidden}>{question.title?.[surveyLanguage]}</caption>}
             <TableHead>
               <TableRow>
-                <TableCell className={classes.stickyLeft} />
+                <TableCell scope="col" className={classes.stickyLeft} />
                 {question.classes.map((entry, index) => {
                   return (
-                    <TableCell
+                    <TableCell scope="col"
                       key={index}
                       className={`${classes.matrixCell} ${classes.matrixText}`}
                     >
@@ -163,7 +164,7 @@ export default function MatrixQuestion({
                   );
                 })}
                 {question.allowEmptyAnswer && (
-                  <TableCell
+                  <TableCell scope="col"
                     className={`${classes.matrixCell} ${classes.matrixText}`}
                   >
                     {tr.MatrixQuestion.emptyAnswer}
@@ -176,6 +177,8 @@ export default function MatrixQuestion({
                 return (
                   <TableRow key={subjectIndex}>
                     <TableCell
+                      component="th"
+                      scope="row"
                       className={[
                         classes.stickyLeft,
                         classes.matrixCell,
@@ -184,13 +187,12 @@ export default function MatrixQuestion({
                     >
                       {subject?.[surveyLanguage]}
                     </TableCell>
-                    {question.classes.map((entry, classIndex) => (
+                    {question.classes.map((_entry, classIndex) => (
                       <TableCell
-                        key={classIndex}
+                        key={classIndex.toString()}
                         className={classes.matrixCell}
                       >
                         <Radio
-                          aria-label={`${question.title} ${subject?.[surveyLanguage]}: ${entry?.[surveyLanguage]}`}
                           name={`question-${subjectIndex}`}
                           checked={
                             value[subjectIndex] === classIndex.toString()
@@ -203,9 +205,8 @@ export default function MatrixQuestion({
                       </TableCell>
                     ))}
                     {question.allowEmptyAnswer && (
-                      <TableCell>
+                      <TableCell className={classes.matrixCell}>
                         <Radio
-                          aria-label={`${question.title} ${subject?.[surveyLanguage]}: ${tr.MatrixQuestion.emptyAnswer}`}
                           name={`question-${subjectIndex}`}
                           checked={value[subjectIndex] === '-1'}
                           value={'-1'}
@@ -225,11 +226,34 @@ export default function MatrixQuestion({
       {!isMobileWidth && componentState.isOverflow && (
         <TableContainer ref={selectRef} sx={{ marginTop: 2 }}>
           <Table size="small">
+            {question.title && <caption style={visuallyHidden}>{question.title?.[surveyLanguage]}</caption>}
+            <TableHead>
+              <TableRow>
+                <TableCell scope="col"
+                  className={[
+                    classes.stickyLeft,
+                    classes.matrixCell,
+                    classes.matrixText,
+                  ].join(' ')}>
+                  {tr.MatrixQuestion.subject}
+                </TableCell>
+                <TableCell scope="col"
+                  className={[
+                    classes.matrixCell,
+                    classes.matrixText,
+                  ].join(' ')}
+                  sx={{"&&": {textAlign: "left"}}}>
+                  {tr.MatrixQuestion.response}
+                </TableCell>
+              </TableRow>
+            </TableHead>
             <TableBody>
               {question.subjects.map((subject, subjectIndex) => {
                 return (
                   <TableRow key={subjectIndex}>
                     <TableCell
+                      component="th"
+                      scope="row"
                       className={[
                         classes.stickyLeft,
                         classes.matrixCell,
@@ -241,12 +265,7 @@ export default function MatrixQuestion({
 
                     <TableCell>
                       <FormControl size="small" sx={{ minWidth: 160, m: 1 }}>
-                        <InputLabel id="matrix-select-label">
-                          {tr.SurveySections.selectAnswer}
-                        </InputLabel>
                         <Select
-                          labelId="matrix-select-label"
-                          label={tr.SurveySections.selectAnswer}
                           id="matrix-select"
                           value={value?.[subjectIndex] ?? ''}
                           onChange={(event: SelectChangeEvent<string>) =>
