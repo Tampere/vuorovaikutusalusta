@@ -453,5 +453,8 @@
     "yes": "Kyllä",
     "no": "Ei",
     "ok": "OK"
+  },
+  "FooterLinks": {
+    "accessibility": "Saavutettavuusseloste"
   }
 }
