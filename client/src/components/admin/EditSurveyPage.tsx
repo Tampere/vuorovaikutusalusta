@@ -8,6 +8,9 @@ import {
   TextField,
   ToggleButton,
   ToggleButtonGroup,
+  FormControl,
+  Radio,
+  RadioGroup,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useSurvey } from '@src/stores/SurveyContext';
@@ -20,6 +23,7 @@ import Fieldset from '../Fieldset';
 import AddSurveySectionActions from './AddSurveySectionActions';
 import FileUpload from './FileUpload';
 import SurveySections from './SurveySections';
+import { SurveyPageSidebarImageSize } from '@interfaces/survey';
 
 const useStyles = makeStyles({
   button: {
@@ -194,6 +198,7 @@ export default function EditSurveyPage() {
                   ...page.sidebar,
                   imagePath: path,
                   imageName: name,
+                  imageSize: 'fitted',
                 },
               });
             }}
@@ -204,12 +209,13 @@ export default function EditSurveyPage() {
                   ...page.sidebar,
                   imagePath: [],
                   imageName: null,
+                  imageSize: null,
                 },
               });
             }}
           />
           <TextField
-            style={{ width: '100%' }}
+            style={{ width: '100%', marginTop: 2 }}
             label={tr.EditSurveyPage.imageAltText}
             value={page.sidebar?.imageAltText?.[surveyLanguage] ?? ''}
             onChange={(event) => {
@@ -225,6 +231,35 @@ export default function EditSurveyPage() {
               });
             }}
           />
+          <FormControl sx={{ marginTop: 2 }}>
+            <FormLabel>{tr.EditSurveyPage.imageScaling}</FormLabel>
+            <RadioGroup
+              row
+              onChange={(event) =>
+                editPage({
+                  ...page,
+                  sidebar: {
+                    ...page.sidebar,
+                    imageSize: event.target.value as SurveyPageSidebarImageSize,
+                  },
+                })
+              }
+            >
+              <FormControlLabel
+                sx={{ marginRight: 4 }}
+                checked={page.sidebar?.imageSize === 'fitted'}
+                value="fitted"
+                control={<Radio />}
+                label={tr.EditSurveyPage.imageScalingLabel.fitted}
+              />
+              <FormControlLabel
+                checked={page.sidebar?.imageSize === 'original'}
+                value="original"
+                control={<Radio />}
+                label={tr.EditSurveyPage.imageScalingLabel.original}
+              />
+            </RadioGroup>
+          </FormControl>
         </div>
       )}
       <SurveySections

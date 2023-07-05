@@ -11,6 +11,7 @@ import {
   SurveyMapSubQuestion,
   SurveyPage,
   SurveyPageSection,
+  SurveyPageSidebarImageSize,
   SurveyPageSidebarType,
   SurveyRadioQuestion,
   SurveyTheme,
@@ -80,6 +81,7 @@ interface DBSurveyPage {
   sidebar_image_path: string[];
   sidebar_image_name: string;
   sidebar_image_alt_text: LocalizedText;
+  sidebar_image_size: SurveyPageSidebarImageSize;
 }
 
 /**
@@ -132,6 +134,7 @@ type DBSurveyJoin = DBSurvey & {
   page_sidebar_image_path: string[];
   page_sidebar_image_name: string;
   page_sidebar_image_alt_text: LocalizedText;
+  page_sidebar_image_size: SurveyPageSidebarImageSize;
   section_id: number;
   section_title: LocalizedText;
   section_title_color: string;
@@ -176,6 +179,7 @@ const surveyPageColumnSet = getColumnSet<DBSurveyPage>('survey_page', [
     name: 'sidebar_image_alt_text',
     cast: 'json',
   },
+  'sidebar_image_size',
 ]);
 
 /**
@@ -226,7 +230,8 @@ export async function getSurvey(params: { id: number } | { name: string }) {
           page.sidebar_map_layers as page_sidebar_map_layers,
           page.sidebar_image_path as page_sidebar_image_path,
           page.sidebar_image_name as page_sidebar_image_name,
-          page.sidebar_image_alt_text as page_sidebar_image_alt_text
+          page.sidebar_image_alt_text as page_sidebar_image_alt_text,
+          page.sidebar_image_size as page_sidebar_image_size
         FROM
           (
             SELECT
@@ -952,6 +957,7 @@ function dbSurveyJoinToPage(dbSurveyJoin: DBSurveyJoin): SurveyPage {
           imagePath: dbSurveyJoin.page_sidebar_image_path,
           imageName: dbSurveyJoin.page_sidebar_image_name,
           imageAltText: dbSurveyJoin.page_sidebar_image_alt_text,
+          imageSize: dbSurveyJoin.page_sidebar_image_size,
         },
       };
 }
@@ -1075,6 +1081,7 @@ function surveyPagesToRows(
       sidebar_image_path: surveyPage.sidebar.imagePath,
       sidebar_image_name: surveyPage.sidebar.imageName,
       sidebar_image_alt_text: surveyPage.sidebar.imageAltText,
+      sidebar_image_size: surveyPage.sidebar.imageSize,
     } as DBSurveyPage;
   });
 }

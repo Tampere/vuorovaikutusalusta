@@ -391,21 +391,26 @@ export default function SurveyStepper({
         return (
           <div
             style={{
-              height: '100%',
               display: 'flex',
-              flexDirection: 'column',
+              alignItems: 'center',
               overflow: 'auto',
+              height: '100%',
+              width: '100%',
             }}
           >
-            <div style={{ margin: 'auto' }}>
-              {currentPage.sidebar.imageName && (
-                <img
-                  alt={currentPage.sidebar?.imageAltText?.[surveyLanguage]}
-                  src={`/api/file/${fullSidebarImagePath}`}
-                  style={{ width: '100%', maxHeight: '100vh' }}
-                />
-              )}
-            </div>
+            {currentPage.sidebar.imageName && (
+              <img
+                style={
+                  currentPage.sidebar.imageSize === 'original'
+                    ? { margin: '0 auto' }
+                    : currentPage.sidebar.imageSize === 'fitted'
+                    ? { margin: '0 auto', maxWidth: '100%' }
+                    : null
+                }
+                alt={currentPage.sidebar?.imageAltText?.[surveyLanguage]}
+                src={`/api/file/${fullSidebarImagePath}`}
+              />
+            )}
           </div>
         );
       case 'none':
@@ -434,7 +439,11 @@ export default function SurveyStepper({
           // Dirty hack to fix iframe resizing issues with the split pane library
           // Issue: https://github.com/tomkp/react-split-pane/issues/361
           // Workaround: https://github.com/tomkp/react-split-pane/issues/241#issuecomment-677091968
-          pane2Style={{ pointerEvents: isResizing ? 'none' : 'auto' }}
+          pane2Style={{
+            pointerEvents: isResizing ? 'none' : 'auto',
+            overflowX:
+              currentPage.sidebar.type === 'image' ? 'auto' : 'visible',
+          }}
           onDragStarted={() => {
             setIsResizing(true);
           }}

@@ -232,6 +232,10 @@ export interface SurveyAttachmentQuestion extends CommonSurveyPageQuestion {
  * Type of the survey page sidebar
  */
 export type SurveyPageSidebarType = 'none' | 'map' | 'image';
+/**
+ * Survey page sidebar image size
+ */
+export type SurveyPageSidebarImageSize = 'original' | 'fitted';
 
 /**
  * Survey page side bar
@@ -257,6 +261,10 @@ export interface SurveyPageSidebar {
    * Alternative text for the sidebar image
    */
   imageAltText: LocalizedText;
+  /**
+   * Information how the picture is displayed
+   */
+  imageSize: SurveyPageSidebarImageSize;
 }
 
 /**
