@@ -265,6 +265,23 @@ export default function EditSurveyInfo() {
           }
           label={tr.EditSurvey.allowSavingUnfinished}
         />
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={activeSurvey.displayPrivacyStatement}
+              onChange={(event) =>
+                editSurvey({
+                  ...activeSurvey,
+                  displayPrivacyStatement: event.target.checked,
+                })
+              }
+              inputProps={{
+                'aria-label': `${tr.EditSurvey.displayPrivacyStatement}`,
+              }}
+            />
+          }
+          label={tr.EditSurvey.displayPrivacyStatement}
+        />
         <div>
           <FormControlLabel
             label={tr.EditSurveyInfo.allowTestSurvey}

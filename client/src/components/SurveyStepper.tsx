@@ -386,7 +386,22 @@ export default function SurveyStepper({
         ))}
       </Stepper>
       <Footer>
-        <Link color="primary" underline="hover" href="https://www.tampere.fi/asioi-kaupungin-kanssa/oskari-karttakyselypalvelun-saavutettavuusseloste">{tr.FooterLinks.accessibility}</Link>
+        <Link
+          color="primary"
+          underline="hover"
+          href="https://www.tampere.fi/asioi-kaupungin-kanssa/oskari-karttakyselypalvelun-saavutettavuusseloste"
+        >
+          {tr.FooterLinks.accessibility}
+        </Link>
+        {survey.displayPrivacyStatement && (
+          <Link
+            color="primary"
+            underline="hover"
+            href="https://www.tampere.fi/tietosuoja-ja-tiedonhallinta/tietosuojaselosteet"
+          >
+            {tr.FooterLinks.privacyStatement}
+          </Link>
+        )}
       </Footer>
     </>
   );
@@ -438,13 +453,17 @@ export default function SurveyStepper({
     <div className={getClassList([classes.root, loading && classes.loading])}>
       {/* Side pane doesn't exist on any page - show the page in 1 column aligned to left */}
       {!sidePane && (
-        <div style={{
-          width: '100%',
-          height: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-between' 
-        }}>{stepperPane}</div>
+        <div
+          style={{
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+          }}
+        >
+          {stepperPane}
+        </div>
       )}
       {/* Desktop: side pane exists */}
       {mdUp && sidePane && (
@@ -455,7 +474,12 @@ export default function SurveyStepper({
           minSize={200}
           maxSize={-200}
           // Allow scrolling for the stepper pane
-          pane1Style={{ overflowY: 'auto', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}
+          pane1Style={{
+            overflowY: 'auto',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+          }}
           // Dirty hack to fix iframe resizing issues with the split pane library
           // Issue: https://github.com/tomkp/react-split-pane/issues/361
           // Workaround: https://github.com/tomkp/react-split-pane/issues/241#issuecomment-677091968
@@ -478,14 +502,32 @@ export default function SurveyStepper({
       {/* Mobile: side pane exists but current page has none */}
       {!mdUp && sidePane && currentPage.sidebar.type === 'none' && (
         <>
-          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>{stepperPane}</div>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+            }}
+          >
+            {stepperPane}
+          </div>
           <div style={{ flexGrow: 1 }}>{sidePane}</div>
         </>
       )}
       {/* Mobile: side pane exists and current page has some - render the drawer and the button to show it */}
       {!mdUp && sidePane && currentPage.sidebar.type !== 'none' && (
         <>
-          <div style={{ marginTop: 50, width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>{stepperPane}</div>
+          <div
+            style={{
+              marginTop: 50,
+              width: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+            }}
+          >
+            {stepperPane}
+          </div>
 
           <Paper
             elevation={3}
