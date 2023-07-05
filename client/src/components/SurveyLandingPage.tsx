@@ -16,7 +16,7 @@ const useStyles = makeStyles((theme: Theme & { [customKey: string]: any }) => ({
     alignItems: 'center',
     justifyContent: 'center',
     ...(props?.imageName && {
-      backgroundImage: `url("/api/file/${props.imageName}")`,
+      backgroundImage: `url("/api/file/background-images/${props.imageName}")`,
     }),
     backgroundSize: 'cover',
     backgroundPosition: 'center',
