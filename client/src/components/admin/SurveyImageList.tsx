@@ -118,10 +118,16 @@ export default function SurveyImageList({ imageType }: Props) {
 
   async function handleDeletingImage(
     event: React.MouseEvent,
-    fileName: string
+    fileName: string,
+    filePath: string[]
   ) {
     event.stopPropagation();
-    await fetch(`/api/file/${fileName}`, { method: 'DELETE' });
+    await fetch(
+      `/api/file${filePath.length > 0 ? '/' : ''}${filePath.join(
+        '/'
+      )}/${fileName}`,
+      { method: 'DELETE' }
+    );
 
     getImages();
   }
@@ -164,6 +170,8 @@ export default function SurveyImageList({ imageType }: Props) {
     );
     acceptedFiles.shift();
     getImages();
+    setImageAltText('');
+    setImageAttributions('');
   }
 
   function handleEmptyImage() {
@@ -334,7 +342,7 @@ export default function SurveyImageList({ imageType }: Props) {
                   color="error"
                   className={classes.deleteImageIcon}
                   onClick={(event) =>
-                    handleDeletingImage(event, image.fileName)
+                    handleDeletingImage(event, image.fileName, image.filePath)
                   }
                 />
                 <img
