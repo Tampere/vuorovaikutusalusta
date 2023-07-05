@@ -20,6 +20,7 @@ import {
   useMediaQuery,
   useTheme,
 } from '@mui/material';
+import { visuallyHidden } from '@mui/utils';
 import { Close, Image, Map } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
@@ -322,6 +323,14 @@ export default function SurveyStepper({
               classes={{ root: classes.stepContent }}
             >
               <FormControl style={{ width: '100%' }} component="fieldset">
+                {currentPage.sidebar.imageName && (
+                  <img
+                    alt={currentPage.sidebar?.imageAltText?.[surveyLanguage]}
+                    src={`/api/file/${fullSidebarImagePath}`}
+                    style={visuallyHidden}
+                  />
+                )}
+
                 {page.sections.map((section) => (
                   <div className={classes.section} key={section.id}>
                     {section.type === 'text' ? (
