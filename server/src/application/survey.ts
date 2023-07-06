@@ -46,6 +46,7 @@ interface DBSurvey {
   start_date: Date;
   end_date: Date;
   allow_test_survey: boolean;
+  display_privacy_statement: boolean;
   created_at: Date;
   updated_at: Date;
   thanks_page_title: LocalizedText;
@@ -703,7 +704,8 @@ export async function updateSurvey(survey: Survey) {
         email_body = $23,
         email_info = $24::json,
         allow_saving_unfinished = $25,
-        localisation_enabled = $26
+        localisation_enabled = $26,
+        display_privacy_statement = $27
       WHERE id = $1 RETURNING *`,
       [
         survey.id,
@@ -732,6 +734,7 @@ export async function updateSurvey(survey: Survey) {
         JSON.stringify(survey.email.info),
         survey.allowSavingUnfinished,
         survey.localisationEnabled,
+        survey.displayPrivacyStatement,
       ]
     )
     .catch((error) => {
@@ -896,6 +899,7 @@ function dbSurveyToSurvey(
     startDate: dbSurvey.start_date,
     endDate: dbSurvey.end_date,
     allowTestSurvey: dbSurvey.allow_test_survey,
+    displayPrivacyStatement: dbSurvey.display_privacy_statement,
     thanksPage: {
       title: dbSurvey.thanks_page_title,
       text: dbSurvey.thanks_page_text,

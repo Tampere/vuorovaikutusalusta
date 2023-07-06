@@ -425,6 +425,10 @@ export interface Survey {
    * Allow publishing surveys with different languages
    */
   localisationEnabled: boolean;
+  /**
+   * Should a link for the privacy statement be displayed
+   */
+  displayPrivacyStatement: boolean;
 }
 
 /**

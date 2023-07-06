@@ -36,7 +36,8 @@
     "deleteSurveyConfirm": "Are you sure you want to delete the survey? This action cannot be reversed.",
     "deleteSurveyFailed": "Error while deleting the survey. Please try again later.",
     "deleteSurveySuccessful": "Survey successfully deleted!",
-    "allowSavingUnfinished": "Allow saving an unfinished survey"
+    "allowSavingUnfinished": "Allow saving an unfinished survey",
+    "displayPrivacyStatement": "Display link for data protection and management in the footer"
   },
   "EditSurveyInfo": {
     "title": "Survey title",
@@ -455,5 +456,9 @@
     "yes": "Yes",
     "no": "No",
     "ok": "OK"
+  },
+  "FooterLinks": {
+    "accessibility": "Accessibility report",
+    "privacyStatement": "Data protection and management"
   }
 }

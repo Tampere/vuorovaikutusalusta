@@ -36,7 +36,8 @@
     "deleteSurveyConfirm": "Haluatko varmasti poistaa koko kyselyn? Toimintoa ei voi perua.",
     "deleteSurveyFailed": "Kyselyn poistamisessa tapahtui virhe. Yritä myöhemmin uudestaan.",
     "deleteSurveySuccessful": "Kysely poistettiin onnistuneesti!",
-    "allowSavingUnfinished": "Salli kyselyn tallentaminen keskeneräisenä"
+    "allowSavingUnfinished": "Salli kyselyn tallentaminen keskeneräisenä",
+    "displayPrivacyStatement": "Näytä tietosuoja ja tiedonhallinta -linkki alatunnisteessa"
   },
   "EditSurveyInfo": {
     "title": "Kyselyn otsikko",
@@ -455,5 +456,9 @@
     "yes": "Kyllä",
     "no": "Ei",
     "ok": "OK"
+  },
+  "FooterLinks": {
+    "accessibility": "Saavutettavuusseloste",
+    "privacyStatement": "Tietosuoja ja tiedonhallinta"
   }
 }
