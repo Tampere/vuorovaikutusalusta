@@ -52,7 +52,7 @@ export default function SurveyQuestion({ question }: Props) {
           htmlFor={`${question.id}-input`}
           style={{ color: survey.sectionTitleColor ?? '#000000' }}
         >
-          {question.title?.[surveyLanguage]} {question.isRequired && '*'}
+          <h3>{question.title?.[surveyLanguage]} {question.isRequired && '*'}</h3>
         </FormLabel>
         {question.info && question.info?.[surveyLanguage] && (
           <SectionInfo

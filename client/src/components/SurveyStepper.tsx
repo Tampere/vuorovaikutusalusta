@@ -289,102 +289,107 @@ export default function SurveyStepper({
           }}
         />
       )}
-      <Stepper
-        className={classes.stepper}
-        activeStep={pageNumber}
-        orientation="vertical"
-        connector={null}
-      >
-        {survey.pages.map((page, index) => (
-          <Step key={page.id} completed={false}>
-            <StepLabel
-              id={`${index}-page-top`}
-              onClick={() => {
-                setPageNumber(index);
-              }}
-              classes={{
-                active: classes.stepActive,
-                label: `${classes.stepHeader} ${
-                  highlightErrorPages && !isPageValid(page)
-                    ? classes.stepHeaderError
-                    : ''
-                }`,
-                iconContainer:
-                  index === pageNumber
-                    ? classes.stepIcon
-                    : (highlightErrorPages && !isPageValid(page)) ||
-                      (pageNumber > index && !isPageValid(page))
-                    ? classes.stepIconUnfinised
-                    : null,
-              }}
-            >
-              {page.title?.[language]}
-            </StepLabel>
-            <StepContent
-              transitionDuration={0}
-              classes={{ root: classes.stepContent }}
-            >
-              <FormControl style={{ width: '100%' }} component="fieldset">
-                {currentPage.sidebar.imageName && (
-                  <img
-                    alt={currentPage.sidebar?.imageAltText?.[surveyLanguage]}
-                    src={`/api/file/${fullSidebarImagePath}`}
-                    style={visuallyHidden}
-                  />
-                )}
+      <article>
+        <h1 style={{ marginLeft: '1rem'}}>
+          {survey.title[surveyLanguage]}
+        </h1>
+        <Stepper
+          className={classes.stepper}
+          activeStep={pageNumber}
+          orientation="vertical"
+          connector={null}
+        >
+          {survey.pages.map((page, index) => (
+            <Step key={page.id} completed={false}>
+              <StepLabel
+                id={`${index}-page-top`}
+                onClick={() => {
+                  setPageNumber(index);
+                }}
+                classes={{
+                  active: classes.stepActive,
+                  label: `${classes.stepHeader} ${
+                    highlightErrorPages && !isPageValid(page)
+                      ? classes.stepHeaderError
+                      : ''
+                  }`,
+                  iconContainer:
+                    index === pageNumber
+                      ? classes.stepIcon
+                      : (highlightErrorPages && !isPageValid(page)) ||
+                        (pageNumber > index && !isPageValid(page))
+                      ? classes.stepIconUnfinised
+                      : null,
+                }}
+              >
+                <h2 style={{ margin: 0, fontSize: '1em' }}>{page.title?.[language]}</h2>
+              </StepLabel>
+              <StepContent
+                transitionDuration={0}
+                classes={{ root: classes.stepContent }}
+              >
+                <FormControl style={{ width: '100%' }} component="fieldset">
+                  {currentPage.sidebar.imageName && (
+                    <img
+                      alt={currentPage.sidebar?.imageAltText?.[surveyLanguage]}
+                      src={`/api/file/${fullSidebarImagePath}`}
+                      style={visuallyHidden}
+                    />
+                  )}
 
-                {page.sections.map((section) => (
-                  <div className={classes.section} key={section.id}>
-                    {section.type === 'text' ? (
-                      <TextSection section={section} />
-                    ) : section.type === 'image' ? (
-                      <ImageSection section={section} />
-                    ) : section.type === 'document' ? (
-                      <DocumentSection section={section} />
-                    ) : (
-                      <SurveyQuestion question={section} />
-                    )}
-                  </div>
-                ))}
-                <StepperControls
-                  isTestSurvey={isTestSurvey}
-                  activeStep={index}
-                  totalSteps={survey.pages.length}
-                  onPrevious={() => {
-                    setPageNumber(index - 1);
-                  }}
-                  onNext={() => {
-                    setPageNumber(index + 1);
-                  }}
-                  disabled={loading}
-                  nextDisabled={false}
-                  onSubmit={() => {
-                    if (!validateSurvey()) {
-                      return;
-                    }
-                    if (survey.email.enabled) {
-                      setSubmissionInfoDialogOpen(true);
-                    } else {
-                      doSubmit();
-                    }
-                  }}
-                  allowSavingUnfinished={survey.allowSavingUnfinished}
-                />
-              </FormControl>
-            </StepContent>
-            {
-              /** Don't show connector after the final page */
-              index + 1 !== survey?.pages?.length && (
-                <PageConnector
-                  activePage={pageNumber}
-                  pageIndex={index}
-                  theme={theme}
-                />
-              )
-            }
-          </Step>
-        ))}
-      </Stepper>
+                  {page.sections.map((section) => (
+                    <div className={classes.section} key={section.id}>
+                      {section.type === 'text' ? (
+                        <TextSection section={section} />
+                      ) : section.type === 'image' ? (
+                        <ImageSection section={section} />
+                      ) : section.type === 'document' ? (
+                        <DocumentSection section={section} />
+                      ) : (
+                        <SurveyQuestion question={section} />
+                      )}
+                    </div>
+                  ))}
+                  <StepperControls
+                    isTestSurvey={isTestSurvey}
+                    activeStep={index}
+                    totalSteps={survey.pages.length}
+                    onPrevious={() => {
+                      setPageNumber(index - 1);
+                    }}
+                    onNext={() => {
+                      setPageNumber(index + 1);
+                    }}
+                    disabled={loading}
+                    nextDisabled={false}
+                    onSubmit={() => {
+                      if (!validateSurvey()) {
+                        return;
+                      }
+                      if (survey.email.enabled) {
+                        setSubmissionInfoDialogOpen(true);
+                      } else {
+                        doSubmit();
+                      }
+                    }}
+                    allowSavingUnfinished={survey.allowSavingUnfinished}
+                  />
+                </FormControl>
+              </StepContent>
+              {
+                /** Don't show connector after the final page */
+                index + 1 !== survey?.pages?.length && (
+                  <PageConnector
+                    activePage={pageNumber}
+                    pageIndex={index}
+                    theme={theme}
+                  />
+                )
+              }
+            </Step>
+          ))}
+        </Stepper>
+      </article>
       <Footer>
         <Link
           color="primary"
