@@ -43,6 +43,7 @@ export default function RadioQuestion({
   return (
     <>
       <RadioGroup
+        id={`${question.id}-input`}
         aria-label={question.title?.[surveyLanguage]}
         value={value}
         onChange={(event) => {
@@ -56,9 +57,6 @@ export default function RadioQuestion({
           );
         }}
         name={`${question.title}-group`}
-        onBlur={() => {
-          setDirty(true);
-        }}
       >
         {question.options.map((option) => (
           <FormControlLabel

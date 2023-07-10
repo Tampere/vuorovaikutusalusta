@@ -34,9 +34,6 @@ export default function FreeTextQuestion({
           setDirty(true);
           onChange(event.target.value);
         }}
-        onBlur={() => {
-          setDirty(true);
-        }}
       />
       <FormHelperText id={`${question.id}-helper-text`}>
         {tr.SurveyQuestion.charactersRemaining.replace(

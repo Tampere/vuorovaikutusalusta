@@ -105,9 +105,6 @@ export default function SliderQuestion({
           setDirty(true);
           onChange(value);
         }}
-        onBlur={() => {
-          setDirty(true);
-        }}
       />
     </div>
   );

@@ -4,9 +4,10 @@ import {
   SurveyQuestion,
 } from '@interfaces/survey';
 import { FormControl, FormHelperText, FormLabel } from '@mui/material';
+import { visuallyHidden } from '@mui/utils';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, forwardRef } from 'react';
 import AttachmentQuestion from './AttachmentQuestion';
 import CheckBoxQuestion from './CheckBoxQuestion';
 import FreeTextQuestion from './FreeTextQuestion';
@@ -21,13 +22,17 @@ import SortingQuestion from './SortingQuestion';
 
 interface Props {
   question: SurveyQuestion;
+  pageUnfinished: boolean;
 }
 
-export default function SurveyQuestion({ question }: Props) {
+function SurveyQuestion(
+  { question, pageUnfinished }: Props,
+  ref: React.Ref<HTMLParagraphElement>
+) {
   const { answers, updateAnswer, getValidationErrors, survey } =
     useSurveyAnswers();
-  const [dirty, setDirty] = useState(false);
   const { tr, surveyLanguage } = useTranslations();
+  const [dirty, setDirty] = useState(false);
 
   const value = useMemo(
     () => answers.find((answer) => answer.sectionId === question.id)?.value,
@@ -35,13 +40,31 @@ export default function SurveyQuestion({ question }: Props) {
   );
 
   const validationErrors = useMemo(
-    () => (dirty ? getValidationErrors(question) : []),
-    [dirty, question, value]
+    () => (dirty || pageUnfinished ? getValidationErrors(question) : []),
+    [dirty, question, value, pageUnfinished]
   );
-
+  console.log(validationErrors);
   return (
     <FormControl error={validationErrors.length > 0} style={{ width: '100%' }}>
+      {/* Show the required error only for empty values (not when answer limits are broken in checkbox questions) */}
+      {validationErrors.includes('required') && (
+        <>
+          <FormHelperText
+            aria-live="assertive"
+            ref={ref}
+            id={`${question.id}-required-text`}
+            sx={{ marginLeft: 0 }}
+          >
+            {tr.SurveyQuestion.errorFieldIsRequired}
+          </FormHelperText>
+          <FormHelperText style={visuallyHidden} role="alert">
+            {tr.SurveyQuestion.accessibilityTooltip}{' '}
+            {question.title?.[surveyLanguage]}
+          </FormHelperText>
+        </>
+      )}
       <div
+        tabIndex={0}
         style={{
           display: 'flex',
           flexDirection: 'row',
@@ -61,160 +84,170 @@ export default function SurveyQuestion({ question }: Props) {
           />
         )}
       </div>
-
-      {/* Radio question */}
-      {question.type === 'radio' && (
-        <RadioQuestion
-          value={value as number | string}
-          onChange={(value) => {
-            updateAnswer({
-              sectionId: question.id,
-              type: question.type,
-              value,
-            });
-          }}
-          question={question}
-          setDirty={setDirty}
-        />
-      )}
-      {/* Checkbox question */}
-      {question.type === 'checkbox' && (
-        <CheckBoxQuestion
-          value={value as (number | string)[]}
-          onChange={(value) => {
-            updateAnswer({
-              sectionId: question.id,
-              type: question.type,
-              value,
-            });
-          }}
-          question={question}
-          setDirty={setDirty}
-        />
-      )}
-      {/* Free text question */}
-      {question.type === 'free-text' && (
-        <FreeTextQuestion
-          value={value as string}
-          maxLength={question.maxLength}
-          onChange={(value) => {
-            updateAnswer({
-              sectionId: question.id,
-              type: question.type,
-              value,
-            });
-          }}
-          question={question}
-          setDirty={setDirty}
-        />
-      )}
-      {/* Numeric question */}
-      {question.type === 'numeric' && (
-        <NumericQuestion
-          value={value as number}
-          onChange={(value) => {
-            updateAnswer({
-              sectionId: question.id,
-              type: question.type,
-              value,
-            });
-          }}
-          question={question}
-          setDirty={setDirty}
-        />
-      )}
-      {/* Map question */}
-      {question.type === 'map' && (
-        <MapQuestion
-          value={value as MapQuestionAnswer[]}
-          onChange={(value) => {
-            updateAnswer({
-              sectionId: question.id,
-              type: question.type,
-              value,
-            });
-          }}
-          question={question}
-          setDirty={setDirty}
-        />
-      )}
-      {/* Sorting question */}
-      {question.type === 'sorting' && (
-        <SortingQuestion
-          value={value as number[]}
-          onChange={(value) => {
-            updateAnswer({
-              sectionId: question.id,
-              type: question.type,
-              value,
-            });
-          }}
-          question={question}
-          setDirty={setDirty}
-        />
-      )}
-      {/* Slider question */}
-      {question.type === 'slider' && (
-        <SliderQuestion
-          value={value as number}
-          onChange={(value) => {
-            updateAnswer({
-              sectionId: question.id,
-              type: question.type,
-              value,
-            });
-          }}
-          question={question}
-          setDirty={setDirty}
-        />
-      )}
-      {question.type === 'matrix' && (
-        <MatrixQuestion
-          value={value as string[]}
-          onChange={(value) => {
-            updateAnswer({
-              sectionId: question.id,
-              type: question.type,
-              value,
-            });
-          }}
-          question={question}
-          setDirty={setDirty}
-        />
-      )}
-      {question.type === 'grouped-checkbox' && (
-        <GroupedCheckBoxQuestion
-          value={value as number[]}
-          onChange={(value) => {
-            updateAnswer({
-              sectionId: question.id,
-              type: question.type,
-              value,
-            });
-          }}
-          question={question}
-          setDirty={setDirty}
-        />
-      )}
-      {question.type === 'attachment' && (
-        <AttachmentQuestion
-          value={value as FileAnswer[]}
-          setDirty={setDirty}
-          onChange={(value) =>
-            updateAnswer({
-              sectionId: question.id,
-              type: question.type,
-              value: value,
-            })
+      <fieldset
+        style={{ border: 'none' }}
+        onBlur={(e) => {
+          if (
+            e.relatedTarget &&
+            !e.currentTarget.contains(e.relatedTarget as Node)
+          ) {
+            setDirty(true);
+            console.log(e.currentTarget, e.relatedTarget, e.target);
+            console.log('focus left parent');
           }
-        />
-      )}
-      {/* Show the required error only for empty values (not when answer limits are broken in checkbox questions) */}
-      {validationErrors.includes('required') && (
-        <FormHelperText id={`${question.id}-required-text`}>
-          {tr.SurveyQuestion.errorFieldIsRequired}
-        </FormHelperText>
-      )}
+        }}
+      >
+        {/* Radio question */}
+        {question.type === 'radio' && (
+          <RadioQuestion
+            value={value as number | string}
+            onChange={(value) => {
+              updateAnswer({
+                sectionId: question.id,
+                type: question.type,
+                value,
+              });
+            }}
+            question={question}
+            setDirty={setDirty}
+          />
+        )}
+        {/* Checkbox question */}
+        {question.type === 'checkbox' && (
+          <CheckBoxQuestion
+            value={value as (number | string)[]}
+            onChange={(value) => {
+              updateAnswer({
+                sectionId: question.id,
+                type: question.type,
+                value,
+              });
+            }}
+            question={question}
+            setDirty={setDirty}
+            validationErrors={validationErrors}
+          />
+        )}
+        {/* Free text question */}
+        {question.type === 'free-text' && (
+          <FreeTextQuestion
+            value={value as string}
+            maxLength={question.maxLength}
+            onChange={(value) => {
+              updateAnswer({
+                sectionId: question.id,
+                type: question.type,
+                value,
+              });
+            }}
+            question={question}
+            setDirty={setDirty}
+          />
+        )}
+        {/* Numeric question */}
+        {question.type === 'numeric' && (
+          <NumericQuestion
+            value={value as number}
+            onChange={(value) => {
+              updateAnswer({
+                sectionId: question.id,
+                type: question.type,
+                value,
+              });
+            }}
+            question={question}
+            setDirty={setDirty}
+          />
+        )}
+        {/* Map question */}
+        {question.type === 'map' && (
+          <MapQuestion
+            value={value as MapQuestionAnswer[]}
+            onChange={(value) => {
+              updateAnswer({
+                sectionId: question.id,
+                type: question.type,
+                value,
+              });
+            }}
+            question={question}
+            setDirty={setDirty}
+          />
+        )}
+        {/* Sorting question */}
+        {question.type === 'sorting' && (
+          <SortingQuestion
+            value={value as number[]}
+            onChange={(value) => {
+              updateAnswer({
+                sectionId: question.id,
+                type: question.type,
+                value,
+              });
+            }}
+            question={question}
+            setDirty={setDirty}
+          />
+        )}
+        {/* Slider question */}
+        {question.type === 'slider' && (
+          <SliderQuestion
+            value={value as number}
+            onChange={(value) => {
+              updateAnswer({
+                sectionId: question.id,
+                type: question.type,
+                value,
+              });
+            }}
+            question={question}
+            setDirty={setDirty}
+          />
+        )}
+        {question.type === 'matrix' && (
+          <MatrixQuestion
+            value={value as string[]}
+            onChange={(value) => {
+              updateAnswer({
+                sectionId: question.id,
+                type: question.type,
+                value,
+              });
+            }}
+            question={question}
+            setDirty={setDirty}
+          />
+        )}
+        {question.type === 'grouped-checkbox' && (
+          <GroupedCheckBoxQuestion
+            value={value as number[]}
+            onChange={(value) => {
+              updateAnswer({
+                sectionId: question.id,
+                type: question.type,
+                value,
+              });
+            }}
+            question={question}
+            setDirty={setDirty}
+          />
+        )}
+        {question.type === 'attachment' && (
+          <AttachmentQuestion
+            value={value as FileAnswer[]}
+            setDirty={setDirty}
+            onChange={(value) =>
+              updateAnswer({
+                sectionId: question.id,
+                type: question.type,
+                value: value,
+              })
+            }
+          />
+        )}
+      </fieldset>
     </FormControl>
   );
 }
+
+export default forwardRef(SurveyQuestion);

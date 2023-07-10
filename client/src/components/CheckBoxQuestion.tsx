@@ -6,6 +6,7 @@ import {
   FormHelperText,
   TextField,
 } from '@mui/material';
+import { visuallyHidden } from '@mui/utils';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useEffect, useMemo, useState } from 'react';
 
@@ -19,6 +20,7 @@ interface Props {
   onChange: (value: (string | number)[]) => void;
   question: SurveyCheckboxQuestion;
   setDirty: (dirty: boolean) => void;
+  validationErrors?: string[];
 }
 
 export default function CheckBoxQuestion({
@@ -26,6 +28,7 @@ export default function CheckBoxQuestion({
   onChange,
   question,
   setDirty,
+  validationErrors = null,
 }: Props) {
   const [customAnswerValue, setCustomAnswerValue] = useState('');
   const { tr, surveyLanguage } = useTranslations();
@@ -58,16 +61,20 @@ export default function CheckBoxQuestion({
     <>
       {answerLimitText && (
         // Align this helper text with the form label
-        <FormHelperText style={{ marginLeft: 0 }}>
-          {answerLimitText}
-        </FormHelperText>
+        <>
+          <FormHelperText style={{ marginLeft: 0 }} id="checkbox-helper-label">
+            {answerLimitText}
+          </FormHelperText>
+          {validationErrors && validationErrors.includes('answerLimits') && (
+            <FormHelperText style={visuallyHidden} role="alert">
+              {answerLimitText}
+            </FormHelperText>
+          )}
+        </>
       )}
       <FormGroup
         aria-label={question.title?.[surveyLanguage]}
-        aria-describedby={answerLimitText}
-        onBlur={() => {
-          setDirty(true);
-        }}
+        aria-describedby="checkbox-helper-label"
       >
         {question.options.map((option) => (
           <FormControlLabel

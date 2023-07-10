@@ -336,6 +336,7 @@
   },
   "SurveyQuestion": {
     "errorFieldIsRequired": "Kenttä on pakollinen.",
+    "accessibilityTooltip": "Vastaathan kysymykseen",
     "answerLimitsMinMax": "Valitse vähintään {min}, enintään {max} vaihtoehtoa",
     "answerLimitsMin": "Valitse vähintään {min} vaihtoehtoa",
     "answerLimitsMax": "Valitse enintään {max} vaihtoehtoa",

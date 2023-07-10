@@ -162,6 +162,7 @@ export default function ToastProvider({ children }: { children: ReactNode }) {
       >
         <Alert
           elevation={2}
+          tabIndex={-1}
           variant="filled"
           severity={state.currentToast?.severity}
           sx={{ width: '100%' }}
