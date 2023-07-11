@@ -54,6 +54,7 @@ export default function SliderQuestion({
 
   return (
     <div
+      id={`${question.id}-input`}
       style={{
         display: 'flex',
         flexDirection: 'column',

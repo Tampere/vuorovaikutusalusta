@@ -53,7 +53,10 @@ export default function SortingQuestion(props: Props) {
   }, [sortedOptionIds]);
 
   return (
-    <FormGroup style={{ display: 'flex', flexDirection: 'row' }}>
+    <FormGroup
+      id={`${props.question.id}-input`}
+      style={{ display: 'flex', flexDirection: 'row' }}
+    >
       <div style={{ flexGrow: 1 }}>
         {props.question.options.map((option) => (
           <FormGroup row key={option.id} className={classes.fieldRow}>

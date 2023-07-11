@@ -100,7 +100,7 @@ export default function GroupedCheckBoxQuestion({
   }, [tr, maxReached]);
 
   return (
-    <>
+    <div id={`${question.id}-input`}>
       <Typography style={{ marginTop: '1rem' }}>
         {question.answerLimits?.min && question.answerLimits?.max
           ? // Both min & max limits are set
@@ -215,6 +215,6 @@ export default function GroupedCheckBoxQuestion({
           </Accordion>
         ))}
       </div>
-    </>
+    </div>
   );
 }

@@ -198,7 +198,10 @@ export default function MapQuestion({ value, onChange, question }: Props) {
 
   return (
     <>
-      <div style={{ display: 'flex', flexDirection: 'column' }}>
+      <div
+        id={`${question.id}-input`}
+        style={{ display: 'flex', flexDirection: 'column' }}
+      >
         <ToggleButtonGroup
           value={selectionType}
           exclusive

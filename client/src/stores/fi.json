@@ -168,7 +168,7 @@
   "NumericQuestion": {
     "minValue": "Arvon pitää olla vähintään {minValue}",
     "maxValue": "Arvon pitää olla enintään {maxValue}",
-    "minMaxValue": "Arvon pitää olla {minValue} ja {maxValue} välissä"
+    "minMaxValue": "Arvon pitää olla lukujen {minValue} ja {maxValue} välissä"
   },
   "AttachmentQuestion": {
     "addedFile": "Lisätty tiedosto",
