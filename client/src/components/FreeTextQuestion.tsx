@@ -35,7 +35,10 @@ export default function FreeTextQuestion({
           onChange(event.target.value);
         }}
       />
-      <FormHelperText id={`${question.id}-helper-text`}>
+      <FormHelperText
+        aria-hidden={value.length < 0.95 * maxLength}
+        id={`${question.id}-helper-text`}
+      >
         {tr.SurveyQuestion.charactersRemaining.replace(
           '{x}',
           String(maxLength - value.length)

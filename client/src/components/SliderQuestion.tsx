@@ -88,6 +88,7 @@ export default function SliderQuestion({
       </div>
       <Slider
         aria-label={question.title?.[surveyLanguage]}
+        aria-invalid={value === null}
         ref={sliderRef}
         className={value == null ? classes.emptyValue : ''}
         value={value ?? visibleEmptyValue}
@@ -97,7 +98,7 @@ export default function SliderQuestion({
         step={1}
         marks
         onClick={() => {
-          if (value == null) {
+          if (value === null) {
             onChange(visibleEmptyValue);
           }
         }}

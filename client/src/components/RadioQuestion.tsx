@@ -56,14 +56,16 @@ export default function RadioQuestion({
               : event.currentTarget.value
           );
         }}
-        name={`${question.title}-group`}
+        name={`${question.title?.[surveyLanguage]}-group`}
       >
         {question.options.map((option) => (
           <FormControlLabel
             key={option.id}
             value={option.id}
             label={option.text?.[surveyLanguage] ?? ''}
-            control={<Radio required={question.isRequired} />}
+            control={
+              <Radio required={question.isRequired} aria-invalid={false} />
+            }
             classes={{ label: classes.labelStyles }}
           />
         ))}
@@ -72,7 +74,9 @@ export default function RadioQuestion({
             <FormControlLabel
               value={customAnswerValue}
               label={tr.SurveyQuestion.customAnswer}
-              control={<Radio required={question.isRequired} />}
+              control={
+                <Radio required={question.isRequired} aria-invalid={false} />
+              }
             />
             {/* Value is a number (ID) when a pre-defined option is selected - otherwise it's custom */}
             {typeof value === 'string' && (

@@ -43,12 +43,26 @@ function SurveyQuestion(
     () => (dirty || pageUnfinished ? getValidationErrors(question) : []),
     [dirty, question, value, pageUnfinished]
   );
-  console.log(validationErrors);
+
   return (
-    <FormControl error={validationErrors.length > 0} style={{ width: '100%' }}>
+    <FormControl
+      component="fieldset"
+      aria-label={question.title?.[surveyLanguage]}
+      aria-invalid={validationErrors.includes('required')}
+      error={validationErrors.length > 0}
+      style={{ width: '100%' }}
+      onBlur={(e: React.FocusEvent<HTMLFieldSetElement>) => {
+        if (
+          e.relatedTarget &&
+          !e.currentTarget.contains(e.relatedTarget as Node)
+        ) {
+          setDirty(true);
+        }
+      }}
+    >
       {/* Show the required error only for empty values (not when answer limits are broken in checkbox questions) */}
       {validationErrors.includes('required') && (
-        <>
+        <div>
           <FormHelperText
             aria-live="assertive"
             ref={ref}
@@ -61,10 +75,9 @@ function SurveyQuestion(
             {tr.SurveyQuestion.accessibilityTooltip}{' '}
             {question.title?.[surveyLanguage]}
           </FormHelperText>
-        </>
+        </div>
       )}
       <div
-        tabIndex={0}
         style={{
           display: 'flex',
           flexDirection: 'row',
@@ -75,7 +88,11 @@ function SurveyQuestion(
           htmlFor={`${question.id}-input`}
           style={{ color: survey.sectionTitleColor ?? '#000000' }}
         >
-          <h3>{question.title?.[surveyLanguage]} {question.isRequired && '*'}</h3>
+          <h3 tabIndex={0}>
+            {question.title?.[surveyLanguage]}
+            <span aria-hidden="true"> </span>
+            {question.isRequired && <span aria-hidden="true">*</span>}
+          </h3>
         </FormLabel>
         {question.info && question.info?.[surveyLanguage] && (
           <SectionInfo
@@ -84,168 +101,155 @@ function SurveyQuestion(
           />
         )}
       </div>
-      <fieldset
-        style={{ border: 'none' }}
-        onBlur={(e) => {
-          if (
-            e.relatedTarget &&
-            !e.currentTarget.contains(e.relatedTarget as Node)
-          ) {
-            setDirty(true);
-            console.log(e.currentTarget, e.relatedTarget, e.target);
-            console.log('focus left parent');
+
+      {/* Radio question */}
+      {question.type === 'radio' && (
+        <RadioQuestion
+          value={value as number | string}
+          onChange={(value) => {
+            updateAnswer({
+              sectionId: question.id,
+              type: question.type,
+              value,
+            });
+          }}
+          question={question}
+          setDirty={setDirty}
+        />
+      )}
+      {/* Checkbox question */}
+      {question.type === 'checkbox' && (
+        <CheckBoxQuestion
+          value={value as (number | string)[]}
+          onChange={(value) => {
+            updateAnswer({
+              sectionId: question.id,
+              type: question.type,
+              value,
+            });
+          }}
+          question={question}
+          setDirty={setDirty}
+          validationErrors={validationErrors}
+        />
+      )}
+      {/* Free text question */}
+      {question.type === 'free-text' && (
+        <FreeTextQuestion
+          value={value as string}
+          maxLength={question.maxLength}
+          onChange={(value) => {
+            updateAnswer({
+              sectionId: question.id,
+              type: question.type,
+              value,
+            });
+          }}
+          question={question}
+          setDirty={setDirty}
+        />
+      )}
+      {/* Numeric question */}
+      {question.type === 'numeric' && (
+        <NumericQuestion
+          value={value as number}
+          onChange={(value) => {
+            updateAnswer({
+              sectionId: question.id,
+              type: question.type,
+              value,
+            });
+          }}
+          question={question}
+          setDirty={setDirty}
+        />
+      )}
+      {/* Map question */}
+      {question.type === 'map' && (
+        <MapQuestion
+          value={value as MapQuestionAnswer[]}
+          onChange={(value) => {
+            updateAnswer({
+              sectionId: question.id,
+              type: question.type,
+              value,
+            });
+          }}
+          question={question}
+          setDirty={setDirty}
+        />
+      )}
+      {/* Sorting question */}
+      {question.type === 'sorting' && (
+        <SortingQuestion
+          value={value as number[]}
+          onChange={(value) => {
+            updateAnswer({
+              sectionId: question.id,
+              type: question.type,
+              value,
+            });
+          }}
+          question={question}
+          setDirty={setDirty}
+        />
+      )}
+      {/* Slider question */}
+      {question.type === 'slider' && (
+        <SliderQuestion
+          value={value as number}
+          onChange={(value) => {
+            updateAnswer({
+              sectionId: question.id,
+              type: question.type,
+              value,
+            });
+          }}
+          question={question}
+          setDirty={setDirty}
+        />
+      )}
+      {question.type === 'matrix' && (
+        <MatrixQuestion
+          value={value as string[]}
+          onChange={(value) => {
+            updateAnswer({
+              sectionId: question.id,
+              type: question.type,
+              value,
+            });
+          }}
+          question={question}
+          setDirty={setDirty}
+        />
+      )}
+      {question.type === 'grouped-checkbox' && (
+        <GroupedCheckBoxQuestion
+          value={value as number[]}
+          onChange={(value) => {
+            updateAnswer({
+              sectionId: question.id,
+              type: question.type,
+              value,
+            });
+          }}
+          question={question}
+          setDirty={setDirty}
+        />
+      )}
+      {question.type === 'attachment' && (
+        <AttachmentQuestion
+          value={value as FileAnswer[]}
+          setDirty={setDirty}
+          onChange={(value) =>
+            updateAnswer({
+              sectionId: question.id,
+              type: question.type,
+              value: value,
+            })
           }
-        }}
-      >
-        {/* Radio question */}
-        {question.type === 'radio' && (
-          <RadioQuestion
-            value={value as number | string}
-            onChange={(value) => {
-              updateAnswer({
-                sectionId: question.id,
-                type: question.type,
-                value,
-              });
-            }}
-            question={question}
-            setDirty={setDirty}
-          />
-        )}
-        {/* Checkbox question */}
-        {question.type === 'checkbox' && (
-          <CheckBoxQuestion
-            value={value as (number | string)[]}
-            onChange={(value) => {
-              updateAnswer({
-                sectionId: question.id,
-                type: question.type,
-                value,
-              });
-            }}
-            question={question}
-            setDirty={setDirty}
-            validationErrors={validationErrors}
-          />
-        )}
-        {/* Free text question */}
-        {question.type === 'free-text' && (
-          <FreeTextQuestion
-            value={value as string}
-            maxLength={question.maxLength}
-            onChange={(value) => {
-              updateAnswer({
-                sectionId: question.id,
-                type: question.type,
-                value,
-              });
-            }}
-            question={question}
-            setDirty={setDirty}
-          />
-        )}
-        {/* Numeric question */}
-        {question.type === 'numeric' && (
-          <NumericQuestion
-            value={value as number}
-            onChange={(value) => {
-              updateAnswer({
-                sectionId: question.id,
-                type: question.type,
-                value,
-              });
-            }}
-            question={question}
-            setDirty={setDirty}
-          />
-        )}
-        {/* Map question */}
-        {question.type === 'map' && (
-          <MapQuestion
-            value={value as MapQuestionAnswer[]}
-            onChange={(value) => {
-              updateAnswer({
-                sectionId: question.id,
-                type: question.type,
-                value,
-              });
-            }}
-            question={question}
-            setDirty={setDirty}
-          />
-        )}
-        {/* Sorting question */}
-        {question.type === 'sorting' && (
-          <SortingQuestion
-            value={value as number[]}
-            onChange={(value) => {
-              updateAnswer({
-                sectionId: question.id,
-                type: question.type,
-                value,
-              });
-            }}
-            question={question}
-            setDirty={setDirty}
-          />
-        )}
-        {/* Slider question */}
-        {question.type === 'slider' && (
-          <SliderQuestion
-            value={value as number}
-            onChange={(value) => {
-              updateAnswer({
-                sectionId: question.id,
-                type: question.type,
-                value,
-              });
-            }}
-            question={question}
-            setDirty={setDirty}
-          />
-        )}
-        {question.type === 'matrix' && (
-          <MatrixQuestion
-            value={value as string[]}
-            onChange={(value) => {
-              updateAnswer({
-                sectionId: question.id,
-                type: question.type,
-                value,
-              });
-            }}
-            question={question}
-            setDirty={setDirty}
-          />
-        )}
-        {question.type === 'grouped-checkbox' && (
-          <GroupedCheckBoxQuestion
-            value={value as number[]}
-            onChange={(value) => {
-              updateAnswer({
-                sectionId: question.id,
-                type: question.type,
-                value,
-              });
-            }}
-            question={question}
-            setDirty={setDirty}
-          />
-        )}
-        {question.type === 'attachment' && (
-          <AttachmentQuestion
-            value={value as FileAnswer[]}
-            setDirty={setDirty}
-            onChange={(value) =>
-              updateAnswer({
-                sectionId: question.id,
-                type: question.type,
-                value: value,
-              })
-            }
-          />
-        )}
-      </fieldset>
+        />
+      )}
     </FormControl>
   );
 }

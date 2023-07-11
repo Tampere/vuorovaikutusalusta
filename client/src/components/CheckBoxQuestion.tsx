@@ -67,7 +67,7 @@ export default function CheckBoxQuestion({
           </FormHelperText>
           {validationErrors && validationErrors.includes('answerLimits') && (
             <FormHelperText style={visuallyHidden} role="alert">
-              {answerLimitText}
+              {`${question.title?.[surveyLanguage]}, ${answerLimitText}`}
             </FormHelperText>
           )}
         </>
