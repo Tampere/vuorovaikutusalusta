@@ -458,5 +458,12 @@
   "FooterLinks": {
     "accessibility": "Accessibility report",
     "privacyStatement": "Data protection and management"
+  },
+  "IconAltTexts": {
+    "areaIconAltText": "Point icon",
+    "lineIconAltText": "Line icon",
+    "pointIconAltText": "Area icon",
+    "treBannerAltText": "Tampere banner",
+    "treLogoAltText": "Tampere Finland logo"
   }
 }

@@ -458,5 +458,12 @@
   "FooterLinks": {
     "accessibility": "Saavutettavuusseloste",
     "privacyStatement": "Tietosuoja ja tiedonhallinta"
+  },
+  "IconAltTexts": {
+    "areaIconAltText": "Piste-kuvake",
+    "lineIconAltText": "Viiva-kuvake",
+    "pointIconAltText": "Alue-kuvake",
+    "treBannerAltText": "Tampereen vaakunalogo",
+    "treLogoAltText": "Tampere Finland -logo"
   }
 }

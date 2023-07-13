@@ -2,7 +2,6 @@ import { Box, Link, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React from 'react';
-import TreLogo from './logos/TreLogo';
 
 const useStyles = makeStyles({
   infoContainer: {
@@ -30,7 +29,11 @@ export function UnavailableSurvey() {
         justifyContent: 'center',
       }}
     >
-      <TreLogo width="351px" height="125px" />
+      <img
+        style={{ height: '125px', width: '351px' }}
+        src={`api/feature-styles/icons/tre_logo`}
+        alt={tr.IconAltTexts.treLogoAltText}
+      />
       <br />
       <Typography variant="body1" classes={{ body1: classes.infoText }}>
         {tr.UnavailableSurvey.surveyNotPublished}
