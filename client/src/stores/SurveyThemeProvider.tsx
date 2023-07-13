@@ -76,7 +76,6 @@ export function useSurveyTheme() {
 function reducer(state: State, action: Action): State {
   switch (action.type) {
     case 'SET_THEME':
-      console.log(action.value);
       return {
         ...state,
         theme: action.value,
