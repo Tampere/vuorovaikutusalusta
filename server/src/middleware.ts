@@ -11,7 +11,7 @@ export function iconCacher(cache: NodeCache) {
     const cachedImage = cache.get(name);
 
     if (cachedImage) {
-      res.type('svg');
+      res.type('image/svg+xml');
       res.status(200).send(cachedImage);
       return;
     } else {

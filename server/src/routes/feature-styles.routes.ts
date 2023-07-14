@@ -38,7 +38,7 @@ router.get(
 
 router.get(
   '/icons/:name',
-  [ensureAuthenticated(), iconCacher(iconCache)],
+  iconCacher(iconCache),
   asyncHandler(async (req, res) => {
     const name = req.params.name;
     const icon = await getDb().oneOrNone<{
@@ -55,7 +55,7 @@ router.get(
       throw new NotFoundError(`Icon with name ${name} not found`);
     }
 
-    res.type('svg');
+    res.type('image/svg+xml');
     res.status(200).send(icon.svg);
   })
 );
