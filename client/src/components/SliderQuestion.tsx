@@ -64,6 +64,7 @@ export default function SliderQuestion({
     >
       <div style={{ display: 'flex', flexDirection: 'row' }}>
         <FormLabel
+          id="min-value-label"
           className={classes.label}
           onClick={() => {
             onChange(question.minValue);
@@ -78,6 +79,7 @@ export default function SliderQuestion({
           }}
         />
         <FormLabel
+          id="max-value-label"
           className={classes.label}
           onClick={() => {
             onChange(question.maxValue);
@@ -90,7 +92,7 @@ export default function SliderQuestion({
       <Slider
         aria-label={question.title?.[surveyLanguage]}
         ref={sliderRef}
-        className={value == null ? classes.emptyValue : ''}
+        className={value === null ? classes.emptyValue : ''}
         value={value ?? visibleEmptyValue}
         min={question.minValue}
         max={question.maxValue}

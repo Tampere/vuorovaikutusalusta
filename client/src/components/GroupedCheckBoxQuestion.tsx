@@ -170,7 +170,6 @@ export default function GroupedCheckBoxQuestion({
                   '{number}',
                   String(amountsByGroup[index])
                 )}`}
-                aria-describedby={`${question.id}-indicator`}
                 onBlur={() => {
                   setDirty(true);
                 }}
@@ -185,6 +184,7 @@ export default function GroupedCheckBoxQuestion({
                       control={
                         <Checkbox
                           checked={value.includes(option.id)}
+                          aria-describedby={`${question.id}-indicator`}
                           disabled={maxReached && !value.includes(option.id)}
                           onChange={(event) => {
                             setDirty(true);

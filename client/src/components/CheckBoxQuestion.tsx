@@ -58,17 +58,12 @@ export default function CheckBoxQuestion({
     <>
       {answerLimitText && (
         // Align this helper text with the form label
-        <FormHelperText
-          id={`${question.id}-checkbox-helper-text`}
-          aria-hidden="true"
-          style={{ marginLeft: 0 }}
-        >
+        <FormHelperText style={{ marginLeft: 0 }}>
           {answerLimitText}
         </FormHelperText>
       )}
       <FormGroup
         id={`${question.id}-input`}
-        aria-describedby={`${question.id}-checkbox-helper-text`}
         onBlur={() => {
           setDirty(true);
         }}
