@@ -45,12 +45,9 @@ router.get(
       id: string;
       name: string;
       svg: Buffer;
-    }>(
-      'SELECT id, name, svg FROM application.static_icons WHERE name=$(name)',
-      {
-        name,
-      }
-    );
+    }>('SELECT name, svg FROM application.static_icons WHERE name=$(name)', {
+      name,
+    });
     if (!icon) {
       throw new NotFoundError(`Icon with name ${name} not found`);
     }
