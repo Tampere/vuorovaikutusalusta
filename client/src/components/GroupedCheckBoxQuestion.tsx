@@ -100,7 +100,7 @@ export default function GroupedCheckBoxQuestion({
   }, [tr, maxReached]);
 
   return (
-    <>
+    <div id={`${question.id}-input`}>
       <Typography style={{ marginTop: '1rem' }}>
         {question.answerLimits?.min && question.answerLimits?.max
           ? // Both min & max limits are set
@@ -171,6 +171,9 @@ export default function GroupedCheckBoxQuestion({
                   String(amountsByGroup[index])
                 )}`}
                 aria-describedby={`${question.id}-indicator`}
+                onBlur={() => {
+                  setDirty(true);
+                }}
               >
                 {group.options.map((option) => (
                   <div
@@ -181,6 +184,9 @@ export default function GroupedCheckBoxQuestion({
                       label={option.text?.[surveyLanguage] ?? ''}
                       control={
                         <Checkbox
+                          inputProps={{
+                            'aria-describedby': `${question.id}-indicator`,
+                          }}
                           checked={value.includes(option.id)}
                           disabled={maxReached && !value.includes(option.id)}
                           onChange={(event) => {
@@ -212,6 +218,6 @@ export default function GroupedCheckBoxQuestion({
           </Accordion>
         ))}
       </div>
-    </>
+    </div>
   );
 }

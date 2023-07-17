@@ -147,7 +147,7 @@ export default function MatrixQuestion({
   return (
     <>
       {!componentState.isOverflow && (
-        <TableContainer ref={radioRef}>
+        <TableContainer id={`${question.id}-input`} ref={radioRef}>
           <Table size="small">
             {question.title && <caption style={visuallyHidden}>{question.title?.[surveyLanguage]}</caption>}
             <TableHead>
@@ -224,7 +224,11 @@ export default function MatrixQuestion({
         </TableContainer>
       )}
       {!isMobileWidth && componentState.isOverflow && (
-        <TableContainer ref={selectRef} sx={{ marginTop: 2 }}>
+        <TableContainer
+          id={`${question.id}-input`}
+          ref={selectRef}
+          sx={{ marginTop: 2 }}
+        >
           <Table size="small">
             {question.title && <caption style={visuallyHidden}>{question.title?.[surveyLanguage]}</caption>}
             <TableHead>
@@ -296,7 +300,7 @@ export default function MatrixQuestion({
         </TableContainer>
       )}
       {isMobileWidth && (
-        <Stack mt={2}>
+        <Stack id={`${question.id}-input`} mt={2}>
           {question.subjects.map((subject, subjectIndex) => {
             return (
               <FormControl

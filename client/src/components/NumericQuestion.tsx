@@ -27,7 +27,7 @@ export default function NumericQuestion({
           min: question.minValue,
           max: question.maxValue,
           id: `${question.id}-input`,
-          'aria-describedby': `${question.id}-helper-text ${question.id}-required-text`,
+          'aria-describedby': `${question.id}-required-text ${question.id}-helper-text`,
         }}
         type="number"
         onChange={(event) => {

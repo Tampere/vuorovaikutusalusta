@@ -73,8 +73,10 @@ export default function CheckBoxQuestion({
         </>
       )}
       <FormGroup
-        aria-label={question.title?.[surveyLanguage]}
         aria-describedby="checkbox-helper-label"
+        onBlur={() => {
+          setDirty(true);
+        }}
       >
         {question.options.map((option) => (
           <FormControlLabel

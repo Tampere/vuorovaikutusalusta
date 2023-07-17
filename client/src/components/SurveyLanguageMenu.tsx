@@ -38,7 +38,10 @@ export default function SurveyLanguageMenu({
 
   return (
     <div className={classes.root} style={style}>
-      <Tooltip title={tr.SurveyLanguageMenu.changeSurveyLanguage}>
+      <Tooltip
+        id="tooltip-button"
+        title={tr.SurveyLanguageMenu.changeSurveyLanguage}
+      >
         <div
           onClick={(event) => handleClick(event)}
           style={{
@@ -61,7 +64,7 @@ export default function SurveyLanguageMenu({
         open={open}
         onClose={handleClose}
         MenuListProps={{
-          'aria-labelledby': 'basic-button',
+          'aria-labelledby': 'tooltip-button',
         }}
       >
         {languages.map((lang, index) => (

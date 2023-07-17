@@ -125,6 +125,7 @@ export default function MapSubQuestionDialog({
       >
         {subQuestions?.map((question, index) => (
           <FormControl
+            component="fieldset"
             key={question.id}
             error={dirty?.[index] && validationErrors?.[index].length > 0}
             style={{ width: '100%' }}

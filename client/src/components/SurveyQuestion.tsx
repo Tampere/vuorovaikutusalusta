@@ -239,6 +239,7 @@ function SurveyQuestion(
       )}
       {question.type === 'attachment' && (
         <AttachmentQuestion
+          question={question}
           value={value as FileAnswer[]}
           setDirty={setDirty}
           onChange={(value) =>
