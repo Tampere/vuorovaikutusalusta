@@ -183,8 +183,10 @@ export default function GroupedCheckBoxQuestion({
                       label={option.text?.[surveyLanguage] ?? ''}
                       control={
                         <Checkbox
+                          inputProps={{
+                            'aria-describedby': `${question.id}-indicator`,
+                          }}
                           checked={value.includes(option.id)}
-                          aria-describedby={`${question.id}-indicator`}
                           disabled={maxReached && !value.includes(option.id)}
                           onChange={(event) => {
                             setDirty(true);
