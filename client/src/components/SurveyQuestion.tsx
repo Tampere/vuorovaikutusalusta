@@ -198,6 +198,7 @@ export default function SurveyQuestion({ question }: Props) {
       )}
       {question.type === 'attachment' && (
         <AttachmentQuestion
+          question={question}
           value={value as FileAnswer[]}
           setDirty={setDirty}
           onChange={(value) =>

@@ -43,7 +43,7 @@ export default function RadioQuestion({
   return (
     <>
       <RadioGroup
-        aria-label={question.title?.[surveyLanguage]}
+        id={`${question.id}-input`}
         value={value}
         onChange={(event) => {
           setDirty(true);

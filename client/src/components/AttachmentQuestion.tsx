@@ -1,4 +1,4 @@
-import { FileAnswer } from '@interfaces/survey';
+import { FileAnswer, SurveyAttachmentQuestion } from '@interfaces/survey';
 import { IconButton, Typography } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useToasts } from '@src/stores/ToastContext';
@@ -10,12 +10,14 @@ interface Props {
   value: FileAnswer[];
   onChange: (value: FileAnswer[]) => void;
   setDirty: (dirty: boolean) => void;
+  question: SurveyAttachmentQuestion;
 }
 
 export default function AttachmentQuestion({
   value,
   setDirty,
   onChange,
+  question,
 }: Props) {
   const { tr } = useTranslations();
   const { showToast } = useToasts();
@@ -71,7 +73,7 @@ export default function AttachmentQuestion({
   ) : null;
 
   return (
-    <div>
+    <div id={`${question.id}-input`}>
       <DropZone
         maxFiles={1}
         fileCallback={async (files: File[]) => {

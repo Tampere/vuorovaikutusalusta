@@ -39,9 +39,10 @@ export default function OptionInfoDialog({
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
         aria-labelledby="option-info-dialog"
-        aria-describedby="option-info-dialog"
       >
-        <DialogTitle>{tr.SurveySections.optionInfo}</DialogTitle>
+        <DialogTitle id="option-info-dialog">
+          {tr.SurveySections.optionInfo}
+        </DialogTitle>
         <DialogContent>
           <RichTextEditor
             value={infoText}

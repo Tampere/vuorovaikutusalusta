@@ -63,8 +63,7 @@ export default function CheckBoxQuestion({
         </FormHelperText>
       )}
       <FormGroup
-        aria-label={question.title?.[surveyLanguage]}
-        aria-describedby={answerLimitText}
+        id={`${question.id}-input`}
         onBlur={() => {
           setDirty(true);
         }}
