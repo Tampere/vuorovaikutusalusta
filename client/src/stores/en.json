@@ -326,6 +326,7 @@
     "openMap": "Open the map",
     "openImage": "Open the image",
     "unfinishedAnswers": "Please, answer all mandatory questions",
+    "unfinishedAnswersInfo": "The following answers need to be answered",
     "saveAsUnfinished": "Save unfinished survey"
   },
   "SaveAsUnfinishedDialog": {

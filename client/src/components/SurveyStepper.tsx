@@ -6,6 +6,7 @@ import {
   SurveyPage,
 } from '@interfaces/survey';
 import {
+  Alert,
   Chip,
   Drawer,
   FormControl,
@@ -32,7 +33,7 @@ import { useTranslations } from '@src/stores/TranslationContext';
 import { getClassList } from '@src/utils/classes';
 import { getFullFilePath } from '@src/utils/path';
 import { request } from '@src/utils/request';
-import React, { createRef, useEffect, useMemo, useState } from 'react';
+import React, { useRef, useEffect, useMemo, useState } from 'react';
 import SplitPane from 'react-split-pane';
 import DocumentSection from './DocumentSection';
 import Footer from './Footer';
@@ -118,11 +119,11 @@ export default function SurveyStepper({
   const [pageUnfinished, setPageUnfinished] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
-  const [highlightErrorPage, setHighlightErrorPage] = useState(false);
   const [submissionInfoDialogOpen, setSubmissionInfoDialogOpen] =
     useState(false);
 
-  const { isPageValid, answers, unfinishedToken } = useSurveyAnswers();
+  const { isPageValid, answers, unfinishedToken, getPageInvalidQuestions } =
+    useSurveyAnswers();
   const { showToast } = useToasts();
   const {
     setVisibleLayers,
@@ -143,14 +144,8 @@ export default function SurveyStepper({
     [survey, pageNumber]
   );
 
-  const currentPageErrorRefs = useMemo(
-    () => currentPage.sections.map((_s) => createRef<HTMLParagraphElement>()),
-    [currentPage]
-  );
+  const currentPageErrorRef = useRef(null);
 
-  currentPageErrorRefs;
-  currentPage;
-  pageUnfinished;
   const fullSidebarImagePath = useMemo(
     () =>
       getFullFilePath(
@@ -190,28 +185,17 @@ export default function SurveyStepper({
 
   // Will run on first render and submit
   useEffect(() => {
-    const firstError = currentPageErrorRefs.find((ref) => {
-      ref;
-      return ref.current !== null;
-    });
-    ('focusing to error...');
-    firstError?.current?.scrollIntoView();
-    firstError?.current?.focus();
+    currentPageErrorRef?.current?.scrollIntoView();
+    currentPageErrorRef?.current?.focus();
   }, [pageUnfinished]);
 
   // Will handle subsequent submits
-  function handleSubmit() {
+  function handleClick() {
     if (!pageUnfinished) {
       return;
     }
-
-    const firstError = currentPageErrorRefs.find((ref) => {
-      ref;
-      return ref.current !== null;
-    });
-    ('focusing to error...');
-    firstError?.current?.scrollIntoView();
-    firstError?.current?.focus();
+    currentPageErrorRef?.current?.scrollIntoView();
+    currentPageErrorRef?.current?.focus();
   }
 
   // Map answer geometries on the current page
@@ -276,14 +260,11 @@ export default function SurveyStepper({
   function validateSurveyPage(page: SurveyPage) {
     // If a page is not finished, highlight it
     if (!isPageValid(page)) {
-      setHighlightErrorPage(true);
-      showToast({
-        severity: 'error',
-        message: tr.SurveyStepper.unfinishedAnswers,
-      });
+      setPageUnfinished(true);
+
       return false;
     }
-    setHighlightErrorPage(false);
+    setPageUnfinished(false);
     return true;
   }
 
@@ -326,6 +307,7 @@ export default function SurveyStepper({
       )}
       <article>
         <h1 style={{ marginLeft: '1rem' }}>{survey.title[surveyLanguage]}</h1>
+
         <Stepper
           className={classes.stepper}
           activeStep={pageNumber}
@@ -338,25 +320,45 @@ export default function SurveyStepper({
                 id={`${index}-page-top`}
                 classes={{
                   active: classes.stepActive,
-                  label: `${classes.stepHeader} ${
-                    highlightErrorPage && page === currentPage
-                      ? classes.stepHeaderError
-                      : ''
-                  }`,
-                  iconContainer:
-                    highlightErrorPage && page === currentPage
-                      ? classes.stepIconUnfinised
-                      : classes.stepIcon,
+                  label: classes.stepHeader,
+                  iconContainer: classes.stepIcon,
                 }}
               >
                 <h2 style={{ margin: 0, fontSize: '1em' }}>
                   {page.title?.[language]}
                 </h2>
               </StepLabel>
+
               <StepContent
                 transitionDuration={0}
                 classes={{ root: classes.stepContent }}
               >
+                {pageUnfinished && (
+                  <Alert
+                    tabIndex={0}
+                    ref={currentPageErrorRef}
+                    severity="error"
+                  >
+                    {tr.SurveyStepper.unfinishedAnswers}
+                    <p style={visuallyHidden}>
+                      {tr.SurveyStepper.unfinishedAnswersInfo}
+                    </p>
+                    {
+                      <ul style={visuallyHidden}>
+                        {getPageInvalidQuestions(currentPage).map(
+                          (question) => {
+                            const [questionName, errors] =
+                              Object.entries(question)[0];
+                            if (errors.includes('required')) {
+                              return <li>{questionName}</li>;
+                            }
+                            return null;
+                          }
+                        )}
+                      </ul>
+                    }
+                  </Alert>
+                )}
                 <FormControl style={{ width: '100%' }} component="fieldset">
                   {currentPage.sidebar.imageName && (
                     <img
@@ -366,7 +368,7 @@ export default function SurveyStepper({
                     />
                   )}
 
-                  {page.sections.map((section, index) => (
+                  {page.sections.map((section, _index) => (
                     <div className={classes.section} key={section.id}>
                       {section.type === 'text' ? (
                         <TextSection section={section} />
@@ -378,7 +380,6 @@ export default function SurveyStepper({
                         <SurveyQuestion
                           question={section}
                           pageUnfinished={pageUnfinished}
-                          ref={currentPageErrorRefs[index]}
                         />
                       )}
                     </div>
@@ -389,22 +390,20 @@ export default function SurveyStepper({
                     totalSteps={survey.pages.length}
                     onPrevious={() => {
                       setPageNumber(index - 1);
+                      setPageUnfinished(false);
                     }}
                     onNext={() => {
                       if (validateSurveyPage(page)) {
                         setPageNumber(index + 1);
-                        setPageUnfinished(false);
                       } else {
-                        setPageUnfinished(true);
-                        handleSubmit();
+                        handleClick();
                       }
                     }}
                     disabled={loading}
                     nextDisabled={false}
                     onSubmit={() => {
                       if (!validateSurveyPage(page)) {
-                        setPageUnfinished(true);
-                        handleSubmit();
+                        handleClick();
                         return;
                       }
                       if (survey.email.enabled) {

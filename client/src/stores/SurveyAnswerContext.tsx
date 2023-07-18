@@ -139,7 +139,7 @@ export function getEmptyAnswer(section: SurveyPageSection): AnswerEntry {
  */
 export function useSurveyAnswers() {
   const context = useContext(SurveyAnswerContext);
-  const { setLanguage } = useTranslations();
+  const { setLanguage, surveyLanguage } = useTranslations();
   if (!context) {
     throw new Error('useSurvey must be used within the SurveyProvider');
   }
@@ -268,6 +268,24 @@ export function useSurveyAnswers() {
             !nonQuestionSectionTypes.includes(section.type)
         )
         .some((section) => getValidationErrors(section).length);
+    },
+    /**
+     *
+     * @param page survey page
+     * @returns a list of objects with question titles as keys and an array of errors as values
+     */
+    getPageInvalidQuestions(page: SurveyPage) {
+      return (
+        page.sections
+          // Skip sections that shouldn't get answers
+          .filter(
+            (section): section is SurveyQuestion =>
+              !nonQuestionSectionTypes.includes(section.type)
+          )
+          .map((section) => ({
+            [section.title[surveyLanguage]]: getValidationErrors(section),
+          }))
+      );
     },
     /**
      * Fetch unfinished answer entries by token and set them into the context

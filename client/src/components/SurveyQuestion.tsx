@@ -25,10 +25,7 @@ interface Props {
   pageUnfinished: boolean;
 }
 
-function SurveyQuestion(
-  { question, pageUnfinished }: Props,
-  ref: React.Ref<HTMLParagraphElement>
-) {
+function SurveyQuestion({ question, pageUnfinished }: Props) {
   const { answers, updateAnswer, getValidationErrors, survey } =
     useSurveyAnswers();
   const { tr, surveyLanguage } = useTranslations();
@@ -65,8 +62,6 @@ function SurveyQuestion(
       {validationErrors.includes('required') && (
         <>
           <FormHelperText
-            aria-live="assertive"
-            ref={ref}
             id={`${question.id}-required-text`}
             sx={{ marginLeft: 0 }}
           >

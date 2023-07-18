@@ -326,6 +326,7 @@
     "openMap": "Avaa kartta",
     "openImage": "Avaa kuva",
     "unfinishedAnswers": "Vastaa kaikkiin pakolliseksi merkittyihin kysymyksiin",
+    "unfinishedAnswersInfo": "Seuraavat kysymykset ovat vastaamatta",
     "saveAsUnfinished": "Tallenna keskeneräisenä"
   },
   "SaveAsUnfinishedDialog": {
