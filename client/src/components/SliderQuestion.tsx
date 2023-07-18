@@ -2,6 +2,7 @@ import { SurveySliderQuestion } from '@interfaces/survey';
 import { FormLabel, Slider } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
+import { visuallyHidden } from '@mui/utils';
 import React, { useMemo, useRef } from 'react';
 
 interface Props {
@@ -30,9 +31,9 @@ export default function SliderQuestion({
   const classes = useStyles();
   const sliderRef = useRef<HTMLElement>();
   const { tr } = useTranslations();
-
+  const verbalExtremes = question.presentationType === 'literal';
   const labels = useMemo(() => {
-    return question.presentationType === 'literal'
+    return verbalExtremes
       ? {
           min:
             question.minLabel?.[surveyLanguage] ??
@@ -66,15 +67,16 @@ export default function SliderQuestion({
         sx={{ display: 'flex', justifyContent: 'space-between' }}
         id={`${question.id}-value-label`}
         className={classes.label}
+        required={false}
       >
+        <span style={visuallyHidden}>{tr.SliderQuestion.scale}: </span>
         <span>
-          {labels.min}: {question.minValue}
+          {question.minValue}{verbalExtremes && `: ${labels.min}`}
         </span>
         <span>
-          {labels.max}: {question.maxValue}
+           {question.maxValue}{verbalExtremes && `: ${labels.max}`}
         </span>
       </FormLabel>
-
       <Slider
         aria-label={question.title?.[surveyLanguage]}
         aria-invalid={value === null}
@@ -83,8 +85,8 @@ export default function SliderQuestion({
         slotProps={{
           input: {
             'aria-describedby': `${question.id}-value-label`,
-            'aria-invalid': true,
-          }, // HUOM! Testailua tässä
+            'aria-required': question.isRequired
+          },
         }}
         value={value ?? visibleEmptyValue}
         min={question.minValue}

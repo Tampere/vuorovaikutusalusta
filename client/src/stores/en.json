@@ -132,7 +132,8 @@
   },
   "SliderQuestion": {
     "defaultMinLabel": "Strongly disagree",
-    "defaultMaxLabel": "Strongly agree"
+    "defaultMaxLabel": "Strongly agree",
+    "scale": "Scale"
   },
   "SurveySection": {
     "radioQuestion": "Radio button question (single choice)",

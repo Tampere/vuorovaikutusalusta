@@ -132,7 +132,8 @@
   },
   "SliderQuestion": {
     "defaultMinLabel": "Täysin eri mieltä",
-    "defaultMaxLabel": "Täysin samaa mieltä"
+    "defaultMaxLabel": "Täysin samaa mieltä",
+    "scale": "Asteikko"
   },
   "SurveySection": {
     "radioQuestion": "Valintakysymys",
