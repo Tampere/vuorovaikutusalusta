@@ -16,14 +16,20 @@ interface Props {
   subject: string;
   infoText: string;
   style?: React.CSSProperties;
+  hiddenFromScreenReader?: boolean;
 }
 
-export default function SectionInfo({ subject, infoText, style }: Props) {
+export default function SectionInfo({
+  subject,
+  infoText,
+  style,
+  hiddenFromScreenReader = false,
+}: Props) {
   const [infoDialogOpen, setInfoDialogOpen] = useState(false);
   const { tr } = useTranslations();
 
   return (
-    <div style={style ?? {}}>
+    <div style={style ?? {}} aria-hidden={hiddenFromScreenReader}>
       <Tooltip title={tr.SurveyQuestion.showInfo}>
         <IconButton
           aria-label={`${tr.SurveyQuestion.showInfo}: ${subject}`}

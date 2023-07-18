@@ -47,7 +47,8 @@ function SurveyQuestion(
   return (
     <FormControl
       component="fieldset"
-      aria-label={question.title?.[surveyLanguage]}
+      required={question.isRequired}
+      aria-required={question.isRequired}
       aria-invalid={validationErrors.includes('required')}
       error={validationErrors.length > 0}
       style={{ width: '100%' }}
@@ -62,7 +63,7 @@ function SurveyQuestion(
     >
       {/* Show the required error only for empty values (not when answer limits are broken in checkbox questions) */}
       {validationErrors.includes('required') && (
-        <div>
+        <>
           <FormHelperText
             aria-live="assertive"
             ref={ref}
@@ -75,32 +76,29 @@ function SurveyQuestion(
             {tr.SurveyQuestion.accessibilityTooltip}{' '}
             {question.title?.[surveyLanguage]}
           </FormHelperText>
-        </div>
+        </>
       )}
-      <div
+      <FormLabel
+        component="legend"
         style={{
           display: 'flex',
-          flexDirection: 'row',
           alignItems: 'center',
+          color: survey.sectionTitleColor ?? '#000000',
         }}
       >
-        <FormLabel
-          htmlFor={`${question.id}-input`}
-          style={{ color: survey.sectionTitleColor ?? '#000000' }}
-        >
-          <h3 tabIndex={0}>
-            {question.title?.[surveyLanguage]}
-            <span aria-hidden="true"> </span>
-            {question.isRequired && <span aria-hidden="true">*</span>}
-          </h3>
-        </FormLabel>
+        <h3 tabIndex={0}>
+          {question.title?.[surveyLanguage]}
+          <span aria-hidden="true"> </span>
+        </h3>
+
         {question.info && question.info?.[surveyLanguage] && (
           <SectionInfo
+            hiddenFromScreenReader={false}
             infoText={question.info?.[surveyLanguage]}
             subject={question.title?.[surveyLanguage]}
           />
         )}
-      </div>
+      </FormLabel>
 
       {/* Radio question */}
       {question.type === 'radio' && (

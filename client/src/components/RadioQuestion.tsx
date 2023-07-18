@@ -62,9 +62,7 @@ export default function RadioQuestion({
             key={option.id}
             value={option.id}
             label={option.text?.[surveyLanguage] ?? ''}
-            control={
-              <Radio required={question.isRequired} aria-invalid={false} />
-            }
+            control={<Radio />}
             classes={{ label: classes.labelStyles }}
           />
         ))}
@@ -73,9 +71,7 @@ export default function RadioQuestion({
             <FormControlLabel
               value={customAnswerValue}
               label={tr.SurveyQuestion.customAnswer}
-              control={
-                <Radio required={question.isRequired} aria-invalid={false} />
-              }
+              control={<Radio />}
             />
             {/* Value is a number (ID) when a pre-defined option is selected - otherwise it's custom */}
             {typeof value === 'string' && (

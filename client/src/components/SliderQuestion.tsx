@@ -62,42 +62,35 @@ export default function SliderQuestion({
         maxWidth: '30rem',
       }}
     >
-      <div style={{ display: 'flex', flexDirection: 'row' }}>
-        <FormLabel
-          id="min-value-label"
-          className={classes.label}
-          onClick={() => {
-            onChange(question.minValue);
-            sliderRef.current.querySelector('input').focus();
-          }}
-        >
-          {labels.min}
-        </FormLabel>
-        <div
-          style={{
-            flexGrow: 1,
-          }}
-        />
-        <FormLabel
-          id="max-value-label"
-          className={classes.label}
-          onClick={() => {
-            onChange(question.maxValue);
-            sliderRef.current.querySelector('input').focus();
-          }}
-        >
-          {labels.max}
-        </FormLabel>
-      </div>
+      <FormLabel
+        sx={{ display: 'flex', justifyContent: 'space-between' }}
+        id={`${question.id}-value-label`}
+        className={classes.label}
+      >
+        <span>
+          {labels.min}: {question.minValue}
+        </span>
+        <span>
+          {labels.max}: {question.maxValue}
+        </span>
+      </FormLabel>
+
       <Slider
         aria-label={question.title?.[surveyLanguage]}
         aria-invalid={value === null}
         ref={sliderRef}
         className={value === null ? classes.emptyValue : ''}
+        slotProps={{
+          input: {
+            'aria-describedby': `${question.id}-value-label`,
+            'aria-invalid': true,
+          }, // HUOM! Testailua tässä
+        }}
         value={value ?? visibleEmptyValue}
         min={question.minValue}
         max={question.maxValue}
         valueLabelDisplay="auto"
+        getAriaValueText={(v) => v.toString()}
         step={1}
         marks
         onClick={() => {
