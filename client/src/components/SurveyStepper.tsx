@@ -346,11 +346,15 @@ export default function SurveyStepper({
                     {
                       <ul style={visuallyHidden}>
                         {getPageInvalidQuestions(currentPage).map(
-                          (question) => {
+                          (question, index) => {
                             const [questionName, errors] =
                               Object.entries(question)[0];
                             if (errors.includes('required')) {
-                              return <li>{questionName}</li>;
+                              return (
+                                <li key={`${questionName}-${index}`}>
+                                  {questionName}
+                                </li>
+                              );
                             }
                             return null;
                           }
