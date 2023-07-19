@@ -21,7 +21,7 @@ export default function AppBarUserMenu() {
   return (
     <div className={classes.root}>
       <IconButton
-        aria-label="user menu"
+        aria-label={tr.AppBarUserMenu.label}
         aria-controls="menu-appbar"
         aria-haspopup="true"
         onClick={(event) => {

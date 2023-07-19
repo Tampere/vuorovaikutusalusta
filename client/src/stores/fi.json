@@ -89,6 +89,7 @@
       "map": "Kartta",
       "image": "Kuva"
     },
+    "sidebarLabel": "Navigointivalikko",
     "warningNoMapUrl": "Kyselylle ei ole määritetty Oskari-karttajulkaisua.",
     "warningNoAvailableMapLayers": "Oskari-karttajulkaisusta ei löytynyt näytettäviä karttatasoja.",
     "mapLayers": "Sivulla näytettävät karttatasot",
@@ -175,7 +176,8 @@
     "fileUploadError": "Virhe ladattaessa tiedostoa",
     "fileSizeLimitError": "Ladattavan tiedoston koko ei saa olla yli 10MB",
     "unsupportedFileFormat": "Tiedostoformaattia ei tueta",
-    "attachmentFileFormats": "Sallitut tiedostoformaatit: jpg, jpeg, png, pdf, docx, xlsx."
+    "attachmentFileFormats": "Sallitut tiedostoformaatit: jpg, jpeg, png, pdf, docx, xlsx.",
+    "deleteUploadedFile": "Poista ladattu tiedosto"
   },
   "SurveyImageList": {
     "attributions": "Tekijänoikeustiedot",
@@ -345,11 +347,13 @@
     "info": "Lisätietoja"
   },
   "MapQuestion": {
+    "mapSelectionButtons": "Kartan valintapainikkeet",
     "selectionTypes": {
       "point": "Piste",
       "line": "Viiva",
       "area": "Alue"
     },
+    "subQuestionDialog": "Alakysymysnäkymä",
     "selectionHelperText": {
       "point": "Sijoita piste oikeaan paikkaan klikkaamalla kartalla oikeassa kohdassa.",
       "line": "Aloita piirtäminen klikkaamalla aloituskohtaa. Jatka piirtämistä klikkaamalla kartalla uudestaan, lopeta piirtäminen klikkaamalla viimeistä pistettä uudestaan.",
@@ -401,6 +405,7 @@
     "email": "Sähköposti (valinnainen)"
   },
   "AppBarUserMenu": {
+    "label": "Käyttäjävalikko",
     "logout": "Kirjaudu ulos"
   },
   "MapInfoBox": {

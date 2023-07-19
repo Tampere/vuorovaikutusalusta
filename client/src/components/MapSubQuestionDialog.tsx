@@ -115,7 +115,7 @@ export default function MapSubQuestionDialog({
     <Dialog
       open={open}
       onClose={onCancel}
-      aria-label="subquestion dialog"
+      aria-label={tr.MapQuestion.subQuestionDialog}
       aria-describedby="subquestion-dialog-content"
     >
       {title && <DialogTitle>{title}</DialogTitle>}

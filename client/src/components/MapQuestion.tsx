@@ -175,7 +175,7 @@ export default function MapQuestion({ value, onChange, question }: Props) {
     return (
       <ToggleButton
         value={selectionType}
-        aria-label={selectionType}
+        aria-label={tr.MapQuestion.selectionTypes[selectionType]}
         disabled={!isMapReady}
       >
         <Badge
@@ -208,7 +208,7 @@ export default function MapQuestion({ value, onChange, question }: Props) {
           onChange={(_, newValue) => {
             setSelectionType(newValue);
           }}
-          aria-label="map-selection-type"
+          aria-label={tr.MapQuestion.mapSelectionButtons}
         >
           {question.selectionTypes.includes('point') &&
             getToggleButton('point')}

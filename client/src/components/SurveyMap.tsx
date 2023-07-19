@@ -85,7 +85,7 @@ export default function SurveyMap(props: Props) {
               style={{ position: 'absolute', bottom: '1rem', right: '1rem' }}
               variant="extended"
               color="primary"
-              aria-label="edit-geometries"
+              aria-label={tr.SurveyMap.editGeometries}
               onClick={() => {
                 startModifying();
               }}
@@ -100,7 +100,7 @@ export default function SurveyMap(props: Props) {
               style={{ position: 'absolute', bottom: '1rem', right: '1rem' }}
               variant="extended"
               color="primary"
-              aria-label="save-geometries"
+              aria-label={tr.SurveyMap.finishEditingGeometries}
               onClick={() => {
                 stopModifying();
               }}
