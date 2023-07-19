@@ -1,7 +1,6 @@
 import { FileAnswer, LanguageCode, LocalizedText } from '@interfaces/survey';
 import { getDb } from '@src/database';
-import { readFileSync, rmSync } from 'fs';
-import { parseAsync } from 'json2csv';
+import { readFileSync, rmSync, writeFile } from 'fs';
 import moment from 'moment';
 import ogr2ogr from 'ogr2ogr';
 import useTranslations from '@src/translations/useTranslations';
@@ -279,43 +278,34 @@ function dbEntriesToFeatures(
 async function answerEntriesToCSV(entries: CSVJson): Promise<string> {
   const { submissions, headers } = entries;
 
-  const headersData = [
-    'Vastaustunniste',
-    'Vastauskieli',
-    'Aikaleima',
-    ...headers.map((headerObj) => Object.values(headerObj)[0]),
-  ];
+  let csvData = `Vastaustunniste,Vastauskieli,Aikaleima,${headers.map(
+    (header) => `${Object.values(header)[0]}`
+  )}\n`;
 
-  const submissionData = submissions.map((submission) => {
-    const answers = {};
-    const [submissionId, submissionAnswers] = Object.entries(submission)[0];
-    answers['Vastaustunniste'] = submissionId;
-    answers['Vastauskieli'] = submission.submissionLanguage;
-    answers['Aikaleima'] = moment(submission.timeStamp).format(
-      'DD-MM-YYYY, HH:mm'
-    );
+  for (let i = 0; i < submissions.length; ++i) {
+    // Timestamp + submission language
+    csvData += `${Object.keys(submissions[i])[0]},${moment(
+      submissions[i].timeStamp
+    ).format('DD-MM-YYYY HH:mm')},${submissions[i].submissionLanguage}`;
+    csvData += ',';
 
-    headers.forEach((headerObj) => {
+    headers.forEach((headerObj, index) => {
       for (const [headerKey, headerValue] of Object.entries(headerObj)) {
-        answers[headerValue as string] = submissionAnswers.hasOwnProperty(
-          headerKey
-        )
-          ? submissionAnswers[headerKey]
+        csvData += Object.values(submissions[i])[0].hasOwnProperty(headerKey)
+          ? Object.values(submissions[i])[0][headerKey]
           : '';
+
+        csvData += ',';
       }
     });
 
-    return answers;
-  });
+    csvData = csvData.substring(0, csvData.length - 1);
 
-  try {
-    const csv = await parseAsync(submissionData, {
-      headersData,
-    } as any);
-    return csv;
-  } catch (err) {
-    console.error(err);
+    // Newline
+    csvData += '\n';
   }
+
+  return csvData;
 }
 /**
  * Handler function for downloading csv file
@@ -638,9 +628,11 @@ function createCSVHeaders(sectionMetadata: SectionHeader[]) {
           );
 
           allHeaders.push({
-            [key]: `${section.title?.['fi'] ?? ''}${
-              section.groupName ? ' - ' + section.groupName['fi'] : ''
-            } - ${section.text?.['fi'] ?? ''}`,
+            [key]: `s${section.pageIndex}k${section.sectionIndex}: ${
+              section.title?.['fi'] ?? ''
+            }${section.groupName ? ' - ' + section.groupName['fi'] : ''} - ${
+              section.text?.['fi'] ?? ''
+            }`,
           });
         });
         if (sectionHead.details.allowCustomAnswer) {
@@ -651,7 +643,9 @@ function createCSVHeaders(sectionMetadata: SectionHeader[]) {
             -1
           );
           allHeaders.push({
-            [key]: `${sectionHead.title['fi']} - joku muu, mikä?`,
+            [key]: `s${sectionHead.pageIndex + 1}k${
+              sectionHead.sectionIndex + 1
+            }: ${sectionHead.title['fi']} - joku muu, mikä?`,
           });
         }
         break;
@@ -664,7 +658,9 @@ function createCSVHeaders(sectionMetadata: SectionHeader[]) {
               idx + 1
             );
             allHeaders.push({
-              [key]: `${sectionHead.title['fi']} - ${subject['fi']}`,
+              [key]: `s${sectionHead.pageIndex + 1}k${
+                sectionHead.sectionIndex + 1
+              }: ${sectionHead.title['fi']} - ${subject['fi']}`,
             });
           }
         );
@@ -678,7 +674,9 @@ function createCSVHeaders(sectionMetadata: SectionHeader[]) {
             section.optionIndex + 1
           );
           allHeaders.push({
-            [key]: `${section.title['fi']} - ${section.optionIndex + 1}.`,
+            [key]: `s${section.pageIndex + 1}k${section.sectionIndex + 1}: ${
+              section.title['fi']
+            } - ${section.optionIndex + 1}.`,
           });
         });
         break;
@@ -686,11 +684,12 @@ function createCSVHeaders(sectionMetadata: SectionHeader[]) {
       default:
         allHeaders.push({
           [getHeaderKey(sectionHead.pageIndex, sectionHead.sectionIndex)]:
-            sectionHead.title?.['fi'] ?? '',
+            `s${sectionHead.pageIndex + 1}k${sectionHead.sectionIndex + 1}: ${
+              sectionHead.title?.['fi']
+            }` ?? '',
         });
     }
   });
-
   return allHeaders;
 }
 

@@ -35,12 +35,14 @@ export default function DataExport({ surveyId }: Props) {
 
   async function exportCSV() {
     try {
-      const res = (await request(`/api/answers/${surveyId}/file-export/csv`, {
+      const res = await fetch(`/api/answers/${surveyId}/file-export/csv`, {
         method: 'POST',
-      })) as string;
+      });
+
+      const csvText = await res.text();
 
       const link = document.createElement('a');
-      link.href = `data:text/csv;charset=utf-8,${encodeURI(res)}`;
+      link.href = `data:text/csv;charset=utf-8,${encodeURI(csvText)}`;
       link.target = '_blank';
       link.download = 'data.csv';
       link.click();

@@ -34,7 +34,9 @@ router.post(
     if (!exportFiles) {
       res.status(404).json({ message: 'No attachments found' });
     } else {
-      res.status(200).json(exportFiles);
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', 'attachment; filename="data.csv"');
+      res.status(200).send(exportFiles);
     }
   })
 );
