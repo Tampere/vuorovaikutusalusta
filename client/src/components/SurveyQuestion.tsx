@@ -7,7 +7,7 @@ import { FormControl, FormHelperText, FormLabel } from '@mui/material';
 import { visuallyHidden } from '@mui/utils';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { useMemo, useState, forwardRef } from 'react';
+import React, { useMemo, useState } from 'react';
 import AttachmentQuestion from './AttachmentQuestion';
 import CheckBoxQuestion from './CheckBoxQuestion';
 import FreeTextQuestion from './FreeTextQuestion';
@@ -248,4 +248,4 @@ function SurveyQuestion({ question, pageUnfinished }: Props) {
   );
 }
 
-export default forwardRef(SurveyQuestion);
+export default SurveyQuestion;
