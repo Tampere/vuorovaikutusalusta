@@ -5,7 +5,6 @@ import { parseAsync } from 'json2csv';
 import moment from 'moment';
 import ogr2ogr from 'ogr2ogr';
 import useTranslations from '@src/translations/useTranslations';
-import { DatabaseError } from 'pg';
 
 const tr = useTranslations('fi');
 
