@@ -4,8 +4,6 @@ import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { getClassList } from '@src/utils/classes';
 import React from 'react';
-import TreBanner from './logos/TreBanner';
-import TreLogo from './logos/TreLogo';
 
 const useStyles = makeStyles((theme: Theme & { [customKey: string]: any }) => ({
   root: (props: any) => ({
@@ -142,7 +140,10 @@ export default function SurveyLandingPage({
       )}
       <div className={classes.header}>
         <div className={classes.headerLogo}>
-          <TreLogo />
+          <img
+            src={`api/feature-styles/icons/tre_logo`}
+            alt={tr.IconAltTexts.treLogoAltText}
+          />
         </div>
       </div>
       <div
@@ -175,7 +176,10 @@ export default function SurveyLandingPage({
       </div>
       <div className={classes.footer}>
         <div className={classes.footerLogo}>
-          <TreBanner />
+          <img
+            src={`api/feature-styles/icons/tre_banner`}
+            alt={tr.IconAltTexts.treBannerAltText}
+          />
         </div>
         {surveyBackgroundImage?.attributions ? (
           <Typography className={classes.imageCopyright} variant="body2">

@@ -1,8 +1,16 @@
 import { MapMarkerIcon, MapStrokeColor } from '@interfaces/survey';
 import { ensureAuthenticated } from '@src/auth';
 import { getDb } from '@src/database';
+import { NotFoundError } from '@src/error';
 import { Router } from 'express';
 import asyncHandler from 'express-async-handler';
+import { iconCacher } from '@src/middleware';
+import NodeCache from 'node-cache';
+
+const iconCache = new NodeCache({
+  stdTTL: 86400, // ttl for generated cache items
+  checkperiod: 3600, // interval of automatic cache cleaning checks
+});
 
 const router = Router();
 
@@ -25,6 +33,27 @@ router.get(
       `SELECT name, value FROM application.map_stroke_color ORDER BY idx ASC`
     );
     res.json(colors);
+  })
+);
+
+router.get(
+  '/icons/:name',
+  iconCacher(iconCache),
+  asyncHandler(async (req, res) => {
+    const name = req.params.name;
+    const icon = await getDb().oneOrNone<{
+      id: string;
+      name: string;
+      svg: Buffer;
+    }>('SELECT name, svg FROM application.static_icons WHERE name=$(name)', {
+      name,
+    });
+    if (!icon) {
+      throw new NotFoundError(`Icon with name ${name} not found`);
+    }
+
+    res.type('image/svg+xml');
+    res.status(200).send(icon.svg);
   })
 );
 

@@ -16,9 +16,6 @@ import { useSurveyMap } from '@src/stores/SurveyMapContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useEffect, useRef, useState } from 'react';
 import ConfirmDialog from './ConfirmDialog';
-import AreaIcon from './icons/AreaIcon';
-import LineIcon from './icons/LineIcon';
-import PointIcon from './icons/PointIcon';
 import MapSubQuestionDialog from './MapSubQuestionDialog';
 
 interface Props {
@@ -38,6 +35,7 @@ export default function MapQuestion({ value, onChange, question }: Props) {
     useState<(answers: SurveyMapSubQuestionAnswer[]) => void>(null);
   const [deleteConfirmDialogOpen, setDeleteConfirmDialogOpen] = useState(false);
   const [clearConfirmDialogOpen, setClearConfirmDialogOpen] = useState(false);
+
   const {
     draw,
     isMapReady,
@@ -185,9 +183,27 @@ export default function MapQuestion({ value, onChange, question }: Props) {
           }
           color="secondary"
         >
-          {selectionType === 'point' && <PointIcon width="2rem" />}
-          {selectionType === 'line' && <LineIcon width="2rem" />}
-          {selectionType === 'area' && <AreaIcon width="2rem" />}
+          {selectionType === 'point' && (
+            <img
+              style={{ height: '2rem' }}
+              src={`api/feature-styles/icons/point_icon`}
+              alt={tr.IconAltTexts.pointIconAltText}
+            />
+          )}
+          {selectionType === 'line' && (
+            <img
+              style={{ height: '2rem' }}
+              src={`api/feature-styles/icons/line_icon`}
+              alt={tr.IconAltTexts.lineIconAltText}
+            />
+          )}
+          {selectionType === 'area' && (
+            <img
+              style={{ height: '2rem' }}
+              src={`api/feature-styles/icons/area_icon`}
+              alt={tr.IconAltTexts.areaIconAltText}
+            />
+          )}
         </Badge>
         <Typography style={{ marginLeft: '1rem' }}>
           {tr.MapQuestion.selectionTypes[selectionType]}
