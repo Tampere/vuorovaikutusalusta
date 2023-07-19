@@ -71,21 +71,23 @@ export default function SliderQuestion({
       >
         <span style={visuallyHidden}>{tr.SliderQuestion.scale}: </span>
         <span>
-          {question.minValue}{verbalExtremes && `: ${labels.min}`}
+          {question.minValue}
+          {verbalExtremes && `: ${labels.min}`}
         </span>
         <span>
-           {question.maxValue}{verbalExtremes && `: ${labels.max}`}
+          {question.maxValue}
+          {verbalExtremes && `: ${labels.max}`}
         </span>
       </FormLabel>
       <Slider
         aria-label={question.title?.[surveyLanguage]}
-        aria-invalid={value === null}
         ref={sliderRef}
         className={value === null ? classes.emptyValue : ''}
         slotProps={{
           input: {
             'aria-describedby': `${question.id}-value-label`,
-            'aria-required': question.isRequired
+            'aria-required': question.isRequired,
+            'aria-invalid': question.isRequired && value === null,
           },
         }}
         value={value ?? visibleEmptyValue}
