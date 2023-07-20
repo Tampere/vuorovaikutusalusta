@@ -5,6 +5,7 @@ import {
   FormGroup,
   Typography,
 } from '@mui/material';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useEffect, useState } from 'react';
 
@@ -28,12 +29,19 @@ export default function SortingQuestion(props: Props) {
     props.onChange(sortedOptionIds);
   }, [sortedOptionIds]);
 
+  const onDragEnd = ():void => {
+    return;
+  };
+
   return (
     <FormGroup
       id={`${props.question.id}-input`}
       style={{ display: 'flex', flexDirection: 'row' }}
     >
-      <div>
+      <DragDropContext
+        onDragEnd={onDragEnd}
+      >
+        <div>
         {props.question.options.map((_option, index) => (
           <Card key={index}
             variant="outlined"
@@ -52,18 +60,37 @@ export default function SortingQuestion(props: Props) {
             </CardContent>
           </Card>
         ))}
-      </div>
-      <div style={{ flexGrow: 1 }}>
-        {props.question.options.map((option, index) => (
-          <Card key={index} variant="outlined" sx={{marginBottom: "0.5em"}}>
-            <CardContent sx={{padding: "0.5em", ":last-child": {paddingBottom: "0.5em"}}}>
-              <Typography>
-                {option.text[surveyLanguage]}
-              </Typography>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+        </div>
+        <Droppable droppableId={props.question.id.toString()}>
+          {(provided) => (
+            <div {...provided.droppableProps} ref={provided.innerRef} style={{ flexGrow: 1 }}>
+            {props.question.options.map((option, index) => (
+              <Draggable key={index} index={index} draggableId={option.id.toString()}>
+                {(provided) => (
+                  <Card
+                    variant="outlined"
+                    sx={{marginBottom: "0.5em"}}
+                    {...provided.draggableProps}
+                    {...provided.dragHandleProps}
+                    ref={provided.innerRef}
+                  >
+                    <CardContent sx={{padding: "0.5em", ":last-child": {paddingBottom: "0.5em"}}}>
+                      <Typography>
+                        {option.text[surveyLanguage]}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                )}
+              </Draggable>
+            ))}
+            {provided.placeholder}
+            </div>
+          )}
+          
+        </Droppable>
+        
+      </DragDropContext>
+      
     </FormGroup>
   );
 }
