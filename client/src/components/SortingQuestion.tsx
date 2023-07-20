@@ -1,13 +1,10 @@
 import { SurveySortingQuestion } from '@interfaces/survey';
 import {
-  FormControl,
-  FormControlLabel,
+  Card,
+  CardContent,
   FormGroup,
-  MenuItem,
-  Paper,
-  Select,
+  Typography,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useEffect, useState } from 'react';
 
@@ -18,32 +15,11 @@ interface Props {
   setDirty: (dirty: boolean) => void;
 }
 
-const useStyles = makeStyles({
-  label: {
-    marginLeft: '1rem',
-  },
-  select: {
-    minWidth: '4rem',
-  },
-  fieldRow: {
-    margin: '0.5rem',
-    marginLeft: '1rem',
-  },
-  finalListPaper: {
-    display: 'inline-block',
-    padding: '1rem',
-    paddingLeft: 0,
-    margin: '1rem',
-  },
-});
-
 export default function SortingQuestion(props: Props) {
-  const { tr, surveyLanguage } = useTranslations();
-  const [sortedOptionIds, setSortedOptionIds] = useState(
+  const { surveyLanguage } = useTranslations();
+  const [sortedOptionIds] = useState(
     props.value ?? new Array(props.question.options.length).fill(null)
   );
-
-  const classes = useStyles();
 
   useEffect(() => {
     if (!sortedOptionIds || !props.onChange) {
@@ -57,82 +33,36 @@ export default function SortingQuestion(props: Props) {
       id={`${props.question.id}-input`}
       style={{ display: 'flex', flexDirection: 'row' }}
     >
-      <div style={{ flexGrow: 1 }}>
-        {props.question.options.map((option) => (
-          <FormGroup row key={option.id} className={classes.fieldRow}>
-            <FormControl>
-              <FormControlLabel
-                label={option.text?.[surveyLanguage] ?? ''}
-                labelPlacement="end"
-                classes={{ label: classes.label }}
-                control={
-                  <Select
-                    aria-label={tr.SortingQuestion.rankForOption.replace(
-                      '{option}',
-                      option.text?.[surveyLanguage]
-                    )}
-                    className={classes.select}
-                    value={
-                      sortedOptionIds.includes(option.id)
-                        ? sortedOptionIds.indexOf(option.id)
-                        : ''
-                    }
-                    onChange={(event) => {
-                      props.setDirty(true);
-                      // Remove possible previous value
-                      const newSortedOptionIds = sortedOptionIds.map(
-                        (optionId) => (optionId === option.id ? null : optionId)
-                      );
-                      if (event.target.value === '') {
-                        // If empty was selected, leave the option ID out of the array
-                        setSortedOptionIds(newSortedOptionIds);
-                        return;
-                      }
-                      setSortedOptionIds(
-                        newSortedOptionIds.map((optionId, index) =>
-                          // Only replace the array item with the requested index with the current option
-                          index === Number(event.target.value)
-                            ? option.id
-                            : optionId
-                        )
-                      );
-                    }}
-                  >
-                    <MenuItem value="">
-                      <em>{tr.SortingQuestion.empty}</em>
-                    </MenuItem>
-                    {new Array(props.question.options.length)
-                      .fill(null)
-                      .map((_, index) => (
-                        <MenuItem
-                          key={index}
-                          value={index}
-                          disabled={sortedOptionIds[index] != null}
-                        >
-                          {index + 1}
-                        </MenuItem>
-                      ))}
-                  </Select>
-                }
-              />
-            </FormControl>
-          </FormGroup>
+      <div>
+        {props.question.options.map((_option, index) => (
+          <Card key={index}
+            variant="outlined"
+            sx={{
+              marginBottom: "0.5em",
+              borderTopRightRadius: "0",
+              borderBottomRightRadius: "0",
+              marginRight: "-0.25em",
+              backgroundColor: "#ededed",
+            }}
+          >
+            <CardContent sx={{padding: "0.5em", ":last-child": {paddingBottom: "0.5em"}}}>
+              <Typography>
+                {index+1}.
+              </Typography>
+            </CardContent>
+          </Card>
         ))}
       </div>
       <div style={{ flexGrow: 1 }}>
-        <Paper elevation={3} className={classes.finalListPaper}>
-          <ol aria-label={tr.SortingQuestion.sortedOptions}>
-            {sortedOptionIds.map((optionId, index) => (
-              <li key={index}>
-                {optionId == null
-                  ? '-'
-                  : props.question.options.find(
-                      (option) => option.id === optionId
-                    ).text?.[surveyLanguage]}
-              </li>
-            ))}
-          </ol>
-        </Paper>
+        {props.question.options.map((option, index) => (
+          <Card key={index} variant="outlined" sx={{marginBottom: "0.5em"}}>
+            <CardContent sx={{padding: "0.5em", ":last-child": {paddingBottom: "0.5em"}}}>
+              <Typography>
+                {option.text[surveyLanguage]}
+              </Typography>
+            </CardContent>
+          </Card>
+        ))}
       </div>
     </FormGroup>
   );
