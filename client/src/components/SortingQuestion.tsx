@@ -5,7 +5,7 @@ import {
   FormGroup,
   Typography,
 } from '@mui/material';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useEffect, useState } from 'react';
 
@@ -18,8 +18,8 @@ interface Props {
 
 export default function SortingQuestion(props: Props) {
   const { surveyLanguage } = useTranslations();
-  const [sortedOptionIds] = useState(
-    props.value ?? new Array(props.question.options.length).fill(null)
+  const [sortedOptionIds, setSortedOptionIds] = useState(
+    props.value ?? props.question.options.map( option => option.id )
   );
 
   useEffect(() => {
@@ -29,8 +29,20 @@ export default function SortingQuestion(props: Props) {
     props.onChange(sortedOptionIds);
   }, [sortedOptionIds]);
 
-  const onDragEnd = ():void => {
-    return;
+  const reorder = (list: Array<number>, startIndex: number, endIndex: number) => {
+    const result = Array.from(list);
+    const [removed] = result.splice(startIndex, 1);
+    result.splice(endIndex, 0, removed);
+    return result;
+  };
+
+  const onDragEnd = (result: DropResult):void => {
+    const { destination, source } = result;
+    if (!destination || destination.index === source.index) {
+      return;
+    }
+    props.setDirty(true);
+    setSortedOptionIds(reorder(sortedOptionIds, source.index, destination.index));
   };
 
   return (
@@ -61,11 +73,11 @@ export default function SortingQuestion(props: Props) {
           </Card>
         ))}
         </div>
-        <Droppable droppableId={props.question.id.toString()}>
+        <Droppable droppableId={`question-dropzone-${props.question.id}`}>
           {(provided) => (
             <div {...provided.droppableProps} ref={provided.innerRef} style={{ flexGrow: 1 }}>
-            {props.question.options.map((option, index) => (
-              <Draggable key={index} index={index} draggableId={option.id.toString()}>
+            {sortedOptionIds.map((optionId, index) => (
+              <Draggable key={`option-${optionId}`} index={index} draggableId={`option-${optionId}`}>
                 {(provided) => (
                   <Card
                     variant="outlined"
@@ -76,7 +88,7 @@ export default function SortingQuestion(props: Props) {
                   >
                     <CardContent sx={{padding: "0.5em", ":last-child": {paddingBottom: "0.5em"}}}>
                       <Typography>
-                        {option.text[surveyLanguage]}
+                        { props.question.options.find( option => option.id === optionId ).text?.[surveyLanguage] }
                       </Typography>
                     </CardContent>
                   </Card>
