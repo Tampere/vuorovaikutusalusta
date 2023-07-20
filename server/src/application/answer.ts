@@ -212,7 +212,9 @@ function dbEntriesToFeatures(
     } else if (submissionGroup[submissionId][answer.parentEntryId]) {
       // Add subquestion answer
       let newAnswer: string;
-      let key: string = `${answer.title?.['fi'] ?? 'Nimetön alikysymys'}`;
+      let key: string = `Alikysymys ${answer.sectionIndex + 1}: ${
+        answer.title?.['fi'] ?? 'Nimetön alikysymys'
+      }`;
       const keyOther: string = `${key} - jokin muu, mikä?`;
 
       switch (answer.type) {
@@ -411,7 +413,7 @@ async function getCheckboxOptionsFromDB(surveyId: number) {
   const rows = await getDb().manyOrNone(
     `SELECT 
         opt.TEXT, 
-        opt.section_id 
+        opt.section_id as "sectionId"
       FROM data.option opt 
         LEFT JOIN data.page_section ps ON opt.section_id = ps.id
         LEFT JOIN data.survey_page sp ON ps.survey_page_id = sp.id 
@@ -539,7 +541,7 @@ async function getGeometryDBEntries(surveyId: number): Promise<AnswerEntry[]> {
         WHERE (type = 'map' OR parent_section IS NOT NULL)
           AND sub.unfinished_token IS NULL
           AND sub.survey_id = $1
-        ORDER BY ae.parent_entry_id ASC NULLS FIRST`,
+          ORDER BY submission_id, ae.parent_entry_id ASC NULLS FIRST, section_index`,
     [surveyId]
   )) as DBAnswerEntry[];
 
