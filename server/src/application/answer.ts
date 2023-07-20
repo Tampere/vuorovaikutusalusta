@@ -38,10 +38,13 @@ interface DBAnswerEntry {
 /**
  * Interface for data.answer_entry file -entries
  */
-interface DBFileEntry {
-  value_file: string;
-  value_file_name: string;
-  submission_id: number;
+interface FileEntry {
+  valueFile: string;
+  valueFileName: string;
+  submissionId: number;
+  sectionId: number;
+  pageIndex: number;
+  sectionIndex: number;
 }
 
 interface AnswerEntry {
@@ -428,22 +431,17 @@ async function getCheckboxOptionsFromDB(surveyId: number) {
 async function getAttachmentDBEntries(surveyId: number) {
   const rows = await getDb().manyOrNone(
     `
-    SELECT * FROM
-      (SELECT
-          ae.submission_id,
-          ae.section_id,
-          ae.value_file,
-          ae.value_file_name
-      FROM data.answer_entry ae
-      LEFT JOIN data.submission sub ON ae.submission_id = sub.id
-      WHERE sub.survey_id = $1 AND ae.value_file IS NOT NULL AND sub.unfinished_token IS NULL) AS temp1
-        LEFT JOIN
-          (SELECT
-            ps.id
-          FROM data.page_section ps
-          LEFT JOIN data.survey_page sp ON ps.survey_page_id = sp.id
-          LEFT JOIN data.survey s ON sp.survey_id = s.id WHERE s.id = $1 ORDER BY ps.id) AS temp2
-        ON temp1.section_id = temp2.id;
+      SELECT 
+        ae.submission_id as "submissionId",
+        ae.section_id as "sectionId",
+        ae.value_file as "valueFile",
+        ae.value_file_name as "valueFileName",
+        sp.idx as "pageIndex",
+        ps.idx as "sectionIndex" FROM data.answer_entry ae 
+      LEFT JOIN data.submission sub ON ae.submission_id = sub.id 
+      LEFT JOIN data.page_section ps ON ae.section_id = ps.id 
+      LEFT JOIN data.survey_page sp ON sp.id = ps.survey_page_id
+      WHERE ae.value_file IS NOT NULL AND sub.unfinished_token IS NULL AND sub.survey_id = $1;
     `,
     [surveyId]
   );
@@ -457,10 +455,12 @@ async function getAttachmentDBEntries(surveyId: number) {
  * @param rows
  * @returns
  */
-function attachmentEntriesToFiles(rows: DBFileEntry[]) {
+function attachmentEntriesToFiles(rows: FileEntry[]) {
   return rows.map((row) => ({
-    fileName: `vastausnro_${row.submission_id}.${row.value_file_name}`,
-    fileString: row.value_file,
+    fileName: `vastausnro_${row.submissionId}.sivunro_${
+      row.pageIndex + 1
+    }.kysymysnro_${row.sectionIndex + 1}.${row.valueFileName}`,
+    fileString: row.valueFile,
   }));
 }
 
