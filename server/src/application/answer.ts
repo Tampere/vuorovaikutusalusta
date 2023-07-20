@@ -70,6 +70,11 @@ interface AnswerEntry {
   optionText?: string;
 }
 
+interface CheckboxOptions {
+  text: LocalizedText;
+  sectionId: number;
+}
+
 /**
  * Single cell on the CSV
  */
@@ -186,7 +191,10 @@ function geometryAnswerToFeature(answer: AnswerEntry) {
  * @param entries DB answer entry rows
  * @returns
  */
-function dbEntriesToFeatures(entries: AnswerEntry[]) {
+function dbEntriesToFeatures(
+  entries: AnswerEntry[],
+  checkboxOptions: CheckboxOptions[]
+) {
   // Sort entries first by submission, then by sectionId
   // Each sectionId instance (separated by submission) will represent a single Feature
 
@@ -199,17 +207,56 @@ function dbEntriesToFeatures(entries: AnswerEntry[]) {
         geometryAnswerToFeature(answer);
     } else if (submissionGroup[submissionId][answer.parentEntryId]) {
       // Add subquestion answer
-      const key = answer.title?.['fi'] ?? 'Nimetön alikysymys';
-      const newAnswer =
-        answer.valueNumeric ??
-        answer.valueText ??
-        answer.optionText?.['fi'] ??
-        '';
-      const oldAnswer =
-        submissionGroup[submissionId][answer.parentEntryId].properties[key];
-      submissionGroup[submissionId][answer.parentEntryId].properties[key] =
-        oldAnswer ? `${oldAnswer}, ${newAnswer}` : newAnswer;
+      let newAnswer: string;
+      let key: string = `${answer.title?.['fi'] ?? 'Nimetön alikysymys'}`;
+      const keyOther: string = `${key} - jokin muu, mikä?`;
+
+      switch (answer.type) {
+        case 'checkbox':
+          // initialize subquestion headers for checkbox question
+          checkboxOptions
+            .filter((opt) => opt.sectionId === answer.sectionId)
+            .forEach((opt) => {
+              const questionKey = `${key} - ${opt.text['fi']}`;
+              if (
+                !submissionGroup[submissionId][answer.parentEntryId].properties[
+                  questionKey
+                ]
+              ) {
+                submissionGroup[submissionId][answer.parentEntryId].properties[
+                  questionKey
+                ] = null;
+              }
+            });
+
+          if (
+            !submissionGroup[submissionId][answer.parentEntryId].properties[
+              keyOther
+            ]
+          ) {
+            submissionGroup[submissionId][answer.parentEntryId].properties[
+              keyOther
+            ] = null;
+          }
+
+          newAnswer = answer.optionText?.['fi'] ?? '';
+          key = `${key} - ${answer.valueText ? 'jokin muu, mikä?' : newAnswer}`;
+
+          submissionGroup[submissionId][answer.parentEntryId].properties[key] =
+            answer.valueText ?? true;
+          break;
+        default:
+          newAnswer =
+            answer.valueNumeric ??
+            answer.valueText ??
+            answer.optionText?.['fi'] ??
+            '';
+
+          submissionGroup[submissionId][answer.parentEntryId].properties[key] =
+            newAnswer;
+      }
     }
+
     return submissionGroup;
   }, {});
 
@@ -289,9 +336,11 @@ export async function getCSVFile(surveyId: number): Promise<string> {
  */
 export async function getGeoPackageFile(surveyId: number): Promise<Buffer> {
   const rows = await getGeometryDBEntries(surveyId);
-  if (!rows) return null;
+  const checkboxOptions = await getCheckboxOptionsFromDB(surveyId);
 
-  const features = dbEntriesToFeatures(rows);
+  if (!rows || !checkboxOptions) return null;
+
+  const features = dbEntriesToFeatures(rows, checkboxOptions);
   // There could be rows where the parent map answer (erroneously) has null geometry - if there are no valid map answers, return null from here too
   if (!features.length) return null;
 
@@ -357,9 +406,26 @@ export async function getGeoPackageFile(surveyId: number): Promise<Buffer> {
  */
 export async function getAttachments(surveyId: number): Promise<FileAnswer[]> {
   const rows = await getAttachmentDBEntries(surveyId);
+
   if (!rows) return null;
 
   return attachmentEntriesToFiles(rows);
+}
+
+async function getCheckboxOptionsFromDB(surveyId: number) {
+  const rows = await getDb().manyOrNone(
+    `SELECT 
+        opt.TEXT, 
+        opt.section_id 
+      FROM data.option opt 
+        LEFT JOIN data.page_section ps ON opt.section_id = ps.id
+        LEFT JOIN data.survey_page sp ON ps.survey_page_id = sp.id 
+        LEFT JOIN data.survey s ON sp.survey_id = s.id 
+      WHERE s.id = $1;`,
+    [surveyId]
+  );
+  if (!rows || rows.length === 0) return null;
+  return rows;
 }
 
 async function getAttachmentDBEntries(surveyId: number) {
