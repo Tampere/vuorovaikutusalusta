@@ -12,6 +12,7 @@ const tr = useTranslations('fi');
  */
 interface DBAnswerEntry {
   answer_id: number;
+  page_index: number;
   details: {
     subjects?: LocalizedText[];
     classes?: LocalizedText[];
@@ -45,6 +46,7 @@ interface DBFileEntry {
 
 interface AnswerEntry {
   answerId: number;
+  pageIndex: number;
   details: {
     subjects?: LocalizedText[];
     classes?: LocalizedText[];
@@ -140,6 +142,7 @@ function dbAnswerEntryRowsToAnswerEntries(rows: DBAnswerEntry[]) {
 
   return rows.map((row) => ({
     answerId: row.answer_id,
+    pageIndex: row.page_index,
     details: row.details,
     sectionId: row.section_id,
     parentSectionId: row?.parent_section,
@@ -180,7 +183,9 @@ function geometryAnswerToFeature(answer: AnswerEntry) {
       ['Vastaustunniste']: answer.submissionId,
       ['Aikaleima']: moment(answer.createdAt).format('DD-MM-YYYY, HH:mm'),
       ['Vastauskieli']: tr[answer?.submissionLanguage ?? 'fi'],
-      ['Kysymys']: answer.title?.['fi'] ?? '',
+      ['Kysymys']: `Sivu ${answer.pageIndex + 1} / Kysymys ${
+        answer.sectionIndex + 1
+      }: ${answer.title?.['fi'] ?? ''}`,
     },
   };
 }
@@ -517,6 +522,8 @@ async function getGeometryDBEntries(surveyId: number): Promise<AnswerEntry[]> {
       ae.value_numeric,
       ae.value_json,
       ae.parent_entry_id,
+      sp.idx as page_index,
+      ps.idx as section_index,
       ps.type,
       ps.title,
       ps.details,
