@@ -72,7 +72,7 @@ interface AnswerEntry {
 
 interface CheckboxOptions {
   text: LocalizedText;
-  section_id: number;
+  sectionId: number;
 }
 
 /**
@@ -215,7 +215,7 @@ function dbEntriesToFeatures(
         case 'checkbox':
           // initialize subquestion headers for checkbox question
           checkboxOptions
-            .filter((opt) => opt.section_id === answer.sectionId)
+            .filter((opt) => opt.sectionId === answer.sectionId)
             .forEach((opt) => {
               const questionKey = `${key} - ${opt.text['fi']}`;
               if (
