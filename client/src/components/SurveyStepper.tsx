@@ -22,6 +22,7 @@ import {
   Typography,
   useMediaQuery,
   useTheme,
+  Box,
 } from '@mui/material';
 import { visuallyHidden } from '@mui/utils';
 import { Close, Image, Map } from '@mui/icons-material';
@@ -334,34 +335,36 @@ export default function SurveyStepper({
                 classes={{ root: classes.stepContent }}
               >
                 {pageUnfinished && (
-                  <Alert
-                    tabIndex={0}
+                  <Box
                     ref={currentPageErrorRef}
-                    severity="error"
+                    tabIndex={-1}
+                    sx={{ ':focus': { outline: 'none' } }}
                   >
-                    {tr.SurveyStepper.unfinishedAnswers}
-                    <p style={visuallyHidden}>
-                      {tr.SurveyStepper.unfinishedAnswersInfo}
-                    </p>
-                    {
-                      <ul style={visuallyHidden}>
-                        {getPageInvalidQuestions(currentPage).map(
-                          (question, index) => {
-                            const [questionName, errors] =
-                              Object.entries(question)[0];
-                            if (errors.includes('required')) {
-                              return (
-                                <li key={`${questionName}-${index}`}>
-                                  {questionName}
-                                </li>
-                              );
+                    <Alert aria-live="off" severity="error">
+                      {tr.SurveyStepper.unfinishedAnswers}
+                      <p style={visuallyHidden}>
+                        {tr.SurveyStepper.unfinishedAnswersInfo}
+                      </p>
+                      {
+                        <ul style={visuallyHidden}>
+                          {getPageInvalidQuestions(currentPage).map(
+                            (question, index) => {
+                              const [questionName, errors] =
+                                Object.entries(question)[0];
+                              if (errors.includes('required')) {
+                                return (
+                                  <li key={`${questionName}-${index}`}>
+                                    {questionName}
+                                  </li>
+                                );
+                              }
+                              return null;
                             }
-                            return null;
-                          }
-                        )}
-                      </ul>
-                    }
-                  </Alert>
+                          )}
+                        </ul>
+                      }
+                    </Alert>
+                  </Box>
                 )}
                 <FormControl style={{ width: '100%' }} component="fieldset">
                   {currentPage.sidebar.imageName && (

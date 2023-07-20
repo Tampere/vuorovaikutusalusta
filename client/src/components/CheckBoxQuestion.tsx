@@ -62,7 +62,10 @@ export default function CheckBoxQuestion({
       {answerLimitText && (
         // Align this helper text with the form label
         <>
-          <FormHelperText style={{ marginLeft: 0 }} id="checkbox-helper-label">
+          <FormHelperText
+            style={{ marginLeft: 0 }}
+            id={`checkbox-helper-label-${question.id}`}
+          >
             {answerLimitText}
           </FormHelperText>
           {validationErrors && validationErrors.includes('answerLimits') && (
@@ -73,7 +76,6 @@ export default function CheckBoxQuestion({
         </>
       )}
       <FormGroup
-        aria-describedby="checkbox-helper-label"
         onBlur={() => {
           setDirty(true);
         }}

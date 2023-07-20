@@ -338,7 +338,7 @@
   },
   "SurveyQuestion": {
     "errorFieldIsRequired": "Field is mandatory.",
-    "accessibilityTooltip": "Please answer question",
+    "accessibilityTooltip": "Please answer question:",
     "answerLimitsMinMax": "Choose a minimum of {min} and a maximum of {max} options",
     "answerLimitsMin": "Choose a minimum of {min} options",
     "answerLimitsMax": "Choose a maximum of {max} options",

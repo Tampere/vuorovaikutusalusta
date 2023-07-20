@@ -81,7 +81,7 @@ function SurveyQuestion({ question, pageUnfinished }: Props) {
           color: survey.sectionTitleColor ?? '#000000',
         }}
       >
-        <h3 tabIndex={0}>
+        <h3>
           {question.title?.[surveyLanguage]}
           <span aria-hidden="true"> </span>
         </h3>
