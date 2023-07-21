@@ -378,7 +378,8 @@
   "SortingQuestion": {
     "empty": "Tyhjä",
     "rankForOption": "Järjestysnumero vaihtoehdolle: {option}",
-    "sortedOptions": "Vaihtoehdot järjestettyinä"
+    "sortedOptions": "Vaihtoehdot järjestettyinä",
+    "orderComplete": "Järjestäminen valmis"
   },
   "DocumentSection": {
     "attachment": "Liite"

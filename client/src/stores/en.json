@@ -378,7 +378,8 @@
   "SortingQuestion": {
     "empty": "Empty",
     "rankForOption": "Rank for the option: {option}",
-    "sortedOptions": "Options sorted"
+    "sortedOptions": "Options sorted",
+    "orderComplete": "Ordering completed"
   },
   "DocumentSection": {
     "attachment": "Attachment"
