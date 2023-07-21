@@ -25,6 +25,7 @@ export default function SortingQuestion(props: Props) {
   const [sortedOptionIds, setSortedOptionIds] = useState(
     props.value ?? props.question.options.map( option => option.id )
   );
+  const [verified, setVerified] = useState(props.value !== null ? true : false);
 
   useEffect(() => {
     if (!sortedOptionIds || !props.onChange) {
@@ -51,6 +52,7 @@ export default function SortingQuestion(props: Props) {
       .replace('{position}', (destination.index + 1).toString())
     );
     props.setDirty(true);
+    setVerified(false);
     setSortedOptionIds(reorder(sortedOptionIds, source.index, destination.index));
   };
 
@@ -109,6 +111,7 @@ export default function SortingQuestion(props: Props) {
                       <Typography color="primary">
                         { props.question.options.find( option => option.id === optionId ).text?.[surveyLanguage] }
                       </Typography>
+                      <Box style={visuallyHidden}>{tr.SortingQuestion.inPosition} {index + 1} / {sortedOptionIds.length}</Box>
                       <DragIndicatorIcon color="action" />
                     </Paper>
                   )}
@@ -125,6 +128,8 @@ export default function SortingQuestion(props: Props) {
             <Checkbox
               // TS can't infer the precise memoized value type from question.type, but for checkboxes it's always an array
               name={`verify-order-question_${props.question.id}`}
+              checked={verified}
+              onChange={(event) => {setVerified(event.target.checked)}}
             />
           }
           sx={{

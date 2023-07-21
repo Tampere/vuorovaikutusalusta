@@ -380,6 +380,7 @@
     "rankForOption": "Rank for the option: {option}",
     "sortedOptions": "Options sorted",
     "orderComplete": "Ordering completed",
+    "inPosition": "In position ",
     "announcement": {
       "focus": "Move this item by pressing spacebar. You may need to activate focus mode.",
       "grab": "Picked up from position {position} . Move with arrow keys.",
