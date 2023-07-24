@@ -36,7 +36,6 @@ export default function NumericQuestion({
             !event.target.value.length ? null : Number(event.target.value)
           );
         }}
-        onBlur={() => setDirty(true)}
       />
       {(question.minValue != null || question.maxValue != null) && (
         <FormHelperText id={`${question.id}-helper-text`}>

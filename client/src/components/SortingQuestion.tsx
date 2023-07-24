@@ -77,9 +77,6 @@ export default function SortingQuestion(props: Props) {
                         ? sortedOptionIds.indexOf(option.id)
                         : ''
                     }
-                    onBlur={() => {
-                      props.setDirty(true);
-                    }}
                     onChange={(event) => {
                       props.setDirty(true);
                       // Remove possible previous value

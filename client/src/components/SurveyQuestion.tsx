@@ -4,6 +4,7 @@ import {
   SurveyQuestion,
 } from '@interfaces/survey';
 import { FormControl, FormHelperText, FormLabel } from '@mui/material';
+import { visuallyHidden } from '@mui/utils';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useMemo, useState } from 'react';
@@ -21,13 +22,14 @@ import SortingQuestion from './SortingQuestion';
 
 interface Props {
   question: SurveyQuestion;
+  pageUnfinished: boolean;
 }
 
-export default function SurveyQuestion({ question }: Props) {
+function SurveyQuestion({ question, pageUnfinished }: Props) {
   const { answers, updateAnswer, getValidationErrors, survey } =
     useSurveyAnswers();
-  const [dirty, setDirty] = useState(false);
   const { tr, surveyLanguage } = useTranslations();
+  const [dirty, setDirty] = useState(false);
 
   const value = useMemo(
     () => answers.find((answer) => answer.sectionId === question.id)?.value,
@@ -35,32 +37,63 @@ export default function SurveyQuestion({ question }: Props) {
   );
 
   const validationErrors = useMemo(
-    () => (dirty ? getValidationErrors(question) : []),
-    [dirty, question, value]
+    () => (dirty || pageUnfinished ? getValidationErrors(question) : []),
+    [dirty, question, value, pageUnfinished]
   );
 
   return (
-    <FormControl error={validationErrors.length > 0} style={{ width: '100%' }}>
-      <div
+    <FormControl
+      component="fieldset"
+      required={question.isRequired}
+      aria-required={question.isRequired}
+      aria-invalid={validationErrors.includes('required')}
+      error={validationErrors.length > 0}
+      style={{ width: '100%' }}
+      onBlur={(e: React.FocusEvent<HTMLFieldSetElement>) => {
+        if (
+          e.relatedTarget &&
+          !e.currentTarget.contains(e.relatedTarget as Node)
+        ) {
+          setDirty(true);
+        }
+      }}
+    >
+      {/* Show the required error only for empty values (not when answer limits are broken in checkbox questions) */}
+      {validationErrors.includes('required') && (
+        <>
+          <FormHelperText
+            id={`${question.id}-required-text`}
+            sx={{ marginLeft: 0 }}
+          >
+            {tr.SurveyQuestion.errorFieldIsRequired}
+          </FormHelperText>
+          <FormHelperText style={visuallyHidden} role="alert">
+            {tr.SurveyQuestion.accessibilityTooltip}{' '}
+            {question.title?.[surveyLanguage]}
+          </FormHelperText>
+        </>
+      )}
+      <FormLabel
+        component="legend"
         style={{
           display: 'flex',
-          flexDirection: 'row',
           alignItems: 'center',
+          color: survey.sectionTitleColor ?? '#000000',
         }}
       >
-        <FormLabel
-          htmlFor={`${question.id}-input`}
-          style={{ color: survey.sectionTitleColor ?? '#000000' }}
-        >
-          {question.title?.[surveyLanguage]} {question.isRequired && '*'}
-        </FormLabel>
+        <h3>
+          {question.title?.[surveyLanguage]}
+          <span aria-hidden="true"> </span>
+        </h3>
+
         {question.info && question.info?.[surveyLanguage] && (
           <SectionInfo
+            hiddenFromScreenReader={false}
             infoText={question.info?.[surveyLanguage]}
             subject={question.title?.[surveyLanguage]}
           />
         )}
-      </div>
+      </FormLabel>
 
       {/* Radio question */}
       {question.type === 'radio' && (
@@ -90,6 +123,7 @@ export default function SurveyQuestion({ question }: Props) {
           }}
           question={question}
           setDirty={setDirty}
+          validationErrors={validationErrors}
         />
       )}
       {/* Free text question */}
@@ -210,12 +244,8 @@ export default function SurveyQuestion({ question }: Props) {
           }
         />
       )}
-      {/* Show the required error only for empty values (not when answer limits are broken in checkbox questions) */}
-      {validationErrors.includes('required') && (
-        <FormHelperText id={`${question.id}-required-text`}>
-          {tr.SurveyQuestion.errorFieldIsRequired}
-        </FormHelperText>
-      )}
     </FormControl>
   );
 }
+
+export default SurveyQuestion;

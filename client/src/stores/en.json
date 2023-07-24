@@ -133,7 +133,8 @@
   },
   "SliderQuestion": {
     "defaultMinLabel": "Strongly disagree",
-    "defaultMaxLabel": "Strongly agree"
+    "defaultMaxLabel": "Strongly agree",
+    "scale": "Scale"
   },
   "SurveySection": {
     "radioQuestion": "Radio button question (single choice)",
@@ -326,7 +327,8 @@
     "errorSubmittingSurvey": "Error while submitting the survey. Please try again later.",
     "openMap": "Open the map",
     "openImage": "Open the image",
-    "unfinishedAnswers": "Please, answer all mandatory questions",
+    "unfinishedAnswers": "Please, answer all mandatory questions.",
+    "unfinishedAnswersInfo": "The following answers need to be answered:",
     "saveAsUnfinished": "Save unfinished survey"
   },
   "SaveAsUnfinishedDialog": {
@@ -338,6 +340,7 @@
   },
   "SurveyQuestion": {
     "errorFieldIsRequired": "Field is mandatory.",
+    "accessibilityTooltip": "Please answer question:",
     "answerLimitsMinMax": "Choose a minimum of {min} and a maximum of {max} options",
     "answerLimitsMin": "Choose a minimum of {min} options",
     "answerLimitsMax": "Choose a maximum of {max} options",
@@ -369,7 +372,9 @@
     "finishEditingGeometries": "Stop modifying map answers"
   },
   "MatrixQuestion": {
-    "emptyAnswer": "I don't know"
+    "emptyAnswer": "I don't know",
+    "subject": "Subject",
+    "response": "Response"
   },
   "ImageSection": {
     "openInNewTab": "Open image on a new tab"

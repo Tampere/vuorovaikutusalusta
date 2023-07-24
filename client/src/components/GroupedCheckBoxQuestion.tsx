@@ -170,6 +170,7 @@ export default function GroupedCheckBoxQuestion({
                   '{number}',
                   String(amountsByGroup[index])
                 )}`}
+                aria-describedby={`${question.id}-indicator`}
                 onBlur={() => {
                   setDirty(true);
                 }}

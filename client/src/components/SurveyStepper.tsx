@@ -3,8 +3,10 @@ import {
   SubmissionInfo,
   Survey,
   SurveyMapQuestion,
+  SurveyPage,
 } from '@interfaces/survey';
 import {
+  Alert,
   Chip,
   Drawer,
   FormControl,
@@ -20,6 +22,7 @@ import {
   Typography,
   useMediaQuery,
   useTheme,
+  Box,
 } from '@mui/material';
 import { visuallyHidden } from '@mui/utils';
 import { Close, Image, Map } from '@mui/icons-material';
@@ -31,7 +34,7 @@ import { useTranslations } from '@src/stores/TranslationContext';
 import { getClassList } from '@src/utils/classes';
 import { getFullFilePath } from '@src/utils/path';
 import { request } from '@src/utils/request';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useRef, useEffect, useMemo, useState } from 'react';
 import SplitPane from 'react-split-pane';
 import DocumentSection from './DocumentSection';
 import Footer from './Footer';
@@ -75,7 +78,6 @@ const useStyles = makeStyles((theme: Theme) => ({
   stepHeader: {
     fontWeight: 'bold !important' as any,
     color: '#22437b !important' as any,
-    cursor: 'pointer',
   },
   stepHeaderError: {
     color: 'red !important' as any,
@@ -115,13 +117,14 @@ export default function SurveyStepper({
 }: Props) {
   const [pageNumber, setPageNumber] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [pageUnfinished, setPageUnfinished] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
-  const [highlightErrorPages, setHighlightErrorPages] = useState(false);
   const [submissionInfoDialogOpen, setSubmissionInfoDialogOpen] =
     useState(false);
 
-  const { isPageValid, answers, unfinishedToken } = useSurveyAnswers();
+  const { isPageValid, answers, unfinishedToken, getPageInvalidQuestions } =
+    useSurveyAnswers();
   const { showToast } = useToasts();
   const {
     setVisibleLayers,
@@ -141,6 +144,8 @@ export default function SurveyStepper({
     () => survey.pages[pageNumber],
     [survey, pageNumber]
   );
+
+  const currentPageErrorRef = useRef(null);
 
   const fullSidebarImagePath = useMemo(
     () =>
@@ -178,6 +183,21 @@ export default function SurveyStepper({
     }
     // TODO scroll to beginning of the step? or only when "next" is clicked, and not on "previous"?
   }, [currentPage]);
+
+  // Will run on first render and submit
+  useEffect(() => {
+    currentPageErrorRef?.current?.scrollIntoView();
+    currentPageErrorRef?.current?.focus();
+  }, [pageUnfinished]);
+
+  // Will handle subsequent submits
+  function handleClick() {
+    if (!pageUnfinished) {
+      return;
+    }
+    currentPageErrorRef?.current?.scrollIntoView();
+    currentPageErrorRef?.current?.focus();
+  }
 
   // Map answer geometries on the current page
   const mapAnswerGeometries = useMemo(() => {
@@ -238,17 +258,14 @@ export default function SurveyStepper({
     }
   }, [isMapReady, mapAnswerGeometries]);
 
-  function validateSurvey() {
+  function validateSurveyPage(page: SurveyPage) {
     // If a page is not finished, highlight it
-    const unfinishedPages = survey.pages.filter((page) => !isPageValid(page));
-    if (unfinishedPages.length !== 0) {
-      setHighlightErrorPages(true);
-      showToast({
-        severity: 'error',
-        message: tr.SurveyStepper.unfinishedAnswers,
-      });
+    if (!isPageValid(page)) {
+      setPageUnfinished(true);
+
       return false;
     }
+    setPageUnfinished(false);
     return true;
   }
 
@@ -289,102 +306,137 @@ export default function SurveyStepper({
           }}
         />
       )}
-      <Stepper
-        className={classes.stepper}
-        activeStep={pageNumber}
-        orientation="vertical"
-        connector={null}
-      >
-        {survey.pages.map((page, index) => (
-          <Step key={page.id} completed={false}>
-            <StepLabel
-              id={`${index}-page-top`}
-              onClick={() => {
-                setPageNumber(index);
-              }}
-              classes={{
-                active: classes.stepActive,
-                label: `${classes.stepHeader} ${
-                  highlightErrorPages && !isPageValid(page)
-                    ? classes.stepHeaderError
-                    : ''
-                }`,
-                iconContainer:
-                  index === pageNumber
-                    ? classes.stepIcon
-                    : (highlightErrorPages && !isPageValid(page)) ||
-                      (pageNumber > index && !isPageValid(page))
-                    ? classes.stepIconUnfinised
-                    : null,
-              }}
-            >
-              {page.title?.[language]}
-            </StepLabel>
-            <StepContent
-              transitionDuration={0}
-              classes={{ root: classes.stepContent }}
-            >
-              <FormControl style={{ width: '100%' }} component="fieldset">
-                {currentPage.sidebar.imageName && (
-                  <img
-                    alt={currentPage.sidebar?.imageAltText?.[surveyLanguage]}
-                    src={`/api/file/${fullSidebarImagePath}`}
-                    style={visuallyHidden}
-                  />
-                )}
+      <article>
+        <h1 style={{ marginLeft: '1rem' }}>{survey.title[surveyLanguage]}</h1>
 
-                {page.sections.map((section) => (
-                  <div className={classes.section} key={section.id}>
-                    {section.type === 'text' ? (
-                      <TextSection section={section} />
-                    ) : section.type === 'image' ? (
-                      <ImageSection section={section} />
-                    ) : section.type === 'document' ? (
-                      <DocumentSection section={section} />
-                    ) : (
-                      <SurveyQuestion question={section} />
-                    )}
-                  </div>
-                ))}
-                <StepperControls
-                  isTestSurvey={isTestSurvey}
-                  activeStep={index}
-                  totalSteps={survey.pages.length}
-                  onPrevious={() => {
-                    setPageNumber(index - 1);
-                  }}
-                  onNext={() => {
-                    setPageNumber(index + 1);
-                  }}
-                  disabled={loading}
-                  nextDisabled={false}
-                  onSubmit={() => {
-                    if (!validateSurvey()) {
-                      return;
-                    }
-                    if (survey.email.enabled) {
-                      setSubmissionInfoDialogOpen(true);
-                    } else {
-                      doSubmit();
-                    }
-                  }}
-                  allowSavingUnfinished={survey.allowSavingUnfinished}
-                />
-              </FormControl>
-            </StepContent>
-            {
-              /** Don't show connector after the final page */
-              index + 1 !== survey?.pages?.length && (
-                <PageConnector
-                  activePage={pageNumber}
-                  pageIndex={index}
-                  theme={theme}
-                />
-              )
-            }
-          </Step>
-        ))}
-      </Stepper>
+        <Stepper
+          className={classes.stepper}
+          activeStep={pageNumber}
+          orientation="vertical"
+          connector={null}
+        >
+          {survey.pages.map((page, index) => (
+            <Step key={page.id} completed={false}>
+              <StepLabel
+                id={`${index}-page-top`}
+                classes={{
+                  active: classes.stepActive,
+                  label: classes.stepHeader,
+                  iconContainer: classes.stepIcon,
+                }}
+              >
+                <h2 style={{ margin: 0, fontSize: '1em' }}>
+                  {page.title?.[language]}
+                </h2>
+              </StepLabel>
+
+              <StepContent
+                transitionDuration={0}
+                classes={{ root: classes.stepContent }}
+              >
+                {pageUnfinished && (
+                  <Box
+                    ref={currentPageErrorRef}
+                    tabIndex={-1}
+                    sx={{ ':focus': { outline: 'none' } }}
+                  >
+                    <Alert aria-live="off" severity="error">
+                      {tr.SurveyStepper.unfinishedAnswers}
+                      <p style={visuallyHidden}>
+                        {tr.SurveyStepper.unfinishedAnswersInfo}
+                      </p>
+                      {
+                        <ul style={visuallyHidden}>
+                          {getPageInvalidQuestions(currentPage).map(
+                            (question, index) => {
+                              const [questionName, errors] =
+                                Object.entries(question)[0];
+                              if (errors.includes('required')) {
+                                return (
+                                  <li key={`${questionName}-${index}`}>
+                                    {questionName}
+                                  </li>
+                                );
+                              }
+                              return null;
+                            }
+                          )}
+                        </ul>
+                      }
+                    </Alert>
+                  </Box>
+                )}
+                <FormControl style={{ width: '100%' }} component="fieldset">
+                  {currentPage.sidebar.imageName && (
+                    <img
+                      alt={currentPage.sidebar?.imageAltText?.[surveyLanguage]}
+                      src={`/api/file/${fullSidebarImagePath}`}
+                      style={visuallyHidden}
+                    />
+                  )}
+
+                  {page.sections.map((section, _index) => (
+                    <div className={classes.section} key={section.id}>
+                      {section.type === 'text' ? (
+                        <TextSection section={section} />
+                      ) : section.type === 'image' ? (
+                        <ImageSection section={section} />
+                      ) : section.type === 'document' ? (
+                        <DocumentSection section={section} />
+                      ) : (
+                        <SurveyQuestion
+                          question={section}
+                          pageUnfinished={pageUnfinished}
+                        />
+                      )}
+                    </div>
+                  ))}
+                  <StepperControls
+                    isTestSurvey={isTestSurvey}
+                    activeStep={index}
+                    totalSteps={survey.pages.length}
+                    onPrevious={() => {
+                      setPageNumber(index - 1);
+                      setPageUnfinished(false);
+                    }}
+                    onNext={() => {
+                      if (validateSurveyPage(page)) {
+                        setPageNumber(index + 1);
+                      } else {
+                        handleClick();
+                      }
+                    }}
+                    disabled={loading}
+                    nextDisabled={false}
+                    onSubmit={() => {
+                      if (!validateSurveyPage(page)) {
+                        handleClick();
+                        return;
+                      }
+                      if (survey.email.enabled) {
+                        setSubmissionInfoDialogOpen(true);
+                      } else {
+                        doSubmit();
+                      }
+                    }}
+                    allowSavingUnfinished={survey.allowSavingUnfinished}
+                  />
+                </FormControl>
+              </StepContent>
+              {
+                /** Don't show connector after the final page */
+                index + 1 !== survey?.pages?.length && (
+                  <PageConnector
+                    activePage={pageNumber}
+                    pageIndex={index}
+                    theme={theme}
+                  />
+                )
+              }
+            </Step>
+          ))}
+        </Stepper>
+      </article>
       <Footer>
         <Link
           color="primary"
@@ -511,6 +563,7 @@ export default function SurveyStepper({
           >
             {stepperPane}
           </div>
+
           <div style={{ flexGrow: 1 }}>{sidePane}</div>
         </>
       )}

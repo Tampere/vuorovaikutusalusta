@@ -133,7 +133,8 @@
   },
   "SliderQuestion": {
     "defaultMinLabel": "Täysin eri mieltä",
-    "defaultMaxLabel": "Täysin samaa mieltä"
+    "defaultMaxLabel": "Täysin samaa mieltä",
+    "scale": "Asteikko"
   },
   "SurveySection": {
     "radioQuestion": "Valintakysymys",
@@ -326,7 +327,8 @@
     "errorSubmittingSurvey": "Kyselyn lähettämisessä tapahtui virhe. Ole hyvä ja yritä myöhemmin uudestaan.",
     "openMap": "Avaa kartta",
     "openImage": "Avaa kuva",
-    "unfinishedAnswers": "Vastaa kaikkiin pakolliseksi merkittyihin kysymyksiin",
+    "unfinishedAnswers": "Vastaa kaikkiin pakolliseksi merkittyihin kysymyksiin.",
+    "unfinishedAnswersInfo": "Seuraavat kysymykset ovat vastaamatta:",
     "saveAsUnfinished": "Tallenna keskeneräisenä"
   },
   "SaveAsUnfinishedDialog": {
@@ -338,6 +340,7 @@
   },
   "SurveyQuestion": {
     "errorFieldIsRequired": "Kenttä on pakollinen.",
+    "accessibilityTooltip": "Vastaathan kysymykseen:",
     "answerLimitsMinMax": "Valitse vähintään {min}, enintään {max} vaihtoehtoa",
     "answerLimitsMin": "Valitse vähintään {min} vaihtoehtoa",
     "answerLimitsMax": "Valitse enintään {max} vaihtoehtoa",
@@ -369,7 +372,9 @@
     "finishEditingGeometries": "Lopeta karttamerkintöjen muokkaus"
   },
   "MatrixQuestion": {
-    "emptyAnswer": "En osaa sanoa"
+    "emptyAnswer": "En osaa sanoa",
+    "subject": "Aihe",
+    "response": "Vastaus"
   },
   "ImageSection": {
     "openInNewTab": "Avaa kuva uudella välilehdellä"
