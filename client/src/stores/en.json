@@ -89,6 +89,7 @@
       "map": "Map",
       "image": "Image"
     },
+    "sidebarLabel": "Navigation menu",
     "warningNoMapUrl": "Oskari map publication url has not been set.",
     "warningNoAvailableMapLayers": "No available map layers found from the Oskari map publication.",
     "mapLayers": "Map layers shown on the survey page",
@@ -175,7 +176,8 @@
     "fileUploadError": "Error while uploading file",
     "fileSizeLimitError": "File size cannot exceed 10MB",
     "unsupportedFileFormat": "Unsupported file format",
-    "attachmentFileFormats": "Supported file formats: jpg, jpeg, png, pdf, docx, xlsx."
+    "attachmentFileFormats": "Supported file formats: jpg, jpeg, png, pdf, docx, xlsx.",
+    "deleteUploadedFile": "Delete uploaded file"
   },
   "SurveyImageList": {
     "attributions": "Copyright & attributions",
@@ -345,11 +347,13 @@
     "info": "Additional information"
   },
   "MapQuestion": {
+    "mapSelectionButtons": "Map selection buttons",
     "selectionTypes": {
       "point": "Point",
       "line": "Line",
       "area": "Area"
     },
+    "subQuestionDialog": "Subquestion dialog",
     "selectionHelperText": {
       "point": "Draw point on the desired location by clicking the map on that location.",
       "line": "Start drawing by clicking the starting point on the map. Continue drawing by clicking on the next point on the map. Stop drawing by clicking the last point of the line again.",
@@ -401,6 +405,7 @@
     "email": "Email address (optional)"
   },
   "AppBarUserMenu": {
+    "label": "User menu",
     "logout": "Logout"
   },
   "MapInfoBox": {

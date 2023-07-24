@@ -57,7 +57,7 @@ export default function AttachmentQuestion({
               {file.fileName}{' '}
             </Typography>
             <IconButton
-              aria-label="delete-uploaded-file"
+              aria-label={tr.AttachmentQuestion.deleteUploadedFile}
               onClick={(event) => {
                 event.stopPropagation();
                 value.splice(index, 1);
