@@ -32,7 +32,6 @@ const useStyles = makeStyles((theme: Theme & { [customKey: string]: any }) => ({
     maxWidth: '100%',
   },
   heading: {
-    textTransform: 'uppercase',
     fontSize: '2rem',
     wordBreak: 'break-word',
     hyphens: 'auto',

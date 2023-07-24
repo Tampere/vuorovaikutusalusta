@@ -1,8 +1,8 @@
 import { Survey } from '@interfaces/survey';
 import { createTheme, Theme } from '@mui/material';
 import { fiFI } from '@mui/material/locale';
-import { ThemeProvider } from '@mui/styles';
-import { defaultSurveyTheme } from '@src/themes/survey';
+import { ThemeProvider } from '@mui/material/styles';
+import { buttonOverrides, defaultSurveyTheme } from '@src/themes/survey';
 import React, { ReactNode, useContext, useMemo, useReducer } from 'react';
 
 /**
@@ -57,7 +57,15 @@ export function useSurveyTheme() {
      */
     setThemeFromSurvey(survey: Survey) {
       const theme = survey.theme?.data
-        ? createTheme(survey.theme?.data, fiFI)
+        ? createTheme(
+            {
+              ...survey.theme?.data,
+              components: {
+                ...buttonOverrides,
+              },
+            },
+            fiFI
+          )
         : defaultSurveyTheme;
       dispatch({ type: 'SET_THEME', value: theme });
     },
