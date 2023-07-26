@@ -306,7 +306,7 @@ export default function SurveyStepper({
           }}
         />
       )}
-      <article>
+      <main>
         <h1 style={{ marginLeft: '1rem' }}>{survey.title[surveyLanguage]}</h1>
 
         <Stepper
@@ -436,7 +436,7 @@ export default function SurveyStepper({
             </Step>
           ))}
         </Stepper>
-      </article>
+      </main>
       <Footer>
         <Link
           color="primary"
