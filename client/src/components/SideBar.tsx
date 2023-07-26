@@ -32,10 +32,11 @@ interface Props {
   children: ReactNode;
 }
 
-const { tr } = useTranslations();
 
 export default function SideBar(props: Props) {
+  
   const classes = useStyles();
+  const { tr } = useTranslations();
 
   return (
     <Box
