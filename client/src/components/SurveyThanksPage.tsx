@@ -5,8 +5,6 @@ import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import rehypeExternalLinks from 'rehype-external-links';
-import TreBanner from './logos/TreBanner';
-import TreLogo from './logos/TreLogo';
 
 const useStyles = makeStyles({
   root: {
@@ -73,7 +71,11 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
           }}
         >
           {' '}
-          <TreLogo width="351px" height="125px" />
+          <img
+            style={{ height: '125px', width: '351px' }}
+            src={`api/feature-styles/icons/tre_logo`}
+            alt={tr.IconAltTexts.treLogoAltText}
+          />
         </div>
         <Typography variant="h5">
           {survey.thanksPage.title?.[surveyLanguage]}
@@ -98,7 +100,11 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
             paddingBottom: '0.5rem',
           }}
         >
-          <TreBanner />
+          <img
+            style={{ height: '2rem' }}
+            src={`api/feature-styles/icons/tre_banner`}
+            alt={tr.IconAltTexts.treBannerAltText}
+          />
         </div>
       </div>
     </div>

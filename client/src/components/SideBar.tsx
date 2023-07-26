@@ -1,6 +1,7 @@
 import React, { ReactNode } from 'react';
 import { Box, Divider, Drawer, Toolbar } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import { useTranslations } from '@src/stores/TranslationContext';
 
 const useStyles = makeStyles({
   paper: {
@@ -31,6 +32,8 @@ interface Props {
   children: ReactNode;
 }
 
+const { tr } = useTranslations();
+
 export default function SideBar(props: Props) {
   const classes = useStyles();
 
@@ -38,7 +41,7 @@ export default function SideBar(props: Props) {
     <Box
       component="nav"
       sx={{ width: { md: props.width }, flexShrink: { md: 0 } }}
-      aria-label="navigation menu"
+      aria-label={tr.EditSurveyPage.sidebarLabel}
     >
       <Drawer
         classes={{
