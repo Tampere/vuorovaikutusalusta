@@ -200,15 +200,6 @@ export function useSurveyAnswers() {
           errors.push('required');
         }
       }
-      // Sorting is considered incomplete, if the array contains any nullish values
-      if (question.type === 'sorting') {
-        if (
-          !answer.value ||
-          (answer.value as number[]).some((value) => value == null)
-        ) {
-          errors.push('required');
-        }
-      }
       // If value is an array, check the array length - otherwise check for its emptiness
       else if (
         Array.isArray(answer.value)

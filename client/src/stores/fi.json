@@ -339,7 +339,7 @@
     "errorSaving": "Vastaustesi tallennuksessa tapahtui virhe. Ole hyvä ja yritä myöhemmin uudestaan."
   },
   "SurveyQuestion": {
-    "errorFieldIsRequired": "Kenttä on pakollinen.",
+    "errorFieldIsRequired": "Vastaus on pakollinen.",
     "accessibilityTooltip": "Vastaathan kysymykseen:",
     "answerLimitsMinMax": "Valitse vähintään {min}, enintään {max} vaihtoehtoa",
     "answerLimitsMin": "Valitse vähintään {min} vaihtoehtoa",
@@ -383,8 +383,8 @@
     "empty": "Tyhjä",
     "rankForOption": "Järjestysnumero vaihtoehdolle: {option}",
     "sortedOptions": "Vaihtoehdot järjestettyinä",
-    "orderComplete": "Järjestäminen valmis",
-    "verifyGuide": "Valitse lopuksi valintaruutu \"Järjestäminen valmis\"",
+    "orderComplete": "Vaihtoehdot ovat nyt oikeassa järjestyksessä.",
+    "confirmationGuide": "Valitse lopuksi vastauksen vahvistusvalintaruutu.",
     "inPosition": "Sijalla ",
     "announcement": {
       "focus": "Siirrä tätä vaihtoehtoa painamalla välilyöntiä. Saattaa olla tarpeen aktivoida kohdistustila.                                                  ",

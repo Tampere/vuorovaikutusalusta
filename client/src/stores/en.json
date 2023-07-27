@@ -339,7 +339,7 @@
     "errorSaving": "Error while saving answers. Please try again later."
   },
   "SurveyQuestion": {
-    "errorFieldIsRequired": "Field is mandatory.",
+    "errorFieldIsRequired": "Answer is mandatory.",
     "accessibilityTooltip": "Please answer question:",
     "answerLimitsMinMax": "Choose a minimum of {min} and a maximum of {max} options",
     "answerLimitsMin": "Choose a minimum of {min} options",
@@ -383,8 +383,8 @@
     "empty": "Empty",
     "rankForOption": "Rank for the option: {option}",
     "sortedOptions": "Options sorted",
-    "orderComplete": "Ordering completed",
-    "verifyGuide": "When ready, check the box \"Ordering completed\"",
+    "orderComplete": "The items are now in the correct order.",
+    "confirmationGuide": "When ready, check the box to confirm your answer.",
     "inPosition": "In position ",
     "announcement": {
       "focus": "Move this item by pressing spacebar. You may need to activate focus mode.",

@@ -139,7 +139,6 @@ export default function SortingQuestion(props: Props) {
           sx={{
             lineHeight: 1.2,
             marginBottom: '0.5em',
-            marginTop: '1em',
           }}
         />
       </DragDropContext>
