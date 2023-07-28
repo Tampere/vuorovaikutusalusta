@@ -85,7 +85,11 @@ function SurveyQuestion({ question, pageUnfinished }: Props) {
           {question.title?.[surveyLanguage]}
           <span aria-hidden="true"> </span>
         </h3>
-        {question.type == "sorting" && <span style={visuallyHidden}>{tr.SortingQuestion.confirmationGuide}</span>}
+        {question.type == "sorting" &&
+          <span style={visuallyHidden}>
+            {tr.SortingQuestion.confirmationGuide}
+          </span>
+        }
         {question.info && question.info?.[surveyLanguage] && (
           <SectionInfo
             hiddenFromScreenReader={false}

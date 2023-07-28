@@ -387,7 +387,7 @@
     "confirmationGuide": "Valitse lopuksi vastauksen vahvistusvalintaruutu.",
     "inPosition": "Sijalla ",
     "announcement": {
-      "focus": "Siirrä tätä vaihtoehtoa painamalla välilyöntiä. Saattaa olla tarpeen aktivoida kohdistustila.                                                  ",
+      "focus": "Siirrä tätä vaihtoehtoa painamalla välilyöntiä. Saattaa olla tarpeen aktivoida kohdistustila.",
       "grab": "Tartuit vaihtoehtoon sijalla {position} . Siirrä ylös tai alaspäin nuolinäppäimillä.",
       "move": "Nyt sijalla {position} kautta {length} . Aseta tähän painamalla välilyöntiä.",
       "drop": "Asetettu sijalle {position} .",
