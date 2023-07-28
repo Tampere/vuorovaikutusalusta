@@ -302,7 +302,7 @@ async function answerEntriesToCSV(entries: CSVJson): Promise<string> {
     headers.forEach((headerObj, index) => {
       for (const [headerKey, headerValue] of Object.entries(headerObj)) {
         csvData += Object.values(submissions[i])[0].hasOwnProperty(headerKey)
-          ? Object.values(submissions[i])[0][headerKey]
+          ? `"${Object.values(submissions[i])[0][headerKey]}"`
           : '';
 
         csvData += ',';
