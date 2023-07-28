@@ -768,8 +768,8 @@ export async function updateSurvey(survey: Survey) {
 
   // Update all sections
   await Promise.all(
-    sections.map(async (section, index) => {
-      const sectionRow = await upsertSection(section, index);
+    sections.map(async (section) => {
+      const sectionRow = await upsertSection(section, section.idx);
 
       // Delete options that were removed
       await deleteRemovedOptions(section.id, section.options);

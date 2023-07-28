@@ -1,7 +1,6 @@
 import { FileAnswer, LanguageCode, LocalizedText } from '@interfaces/survey';
 import { getDb } from '@src/database';
-import { readFileSync, rmSync } from 'fs';
-import { parseAsync } from 'json2csv';
+import { readFileSync, rmSync, writeFile } from 'fs';
 import moment from 'moment';
 import ogr2ogr from 'ogr2ogr';
 import useTranslations from '@src/translations/useTranslations';
@@ -13,6 +12,7 @@ const tr = useTranslations('fi');
  */
 interface DBAnswerEntry {
   answer_id: number;
+  page_index: number;
   details: {
     subjects?: LocalizedText[];
     classes?: LocalizedText[];
@@ -38,14 +38,18 @@ interface DBAnswerEntry {
 /**
  * Interface for data.answer_entry file -entries
  */
-interface DBFileEntry {
-  value_file: string;
-  value_file_name: string;
-  submission_id: number;
+interface FileEntry {
+  valueFile: string;
+  valueFileName: string;
+  submissionId: number;
+  sectionId: number;
+  pageIndex: number;
+  sectionIndex: number;
 }
 
 interface AnswerEntry {
   answerId: number;
+  pageIndex: number;
   details: {
     subjects?: LocalizedText[];
     classes?: LocalizedText[];
@@ -141,6 +145,7 @@ function dbAnswerEntryRowsToAnswerEntries(rows: DBAnswerEntry[]) {
 
   return rows.map((row) => ({
     answerId: row.answer_id,
+    pageIndex: row.page_index,
     details: row.details,
     sectionId: row.section_id,
     parentSectionId: row?.parent_section,
@@ -181,7 +186,9 @@ function geometryAnswerToFeature(answer: AnswerEntry) {
       ['Vastaustunniste']: answer.submissionId,
       ['Aikaleima']: moment(answer.createdAt).format('DD-MM-YYYY, HH:mm'),
       ['Vastauskieli']: tr[answer?.submissionLanguage ?? 'fi'],
-      ['Kysymys']: answer.title?.['fi'] ?? '',
+      ['Kysymys']: `Sivu ${answer.pageIndex + 1} / Kysymys ${
+        answer.sectionIndex + 1
+      }: ${answer.title?.['fi'] ?? ''}`,
     },
   };
 }
@@ -208,7 +215,9 @@ function dbEntriesToFeatures(
     } else if (submissionGroup[submissionId][answer.parentEntryId]) {
       // Add subquestion answer
       let newAnswer: string;
-      let key: string = `${answer.title?.['fi'] ?? 'Nimetön alikysymys'}`;
+      let key: string = `Alikysymys ${answer.sectionIndex + 1}: ${
+        answer.title?.['fi'] ?? 'Nimetön alikysymys'
+      }`;
       const keyOther: string = `${key} - jokin muu, mikä?`;
 
       switch (answer.type) {
@@ -279,43 +288,34 @@ function dbEntriesToFeatures(
 async function answerEntriesToCSV(entries: CSVJson): Promise<string> {
   const { submissions, headers } = entries;
 
-  const headersData = [
-    'Vastaustunniste',
-    'Vastauskieli',
-    'Aikaleima',
-    ...headers.map((headerObj) => Object.values(headerObj)[0]),
-  ];
+  let csvData = `Vastaustunniste,Vastauskieli,Aikaleima,${headers.map(
+    (header) => `${Object.values(header)[0]}`
+  )}\n`;
 
-  const submissionData = submissions.map((submission) => {
-    const answers = {};
-    const [submissionId, submissionAnswers] = Object.entries(submission)[0];
-    answers['Vastaustunniste'] = submissionId;
-    answers['Vastauskieli'] = submission.submissionLanguage;
-    answers['Aikaleima'] = moment(submission.timeStamp).format(
-      'DD-MM-YYYY, HH:mm'
-    );
+  for (let i = 0; i < submissions.length; ++i) {
+    // Timestamp + submission language
+    csvData += `${Object.keys(submissions[i])[0]},${moment(
+      submissions[i].timeStamp
+    ).format('DD-MM-YYYY HH:mm')},${submissions[i].submissionLanguage}`;
+    csvData += ',';
 
-    headers.forEach((headerObj) => {
+    headers.forEach((headerObj, index) => {
       for (const [headerKey, headerValue] of Object.entries(headerObj)) {
-        answers[headerValue as string] = submissionAnswers.hasOwnProperty(
-          headerKey
-        )
-          ? submissionAnswers[headerKey]
+        csvData += Object.values(submissions[i])[0].hasOwnProperty(headerKey)
+          ? `"${Object.values(submissions[i])[0][headerKey]}"`
           : '';
+
+        csvData += ',';
       }
     });
 
-    return answers;
-  });
+    csvData = csvData.substring(0, csvData.length - 1);
 
-  try {
-    const csv = await parseAsync(submissionData, {
-      headersData,
-    } as any);
-    return csv;
-  } catch (err) {
-    console.error(err);
+    // Newline
+    csvData += '\n';
   }
+
+  return csvData;
 }
 /**
  * Handler function for downloading csv file
@@ -416,7 +416,7 @@ async function getCheckboxOptionsFromDB(surveyId: number) {
   const rows = await getDb().manyOrNone(
     `SELECT 
         opt.TEXT, 
-        opt.section_id 
+        opt.section_id as "sectionId"
       FROM data.option opt 
         LEFT JOIN data.page_section ps ON opt.section_id = ps.id
         LEFT JOIN data.survey_page sp ON ps.survey_page_id = sp.id 
@@ -431,22 +431,17 @@ async function getCheckboxOptionsFromDB(surveyId: number) {
 async function getAttachmentDBEntries(surveyId: number) {
   const rows = await getDb().manyOrNone(
     `
-    SELECT * FROM
-      (SELECT
-          ae.submission_id,
-          ae.section_id,
-          ae.value_file,
-          ae.value_file_name
-      FROM data.answer_entry ae
-      LEFT JOIN data.submission sub ON ae.submission_id = sub.id
-      WHERE sub.survey_id = $1 AND ae.value_file IS NOT NULL AND sub.unfinished_token IS NULL) AS temp1
-        LEFT JOIN
-          (SELECT
-            ps.id
-          FROM data.page_section ps
-          LEFT JOIN data.survey_page sp ON ps.survey_page_id = sp.id
-          LEFT JOIN data.survey s ON sp.survey_id = s.id WHERE s.id = $1 ORDER BY ps.id) AS temp2
-        ON temp1.section_id = temp2.id;
+      SELECT 
+        ae.submission_id as "submissionId",
+        ae.section_id as "sectionId",
+        ae.value_file as "valueFile",
+        ae.value_file_name as "valueFileName",
+        sp.idx as "pageIndex",
+        ps.idx as "sectionIndex" FROM data.answer_entry ae 
+      LEFT JOIN data.submission sub ON ae.submission_id = sub.id 
+      LEFT JOIN data.page_section ps ON ae.section_id = ps.id 
+      LEFT JOIN data.survey_page sp ON sp.id = ps.survey_page_id
+      WHERE ae.value_file IS NOT NULL AND sub.unfinished_token IS NULL AND sub.survey_id = $1;
     `,
     [surveyId]
   );
@@ -460,10 +455,12 @@ async function getAttachmentDBEntries(surveyId: number) {
  * @param rows
  * @returns
  */
-function attachmentEntriesToFiles(rows: DBFileEntry[]) {
+function attachmentEntriesToFiles(rows: FileEntry[]) {
   return rows.map((row) => ({
-    fileName: `vastausnro_${row.submission_id}.${row.value_file_name}`,
-    fileString: row.value_file,
+    fileName: `vastausnro_${row.submissionId}.sivunro_${
+      row.pageIndex + 1
+    }.kysymysnro_${row.sectionIndex + 1}.${row.valueFileName}`,
+    fileString: row.valueFile,
   }));
 }
 
@@ -527,6 +524,8 @@ async function getGeometryDBEntries(surveyId: number): Promise<AnswerEntry[]> {
       ae.value_numeric,
       ae.value_json,
       ae.parent_entry_id,
+      sp.idx as page_index,
+      ps.idx as section_index,
       ps.type,
       ps.title,
       ps.details,
@@ -542,7 +541,7 @@ async function getGeometryDBEntries(surveyId: number): Promise<AnswerEntry[]> {
         WHERE (type = 'map' OR parent_section IS NOT NULL)
           AND sub.unfinished_token IS NULL
           AND sub.survey_id = $1
-        ORDER BY ae.parent_entry_id ASC NULLS FIRST`,
+          ORDER BY submission_id, ae.parent_entry_id ASC NULLS FIRST, section_index`,
     [surveyId]
   )) as DBAnswerEntry[];
 
@@ -638,9 +637,11 @@ function createCSVHeaders(sectionMetadata: SectionHeader[]) {
           );
 
           allHeaders.push({
-            [key]: `${section.title?.['fi'] ?? ''}${
-              section.groupName ? ' - ' + section.groupName['fi'] : ''
-            } - ${section.text?.['fi'] ?? ''}`,
+            [key]: `s${section.pageIndex}k${section.sectionIndex}: ${
+              section.title?.['fi'] ?? ''
+            }${section.groupName ? ' - ' + section.groupName['fi'] : ''} - ${
+              section.text?.['fi'] ?? ''
+            }`,
           });
         });
         if (sectionHead.details.allowCustomAnswer) {
@@ -651,7 +652,9 @@ function createCSVHeaders(sectionMetadata: SectionHeader[]) {
             -1
           );
           allHeaders.push({
-            [key]: `${sectionHead.title['fi']} - joku muu, mikä?`,
+            [key]: `s${sectionHead.pageIndex + 1}k${
+              sectionHead.sectionIndex + 1
+            }: ${sectionHead.title['fi']} - joku muu, mikä?`,
           });
         }
         break;
@@ -664,7 +667,9 @@ function createCSVHeaders(sectionMetadata: SectionHeader[]) {
               idx + 1
             );
             allHeaders.push({
-              [key]: `${sectionHead.title['fi']} - ${subject['fi']}`,
+              [key]: `s${sectionHead.pageIndex + 1}k${
+                sectionHead.sectionIndex + 1
+              }: ${sectionHead.title['fi']} - ${subject['fi']}`,
             });
           }
         );
@@ -678,7 +683,9 @@ function createCSVHeaders(sectionMetadata: SectionHeader[]) {
             section.optionIndex + 1
           );
           allHeaders.push({
-            [key]: `${section.title['fi']} - ${section.optionIndex + 1}.`,
+            [key]: `s${section.pageIndex + 1}k${section.sectionIndex + 1}: ${
+              section.title['fi']
+            } - ${section.optionIndex + 1}.`,
           });
         });
         break;
@@ -686,11 +693,12 @@ function createCSVHeaders(sectionMetadata: SectionHeader[]) {
       default:
         allHeaders.push({
           [getHeaderKey(sectionHead.pageIndex, sectionHead.sectionIndex)]:
-            sectionHead.title?.['fi'] ?? '',
+            `s${sectionHead.pageIndex + 1}k${sectionHead.sectionIndex + 1}: ${
+              sectionHead.title?.['fi']
+            }` ?? '',
         });
     }
   });
-
   return allHeaders;
 }
 
