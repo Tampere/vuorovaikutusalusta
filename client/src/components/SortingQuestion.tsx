@@ -26,7 +26,6 @@ interface Props {
 }
 
 export default function SortingQuestion(props: Props) {
-  console.log(props);
   const { surveyLanguage, tr } = useTranslations();
   const [verified, setVerified] = useState(props.value ? true : false);
   const [sortedOptionIds, setSortedOptionIds] = useState(
@@ -48,7 +47,7 @@ export default function SortingQuestion(props: Props) {
     return result;
   };
 
-  const onDragEnd = (result: DropResult, provided: ResponderProvided):void => {
+  const onDragEnd = (result: DropResult, provided: ResponderProvided) => {
     const { destination, source } = result;
     if (!destination || destination.index === source.index) {
       provided.announce(tr.SortingQuestion.announcement.droppedInPlace
@@ -143,7 +142,6 @@ export default function SortingQuestion(props: Props) {
           label={tr.SortingQuestion.orderComplete}
           control={
             <Checkbox
-              // TS can't infer the precise memoized value type from question.type, but for checkboxes it's always an array
               name={`verify-order-question_${props.question.id}`}
               checked={verified}
               onChange={(event) => {
