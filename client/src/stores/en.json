@@ -329,7 +329,11 @@
     "openImage": "Open the image",
     "unfinishedAnswers": "Please, answer all mandatory questions.",
     "unfinishedAnswersInfo": "The following answers need to be answered:",
-    "saveAsUnfinished": "Save unfinished survey"
+    "saveAsUnfinished": "Save unfinished survey",
+    "step": "Step",
+    "outOf": "out of",
+    "completedStep": "Completed step",
+    "futureStep": "Future step"
   },
   "SaveAsUnfinishedDialog": {
     "description": "You can save the unfinished survey by providing your email address. A link will be sent to your email, from which you can access your unfinished survey provided that the survey is still open.",

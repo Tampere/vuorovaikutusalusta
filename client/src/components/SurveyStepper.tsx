@@ -316,9 +316,10 @@ export default function SurveyStepper({
           connector={null}
         >
           {survey.pages.map((page, index) => (
-            <Step key={page.id} completed={false}>
+            <Step key={page.id} completed={index < pageNumber ? true : false}>
               <StepLabel
                 id={`${index}-page-top`}
+                aria-current={index === pageNumber ? "step" : false}
                 classes={{
                   active: classes.stepActive,
                   label: classes.stepHeader,
@@ -326,6 +327,11 @@ export default function SurveyStepper({
                 }}
               >
                 <h2 style={{ margin: 0, fontSize: '1em' }}>
+                  <span style={visuallyHidden}>
+                    {index < pageNumber && tr.SurveyStepper.completedStep}
+                    {index > pageNumber && tr.SurveyStepper.futureStep}
+                    {tr.SurveyStepper.step} {index + 1} {tr.SurveyStepper.outOf} {survey?.pages?.length}
+                  </span>
                   {page.title?.[language]}
                 </h2>
               </StepLabel>
