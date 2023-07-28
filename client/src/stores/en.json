@@ -425,6 +425,7 @@
     "en": "English"
   },
   "SurveyLanguageMenu": {
+    "languageControl": "Language / Kieli",
     "changeSurveyLanguage": "Change language of the survey",
     "surveyLanguage": "Survey language"
   },

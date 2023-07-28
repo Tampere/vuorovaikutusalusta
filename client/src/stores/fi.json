@@ -425,6 +425,7 @@
     "en": "English"
   },
   "SurveyLanguageMenu": {
+    "languageControl": "Language / Kieli",
     "changeSurveyLanguage": "Vaihda kyselyn kieltä",
     "surveyLanguage": "Kyselyn kieli"
   },
