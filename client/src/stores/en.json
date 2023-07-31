@@ -420,6 +420,7 @@
     "text": "This is a test survey. Survey answers are not saved nor are any email reports sent."
   },
   "LanguageMenu": {
+    "languageControl": "Language / Kieli",
     "changeLanguage": "Change service language",
     "fi": "Suomi",
     "en": "English"

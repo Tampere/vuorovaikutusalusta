@@ -1,4 +1,4 @@
-import { MenuItem, Select } from '@mui/material';
+import { MenuItem, Select, Tooltip } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { LanguageCode } from '@interfaces/survey';
 import { makeStyles } from '@mui/styles';
@@ -29,33 +29,46 @@ export default function SurveyLanguageMenu({
 
   return (
     <div className={classes.root} style={style}>
-      <Select
-        inputProps={{"aria-label": tr.SurveyLanguageMenu.languageControl}}
-        value={surveyLanguage}
-        onChange={(event) => {
-          const targetLanguage = event.target.value as LanguageCode;
-          setSurveyLanguage(targetLanguage);
-          if (changeUILanguage) setLanguage(targetLanguage);
-        }}
-        IconComponent={LanguageIcon}
-        sx={{
-          /* Visual label not used, hide the border and legend */
-          '& fieldset': {
-            borderWidth: 0,
-            '&>legend': {display: 'none'}
-          }
-        }}
+      <Tooltip
+        arrow
+        placement='left'
+        title={tr.SurveyLanguageMenu.changeSurveyLanguage}
       >
-        {languages.map((lang, index) => (
-          <MenuItem
-            key={`lang-item-${index}`}
-            value={lang}
-            selected={lang === surveyLanguage}
-          >
-            {tr.LanguageMenu[lang]} ({lang.toLocaleUpperCase()})
-          </MenuItem>
-        ))}
-      </Select>
+        <Select
+          inputProps={{"aria-label": tr.SurveyLanguageMenu.languageControl}}
+          value={surveyLanguage}
+          onChange={(event) => {
+            const targetLanguage = event.target.value as LanguageCode;
+            setSurveyLanguage(targetLanguage);
+            if (changeUILanguage) setLanguage(targetLanguage);
+          }}
+          IconComponent={LanguageIcon}
+          sx={{
+            color: 'inherit',
+            '&>.MuiSelect-select': { // Accommodate the larger globe icon
+              paddingRight: '38px !important',
+            },
+            '&>fieldset': { // Visual label not used, hide border and legend
+              borderWidth: 0,
+              '&>legend': {display: 'none'},
+            },
+            '& svg': { // The component is used in admin panel and survey, must adapt
+              color: 'inherit',
+              fill: 'currentColor',
+            }
+          }}
+        >
+          {languages.map((lang, index) => (
+            <MenuItem
+              key={`lang-item-${index}`}
+              value={lang}
+              selected={lang === surveyLanguage}
+            >
+              {tr.LanguageMenu[lang]} ({lang.toLocaleUpperCase()})
+            </MenuItem>
+          ))}
+        </Select>
+      </Tooltip>
     </div>
   );
 }
