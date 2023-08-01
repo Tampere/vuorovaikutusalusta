@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { IconButton, Menu, MenuItem, Tooltip, Typography } from '@mui/material';
+import { MenuItem, Select, Tooltip } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { LanguageCode } from '@interfaces/survey';
 import { makeStyles } from '@mui/styles';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import LanguageIcon from '@mui/icons-material/Language';
+import React from 'react';
 
 interface Props {
   style?: React.CSSProperties;
@@ -11,64 +11,61 @@ interface Props {
 
 const useStyles = makeStyles({
   root: {
+    cursor: 'pointer',
     display: 'flex',
     flexGrow: 1,
     justifyContent: 'flex-end',
   },
 });
 
-export default function LanguageMenu({ style }: Props) {
-  const { tr, setLanguage, languages, language } = useTranslations();
-  const [anchorEl, setAnchorEl] = useState(null);
+export default function LanguageMenu({
+  style,
+}: Props) {
+  const { tr,  setLanguage, languages, language } =
+    useTranslations();
   const classes = useStyles();
-  const open = Boolean(anchorEl);
-  const handleClick = (event: any) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
 
   return (
     <div className={classes.root} style={style}>
-      <Tooltip title={tr.LanguageMenu.changeLanguage}>
-        <IconButton
-          id="basic-button"
-          aria-controls={open ? 'basic-menu' : undefined}
-          aria-haspopup="true"
-          aria-expanded={open ? 'true' : undefined}
-          onClick={handleClick}
-          color="inherit"
-        >
-          <Typography>{language.toLocaleUpperCase()}</Typography>
-          <ArrowDropDownIcon />
-        </IconButton>
-      </Tooltip>
-      <Menu
-        style={{ display: !anchorEl ? 'none' : '' }}
-        id="basic-menu"
-        anchorEl={anchorEl}
-        open={open}
-        onClose={handleClose}
-        MenuListProps={{
-          'aria-labelledby': 'basic-button',
-        }}
+      <Tooltip
+        arrow
+        placement='left'
+        title={tr.LanguageMenu.changeLanguage}
       >
-        {languages.map((lang, index) => (
-          <MenuItem
-            key={`lang-item-${index}`}
-            lang={lang}
-            selected={lang === language}
-            onClick={(event) => {
-              handleClose();
-              const target = event.target as HTMLInputElement;
-              setLanguage(target.lang as LanguageCode);
-            }}
-          >
-            {tr.LanguageMenu[lang]} ({lang.toLocaleUpperCase()})
-          </MenuItem>
-        ))}
-      </Menu>
+        <Select
+          inputProps={{"aria-label": tr.LanguageMenu.languageControl}}
+          value={language}
+          onChange={(event) => {
+            const targetLanguage = event.target.value as LanguageCode;
+            setLanguage(targetLanguage);
+          }}
+          IconComponent={LanguageIcon}
+          sx={{
+            color: 'inherit',
+            '&>.MuiSelect-select': { // Accommodate the larger globe icon
+              paddingRight: '38px !important',
+            },
+            '&>fieldset': { // Visual label not used, hide border and legend
+              borderWidth: 0,
+              '&>legend': {display: 'none'},
+            },
+            '& svg': { // The component is used in admin panel and survey, must adapt
+              color: 'inherit',
+              fill: 'currentColor',
+            }
+          }}
+        >
+          {languages.map((lang, index) => (
+            <MenuItem
+              key={`lang-item-${index}`}
+              value={lang}
+              selected={lang === language}
+            >
+              {tr.LanguageMenu[lang]} ({lang.toLocaleUpperCase()})
+            </MenuItem>
+          ))}
+        </Select>
+      </Tooltip>
     </div>
   );
 }

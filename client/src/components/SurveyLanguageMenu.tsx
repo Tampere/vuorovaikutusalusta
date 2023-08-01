@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { Menu, MenuItem, Tooltip, Typography } from '@mui/material';
+import { MenuItem, Select, Tooltip } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { LanguageCode } from '@interfaces/survey';
 import { makeStyles } from '@mui/styles';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import LanguageIcon from '@mui/icons-material/Language';
+import React from 'react';
 
 interface Props {
   style?: React.CSSProperties;
@@ -25,65 +25,50 @@ export default function SurveyLanguageMenu({
 }: Props) {
   const { tr, setSurveyLanguage, setLanguage, languages, surveyLanguage } =
     useTranslations();
-  const [anchorEl, setAnchorEl] = useState(null);
   const classes = useStyles();
-  const open = Boolean(anchorEl);
-
-  const handleClick = (event: any) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
 
   return (
     <div className={classes.root} style={style}>
       <Tooltip
-        id="tooltip-button"
+        arrow
+        placement='left'
         title={tr.SurveyLanguageMenu.changeSurveyLanguage}
       >
-        <div
-          onClick={(event) => handleClick(event)}
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center',
+        <Select
+          inputProps={{"aria-label": tr.SurveyLanguageMenu.languageControl}}
+          value={surveyLanguage}
+          onChange={(event) => {
+            const targetLanguage = event.target.value as LanguageCode;
+            setSurveyLanguage(targetLanguage);
+            if (changeUILanguage) setLanguage(targetLanguage);
+          }}
+          IconComponent={LanguageIcon}
+          sx={{
+            color: 'inherit',
+            '&>.MuiSelect-select': { // Accommodate the larger globe icon
+              paddingRight: '38px !important',
+            },
+            '&>fieldset': { // Visual label not used, hide border and legend
+              borderWidth: 0,
+              '&>legend': {display: 'none'},
+            },
+            '& svg': { // The component is used in admin panel and survey, must adapt
+              color: 'inherit',
+              fill: 'currentColor',
+            }
           }}
         >
-          <Typography>
-            {tr.SurveyLanguageMenu.surveyLanguage} (
-            {surveyLanguage?.toLocaleUpperCase()})
-          </Typography>
-          <ArrowDropDownIcon />
-        </div>
+          {languages.map((lang, index) => (
+            <MenuItem
+              key={`lang-item-${index}`}
+              value={lang}
+              selected={lang === surveyLanguage}
+            >
+              {tr.LanguageMenu[lang]} ({lang.toLocaleUpperCase()})
+            </MenuItem>
+          ))}
+        </Select>
       </Tooltip>
-      <Menu
-        style={{ display: !anchorEl ? 'none' : '' }}
-        id="basic-menu"
-        anchorEl={anchorEl}
-        open={open}
-        onClose={handleClose}
-        MenuListProps={{
-          'aria-labelledby': 'tooltip-button',
-        }}
-      >
-        {languages.map((lang, index) => (
-          <MenuItem
-            key={`lang-item-${index}`}
-            lang={lang}
-            selected={lang === surveyLanguage}
-            onClick={(event) => {
-              handleClose();
-              const targetLanguage = (event.target as HTMLInputElement)
-                .lang as LanguageCode;
-              setSurveyLanguage(targetLanguage);
-              if (changeUILanguage) setLanguage(targetLanguage);
-            }}
-          >
-            {tr.LanguageMenu[lang]} ({lang.toLocaleUpperCase()})
-          </MenuItem>
-        ))}
-      </Menu>
     </div>
   );
 }

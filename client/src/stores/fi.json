@@ -434,11 +434,13 @@
     "text": "Tämä on testikysely. Vastauksia ei tallenneta, eikä niistä lähetetä sähköpostia."
   },
   "LanguageMenu": {
+    "languageControl": "Language / Kieli",
     "changeLanguage": "Vaihda palvelun kieltä",
     "fi": "Suomi",
     "en": "English"
   },
   "SurveyLanguageMenu": {
+    "languageControl": "Language / Kieli",
     "changeSurveyLanguage": "Vaihda kyselyn kieltä",
     "surveyLanguage": "Kyselyn kieli"
   },
