@@ -34,6 +34,7 @@ interface DBAnswerEntry {
   parent_entry_id: number;
   value_file: string;
   value_file_name: string;
+  map_layers: number[];
 }
 
 /**
@@ -61,6 +62,7 @@ const answerEntryColumnSet = (inputSRID: number) =>
     'parent_entry_id',
     'value_file',
     'value_file_name',
+    'map_layers',
   ]);
 
 /**
@@ -297,6 +299,7 @@ function answerEntriesToRows(
             value_json: null,
             value_file: null,
             value_file_name: null,
+            map_layers: null,
           },
         ];
         break;
@@ -314,6 +317,7 @@ function answerEntriesToRows(
             value_json: null,
             value_file: null,
             value_file_name: null,
+            map_layers: null,
           },
         ];
         break;
@@ -334,6 +338,7 @@ function answerEntriesToRows(
                     value_json: null,
                     value_file: null,
                     value_file_name: null,
+                    map_layers: null,
                   };
                 }),
               ]
@@ -349,6 +354,7 @@ function answerEntriesToRows(
                   value_json: null,
                   value_file: null,
                   value_file_name: null,
+                  map_layers: null,
                 },
               ];
         break;
@@ -365,6 +371,7 @@ function answerEntriesToRows(
             value_json: null,
             value_file: null,
             value_file_name: null,
+            map_layers: null,
           },
         ];
         break;
@@ -381,6 +388,7 @@ function answerEntriesToRows(
             value_json: null,
             value_file: null,
             value_file_name: null,
+            map_layers: value.mapLayers,
             // Save subquestion answers under the entry for inserting them with correct parent entry ID later on
             subQuestionAnswers: value.subQuestionAnswers,
           };
@@ -400,6 +408,7 @@ function answerEntriesToRows(
             value_json: JSON.stringify(entry.value),
             value_file: null,
             value_file_name: null,
+            map_layers: null,
           },
         ];
         break;
@@ -416,6 +425,7 @@ function answerEntriesToRows(
             value_json: null,
             value_file: null,
             value_file_name: null,
+            map_layers: null,
           },
         ];
         break;
@@ -432,6 +442,7 @@ function answerEntriesToRows(
             value_json: JSON.stringify(entry.value),
             value_file: null,
             value_file_name: null,
+            map_layers: null,
           },
         ];
         break;
@@ -448,6 +459,7 @@ function answerEntriesToRows(
             value_json: null,
             value_file: value.fileString,
             value_file_name: value.fileName,
+            map_layers: null,
           })) ?? [];
     }
 
@@ -561,6 +573,7 @@ function dbAnswerEntriesToAnswerEntries(
               geometry: row.value_geometry,
               properties: {},
             },
+            mapLayers: row.map_layers,
             // The function should only return map subquestion answers because of filtering - assume the type here
             subQuestionAnswers: dbAnswerEntriesToAnswerEntries(
               rows,
@@ -655,6 +668,7 @@ export async function getUnfinishedAnswerEntries(token: string) {
       ae.value_json,
       ae.value_file,
       ae.value_file_name,
+      ae.map_layers,
       ps.type AS section_type,
       ps.parent_section AS parent_section
     FROM
@@ -700,6 +714,7 @@ export async function getAnswerEntries(submissionId: number) {
       ae.value_json,
       ae.value_file,
       ae.value_file_name,
+      ae.map_layers,
       ps.type AS section_type,
       ps.parent_section AS parent_section
     FROM

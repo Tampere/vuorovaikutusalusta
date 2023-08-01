@@ -492,6 +492,7 @@ export type SurveyMapSubQuestionAnswer = AnswerEntry & {
  */
 export interface MapQuestionAnswer {
   selectionType: MapQuestionSelectionType;
+  mapLayers: number[];
   geometry: GeoJSONWithCRS<
     GeoJSON.Feature<GeoJSON.Point | GeoJSON.LineString | GeoJSON.Polygon>
   >;

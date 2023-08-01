@@ -8,8 +8,8 @@ import {
 } from '@interfaces/survey';
 import { request } from '@src/utils/request';
 import React, {
-  createContext,
   ReactNode,
+  createContext,
   useContext,
   useMemo,
   useReducer,
@@ -26,6 +26,10 @@ type Action =
   | {
       type: 'SET_SURVEY';
       survey: Survey;
+    }
+  | {
+      type: 'UPDATE_SURVEY_PAGE';
+      page: SurveyPage;
     }
   | {
       type: 'UPDATE_ANSWER';
@@ -128,7 +132,7 @@ export function getEmptyAnswer(section: SurveyPageSection): AnswerEntry {
       };
     default:
       throw new Error(
-        `No default value defined for questions of type "${section.type}"`
+        `No default value defined for questions of type "${section.type}"`,
       );
   }
 }
@@ -148,7 +152,7 @@ export function useSurveyAnswers() {
 
   function getValidationErrors(
     question: SurveyQuestion,
-    answers = state.answers
+    answers = state.answers,
   ) {
     const errors: ('answerLimits' | 'required' | 'minValue' | 'maxValue')[] =
       [];
@@ -162,7 +166,7 @@ export function useSurveyAnswers() {
       const nonEmptySelections = value.filter(
         (selection) =>
           selection != null &&
-          (typeof selection !== 'string' || selection.length > 0)
+          (typeof selection !== 'string' || selection.length > 0),
       );
       if (
         // If either limit is defined and that limit is broken, the answer is invalid
@@ -256,7 +260,7 @@ export function useSurveyAnswers() {
         // Skip sections that shouldn't get answers
         .filter(
           (section): section is SurveyQuestion =>
-            !nonQuestionSectionTypes.includes(section.type)
+            !nonQuestionSectionTypes.includes(section.type),
         )
         .some((section) => getValidationErrors(section).length);
     },
@@ -271,7 +275,7 @@ export function useSurveyAnswers() {
           // Skip sections that shouldn't get answers
           .filter(
             (section): section is SurveyQuestion =>
-              !nonQuestionSectionTypes.includes(section.type)
+              !nonQuestionSectionTypes.includes(section.type),
           )
           .map((section) => ({
             [section.title[surveyLanguage]]: getValidationErrors(section),
@@ -288,7 +292,7 @@ export function useSurveyAnswers() {
         answers: AnswerEntry[];
         language: LanguageCode;
       }>(
-        `/api/published-surveys/${state.survey.name}/unfinished-submission?token=${token}`
+        `/api/published-surveys/${state.survey.name}/unfinished-submission?token=${token}`,
       );
       const { answers, language } = response;
       dispatch({
@@ -303,6 +307,17 @@ export function useSurveyAnswers() {
      */
     setUnfinishedToken(token: string) {
       dispatch({ type: 'SET_UNFINISHED_TOKEN', token });
+    },
+    /**
+     * Updates the given map layers to the state.
+     * @param page Page to be updated
+     * @param mapLayers Visible map layers
+     */
+    updatePageMapLayers(page: SurveyPage, mapLayers: number[]) {
+      dispatch({
+        type: 'UPDATE_SURVEY_PAGE',
+        page: { ...page, sidebar: { ...page.sidebar, mapLayers } },
+      });
     },
   };
 }
@@ -320,11 +335,21 @@ function reducer(state: State, action: Action): State {
         ...state,
         survey: action.survey,
       };
+    case 'UPDATE_SURVEY_PAGE':
+      return {
+        ...state,
+        survey: {
+          ...state.survey,
+          pages: state.survey.pages.map((page) =>
+            page.id === action.page.id ? action.page : page,
+          ),
+        },
+      };
     case 'UPDATE_ANSWER':
       return {
         ...state,
         answers: state.answers.map((answer) =>
-          answer.sectionId === action.answer.sectionId ? action.answer : answer
+          answer.sectionId === action.answer.sectionId ? action.answer : answer,
         ),
       };
     case 'UPDATE_ANSWERS':
@@ -333,7 +358,7 @@ function reducer(state: State, action: Action): State {
         answers: state.answers.map(
           (answer) =>
             action.answers.find((a) => a.sectionId === answer.sectionId) ??
-            answer
+            answer,
         ),
       };
     case 'SET_ANSWERS':
