@@ -244,9 +244,10 @@ export default function SurveyStepper({
    * Scroll to page header (=StepLabel) when page changes
    */
   useEffect(() => {
-    const element = document.getElementById(`${pageNumber}-page-top`);
-    if (!element) return;
-    element.scrollIntoView();
+    const heading = document.getElementById(`${pageNumber}-page-heading`);
+    if (!heading) return;
+    heading.scrollIntoView();
+    heading.focus();
   }, [pageNumber]);
 
   /**
@@ -316,18 +317,29 @@ export default function SurveyStepper({
           connector={null}
         >
           {survey.pages.map((page, index) => (
-            <Step key={page.id} completed={false}>
+            <Step key={page.id} completed={index < pageNumber}>
               <StepLabel
                 id={`${index}-page-top`}
+                aria-current={index === pageNumber ? "step" : false}
                 classes={{
                   active: classes.stepActive,
                   label: classes.stepHeader,
                   iconContainer: classes.stepIcon,
                 }}
               >
-                <h2 style={{ margin: 0, fontSize: '1em' }}>
+                <Typography
+                  id={`${index}-page-heading`}
+                  component="h2"
+                  tabIndex={-1}
+                  sx={{ margin: 0, fontSize: '1em', "&:focus": { outline: 'none'} }}
+                >
+                  <span style={visuallyHidden}>
+                    {index < pageNumber && tr.SurveyStepper.completedStep}
+                    {index > pageNumber && tr.SurveyStepper.futureStep}
+                    {tr.SurveyStepper.step} {index + 1} {tr.SurveyStepper.outOf} {survey?.pages?.length}
+                  </span>
                   {page.title?.[language]}
-                </h2>
+                </Typography>
               </StepLabel>
 
               <StepContent

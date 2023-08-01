@@ -329,7 +329,11 @@
     "openImage": "Avaa kuva",
     "unfinishedAnswers": "Vastaa kaikkiin pakolliseksi merkittyihin kysymyksiin.",
     "unfinishedAnswersInfo": "Seuraavat kysymykset ovat vastaamatta:",
-    "saveAsUnfinished": "Tallenna keskeneräisenä"
+    "saveAsUnfinished": "Tallenna keskeneräisenä",
+    "step": "Vaihe",
+    "outOf": "/",
+    "completedStep": "Täytetty vaihe",
+    "futureStep": "Tuleva vaihe"
   },
   "SaveAsUnfinishedDialog": {
     "description": "Voit tallentaa kyselyn keskeneräisenä antamalla sähköpostiosoitteesi. Sähköpostiisi toimitetaan linkki, josta pääset jatkamaan vastaamista kyselyn ollessa auki.",
