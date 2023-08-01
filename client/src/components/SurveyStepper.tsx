@@ -317,7 +317,7 @@ export default function SurveyStepper({
           connector={null}
         >
           {survey.pages.map((page, index) => (
-            <Step key={page.id} completed={index < pageNumber ? true : false}>
+            <Step key={page.id} completed={index < pageNumber}>
               <StepLabel
                 id={`${index}-page-top`}
                 aria-current={index === pageNumber ? "step" : false}
