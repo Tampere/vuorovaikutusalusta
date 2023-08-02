@@ -7,10 +7,10 @@
     "test": "jest --config ./jest.config.json",
     "test:watch": "npm run test -- --watch",
     "lint": "eslint . --ext .ts,.tsx",
-    "dev": "webpack serve --config webpack.dev.js",
+    "dev": "NODE_OPTIONS=--openssl-legacy-provider webpack serve --config webpack.dev.js",
     "start": "node server.js",
     "prebuild": "npm run lint && npm run test",
-    "build": "webpack --config webpack.prod.js"
+    "build": "NODE_OPTIONS=--openssl-legacy-provider webpack --config webpack.prod.js"
   },
   "repository": {
     "type": "git",
@@ -30,7 +30,7 @@
   },
   "homepage": "https://github.com/ubigu/vuorovaikutusalusta#readme",
   "engines": {
-    "node": "^14.17.1"
+    "node": "^20.5.0"
   },
   "dependencies": {
     "@date-io/date-fns": "^2.11.0",

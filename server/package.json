@@ -32,7 +32,7 @@
   },
   "homepage": "https://github.com/ubigu/vuorovaikutusalusta#readme",
   "engines": {
-    "node": "^14.17.1"
+    "node": "^20.5.0"
   },
   "dependencies": {
     "@types/async-retry": "^1.4.2",
