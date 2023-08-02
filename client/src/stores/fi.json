@@ -372,8 +372,10 @@
     "confirmRemoveAnswer": "Haluatko varmasti poistaa tämän karttavastauksen?"
   },
   "SurveyMap": {
+    "browsingInstructions": "Liikuta karttanäkymää nuolinäppäimillä. Lähennä ja loitonna plus- ja miinusnäppäimillä.",
     "editGeometries": "Muokkaa piirtämiäsi karttamerkintöjä",
-    "finishEditingGeometries": "Lopeta karttamerkintöjen muokkaus"
+    "finishEditingGeometries": "Lopeta karttamerkintöjen muokkaus",
+    "iFrameTitle": "Karttanäkymä"
   },
   "MatrixQuestion": {
     "emptyAnswer": "En osaa sanoa",

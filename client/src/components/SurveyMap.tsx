@@ -2,6 +2,7 @@ import { Fab, Tooltip } from '@mui/material';
 import { Check, Edit } from '@mui/icons-material';
 import { useSurveyMap } from '@src/stores/SurveyMapContext';
 import { useTranslations } from '@src/stores/TranslationContext';
+import { visuallyHidden } from '@mui/utils';
 import OskariRPC from 'oskari-rpc';
 import React, { useEffect, useRef } from 'react';
 
@@ -68,8 +69,13 @@ export default function SurveyMap(props: Props) {
   return (
     props.url && (
       <>
+        <p style={visuallyHidden}>
+          {tr.SurveyMap.browsingInstructions}
+        </p>
         <iframe
           ref={iframeRef}
+          title={tr.SurveyMap.iFrameTitle}
+          aria-describedby="mapEmbedInstructions"
           style={{
             border: 0,
             width: '100%',
