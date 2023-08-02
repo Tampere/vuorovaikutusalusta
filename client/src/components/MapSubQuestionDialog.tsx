@@ -116,11 +116,9 @@ export default function MapSubQuestionDialog({
       open={open}
       onClose={onCancel}
       aria-label={tr.MapQuestion.subQuestionDialog}
-      aria-describedby="subquestion-dialog-content"
     >
       {title && <DialogTitle>{title}</DialogTitle>}
       <DialogContent
-        id="subquestion-dialog-content"
         className={classes.content}
       >
         {subQuestions?.map((question, index) => (
@@ -130,6 +128,9 @@ export default function MapSubQuestionDialog({
             error={dirty?.[index] && validationErrors?.[index].length > 0}
             style={{ width: '100%' }}
           >
+            <FormLabel component="legend">
+              {question.title?.[surveyLanguage]} {question.isRequired && '*'}
+            </FormLabel>
             <div
               style={{
                 display: 'flex',
@@ -137,9 +138,6 @@ export default function MapSubQuestionDialog({
                 alignItems: 'center',
               }}
             >
-              <FormLabel htmlFor={`${question.id}-input`}>
-                {question.title?.[surveyLanguage]} {question.isRequired && '*'}
-              </FormLabel>
               {question.info && question.info?.[surveyLanguage] && (
                 <SectionInfo
                   infoText={question.info?.[surveyLanguage]}
@@ -149,6 +147,7 @@ export default function MapSubQuestionDialog({
             </div>
             {question.type === 'checkbox' ? (
               <CheckBoxQuestion
+                autoFocus={index === 0}
                 value={answers[index]?.value as (number | string)[]}
                 onChange={(value) => {
                   answers[index].value = value;
@@ -162,6 +161,7 @@ export default function MapSubQuestionDialog({
               />
             ) : question.type === 'radio' ? (
               <RadioQuestion
+                autoFocus={index === 0}
                 value={answers[index]?.value as number | string}
                 onChange={(value) => {
                   answers[index].value = value;
@@ -175,6 +175,7 @@ export default function MapSubQuestionDialog({
               />
             ) : question.type === 'free-text' ? (
               <FreeTextQuestion
+                autoFocus={index === 0}
                 value={answers[index]?.value as string}
                 onChange={(value) => {
                   answers[index].value = value;
@@ -189,6 +190,7 @@ export default function MapSubQuestionDialog({
               />
             ) : question.type === 'numeric' ? (
               <NumericQuestion
+                autoFocus={index === 0}
                 value={answers[index]?.value as number}
                 onChange={(value) => {
                   answers[index].value = value;

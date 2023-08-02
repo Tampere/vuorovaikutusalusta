@@ -16,6 +16,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 const customAnswerMaxLength = 100;
 
 interface Props {
+  autoFocus?: boolean;
   value: (string | number)[];
   onChange: (value: (string | number)[]) => void;
   question: SurveyCheckboxQuestion;
@@ -24,6 +25,7 @@ interface Props {
 }
 
 export default function CheckBoxQuestion({
+  autoFocus = false,
   value,
   onChange,
   question,
@@ -80,12 +82,13 @@ export default function CheckBoxQuestion({
           setDirty(true);
         }}
       >
-        {question.options.map((option) => (
+        {question.options.map((option, index) => (
           <FormControlLabel
             key={option.id}
             label={option.text?.[surveyLanguage] ?? ''}
             control={
               <Checkbox
+                autoFocus={index === 0 && autoFocus}
                 // TS can't infer the precise memoized value type from question.type, but for checkboxes it's always an array
                 checked={value.includes(option.id)}
                 onChange={(event) => {
