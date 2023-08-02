@@ -4,11 +4,11 @@ import {
   SurveyMapQuestion,
 } from '@interfaces/survey';
 import { LineString, Point, Polygon } from 'geojson';
-import { Channel, DrawingEventHandler } from 'oskari-rpc';
+import { Channel, DrawingEventHandler, Layer } from 'oskari-rpc';
 import parseCSSColor from 'parse-css-color';
 import React, {
-  createContext,
   ReactNode,
+  createContext,
   useContext,
   useEffect,
   useMemo,
@@ -114,7 +114,7 @@ const defaultFeatureStyle = {
 
 function getFeatureStyle(
   selectionType: MapQuestionSelectionType,
-  question: SurveyMapQuestion
+  question: SurveyMapQuestion,
 ) {
   // Use default style for points
   if (selectionType === 'point') {
@@ -158,7 +158,7 @@ function getFeatureStyle(
  */
 function getDrawingEventId(
   questionId: number,
-  selectionType?: MapQuestionSelectionType
+  selectionType?: MapQuestionSelectionType,
 ) {
   return `map-answer:${questionId}${selectionType ? `:${selectionType}` : ''}`;
 }
@@ -182,7 +182,7 @@ export function useSurveyMap() {
 
   const isMapReady = useMemo(
     () => Boolean(state.rpcChannel),
-    [state.rpcChannel]
+    [state.rpcChannel],
   );
 
   /**
@@ -193,7 +193,7 @@ export function useSurveyMap() {
     // Clear previous geometries
     state.rpcChannel.postRequest(
       'MapModulePlugin.RemoveFeaturesFromMapRequest',
-      [null, null, answerGeometryLayer]
+      [null, null, answerGeometryLayer],
     );
     state.rpcChannel.postRequest('MapModulePlugin.RemoveMarkersRequest', []);
     // Add current features one by one to get the correct styles
@@ -213,10 +213,10 @@ export function useSurveyMap() {
               cursor: 'pointer',
               featureStyle: getFeatureStyle(
                 feature.geometry.type === 'Polygon' ? 'area' : 'line',
-                feature.properties.question
+                feature.properties.question,
               ),
             },
-          ]
+          ],
         );
       } else {
         state.rpcChannel.postRequest('MapModulePlugin.AddMarkerRequest', [
@@ -304,7 +304,7 @@ export function useSurveyMap() {
       if (state.questionId) {
         const previousEventId = getDrawingEventId(
           state.questionId,
-          state.selectionType
+          state.selectionType,
         );
         state.rpcChannel.postRequest('DrawTools.StopDrawingRequest', [
           previousEventId,
@@ -409,7 +409,7 @@ export function useSurveyMap() {
       // Remove all static features from the map
       state.rpcChannel.postRequest(
         'MapModulePlugin.RemoveFeaturesFromMapRequest',
-        [null, null, answerGeometryLayer]
+        [null, null, answerGeometryLayer],
       );
       state.rpcChannel.postRequest('MapModulePlugin.RemoveMarkersRequest', []);
 
@@ -464,8 +464,8 @@ export function useSurveyMap() {
     onModify(
       questionId: number,
       callback: (
-        features: GeoJSON.Feature<Point | LineString | Polygon>[]
-      ) => void
+        features: GeoJSON.Feature<Point | LineString | Polygon>[],
+      ) => void,
     ) {
       // Create a handler for any modification DrawingEvents
       const handler: DrawingEventHandler = (event) => {
@@ -523,7 +523,7 @@ export function useSurveyMap() {
       }
       state.rpcChannel.postRequest(
         'MapModulePlugin.RemoveFeaturesFromMapRequest',
-        [null, null, answerGeometryLayer]
+        [null, null, answerGeometryLayer],
       );
       drawAnswerGeometries(geometries);
     },
@@ -547,6 +547,18 @@ export function useSurveyMap() {
      */
     get drawing() {
       return state.questionId !== null;
+    },
+    /**
+     * Get all current layers
+     * @returns
+     */
+    async getAllLayers() {
+      if (!state.rpcChannel) {
+        return null;
+      }
+      return new Promise<Layer[]>((resolve) => {
+        state.rpcChannel.getAllLayers((layers) => resolve(layers));
+      });
     },
   };
 }
@@ -653,7 +665,7 @@ export default function SurveyMapProvider({
       // Update visibility for each layer - only show it if current page has that layer visible
       state.rpcChannel.postRequest(
         'MapModulePlugin.MapLayerVisibilityRequest',
-        [layerId, state.visibleLayers.includes(layerId)]
+        [layerId, state.visibleLayers.includes(layerId)],
       );
     });
   }, [state.rpcChannel, state.allLayers, state.visibleLayers]);

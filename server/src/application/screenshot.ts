@@ -7,6 +7,7 @@ import { Feature, LineString, Point, Polygon } from 'geojson';
 import parseCSSColor from 'parse-css-color';
 import { Page } from 'puppeteer';
 import { Cluster } from 'puppeteer-cluster';
+import { getAvailableMapLayers } from './map';
 
 /**
  * Oskari needs to be declared, because it is available as a global variable inside
@@ -35,6 +36,7 @@ export interface ScreenshotJobReturnData {
   sectionId: number;
   index: number;
   image: Buffer;
+  layerNames: string[];
 }
 
 // Default feature style
@@ -94,6 +96,8 @@ async function generateScreenshots({
 }) {
   const { mapUrl, answers } = data;
   const returnData: ScreenshotJobReturnData[] = [];
+
+  const availableMapLayers = await getAvailableMapLayers(mapUrl);
 
   // Setting a real user agent _might_ make requests flow faster
   await page.setUserAgent(
@@ -195,6 +199,12 @@ async function generateScreenshots({
       sectionId: answer.sectionId,
       index: answer.index,
       image,
+      layerNames: answer.visibleLayerIds
+        .map(
+          (layerId) =>
+            availableMapLayers.find((layer) => layer.id === layerId)?.name
+        )
+        .filter(Boolean),
     });
   }
 

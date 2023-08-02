@@ -14,9 +14,9 @@ import PDFDocument from 'pdfkit';
 import PdfPrinter from 'pdfmake';
 import { Content } from 'pdfmake/interfaces';
 import {
-  getScreenshots,
   ScreenshotJobData,
   ScreenshotJobReturnData,
+  getScreenshots,
 } from './screenshot';
 import { getFile, getOptionsForSurvey } from './survey';
 
@@ -87,7 +87,7 @@ function prepareMapAnswers(
               sectionId: entry.sectionId,
               index,
               feature: answer.geometry,
-              visibleLayerIds: page.sidebar.mapLayers,
+              visibleLayerIds: answer.mapLayers ?? page.sidebar.mapLayers,
               question: page.sections.find(
                 (section): section is SurveyMapQuestion =>
                   section.id === entry.sectionId
@@ -195,9 +195,7 @@ function getContent(
   const section = sections[sectionIndex];
 
   const heading: Content = {
-    text: `${isSubQuestion ? tr.subquestion : tr.question} #${
-      sectionIndex + 1
-    }: ${section.title?.[language]}`,
+    text: section.title?.[language],
     style: isSubQuestion ? 'subQuestionTitle' : 'questionTitle',
   };
 
@@ -272,12 +270,17 @@ function getContent(
     case 'sorting': {
       return [
         heading,
-        {
-          ol: answerEntry.value.map((value) => ({
-            text: `${getOptionSelectionText(value, options, language)}`,
-            style,
-          })),
-        },
+        !answerEntry.value
+          ? {
+              text: '-',
+              style,
+            }
+          : {
+              ol: answerEntry.value.map((value) => ({
+                text: `${getOptionSelectionText(value, options, language)}`,
+                style,
+              })),
+            },
       ];
     }
     case 'map': {
@@ -292,25 +295,42 @@ function getContent(
               screenshot.sectionId === answerEntry.sectionId &&
               screenshot.index === index
           );
-          return [
-            {
-              image:
-                'data:image/png;base64,' + screenshot.image.toString('base64'),
-              width: 300,
-              style,
-            },
-            ...answer.subQuestionAnswers.map((subQuestionAnswer) => {
-              const mapQuestion = section as SurveyMapQuestion;
-              return getContent(
-                subQuestionAnswer,
-                mapQuestion.subQuestions,
-                [],
-                options,
-                true,
-                language
-              );
-            }),
-          ];
+          return {
+            columns: [
+              {
+                image:
+                  'data:image/png;base64,' +
+                  screenshot.image.toString('base64'),
+                width: 200,
+                style,
+              },
+              [
+                { text: 'Merkintä:', style: 'subQuestionTitle' },
+                {
+                  text: `${index + 1}/${answerEntry.value.length}`,
+                  style: 'subQuestionAnswer',
+                },
+                { text: 'Näkyvät tasot:', style: 'subQuestionTitle' },
+                {
+                  text: !screenshot.layerNames.length
+                    ? '-'
+                    : screenshot.layerNames.join(', '),
+                  style: 'subQuestionAnswer',
+                },
+                ...answer.subQuestionAnswers.map((subQuestionAnswer) => {
+                  const mapQuestion = section as SurveyMapQuestion;
+                  return getContent(
+                    subQuestionAnswer,
+                    mapQuestion.subQuestions,
+                    [],
+                    options,
+                    true,
+                    language
+                  );
+                }),
+              ],
+            ],
+          };
         }),
       ];
     }
@@ -383,12 +403,13 @@ export async function generatePdf(
         margin: [0, 0, 0, 20],
       },
       subQuestionTitle: {
-        fontSize: 14,
+        fontSize: 12,
         bold: true,
-        margin: [10, 0, 0, 10],
+        margin: [5, 0, 0, 5],
       },
       subQuestionAnswer: {
-        margin: [10, 0, 0, 20],
+        margin: [5, 0, 0, 5],
+        fontSize: 12,
       },
     },
   });

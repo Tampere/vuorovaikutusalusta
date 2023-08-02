@@ -5,8 +5,10 @@ import {
   SurveyMapQuestion,
   SurveyPage,
 } from '@interfaces/survey';
+import { Close, Image, Map } from '@mui/icons-material';
 import {
   Alert,
+  Box,
   Chip,
   Drawer,
   FormControl,
@@ -22,11 +24,9 @@ import {
   Typography,
   useMediaQuery,
   useTheme,
-  Box,
 } from '@mui/material';
-import { visuallyHidden } from '@mui/utils';
-import { Close, Image, Map } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
+import { visuallyHidden } from '@mui/utils';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import { useSurveyMap } from '@src/stores/SurveyMapContext';
 import { useToasts } from '@src/stores/ToastContext';
@@ -34,7 +34,7 @@ import { useTranslations } from '@src/stores/TranslationContext';
 import { getClassList } from '@src/utils/classes';
 import { getFullFilePath } from '@src/utils/path';
 import { request } from '@src/utils/request';
-import React, { useRef, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import SplitPane from 'react-split-pane';
 import DocumentSection from './DocumentSection';
 import Footer from './Footer';
@@ -123,8 +123,14 @@ export default function SurveyStepper({
   const [submissionInfoDialogOpen, setSubmissionInfoDialogOpen] =
     useState(false);
 
-  const { isPageValid, answers, unfinishedToken, getPageInvalidQuestions } =
-    useSurveyAnswers();
+  const {
+    isPageValid,
+    answers,
+    unfinishedToken,
+    getPageInvalidQuestions,
+    updatePageMapLayers,
+    updateAnswer,
+  } = useSurveyAnswers();
   const { showToast } = useToasts();
   const {
     setVisibleLayers,
@@ -135,6 +141,7 @@ export default function SurveyStepper({
     selectionType,
     updateGeometries,
     stopModifying,
+    getAllLayers,
   } = useSurveyMap();
   const classes = useStyles();
   const { tr, language, surveyLanguage } = useTranslations();
@@ -142,7 +149,7 @@ export default function SurveyStepper({
   const mdUp = useMediaQuery(theme.breakpoints.up('md'));
   const currentPage = useMemo(
     () => survey.pages[pageNumber],
-    [survey, pageNumber]
+    [survey, pageNumber],
   );
 
   const currentPageErrorRef = useRef(null);
@@ -151,9 +158,9 @@ export default function SurveyStepper({
     () =>
       getFullFilePath(
         currentPage.sidebar.imagePath,
-        currentPage.sidebar.imageName
+        currentPage.sidebar.imageName,
       ),
-    [currentPage.sidebar]
+    [currentPage.sidebar],
   );
 
   /**
@@ -202,13 +209,13 @@ export default function SurveyStepper({
   // Map answer geometries on the current page
   const mapAnswerGeometries = useMemo(() => {
     const mapQuestions = currentPage.sections.filter(
-      (section): section is SurveyMapQuestion => section.type === 'map'
+      (section): section is SurveyMapQuestion => section.type === 'map',
     );
     // Reduce all geometries from map question answers into a feature collection
     return mapQuestions.reduce(
       (featureCollection, question) => {
         const answer = answers.find(
-          (answer) => answer.sectionId === question.id
+          (answer) => answer.sectionId === question.id,
         ) as AnswerEntry & { type: 'map' };
         return {
           ...featureCollection,
@@ -228,7 +235,7 @@ export default function SurveyStepper({
                   },
                 },
               ],
-              []
+              [],
             ),
           ],
         };
@@ -236,7 +243,7 @@ export default function SurveyStepper({
       {
         type: 'FeatureCollection',
         features: [],
-      } as GeoJSON.FeatureCollection
+      } as GeoJSON.FeatureCollection,
     );
   }, [currentPage, answers]);
 
@@ -281,7 +288,7 @@ export default function SurveyStepper({
         `/api/published-surveys/${survey.name}/submission${
           unfinishedToken ? `?token=${unfinishedToken}` : ''
         }`,
-        { method: 'POST', body: { entries: answers, info, language } }
+        { method: 'POST', body: { entries: answers, info, language } },
       );
       setLoading(false);
       onComplete();
@@ -292,6 +299,29 @@ export default function SurveyStepper({
       });
       setLoading(false);
     }
+  }
+
+  async function saveMapLayers() {
+    // Get all currently visible map layer iDs and update to the survey page
+    const mapLayers = (await getAllLayers())
+      .filter((layer) => layer.visible)
+      .map((layer) => layer.id);
+    updatePageMapLayers(currentPage, mapLayers);
+
+    // Get all map answer entries on the current page and set their map layers
+    const mapQuestionIds = currentPage.sections
+      .filter((section): section is SurveyMapQuestion => section.type === 'map')
+      .map((question) => question.id);
+    answers
+      .filter((answer): answer is AnswerEntry & { type: 'map' } =>
+        mapQuestionIds.includes(answer.sectionId),
+      )
+      .forEach((answer) => {
+        updateAnswer({
+          ...answer,
+          value: answer.value.map((value) => ({ ...value, mapLayers })),
+        });
+      });
   }
 
   const stepperPane = (
@@ -371,7 +401,7 @@ export default function SurveyStepper({
                                 );
                               }
                               return null;
-                            }
+                            },
                           )}
                         </ul>
                       }
@@ -407,12 +437,14 @@ export default function SurveyStepper({
                     isTestSurvey={isTestSurvey}
                     activeStep={index}
                     totalSteps={survey.pages.length}
-                    onPrevious={() => {
+                    onPrevious={async () => {
+                      await saveMapLayers();
                       setPageNumber(index - 1);
                       setPageUnfinished(false);
                     }}
-                    onNext={() => {
+                    onNext={async () => {
                       if (validateSurveyPage(page)) {
+                        await saveMapLayers();
                         setPageNumber(index + 1);
                       } else {
                         handleClick();
@@ -420,11 +452,12 @@ export default function SurveyStepper({
                     }}
                     disabled={loading}
                     nextDisabled={false}
-                    onSubmit={() => {
+                    onSubmit={async () => {
                       if (!validateSurveyPage(page)) {
                         handleClick();
                         return;
                       }
+                      await saveMapLayers();
                       if (survey.email.enabled) {
                         setSubmissionInfoDialogOpen(true);
                       } else {
