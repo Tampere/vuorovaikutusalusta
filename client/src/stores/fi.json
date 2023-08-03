@@ -348,7 +348,8 @@
     "answerLimitsMinMax": "Valitse vähintään {min}, enintään {max} vaihtoehtoa",
     "answerLimitsMin": "Valitse vähintään {min} vaihtoehtoa",
     "answerLimitsMax": "Valitse enintään {max} vaihtoehtoa",
-    "customAnswer": "Jokin muu, mikä?",
+    "customAnswer": "Jokin muu (täsmennä alla)",
+    "customAnswerField": "Täsmennä vastaustasi tässä.",
     "charactersRemaining": "{x} merkki(ä) jäljellä.",
     "showInfo": "Näytä lisätietoja",
     "info": "Lisätietoja"

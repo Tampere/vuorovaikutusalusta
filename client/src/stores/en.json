@@ -348,7 +348,8 @@
     "answerLimitsMinMax": "Choose a minimum of {min} and a maximum of {max} options",
     "answerLimitsMin": "Choose a minimum of {min} options",
     "answerLimitsMax": "Choose a maximum of {max} options",
-    "customAnswer": "Something else, what?",
+    "customAnswer": "Other (specify below)",
+    "customAnswerField": "Specify your answer here.",
     "charactersRemaining": "{x} character(s) left.",
     "showInfo": "Show additional information",
     "info": "Additional information"

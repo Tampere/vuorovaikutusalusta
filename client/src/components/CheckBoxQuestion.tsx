@@ -137,9 +137,10 @@ export default function CheckBoxQuestion({
           <TextField
             value={customAnswerValue}
             required={question.isRequired}
+            placeholder={tr.SurveyQuestion.customAnswerField}
             inputProps={{
               maxLength: customAnswerMaxLength,
-              'aria-label': tr.SurveyQuestion.customAnswer,
+              'aria-label': tr.SurveyQuestion.customAnswerField,
             }}
             onChange={(event) => {
               setCustomAnswerValue(event.currentTarget.value);
