@@ -219,13 +219,14 @@ export default function MapSubQuestionDialog({
             onClick={() => {
               onDelete();
             }}
-            variant="contained"
+            color="error"
           >
             {tr.MapQuestion.removeAnswer}
           </Button>
         )}
         <div style={{ flexGrow: 1 }} />
         <Button
+          variant="outlined"
           onClick={() => {
             onCancel();
           }}
@@ -233,6 +234,7 @@ export default function MapSubQuestionDialog({
           {tr.commands.cancel}
         </Button>
         <Button
+          variant="contained"
           onClick={() => {
             onSubmit(answers);
           }}

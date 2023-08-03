@@ -126,7 +126,11 @@ export default function SaveAsUnfinishedDialog({
         >
           {tr.commands.cancel}
         </Button>
-        <Button onClick={handleSave} disabled={loading || !email.length}>
+        <Button
+          variant='contained'
+          onClick={handleSave}
+          disabled={loading || !email.length}
+        >
           {tr.options.ok}
         </Button>
       </DialogActions>

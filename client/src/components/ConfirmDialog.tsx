@@ -42,10 +42,20 @@ export default function ConfirmDialog(props: Props) {
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose(false)} autoFocus>
+        <Button
+          autoFocus
+          variant="outlined"
+          onClick={handleClose(false)}
+        >
           {tr.options.no}
         </Button>
-        <Button onClick={handleClose(true)}>{tr.options.yes}</Button>
+        <Button
+          variant="outlined"
+          color="error"
+          onClick={handleClose(true)}
+        >
+          {tr.options.yes}
+        </Button>
       </DialogActions>
     </Dialog>
   );
