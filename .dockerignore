@@ -5,7 +5,9 @@ client/*
 !client/tsconfig.json
 !client/.npmrc
 !client/src
-!client/webpack.*.js
+!client/admin
+!client/index.html
+!client/vite.config.ts
 !client/jest.config.json
 !client/setupTests.ts
 !client/.eslintrc
