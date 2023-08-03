@@ -11,6 +11,7 @@ import { Help as HelpIcon } from '@mui/icons-material';
 import ReactMarkdown from 'react-markdown';
 import rehypeExternalLinks from 'rehype-external-links';
 import { useTranslations } from '@src/stores/TranslationContext';
+import useId from '@mui/material/utils/useId';
 
 interface Props {
   subject: string;
@@ -27,6 +28,7 @@ export default function SectionInfo({
 }: Props) {
   const [infoDialogOpen, setInfoDialogOpen] = useState(false);
   const { tr } = useTranslations();
+  const dialogId = useId();
 
   return (
     <div style={style ?? {}} aria-hidden={hiddenFromScreenReader}>
@@ -38,18 +40,19 @@ export default function SectionInfo({
           <HelpIcon color="primary" fontSize="medium" />
         </IconButton>
       </Tooltip>
-      <Dialog onClose={() => setInfoDialogOpen(false)} open={infoDialogOpen}>
-        <DialogContent
-          tabIndex={0}
-          aria-label={`${tr.SurveyQuestion.info}: ${subject}`}
-        >
+      <Dialog
+        aria-describedby={`${dialogId}-dialog-content`}
+        onClose={() => setInfoDialogOpen(false)}
+        open={infoDialogOpen}
+      >
+        <DialogContent id={`${dialogId}-dialog-content`}>
           <ReactMarkdown rehypePlugins={[rehypeExternalLinks]}>
             {infoText}
           </ReactMarkdown>
         </DialogContent>
         <DialogActions>
           <Button
-            tabIndex={1}
+            autoFocus
             color="primary"
             variant="contained"
             onClick={() => setInfoDialogOpen(false)}
