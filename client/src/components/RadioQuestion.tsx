@@ -18,6 +18,7 @@ const useStyles = makeStyles({
 const customAnswerMaxLength = 100;
 
 interface Props {
+  autoFocus?: boolean;
   value: number | string;
   onChange: (value: number | string) => void;
   question: SurveyRadioQuestion;
@@ -25,6 +26,7 @@ interface Props {
 }
 
 export default function RadioQuestion({
+  autoFocus = false,
   value,
   onChange,
   question,
@@ -57,12 +59,12 @@ export default function RadioQuestion({
         }}
         name={`${question.title?.[surveyLanguage]}-group`}
       >
-        {question.options.map((option) => (
+        {question.options.map((option, index) => (
           <FormControlLabel
             key={option.id}
             value={option.id}
             label={option.text?.[surveyLanguage] ?? ''}
-            control={<Radio />}
+            control={<Radio autoFocus={index === 0 && autoFocus} />}
             classes={{ label: classes.labelStyles }}
           />
         ))}
@@ -78,9 +80,10 @@ export default function RadioQuestion({
               <TextField
                 value={customAnswerValue}
                 required={question.isRequired}
+                placeholder={tr.SurveyQuestion.customAnswerField}
                 inputProps={{
                   maxLength: customAnswerMaxLength,
-                  'aria-label': tr.SurveyQuestion.customAnswer,
+                  'aria-label': tr.SurveyQuestion.customAnswerField,
                 }}
                 onChange={(event) => {
                   setCustomAnswerValue(event.currentTarget.value);

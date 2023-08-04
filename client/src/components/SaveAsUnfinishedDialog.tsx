@@ -83,21 +83,27 @@ export default function SaveAsUnfinishedDialog({
     <Dialog
       open={open}
       onClose={() => {
+        setEmailDirty(false);
         onCancel();
       }}
+      aria-describedby='save-dialog-content'
     >
       <DialogTitle>{tr.SurveyStepper.saveAsUnfinished}</DialogTitle>
       <DialogContent>
-        <Typography variant="body1" className={classes.paragraph}>
-          {tr.SaveAsUnfinishedDialog.description}
-        </Typography>
-        <Typography variant="body1" className={classes.paragraph}>
-          {tr.SaveAsUnfinishedDialog.disclaimer}
-        </Typography>
+        <div id='save-dialog-content'>
+          <Typography variant="body1" className={classes.paragraph}>
+            {tr.SaveAsUnfinishedDialog.description}
+          </Typography>
+          <Typography variant="body1" className={classes.paragraph}>
+            {tr.SaveAsUnfinishedDialog.disclaimer}
+          </Typography>
+        </div>
         <TextField
+          autoFocus
           aria-label={tr.SaveAsUnfinishedDialog.email}
           label={tr.SaveAsUnfinishedDialog.email}
           required
+          name='email'
           error={emailDirty && !email.length}
           value={email}
           inputProps={{ type: 'email' }}
@@ -111,10 +117,20 @@ export default function SaveAsUnfinishedDialog({
         />
       </DialogContent>
       <DialogActions>
-        <Button onClick={onCancel} disabled={loading}>
+        <Button
+          onClick={() => {
+            setEmailDirty(false);
+            onCancel();
+          }}
+          disabled={loading}
+        >
           {tr.commands.cancel}
         </Button>
-        <Button onClick={handleSave} disabled={loading || !email.length}>
+        <Button
+          variant='contained'
+          onClick={handleSave}
+          disabled={loading || !email.length}
+        >
           {tr.options.ok}
         </Button>
       </DialogActions>

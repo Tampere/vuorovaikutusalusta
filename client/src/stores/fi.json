@@ -348,7 +348,8 @@
     "answerLimitsMinMax": "Valitse vähintään {min}, enintään {max} vaihtoehtoa",
     "answerLimitsMin": "Valitse vähintään {min} vaihtoehtoa",
     "answerLimitsMax": "Valitse enintään {max} vaihtoehtoa",
-    "customAnswer": "Jokin muu, mikä?",
+    "customAnswer": "Jokin muu (täsmennä alla)",
+    "customAnswerField": "Täsmennä vastaustasi tässä.",
     "charactersRemaining": "{x} merkki(ä) jäljellä.",
     "showInfo": "Näytä lisätietoja",
     "info": "Lisätietoja"
@@ -372,8 +373,10 @@
     "confirmRemoveAnswer": "Haluatko varmasti poistaa tämän karttavastauksen?"
   },
   "SurveyMap": {
+    "browsingInstructions": "Liikuta karttanäkymää nuolinäppäimillä. Lähennä ja loitonna plus- ja miinusnäppäimillä.",
     "editGeometries": "Muokkaa piirtämiäsi karttamerkintöjä",
-    "finishEditingGeometries": "Lopeta karttamerkintöjen muokkaus"
+    "finishEditingGeometries": "Lopeta karttamerkintöjen muokkaus",
+    "iFrameTitle": "Karttanäkymä"
   },
   "MatrixQuestion": {
     "emptyAnswer": "En osaa sanoa",

@@ -4,6 +4,7 @@ import { useTranslations } from '@src/stores/TranslationContext';
 import React from 'react';
 
 interface Props {
+  autoFocus?: boolean;
   question: SurveyNumericQuestion;
   value: number;
   onChange: (value: number) => void;
@@ -11,6 +12,7 @@ interface Props {
 }
 
 export default function NumericQuestion({
+  autoFocus = false,
   question,
   value,
   onChange,
@@ -21,6 +23,7 @@ export default function NumericQuestion({
   return (
     <>
       <TextField
+        autoFocus={autoFocus}
         value={value ?? ''}
         required={question.isRequired}
         inputProps={{

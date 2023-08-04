@@ -348,7 +348,8 @@
     "answerLimitsMinMax": "Choose a minimum of {min} and a maximum of {max} options",
     "answerLimitsMin": "Choose a minimum of {min} options",
     "answerLimitsMax": "Choose a maximum of {max} options",
-    "customAnswer": "Something else, what?",
+    "customAnswer": "Other (specify below)",
+    "customAnswerField": "Specify your answer here.",
     "charactersRemaining": "{x} character(s) left.",
     "showInfo": "Show additional information",
     "info": "Additional information"
@@ -372,8 +373,10 @@
     "confirmRemoveAnswer": "Are you sure you want to delete this answer?"
   },
   "SurveyMap": {
+    "browsingInstructions": "Pan the map view with the arrow keys, zoom in and out using plus and minus keys.",
     "editGeometries": "Modify your previous map answers",
-    "finishEditingGeometries": "Stop modifying map answers"
+    "finishEditingGeometries": "Stop modifying map answers",
+    "iFrameTitle": "Map view"
   },
   "MatrixQuestion": {
     "emptyAnswer": "I don't know",

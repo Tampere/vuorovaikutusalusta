@@ -4,6 +4,7 @@ import { useTranslations } from '@src/stores/TranslationContext';
 import React from 'react';
 
 interface Props {
+  autoFocus?: boolean;
   question: SurveyFreeTextQuestion;
   value: string;
   onChange: (value: string) => void;
@@ -12,6 +13,7 @@ interface Props {
 }
 
 export default function FreeTextQuestion({
+  autoFocus = false,
   question,
   value,
   onChange,
@@ -22,6 +24,7 @@ export default function FreeTextQuestion({
   return (
     <>
       <TextField
+        autoFocus={autoFocus}
         value={value}
         multiline
         required={question.isRequired}
