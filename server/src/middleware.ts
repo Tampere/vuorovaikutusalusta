@@ -18,7 +18,9 @@ export function iconCacher(cache: NodeCache) {
       res.sendResponse = res.send;
 
       res.send = (data: Buffer) => {
-        cache.set(name, data);
+        if (res.statusCode < 400) {
+          cache.set(name, data);
+        }
 
         return res.sendResponse(data);
       };
