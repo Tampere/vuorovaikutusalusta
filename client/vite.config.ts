@@ -24,6 +24,9 @@ export default defineConfig({
       },
     },
   ],
+  define: {
+    'process.env': {},
+  },
   optimizeDeps: {
     esbuildOptions: {
       define: {
