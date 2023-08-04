@@ -1,4 +1,4 @@
-import {
+import type {
   FileAnswer,
   MapQuestionAnswer,
   SurveyQuestion,
@@ -33,12 +33,12 @@ function SurveyQuestion({ question, pageUnfinished }: Props) {
 
   const value = useMemo(
     () => answers.find((answer) => answer.sectionId === question.id)?.value,
-    [answers, question]
+    [answers, question],
   );
 
   const validationErrors = useMemo(
     () => (dirty || pageUnfinished ? getValidationErrors(question) : []),
-    [dirty, question, value, pageUnfinished]
+    [dirty, question, value, pageUnfinished],
   );
 
   return (
@@ -85,11 +85,11 @@ function SurveyQuestion({ question, pageUnfinished }: Props) {
           {question.title?.[surveyLanguage]}
           <span aria-hidden="true"> </span>
         </h3>
-        {question.type == "sorting" &&
+        {question.type == 'sorting' && (
           <span style={visuallyHidden}>
             {tr.SortingQuestion.confirmationGuide}
           </span>
-        }
+        )}
         {question.info && question.info?.[surveyLanguage] && (
           <SectionInfo
             hiddenFromScreenReader={false}

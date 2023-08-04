@@ -554,7 +554,7 @@ export function useSurveyMap() {
      */
     async getAllLayers() {
       if (!state.rpcChannel) {
-        return null;
+        return [];
       }
       return new Promise<Layer[]>((resolve) => {
         state.rpcChannel.getAllLayers((layers) => resolve(layers));
