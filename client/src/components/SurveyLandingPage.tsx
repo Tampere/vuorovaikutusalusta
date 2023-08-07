@@ -1,5 +1,6 @@
 import { Survey } from '@interfaces/survey';
-import { Box, Link, Theme, Typography } from '@mui/material';
+import { Scale } from '@mui/icons-material';
+import { Box, Button, Link, Theme, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { getClassList } from '@src/utils/classes';
@@ -38,7 +39,7 @@ const useStyles = makeStyles((theme: Theme & { [customKey: string]: any }) => ({
     textAlign: 'center',
     fontWeight: 800,
     lineHeight: 1.5,
-    margin: '1rem',
+    margin: '2rem',
     '& span': {
       backgroundColor: theme.palette.primary.main,
       color: theme.palette.primary.contrastText,
@@ -74,13 +75,13 @@ const useStyles = makeStyles((theme: Theme & { [customKey: string]: any }) => ({
     color: theme.palette.secondary.contrastText,
     padding: '0.5rem',
     textDecoration: 'none',
-    marginTop: '1.5rem',
+    transition: 'transform 200ms ease-out',
     '&:hover': {
-      // TODO: hover effect for start button?
+      transform: 'scale(1.1)',
     },
     ...theme.landingPage?.start,
     [theme.breakpoints.down(600)]: {
-      fontSize: '6vw',
+      fontSize: '6vw',    
     },
   },
   footer: {
@@ -154,24 +155,29 @@ export default function SurveyLandingPage({
           flexGrow: 1,
         }}
       >
-        <h1 className={getClassList([classes.heading, classes.title])}>
-          <span>{survey.title?.[surveyLanguage]}</span>
-        </h1>
-        {survey.subtitle?.[surveyLanguage] && (
-          <h2 className={getClassList([classes.heading, classes.subtitle])}>
-            <span>{survey.subtitle?.[surveyLanguage]}</span>
-          </h2>
-        )}
-        <Link
-          component="button"
-          variant="body2"
-          className={classes.start}
+        <div>
+          <h1 className={getClassList([classes.heading, classes.title])}>
+            <span>{survey.title?.[surveyLanguage]}</span>
+          </h1>
+          {survey.subtitle?.[surveyLanguage] && (
+            <h2 className={getClassList([classes.heading, classes.subtitle])}>
+              <span>{survey.subtitle?.[surveyLanguage]}</span>
+            </h2>
+          )}
+        </div>
+        <Button
           onClick={onStart}
         >
-          {continueUnfinished
-            ? tr.SurveyPage.continueSurveyLink
-            : tr.SurveyPage.startSurveyLink}
-        </Link>
+          <Typography
+            variant="body1"
+            className={classes.start}
+          >
+            {continueUnfinished
+              ? tr.SurveyPage.continueSurveyLink
+              : tr.SurveyPage.startSurveyLink
+            }
+          </Typography>
+        </Button>
       </div>
       <div className={classes.footer}>
         <div className={classes.footerLogo}>

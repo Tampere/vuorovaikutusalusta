@@ -114,7 +114,12 @@ export default function SortingQuestion(props: Props) {
                         justifyContent: "space-between",
                         marginBottom: "0.5em",
                         padding: "0.5em",
-                        transition: "background-color 200ms",}}
+                        transition: "background-color 200ms",
+                        '&:focus': {
+                          outlineOffset: "2px",
+                          outline: "2px solid black",
+                        }
+                      }}
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
                       ref={provided.innerRef}
