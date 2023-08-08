@@ -25,15 +25,21 @@ export const buttonOverrides: Components<Omit<Theme, 'components'>> = {
   },
 };
 
+const idleOutlineStyle: CSSInterpolation = {
+  outlineOffset: 0,
+  outlineColor: 'rgba(0,0,0,.0);',
+  transition: 'outline-offset 400ms, outline-color 400ms',
+}
+
+const defaultFocusOutlineShorthand = '2px solid black';
+
 const defaultFocusStyles: CSSInterpolation = {
-  outline: '2px solid black',
+  outline: defaultFocusOutlineShorthand,
   outlineOffset: '2px',
 }
 
 const defaultFocus: CSSInterpolation = {
-  outlineOffset: 0,
-  outlineColor: 'rbga(0,0,0,0)',
-  transition: 'outline-offset 400ms, outline-color   400ms',
+  ...idleOutlineStyle,
   '&.Mui-focusVisible': defaultFocusStyles,
 }
 
@@ -57,7 +63,7 @@ export const focusOverrides: Components<Omit<Theme, 'components'>> = {
   },
   MuiOutlinedInput: {
     styleOverrides: {
-      root: {
+      root: { ...idleOutlineStyle,
         '&.Mui-focused': defaultFocusStyles,
       }
     },    
@@ -69,7 +75,12 @@ export const focusOverrides: Components<Omit<Theme, 'components'>> = {
   },
   MuiSlider: {
     styleOverrides: {
-      thumb: defaultFocus,
+      thumb: { ...idleOutlineStyle,
+        '&.Mui-focusVisible': {
+          outlineOffset: '6px',
+          outline: defaultFocusOutlineShorthand,
+        },
+      },
     },
   },
 };

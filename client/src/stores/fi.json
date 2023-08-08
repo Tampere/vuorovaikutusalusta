@@ -178,7 +178,8 @@
     "fileSizeLimitError": "Ladattavan tiedoston koko ei saa olla yli 10MB",
     "unsupportedFileFormat": "Tiedostoformaattia ei tueta",
     "attachmentFileFormats": "Sallitut tiedostoformaatit: jpg, jpeg, png, pdf, docx, xlsx.",
-    "deleteUploadedFile": "Poista ladattu tiedosto"
+    "deleteUploadedFile": "Poista ladattu tiedosto",
+    "replace": "Korvaa valittu liite napsauttamalla."
   },
   "SurveyImageList": {
     "attributions": "Tekijänoikeustiedot",

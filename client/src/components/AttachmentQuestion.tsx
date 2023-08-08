@@ -41,7 +41,7 @@ export default function AttachmentQuestion({
 
   const dropzoneContent = value?.length ? (
     <div>
-      <Typography> {tr.AttachmentQuestion.addedFile}: </Typography>
+      <Typography color='info'> {tr.AttachmentQuestion.addedFile}: </Typography>
       {value?.map((file, index) => {
         return (
           <div
@@ -52,7 +52,7 @@ export default function AttachmentQuestion({
               alignItems: 'center',
             }}
           >
-            <Typography style={{ color: 'purple' }}>
+            <Typography color='primary' >
               {' '}
               {file.fileName}{' '}
             </Typography>

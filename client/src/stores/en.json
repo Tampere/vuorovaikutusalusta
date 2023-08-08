@@ -178,7 +178,8 @@
     "fileSizeLimitError": "File size cannot exceed 10MB",
     "unsupportedFileFormat": "Unsupported file format",
     "attachmentFileFormats": "Supported file formats: jpg, jpeg, png, pdf, docx, xlsx.",
-    "deleteUploadedFile": "Delete uploaded file"
+    "deleteUploadedFile": "Delete uploaded file",
+    "replace": "Replace the selected file by clicking here."
   },
   "SurveyImageList": {
     "attributions": "Copyright & attributions",
