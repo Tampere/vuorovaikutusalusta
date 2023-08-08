@@ -118,15 +118,22 @@ export default function MapSubQuestionDialog({
       aria-label={tr.MapQuestion.subQuestionDialog}
     >
       {title && <DialogTitle>{title}</DialogTitle>}
-      <DialogContent
-        className={classes.content}
-      >
+      <DialogContent className={classes.content}>
         {subQuestions?.map((question, index) => (
           <FormControl
             component="fieldset"
             key={question.id}
             error={dirty?.[index] && validationErrors?.[index].length > 0}
             style={{ width: '100%' }}
+            onBlur={(e: React.FocusEvent<HTMLFieldSetElement>) => {
+              if (
+                e.relatedTarget &&
+                !e.currentTarget.contains(e.relatedTarget as Node)
+              ) {
+                dirty[index] = true;
+                setDirty([...dirty]);
+              }
+            }}
           >
             <FormLabel component="legend">
               {question.title?.[surveyLanguage]} {question.isRequired && '*'}
