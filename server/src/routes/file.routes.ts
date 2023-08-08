@@ -1,11 +1,15 @@
 import {
+  getAdminInstructions,
+  storeAdminInstructions,
+} from '@src/application/admin';
+import {
   getFile,
   getImages,
   removeFile,
   storeFile,
 } from '@src/application/survey';
 import { ensureAuthenticated } from '@src/auth';
-import { parseImageType, validateRequest } from '@src/utils';
+import { parseMimeType, validateRequest } from '@src/utils';
 import { Router } from 'express';
 import asyncHandler from 'express-async-handler';
 import { param } from 'express-validator';
@@ -13,6 +17,42 @@ import multer from 'multer';
 
 const router = Router();
 const upload = multer({ limits: { fileSize: 10 * 1000 * 1000 } });
+
+/**
+ * Endpoint for getting admin instructions
+ */
+router.get(
+  '/instructions',
+
+  ensureAuthenticated(),
+  asyncHandler(async (_req, res) => {
+    const row = await getAdminInstructions();
+
+    res.set('Content-type', row.mimeType);
+    res.set('File-details', JSON.stringify({ name: row.name }));
+    res.status(200).send(row.data);
+  })
+);
+
+/**
+ * Endpoint for posting new admin instructions
+ */
+router.post(
+  '/instructions',
+  upload.single('file'),
+  ensureAuthenticated(),
+  asyncHandler(async (req, res) => {
+    console.log(req.file);
+    const { buffer, originalname, mimetype } = req.file;
+    const { name } = await storeAdminInstructions(
+      originalname,
+      parseMimeType(mimetype),
+      buffer
+    );
+
+    res.status(200).json({ message: `File ${name} succesfully stored` });
+  })
+);
 
 /**
  * Endpoint for inserting a single file
