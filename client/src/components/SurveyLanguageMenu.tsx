@@ -31,12 +31,12 @@ export default function SurveyLanguageMenu({
     <div className={classes.root} style={style}>
       <Tooltip
         arrow
-        placement='left'
+        placement="left-end"
         title={tr.SurveyLanguageMenu.changeSurveyLanguage}
       >
         <Select
-          inputProps={{ "aria-label": tr.SurveyLanguageMenu.languageControl }}
-          size='small'
+          inputProps={{ 'aria-label': tr.SurveyLanguageMenu.languageControl }}
+          size="small"
           value={surveyLanguage}
           onChange={(event) => {
             const targetLanguage = event.target.value as LanguageCode;
@@ -46,16 +46,18 @@ export default function SurveyLanguageMenu({
           IconComponent={LanguageIcon}
           sx={{
             color: 'inherit',
-            '&>.MuiSelect-select': { // Accommodate the larger globe icon
+            '&>.MuiSelect-select': {
+              // Accommodate the larger globe icon
               paddingRight: '38px !important',
             },
-            '&>fieldset': { 
+            '&>fieldset': {
               display: 'none',
             },
-            '& svg': { // The component is used in admin panel and survey, must adapt
+            '& svg': {
+              // The component is used in admin panel and survey, must adapt
               color: 'inherit',
               fill: 'currentColor',
-            }
+            },
           }}
         >
           {languages.map((lang, index) => (

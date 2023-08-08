@@ -432,7 +432,16 @@
   },
   "AppBarUserMenu": {
     "label": "User menu",
-    "logout": "Logout"
+    "logout": "Logout",
+    "updateInstructions": "Update user instructions"
+  },
+  "InstructionsDialog": {
+    "fetchingError": "Error while fetching current user instructions",
+    "currentInstructions": "Current instructions",
+    "uploadNewInstructions": "Upload new instructions",
+    "wrongFileFormat": "The file needs to be in pdf format",
+    "fileUploadError": "Error while uploading file",
+    "fileSizeLimitError": "File size cannot exceed {x}MB"
   },
   "MapInfoBox": {
     "answer": "Answer"
@@ -495,5 +504,6 @@
   "IconAltTexts": {
     "treBannerAltText": "Tampere banner",
     "treLogoAltText": "Tampere Finland logo"
-  }
+  },
+  "adminInstructions": "Open user manual"
 }

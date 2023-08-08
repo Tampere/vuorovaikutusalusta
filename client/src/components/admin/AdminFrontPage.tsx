@@ -5,6 +5,7 @@ import { useTranslations } from '@src/stores/TranslationContext';
 import AppBarUserMenu from './AppBarUserMenu';
 import LanguageMenu from '../LanguageMenu';
 import SurveyLanguageMenu from '../SurveyLanguageMenu';
+import { AdminInstructionButton } from './AdminInstructionButton';
 
 export default function AdminFrontPage() {
   const { tr } = useTranslations();
@@ -24,6 +25,7 @@ export default function AdminFrontPage() {
           >
             <SurveyLanguageMenu />
             <LanguageMenu />
+            <AdminInstructionButton />
             <AppBarUserMenu />
           </div>
         </Toolbar>
