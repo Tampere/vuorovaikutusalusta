@@ -114,6 +114,11 @@ export default function SaveAsUnfinishedDialog({
           onBlur={() => {
             setEmailDirty(true);
           }}
+          sx={{
+            '& .Mui-focused': {
+              outlineOffset: '.5em', // Outline obstructs label otherwise
+            }
+          }}
         />
       </DialogContent>
       <DialogActions>
