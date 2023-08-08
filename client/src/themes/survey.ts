@@ -1,4 +1,4 @@
-import { Theme, Components, createTheme, CSSInterpolation, useTheme } from '@mui/material/styles';
+import { Theme, Components, createTheme, CSSInterpolation } from '@mui/material/styles';
 import { fiFI } from '@mui/material/locale';
 
 const idleOutlineStyle: CSSInterpolation = {
@@ -103,9 +103,9 @@ export const inputOverrides: Components<Omit<Theme, 'components'>> = {
       label: {
         '&.Mui-disabled': {
           color: 'rgba(0, 0, 0, 0.54)',
-        }
-      }
-    }
+        },
+      },
+    },
   },
 }
 

@@ -115,7 +115,7 @@ export default function SaveAsUnfinishedDialog({
             setEmailDirty(true);
           }}
           sx={{
-            '& .Mui-focused': {
+            '& .MuiOutlinedInput-root.Mui-focused': {
               outlineOffset: '.5em', // Outline obstructs label otherwise
             }
           }}
