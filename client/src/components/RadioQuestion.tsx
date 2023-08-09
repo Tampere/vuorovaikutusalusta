@@ -48,8 +48,10 @@ export default function RadioQuestion({
         id={`${question.id}-input`}
         value={value}
         onChange={(event) => {
-          setDirty(true);
           const numericValue = Number(event.currentTarget.value);
+          if (event.currentTarget.value.length > 0 && !isNaN(numericValue)) {
+            setDirty(true);
+          }
           // Empty strings are converted to 0 with Number()
           onChange(
             event.currentTarget.value.length > 0 && !isNaN(numericValue)

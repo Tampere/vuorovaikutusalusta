@@ -52,6 +52,7 @@ export default function SectionInfo({
         </DialogContent>
         <DialogActions>
           <Button
+            className="close-section-info-button"
             autoFocus
             color="primary"
             variant="contained"

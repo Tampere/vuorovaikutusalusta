@@ -33,12 +33,12 @@ function SurveyQuestion({ question, pageUnfinished }: Props) {
 
   const value = useMemo(
     () => answers.find((answer) => answer.sectionId === question.id)?.value,
-    [answers, question],
+    [answers, question]
   );
 
   const validationErrors = useMemo(
     () => (dirty || pageUnfinished ? getValidationErrors(question) : []),
-    [dirty, question, value, pageUnfinished],
+    [dirty, question, value, pageUnfinished]
   );
 
   return (
@@ -52,7 +52,10 @@ function SurveyQuestion({ question, pageUnfinished }: Props) {
       onBlur={(e: React.FocusEvent<HTMLFieldSetElement>) => {
         if (
           e.relatedTarget &&
-          !e.currentTarget.contains(e.relatedTarget as Node)
+          !e.currentTarget.contains(e.relatedTarget as Node) &&
+          !(e.relatedTarget as HTMLElement)?.classList.contains(
+            'close-section-info-button'
+          )
         ) {
           setDirty(true);
         }
