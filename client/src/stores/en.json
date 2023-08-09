@@ -441,7 +441,9 @@
     "uploadNewInstructions": "Upload new instructions",
     "wrongFileFormat": "The file needs to be in pdf format",
     "fileUploadError": "Error while uploading file",
-    "fileSizeLimitError": "File size cannot exceed {x}MB"
+    "fileSizeLimitError": "File size cannot exceed {x}MB",
+    "submit": "Send",
+    "cancel": "Cancel"
   },
   "MapInfoBox": {
     "answer": "Answer"

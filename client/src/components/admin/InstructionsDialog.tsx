@@ -153,7 +153,7 @@ export function InstructionsDialog({ isOpen, setIsOpen }: Props) {
             setInstructionFileName(null);
           }}
         >
-          Peruuta
+          {tr.InstructionsDialog.cancel}
         </Button>
         <Button
           onClick={async () => {
@@ -165,7 +165,7 @@ export function InstructionsDialog({ isOpen, setIsOpen }: Props) {
             }
           }}
         >
-          OK
+          {tr.InstructionsDialog.submit}
         </Button>
       </DialogActions>
     </Dialog>

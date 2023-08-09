@@ -441,7 +441,9 @@
     "uploadNewInstructions": "Uuden käyttöohjeen lataaminen",
     "wrongFileFormat": "Tiedoston tulee olla pdf-muodossa",
     "fileUploadError": "Virhe ladattaessa tiedostoa",
-    "fileSizeLimitError": "Ladattavan tiedoston koko ei saa olla yli {x}MB"
+    "fileSizeLimitError": "Ladattavan tiedoston koko ei saa olla yli {x}MB",
+    "submit": "Lähetä",
+    "cancel": "Peruuta"
   },
 
   "MapInfoBox": {
