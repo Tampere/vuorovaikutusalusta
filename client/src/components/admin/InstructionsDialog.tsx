@@ -20,11 +20,12 @@ import {
 interface Props {
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 const MEGAS = 10;
 const MAX_FILE_SIZE = MEGAS * 1000 * 1000; // ten megabytes
 
-export function InstructionsDialog({ isOpen, setIsOpen }: Props) {
+export function InstructionsDialog({ isOpen, setIsOpen, setMenuOpen }: Props) {
   const { showToast } = useToasts();
   const { tr } = useTranslations();
   const [instructionFileName, setInstructionFileName] = useState(null);
@@ -34,6 +35,8 @@ export function InstructionsDialog({ isOpen, setIsOpen }: Props) {
     if (!isOpen) {
       return;
     }
+    setStagedFile(null);
+    setInstructionFileName(null);
 
     async function setFileName() {
       try {
@@ -160,8 +163,7 @@ export function InstructionsDialog({ isOpen, setIsOpen }: Props) {
             if (stagedFile) {
               await storeAdminInstructions(stagedFile);
               setIsOpen(false);
-              setStagedFile(null);
-              setInstructionFileName(null);
+              setMenuOpen(false);
             }
           }}
         >

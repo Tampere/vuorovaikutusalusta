@@ -70,6 +70,7 @@ export default function AppBarUserMenu() {
       <InstructionsDialog
         isOpen={instructionsDialogOpen}
         setIsOpen={setInstructionsDialogOpen}
+        setMenuOpen={setMenuOpen}
       />
     </div>
   );
