@@ -61,7 +61,7 @@ export default function MapQuestion({ value, onChange, question }: Props) {
         valueRef.current.map((answer, index) => ({
           ...answer,
           geometry: features[index],
-        })),
+        }))
       );
     });
     // On unmount unregister the event handler
@@ -164,15 +164,16 @@ export default function MapQuestion({ value, onChange, question }: Props) {
           () => (answers: SurveyMapSubQuestionAnswer[]) => {
             resolve(answers);
             setSubQuestionDialogOpen(false);
-          },
+          }
         );
-      },
+      }
     );
   }
 
   function getToggleButton(selectionType: MapQuestionSelectionType) {
     return (
       <ToggleButton
+        className="draw-button"
         value={selectionType}
         aria-label={tr.MapQuestion.selectionTypes[selectionType]}
         disabled={!isMapReady}
@@ -264,8 +265,8 @@ export default function MapQuestion({ value, onChange, question }: Props) {
             value.map((answer, index) =>
               index === editingMapAnswer.index
                 ? { ...answer, subQuestionAnswers: answers }
-                : answer,
-            ),
+                : answer
+            )
           );
           stopEditingMapAnswer();
         }}
@@ -285,6 +286,14 @@ export default function MapQuestion({ value, onChange, question }: Props) {
         }}
         onCancel={() => {
           handleSubQuestionDialogClose(null);
+
+          setTimeout(() => {
+            (
+              document.getElementsByClassName(
+                'draw-button'
+              )[0] as HTMLButtonElement
+            )?.focus();
+          }, 1);
         }}
       />
       {/* Confirm dialog for deleting a map answer */}
@@ -294,7 +303,7 @@ export default function MapQuestion({ value, onChange, question }: Props) {
         onClose={(result) => {
           if (result) {
             onChange(
-              value.filter((_, index) => index !== editingMapAnswer.index),
+              value.filter((_, index) => index !== editingMapAnswer.index)
             );
             stopEditingMapAnswer();
           }
