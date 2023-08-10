@@ -147,9 +147,9 @@ export default function SurveyStepper({
   const { tr, language, surveyLanguage } = useTranslations();
   const theme = useTheme();
   const mdUp = useMediaQuery(theme.breakpoints.up('md'));
-  const currentPage = useMemo(
+  const currentPage = useMemo<SurveyPage>(
     () => survey.pages[pageNumber],
-    [survey, pageNumber],
+    [survey, pageNumber]
   );
 
   const currentPageErrorRef = useRef(null);
@@ -438,13 +438,15 @@ export default function SurveyStepper({
                     activeStep={index}
                     totalSteps={survey.pages.length}
                     onPrevious={async () => {
-                      await saveMapLayers();
+                      if (currentPage.sidebar.type === 'map')
+                        await saveMapLayers();
                       setPageNumber(index - 1);
                       setPageUnfinished(false);
                     }}
                     onNext={async () => {
                       if (validateSurveyPage(page)) {
-                        await saveMapLayers();
+                        if (currentPage.sidebar.type === 'map')
+                          await saveMapLayers();
                         setPageNumber(index + 1);
                       } else {
                         handleClick();
@@ -457,7 +459,8 @@ export default function SurveyStepper({
                         handleClick();
                         return;
                       }
-                      await saveMapLayers();
+                      if (currentPage.sidebar.type === 'map')
+                        await saveMapLayers();
                       if (survey.email.enabled) {
                         setSubmissionInfoDialogOpen(true);
                       } else {
