@@ -172,7 +172,7 @@ export default function MapQuestion({ value, onChange, question }: Props) {
 
   function getToggleButton(selectionType: MapQuestionSelectionType) {
     const markingCount = value?.filter(
-      (answer) => answer.selectionType === selectionType,
+      (answer) => answer.selectionType === selectionType
     ).length;
     return (
       <ToggleButton

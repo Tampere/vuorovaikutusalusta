@@ -26,6 +26,7 @@ const useStyles = makeStyles((theme: Theme & { [customKey: string]: any }) => ({
     display: 'flex',
     flexDirection: 'row',
     width: '100%',
+    minHeight: '200px',
     justifyContent: 'flex-end',
   },
   headerLogo: {
@@ -88,6 +89,7 @@ const useStyles = makeStyles((theme: Theme & { [customKey: string]: any }) => ({
     display: 'flex',
     flexDirection: 'row',
     width: '100%',
+    minHeight: '50px',
     justifyContent: 'space-between',
     marginTop: '2rem',
     gap: '1rem',
@@ -141,7 +143,7 @@ export default function SurveyLandingPage({
       <div className={classes.header}>
         <div className={classes.headerLogo}>
           <img
-            src={`api/feature-styles/icons/tre_logo`}
+            src={`/api/feature-styles/icons/tre_logo`}
             alt={tr.IconAltTexts.treLogoAltText}
           />
         </div>
@@ -182,7 +184,7 @@ export default function SurveyLandingPage({
       <div className={classes.footer}>
         <div className={classes.footerLogo}>
           <img
-            src={`api/feature-styles/icons/tre_banner`}
+            src={`/api/feature-styles/icons/tre_banner`}
             alt={tr.IconAltTexts.treBannerAltText}
           />
         </div>

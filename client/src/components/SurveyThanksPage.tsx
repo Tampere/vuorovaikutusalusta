@@ -1,5 +1,5 @@
 import { Survey } from '@interfaces/survey';
-import { Typography } from '@mui/material';
+import { Typography, useMediaQuery } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useEffect, useState } from 'react';
@@ -16,6 +16,7 @@ const useStyles = makeStyles({
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
+    textAlign: 'center',
   },
   testSurveyHeader: {
     padding: '1rem',
@@ -33,19 +34,18 @@ interface Props {
 
 export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
   const [imageAltText, setImageAltText] = useState<string | null>(null);
+  const matches = useMediaQuery('(max-width:400px)');
 
   useEffect(() => {
     async function getImageHeaders() {
       const res = await fetch(
-        `api/file/${survey.thanksPage.imagePath[0]}/${survey.thanksPage.imageName}`,
+        `/api/file/${survey.thanksPage.imagePath[0]}/${survey.thanksPage.imageName}`,
         { method: 'HEAD' }
       );
 
-      const altText: string = JSON.parse(
-        res.headers.get('File-details')
-      ).imageAltText;
+      const details = JSON.parse(res.headers.get('File-details'));
 
-      setImageAltText(altText);
+      setImageAltText(details?.imageAltText);
     }
     survey.thanksPage.imagePath.length > 0 &&
       survey.thanksPage.imageName &&
@@ -73,22 +73,30 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
           {' '}
           <img
             style={{ height: '125px', width: '351px' }}
-            src={`api/feature-styles/icons/tre_logo`}
+            src={`/api/feature-styles/icons/tre_logo`}
             alt={tr.IconAltTexts.treLogoAltText}
           />
         </div>
-        <Typography variant="h5">
+        <Typography variant="h5" mt={survey.thanksPage.imageName ? 10 : 0}>
           {survey.thanksPage.title?.[surveyLanguage]}
         </Typography>
         <ReactMarkdown rehypePlugins={[rehypeExternalLinks]}>
           {survey.thanksPage.text?.[surveyLanguage]}
         </ReactMarkdown>
-        {imageAltText && (
-          <img
-            style={{ maxHeight: '800px' }}
-            src={`api/file/${survey.thanksPage.imagePath[0]}/${survey.thanksPage.imageName}`}
-            alt={imageAltText}
-          />
+
+        {survey.thanksPage.imageName && (
+          <div
+            style={{
+              width: matches ? '100%' : '50%',
+              height: '50%',
+            }}
+          >
+            <img
+              style={{ maxWidth: '100%', maxHeight: '100%' }}
+              src={`/api/file/${survey.thanksPage.imagePath[0]}/${survey.thanksPage.imageName}`}
+              alt={imageAltText}
+            />
+          </div>
         )}
 
         <div
@@ -102,7 +110,7 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
         >
           <img
             style={{ height: '2rem' }}
-            src={`api/feature-styles/icons/tre_banner`}
+            src={`/api/feature-styles/icons/tre_banner`}
             alt={tr.IconAltTexts.treBannerAltText}
           />
         </div>
