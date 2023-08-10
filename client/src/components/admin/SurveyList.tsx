@@ -8,6 +8,7 @@ import { FormControlLabel, Skeleton, Switch } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import LoadingButton from '../LoadingButton';
+import { useHistory } from 'react-router-dom';
 
 const useStyles = makeStyles({
   root: {
@@ -31,6 +32,7 @@ export default function SurveyList() {
   const classes = useStyles();
   const { showToast } = useToasts();
   const { tr } = useTranslations();
+  const history = useHistory();
 
   useEffect(() => {
     let abortController = new AbortController();
@@ -89,7 +91,7 @@ export default function SurveyList() {
             setNewSurveyLoading(true);
             try {
               const newSurvey = await createNewSurvey();
-              window.open(`/admin/kyselyt/${newSurvey.id}`);
+              history.push(`/kyselyt/${newSurvey.id}`);
             } catch (error) {
               showToast({
                 severity: 'error',

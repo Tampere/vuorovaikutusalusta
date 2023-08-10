@@ -16,6 +16,7 @@ import { useToasts } from '@src/stores/ToastContext';
 import { makeStyles } from '@mui/styles';
 import DataExport from './DataExport';
 import LoadingButton from '../LoadingButton';
+import { NavLink, useRouteMatch } from 'react-router-dom';
 
 const useStyles = makeStyles((theme: Theme) => ({
   '@keyframes pulse': {
@@ -54,6 +55,7 @@ export default function SurveyListItem(props: Props) {
   const classes = useStyles();
   const { tr, language, surveyLanguage } = useTranslations();
   const { showToast } = useToasts();
+  const { url } = useRouteMatch();
 
   const surveyUrl = useMemo(() => {
     if (!survey.name) {
@@ -142,13 +144,7 @@ export default function SurveyListItem(props: Props) {
             justifyContent: 'flex-start',
           }}
         >
-          <Button
-            onClick={() =>
-              window.open(
-                `/admin/kyselyt/${survey.id}/perustiedot?lang=${language}`
-              )
-            }
-          >
+          <Button component={NavLink} to={`${url}kyselyt/${survey.id}`}>
             {tr.SurveyList.editSurvey}
           </Button>
           {/* Allow publish only if it isn't yet published and has a name */}
