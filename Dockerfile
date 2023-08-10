@@ -48,7 +48,7 @@ FROM base AS main
 
 # Install all dependencies (GDAL & others for Puppeteer)
 RUN apk update && apk add \
-  gdal \
+  gdal-tools \
   chromium \
   nss \
   freetype \
