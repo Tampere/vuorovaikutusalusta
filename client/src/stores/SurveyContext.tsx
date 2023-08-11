@@ -4,6 +4,7 @@ import {
   SurveyPage,
   SurveyPageSection,
 } from '@interfaces/survey';
+import { getSurvey, updateSurvey } from '@src/controllers/SurveyController';
 import { request } from '@src/utils/request';
 import { useDebounce } from '@src/utils/useDebounce';
 import React, {
@@ -228,10 +229,10 @@ export function useSurvey() {
       dispatch({
         type: 'START_LOADING_ACTIVE_SURVEY',
       });
+
       try {
-        const survey = await request<Survey>(`/api/surveys/${id}`, {
-          method: 'GET',
-        });
+        const survey = await getSurvey(id);
+
         dispatch({
           type: 'SET_ACTIVE_SURVEY',
           survey,
@@ -357,9 +358,9 @@ export function useSurvey() {
     async saveChanges() {
       dispatch({ type: 'START_LOADING_ACTIVE_SURVEY' });
       try {
-        const survey = await request<Survey>(
-          `/api/surveys/${state.activeSurvey.id}`,
-          { method: 'PUT', body: state.activeSurvey }
+        const survey = await updateSurvey(
+          state.activeSurvey.id,
+          state.activeSurvey
         );
         dispatch({
           type: 'SET_ACTIVE_SURVEY',

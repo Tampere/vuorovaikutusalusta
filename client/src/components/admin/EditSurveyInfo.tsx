@@ -10,7 +10,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import DateTimePicker from '@mui/lab/DateTimePicker';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { makeStyles } from '@mui/styles';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useToasts } from '@src/stores/ToastContext';
@@ -220,35 +220,30 @@ export default function EditSurveyInfo() {
             });
           }}
         />
+
         <DateTimePicker
+          sx={{ width: '206px' }}
           label={tr.EditSurveyInfo.startDate}
           value={activeSurvey.startDate}
-          inputFormat="dd.MM.yyyy HH:mm"
-          mask="__.__.____ __:__"
+          format="dd.MM.yyyy HH:mm"
           onChange={(value: Date) => {
             editSurvey({
               ...activeSurvey,
               startDate: value,
             });
           }}
-          renderInput={(params: any) => (
-            <TextField className={classes.dateTimePicker} {...params} />
-          )}
         />
         <DateTimePicker
+          sx={{ width: '206px' }}
           label={tr.EditSurveyInfo.endDate}
           value={activeSurvey.endDate}
-          inputFormat="dd.MM.yyyy HH:mm"
-          mask="__.__.____ __:__"
+          format="dd.MM.yyyy HH:mm"
           onChange={(value: Date) => {
             editSurvey({
               ...activeSurvey,
               endDate: value,
             });
           }}
-          renderInput={(params: any) => (
-            <TextField className={classes.dateTimePicker} {...params} />
-          )}
         />
         <FormControlLabel
           control={
