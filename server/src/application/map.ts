@@ -2,7 +2,12 @@ import { MapLayer } from '@interfaces/survey';
 import fetch, { Response } from 'node-fetch';
 import { NotFoundError } from '../error';
 
-export async function getAvailableMapLayers(mapUrl: string) {
+export async function getAvailableMapLayers(
+  mapUrl: string
+): Promise<MapLayer[]> {
+  if (!mapUrl) {
+    return [];
+  }
   // Separate query parameters and possible trailing slash
   const [baseUrl, queryParams] = mapUrl.split(/\/?\?/);
   try {

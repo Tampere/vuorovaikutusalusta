@@ -13,6 +13,7 @@ import moment from 'moment';
 import PDFDocument from 'pdfkit';
 import PdfPrinter from 'pdfmake';
 import { Content } from 'pdfmake/interfaces';
+import { getDb } from '../database';
 import {
   ScreenshotJobData,
   ScreenshotJobReturnData,
@@ -46,6 +47,15 @@ const fonts = {
     normal: 'ZapfDingbats',
   },
 };
+
+async function getStaticIconSvg(name: string) {
+  const { svg } = await getDb().oneOrNone<{
+    svg: Buffer;
+  }>('SELECT svg FROM application.static_icons WHERE name=$(name)', {
+    name,
+  });
+  return svg.toString();
+}
 
 /**
  * Converts a PDFDocument to a Buffer
@@ -114,6 +124,12 @@ async function getFrontPage(
   const image = survey.backgroundImageName
     ? await getFile(survey.backgroundImageName, survey.backgroundImagePath)
     : null;
+
+  const [logo, banner] = await Promise.all([
+    getStaticIconSvg('tre_logo'),
+    getStaticIconSvg('tre_banner'),
+  ]);
+
   const attachmentFileNames = answerEntries
     .filter(
       (entry): entry is AnswerEntry & { type: 'attachment' } =>
@@ -122,7 +138,20 @@ async function getFrontPage(
     .map((entry) => entry.value[0]?.fileName)
     .filter(Boolean);
   return [
-    // TODO header logo from DB
+    {
+      svg: logo,
+      width: 200,
+      absolutePosition: { x: 360, y: 20 },
+    },
+    {
+      svg: banner,
+      width: 100,
+      absolutePosition: { x: 40, y: 780 },
+    },
+    {
+      text: '',
+      margin: [0, image ? 120 : 300, 0, 0],
+    },
     image && {
       image: `data:image/png;base64,${image.data.toString('base64')}`,
       width: 498.9,
@@ -158,7 +187,6 @@ async function getFrontPage(
         fontSize: 12,
         margin: [0, 0, 0, 10],
       })),
-    // TODO footer logo from DB
     { text: '', pageBreak: 'after' },
   ];
 }
