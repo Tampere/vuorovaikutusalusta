@@ -94,7 +94,7 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
             <img
               style={{ maxWidth: '100%', maxHeight: '100%' }}
               src={`/api/file/${survey.thanksPage.imagePath[0]}/${survey.thanksPage.imageName}`}
-              alt={imageAltText}
+              alt={imageAltText ?? ''}
             />
           </div>
         )}
