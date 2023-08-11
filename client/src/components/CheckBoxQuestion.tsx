@@ -77,11 +77,7 @@ export default function CheckBoxQuestion({
           )}
         </>
       )}
-      <FormGroup
-        onBlur={() => {
-          setDirty(true);
-        }}
-      >
+      <FormGroup>
         {question.options.map((option, index) => (
           <FormControlLabel
             key={option.id}
