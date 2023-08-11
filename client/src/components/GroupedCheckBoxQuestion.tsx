@@ -3,6 +3,7 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
+  Box,
   Checkbox,
   Chip,
   FormControlLabel,
@@ -13,6 +14,7 @@ import {
 import { ArrowForwardIosSharp } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
+import { visuallyHidden } from '@mui/utils';
 import React, { useMemo, useState } from 'react';
 import SectionInfo from './SectionInfo';
 
@@ -81,9 +83,9 @@ export default function GroupedCheckBoxQuestion({
       question.groups?.map(
         (group) =>
           value.filter((id) => group.options.some((option) => option.id === id))
-            .length ?? 0
+            .length ?? 0,
       ),
-    [question.groups, value]
+    [question.groups, value],
   );
 
   const maxReached = useMemo(() => {
@@ -111,13 +113,13 @@ export default function GroupedCheckBoxQuestion({
           ? // Only min limit is set
             tr.GroupedCheckBoxQuestion.helperTextMin.replace(
               '{min}',
-              question.answerLimits.min.toString()
+              question.answerLimits.min.toString(),
             )
           : question.answerLimits?.max
           ? // Only max limit is set
             tr.GroupedCheckBoxQuestion.helperTextMax.replace(
               '{max}',
-              question.answerLimits.max.toString()
+              question.answerLimits.max.toString(),
             )
           : // No limits are set
             tr.GroupedCheckBoxQuestion.helperText}
@@ -153,22 +155,31 @@ export default function GroupedCheckBoxQuestion({
             >
               {group.name?.[surveyLanguage]}
               {amountsByGroup[index] > 0 && (
-                <Chip
-                  style={{ marginLeft: '1rem' }}
-                  label={amountsByGroup[index]}
-                  size="small"
-                  color="primary"
-                />
+                <>
+                  <Chip
+                    style={{ marginLeft: '1rem' }}
+                    label={amountsByGroup[index]}
+                    size="small"
+                    color="primary"
+                    aria-hidden={true}
+                  />
+                  <Box style={visuallyHidden}>
+                    {tr.GroupedCheckBoxQuestion.optionsSelectedInGroup.replace(
+                      '{number}',
+                      amountsByGroup[index].toString(),
+                    )}
+                  </Box>
+                </>
               )}
             </AccordionSummary>
             <AccordionDetails className={classes.accordionDetails}>
               <FormGroup
                 // Indicate the amount of selections inside the group for screen readers
-                aria-label={`${
-                  group.name?.[surveyLanguage]
-                }: ${tr.GroupedCheckBoxQuestion.optionsSelectedInGroup.replace(
+                aria-label={`${group.name?.[
+                  surveyLanguage
+                ]}: ${tr.GroupedCheckBoxQuestion.optionsSelectedInGroup.replace(
                   '{number}',
-                  String(amountsByGroup[index])
+                  String(amountsByGroup[index]),
                 )}`}
                 aria-describedby={`${question.id}-indicator`}
                 onBlur={() => {
@@ -196,7 +207,7 @@ export default function GroupedCheckBoxQuestion({
                                 [...value, option.id]
                               : // Filter out the value from the selected options
                                 value.filter(
-                                  (optionId) => optionId !== option.id
+                                  (optionId) => optionId !== option.id,
                                 );
                             onChange(newValue);
                           }}

@@ -171,39 +171,41 @@ export default function MapQuestion({ value, onChange, question }: Props) {
   }
 
   function getToggleButton(selectionType: MapQuestionSelectionType) {
+    const markingCount = value?.filter(
+      (answer) => answer.selectionType === selectionType,
+    ).length;
     return (
       <ToggleButton
         id={`${question.id}-draw-button`}
         value={selectionType}
-        aria-label={tr.MapQuestion.selectionTypes[selectionType]}
+        aria-label={`${tr.MapQuestion.selectionTypes[selectionType]}
+          ${
+            markingCount > 0
+              ? ` ${markingCount} ${tr.MapQuestion.markingsMade}`
+              : ''
+          }`}
         disabled={!isMapReady}
       >
-        <Badge
-          badgeContent={
-            value?.filter((answer) => answer.selectionType === selectionType)
-              .length
-          }
-          color="secondary"
-        >
+        <Badge badgeContent={markingCount} color="secondary">
           {selectionType === 'point' && (
             <img
               style={{ height: '2rem' }}
               src={`api/feature-styles/icons/point_icon`}
-              alt={tr.IconAltTexts.pointIconAltText}
+              alt=""
             />
           )}
           {selectionType === 'line' && (
             <img
               style={{ height: '2rem' }}
               src={`api/feature-styles/icons/line_icon`}
-              alt={tr.IconAltTexts.lineIconAltText}
+              alt=""
             />
           )}
           {selectionType === 'area' && (
             <img
               style={{ height: '2rem' }}
               src={`api/feature-styles/icons/area_icon`}
-              alt={tr.IconAltTexts.areaIconAltText}
+              alt=""
             />
           )}
         </Badge>
