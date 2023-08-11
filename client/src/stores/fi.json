@@ -432,8 +432,20 @@
   },
   "AppBarUserMenu": {
     "label": "Käyttäjävalikko",
-    "logout": "Kirjaudu ulos"
+    "logout": "Kirjaudu ulos",
+    "updateInstructions": "Päivitä käyttöohjeet"
   },
+  "InstructionsDialog": {
+    "fetchingError": "Virhe haettaessa nykyisiä käyttöohjeita",
+    "currentInstructions": "Nykyiset käyttöohjeet",
+    "uploadNewInstructions": "Uuden käyttöohjeen lataaminen",
+    "wrongFileFormat": "Tiedoston tulee olla pdf-muodossa",
+    "fileUploadError": "Virhe ladattaessa tiedostoa",
+    "fileSizeLimitError": "Ladattavan tiedoston koko ei saa olla yli {x}MB",
+    "submit": "Lähetä",
+    "cancel": "Peruuta"
+  },
+
   "MapInfoBox": {
     "answer": "Vastaus"
   },
@@ -495,5 +507,6 @@
   "IconAltTexts": {
     "treBannerAltText": "Tampereen vaakunalogo",
     "treLogoAltText": "Tampere Finland -logo"
-  }
+  },
+  "adminInstructions": "Avaa käyttöohje"
 }

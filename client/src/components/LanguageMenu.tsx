@@ -18,22 +18,19 @@ const useStyles = makeStyles({
   },
 });
 
-export default function LanguageMenu({
-  style,
-}: Props) {
-  const { tr,  setLanguage, languages, language } =
-    useTranslations();
+export default function LanguageMenu({ style }: Props) {
+  const { tr, setLanguage, languages, language } = useTranslations();
   const classes = useStyles();
 
   return (
     <div className={classes.root} style={style}>
       <Tooltip
         arrow
-        placement='left'
+        placement="left-end"
         title={tr.LanguageMenu.changeLanguage}
       >
         <Select
-          inputProps={{"aria-label": tr.LanguageMenu.languageControl}}
+          inputProps={{ 'aria-label': tr.LanguageMenu.languageControl }}
           value={language}
           onChange={(event) => {
             const targetLanguage = event.target.value as LanguageCode;
@@ -42,17 +39,20 @@ export default function LanguageMenu({
           IconComponent={LanguageIcon}
           sx={{
             color: 'inherit',
-            '&>.MuiSelect-select': { // Accommodate the larger globe icon
+            '&>.MuiSelect-select': {
+              // Accommodate the larger globe icon
               paddingRight: '38px !important',
             },
-            '&>fieldset': { // Visual label not used, hide border and legend
+            '&>fieldset': {
+              // Visual label not used, hide border and legend
               borderWidth: 0,
-              '&>legend': {display: 'none'},
+              '&>legend': { display: 'none' },
             },
-            '& svg': { // The component is used in admin panel and survey, must adapt
+            '& svg': {
+              // The component is used in admin panel and survey, must adapt
               color: 'inherit',
               fill: 'currentColor',
-            }
+            },
           }}
         >
           {languages.map((lang, index) => (

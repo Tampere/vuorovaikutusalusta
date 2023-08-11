@@ -1278,7 +1278,7 @@ export async function storeFile({
  * Get a single file with id from the database
  * @param fileName
  * @param filePath
- * @returns SurveyBackgroudImage
+ * @returns File
  */
 export async function getFile(fileName: string, filePath: string[]) {
   const row = await getDb().oneOrNone<{

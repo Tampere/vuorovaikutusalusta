@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { ValidationChain, validationResult } from 'express-validator';
 import { BadRequestError } from './error';
 import { ImageType } from '@interfaces/survey';
+import { MimeType } from '@interfaces/admin';
 
 /**
  * Middleware function for validating a request against provided validation rules.
@@ -50,6 +51,17 @@ function isImageType(val: string): val is ImageType {
 export function parseImageType(val: unknown): ImageType | null {
   if (!isString(val) || !isImageType(val)) {
     throw new Error('Invalid value for imagetype');
+  }
+  return val;
+}
+
+function isMimeType(val: string): val is MimeType {
+  return val === 'application/pdf';
+}
+
+export function parseMimeType(val: unknown): MimeType {
+  if (!isString(val) || !isMimeType(val)) {
+    throw new Error('Invalid value for mimeType');
   }
   return val;
 }
