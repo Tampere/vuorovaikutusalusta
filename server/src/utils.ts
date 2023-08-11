@@ -65,16 +65,3 @@ export function parseMimeType(val: unknown): MimeType {
   }
   return val;
 }
-/*
-function isFileDescription(val: string): val is FileDescription {
-  console.log(val);
-  return val === 'admin_instructions';
-}
-
-export function parseFileDescription(val: unknown): FileDescription {
-  if (!isString(val) || !isFileDescription(val)) {
-    throw new Error('Invalid value for description');
-  }
-  return val;
-}
-*/
