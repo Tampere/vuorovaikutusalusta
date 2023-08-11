@@ -61,7 +61,7 @@ export default function MapQuestion({ value, onChange, question }: Props) {
         valueRef.current.map((answer, index) => ({
           ...answer,
           geometry: features[index],
-        }))
+        })),
       );
     });
     // On unmount unregister the event handler
@@ -164,15 +164,15 @@ export default function MapQuestion({ value, onChange, question }: Props) {
           () => (answers: SurveyMapSubQuestionAnswer[]) => {
             resolve(answers);
             setSubQuestionDialogOpen(false);
-          }
+          },
         );
-      }
+      },
     );
   }
 
   function getToggleButton(selectionType: MapQuestionSelectionType) {
     const markingCount = value?.filter(
-      (answer) => answer.selectionType === selectionType,
+      (answer) => answer.selectionType === selectionType
     ).length;
     return (
       <ToggleButton
@@ -267,8 +267,8 @@ export default function MapQuestion({ value, onChange, question }: Props) {
             value.map((answer, index) =>
               index === editingMapAnswer.index
                 ? { ...answer, subQuestionAnswers: answers }
-                : answer
-            )
+                : answer,
+            ),
           );
           stopEditingMapAnswer();
         }}
@@ -312,7 +312,7 @@ export default function MapQuestion({ value, onChange, question }: Props) {
         onClose={(result) => {
           if (result) {
             onChange(
-              value.filter((_, index) => index !== editingMapAnswer.index)
+              value.filter((_, index) => index !== editingMapAnswer.index),
             );
             stopEditingMapAnswer();
           }

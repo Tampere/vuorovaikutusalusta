@@ -156,7 +156,7 @@ export default function SurveyImageList({ imageType }: Props) {
     const formData = new FormData();
     formData.append('file', acceptedFiles[0]);
     formData.append('attributions', imageAttributions);
-    formData.append('imageAltText', imageAltText);
+    imageAltText && formData.append('imageAltText', imageAltText);
 
     await fetch(
       `/api/file/${
