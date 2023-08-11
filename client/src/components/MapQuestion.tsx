@@ -173,7 +173,7 @@ export default function MapQuestion({ value, onChange, question }: Props) {
   function getToggleButton(selectionType: MapQuestionSelectionType) {
     return (
       <ToggleButton
-        className="draw-button"
+        id={`${question.id}-draw-button`}
         value={selectionType}
         aria-label={tr.MapQuestion.selectionTypes[selectionType]}
         disabled={!isMapReady}
@@ -283,15 +283,22 @@ export default function MapQuestion({ value, onChange, question }: Props) {
         subQuestions={question.subQuestions}
         onSubmit={(answers) => {
           handleSubQuestionDialogClose(answers);
+          setTimeout(() => {
+            (
+              document.getElementById(
+                `${question.id}-draw-button`
+              ) as HTMLButtonElement
+            )?.focus();
+          }, 1);
         }}
         onCancel={() => {
           handleSubQuestionDialogClose(null);
 
           setTimeout(() => {
             (
-              document.getElementsByClassName(
-                'draw-button'
-              )[0] as HTMLButtonElement
+              document.getElementById(
+                `${question.id}-draw-button`
+              ) as HTMLButtonElement
             )?.focus();
           }, 1);
         }}
