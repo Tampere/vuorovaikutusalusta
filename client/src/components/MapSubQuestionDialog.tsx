@@ -78,7 +78,7 @@ export default function MapSubQuestionDialog({
     ...(existingAnswer?.subQuestionAnswers ?? []),
   ]);
   const [dirty, setDirty] = useState<boolean[]>([]);
-
+  const [infoDialogOpen, setInfoDialogOpen] = useState(false);
   const classes = useStyles();
   const { getValidationErrors } = useSurveyAnswers();
   const { tr, surveyLanguage } = useTranslations();
@@ -135,23 +135,25 @@ export default function MapSubQuestionDialog({
               }
             }}
           >
-            <FormLabel component="legend">
-              {question.title?.[surveyLanguage]} {question.isRequired && '*'}
-            </FormLabel>
-            <div
+            <FormLabel
+              component="legend"
               style={{
                 display: 'flex',
                 flexDirection: 'row',
                 alignItems: 'center',
               }}
             >
+              {question.title?.[surveyLanguage]} {question.isRequired && '*'}
               {question.info && question.info?.[surveyLanguage] && (
                 <SectionInfo
+                  infoDialogOpen={infoDialogOpen}
+                  setInfoDialogOpen={setInfoDialogOpen}
                   infoText={question.info?.[surveyLanguage]}
                   subject={question.title?.[surveyLanguage]}
                 />
               )}
-            </div>
+            </FormLabel>
+
             {question.type === 'checkbox' ? (
               <CheckBoxQuestion
                 autoFocus={index === 0}

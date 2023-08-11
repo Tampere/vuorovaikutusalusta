@@ -30,6 +30,7 @@ function SurveyQuestion({ question, pageUnfinished }: Props) {
     useSurveyAnswers();
   const { tr, surveyLanguage } = useTranslations();
   const [dirty, setDirty] = useState(false);
+  const [infoDialogOpen, setInfoDialogOpen] = useState(false);
 
   const value = useMemo(
     () => answers.find((answer) => answer.sectionId === question.id)?.value,
@@ -53,9 +54,7 @@ function SurveyQuestion({ question, pageUnfinished }: Props) {
         if (
           e.relatedTarget &&
           !e.currentTarget.contains(e.relatedTarget as Node) &&
-          !(e.relatedTarget as HTMLElement)?.classList.contains(
-            'close-section-info-button'
-          )
+          !infoDialogOpen
         ) {
           setDirty(true);
         }
@@ -95,6 +94,8 @@ function SurveyQuestion({ question, pageUnfinished }: Props) {
         )}
         {question.info && question.info?.[surveyLanguage] && (
           <SectionInfo
+            infoDialogOpen={infoDialogOpen}
+            setInfoDialogOpen={setInfoDialogOpen}
             hiddenFromScreenReader={false}
             infoText={question.info?.[surveyLanguage]}
             subject={question.title?.[surveyLanguage]}
