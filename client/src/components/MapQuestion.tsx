@@ -61,7 +61,7 @@ export default function MapQuestion({ value, onChange, question }: Props) {
         valueRef.current.map((answer, index) => ({
           ...answer,
           geometry: features[index],
-        })),
+        }))
       );
     });
     // On unmount unregister the event handler
@@ -164,9 +164,9 @@ export default function MapQuestion({ value, onChange, question }: Props) {
           () => (answers: SurveyMapSubQuestionAnswer[]) => {
             resolve(answers);
             setSubQuestionDialogOpen(false);
-          },
+          }
         );
-      },
+      }
     );
   }
 
@@ -264,8 +264,8 @@ export default function MapQuestion({ value, onChange, question }: Props) {
             value.map((answer, index) =>
               index === editingMapAnswer.index
                 ? { ...answer, subQuestionAnswers: answers }
-                : answer,
-            ),
+                : answer
+            )
           );
           stopEditingMapAnswer();
         }}
@@ -291,10 +291,11 @@ export default function MapQuestion({ value, onChange, question }: Props) {
       <ConfirmDialog
         open={deleteConfirmDialogOpen}
         text={tr.MapQuestion.confirmRemoveAnswer}
+        submitColor="error"
         onClose={(result) => {
           if (result) {
             onChange(
-              value.filter((_, index) => index !== editingMapAnswer.index),
+              value.filter((_, index) => index !== editingMapAnswer.index)
             );
             stopEditingMapAnswer();
           }
@@ -305,6 +306,7 @@ export default function MapQuestion({ value, onChange, question }: Props) {
       <ConfirmDialog
         open={clearConfirmDialogOpen}
         text={tr.MapQuestion.confirmClearAnswers}
+        submitColor="error"
         onClose={(result) => {
           if (result) {
             onChange([]);

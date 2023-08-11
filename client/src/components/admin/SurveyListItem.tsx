@@ -53,7 +53,7 @@ export default function SurveyListItem(props: Props) {
   const [loading, setLoading] = useState(false);
 
   const classes = useStyles();
-  const { tr, language, surveyLanguage } = useTranslations();
+  const { tr, surveyLanguage } = useTranslations();
   const { showToast } = useToasts();
   const { url } = useRouteMatch();
 
@@ -182,6 +182,7 @@ export default function SurveyListItem(props: Props) {
       </Card>
       <ConfirmDialog
         open={publishConfirmDialogOpen}
+        submitColor="primary"
         title={survey.title?.[surveyLanguage] ?? ''}
         text={tr.SurveyList.confirmPublish}
         onClose={async (result) => {
@@ -208,6 +209,7 @@ export default function SurveyListItem(props: Props) {
       />
       <ConfirmDialog
         open={unpublishConfirmDialogOpen}
+        submitColor="error"
         title={survey.title?.[surveyLanguage] ?? ''}
         text={tr.SurveyList.confirmUnpublish}
         onClose={async (result) => {
