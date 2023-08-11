@@ -5,6 +5,7 @@ import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { getClassList } from '@src/utils/classes';
 import React from 'react';
+import Footer from './Footer';
 
 const useStyles = makeStyles((theme: Theme & { [customKey: string]: any }) => ({
   root: (props: any) => ({
@@ -82,7 +83,7 @@ const useStyles = makeStyles((theme: Theme & { [customKey: string]: any }) => ({
     },
     ...theme.landingPage?.start,
     [theme.breakpoints.down(600)]: {
-      fontSize: '6vw',    
+      fontSize: '6vw',
     },
   },
   footer: {
@@ -93,15 +94,23 @@ const useStyles = makeStyles((theme: Theme & { [customKey: string]: any }) => ({
     justifyContent: 'space-between',
     marginTop: '2rem',
     gap: '1rem',
+    [theme.breakpoints.down(800)]: {
+      flexDirection: 'column',
+      alignItems: 'center',
+    },
   },
   footerLogo: {
-    display: 'flex',
+    position: 'absolute',
+    left: 0,
+    bottom: 0,
     marginLeft: '0.5rem',
     marginBottom: '0.5rem',
     alignItems: 'flex-end',
   },
   imageCopyright: {
-    alignSelf: 'flex-end',
+    position: 'absolute',
+    right: 0,
+    bottom: 0,
     backgroundColor: theme.palette.primary.main,
     color: theme.palette.primary.contrastText,
     padding: '1rem',
@@ -167,17 +176,11 @@ export default function SurveyLandingPage({
             </h2>
           )}
         </div>
-        <Button
-          onClick={onStart}
-        >
-          <Typography
-            variant="body1"
-            className={classes.start}
-          >
+        <Button onClick={onStart}>
+          <Typography variant="body1" className={classes.start}>
             {continueUnfinished
               ? tr.SurveyPage.continueSurveyLink
-              : tr.SurveyPage.startSurveyLink
-            }
+              : tr.SurveyPage.startSurveyLink}
           </Typography>
         </Button>
       </div>
@@ -188,6 +191,27 @@ export default function SurveyLandingPage({
             alt={tr.IconAltTexts.treBannerAltText}
           />
         </div>
+        <Footer>
+          <Link
+            color="primary"
+            underline="hover"
+            href="https://www.tampere.fi/asioi-kaupungin-kanssa/oskari-karttakyselypalvelun-saavutettavuusseloste"
+            target="_blank"
+          >
+            {tr.FooterLinks.accessibility}
+          </Link>
+          {survey.displayPrivacyStatement && (
+            <Link
+              color="primary"
+              underline="hover"
+              href="https://www.tampere.fi/tietosuoja-ja-tiedonhallinta/tietosuojaselosteet"
+              target="_blank"
+            >
+              {tr.FooterLinks.privacyStatement}
+            </Link>
+          )}
+        </Footer>
+
         {surveyBackgroundImage?.attributions ? (
           <Typography className={classes.imageCopyright} variant="body2">
             {surveyBackgroundImage.attributions}

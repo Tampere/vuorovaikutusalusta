@@ -153,9 +153,9 @@ export default function SurveyStepper({
     () =>
       getFullFilePath(
         currentPage.sidebar.imagePath,
-        currentPage.sidebar.imageName,
+        currentPage.sidebar.imageName
       ),
-    [currentPage.sidebar],
+    [currentPage.sidebar]
   );
 
   /**
@@ -204,13 +204,13 @@ export default function SurveyStepper({
   // Map answer geometries on the current page
   const mapAnswerGeometries = useMemo(() => {
     const mapQuestions = currentPage.sections.filter(
-      (section): section is SurveyMapQuestion => section.type === 'map',
+      (section): section is SurveyMapQuestion => section.type === 'map'
     );
     // Reduce all geometries from map question answers into a feature collection
     return mapQuestions.reduce(
       (featureCollection, question) => {
         const answer = answers.find(
-          (answer) => answer.sectionId === question.id,
+          (answer) => answer.sectionId === question.id
         ) as AnswerEntry & { type: 'map' };
         return {
           ...featureCollection,
@@ -230,7 +230,7 @@ export default function SurveyStepper({
                   },
                 },
               ],
-              [],
+              []
             ),
           ],
         };
@@ -238,7 +238,7 @@ export default function SurveyStepper({
       {
         type: 'FeatureCollection',
         features: [],
-      } as GeoJSON.FeatureCollection,
+      } as GeoJSON.FeatureCollection
     );
   }, [currentPage, answers]);
 
@@ -283,7 +283,7 @@ export default function SurveyStepper({
         `/api/published-surveys/${survey.name}/submission${
           unfinishedToken ? `?token=${unfinishedToken}` : ''
         }`,
-        { method: 'POST', body: { entries: answers, info, language } },
+        { method: 'POST', body: { entries: answers, info, language } }
       );
       setLoading(false);
       onComplete();
@@ -309,7 +309,7 @@ export default function SurveyStepper({
       .map((question) => question.id);
     answers
       .filter((answer): answer is AnswerEntry & { type: 'map' } =>
-        mapQuestionIds.includes(answer.sectionId),
+        mapQuestionIds.includes(answer.sectionId)
       )
       .forEach((answer) => {
         updateAnswer({
@@ -345,7 +345,7 @@ export default function SurveyStepper({
             <Step key={page.id} completed={index < pageNumber}>
               <StepLabel
                 id={`${index}-page-top`}
-                aria-current={index === pageNumber ? "step" : false}
+                aria-current={index === pageNumber ? 'step' : false}
                 classes={{
                   active: classes.stepActive,
                   label: classes.stepHeader,
@@ -355,12 +355,17 @@ export default function SurveyStepper({
                   id={`${index}-page-heading`}
                   component="h2"
                   tabIndex={-1}
-                  sx={{ margin: 0, fontSize: '1em', "&:focus": { outline: 'none'} }}
+                  sx={{
+                    margin: 0,
+                    fontSize: '1em',
+                    '&:focus': { outline: 'none' },
+                  }}
                 >
                   <span style={visuallyHidden}>
                     {index < pageNumber && tr.SurveyStepper.completedStep}
                     {index > pageNumber && tr.SurveyStepper.futureStep}
-                    {tr.SurveyStepper.step} {index + 1} {tr.SurveyStepper.outOf} {survey?.pages?.length}
+                    {tr.SurveyStepper.step} {index + 1} {tr.SurveyStepper.outOf}{' '}
+                    {survey?.pages?.length}
                   </span>
                   {page.title?.[language]}
                 </Typography>
@@ -395,7 +400,7 @@ export default function SurveyStepper({
                                 );
                               }
                               return null;
-                            },
+                            }
                           )}
                         </ul>
                       }
@@ -484,6 +489,7 @@ export default function SurveyStepper({
           color="primary"
           underline="hover"
           href="https://www.tampere.fi/asioi-kaupungin-kanssa/oskari-karttakyselypalvelun-saavutettavuusseloste"
+          target="_blank"
         >
           {tr.FooterLinks.accessibility}
         </Link>
@@ -492,6 +498,7 @@ export default function SurveyStepper({
             color="primary"
             underline="hover"
             href="https://www.tampere.fi/tietosuoja-ja-tiedonhallinta/tietosuojaselosteet"
+            target="_blank"
           >
             {tr.FooterLinks.privacyStatement}
           </Link>

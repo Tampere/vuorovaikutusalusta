@@ -1,12 +1,15 @@
 import { Survey } from '@interfaces/survey';
-import { Typography, useMediaQuery } from '@mui/material';
-import { makeStyles } from '@mui/styles';
+import { Link, Typography, SxProps, Theme, Box } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import rehypeExternalLinks from 'rehype-external-links';
+import Footer from './Footer';
+import { theme } from '@src/themes/admin';
 
-const useStyles = makeStyles({
+type StyleKeys = 'root' | 'links' | 'testSurveyHeader';
+
+const styles: Record<StyleKeys, SxProps<Theme>> = {
   root: {
     position: 'relative',
     height: '100%',
@@ -25,7 +28,22 @@ const useStyles = makeStyles({
     color: 'white',
     textAlign: 'center',
   },
-});
+  links: {
+    display: 'flex',
+    flexDirection: 'row',
+    width: '100%',
+    minHeight: '3rem',
+    justifyContent: 'center',
+    alignItems: 'flex-end',
+    marginTop: '2rem',
+    gap: '1rem',
+    [theme.breakpoints.down(800)]: {
+      flexDirection: 'column',
+      alignItems: 'center',
+      bottom: '50px',
+    },
+  },
+};
 
 interface Props {
   survey: Survey;
@@ -39,8 +57,8 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
   useEffect(() => {
     async function getImageHeaders() {
       const res = await fetch(
-        `/api/file/${survey.thanksPage.imagePath[0]}/${survey.thanksPage.imageName}`,
-        { method: 'HEAD' }
+        `api/file/${survey.thanksPage.imagePath[0]}/${survey.thanksPage.imageName}`,
+        { method: 'HEAD' },
       );
 
       const details = JSON.parse(res.headers.get('File-details'));
@@ -52,17 +70,21 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
       getImageHeaders();
   }, []);
 
-  const classes = useStyles();
   const { tr, surveyLanguage } = useTranslations();
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        justifyContent: 'space-between',
+      }}
+    >
       {isTestSurvey && (
-        <div className={classes.testSurveyHeader}>
-          {tr.TestSurveyFrame.text}
-        </div>
+        <Box sx={{ ...styles.testSurveyHeader }}>{tr.TestSurveyFrame.text}</Box>
       )}
-      <div className={classes.root}>
+      <Box sx={{ ...styles.root }}>
         <div
           style={{
             position: 'absolute',
@@ -102,23 +124,44 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
             />
           </div>
         )}
-
-        <div
-          style={{
-            position: 'absolute',
-            bottom: '0',
-            left: '0',
-            paddingLeft: '1rem',
-            paddingBottom: '0.5rem',
-          }}
-        >
-          <img
-            style={{ height: '2rem' }}
-            src={`/api/feature-styles/icons/tre_banner`}
-            alt={tr.IconAltTexts.treBannerAltText}
-          />
-        </div>
-      </div>
+        <Box sx={{ ...styles.links }}>
+          <Footer>
+            <Link
+              color="primary"
+              underline="hover"
+              href="https://www.tampere.fi/asioi-kaupungin-kanssa/oskari-karttakyselypalvelun-saavutettavuusseloste"
+              target="_blank"
+            >
+              {tr.FooterLinks.accessibility}
+            </Link>
+            {survey.displayPrivacyStatement && (
+              <Link
+                color="primary"
+                underline="hover"
+                href="https://www.tampere.fi/tietosuoja-ja-tiedonhallinta/tietosuojaselosteet"
+                target="_blank"
+              >
+                {tr.FooterLinks.privacyStatement}
+              </Link>
+            )}
+          </Footer>
+          <div
+            style={{
+              position: 'absolute',
+              bottom: '0',
+              left: '0',
+              paddingLeft: '1rem',
+              paddingBottom: '0.5rem',
+            }}
+          >
+            <img
+              style={{ height: '2rem' }}
+              src={`/api/feature-styles/icons/tre_banner`}
+              alt={tr.IconAltTexts.treBannerAltText}
+            />
+          </div>
+        </Box>
+      </Box>
     </div>
   );
 }
