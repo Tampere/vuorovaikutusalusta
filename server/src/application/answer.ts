@@ -1,9 +1,16 @@
-import { FileAnswer, LanguageCode, LocalizedText } from '@interfaces/survey';
+import {
+  FileAnswer,
+  LanguageCode,
+  LocalizedText,
+  MapLayer,
+} from '@interfaces/survey';
 import { getDb } from '@src/database';
-import { readFileSync, rmSync, writeFile } from 'fs';
+import useTranslations from '@src/translations/useTranslations';
+import { readFileSync, rmSync } from 'fs';
 import moment from 'moment';
 import ogr2ogr from 'ogr2ogr';
-import useTranslations from '@src/translations/useTranslations';
+import { getAvailableMapLayers } from './map';
+import { getSurvey } from './survey';
 
 const tr = useTranslations('fi');
 
@@ -33,6 +40,7 @@ interface DBAnswerEntry {
   created_at: Date;
   option_text: string;
   option_group_index: number;
+  map_layers: number[];
 }
 
 /**
@@ -72,6 +80,7 @@ interface AnswerEntry {
   groupIndex: number;
   optionIndex: number;
   optionText?: string;
+  mapLayers: number[];
 }
 
 interface CheckboxOptions {
@@ -163,6 +172,7 @@ function dbAnswerEntryRowsToAnswerEntries(rows: DBAnswerEntry[]) {
     optionText: row?.option_text,
     createdAt: row.created_at,
     groupIndex: row.option_group_index,
+    mapLayers: row.map_layers ?? [],
   })) as AnswerEntry[];
 }
 
@@ -171,11 +181,15 @@ function dbAnswerEntryRowsToAnswerEntries(rows: DBAnswerEntry[]) {
  * @param answer
  * @returns
  */
-function geometryAnswerToFeature(answer: AnswerEntry) {
+function geometryAnswerToFeature(answer: AnswerEntry, mapLayers: MapLayer[]) {
   // Some erroneous data might not have a geometry - return null for them to avoid further errors
   if (!answer.valueGeometry) {
     return null;
   }
+  const mapLayerNames = answer.mapLayers
+    .map((layerId) => mapLayers.find((layer) => layer.id === layerId))
+    .filter(Boolean)
+    .map((layer) => layer.name);
   return {
     type: 'Feature',
     geometry: {
@@ -189,6 +203,7 @@ function geometryAnswerToFeature(answer: AnswerEntry) {
       ['Kysymys']: `Sivu ${answer.pageIndex + 1} / Kysymys ${
         answer.sectionIndex + 1
       }: ${answer.title?.['fi'] ?? ''}`,
+      ['Näkyvät tasot']: mapLayerNames.join(', '),
     },
   };
 }
@@ -200,7 +215,8 @@ function geometryAnswerToFeature(answer: AnswerEntry) {
  */
 function dbEntriesToFeatures(
   entries: AnswerEntry[],
-  checkboxOptions: CheckboxOptions[]
+  checkboxOptions: CheckboxOptions[],
+  mapLayers: MapLayer[]
 ) {
   // Sort entries first by submission, then by sectionId
   // Each sectionId instance (separated by submission) will represent a single Feature
@@ -210,8 +226,10 @@ function dbEntriesToFeatures(
     submissionGroup[submissionId] = submissionGroup[submissionId] ?? {};
     // If answer doesn't have parentEntryId, it is the parent itself. Store following answers under the parent
     if (!answer.parentEntryId) {
-      submissionGroup[submissionId][answer.answerId] =
-        geometryAnswerToFeature(answer);
+      submissionGroup[submissionId][answer.answerId] = geometryAnswerToFeature(
+        answer,
+        mapLayers
+      );
     } else if (submissionGroup[submissionId][answer.parentEntryId]) {
       // Add subquestion answer
       let newAnswer: string;
@@ -337,12 +355,19 @@ export async function getCSVFile(surveyId: number): Promise<string> {
 export async function getGeoPackageFile(surveyId: number): Promise<Buffer> {
   const rows = await getGeometryDBEntries(surveyId);
   const checkboxOptions = await getCheckboxOptionsFromDB(surveyId);
+  const mapLayers = await getSurvey({ id: surveyId }).then((survey) =>
+    getAvailableMapLayers(survey.mapUrl)
+  );
 
-  if (!rows || !checkboxOptions) return null;
+  if (!rows || !checkboxOptions) {
+    return null;
+  }
 
-  const features = dbEntriesToFeatures(rows, checkboxOptions);
+  const features = dbEntriesToFeatures(rows, checkboxOptions, mapLayers);
   // There could be rows where the parent map answer (erroneously) has null geometry - if there are no valid map answers, return null from here too
-  if (!features.length) return null;
+  if (!features.length) {
+    return null;
+  }
 
   // Group features by question to add them to separate layers
   const featuresByQuestion = features.reduce((questions, feature) => {
@@ -414,13 +439,13 @@ export async function getAttachments(surveyId: number): Promise<FileAnswer[]> {
 
 async function getCheckboxOptionsFromDB(surveyId: number) {
   const rows = await getDb().manyOrNone(
-    `SELECT 
-        opt.TEXT, 
+    `SELECT
+        opt.TEXT,
         opt.section_id as "sectionId"
-      FROM data.option opt 
+      FROM data.option opt
         LEFT JOIN data.page_section ps ON opt.section_id = ps.id
-        LEFT JOIN data.survey_page sp ON ps.survey_page_id = sp.id 
-        LEFT JOIN data.survey s ON sp.survey_id = s.id 
+        LEFT JOIN data.survey_page sp ON ps.survey_page_id = sp.id
+        LEFT JOIN data.survey s ON sp.survey_id = s.id
       WHERE s.id = $1;`,
     [surveyId]
   );
@@ -431,15 +456,15 @@ async function getCheckboxOptionsFromDB(surveyId: number) {
 async function getAttachmentDBEntries(surveyId: number) {
   const rows = await getDb().manyOrNone(
     `
-      SELECT 
+      SELECT
         ae.submission_id as "submissionId",
         ae.section_id as "sectionId",
         ae.value_file as "valueFile",
         ae.value_file_name as "valueFileName",
         sp.idx as "pageIndex",
-        ps.idx as "sectionIndex" FROM data.answer_entry ae 
-      LEFT JOIN data.submission sub ON ae.submission_id = sub.id 
-      LEFT JOIN data.page_section ps ON ae.section_id = ps.id 
+        ps.idx as "sectionIndex" FROM data.answer_entry ae
+      LEFT JOIN data.submission sub ON ae.submission_id = sub.id
+      LEFT JOIN data.page_section ps ON ae.section_id = ps.id
       LEFT JOIN data.survey_page sp ON sp.id = ps.survey_page_id
       WHERE ae.value_file IS NOT NULL AND sub.unfinished_token IS NULL AND sub.survey_id = $1;
     `,
@@ -524,6 +549,7 @@ async function getGeometryDBEntries(surveyId: number): Promise<AnswerEntry[]> {
       ae.value_numeric,
       ae.value_json,
       ae.parent_entry_id,
+      ae.map_layers,
       sp.idx as page_index,
       ps.idx as section_index,
       ps.type,
