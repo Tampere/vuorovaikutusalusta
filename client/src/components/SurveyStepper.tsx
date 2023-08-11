@@ -687,6 +687,10 @@ export default function SurveyStepper({
                 onClick={() => {
                   setMobileDrawerOpen(false);
                 }}
+                aria-label={
+                  currentPage.sidebar.type === 'image' ? tr.SurveyStepper.closeImage :
+                  currentPage.sidebar.type === 'map' ? tr.SurveyStepper.closeMap : ""
+                }
               >
                 <Close />
               </IconButton>

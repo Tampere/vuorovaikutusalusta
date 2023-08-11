@@ -327,7 +327,9 @@
     "submit": "Submit",
     "errorSubmittingSurvey": "Error while submitting the survey. Please try again later.",
     "openMap": "Open the map",
+    "closeMap": "Close the map",
     "openImage": "Open the image",
+    "closeImage": "Close the image",
     "unfinishedAnswers": "Please, answer all mandatory questions.",
     "unfinishedAnswersInfo": "The following answers need to be answered:",
     "saveAsUnfinished": "Save unfinished survey",
@@ -358,10 +360,11 @@
   "MapQuestion": {
     "mapSelectionButtons": "Map selection buttons",
     "selectionTypes": {
-      "point": "Point",
-      "line": "Line",
-      "area": "Area"
+      "point": "Point marking",
+      "line": "Line marking",
+      "area": "Area marking"
     },
+    "markingsMade": "markings made.",
     "subQuestionDialog": "Subquestion dialog",
     "selectionHelperText": {
       "point": "Draw point on the desired location by clicking the map on that location.",
@@ -414,13 +417,13 @@
     "surveyToBeDeleted": "name of the survey to be deleted"
   },
   "GroupedCheckBoxQuestion": {
-    "helperText": "Choose options from the groups listed below.",
-    "helperTextMin": "Choose a minimum of {min} options.",
-    "helperTextMax": "Choose a maximum of {max} options.",
-    "helperTextMinMax": "Choose a minimum of {min} and a maximum of {max} options.",
-    "indicatorText": "You have chosen {numbers} options.",
-    "indicatorTextMaxReached": "You have chosen all {numbers} options.",
-    "optionsSelectedInGroup": "{number} options chosen."
+    "helperText": "Select options from the groups listed below.",
+    "helperTextMin": "Select a minimum of {min} options.",
+    "helperTextMax": "Select a maximum of {max} options.",
+    "helperTextMinMax": "Select a minimum of {min} and a maximum of {max} options.",
+    "indicatorText": "You have selected {numbers} options.",
+    "indicatorTextMaxReached": "You have selected all {numbers} options.",
+    "optionsSelectedInGroup": "{number} options selected."
   },
   "SubmissionInfoDialog": {
     "title": "Submit answers",
@@ -490,9 +493,6 @@
     "privacyStatement": "Data protection and management"
   },
   "IconAltTexts": {
-    "areaIconAltText": "Point icon",
-    "lineIconAltText": "Line icon",
-    "pointIconAltText": "Area icon",
     "treBannerAltText": "Tampere banner",
     "treLogoAltText": "Tampere Finland logo"
   }

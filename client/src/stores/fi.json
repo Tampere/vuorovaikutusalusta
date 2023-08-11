@@ -327,7 +327,9 @@
     "submit": "Lähetä",
     "errorSubmittingSurvey": "Kyselyn lähettämisessä tapahtui virhe. Ole hyvä ja yritä myöhemmin uudestaan.",
     "openMap": "Avaa kartta",
+    "closeMap": "Sulje kartta",
     "openImage": "Avaa kuva",
+    "closeImage": "Sulje kuva",
     "unfinishedAnswers": "Vastaa kaikkiin pakolliseksi merkittyihin kysymyksiin.",
     "unfinishedAnswersInfo": "Seuraavat kysymykset ovat vastaamatta:",
     "saveAsUnfinished": "Tallenna keskeneräisenä",
@@ -358,10 +360,11 @@
   "MapQuestion": {
     "mapSelectionButtons": "Kartan valintapainikkeet",
     "selectionTypes": {
-      "point": "Piste",
-      "line": "Viiva",
-      "area": "Alue"
+      "point": "Pistemerkintä",
+      "line": "Viivamerkintä",
+      "area": "Aluemerkintä"
     },
+    "markingsMade": "merkintää tehtynä.",
     "subQuestionDialog": "Alakysymysnäkymä",
     "selectionHelperText": {
       "point": "Sijoita piste oikeaan paikkaan klikkaamalla kartalla oikeassa kohdassa.",
@@ -490,9 +493,6 @@
     "privacyStatement": "Tietosuoja ja tiedonhallinta"
   },
   "IconAltTexts": {
-    "areaIconAltText": "Piste-kuvake",
-    "lineIconAltText": "Viiva-kuvake",
-    "pointIconAltText": "Alue-kuvake",
     "treBannerAltText": "Tampereen vaakunalogo",
     "treLogoAltText": "Tampere Finland -logo"
   }
