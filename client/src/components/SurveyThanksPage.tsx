@@ -77,7 +77,11 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
             alt={tr.IconAltTexts.treLogoAltText}
           />
         </div>
-        <Typography variant="h5" mt={survey.thanksPage.imageName ? 10 : 0}>
+        <Typography
+          variant="h5"
+          component="h1"
+          mt={survey.thanksPage.imageName ? 10 : 0}
+        >
           {survey.thanksPage.title?.[surveyLanguage]}
         </Typography>
         <ReactMarkdown rehypePlugins={[rehypeExternalLinks]}>
