@@ -18,6 +18,8 @@ interface Props {
   infoText: string;
   style?: React.CSSProperties;
   hiddenFromScreenReader?: boolean;
+  infoDialogOpen: boolean;
+  setInfoDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export default function SectionInfo({
@@ -25,8 +27,9 @@ export default function SectionInfo({
   infoText,
   style,
   hiddenFromScreenReader = false,
+  infoDialogOpen,
+  setInfoDialogOpen,
 }: Props) {
-  const [infoDialogOpen, setInfoDialogOpen] = useState(false);
   const { tr } = useTranslations();
   const dialogId = useId();
 
@@ -52,6 +55,7 @@ export default function SectionInfo({
         </DialogContent>
         <DialogActions>
           <Button
+            className="close-section-info-button"
             autoFocus
             color="primary"
             variant="contained"

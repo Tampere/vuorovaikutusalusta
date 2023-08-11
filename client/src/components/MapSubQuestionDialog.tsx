@@ -78,7 +78,7 @@ export default function MapSubQuestionDialog({
     ...(existingAnswer?.subQuestionAnswers ?? []),
   ]);
   const [dirty, setDirty] = useState<boolean[]>([]);
-
+  const [infoDialogOpen, setInfoDialogOpen] = useState(false);
   const classes = useStyles();
   const { getValidationErrors } = useSurveyAnswers();
   const { tr, surveyLanguage } = useTranslations();
@@ -118,33 +118,43 @@ export default function MapSubQuestionDialog({
       aria-label={tr.MapQuestion.subQuestionDialog}
     >
       {title && <DialogTitle>{title}</DialogTitle>}
-      <DialogContent
-        className={classes.content}
-      >
+      <DialogContent className={classes.content}>
         {subQuestions?.map((question, index) => (
           <FormControl
             component="fieldset"
             key={question.id}
             error={dirty?.[index] && validationErrors?.[index].length > 0}
             style={{ width: '100%' }}
+            onBlur={(e: React.FocusEvent<HTMLFieldSetElement>) => {
+              if (
+                e.relatedTarget &&
+                !e.currentTarget.contains(e.relatedTarget as Node) &&
+                !infoDialogOpen
+              ) {
+                dirty[index] = true;
+                setDirty([...dirty]);
+              }
+            }}
           >
-            <FormLabel component="legend">
-              {question.title?.[surveyLanguage]} {question.isRequired && '*'}
-            </FormLabel>
-            <div
+            <FormLabel
+              component="legend"
               style={{
                 display: 'flex',
                 flexDirection: 'row',
                 alignItems: 'center',
               }}
             >
+              {question.title?.[surveyLanguage]} {question.isRequired && '*'}
               {question.info && question.info?.[surveyLanguage] && (
                 <SectionInfo
+                  infoDialogOpen={infoDialogOpen}
+                  setInfoDialogOpen={setInfoDialogOpen}
                   infoText={question.info?.[surveyLanguage]}
                   subject={question.title?.[surveyLanguage]}
                 />
               )}
-            </div>
+            </FormLabel>
+
             {question.type === 'checkbox' ? (
               <CheckBoxQuestion
                 autoFocus={index === 0}

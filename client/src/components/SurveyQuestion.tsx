@@ -30,15 +30,16 @@ function SurveyQuestion({ question, pageUnfinished }: Props) {
     useSurveyAnswers();
   const { tr, surveyLanguage } = useTranslations();
   const [dirty, setDirty] = useState(false);
+  const [infoDialogOpen, setInfoDialogOpen] = useState(false);
 
   const value = useMemo(
     () => answers.find((answer) => answer.sectionId === question.id)?.value,
-    [answers, question],
+    [answers, question]
   );
 
   const validationErrors = useMemo(
     () => (dirty || pageUnfinished ? getValidationErrors(question) : []),
-    [dirty, question, value, pageUnfinished],
+    [dirty, question, value, pageUnfinished]
   );
 
   return (
@@ -52,7 +53,8 @@ function SurveyQuestion({ question, pageUnfinished }: Props) {
       onBlur={(e: React.FocusEvent<HTMLFieldSetElement>) => {
         if (
           e.relatedTarget &&
-          !e.currentTarget.contains(e.relatedTarget as Node)
+          !e.currentTarget.contains(e.relatedTarget as Node) &&
+          !infoDialogOpen
         ) {
           setDirty(true);
         }
@@ -92,6 +94,8 @@ function SurveyQuestion({ question, pageUnfinished }: Props) {
         )}
         {question.info && question.info?.[surveyLanguage] && (
           <SectionInfo
+            infoDialogOpen={infoDialogOpen}
+            setInfoDialogOpen={setInfoDialogOpen}
             hiddenFromScreenReader={false}
             infoText={question.info?.[surveyLanguage]}
             subject={question.title?.[surveyLanguage]}
