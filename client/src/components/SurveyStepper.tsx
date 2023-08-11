@@ -85,11 +85,6 @@ const useStyles = makeStyles((theme: Theme) => ({
   stepActive: {
     fontSize: '1.1rem',
   },
-  stepIcon: {
-    '& text': {
-      fill: 'white !important' as any,
-    },
-  },
   stepIconUnfinised: {
     '& svg': {
       color: 'red',
@@ -354,7 +349,6 @@ export default function SurveyStepper({
                 classes={{
                   active: classes.stepActive,
                   label: classes.stepHeader,
-                  iconContainer: classes.stepIcon,
                 }}
               >
                 <Typography

@@ -16,9 +16,6 @@ const useStyles = makeStyles({
   label: {
     cursor: 'pointer',
   },
-  emptyValue: {
-    color: '#ccc',
-  },
 });
 
 export default function SliderQuestion({
@@ -82,7 +79,6 @@ export default function SliderQuestion({
       <Slider
         aria-label={question.title?.[surveyLanguage]}
         ref={sliderRef}
-        className={value === null ? classes.emptyValue : ''}
         slotProps={{
           input: {
             'aria-describedby': `${question.id}-value-label`,
@@ -97,6 +93,14 @@ export default function SliderQuestion({
         getAriaValueText={(v) => v.toString()}
         step={1}
         marks
+        sx={{
+          '.MuiSlider-track, .MuiSlider-rail': {
+            color: value === null ? '#ccc' : 'inherit',
+          },
+          '.MuiSlider-mark': {
+            color: value === null ? 'white' : 'inherit',
+          },
+        }}
         onClick={() => {
           if (value === null) {
             onChange(visibleEmptyValue);

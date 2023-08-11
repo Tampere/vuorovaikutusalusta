@@ -35,7 +35,8 @@ export default function SurveyLanguageMenu({
         title={tr.SurveyLanguageMenu.changeSurveyLanguage}
       >
         <Select
-          inputProps={{"aria-label": tr.SurveyLanguageMenu.languageControl}}
+          inputProps={{ "aria-label": tr.SurveyLanguageMenu.languageControl }}
+          size='small'
           value={surveyLanguage}
           onChange={(event) => {
             const targetLanguage = event.target.value as LanguageCode;
@@ -48,9 +49,8 @@ export default function SurveyLanguageMenu({
             '&>.MuiSelect-select': { // Accommodate the larger globe icon
               paddingRight: '38px !important',
             },
-            '&>fieldset': { // Visual label not used, hide border and legend
-              borderWidth: 0,
-              '&>legend': {display: 'none'},
+            '&>fieldset': { 
+              display: 'none',
             },
             '& svg': { // The component is used in admin panel and survey, must adapt
               color: 'inherit',
