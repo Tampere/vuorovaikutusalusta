@@ -128,7 +128,8 @@ export default function MapSubQuestionDialog({
             onBlur={(e: React.FocusEvent<HTMLFieldSetElement>) => {
               if (
                 e.relatedTarget &&
-                !e.currentTarget.contains(e.relatedTarget as Node)
+                !e.currentTarget.contains(e.relatedTarget as Node) &&
+                !infoDialogOpen
               ) {
                 dirty[index] = true;
                 setDirty([...dirty]);
