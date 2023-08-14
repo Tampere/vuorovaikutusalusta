@@ -6,6 +6,13 @@ export const theme = createTheme(
   {
     components: {
       ...buttonOverrides,
+      MuiTypography: {
+        styleOverrides: {
+          root: {
+            textTransform: 'none',
+          },
+        },
+      },
     },
   },
   fiFI

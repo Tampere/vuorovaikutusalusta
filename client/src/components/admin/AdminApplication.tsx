@@ -20,7 +20,7 @@ export default function AdminApplication() {
       components={[
         [
           LocalizationProvider,
-          { dateAdapter: AdapterDateFns, locale: fiLocale },
+          { dateAdapter: AdapterDateFns, adapterLocale: fiLocale },
         ],
         [ThemeProvider, { theme }],
         SurveyProvider,

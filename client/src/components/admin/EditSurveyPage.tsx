@@ -282,6 +282,7 @@ export default function EditSurveyPage() {
       <ConfirmDialog
         open={deleteConfirmDialogOpen}
         text={tr.EditSurveyPage.confirmDeletePage}
+        submitColor="error"
         onClose={async (result) => {
           setDeleteConfirmDialogOpen(false);
           if (result) {

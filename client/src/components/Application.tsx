@@ -25,7 +25,7 @@ const Application = () => {
       components={[
         [
           LocalizationProvider,
-          { dateAdapter: AdapterDateFns, locale: fiLocale },
+          { dateAdapter: AdapterDateFns, adapterLocale: fiLocale },
         ],
         SurveyThemeProvider,
         TranslationProvider,

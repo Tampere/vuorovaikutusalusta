@@ -54,6 +54,7 @@
     "availableMapLayers": "Saatavilla olevat karttatasot:",
     "startDate": "Alkamisaika",
     "endDate": "Loppumisaika",
+    "selectDateAndTime": "Valitse päivämäärä ja aika",
     "theme": "Teema",
     "selectTheme": "Valitse teema",
     "themeFetchFailed": "Teemojen hakemisessa tapahtui virhe. Yritä myöhemmin uudestaan.",

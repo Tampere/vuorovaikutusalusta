@@ -9,11 +9,21 @@ import {
 } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
 
+type PaletteColor =
+  | 'inherit'
+  | 'error'
+  | 'secondary'
+  | 'primary'
+  | 'info'
+  | 'success'
+  | 'warning';
+
 interface Props {
   title?: string;
   text: string;
   open: boolean;
   onClose: (result: boolean) => void;
+  submitColor: PaletteColor;
 }
 
 export default function ConfirmDialog(props: Props) {
@@ -42,16 +52,12 @@ export default function ConfirmDialog(props: Props) {
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button
-          autoFocus
-          variant="outlined"
-          onClick={handleClose(false)}
-        >
+        <Button autoFocus variant="outlined" onClick={handleClose(false)}>
           {tr.options.no}
         </Button>
         <Button
-          variant="outlined"
-          color="error"
+          variant="contained"
+          color={props.submitColor}
           onClick={handleClose(true)}
         >
           {tr.options.yes}
