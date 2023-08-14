@@ -54,6 +54,7 @@
     "availableMapLayers": "Available map layers:",
     "startDate": "Start date",
     "endDate": "End date",
+    "selectDateAndTime": "Select date and time",
     "theme": "Theme",
     "selectTheme": "Choose a theme",
     "themeFetchFailed": "Failed to access survey themes. Please try again later.",
