@@ -1,5 +1,4 @@
 import { Survey } from '@interfaces/survey';
-import { Scale } from '@mui/icons-material';
 import { Box, Button, Link, Theme, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';

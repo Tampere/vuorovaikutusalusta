@@ -1,5 +1,12 @@
 import { Survey } from '@interfaces/survey';
-import { Link, Typography, SxProps, Theme, Box } from '@mui/material';
+import {
+  Link,
+  Typography,
+  SxProps,
+  Theme,
+  Box,
+  useMediaQuery,
+} from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
