@@ -34,7 +34,6 @@ interface Props {
 
 export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
   const [imageAltText, setImageAltText] = useState<string | null>(null);
-  const widthFourHundred = useMediaQuery('(max-width:400px)');
 
   useEffect(() => {
     async function getImageHeaders() {
@@ -53,6 +52,11 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
   }, []);
 
   const { tr, surveyLanguage } = useTranslations();
+  const hasImage = survey.thanksPage.imageName !== null;
+  const lowWidth = useMediaQuery('(max-width:400px)');
+  const lowHeight = useMediaQuery('(max-height:400px');
+  const landscape = useMediaQuery('(orientation:landscape)');
+  const mobileLandscape = lowHeight && landscape;
 
   return (
     <Stack
@@ -61,6 +65,7 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
         height: '100vh',
         width: '100%',
         minHeight: '-webkit-fill-available',
+        display: 'flex',
       }}
       direction="column"
       justifyContent="space-between"
@@ -72,14 +77,13 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
         className="header-content"
         sx={{
           position: 'relative',
-          height: '20vh',
           display: 'flex',
           justifyContent: 'flex-end',
           alignItems: 'flex-start',
         }}
       >
         <img
-          style={{ maxWidth: '60%', maxHeight: '100%' }}
+          style={{ maxWidth: '60%', maxHeight: '15vh' }}
           src={`/api/feature-styles/icons/tre_logo`}
           alt={tr.IconAltTexts.treLogoAltText}
         />
@@ -87,16 +91,26 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
       <Box
         className="middle-content"
         sx={{
-          maxHeight: '60vh',
+          flexGrow: 1,
+          maxHeight: !lowHeight ? '80vh' : 'auto',
+          maxWidth: '60em',
           textAlign: 'center',
           display: 'flex',
           flexDirection: 'column',
-          justifyContent: 'center',
+          justifyContent: !lowWidth || !hasImage ? 'center' : 'start',
           alignItems: 'center',
-          padding: '0 1em 0 1em',
+          padding: '1em',
+          margin: '0 auto',
         }}
       >
-        <div>
+        <div
+          style={{
+            flexGrow: !lowWidth ? 1 : 0,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: hasImage ? 'end' : 'center',
+          }}
+        >
           <Typography variant="h5" component="h1">
             {survey.thanksPage.title?.[surveyLanguage]}
           </Typography>
@@ -106,7 +120,10 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
         </div>
         {survey.thanksPage.imageName && (
           <img
-            style={{ maxHeight: '40%' }}
+            style={{
+              maxHeight: !mobileLandscape ? '40vh' : '100vh',
+              maxWidth: '100%',
+            }}
             src={`/api/file/${survey.thanksPage.imagePath[0]}/${survey.thanksPage.imageName}`}
             alt={imageAltText ?? ''}
           />
@@ -116,7 +133,7 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
         className="footer-content"
         sx={{
           position: 'relative',
-          height: '20vh',
+          height: '10em',
           display: 'flex',
           justifyContent: 'center',
           alignItems: { xs: 'center', md: 'flex-end' },
@@ -127,12 +144,11 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
         <img
           style={{
             minWidth: '130px',
-            maxWidth: '20%',
+            width: '10vw',
             position: 'absolute',
-            left: 0,
+            left: !lowWidth ? '0' : 'auto',
             bottom: 0,
-            marginLeft: '0.5rem',
-            marginBottom: '0.5rem',
+            margin: '0.5rem',
           }}
           src={`/api/feature-styles/icons/tre_banner`}
           alt={tr.IconAltTexts.treBannerAltText}
