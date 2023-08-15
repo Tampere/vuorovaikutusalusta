@@ -1,5 +1,5 @@
 import { Survey } from '@interfaces/survey';
-import { Box, Button, Link, Theme, Typography } from '@mui/material';
+import { Box, Button, Link, Theme, Typography, Stack } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { getClassList } from '@src/utils/classes';
@@ -7,32 +7,6 @@ import React from 'react';
 import Footer from './Footer';
 
 const useStyles = makeStyles((theme: Theme & { [customKey: string]: any }) => ({
-  root: (props: any) => ({
-    display: 'flex',
-    width: '100%',
-    minHeight: '-webkit-fill-available',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    ...(props?.imageName && {
-      backgroundImage: `url("/api/file/background-images/${props.imageName}")`,
-    }),
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-    backgroundAttachment: 'fixed',
-    backgroundColor: theme.landingPage?.backgroundColor ?? '#fff',
-  }),
-  header: {
-    display: 'flex',
-    flexDirection: 'row',
-    width: '100%',
-    minHeight: '200px',
-    justifyContent: 'flex-end',
-  },
-  headerLogo: {
-    width: '30rem',
-    maxWidth: '100%',
-  },
   heading: {
     fontSize: '2rem',
     wordBreak: 'break-word',
@@ -85,27 +59,7 @@ const useStyles = makeStyles((theme: Theme & { [customKey: string]: any }) => ({
       fontSize: '6vw',
     },
   },
-  footer: {
-    display: 'flex',
-    flexDirection: 'row',
-    width: '100%',
-    minHeight: '50px',
-    justifyContent: 'space-between',
-    marginTop: '2rem',
-    gap: '1rem',
-    [theme.breakpoints.down(800)]: {
-      flexDirection: 'column',
-      alignItems: 'center',
-    },
-  },
-  footerLogo: {
-    position: 'absolute',
-    left: 0,
-    bottom: 0,
-    marginLeft: '0.5rem',
-    marginBottom: '0.5rem',
-    alignItems: 'flex-end',
-  },
+
   imageCopyright: {
     position: 'absolute',
     right: 0,
@@ -115,8 +69,7 @@ const useStyles = makeStyles((theme: Theme & { [customKey: string]: any }) => ({
     padding: '1rem',
   },
   testSurveyHeader: {
-    padding: '1rem',
-    width: '100%',
+    padding: '2px',
     background: 'red',
     color: 'white',
     textAlign: 'center',
@@ -142,27 +95,57 @@ export default function SurveyLandingPage({
   const { tr, surveyLanguage } = useTranslations();
 
   return (
-    <Box className={classes.root}>
+    <Stack
+      direction="column"
+      justifyContent="space-between"
+      alignItems="stretch"
+      sx={{
+        width: '100%',
+        minHeight: '-webkit-fill-available',
+        ...(survey?.backgroundImageName && {
+          backgroundImage: `url("/api/file/background-images/${survey?.backgroundImageName}")`,
+        }),
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed',
+      }}
+    >
       {isTestSurvey && (
-        <div className={classes.testSurveyHeader}>
-          {tr.TestSurveyFrame.text}
-        </div>
+        <Box
+          className="test-survey-header"
+          sx={{ position: 'absolute', width: '100%' }}
+        >
+          <div className={classes.testSurveyHeader}>
+            {tr.TestSurveyFrame.text}
+          </div>
+        </Box>
       )}
-      <div className={classes.header}>
-        <div className={classes.headerLogo}>
-          <img
-            src={`/api/feature-styles/icons/tre_logo`}
-            alt={tr.IconAltTexts.treLogoAltText}
-          />
-        </div>
-      </div>
-      <div
-        style={{
+      <Box
+        className="header-content"
+        sx={{
+          position: 'relative',
+          height: '20vh',
+          display: 'flex',
+          justifyContent: 'flex-end',
+          alignItems: 'flex-start',
+        }}
+      >
+        <img
+          style={{
+            maxWidth: '60%',
+            maxHeight: '100%',
+          }}
+          src={`/api/feature-styles/icons/tre_logo`}
+          alt={tr.IconAltTexts.treLogoAltText}
+        />
+      </Box>
+      <Box
+        className="middle-content"
+        sx={{
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          flexGrow: 1,
         }}
       >
         <div>
@@ -182,14 +165,31 @@ export default function SurveyLandingPage({
               : tr.SurveyPage.startSurveyLink}
           </Typography>
         </Button>
-      </div>
-      <div className={classes.footer}>
-        <div className={classes.footerLogo}>
-          <img
-            src={`/api/feature-styles/icons/tre_banner`}
-            alt={tr.IconAltTexts.treBannerAltText}
-          />
-        </div>
+      </Box>
+      <Box
+        className="footer-content"
+        sx={{
+          position: 'relative',
+          minHeight: '20vh',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: { xs: 'center', md: 'flex-end' },
+          whiteSpace: 'nowrap',
+        }}
+      >
+        <img
+          style={{
+            minWidth: '130px',
+            maxWidth: '20%',
+            position: 'absolute',
+            left: 0,
+            bottom: 0,
+            marginLeft: '0.5rem',
+            marginBottom: '0.5rem',
+          }}
+          src={`/api/feature-styles/icons/tre_banner`}
+          alt={tr.IconAltTexts.treBannerAltText}
+        />
         <Footer>
           <Link
             color="primary"
@@ -216,7 +216,7 @@ export default function SurveyLandingPage({
             {surveyBackgroundImage.attributions}
           </Typography>
         ) : null}
-      </div>
-    </Box>
+      </Box>
+    </Stack>
   );
 }
