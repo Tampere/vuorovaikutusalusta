@@ -119,14 +119,16 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
           </ReactMarkdown>
         </div>
         {survey.thanksPage.imageName && (
-          <img
-            style={{
-              maxHeight: !mobileLandscape ? '40vh' : '100vh',
-              maxWidth: '100%',
-            }}
-            src={`/api/file/${survey.thanksPage.imagePath[0]}/${survey.thanksPage.imageName}`}
-            alt={imageAltText ?? ''}
-          />
+          <div className="spacer" style={{ minHeight: '40vh', width: '100%' }}>
+            <img
+              style={{
+                maxHeight: !mobileLandscape ? '40vh' : '100vh',
+                maxWidth: '100%',
+              }}
+              src={`/api/file/${survey.thanksPage.imagePath[0]}/${survey.thanksPage.imageName}`}
+              alt={imageAltText ?? ''}
+            />
+          </div>
         )}
       </Box>
       <Box
