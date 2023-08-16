@@ -39,7 +39,7 @@ export default function SurveyPage({ isTestSurvey }: Props) {
 
   const unfinishedToken = useMemo(
     () => new URLSearchParams(search)?.get('token'),
-    [search]
+    [search],
   );
 
   // Fetch survey data from server
@@ -47,7 +47,7 @@ export default function SurveyPage({ isTestSurvey }: Props) {
     async function fetchSurvey() {
       try {
         const survey = await request<Survey>(
-          `/api/published-surveys/${name}${isTestSurvey ? '?test=true' : ''}`
+          `/api/published-surveys/${name}${isTestSurvey ? '?test=true' : ''}`,
         );
         if (
           survey.backgroundImagePath &&
@@ -56,11 +56,11 @@ export default function SurveyPage({ isTestSurvey }: Props) {
         ) {
           const fullFilePath = getFullFilePath(
             survey.backgroundImagePath,
-            survey.backgroundImageName
+            survey.backgroundImageName,
           );
           const response = await fetch(`/api/file/${fullFilePath}`);
           const details = JSON.parse(
-            response.headers.get('File-details') ?? '{}'
+            response.headers.get('File-details') ?? '{}',
           );
           setSurveyBackgroundImage(details);
         }

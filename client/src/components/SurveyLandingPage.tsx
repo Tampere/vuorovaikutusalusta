@@ -1,38 +1,12 @@
 import { Survey } from '@interfaces/survey';
-import { Scale } from '@mui/icons-material';
-import { Box, Button, Link, Theme, Typography } from '@mui/material';
+import { Box, Button, Link, Theme, Typography, Stack } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { getClassList } from '@src/utils/classes';
 import React from 'react';
+import Footer from './Footer';
 
 const useStyles = makeStyles((theme: Theme & { [customKey: string]: any }) => ({
-  root: (props: any) => ({
-    display: 'flex',
-    width: '100%',
-    minHeight: '-webkit-fill-available',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    ...(props?.imageName && {
-      backgroundImage: `url("/api/file/background-images/${props.imageName}")`,
-    }),
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-    backgroundAttachment: 'fixed',
-    backgroundColor: theme.landingPage?.backgroundColor ?? '#fff',
-  }),
-  header: {
-    display: 'flex',
-    flexDirection: 'row',
-    width: '100%',
-    minHeight: '200px',
-    justifyContent: 'flex-end',
-  },
-  headerLogo: {
-    width: '30rem',
-    maxWidth: '100%',
-  },
   heading: {
     fontSize: '2rem',
     wordBreak: 'break-word',
@@ -82,33 +56,20 @@ const useStyles = makeStyles((theme: Theme & { [customKey: string]: any }) => ({
     },
     ...theme.landingPage?.start,
     [theme.breakpoints.down(600)]: {
-      fontSize: '6vw',    
+      fontSize: '6vw',
     },
   },
-  footer: {
-    display: 'flex',
-    flexDirection: 'row',
-    width: '100%',
-    minHeight: '50px',
-    justifyContent: 'space-between',
-    marginTop: '2rem',
-    gap: '1rem',
-  },
-  footerLogo: {
-    display: 'flex',
-    marginLeft: '0.5rem',
-    marginBottom: '0.5rem',
-    alignItems: 'flex-end',
-  },
+
   imageCopyright: {
-    alignSelf: 'flex-end',
+    position: 'absolute',
+    right: 0,
+    bottom: 0,
     backgroundColor: theme.palette.primary.main,
     color: theme.palette.primary.contrastText,
     padding: '1rem',
   },
   testSurveyHeader: {
-    padding: '1rem',
-    width: '100%',
+    padding: '2px',
     background: 'red',
     color: 'white',
     textAlign: 'center',
@@ -134,27 +95,57 @@ export default function SurveyLandingPage({
   const { tr, surveyLanguage } = useTranslations();
 
   return (
-    <Box className={classes.root}>
+    <Stack
+      direction="column"
+      justifyContent="space-between"
+      alignItems="stretch"
+      sx={{
+        width: '100%',
+        minHeight: '-webkit-fill-available',
+        ...(survey?.backgroundImageName && {
+          backgroundImage: `url("/api/file/background-images/${survey?.backgroundImageName}")`,
+        }),
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed',
+      }}
+    >
       {isTestSurvey && (
-        <div className={classes.testSurveyHeader}>
-          {tr.TestSurveyFrame.text}
-        </div>
+        <Box
+          className="test-survey-header"
+          sx={{ position: 'absolute', width: '100%' }}
+        >
+          <div className={classes.testSurveyHeader}>
+            {tr.TestSurveyFrame.text}
+          </div>
+        </Box>
       )}
-      <div className={classes.header}>
-        <div className={classes.headerLogo}>
-          <img
-            src={`/api/feature-styles/icons/tre_logo`}
-            alt={tr.IconAltTexts.treLogoAltText}
-          />
-        </div>
-      </div>
-      <div
-        style={{
+      <Box
+        className="header-content"
+        sx={{
+          position: 'relative',
+          height: '20vh',
+          display: 'flex',
+          justifyContent: 'flex-end',
+          alignItems: 'flex-start',
+        }}
+      >
+        <img
+          style={{
+            maxWidth: '60%',
+            maxHeight: '100%',
+          }}
+          src={`/api/feature-styles/icons/tre_logo`}
+          alt={tr.IconAltTexts.treLogoAltText}
+        />
+      </Box>
+      <Box
+        className="middle-content"
+        sx={{
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          flexGrow: 1,
         }}
       >
         <div>
@@ -167,33 +158,65 @@ export default function SurveyLandingPage({
             </h2>
           )}
         </div>
-        <Button
-          onClick={onStart}
-        >
-          <Typography
-            variant="body1"
-            className={classes.start}
-          >
+        <Button onClick={onStart}>
+          <Typography variant="body1" className={classes.start}>
             {continueUnfinished
               ? tr.SurveyPage.continueSurveyLink
-              : tr.SurveyPage.startSurveyLink
-            }
+              : tr.SurveyPage.startSurveyLink}
           </Typography>
         </Button>
-      </div>
-      <div className={classes.footer}>
-        <div className={classes.footerLogo}>
-          <img
-            src={`/api/feature-styles/icons/tre_banner`}
-            alt={tr.IconAltTexts.treBannerAltText}
-          />
-        </div>
+      </Box>
+      <Box
+        className="footer-content"
+        sx={{
+          position: 'relative',
+          minHeight: '20vh',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: { xs: 'center', md: 'flex-end' },
+          whiteSpace: 'nowrap',
+        }}
+      >
+        <img
+          style={{
+            minWidth: '130px',
+            maxWidth: '20%',
+            position: 'absolute',
+            left: 0,
+            bottom: 0,
+            marginLeft: '0.5rem',
+            marginBottom: '0.5rem',
+          }}
+          src={`/api/feature-styles/icons/tre_banner`}
+          alt={tr.IconAltTexts.treBannerAltText}
+        />
+        <Footer>
+          <Link
+            color="primary"
+            underline="hover"
+            href="https://www.tampere.fi/asioi-kaupungin-kanssa/oskari-karttakyselypalvelun-saavutettavuusseloste"
+            target="_blank"
+          >
+            {tr.FooterLinks.accessibility}
+          </Link>
+          {survey.displayPrivacyStatement && (
+            <Link
+              color="primary"
+              underline="hover"
+              href="https://www.tampere.fi/tietosuoja-ja-tiedonhallinta/tietosuojaselosteet"
+              target="_blank"
+            >
+              {tr.FooterLinks.privacyStatement}
+            </Link>
+          )}
+        </Footer>
+
         {surveyBackgroundImage?.attributions ? (
           <Typography className={classes.imageCopyright} variant="body2">
             {surveyBackgroundImage.attributions}
           </Typography>
         ) : null}
-      </div>
-    </Box>
+      </Box>
+    </Stack>
   );
 }

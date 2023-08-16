@@ -1,31 +1,31 @@
 import { Survey } from '@interfaces/survey';
-import { Typography, useMediaQuery } from '@mui/material';
-import { makeStyles } from '@mui/styles';
+import {
+  Link,
+  Typography,
+  SxProps,
+  Theme,
+  Box,
+  useMediaQuery,
+  Stack,
+} from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import rehypeExternalLinks from 'rehype-external-links';
+import Footer from './Footer';
 
-const useStyles = makeStyles({
-  root: {
-    position: 'relative',
-    height: '100%',
-    width: '100%',
-    padding: '1rem',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-    textAlign: 'center',
-  },
+type StyleKeys = 'testSurveyHeader';
+
+const styles: Record<StyleKeys, SxProps<Theme>> = {
   testSurveyHeader: {
-    padding: '1rem',
+    padding: '2px',
     width: '100%',
     background: 'red',
     color: 'white',
     textAlign: 'center',
+    position: 'absolute',
   },
-});
+};
 
 interface Props {
   survey: Survey;
@@ -34,13 +34,12 @@ interface Props {
 
 export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
   const [imageAltText, setImageAltText] = useState<string | null>(null);
-  const matches = useMediaQuery('(max-width:400px)');
 
   useEffect(() => {
     async function getImageHeaders() {
       const res = await fetch(
-        `/api/file/${survey.thanksPage.imagePath[0]}/${survey.thanksPage.imageName}`,
-        { method: 'HEAD' }
+        `api/file/${survey.thanksPage.imagePath[0]}/${survey.thanksPage.imageName}`,
+        { method: 'HEAD' },
       );
 
       const details = JSON.parse(res.headers.get('File-details'));
@@ -52,73 +51,131 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
       getImageHeaders();
   }, []);
 
-  const classes = useStyles();
   const { tr, surveyLanguage } = useTranslations();
+  const hasImage = survey.thanksPage.imageName !== null;
+  const lowWidth = useMediaQuery('(max-width:400px)');
+  const lowHeight = useMediaQuery('(max-height:400px');
+  const landscape = useMediaQuery('(orientation:landscape)');
+  const mobileLandscape = lowHeight && landscape;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+    <Stack
+      sx={{
+        maxHeight: '100vh',
+        height: '100vh',
+        width: '100%',
+        minHeight: '-webkit-fill-available',
+        display: 'flex',
+      }}
+      direction="column"
+      justifyContent="space-between"
+    >
       {isTestSurvey && (
-        <div className={classes.testSurveyHeader}>
-          {tr.TestSurveyFrame.text}
-        </div>
+        <Box sx={{ ...styles.testSurveyHeader }}>{tr.TestSurveyFrame.text}</Box>
       )}
-      <div className={classes.root}>
+      <Box
+        className="header-content"
+        sx={{
+          position: 'relative',
+          display: 'flex',
+          justifyContent: 'flex-end',
+          alignItems: 'flex-start',
+        }}
+      >
+        <img
+          style={{ maxWidth: '60%', maxHeight: '15vh' }}
+          src={`/api/feature-styles/icons/tre_logo`}
+          alt={tr.IconAltTexts.treLogoAltText}
+        />
+      </Box>
+      <Box
+        className="middle-content"
+        sx={{
+          flexGrow: 1,
+          maxHeight: !lowHeight ? '80vh' : 'auto',
+          maxWidth: '60em',
+          textAlign: 'center',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: !lowWidth || !hasImage ? 'center' : 'start',
+          alignItems: 'center',
+          padding: '1em',
+          margin: '0 auto',
+        }}
+      >
         <div
           style={{
-            position: 'absolute',
-            top: '0',
-            right: '0',
+            flexGrow: !lowWidth ? 1 : 0,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: hasImage ? 'end' : 'center',
           }}
         >
-          {' '}
-          <img
-            style={{ height: '125px', width: '351px' }}
-            src={`/api/feature-styles/icons/tre_logo`}
-            alt={tr.IconAltTexts.treLogoAltText}
-          />
+          <Typography variant="h5" component="h1">
+            {survey.thanksPage.title?.[surveyLanguage]}
+          </Typography>
+          <ReactMarkdown rehypePlugins={[rehypeExternalLinks]}>
+            {survey.thanksPage.text?.[surveyLanguage]}
+          </ReactMarkdown>
         </div>
-        <Typography
-          variant="h5"
-          component="h1"
-          mt={survey.thanksPage.imageName ? 10 : 0}
-        >
-          {survey.thanksPage.title?.[surveyLanguage]}
-        </Typography>
-        <ReactMarkdown rehypePlugins={[rehypeExternalLinks]}>
-          {survey.thanksPage.text?.[surveyLanguage]}
-        </ReactMarkdown>
-
         {survey.thanksPage.imageName && (
-          <div
-            style={{
-              width: matches ? '100%' : '50%',
-              height: '50%',
-            }}
-          >
+          <div className="spacer" style={{ minHeight: '40vh', width: '100%' }}>
             <img
-              style={{ maxWidth: '100%', maxHeight: '100%' }}
+              style={{
+                maxHeight: !mobileLandscape ? '40vh' : '100vh',
+                maxWidth: '100%',
+              }}
               src={`/api/file/${survey.thanksPage.imagePath[0]}/${survey.thanksPage.imageName}`}
               alt={imageAltText ?? ''}
             />
           </div>
         )}
-
-        <div
+      </Box>
+      <Box
+        className="footer-content"
+        sx={{
+          position: 'relative',
+          height: '10em',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: { xs: 'center', md: 'flex-end' },
+          marginBottom: { xs: '10px', sm: 0 },
+          whiteSpace: 'nowrap',
+        }}
+      >
+        <img
           style={{
+            minWidth: '130px',
+            width: '10vw',
             position: 'absolute',
-            bottom: '0',
-            left: '0',
-            paddingLeft: '1rem',
-            paddingBottom: '0.5rem',
+            left: !lowWidth ? '0' : 'auto',
+            bottom: 0,
+            margin: '0.5rem',
           }}
-        >
-          <img
-            style={{ height: '2rem' }}
-            src={`/api/feature-styles/icons/tre_banner`}
-            alt={tr.IconAltTexts.treBannerAltText}
-          />
-        </div>
-      </div>
-    </div>
+          src={`/api/feature-styles/icons/tre_banner`}
+          alt={tr.IconAltTexts.treBannerAltText}
+        />
+        <Footer>
+          <Link
+            color="primary"
+            underline="hover"
+            href="https://www.tampere.fi/asioi-kaupungin-kanssa/oskari-karttakyselypalvelun-saavutettavuusseloste"
+            target="_blank"
+          >
+            {tr.FooterLinks.accessibility}
+          </Link>
+          {survey.displayPrivacyStatement && (
+            <Link
+              color="primary"
+              underline="hover"
+              href="https://www.tampere.fi/tietosuoja-ja-tiedonhallinta/tietosuojaselosteet"
+              target="_blank"
+            >
+              {tr.FooterLinks.privacyStatement}
+            </Link>
+          )}
+        </Footer>
+      </Box>
+    </Stack>
   );
 }
