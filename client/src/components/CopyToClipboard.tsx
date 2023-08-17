@@ -17,7 +17,10 @@ export default function CopyToClipboard({ data, tooltip }: Props) {
     <Tooltip title={tooltip ?? tr.CopyToClipboard.tooltip}>
       <IconButton
         size="small"
-        onClick={async () => {
+        onClick={async (event: React.MouseEvent<HTMLButtonElement>) => {
+          event.stopPropagation();
+          event.preventDefault();
+
           try {
             await navigator.clipboard.writeText(data);
             showToast({
