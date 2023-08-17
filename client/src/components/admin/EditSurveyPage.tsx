@@ -6,12 +6,15 @@ import {
   FormLabel,
   Skeleton,
   TextField,
+  Typography,
   ToggleButton,
   ToggleButtonGroup,
   FormControl,
   Radio,
   RadioGroup,
+  Fab,
 } from '@mui/material';
+import { Article } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useToasts } from '@src/stores/ToastContext';
@@ -158,7 +161,7 @@ export default function EditSurveyPage() {
                               // changes are detected correctly (the order won't matter anyway)
                               [...page.sidebar.mapLayers, layer.id].sort()
                             : page.sidebar.mapLayers.filter(
-                                (layerId) => layerId !== layer.id
+                                (layerId) => layerId !== layer.id,
                               );
                           editPage({
                             ...page,
@@ -271,6 +274,21 @@ export default function EditSurveyPage() {
           setExpandedSection(section);
         }}
       />
+      <div className={classes.actionItem}>
+        <Fab
+          aria-label={'asdf'}
+          size="small"
+          onClick={async () => {
+            const text = await navigator.clipboard.readText();
+            const section = JSON.parse(text) as SurveyPageSection;
+            console.log(section);
+            addSection(page.id, { ...section, id: -1 });
+          }}
+        >
+          <Article style={{ color: 'white', backgroundColor: 'pink' }} />
+        </Fab>
+        <Typography>Liitä kysymys</Typography>
+      </div>
       <AddSurveySectionActions
         disabled={loading}
         onAdd={(newSection) => {

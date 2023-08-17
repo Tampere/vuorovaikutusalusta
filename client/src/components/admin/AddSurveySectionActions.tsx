@@ -269,7 +269,7 @@ export default function AddSurveySectionActions(props: Props) {
         <Grid item xs={12} md={6}>
           {questionButtons
             .filter(
-              (button) => !props.types || props.types.includes(button.type)
+              (button) => !props.types || props.types.includes(button.type),
             )
             .map((button) => (
               <Grid item key={button.type} style={{ padding: '0.5rem' }}>
@@ -292,7 +292,7 @@ export default function AddSurveySectionActions(props: Props) {
         <Grid item xs={12} md={6}>
           {sectionButtons
             .filter(
-              (button) => !props.types || props.types.includes(button.type)
+              (button) => !props.types || props.types.includes(button.type),
             )
             .map((button) => (
               <Grid item key={button.type} style={{ padding: '0.5rem' }}>
@@ -310,6 +310,23 @@ export default function AddSurveySectionActions(props: Props) {
                 </div>
               </Grid>
             ))}
+          <Grid item style={{ padding: '0.5rem' }}>
+            <div className={classes.actionItem}>
+              <Fab
+                aria-label={'asdf'}
+                size="small"
+                onClick={async () => {
+                  const text = await navigator.clipboard.readText();
+                  const section = JSON.parse(text) as SurveyPageSection;
+                  console.log(section);
+                  handleAdd(section.type);
+                }}
+              >
+                <Article style={{ color: 'white', backgroundColor: 'pink' }} />
+              </Fab>
+              <Typography>Liitä kysymys</Typography>
+            </div>
+          </Grid>
         </Grid>
       </Grid>
     </Grid>

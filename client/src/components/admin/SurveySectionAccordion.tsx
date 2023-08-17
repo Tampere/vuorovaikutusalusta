@@ -41,6 +41,7 @@ import {
   Subject,
   TextFields,
   ViewComfy,
+  ContentPaste,
 } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
@@ -61,6 +62,7 @@ import EditRadioQuestion from './EditRadioQuestion';
 import EditSliderQuestion from './EditSliderQuestion';
 import EditSortingQuestion from './EditSortingQuestion';
 import EditTextSection from './EditTextSection';
+import CopyToClipboard from '../CopyToClipboard';
 
 const useStyles = makeStyles({
   accordion: {
@@ -285,6 +287,10 @@ export default function SurveySectionAccordion(props: Props) {
               <em>{tr.EditSurveyPage.untitledSection}</em>
             )}
           </Typography>
+          <CopyToClipboard
+            data={JSON.stringify(props.section)}
+            tooltip="kopioi kysymys"
+          />
           <div {...props.provided.dragHandleProps} style={{ display: 'flex' }}>
             <DragIndicator />
           </div>
