@@ -68,7 +68,7 @@ function surveyToTranslationString(survey: Survey) {
   function getRowString(
     label: string,
     valueFi: string,
-    valueEn: string
+    valueEn: string,
   ): string {
     return `${label} \t ${valueFi} \t ${valueEn} \n`;
   }
@@ -88,7 +88,7 @@ function surveyToTranslationString(survey: Survey) {
       } else if (Array.isArray(value)) {
         index = 1;
         value.forEach((item) =>
-          addRowString(item, `${label}.${key}[${index}]`, index++)
+          addRowString(item, `${label}.${key}[${index}]`, index++),
         );
       } else if (typeof value === 'object' && !isLocalizedText(value)) {
         addRowString(value, `${label}.${key}[${index}]`, index);
@@ -232,7 +232,7 @@ export default function EditSurveyTranslations() {
                         <RichTextEditor
                           value={activeSurvey.email.body?.[lang] ?? ''}
                           missingValue={Boolean(
-                            !activeSurvey.email.body?.[lang]
+                            !activeSurvey.email.body?.[lang],
                           )}
                           onChange={(value) =>
                             editSurvey({
@@ -248,8 +248,8 @@ export default function EditSurveyTranslations() {
                           }
                           editorHeight={'100px'}
                         />
-                        {activeSurvey.email.info.map(
-                          (infoRow: SurveyEmailInfoItem, index) => (
+                        {activeSurvey?.email?.info?.map(
+                          (infoRow: SurveyEmailInfoItem, index: number) => (
                             <div
                               key={`email-info-${index}`}
                               className={classes.keyValueContainer}
@@ -301,7 +301,7 @@ export default function EditSurveyTranslations() {
                                 }}
                               />
                             </div>
-                          )
+                          ),
                         )}
                       </>
                     )}
@@ -366,7 +366,7 @@ export default function EditSurveyTranslations() {
                                   editSection(
                                     page.id,
                                     sectionIndex,
-                                    editedSection
+                                    editedSection,
                                   )
                                 }
                               />
@@ -400,7 +400,7 @@ export default function EditSurveyTranslations() {
                       <RichTextEditor
                         value={activeSurvey.thanksPage.text?.[lang] ?? ''}
                         missingValue={Boolean(
-                          !activeSurvey.thanksPage.text?.[lang]
+                          !activeSurvey.thanksPage.text?.[lang],
                         )}
                         onChange={(value) =>
                           editSurvey({
