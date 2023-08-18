@@ -11,6 +11,7 @@ import {
   ToggleButton,
   ToggleButtonGroup,
   Typography,
+  useMediaQuery,
 } from '@mui/material';
 import { useSurveyMap } from '@src/stores/SurveyMapContext';
 import { useTranslations } from '@src/stores/TranslationContext';
@@ -152,6 +153,8 @@ export default function MapQuestion({ value, onChange, question }: Props) {
     }
   }, [drawing]);
 
+  const mobileWidth = useMediaQuery('(max-width:600px)');
+
   async function getSubQuestionAnswers() {
     // Don't open the dialog at all if there are no subquestions
     if (!question.subQuestions?.length) {
@@ -229,6 +232,7 @@ export default function MapQuestion({ value, onChange, question }: Props) {
             setSelectionType(newValue);
           }}
           aria-label={tr.MapQuestion.mapSelectionButtons}
+          orientation={mobileWidth ? 'vertical' : 'horizontal'}
         >
           {question.selectionTypes.includes('point') &&
             getToggleButton('point')}
