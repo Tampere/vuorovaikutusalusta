@@ -116,8 +116,8 @@ export default function AddSurveySectionActions(props: Props) {
       presentationType: 'literal',
       minValue: 0,
       maxValue: 10,
-      minLabel: null,
-      maxLabel: null,
+      minLabel: initializeLocalizedObject(''),
+      maxLabel: initializeLocalizedObject(''),
     },
     matrix: {
       type: 'matrix',
@@ -269,7 +269,7 @@ export default function AddSurveySectionActions(props: Props) {
         <Grid item xs={12} md={6}>
           {questionButtons
             .filter(
-              (button) => !props.types || props.types.includes(button.type)
+              (button) => !props.types || props.types.includes(button.type),
             )
             .map((button) => (
               <Grid item key={button.type} style={{ padding: '0.5rem' }}>
@@ -292,7 +292,7 @@ export default function AddSurveySectionActions(props: Props) {
         <Grid item xs={12} md={6}>
           {sectionButtons
             .filter(
-              (button) => !props.types || props.types.includes(button.type)
+              (button) => !props.types || props.types.includes(button.type),
             )
             .map((button) => (
               <Grid item key={button.type} style={{ padding: '0.5rem' }}>

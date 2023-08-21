@@ -6,7 +6,7 @@ import {
   IconButton,
   Tooltip,
 } from '@mui/material';
-import React, { useState } from 'react';
+import React from 'react';
 import { Help as HelpIcon } from '@mui/icons-material';
 import ReactMarkdown from 'react-markdown';
 import rehypeExternalLinks from 'rehype-external-links';

@@ -82,14 +82,21 @@ function surveyToTranslationString(survey: Survey) {
       return;
     }
 
+    if (isLocalizedText(obj)) {
+      surveyStrings.push(
+        getRowString(`${label}`, obj?.fi ?? '', obj?.en ?? ''),
+      );
+      return;
+    }
+
     Object.entries(obj).forEach(([key, value]) => {
       if (!value) {
         return;
       } else if (Array.isArray(value)) {
         index = 1;
-        value.forEach((item) =>
-          addRowString(item, `${label}.${key}[${index}]`, index++),
-        );
+        value.forEach((item) => {
+          addRowString(item, `${label}.${key}[${index}]`, index++);
+        });
       } else if (typeof value === 'object' && !isLocalizedText(value)) {
         addRowString(value, `${label}.${key}[${index}]`, index);
       } else if (isLocalizedText(value)) {
