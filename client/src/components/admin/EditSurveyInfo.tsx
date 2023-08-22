@@ -75,7 +75,7 @@ export default function EditSurveyInfo() {
       setUsersLoading(true);
       try {
         const users = await fetch('/api/users/others').then(
-          (response) => response.json() as Promise<User[]>
+          (response) => response.json() as Promise<User[]>,
         );
         setUsers(users);
       } catch (error) {

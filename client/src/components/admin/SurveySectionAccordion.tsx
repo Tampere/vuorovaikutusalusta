@@ -41,7 +41,7 @@ import {
   Subject,
   TextFields,
   ViewComfy,
-  ContentPaste,
+  ContentCopy,
 } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
@@ -289,7 +289,11 @@ export default function SurveySectionAccordion(props: Props) {
           </Typography>
           <CopyToClipboard
             data={JSON.stringify(props.section)}
-            tooltip="kopioi kysymys"
+            tooltip={'Kopioi osio'}
+            icon={<ContentCopy />}
+            msg={
+              'Osio kopioitu leikepöydälle. Voit kopioida osion mille tahansa kyselylle uutena osiona.'
+            }
           />
           <div {...props.provided.dragHandleProps} style={{ display: 'flex' }}>
             <DragIndicator />

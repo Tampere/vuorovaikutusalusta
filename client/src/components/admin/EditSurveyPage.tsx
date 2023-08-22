@@ -14,7 +14,7 @@ import {
   RadioGroup,
   Fab,
 } from '@mui/material';
-import { Article } from '@mui/icons-material';
+import { ContentPaste } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useToasts } from '@src/stores/ToastContext';
@@ -26,7 +26,14 @@ import Fieldset from '../Fieldset';
 import AddSurveySectionActions from './AddSurveySectionActions';
 import FileUpload from './FileUpload';
 import SurveySections from './SurveySections';
-import { SurveyPageSidebarImageSize } from '@interfaces/survey';
+import {
+  SurveyPageSection,
+  SurveyPageSidebarImageSize,
+} from '@interfaces/survey';
+import {
+  replaceIdsWithNull,
+  replaceTranslationsWithNull,
+} from '@src/utils/schemaValidation';
 
 const useStyles = makeStyles({
   button: {
@@ -274,20 +281,27 @@ export default function EditSurveyPage() {
           setExpandedSection(section);
         }}
       />
-      <div className={classes.actionItem}>
+      <div
+        style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}
+      >
         <Fab
+          color="secondary"
+          sx={{ marginRight: '1rem' }}
           aria-label={'asdf'}
           size="small"
           onClick={async () => {
             const text = await navigator.clipboard.readText();
             const section = JSON.parse(text) as SurveyPageSection;
             console.log(section);
-            addSection(page.id, { ...section, id: -1 });
+            const newSection = replaceTranslationsWithNull(
+              replaceIdsWithNull(section, -1),
+            );
+            addSection(page.id, { ...newSection, id: -1 });
           }}
         >
-          <Article style={{ color: 'white', backgroundColor: 'pink' }} />
+          <ContentPaste />
         </Fab>
-        <Typography>Liitä kysymys</Typography>
+        <Typography>{tr.EditSurveyPage.attachSection}</Typography>
       </div>
       <AddSurveySectionActions
         disabled={loading}

@@ -106,7 +106,8 @@
     "imageScalingLabel": {
       "original": "Alkuperäinen koko",
       "fitted": "Sovita näkymään"
-    }
+    },
+    "attachSection": "Uusi osio leikepöydältä"
   },
   "FileUpload": {
     "deleteFile": "Poista tiedosto",

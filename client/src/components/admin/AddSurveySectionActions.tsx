@@ -311,7 +311,7 @@ export default function AddSurveySectionActions(props: Props) {
               </Grid>
             ))}
           <Grid item style={{ padding: '0.5rem' }}>
-            <div className={classes.actionItem}>
+            {/* <div className={classes.actionItem}>
               <Fab
                 aria-label={'asdf'}
                 size="small"
@@ -325,7 +325,7 @@ export default function AddSurveySectionActions(props: Props) {
                 <Article style={{ color: 'white', backgroundColor: 'pink' }} />
               </Fab>
               <Typography>Liitä kysymys</Typography>
-            </div>
+            </div> */}
           </Grid>
         </Grid>
       </Grid>
