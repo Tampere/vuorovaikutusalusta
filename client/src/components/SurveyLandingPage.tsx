@@ -81,7 +81,7 @@ interface Props {
   isTestSurvey: boolean;
   continueUnfinished: boolean;
   onStart: () => void;
-  surveyBackgroundImage?: { attributions: string };
+  surveyBackgroundImage?: { attributions?: string };
 }
 
 export default function SurveyLandingPage({

@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { ValidationChain, validationResult } from 'express-validator';
 import { BadRequestError } from './error';
-import { ImageType } from '@interfaces/survey';
+import { FileDetails, ImageType } from '@interfaces/survey';
 import { MimeType } from '@interfaces/admin';
 
 /**
@@ -38,6 +38,19 @@ export function base64Encode(str: string) {
  */
 export function base64Decode(str: string) {
   return Buffer.from(str, 'base64').toString('ascii');
+}
+
+/**
+ * Encode ASCII strings to UTF-8 from response headers
+ */
+
+export function encodeFileDetailValues(obj: FileDetails): FileDetails {
+  return Object.keys(obj).reduce((object, key: keyof FileDetails) => {
+    return {
+      ...object,
+      [key]: encodeURIComponent(obj[key]),
+    };
+  }, {});
 }
 
 function isString(text: unknown): text is string {

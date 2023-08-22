@@ -13,6 +13,7 @@ import React, { useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import rehypeExternalLinks from 'rehype-external-links';
 import Footer from './Footer';
+import { getFileDetails } from '@src/controllers/FileController';
 
 type StyleKeys = 'testSurveyHeader';
 
@@ -37,12 +38,9 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
 
   useEffect(() => {
     async function getImageHeaders() {
-      const res = await fetch(
-        `api/file/${survey.thanksPage.imagePath[0]}/${survey.thanksPage.imageName}`,
-        { method: 'HEAD' },
+      const details = await getFileDetails(
+        `${survey.thanksPage.imagePath[0]}/${survey.thanksPage.imageName}`,
       );
-
-      const details = JSON.parse(res.headers.get('File-details'));
 
       setImageAltText(details?.imageAltText);
     }

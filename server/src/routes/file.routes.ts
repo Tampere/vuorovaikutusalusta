@@ -9,7 +9,11 @@ import {
   storeFile,
 } from '@src/application/survey';
 import { ensureAuthenticated } from '@src/auth';
-import { parseMimeType, validateRequest } from '@src/utils';
+import {
+  encodeFileDetailValues,
+  parseMimeType,
+  validateRequest,
+} from '@src/utils';
 import { Router } from 'express';
 import asyncHandler from 'express-async-handler';
 import { param } from 'express-validator';
@@ -29,9 +33,12 @@ router.get(
     const row = await getAdminInstructions();
 
     res.set('Content-type', row.mimeType);
-    res.set('File-details', JSON.stringify({ name: row.name }));
+    res.set(
+      'File-details',
+      JSON.stringify(encodeFileDetailValues({ name: row.name })),
+    );
     res.status(200).send(row.data);
-  })
+  }),
 );
 
 /**
@@ -47,11 +54,11 @@ router.post(
     const { name } = await storeAdminInstructions(
       originalname,
       parseMimeType(mimetype),
-      buffer
+      buffer,
     );
 
     res.status(200).json({ message: `File ${name} succesfully stored` });
-  })
+  }),
 );
 
 /**
@@ -83,7 +90,7 @@ router.post(
       surveyId: surveyId == null ? null : Number(surveyId),
     });
     res.status(200).json({ id });
-  })
+  }),
 );
 
 /**
@@ -98,7 +105,7 @@ router.get(
     const row = await getImages(filePathArray);
 
     res.status(200).json(row);
-  })
+  }),
 );
 
 /**
@@ -118,9 +125,12 @@ router.get(
     const filePathArray = filePath?.split('/') ?? [];
     const row = await getFile(fileName, filePathArray);
     res.set('Content-type', row.mimeType);
-    res.set('File-details', JSON.stringify(row.details));
+    res.set(
+      'File-details',
+      JSON.stringify(encodeFileDetailValues(row.details)),
+    );
     res.status(200).send(row.data);
-  })
+  }),
 );
 
 /**
@@ -142,7 +152,7 @@ router.delete(
 
     await removeFile(fileName, filePathArray);
     res.status(200).send();
-  })
+  }),
 );
 
 export default router;

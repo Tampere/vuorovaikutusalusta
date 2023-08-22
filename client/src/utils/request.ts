@@ -1,3 +1,5 @@
+import { FileDetails } from '@interfaces/survey';
+
 /**
  * Fetch TS typings only allow string values in body -
  * override it with unknown value (JSON serialization is done in the wrapper anyway)
@@ -29,6 +31,19 @@ function serializeBody(body: unknown): {
 }
 
 /**
+ * Decode UTF-8 encoded strings from response headers
+ */
+
+export function decodeFileDetailValues(obj: FileDetails): FileDetails {
+  return Object.keys(obj).reduce((object, key: keyof FileDetails) => {
+    return {
+      ...object,
+      [key]: decodeURIComponent(obj[key]),
+    };
+  }, {});
+}
+
+/**
  * Request wrapper for handling JSON data.
  * Accepts unknown values for the request body.
  * Body is serialized as JSON, unless it is of type ArrayBuffer - in this case the data is sent as is.
@@ -38,7 +53,7 @@ function serializeBody(body: unknown): {
  */
 export async function request<Response = unknown>(
   url: string,
-  options?: RequestOptions
+  options?: RequestOptions,
 ) {
   const body = options?.body ? serializeBody(options.body) : undefined;
   const response = await fetch(url, {

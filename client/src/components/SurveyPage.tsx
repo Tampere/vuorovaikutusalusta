@@ -15,6 +15,7 @@ import SurveyStepper from './SurveyStepper';
 import SurveyThanksPage from './SurveyThanksPage';
 import TestSurveyFrame from './TestSurveyFrame';
 import { UnavailableSurvey } from './UnavailableSurvey';
+import { getFileDetails } from '@src/controllers/FileController';
 
 interface Props {
   isTestSurvey?: boolean;
@@ -25,7 +26,7 @@ export default function SurveyPage({ isTestSurvey }: Props) {
   const [showLandingPage, setShowLandingPage] = useState(true);
   const [showThanksPage, setShowThanksPage] = useState(false);
   const [surveyBackgroundImage, setSurveyBackgroundImage] = useState<{
-    attributions: string;
+    attributions?: string;
   }>(null);
   const [errorStatusCode, setErrorStatusCode] = useState<number>(null);
   const [continueUnfinished, setContinueUnfinished] = useState(false);
@@ -58,10 +59,7 @@ export default function SurveyPage({ isTestSurvey }: Props) {
             survey.backgroundImagePath,
             survey.backgroundImageName,
           );
-          const response = await fetch(`/api/file/${fullFilePath}`);
-          const details = JSON.parse(
-            response.headers.get('File-details') ?? '{}',
-          );
+          const details = await getFileDetails(fullFilePath);
           setSurveyBackgroundImage(details);
         }
         setSurvey(survey);

@@ -665,3 +665,9 @@ export interface SurveyEmailInfoItem {
 }
 
 export type ImageType = 'backgroundImage' | 'thanksPageImage';
+
+export interface FileDetails {
+  attributions?: string;
+  imageAltText?: string;
+  name?: string;
+}
