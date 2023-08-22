@@ -66,7 +66,7 @@ const useStyles = makeStyles((theme: Theme & { [customKey: string]: any }) => ({
     bottom: 0,
     backgroundColor: theme.palette.primary.main,
     color: theme.palette.primary.contrastText,
-    padding: '1rem',
+    padding: '0.75rem',
   },
   testSurveyHeader: {
     padding: '2px',
@@ -99,9 +99,10 @@ export default function SurveyLandingPage({
       direction="column"
       justifyContent="space-between"
       alignItems="stretch"
+      style={{ minHeight: '100svh' }} // primary
       sx={{
         width: '100%',
-        minHeight: '-webkit-fill-available',
+        minHeight: '100vh', // as a fallback if svh not supported
         ...(survey?.backgroundImageName && {
           backgroundImage: `url("/api/file/background-images/${survey?.backgroundImageName}")`,
         }),
