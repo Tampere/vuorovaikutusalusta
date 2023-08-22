@@ -7,9 +7,11 @@ import React from 'react';
 interface Props {
   data: string;
   tooltip?: string;
+  msg?: string;
+  icon?: any;
 }
 
-export default function CopyToClipboard({ data, tooltip }: Props) {
+export default function CopyToClipboard({ data, tooltip, icon, msg }: Props) {
   const { tr } = useTranslations();
   const { showToast } = useToasts();
 
@@ -25,17 +27,17 @@ export default function CopyToClipboard({ data, tooltip }: Props) {
             await navigator.clipboard.writeText(data);
             showToast({
               severity: 'success',
-              message: tr.CopyToClipboard.successful,
+              message: msg ?? tr.CopyToClipboard.successful,
             });
           } catch (error) {
             showToast({
               severity: 'error',
-              message: tr.CopyToClipboard.fail,
+              message: msg ?? tr.CopyToClipboard.fail,
             });
           }
         }}
       >
-        <FileCopyIcon />
+        {icon ?? <FileCopyIcon />}
       </IconButton>
     </Tooltip>
   );
