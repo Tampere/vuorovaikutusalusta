@@ -25,7 +25,7 @@
     "toFrontPage": "Etusivulle",
     "info": "Kyselyn perustiedot",
     "email": "Sähköposti",
-    "newPage": "Uusi sivu",
+    "newPage": "Luo sivu",
     "newPageFailed": "Uuden sivun luomisessa tapahtui virhe. Yritä myöhemmin uudestaan.",
     "thanksPage": "Kiitos-sivu",
     "translations": "Käännökset",
@@ -37,7 +37,10 @@
     "deleteSurveyFailed": "Kyselyn poistamisessa tapahtui virhe. Yritä myöhemmin uudestaan.",
     "deleteSurveySuccessful": "Kysely poistettiin onnistuneesti!",
     "allowSavingUnfinished": "Salli kyselyn tallentaminen keskeneräisenä",
-    "displayPrivacyStatement": "Näytä tietosuoja ja tiedonhallinta -linkki alatunnisteessa"
+    "displayPrivacyStatement": "Näytä tietosuoja ja tiedonhallinta -linkki alatunnisteessa",
+    "copyPage": "Kopioi sivu",
+    "attachNewPage": "Liitä sivu",
+    "pageCopied": "Sivu kopioitu leikepöydälle. Voit nyt liittää kopioidun sivun mihin tahansa kyselyyn."
   },
   "EditSurveyInfo": {
     "title": "Kyselyn otsikko",
@@ -446,7 +449,6 @@
     "submit": "Lähetä",
     "cancel": "Peruuta"
   },
-
   "MapInfoBox": {
     "answer": "Vastaus"
   },

@@ -8,7 +8,7 @@ import {
   Theme,
 } from '@mui/material';
 import {
-  AddCircle,
+  Add,
   ArrowBack,
   DragIndicator,
   FavoriteBorder,
@@ -17,6 +17,8 @@ import {
   Language,
   Mail,
   Preview,
+  ContentCopy,
+  ContentPaste,
 } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { useSurvey } from '@src/stores/SurveyContext';
@@ -28,6 +30,44 @@ import { useHistory, useRouteMatch } from 'react-router-dom';
 import ListItemLink from '../ListItemLink';
 import SideBar from '../SideBar';
 import CopyToClipboard from '../CopyToClipboard';
+
+function replaceIdsWithNull(obj: any, depth: number) {
+  if (typeof obj !== 'object' || obj === null) {
+    return obj;
+  }
+
+  if (obj.hasOwnProperty('id')) {
+    obj = { ...obj, id: depth };
+  }
+
+  for (const key in obj) {
+    if (Array.isArray(obj[key])) {
+      for (let i = 0; i < obj[key].length; ++i) {
+        obj[key][i] = replaceIdsWithNull(obj[key][i], depth - i);
+      }
+    } else {
+      obj[key] = replaceIdsWithNull(obj[key], depth);
+    }
+  }
+
+  return obj;
+}
+
+function replaceTranslationsWithNull(obj: any) {
+  if (typeof obj !== 'object' || obj === null) {
+    return obj;
+  }
+
+  if (obj.hasOwnProperty('en')) {
+    obj = { ...obj, en: null };
+  }
+
+  for (const key in obj) {
+    obj[key] = replaceTranslationsWithNull(obj[key]);
+  }
+
+  return obj;
+}
 
 const useStyles = makeStyles((theme: Theme) => ({
   '@keyframes pulse': {
@@ -142,7 +182,9 @@ export default function EditSurveySideBar(props: Props) {
                           />
                           <CopyToClipboard
                             data={JSON.stringify(page)}
-                            tooltip="Kopioi sivu"
+                            tooltip={tr.EditSurvey.copyPage}
+                            icon={<ContentCopy />}
+                            msg={tr.EditSurvey.pageCopied}
                           />
                           <div {...provided.dragHandleProps}>
                             <DragIndicator />
@@ -159,6 +201,11 @@ export default function EditSurveySideBar(props: Props) {
         </DragDropContext>
         <div style={{ display: 'flex', flexDirection: 'row' }}>
           <ListItem
+            sx={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'space-around',
+            }}
             button
             className={`${
               newPageDisabled || activeSurveyLoading ? classes.disabled : ''
@@ -180,11 +227,23 @@ export default function EditSurveySideBar(props: Props) {
             }}
           >
             <ListItemIcon>
-              <AddCircle />
+              <Add />
             </ListItemIcon>
             <ListItemText primary={tr.EditSurvey.newPage} />
           </ListItem>
+          <div
+            style={{
+              height: '2rem',
+              borderRight: '1px solid white',
+              alignSelf: 'center',
+            }}
+          ></div>
           <ListItem
+            sx={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'space-around',
+            }}
             onClick={async () => {
               setNewPageDisabled(true);
               try {
@@ -194,8 +253,11 @@ export default function EditSurveySideBar(props: Props) {
                 // Add stuff to newly created page, override with id of newly created blank page
                 const text = await navigator.clipboard.readText();
                 const surveyPage = JSON.parse(text) as SurveyPage;
-                console.log(surveyPage);
-                editPage({ ...surveyPage, id: page.id });
+                const newSurveyPage = replaceTranslationsWithNull(
+                  replaceIdsWithNull(surveyPage, -1),
+                );
+                console.log({ ...newSurveyPage, id: page.id });
+                editPage({ ...newSurveyPage, id: page.id });
               } catch (error) {
                 showToast({
                   severity: 'error',
@@ -206,7 +268,8 @@ export default function EditSurveySideBar(props: Props) {
               }
             }}
           >
-            Liitä
+            <ContentPaste />
+            {tr.EditSurvey.attachNewPage}
           </ListItem>
         </div>
       </List>
