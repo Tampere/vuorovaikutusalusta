@@ -60,11 +60,11 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
 
   return (
     <Stack
+      style={{ minHeight: '100svh' }} // primary
       sx={{
         maxHeight: '100vh',
-        height: '100vh',
         width: '100%',
-        minHeight: '-webkit-fill-available',
+        minHeight: '100vh', // as fallback if svh is not supported
         display: 'flex',
       }}
       direction="column"
@@ -138,7 +138,10 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
           height: '10em',
           display: 'flex',
           justifyContent: 'center',
-          alignItems: { xs: 'center', md: 'flex-end' },
+          alignItems: {
+            xs: 'center',
+            md: 'flex-end',
+          },
           marginBottom: { xs: '10px', sm: 0 },
           whiteSpace: 'nowrap',
         }}
@@ -155,7 +158,13 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
           src={`/api/feature-styles/icons/tre_banner`}
           alt={tr.IconAltTexts.treBannerAltText}
         />
-        <Footer>
+        <Footer
+          style={
+            useMediaQuery('(max-width:420px)')
+              ? { padding: 0, transform: 'translateY(-65%)' }
+              : {}
+          }
+        >
           <Link
             color="primary"
             underline="hover"
