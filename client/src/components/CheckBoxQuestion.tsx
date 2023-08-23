@@ -8,7 +8,7 @@ import {
 } from '@mui/material';
 import { visuallyHidden } from '@mui/utils';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { createRef, useEffect, useMemo, useRef, useState } from 'react';
 
 /**
  * Max length of a custom answer in radio/checkbox questions
@@ -34,6 +34,18 @@ export default function CheckBoxQuestion({
 }: Props) {
   const [customAnswerValue, setCustomAnswerValue] = useState('');
   const { tr, surveyLanguage } = useTranslations();
+  const actionRef = useRef([]);
+
+  if (autoFocus) {
+    actionRef.current = question.options.map(
+      (_, i) => actionRef.current[i] ?? createRef(),
+    );
+  }
+
+  useEffect(() => {
+    // autoFocus prop won't trigger focus styling, must be done manually
+    autoFocus && actionRef.current[0]?.current.focusVisible();
+  }, []);
 
   const answerLimitText = useMemo(() => {
     if (!question.answerLimits) {
@@ -84,6 +96,7 @@ export default function CheckBoxQuestion({
             label={option.text?.[surveyLanguage] ?? ''}
             control={
               <Checkbox
+                action={actionRef.current[index]}
                 autoFocus={index === 0 && autoFocus}
                 // TS can't infer the precise memoized value type from question.type, but for checkboxes it's always an array
                 checked={value.includes(option.id)}
@@ -144,8 +157,8 @@ export default function CheckBoxQuestion({
                 value.map((option) =>
                   typeof option === 'string'
                     ? event.currentTarget.value
-                    : option
-                )
+                    : option,
+                ),
               );
             }}
           />

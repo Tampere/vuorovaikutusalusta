@@ -2,7 +2,7 @@ import { SurveyRadioQuestion } from '@interfaces/survey';
 import { FormControlLabel, Radio, RadioGroup, TextField } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { useEffect, useState } from 'react';
+import React, { createRef, useEffect, useRef, useState } from 'react';
 
 const useStyles = makeStyles({
   labelStyles: {
@@ -35,6 +35,18 @@ export default function RadioQuestion({
   const [customAnswerValue, setCustomAnswerValue] = useState('');
   const { tr, surveyLanguage } = useTranslations();
   const classes = useStyles();
+  const actionRef = useRef([]);
+
+  if (autoFocus) {
+    actionRef.current = question.options.map(
+      (_, i) => actionRef.current[i] ?? createRef(),
+    );
+  }
+
+  useEffect(() => {
+    // autoFocus prop won't trigger focus styling, must be done manually
+    autoFocus && actionRef.current[0]?.current.focusVisible();
+  }, []);
 
   // Update custom answer value if value from context is string
   useEffect(() => {
@@ -56,7 +68,7 @@ export default function RadioQuestion({
           onChange(
             event.currentTarget.value.length > 0 && !isNaN(numericValue)
               ? numericValue
-              : event.currentTarget.value
+              : event.currentTarget.value,
           );
         }}
         name={`${question.title?.[surveyLanguage]}-group`}
@@ -66,7 +78,12 @@ export default function RadioQuestion({
             key={option.id}
             value={option.id}
             label={option.text?.[surveyLanguage] ?? ''}
-            control={<Radio autoFocus={index === 0 && autoFocus} />}
+            control={
+              <Radio
+                action={actionRef.current[index]}
+                autoFocus={index === 0 && autoFocus}
+              />
+            }
             classes={{ label: classes.labelStyles }}
           />
         ))}
