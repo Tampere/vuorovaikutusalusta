@@ -1,5 +1,13 @@
 import { Survey } from '@interfaces/survey';
-import { Box, Button, Link, Theme, Typography, Stack } from '@mui/material';
+import {
+  Box,
+  Button,
+  Link,
+  Theme,
+  Typography,
+  Stack,
+  useMediaQuery,
+} from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { getClassList } from '@src/utils/classes';
@@ -66,7 +74,7 @@ const useStyles = makeStyles((theme: Theme & { [customKey: string]: any }) => ({
     bottom: 0,
     backgroundColor: theme.palette.primary.main,
     color: theme.palette.primary.contrastText,
-    padding: '0.75rem',
+    padding: '0.6rem',
   },
   testSurveyHeader: {
     padding: '2px',
@@ -93,7 +101,7 @@ export default function SurveyLandingPage({
 }: Props) {
   const classes = useStyles({ imageName: survey?.backgroundImageName ?? '' });
   const { tr, surveyLanguage } = useTranslations();
-
+  const lowHeight = useMediaQuery('(max-height: 400px)');
   return (
     <Stack
       direction="column"
@@ -191,7 +199,13 @@ export default function SurveyLandingPage({
           src={`/api/feature-styles/icons/tre_banner`}
           alt={tr.IconAltTexts.treBannerAltText}
         />
-        <Footer>
+        <Footer
+          style={
+            useMediaQuery('(max-width:420px)') && lowHeight
+              ? { padding: 0, transform: 'translateY(-50%)' }
+              : {}
+          }
+        >
           <Link
             color="primary"
             underline="hover"
