@@ -37,7 +37,7 @@ function SurveyQuestion({ question, pageUnfinished, mobileDrawerOpen }: Props) {
     () => answers.find((answer) => answer.sectionId === question.id)?.value,
     [answers, question],
   );
-  console.log(dialogOpen);
+
   const validationErrors = useMemo(
     () => (dirty || pageUnfinished ? getValidationErrors(question) : []),
     [dirty, question, value, pageUnfinished],
@@ -52,7 +52,6 @@ function SurveyQuestion({ question, pageUnfinished, mobileDrawerOpen }: Props) {
       error={validationErrors.length > 0}
       style={{ width: '100%' }}
       onBlur={(e: React.FocusEvent<HTMLFieldSetElement>) => {
-        console.log('blur');
         if (
           e.relatedTarget &&
           !e.currentTarget.contains(e.relatedTarget as Node) &&
