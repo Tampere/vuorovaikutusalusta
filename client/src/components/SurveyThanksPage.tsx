@@ -160,7 +160,7 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
         />
         <Footer
           style={
-            useMediaQuery('(max-width:420px)')
+            useMediaQuery('(max-width:420px)') && lowHeight
               ? { padding: 0, transform: 'translateY(-65%)' }
               : {}
           }
