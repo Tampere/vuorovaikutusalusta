@@ -23,23 +23,24 @@ import SortingQuestion from './SortingQuestion';
 interface Props {
   question: SurveyQuestion;
   pageUnfinished: boolean;
+  mobileDrawerOpen: boolean;
 }
 
-function SurveyQuestion({ question, pageUnfinished }: Props) {
+function SurveyQuestion({ question, pageUnfinished, mobileDrawerOpen }: Props) {
   const { answers, updateAnswer, getValidationErrors, survey } =
     useSurveyAnswers();
   const { tr, surveyLanguage } = useTranslations();
   const [dirty, setDirty] = useState(false);
-  const [infoDialogOpen, setInfoDialogOpen] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const value = useMemo(
     () => answers.find((answer) => answer.sectionId === question.id)?.value,
-    [answers, question]
+    [answers, question],
   );
-
+  console.log(dialogOpen);
   const validationErrors = useMemo(
     () => (dirty || pageUnfinished ? getValidationErrors(question) : []),
-    [dirty, question, value, pageUnfinished]
+    [dirty, question, value, pageUnfinished],
   );
 
   return (
@@ -51,10 +52,12 @@ function SurveyQuestion({ question, pageUnfinished }: Props) {
       error={validationErrors.length > 0}
       style={{ width: '100%' }}
       onBlur={(e: React.FocusEvent<HTMLFieldSetElement>) => {
+        console.log('blur');
         if (
           e.relatedTarget &&
           !e.currentTarget.contains(e.relatedTarget as Node) &&
-          !infoDialogOpen
+          !dialogOpen &&
+          !mobileDrawerOpen
         ) {
           setDirty(true);
         }
@@ -94,8 +97,8 @@ function SurveyQuestion({ question, pageUnfinished }: Props) {
         )}
         {question.info && question.info?.[surveyLanguage] && (
           <SectionInfo
-            infoDialogOpen={infoDialogOpen}
-            setInfoDialogOpen={setInfoDialogOpen}
+            infoDialogOpen={dialogOpen}
+            setInfoDialogOpen={setDialogOpen}
             hiddenFromScreenReader={false}
             infoText={question.info?.[surveyLanguage]}
             subject={question.title?.[surveyLanguage]}
@@ -169,6 +172,7 @@ function SurveyQuestion({ question, pageUnfinished }: Props) {
       {question.type === 'map' && (
         <MapQuestion
           value={value as MapQuestionAnswer[]}
+          setDialogOpen={setDialogOpen}
           onChange={(value) => {
             updateAnswer({
               sectionId: question.id,
@@ -177,7 +181,6 @@ function SurveyQuestion({ question, pageUnfinished }: Props) {
             });
           }}
           question={question}
-          setDirty={setDirty}
         />
       )}
       {/* Sorting question */}

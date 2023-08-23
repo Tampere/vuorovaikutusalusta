@@ -93,7 +93,7 @@ export default function MapSubQuestionDialog({
     } else {
       // New map answer - set subquestion answers empty
       const answers = subQuestions?.map(
-        (question) => getEmptyAnswer(question) as SurveyMapSubQuestionAnswer
+        (question) => getEmptyAnswer(question) as SurveyMapSubQuestionAnswer,
       );
       setAnswers(answers);
     }
@@ -107,7 +107,7 @@ export default function MapSubQuestionDialog({
       return;
     }
     return subQuestions.map((question) =>
-      getValidationErrors(question, answers)
+      getValidationErrors(question, answers),
     );
   }, [answers, subQuestions]);
 

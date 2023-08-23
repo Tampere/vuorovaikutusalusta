@@ -144,7 +144,7 @@ export default function SurveyStepper({
   const mdUp = useMediaQuery(theme.breakpoints.up('md'));
   const currentPage = useMemo<SurveyPage>(
     () => survey.pages[pageNumber],
-    [survey, pageNumber]
+    [survey, pageNumber],
   );
 
   const currentPageErrorRef = useRef(null);
@@ -153,9 +153,9 @@ export default function SurveyStepper({
     () =>
       getFullFilePath(
         currentPage.sidebar.imagePath,
-        currentPage.sidebar.imageName
+        currentPage.sidebar.imageName,
       ),
-    [currentPage.sidebar]
+    [currentPage.sidebar],
   );
 
   /**
@@ -204,13 +204,13 @@ export default function SurveyStepper({
   // Map answer geometries on the current page
   const mapAnswerGeometries = useMemo(() => {
     const mapQuestions = currentPage.sections.filter(
-      (section): section is SurveyMapQuestion => section.type === 'map'
+      (section): section is SurveyMapQuestion => section.type === 'map',
     );
     // Reduce all geometries from map question answers into a feature collection
     return mapQuestions.reduce(
       (featureCollection, question) => {
         const answer = answers.find(
-          (answer) => answer.sectionId === question.id
+          (answer) => answer.sectionId === question.id,
         ) as AnswerEntry & { type: 'map' };
         return {
           ...featureCollection,
@@ -230,7 +230,7 @@ export default function SurveyStepper({
                   },
                 },
               ],
-              []
+              [],
             ),
           ],
         };
@@ -238,7 +238,7 @@ export default function SurveyStepper({
       {
         type: 'FeatureCollection',
         features: [],
-      } as GeoJSON.FeatureCollection
+      } as GeoJSON.FeatureCollection,
     );
   }, [currentPage, answers]);
 
@@ -283,7 +283,7 @@ export default function SurveyStepper({
         `/api/published-surveys/${survey.name}/submission${
           unfinishedToken ? `?token=${unfinishedToken}` : ''
         }`,
-        { method: 'POST', body: { entries: answers, info, language } }
+        { method: 'POST', body: { entries: answers, info, language } },
       );
       setLoading(false);
       onComplete();
@@ -309,7 +309,7 @@ export default function SurveyStepper({
       .map((question) => question.id);
     answers
       .filter((answer): answer is AnswerEntry & { type: 'map' } =>
-        mapQuestionIds.includes(answer.sectionId)
+        mapQuestionIds.includes(answer.sectionId),
       )
       .forEach((answer) => {
         updateAnswer({
@@ -400,7 +400,7 @@ export default function SurveyStepper({
                                 );
                               }
                               return null;
-                            }
+                            },
                           )}
                         </ul>
                       }
@@ -428,6 +428,7 @@ export default function SurveyStepper({
                         <SurveyQuestion
                           question={section}
                           pageUnfinished={pageUnfinished}
+                          mobileDrawerOpen={mobileDrawerOpen}
                         />
                       )}
                     </div>
@@ -698,8 +699,11 @@ export default function SurveyStepper({
                   setMobileDrawerOpen(false);
                 }}
                 aria-label={
-                  currentPage.sidebar.type === 'image' ? tr.SurveyStepper.closeImage :
-                  currentPage.sidebar.type === 'map' ? tr.SurveyStepper.closeMap : ""
+                  currentPage.sidebar.type === 'image'
+                    ? tr.SurveyStepper.closeImage
+                    : currentPage.sidebar.type === 'map'
+                    ? tr.SurveyStepper.closeMap
+                    : ''
                 }
               >
                 <Close />

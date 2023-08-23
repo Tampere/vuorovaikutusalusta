@@ -22,10 +22,15 @@ interface Props {
   value: MapQuestionAnswer[];
   onChange: (value: MapQuestionAnswer[]) => void;
   question: SurveyMapQuestion;
-  setDirty: (dirty: boolean) => void;
+  setDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export default function MapQuestion({ value, onChange, question }: Props) {
+export default function MapQuestion({
+  value,
+  onChange,
+  question,
+  setDialogOpen,
+}: Props) {
   const [drawingCancelled, setDrawingCancelled] = useState(false);
   const drawingCancelledRef = useRef(drawingCancelled);
   const [selectionType, setSelectionType] =
@@ -61,7 +66,7 @@ export default function MapQuestion({ value, onChange, question }: Props) {
         valueRef.current.map((answer, index) => ({
           ...answer,
           geometry: features[index],
-        }))
+        })),
       );
     });
     // On unmount unregister the event handler
@@ -164,15 +169,23 @@ export default function MapQuestion({ value, onChange, question }: Props) {
           () => (answers: SurveyMapSubQuestionAnswer[]) => {
             resolve(answers);
             setSubQuestionDialogOpen(false);
-          }
+          },
         );
-      }
+      },
     );
   }
 
+  useEffect(() => {
+    setDialogOpen(
+      deleteConfirmDialogOpen || clearConfirmDialogOpen || subQuestionDialogOpen
+        ? true
+        : false,
+    );
+  }, [deleteConfirmDialogOpen, clearConfirmDialogOpen, subQuestionDialogOpen]);
+
   function getToggleButton(selectionType: MapQuestionSelectionType) {
     const markingCount = value?.filter(
-      (answer) => answer.selectionType === selectionType
+      (answer) => answer.selectionType === selectionType,
     ).length;
     return (
       <ToggleButton
@@ -267,8 +280,8 @@ export default function MapQuestion({ value, onChange, question }: Props) {
             value.map((answer, index) =>
               index === editingMapAnswer.index
                 ? { ...answer, subQuestionAnswers: answers }
-                : answer
-            )
+                : answer,
+            ),
           );
           stopEditingMapAnswer();
         }}
@@ -288,7 +301,7 @@ export default function MapQuestion({ value, onChange, question }: Props) {
           setTimeout(() => {
             (
               document.getElementById(
-                `${question.id}-draw-button`
+                `${question.id}-draw-button`,
               ) as HTMLButtonElement
             )?.focus();
           }, 1);
@@ -299,7 +312,7 @@ export default function MapQuestion({ value, onChange, question }: Props) {
           setTimeout(() => {
             (
               document.getElementById(
-                `${question.id}-draw-button`
+                `${question.id}-draw-button`,
               ) as HTMLButtonElement
             )?.focus();
           }, 1);
@@ -313,7 +326,7 @@ export default function MapQuestion({ value, onChange, question }: Props) {
         onClose={(result) => {
           if (result) {
             onChange(
-              value.filter((_, index) => index !== editingMapAnswer.index)
+              value.filter((_, index) => index !== editingMapAnswer.index),
             );
             stopEditingMapAnswer();
           }
