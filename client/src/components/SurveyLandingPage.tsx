@@ -1,5 +1,13 @@
 import { Survey } from '@interfaces/survey';
-import { Box, Button, Link, Theme, Typography, Stack } from '@mui/material';
+import {
+  Box,
+  Button,
+  Link,
+  Theme,
+  Typography,
+  Stack,
+  useMediaQuery,
+} from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { getClassList } from '@src/utils/classes';
@@ -66,7 +74,7 @@ const useStyles = makeStyles((theme: Theme & { [customKey: string]: any }) => ({
     bottom: 0,
     backgroundColor: theme.palette.primary.main,
     color: theme.palette.primary.contrastText,
-    padding: '1rem',
+    padding: '0.6rem',
   },
   testSurveyHeader: {
     padding: '2px',
@@ -93,15 +101,17 @@ export default function SurveyLandingPage({
 }: Props) {
   const classes = useStyles({ imageName: survey?.backgroundImageName ?? '' });
   const { tr, surveyLanguage } = useTranslations();
-
+  const lowHeight = useMediaQuery('(max-height: 400px)');
+  const mediumWidth = useMediaQuery('(max-width: 640px)');
   return (
     <Stack
       direction="column"
       justifyContent="space-between"
       alignItems="stretch"
+      style={{ minHeight: '100svh' }} // primary
       sx={{
         width: '100%',
-        minHeight: '-webkit-fill-available',
+        minHeight: '100vh', // as a fallback if svh not supported
         ...(survey?.backgroundImageName && {
           backgroundImage: `url("/api/file/background-images/${survey?.backgroundImageName}")`,
         }),
@@ -172,24 +182,12 @@ export default function SurveyLandingPage({
           position: 'relative',
           minHeight: '20vh',
           display: 'flex',
-          justifyContent: 'center',
-          alignItems: { xs: 'center', md: 'flex-end' },
+          flexDirection: 'column',
+          justifyContent: 'flex-end',
+          alignItems: 'center',
           whiteSpace: 'nowrap',
         }}
       >
-        <img
-          style={{
-            minWidth: '130px',
-            maxWidth: '20%',
-            position: 'absolute',
-            left: 0,
-            bottom: 0,
-            marginLeft: '0.5rem',
-            marginBottom: '0.5rem',
-          }}
-          src={`/api/feature-styles/icons/tre_banner`}
-          alt={tr.IconAltTexts.treBannerAltText}
-        />
         <Footer>
           <Link
             color="primary"
@@ -210,6 +208,19 @@ export default function SurveyLandingPage({
             </Link>
           )}
         </Footer>
+        <img
+          style={{
+            minWidth: '130px',
+            maxWidth: '20%',
+            position: !mediumWidth ? 'absolute' : 'static',
+            left: !mediumWidth ? '0' : 'auto',
+            bottom: 0,
+            marginLeft: '0.5rem',
+            marginBottom: '0.5rem',
+          }}
+          src={`/api/feature-styles/icons/tre_banner`}
+          alt={tr.IconAltTexts.treBannerAltText}
+        />
 
         {surveyBackgroundImage?.attributions ? (
           <Typography className={classes.imageCopyright} variant="body2">

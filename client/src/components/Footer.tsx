@@ -3,6 +3,7 @@ import React, { ReactNode } from 'react';
 
 type FooterProps = {
   children?: ReactNode;
+  style?: React.CSSProperties;
 };
 
 export default function Footer(props: FooterProps) {
@@ -11,6 +12,7 @@ export default function Footer(props: FooterProps) {
   return (
     <Box
       component="footer"
+      style={props.style ?? {}}
       sx={{
         fontSize: '.8rem',
         padding: '0.5rem 1rem 0',

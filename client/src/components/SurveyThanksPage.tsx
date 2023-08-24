@@ -53,18 +53,19 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
 
   const { tr, surveyLanguage } = useTranslations();
   const hasImage = survey.thanksPage.imageName !== null;
-  const lowWidth = useMediaQuery('(max-width:400px)');
-  const lowHeight = useMediaQuery('(max-height:400px');
-  const landscape = useMediaQuery('(orientation:landscape)');
+  const lowWidth = useMediaQuery('(max-width: 400px)');
+  const mediumWidth = useMediaQuery('(max-width: 640px)');
+  const lowHeight = useMediaQuery('(max-height: 400px');
+  const landscape = useMediaQuery('(orientation: landscape)');
   const mobileLandscape = lowHeight && landscape;
 
   return (
     <Stack
+      style={{ minHeight: '100svh' }} // primary
       sx={{
         maxHeight: '100vh',
-        height: '100vh',
         width: '100%',
-        minHeight: '-webkit-fill-available',
+        minHeight: '100vh', // as fallback if svh is not supported
         display: 'flex',
       }}
       direction="column"
@@ -137,24 +138,13 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
           position: 'relative',
           height: '10em',
           display: 'flex',
-          justifyContent: 'center',
-          alignItems: { xs: 'center', md: 'flex-end' },
+          flexDirection: 'column',
+          justifyContent: 'flex-end',
+          alignItems: 'center',
           marginBottom: { xs: '10px', sm: 0 },
           whiteSpace: 'nowrap',
         }}
       >
-        <img
-          style={{
-            minWidth: '130px',
-            width: '10vw',
-            position: 'absolute',
-            left: !lowWidth ? '0' : 'auto',
-            bottom: 0,
-            margin: '0.5rem',
-          }}
-          src={`/api/feature-styles/icons/tre_banner`}
-          alt={tr.IconAltTexts.treBannerAltText}
-        />
         <Footer>
           <Link
             color="primary"
@@ -175,6 +165,18 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
             </Link>
           )}
         </Footer>
+        <img
+          style={{
+            minWidth: '130px',
+            width: '10vw',
+            position: !mediumWidth ? 'absolute' : 'static',
+            left: !mediumWidth ? '0' : 'auto',
+            bottom: 0,
+            margin: '0.5rem',
+          }}
+          src={`/api/feature-styles/icons/tre_banner`}
+          alt={tr.IconAltTexts.treBannerAltText}
+        />
       </Box>
     </Stack>
   );
