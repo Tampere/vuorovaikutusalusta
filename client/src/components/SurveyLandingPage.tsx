@@ -102,6 +102,7 @@ export default function SurveyLandingPage({
   const classes = useStyles({ imageName: survey?.backgroundImageName ?? '' });
   const { tr, surveyLanguage } = useTranslations();
   const lowHeight = useMediaQuery('(max-height: 400px)');
+  const mediumWidth = useMediaQuery('(max-width: 640px)');
   return (
     <Stack
       direction="column"
@@ -181,31 +182,13 @@ export default function SurveyLandingPage({
           position: 'relative',
           minHeight: '20vh',
           display: 'flex',
-          justifyContent: 'center',
-          alignItems: { xs: 'center', md: 'flex-end' },
+          flexDirection: 'column',
+          justifyContent: 'flex-end',
+          alignItems: 'center',
           whiteSpace: 'nowrap',
         }}
       >
-        <img
-          style={{
-            minWidth: '130px',
-            maxWidth: '20%',
-            position: 'absolute',
-            left: 0,
-            bottom: 0,
-            marginLeft: '0.5rem',
-            marginBottom: '0.5rem',
-          }}
-          src={`/api/feature-styles/icons/tre_banner`}
-          alt={tr.IconAltTexts.treBannerAltText}
-        />
-        <Footer
-          style={
-            useMediaQuery('(max-width:420px)') && lowHeight
-              ? { padding: 0, transform: 'translateY(-50%)' }
-              : {}
-          }
-        >
+        <Footer>
           <Link
             color="primary"
             underline="hover"
@@ -225,6 +208,19 @@ export default function SurveyLandingPage({
             </Link>
           )}
         </Footer>
+        <img
+          style={{
+            minWidth: '130px',
+            maxWidth: '20%',
+            position: !mediumWidth ? 'absolute' : 'static',
+            left: !mediumWidth ? '0' : 'auto',
+            bottom: 0,
+            marginLeft: '0.5rem',
+            marginBottom: '0.5rem',
+          }}
+          src={`/api/feature-styles/icons/tre_banner`}
+          alt={tr.IconAltTexts.treBannerAltText}
+        />
 
         {surveyBackgroundImage?.attributions ? (
           <Typography className={classes.imageCopyright} variant="body2">
