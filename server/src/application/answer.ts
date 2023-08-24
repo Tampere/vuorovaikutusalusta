@@ -272,7 +272,7 @@ function dbEntriesToFeatures(
             submissionGroup[submissionId][answer.parentEntryId].properties[
               keyOther
             ] = answer.valueText;
-          } else {
+          } else if (answer.optionText?.['fi']) {
             key = `${key} - ${answer?.optionText?.['fi']}`;
             submissionGroup[submissionId][answer.parentEntryId].properties[
               key
