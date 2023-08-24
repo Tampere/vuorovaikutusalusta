@@ -6,6 +6,7 @@ import React from 'react';
 import LanguageMenu from '../LanguageMenu';
 import SurveyLanguageMenu from '../SurveyLanguageMenu';
 import AppBarUserMenu from './AppBarUserMenu';
+import { AdminInstructionButton } from './AdminInstructionButton';
 
 interface Props {
   sideBarWidth: number;
@@ -51,6 +52,7 @@ export default function EditSurveyHeader(props: Props) {
         >
           {originalActiveSurvey.localisationEnabled && <SurveyLanguageMenu />}
           <LanguageMenu />
+          <AdminInstructionButton />
           <AppBarUserMenu />
         </div>
       </Toolbar>

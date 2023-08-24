@@ -131,7 +131,7 @@ export default function MatrixQuestion({
   function handleChange(
     subjectIndex: number,
     event: React.ChangeEvent<HTMLInputElement> | SelectChangeEvent,
-    type: 'radio' | 'select' = 'radio'
+    type: 'radio' | 'select' = 'radio',
   ) {
     // Ignore if the value is false
     if (type === 'radio' && !(event.target as HTMLInputElement).checked) {
@@ -146,16 +146,21 @@ export default function MatrixQuestion({
 
   return (
     <>
-      {!componentState.isOverflow && (
+      {!isMobileWidth && !componentState.isOverflow && (
         <TableContainer id={`${question.id}-input`} ref={radioRef}>
           <Table size="small">
-            {question.title && <caption style={visuallyHidden}>{question.title?.[surveyLanguage]}</caption>}
+            {question.title && (
+              <caption style={visuallyHidden}>
+                {question.title?.[surveyLanguage]}
+              </caption>
+            )}
             <TableHead>
               <TableRow>
                 <TableCell scope="col" className={classes.stickyLeft} />
                 {question.classes.map((entry, index) => {
                   return (
-                    <TableCell scope="col"
+                    <TableCell
+                      scope="col"
                       key={index}
                       className={`${classes.matrixCell} ${classes.matrixText}`}
                     >
@@ -164,7 +169,8 @@ export default function MatrixQuestion({
                   );
                 })}
                 {question.allowEmptyAnswer && (
-                  <TableCell scope="col"
+                  <TableCell
+                    scope="col"
                     className={`${classes.matrixCell} ${classes.matrixText}`}
                   >
                     {tr.MatrixQuestion.emptyAnswer}
@@ -230,23 +236,28 @@ export default function MatrixQuestion({
           sx={{ marginTop: 2 }}
         >
           <Table size="small">
-            {question.title && <caption style={visuallyHidden}>{question.title?.[surveyLanguage]}</caption>}
+            {question.title && (
+              <caption style={visuallyHidden}>
+                {question.title?.[surveyLanguage]}
+              </caption>
+            )}
             <TableHead>
               <TableRow>
-                <TableCell scope="col"
+                <TableCell
+                  scope="col"
                   className={[
                     classes.stickyLeft,
                     classes.matrixCell,
                     classes.matrixText,
-                  ].join(' ')}>
+                  ].join(' ')}
+                >
                   {tr.MatrixQuestion.subject}
                 </TableCell>
-                <TableCell scope="col"
-                  className={[
-                    classes.matrixCell,
-                    classes.matrixText,
-                  ].join(' ')}
-                  sx={{"&&": {textAlign: "left"}}}>
+                <TableCell
+                  scope="col"
+                  className={[classes.matrixCell, classes.matrixText].join(' ')}
+                  sx={{ '&&': { textAlign: 'left' } }}
+                >
                   {tr.MatrixQuestion.response}
                 </TableCell>
               </TableRow>
