@@ -269,9 +269,8 @@ function dbEntriesToFeatures(
 
           // insert subquestion answer under respective header
           if (answer.valueText) {
-            key = `${key} - 'jokin muu, mikä?'`;
             submissionGroup[submissionId][answer.parentEntryId].properties[
-              key
+              keyOther
             ] = answer.valueText;
           } else {
             key = `${key} - ${answer?.optionText?.['fi']}`;
