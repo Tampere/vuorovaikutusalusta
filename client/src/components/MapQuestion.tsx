@@ -23,10 +23,15 @@ interface Props {
   value: MapQuestionAnswer[];
   onChange: (value: MapQuestionAnswer[]) => void;
   question: SurveyMapQuestion;
-  setDirty: (dirty: boolean) => void;
+  setDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export default function MapQuestion({ value, onChange, question }: Props) {
+export default function MapQuestion({
+  value,
+  onChange,
+  question,
+  setDialogOpen,
+}: Props) {
   const [drawingCancelled, setDrawingCancelled] = useState(false);
   const drawingCancelledRef = useRef(drawingCancelled);
   const [selectionType, setSelectionType] =
@@ -172,6 +177,14 @@ export default function MapQuestion({ value, onChange, question }: Props) {
       },
     );
   }
+
+  useEffect(() => {
+    setDialogOpen(
+      deleteConfirmDialogOpen || clearConfirmDialogOpen || subQuestionDialogOpen
+        ? true
+        : false,
+    );
+  }, [deleteConfirmDialogOpen, clearConfirmDialogOpen, subQuestionDialogOpen]);
 
   function getToggleButton(selectionType: MapQuestionSelectionType) {
     const markingCount = value?.filter(
