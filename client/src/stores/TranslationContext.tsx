@@ -2,6 +2,7 @@ import React, { ReactNode, useContext, useMemo, useReducer } from 'react';
 import { useHistory } from 'react-router-dom';
 import en from './en.json';
 import fi from './fi.json';
+import { LocalizedText } from '@interfaces/survey';
 
 // Object containing all translations
 const translations = {
@@ -59,7 +60,7 @@ export function useTranslations() {
 
   if (!context) {
     throw new Error(
-      'useTranslations must be used within the TranslationProvider'
+      'useTranslations must be used within the TranslationProvider',
     );
   }
   const [state, dispatch] = context;
@@ -82,13 +83,13 @@ export function useTranslations() {
     language: state.language,
     surveyLanguage: state.surveyLanguage,
     tr: translations[state.language],
-    initializeLocalizedObject: (initialValue: string | null): any => {
+    initializeLocalizedObject: (initialValue: string | null): LocalizedText => {
       return state.languages.reduce((prevValue, currentValue) => {
         return {
           ...prevValue,
           [currentValue]: initialValue,
         };
-      }, {});
+      }, {} as LocalizedText);
     },
     languages: state.languages,
   };
