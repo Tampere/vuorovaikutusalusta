@@ -1,6 +1,7 @@
 import { SurveyPage } from '@interfaces/survey';
 import {
   Divider,
+  IconButton,
   List,
   ListItem,
   ListItemIcon,
@@ -34,6 +35,7 @@ import {
   replaceIdsWithNull,
   replaceTranslationsWithNull,
 } from '@src/utils/schemaValidation';
+import { request } from '@src/utils/request';
 
 const useStyles = makeStyles((theme: Theme) => ({
   '@keyframes pulse': {
@@ -146,12 +148,32 @@ export default function EditSurveySideBar(props: Props) {
                               )
                             }
                           />
-                          <CopyToClipboard
-                            data={JSON.stringify(page)}
-                            tooltip={tr.EditSurvey.copyPage}
-                            icon={<ContentCopy />}
-                            msg={tr.EditSurvey.pageCopied}
-                          />
+                          <IconButton
+                            onClick={async (event) => {
+                              event.stopPropagation();
+                              event.preventDefault();
+                              console.log('heps');
+
+                              try {
+                                const res = await request(
+                                  `/api/surveys/clipboard/`,
+                                  {
+                                    method: 'POST',
+                                    body: {
+                                      page: { a: 11 },
+                                      section: { b: 'jautsaa' },
+                                    },
+                                  },
+                                );
+
+                                console.log(res);
+                              } catch (_err) {
+                                console.log(`Error while copying page`);
+                              }
+                            }}
+                          >
+                            <ContentCopy />
+                          </IconButton>
                           <div {...provided.dragHandleProps}>
                             <DragIndicator />
                           </div>

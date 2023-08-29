@@ -1393,3 +1393,37 @@ export async function getDistinctAutoSendToEmails() {
   `);
   return rows.map((row) => row.email);
 }
+
+/**
+ *
+ */
+
+export async function storeClipboardData(
+  userId: string,
+  page: any,
+  section: any,
+) {
+  console.log('adsf');
+  const row = await getDb().oneOrNone(
+    `
+    INSERT INTO application.clipboard (user_id, page, section) 
+    VALUES ($(userId), $(page)::json, $(section)::json)
+    ON CONFLICT (user_id)
+    DO UPDATE SET page = $(page)::json, section = $(section)::json
+    RETURNING *
+    `,
+    {
+      userId,
+      page,
+      section,
+    },
+  );
+
+  if (!row) {
+    throw new InternalServerError(
+      `Error while storing clipboard content to db`,
+    );
+  }
+
+  return;
+}

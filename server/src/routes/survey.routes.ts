@@ -10,6 +10,7 @@ import {
   getSurvey,
   getSurveys,
   publishSurvey,
+  storeClipboardData,
   unpublishSurvey,
   updateSurvey,
   userCanEditSurvey,
@@ -31,7 +32,7 @@ router.get(
   asyncHandler(async (req, res) => {
     const emails = await getDistinctAutoSendToEmails();
     res.json(emails);
-  })
+  }),
 );
 
 /**
@@ -55,10 +56,10 @@ router.get(
     const { filterByAuthored, filterByPublished } = req.query;
     const surveys = await getSurveys(
       filterByAuthored ? userId : null,
-      Boolean(filterByPublished)
+      Boolean(filterByPublished),
     );
     res.status(200).json(surveys);
-  })
+  }),
 );
 
 /**
@@ -73,7 +74,7 @@ router.get(
     const id = Number(req.params.id);
     const survey = await getSurvey({ id });
     res.status(200).json(survey);
-  })
+  }),
 );
 
 /**
@@ -85,7 +86,7 @@ router.post(
   asyncHandler(async (req, res) => {
     const createdSurvey = await createSurvey(req.user);
     res.status(201).json(createdSurvey);
-  })
+  }),
 );
 
 /**
@@ -178,7 +179,7 @@ router.put(
     };
     const updatedSurvey = await updateSurvey(survey);
     res.status(200).json(updatedSurvey);
-  })
+  }),
 );
 
 /**
@@ -198,7 +199,7 @@ router.delete(
     }
     const deletedSurvey = await deleteSurvey(surveyId);
     res.status(200).json(deletedSurvey);
-  })
+  }),
 );
 
 /**
@@ -242,7 +243,7 @@ router.post(
       const additionalPages = await Promise.all(
         Array(copiedSurveyData.pages.length - 1)
           .fill(null)
-          .map(() => createSurveyPage(createdSurvey.id))
+          .map(() => createSurveyPage(createdSurvey.id)),
       );
       pageSkeletons.push(...additionalPages);
     }
@@ -266,7 +267,7 @@ router.post(
     } else {
       return res.status(500).json('Error while copying survey');
     }
-  })
+  }),
 );
 
 /**
@@ -282,7 +283,7 @@ router.post(
     const surveyId = Number(req.params.id);
     const survey = await publishSurvey(surveyId);
     res.status(200).json(survey);
-  })
+  }),
 );
 
 /**
@@ -298,7 +299,7 @@ router.post(
     const surveyId = Number(req.params.id);
     const survey = await unpublishSurvey(surveyId);
     res.status(200).json(survey);
-  })
+  }),
 );
 
 /**
@@ -315,7 +316,7 @@ router.post(
     const partialPage = req.body as Partial<SurveyPage>;
     const createdSurveyPage = await createSurveyPage(id, partialPage);
     res.status(201).json(createdSurveyPage);
-  })
+  }),
 );
 
 /**
@@ -331,7 +332,7 @@ router.delete(
     const id = Number(req.params.id);
     const deletedSurveyPage = await deleteSurveyPage(id);
     res.status(200).json(deletedSurveyPage);
-  })
+  }),
 );
 
 /**
@@ -358,14 +359,31 @@ router.get(
       survey,
       { id: submissionId, timestamp },
       answerEntries,
-      language
+      language,
     );
     res.writeHead(200, {
       'Content-Type': 'application/pdf',
       'Content-Length': pdfBuffer.length,
     });
     res.end(pdfBuffer);
-  })
+  }),
+);
+
+/**
+ * Endpoit for copying a survey page to virtual clipboard
+ */
+router.post(
+  '/clipboard/',
+  ensureAuthenticated(),
+  asyncHandler(async (req, res) => {
+    const page = req.body.page;
+    const section = req.body.section;
+    const userId = req.user.id;
+
+    console.log(page, section, userId);
+    await storeClipboardData(userId, page, section);
+    res.send('ok').status(200);
+  }),
 );
 
 export default router;
