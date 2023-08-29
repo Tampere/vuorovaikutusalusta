@@ -1,4 +1,5 @@
 import { LocalizedText, SurveyMatrixQuestion } from '@interfaces/survey';
+import { Add, Cancel } from '@mui/icons-material';
 import {
   Checkbox,
   Fab,
@@ -9,18 +10,18 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import { Add, Cancel } from '@mui/icons-material';
-import { useTranslations } from '@src/stores/TranslationContext';
 import React from 'react';
 import QuestionOptions from './QuestionOptions';
+import { useTranslations } from '@src/stores/TranslationContext';
 
 interface Props {
   section: SurveyMatrixQuestion;
+
   onChange: (section: SurveyMatrixQuestion) => void;
 }
 
-export default function EditMatrixQuestion({ section, onChange }: Props) {
-  const { tr, surveyLanguage, initializeLocalizedObject } = useTranslations();
+export function EditMultiMatrixQuestion({ onChange, section }: Props) {
+  const { tr, initializeLocalizedObject, surveyLanguage } = useTranslations();
 
   return (
     <>

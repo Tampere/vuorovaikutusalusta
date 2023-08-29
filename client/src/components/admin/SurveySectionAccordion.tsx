@@ -41,6 +41,7 @@ import {
   Subject,
   TextFields,
   ViewComfy,
+  ViewComfyAlt,
 } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
@@ -61,6 +62,7 @@ import EditRadioQuestion from './EditRadioQuestion';
 import EditSliderQuestion from './EditSliderQuestion';
 import EditSortingQuestion from './EditSortingQuestion';
 import EditTextSection from './EditTextSection';
+import { EditMultiMatrixQuestion } from './EditMultiMatrixQuestion';
 
 const useStyles = makeStyles({
   accordion: {
@@ -210,7 +212,16 @@ export default function SurveySectionAccordion(props: Props) {
       tooltip: tr.SurveySection.matrixQuestion,
       form: (
         <EditMatrixQuestion
-          disabled={props.disabled}
+          section={props.section as SurveyMatrixQuestion}
+          onChange={handleEdit}
+        />
+      ),
+    },
+    'multi-matrix': {
+      icon: <ViewComfyAlt />,
+      tooltip: tr.SurveySection.multiMatrixQuestion,
+      form: (
+        <EditMultiMatrixQuestion
           section={props.section as SurveyMatrixQuestion}
           onChange={handleEdit}
         />
