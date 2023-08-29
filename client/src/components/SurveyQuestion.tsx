@@ -7,7 +7,7 @@ import { FormControl, FormHelperText, FormLabel } from '@mui/material';
 import { visuallyHidden } from '@mui/utils';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import AttachmentQuestion from './AttachmentQuestion';
 import CheckBoxQuestion from './CheckBoxQuestion';
 import FreeTextQuestion from './FreeTextQuestion';
@@ -32,6 +32,7 @@ function SurveyQuestion({ question, pageUnfinished, mobileDrawerOpen }: Props) {
   const { tr, surveyLanguage } = useTranslations();
   const [dirty, setDirty] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const infoDialogRef = useRef(null);
 
   const value = useMemo(
     () => answers.find((answer) => answer.sectionId === question.id)?.value,
@@ -56,6 +57,7 @@ function SurveyQuestion({ question, pageUnfinished, mobileDrawerOpen }: Props) {
           e.relatedTarget &&
           !e.currentTarget.contains(e.relatedTarget as Node) &&
           !dialogOpen &&
+          !infoDialogRef?.current?.infoDialogOpen &&
           !mobileDrawerOpen
         ) {
           setDirty(true);
@@ -96,8 +98,7 @@ function SurveyQuestion({ question, pageUnfinished, mobileDrawerOpen }: Props) {
         )}
         {question.info && question.info?.[surveyLanguage] && (
           <SectionInfo
-            infoDialogOpen={dialogOpen}
-            setInfoDialogOpen={setDialogOpen}
+            ref={infoDialogRef}
             hiddenFromScreenReader={false}
             infoText={question.info?.[surveyLanguage]}
             subject={question.title?.[surveyLanguage]}
