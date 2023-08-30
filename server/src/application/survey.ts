@@ -1401,8 +1401,8 @@ export async function getDistinctAutoSendToEmails() {
 
 export async function storeClipboardData(
   userId: string,
-  page: any,
-  section: any,
+  page: SurveyPage,
+  section: SurveyPageSection,
 ) {
   let row;
   if (page) {
@@ -1442,4 +1442,24 @@ export async function storeClipboardData(
   }
 
   return;
+}
+
+/**
+ * Get (page or section) data from virtual clipboard
+ */
+export async function getClipboardData(
+  userId: string,
+  dataToCopy: 'page' | 'section',
+) {
+  const row = await getDb().oneOrNone(
+    `
+    SELECT ${dataToCopy} FROM application.clipboard WHERE user_id = $(userId);
+  `,
+    {
+      userId,
+      dataToCopy,
+    },
+  );
+
+  return row;
 }

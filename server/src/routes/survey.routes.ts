@@ -6,6 +6,7 @@ import {
   createSurveyPage,
   deleteSurvey,
   deleteSurveyPage,
+  getClipboardData,
   getDistinctAutoSendToEmails,
   getSurvey,
   getSurveys,
@@ -380,10 +381,24 @@ router.post(
     const section = req.body.section;
     const userId = req.user.id;
 
-    console.log(page, section, userId);
     await storeClipboardData(userId, page, section);
     res.send('ok').status(200);
   }),
 );
 
 export default router;
+
+/**
+ * Endpoint for fetching previously stored clipboard data from db
+ */
+router.get(
+  '/clipboard/:dataToCopy',
+  ensureAuthenticated(),
+  asyncHandler(async (req, res) => {
+    const userId = req.user.id;
+    const dataToCopy = req.params.dataToCopy as 'page' | 'section';
+    const clipboardContent = await getClipboardData(userId, dataToCopy);
+
+    res.send(clipboardContent).status(200);
+  }),
+);

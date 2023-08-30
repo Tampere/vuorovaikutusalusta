@@ -34,6 +34,7 @@ import {
   replaceIdsWithNull,
   replaceTranslationsWithNull,
 } from '@src/utils/schemaValidation';
+import { request } from '@src/utils/request';
 
 const useStyles = makeStyles({
   button: {
@@ -282,21 +283,27 @@ export default function EditSurveyPage() {
         }}
       />
       <div
-        style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          marginLeft: '0.5rem',
+        }}
       >
         <Fab
           color="secondary"
           sx={{ marginRight: '1rem' }}
-          aria-label={'asdf'}
+          aria-label={'attach-section-from-clipboard'}
           size="small"
           onClick={async () => {
-            const text = await navigator.clipboard.readText();
-            const section = JSON.parse(text) as SurveyPageSection;
+            const res = (await request(
+              `/api/surveys/clipboard/section`,
+            )) as any;
+
+            console.log(res);
+            const section = res.section as SurveyPageSection;
             console.log(section);
-            const newSection = replaceTranslationsWithNull(
-              replaceIdsWithNull(section, -1),
-            );
-            addSection(page.id, { ...newSection, id: -1 });
+            addSection(page.id, { ...section });
           }}
         >
           <ContentPaste />

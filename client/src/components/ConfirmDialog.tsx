@@ -23,7 +23,7 @@ interface Props {
   text: string;
   open: boolean;
   onClose: (result: boolean) => void;
-  submitColor: PaletteColor;
+  submitColor?: PaletteColor;
 }
 
 export default function ConfirmDialog(props: Props) {

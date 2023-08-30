@@ -241,14 +241,15 @@ export default function EditSurveySideBar(props: Props) {
                 const page = await createPage();
                 history.push(`${url}/sivut/${page.id}?lang=${language}`);
                 setNewPageDisabled(false);
-                // Add stuff to newly created page, override with id of newly created blank page
-                const text = await navigator.clipboard.readText();
-                const surveyPage = JSON.parse(text) as SurveyPage;
-                const newSurveyPage = replaceTranslationsWithNull(
-                  replaceIdsWithNull(surveyPage, -1),
-                );
-                console.log({ ...newSurveyPage, id: page.id });
-                editPage({ ...newSurveyPage, id: page.id });
+
+                const res = (await request(
+                  `/api/surveys/clipboard/page`,
+                )) as any;
+
+                console.log(res);
+                const newPage = res.page as SurveyPage;
+
+                editPage({ ...newPage, id: page.id });
               } catch (error) {
                 showToast({
                   severity: 'error',
