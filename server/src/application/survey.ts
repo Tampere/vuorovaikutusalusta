@@ -1395,7 +1395,8 @@ export async function getDistinctAutoSendToEmails() {
 }
 
 /**
- *
+ * Store page/section details to virtual clipboard
+ * User can have both section and page stored on the database at the same time
  */
 
 export async function storeClipboardData(
@@ -1403,21 +1404,36 @@ export async function storeClipboardData(
   page: any,
   section: any,
 ) {
-  console.log('adsf');
-  const row = await getDb().oneOrNone(
-    `
-    INSERT INTO application.clipboard (user_id, page, section) 
-    VALUES ($(userId), $(page)::json, $(section)::json)
-    ON CONFLICT (user_id)
-    DO UPDATE SET page = $(page)::json, section = $(section)::json
-    RETURNING *
-    `,
-    {
-      userId,
-      page,
-      section,
-    },
-  );
+  let row;
+  if (page) {
+    row = await getDb().oneOrNone(
+      `
+      INSERT INTO application.clipboard (user_id, page) 
+      VALUES ($(userId), $(page)::json)
+      ON CONFLICT (user_id)
+      DO UPDATE SET page = $(page)::json
+      RETURNING user_id
+      `,
+      {
+        userId,
+        page,
+      },
+    );
+  } else if (section) {
+    row = await getDb().oneOrNone(
+      `
+      INSERT INTO application.clipboard (user_id, section) 
+      VALUES ($(userId), $(section)::json)
+      ON CONFLICT (user_id)
+      DO UPDATE SET section = $(section)::json
+      RETURNING user_id
+      `,
+      {
+        userId,
+        section,
+      },
+    );
+  }
 
   if (!row) {
     throw new InternalServerError(

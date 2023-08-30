@@ -30,7 +30,7 @@ import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { useHistory, useRouteMatch } from 'react-router-dom';
 import ListItemLink from '../ListItemLink';
 import SideBar from '../SideBar';
-import CopyToClipboard from '../CopyToClipboard';
+
 import {
   replaceIdsWithNull,
   replaceTranslationsWithNull,
@@ -152,7 +152,10 @@ export default function EditSurveySideBar(props: Props) {
                             onClick={async (event) => {
                               event.stopPropagation();
                               event.preventDefault();
-                              console.log('heps');
+                              const copiedSurveyPage =
+                                replaceTranslationsWithNull(
+                                  replaceIdsWithNull({ ...page, id: -1 }, -1),
+                                );
 
                               try {
                                 const res = await request(
@@ -160,8 +163,8 @@ export default function EditSurveySideBar(props: Props) {
                                   {
                                     method: 'POST',
                                     body: {
-                                      page: { a: 11 },
-                                      section: { b: 'jautsaa' },
+                                      page: copiedSurveyPage,
+                                      section: null,
                                     },
                                   },
                                 );
