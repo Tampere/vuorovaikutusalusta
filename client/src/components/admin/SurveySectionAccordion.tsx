@@ -21,6 +21,7 @@ import {
   Checkbox,
   FormControlLabel,
   FormGroup,
+  IconButton,
   TextField,
   Tooltip,
   Typography,
@@ -62,7 +63,11 @@ import EditRadioQuestion from './EditRadioQuestion';
 import EditSliderQuestion from './EditSliderQuestion';
 import EditSortingQuestion from './EditSortingQuestion';
 import EditTextSection from './EditTextSection';
-import CopyToClipboard from '../CopyToClipboard';
+import {
+  replaceIdsWithNull,
+  replaceTranslationsWithNull,
+} from '@src/utils/schemaValidation';
+import { request } from '@src/utils/request';
 
 const useStyles = makeStyles({
   accordion: {
@@ -287,14 +292,31 @@ export default function SurveySectionAccordion(props: Props) {
               <em>{tr.EditSurveyPage.untitledSection}</em>
             )}
           </Typography>
-          <CopyToClipboard
-            data={JSON.stringify(props.section)}
-            tooltip={'Kopioi osio'}
-            icon={<ContentCopy />}
-            msg={
-              'Osio kopioitu leikepöydälle. Voit kopioida osion mille tahansa kyselylle uutena osiona.'
-            }
-          />
+          <IconButton
+            onClick={async (event) => {
+              event.stopPropagation();
+              event.preventDefault();
+              const copiedSurveySection = replaceTranslationsWithNull(
+                replaceIdsWithNull({ ...props.section }, -1),
+              );
+
+              try {
+                const res = await request(`/api/surveys/clipboard/`, {
+                  method: 'POST',
+                  body: {
+                    page: null,
+                    section: copiedSurveySection,
+                  },
+                });
+
+                console.log(res);
+              } catch (_err) {
+                console.log(`Error while copying page section`);
+              }
+            }}
+          >
+            <ContentCopy />
+          </IconButton>
           <div {...props.provided.dragHandleProps} style={{ display: 'flex' }}>
             <DragIndicator />
           </div>
