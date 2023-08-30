@@ -118,6 +118,14 @@ export function getEmptyAnswer(section: SurveyPageSection): AnswerEntry {
         type: section.type,
         value: new Array(section.subjects?.length ?? 1).fill(null),
       };
+    case 'multi-matrix':
+      return {
+        sectionId: section.id,
+        type: section.type,
+        value: new Array(section.subjects?.length ?? 1).fill(
+          new Array().fill(null),
+        ),
+      };
     case 'grouped-checkbox':
       return {
         sectionId: section.id,

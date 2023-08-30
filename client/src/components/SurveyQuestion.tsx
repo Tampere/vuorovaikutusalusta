@@ -19,6 +19,7 @@ import RadioQuestion from './RadioQuestion';
 import SectionInfo from './SectionInfo';
 import SliderQuestion from './SliderQuestion';
 import SortingQuestion from './SortingQuestion';
+import MultiMatrixQuestion from './MultiMatrixQuestion';
 
 interface Props {
   question: SurveyQuestion;
@@ -216,6 +217,20 @@ function SurveyQuestion({ question, pageUnfinished, mobileDrawerOpen }: Props) {
       {question.type === 'matrix' && (
         <MatrixQuestion
           value={value as string[]}
+          onChange={(value) => {
+            updateAnswer({
+              sectionId: question.id,
+              type: question.type,
+              value,
+            });
+          }}
+          question={question}
+          setDirty={setDirty}
+        />
+      )}
+      {question.type === 'multi-matrix' && (
+        <MultiMatrixQuestion
+          value={value as string[][]}
           onChange={(value) => {
             updateAnswer({
               sectionId: question.id,

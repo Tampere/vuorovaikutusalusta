@@ -1,4 +1,4 @@
-import { LocalizedText, SurveyMatrixQuestion } from '@interfaces/survey';
+import { LocalizedText, SurveyMultiMatrixQuestion } from '@interfaces/survey';
 import { Add, Cancel } from '@mui/icons-material';
 import {
   Checkbox,
@@ -15,16 +15,120 @@ import QuestionOptions from './QuestionOptions';
 import { useTranslations } from '@src/stores/TranslationContext';
 
 interface Props {
-  section: SurveyMatrixQuestion;
-
-  onChange: (section: SurveyMatrixQuestion) => void;
+  section: SurveyMultiMatrixQuestion;
+  disabled: boolean;
+  onChange: (section: SurveyMultiMatrixQuestion) => void;
 }
 
-export function EditMultiMatrixQuestion({ onChange, section }: Props) {
+export function EditMultiMatrixQuestion({
+  onChange,
+  section,
+  disabled,
+}: Props) {
   const { tr, initializeLocalizedObject, surveyLanguage } = useTranslations();
+
+  function clampValue(value: number, min: number, max: number) {
+    return value === null ? null : Math.max(Math.min(max, value), min);
+  }
+
+  function handleAnswerLimitsMinChange(value: number) {
+    // Clamp value between 1 and amount of options
+    const min = clampValue(value, 1, section.classes.length);
+    // Accept original max value when 1) new min is empty, 2) old max was empty, or 3) old max is greater than new min
+    const max =
+      min === null ||
+      section.answerLimits.max === null ||
+      section.answerLimits.max >= min
+        ? section.answerLimits.max
+        : min;
+    onChange({
+      ...section,
+      answerLimits: {
+        min,
+        max,
+      },
+    });
+  }
+
+  function handleAnswerLimitsMaxChange(value: number) {
+    // Clamp value between 1 and amount of options
+    const max = clampValue(value, 1, section.classes.length);
+    // Accept original min value when 1) new max is empty, 2) old min was empty, or 3) old min is smaller than new max
+    const min =
+      max === null ||
+      section.answerLimits.min === null ||
+      section.answerLimits.min <= max
+        ? section.answerLimits.min
+        : max;
+    onChange({
+      ...section,
+      answerLimits: {
+        min,
+        max,
+      },
+    });
+  }
 
   return (
     <>
+      <FormGroup row>
+        <FormControlLabel
+          control={
+            <Checkbox
+              name="limit-answers"
+              disabled={disabled}
+              checked={Boolean(section.answerLimits)}
+              onChange={(event) => {
+                onChange({
+                  ...section,
+                  answerLimits: event.target.checked
+                    ? {
+                        min: null,
+                        max: null,
+                      }
+                    : null,
+                });
+              }}
+            />
+          }
+          label={tr.SurveySections.limitAnswers}
+        />
+      </FormGroup>
+      {section.answerLimits && (
+        <FormGroup row>
+          <TextField
+            sx={{
+              marginRight: '1rem',
+            }}
+            id="min-answers"
+            disabled={disabled}
+            type="number"
+            variant="standard"
+            label={tr.SurveySections.minAnswers}
+            InputLabelProps={{ shrink: true }}
+            value={section.answerLimits?.min ?? ''}
+            onChange={(event) => {
+              handleAnswerLimitsMinChange(
+                !event.target.value.length ? null : Number(event.target.value),
+              );
+            }}
+          />
+          <TextField
+            id="max-answers"
+            disabled={disabled}
+            type="number"
+            variant="standard"
+            label={tr.SurveySections.maxAnswers}
+            InputLabelProps={{ shrink: true }}
+            value={section.answerLimits?.max ?? ''}
+            onChange={(event) => {
+              handleAnswerLimitsMaxChange(
+                !event.target.value.length ? null : Number(event.target.value),
+              );
+            }}
+          />
+        </FormGroup>
+      )}
       <FormGroup row>
         <FormControlLabel
           control={

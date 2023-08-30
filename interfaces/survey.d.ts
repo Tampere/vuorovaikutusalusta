@@ -558,6 +558,10 @@ export type AnswerEntry = {
       value: string[];
     }
   | {
+      type: 'multi-matrix';
+      value: string[][];
+    }
+  | {
       type: 'grouped-checkbox';
       value: number[];
     }

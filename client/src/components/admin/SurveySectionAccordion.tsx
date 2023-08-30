@@ -6,6 +6,7 @@ import {
   SurveyImageSection,
   SurveyMapQuestion,
   SurveyMatrixQuestion,
+  SurveyMultiMatrixQuestion,
   SurveyNumericQuestion,
   SurveyPageSection,
   SurveyRadioQuestion,
@@ -222,7 +223,8 @@ export default function SurveySectionAccordion(props: Props) {
       tooltip: tr.SurveySection.multiMatrixQuestion,
       form: (
         <EditMultiMatrixQuestion
-          section={props.section as SurveyMatrixQuestion}
+          disabled={props.disabled}
+          section={props.section as SurveyMultiMatrixQuestion}
           onChange={handleEdit}
         />
       ),
