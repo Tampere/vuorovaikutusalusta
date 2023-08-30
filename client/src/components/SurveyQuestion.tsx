@@ -240,6 +240,7 @@ function SurveyQuestion({ question, pageUnfinished, mobileDrawerOpen }: Props) {
           }}
           question={question}
           setDirty={setDirty}
+          validationErrors={validationErrors}
         />
       )}
       {question.type === 'grouped-checkbox' && (

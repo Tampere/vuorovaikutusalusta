@@ -187,6 +187,23 @@ export function useSurveyAnswers() {
       }
     }
 
+    // Multi choice matrix question validation - check possible answer limits
+
+    if (question.type === 'multi-matrix') {
+      const value = answer.value as string[][];
+      for (const row of value) {
+        if (
+          // If either limit is defined and that limit is broken, the answer is invalid
+          (question.answerLimits?.max &&
+            row.length > question.answerLimits.max) ||
+          (question.answerLimits?.min && row.length < question.answerLimits.min)
+        ) {
+          errors.push('answerLimits');
+          break;
+        }
+      }
+    }
+
     // Numeric question validation - check min & max values
     if (
       question.type === 'numeric' &&
@@ -211,6 +228,13 @@ export function useSurveyAnswers() {
         ) {
           errors.push('required');
         }
+      }
+      // Multiple choice matrix is considered incomplete if any of the rows is empty
+      else if (
+        question.type === 'multi-matrix' &&
+        (answer.value as string[][]).some((row) => row.length === 0)
+      ) {
+        errors.push('required');
       }
       // If value is an array, check the array length - otherwise check for its emptiness
       else if (

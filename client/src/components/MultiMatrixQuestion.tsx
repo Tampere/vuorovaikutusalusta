@@ -1,6 +1,7 @@
 import { SurveyMultiMatrixQuestion } from '@interfaces/survey';
 import {
   FormControl,
+  FormHelperText,
   FormLabel,
   MenuItem,
   Radio,
@@ -19,13 +20,14 @@ import { visuallyHidden } from '@mui/utils';
 import { makeStyles } from '@mui/styles';
 
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 
 interface Props {
   value: string[][];
   onChange: (value: string[][]) => void;
   setDirty: (dirty: boolean) => void;
   question: SurveyMultiMatrixQuestion;
+  validationErrors: ('required' | 'answerLimits' | 'minValue' | 'maxValue')[];
 }
 
 interface ComponentState {
@@ -60,6 +62,7 @@ export default function MultiMatrixQuestion({
   onChange,
   setDirty,
   question,
+  validationErrors,
 }: Props) {
   const { tr, surveyLanguage } = useTranslations();
   const classes = useStyles();
@@ -177,8 +180,41 @@ export default function MultiMatrixQuestion({
     return question.classes[Number(valueList[0])]?.[surveyLanguage];
   }
 
+  const answerLimitText = useMemo(() => {
+    if (!question.answerLimits) {
+      return null;
+    }
+    return (
+      question.answerLimits.min && question.answerLimits.max
+        ? tr.SurveyQuestion.answerLimitsMinMax
+        : question.answerLimits.min
+        ? tr.SurveyQuestion.answerLimitsMin
+        : question.answerLimits.max
+        ? tr.SurveyQuestion.answerLimitsMax
+        : ''
+    )
+      .replace('{min}', `${question.answerLimits.min}`)
+      .replace('{max}', `${question.answerLimits.max}`);
+  }, [question.answerLimits, surveyLanguage]);
+
   return (
     <>
+      {answerLimitText && (
+        // Align this helper text with the form label
+        <>
+          <FormHelperText
+            style={{ marginLeft: 0, marginBottom: '0.5em' }}
+            id={`checkbox-helper-label-${question.id}`}
+          >
+            {answerLimitText}
+          </FormHelperText>
+          {validationErrors && validationErrors.includes('answerLimits') && (
+            <FormHelperText style={visuallyHidden} role="alert">
+              {`${question.title?.[surveyLanguage]}, ${answerLimitText}`}
+            </FormHelperText>
+          )}
+        </>
+      )}
       {!isMobileWidth && !componentState.isOverflow && (
         <TableContainer id={`${question.id}-input`} ref={radioRef}>
           <Table size="small">
