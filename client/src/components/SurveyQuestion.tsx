@@ -1,7 +1,7 @@
 import type {
   FileAnswer,
   MapQuestionAnswer,
-  SurveyQuestion,
+  SurveyQuestion as SurveyQuestionType,
 } from '@interfaces/survey';
 import { FormControl, FormHelperText, FormLabel } from '@mui/material';
 import { visuallyHidden } from '@mui/utils';
@@ -22,7 +22,7 @@ import SortingQuestion from './SortingQuestion';
 import MultiMatrixQuestion from './MultiMatrixQuestion';
 
 interface Props {
-  question: SurveyQuestion;
+  question: SurveyQuestionType;
   pageUnfinished: boolean;
   mobileDrawerOpen: boolean;
 }
