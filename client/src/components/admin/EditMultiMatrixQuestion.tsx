@@ -195,6 +195,13 @@ export function EditMultiMatrixQuestion({
                   onChange({
                     ...section,
                     classes: updatedClasses,
+                    answerLimits: {
+                      ...section.answerLimits,
+                      max:
+                        section.answerLimits.max > updatedClasses.length
+                          ? updatedClasses.length
+                          : section.answerLimits.max,
+                    },
                   });
                 }}
                 style={{ position: 'absolute', top: '-1rem', right: '0.1rem' }}
