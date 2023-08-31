@@ -17,6 +17,7 @@ import {
   NotFoundError,
 } from '@src/error';
 import logger from '@src/logger';
+import { assertNever } from '@src/utils';
 import { LineString, Point, Polygon } from 'geojson';
 
 /**
@@ -84,7 +85,7 @@ async function validateEntriesByAnswerLimits(answerEntries: AnswerEntry[]) {
     WHERE
       id = ANY ($1) AND
       details->'answerLimits' IS NOT NULL`,
-    [answerEntries.map((entry) => entry.sectionId)]
+    [answerEntries.map((entry) => entry.sectionId)],
   );
   // Validate each entry against the question answer limits
   answerEntries.forEach((entry) => {
@@ -98,7 +99,7 @@ async function validateEntriesByAnswerLimits(answerEntries: AnswerEntry[]) {
         (max != null && answerCount > max)
       ) {
         throw new BadRequestError(
-          `Answer for question ${entry.sectionId} must have between ${min} and ${max} selections`
+          `Answer for question ${entry.sectionId} must have between ${min} and ${max} selections`,
         );
       }
     }
@@ -120,7 +121,7 @@ async function validateEntriesByIsRequired(answerEntries: AnswerEntry[]) {
     WHERE
       id = ANY ($1) AND
       (details->>'isRequired')::boolean`,
-    [answerEntries.map((entry) => entry.sectionId)]
+    [answerEntries.map((entry) => entry.sectionId)],
   );
 
   // Check if there is a non-null answer for each required question
@@ -130,11 +131,11 @@ async function validateEntriesByIsRequired(answerEntries: AnswerEntry[]) {
         (entry) =>
           entry.value != null &&
           (typeof entry.value !== 'string' || entry.value !== '') &&
-          entry.sectionId === question.id
+          entry.sectionId === question.id,
       )
     ) {
       throw new BadRequestError(
-        `Answer for question ${question.id} is required`
+        `Answer for question ${question.id} is required`,
       );
     }
   });
@@ -164,7 +165,7 @@ export async function createSurveySubmission(
   answerEntries: AnswerEntry[],
   unfinishedToken: string,
   unfinished = false,
-  language: LanguageCode
+  language: LanguageCode,
 ) {
   // Only validate the entries if saving the final submission (not unfinished)
   if (!unfinished) {
@@ -174,7 +175,7 @@ export async function createSurveySubmission(
   const oldRow = unfinishedToken
     ? await getDb().oneOrNone<{ created_at: Date }>(
         'DELETE FROM data.submission WHERE unfinished_token = $1 RETURNING created_at',
-        [unfinishedToken]
+        [unfinishedToken],
       )
     : null;
 
@@ -199,12 +200,12 @@ export async function createSurveySubmission(
         COALESCE($3, gen_random_uuid()),
         $4
     ) RETURNING id, unfinished_token, updated_at;`,
-    [surveyID, oldRow?.created_at ?? null, unfinishedToken ?? null, language]
+    [surveyID, oldRow?.created_at ?? null, unfinishedToken ?? null, language],
   );
 
   if (!submissionRow) {
     logger.error(
-      `Error while creating submission for survey with id: ${surveyID}, answer entries: ${answerEntries}`
+      `Error while creating submission for survey with id: ${surveyID}, answer entries: ${answerEntries}`,
     );
     throw new InternalServerError(`Error while creating submission for survey`);
   }
@@ -216,8 +217,8 @@ export async function createSurveySubmission(
   const entryIds = await getDb().manyOrNone<{ id: number }>(
     `${getMultiInsertQuery(
       entryRows,
-      answerEntryColumnSet(inputSRID)
-    )} RETURNING id;`
+      answerEntryColumnSet(inputSRID),
+    )} RETURNING id;`,
   );
 
   // Insert subquestion answers for the newly created entries
@@ -233,16 +234,16 @@ export async function createSurveySubmission(
       const subQuestionAnswerRows = answerEntriesToRows(
         id,
         entry.subQuestionAnswers as AnswerEntry[],
-        entryId
+        entryId,
       );
       // Insert the rows
       await getDb().manyOrNone<{ id: number }>(
         getMultiInsertQuery(
           subQuestionAnswerRows,
-          answerEntryColumnSet(inputSRID)
-        )
+          answerEntryColumnSet(inputSRID),
+        ),
       );
-    })
+    }),
   );
 
   return {
@@ -261,7 +262,7 @@ export async function createSurveySubmission(
  */
 function getSRIDFromEntries(submissionEntries: AnswerEntry[]) {
   const geometryEntry = submissionEntries.find(
-    (entry) => entry.type === 'map' && entry.value.length > 0
+    (entry) => entry.type === 'map' && entry.value.length > 0,
   );
   if (!geometryEntry) return null;
 
@@ -280,7 +281,7 @@ function getSRIDFromEntries(submissionEntries: AnswerEntry[]) {
 function answerEntriesToRows(
   submissionID: number,
   submissionEntries: AnswerEntry[],
-  parentEntryId: number = null
+  parentEntryId: number = null,
 ) {
   return submissionEntries.reduce((entries, entry) => {
     let newEntries: DBAnswerEntryWithSubQuestionAnswers[];
@@ -446,6 +447,23 @@ function answerEntriesToRows(
           },
         ];
         break;
+      case 'multi-matrix':
+        newEntries = [
+          {
+            submission_id: submissionID,
+            section_id: entry.sectionId,
+            parent_entry_id: parentEntryId,
+            value_text: null,
+            value_option_id: null,
+            value_geometry: null,
+            value_numeric: null,
+            value_json: JSON.stringify(entry.value),
+            value_file: null,
+            value_file_name: null,
+            map_layers: null,
+          },
+        ];
+        break;
       case 'attachment':
         newEntries =
           entry.value?.map((value) => ({
@@ -461,6 +479,9 @@ function answerEntriesToRows(
             value_file_name: value.fileName,
             map_layers: null,
           })) ?? [];
+        break;
+      default:
+        assertNever(entry);
     }
 
     return [...entries, ...(newEntries ?? [])];
@@ -473,7 +494,7 @@ function dbAnswerEntriesToAnswerEntries(
     // value_feature: GeoJSONWithCRS<Feature<Point | LineString | Polygon>>;
     value_geometry: Point | LineString | Polygon;
   })[],
-  parentEntryId: number = null
+  parentEntryId: number = null,
 ) {
   return rows
     .filter((row) => row.parent_entry_id === parentEntryId)
@@ -499,7 +520,7 @@ function dbAnswerEntriesToAnswerEntries(
           // Try to find an existing entry for this section
           let entry = entries.find(
             (entry): entry is AnswerEntry & { type: 'checkbox' } =>
-              entry.sectionId === row.section_id
+              entry.sectionId === row.section_id,
           );
           // If the entry doesn't exist, create it
           if (
@@ -518,7 +539,7 @@ function dbAnswerEntriesToAnswerEntries(
           // Try to find an existing entry for this section
           let entry = entries.find(
             (entry): entry is AnswerEntry & { type: 'grouped-checkbox' } =>
-              entry.sectionId === row.section_id
+              entry.sectionId === row.section_id,
           );
           // If the entry doesn't exist, create it
           if (
@@ -548,7 +569,7 @@ function dbAnswerEntriesToAnswerEntries(
           // Try to find an existing entry for this section
           let entry = entries.find(
             (entry): entry is AnswerEntry & { type: 'map' } =>
-              entry.sectionId === row.section_id
+              entry.sectionId === row.section_id,
           );
           // If the entry doesn't exist, create it
           if (
@@ -577,7 +598,7 @@ function dbAnswerEntriesToAnswerEntries(
             // The function should only return map subquestion answers because of filtering - assume the type here
             subQuestionAnswers: dbAnswerEntriesToAnswerEntries(
               rows,
-              row.id
+              row.id,
             ) as SurveyMapSubQuestionAnswer[],
           };
           if (value != null) {
@@ -635,7 +656,7 @@ export async function getSurveyAnswerLanguage(token: string) {
     `
     SELECT language FROM data.submission WHERE submission.unfinished_token = $1;
   `,
-    [token]
+    [token],
   );
 
   return row?.language;
@@ -677,7 +698,7 @@ export async function getUnfinishedAnswerEntries(token: string) {
       INNER JOIN data.page_section ps ON ps.id = ae.section_id
     WHERE s.unfinished_token = $1
   `,
-      [token]
+      [token],
     )
     .catch(() => {
       throw new BadRequestError(`Invalid token`);
@@ -725,7 +746,7 @@ export async function getAnswerEntries(submissionId: number) {
     WHERE s.id = $1
     ORDER BY sp.idx, ps.idx ASC
   `,
-    [submissionId]
+    [submissionId],
   );
   if (!rows.length) {
     throw new Error(`Submission with ID ${submissionId} not found`);
@@ -741,7 +762,7 @@ export async function getAnswerEntries(submissionId: number) {
 export async function getTimestamp(submissionId: number) {
   const { updated_at } = await getDb().one<{ updated_at: Date }>(
     `SELECT updated_at FROM data.submission WHERE id = $1`,
-    [submissionId]
+    [submissionId],
   );
   return updated_at;
 }
