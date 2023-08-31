@@ -67,7 +67,7 @@ import {
   replaceIdsWithNull,
   replaceTranslationsWithNull,
 } from '@src/utils/schemaValidation';
-import { request } from '@src/utils/request';
+import { useClipboard } from '@src/stores/ClipboardContext';
 
 const useStyles = makeStyles({
   accordion: {
@@ -105,6 +105,7 @@ export default function SurveySectionAccordion(props: Props) {
 
   const classes = useStyles();
   const { tr, surveyLanguage, initializeLocalizedObject } = useTranslations();
+  const { setSection } = useClipboard();
 
   // Index is used inside a callback function -> useRef is required in React to catch all updates
   const indexRef = useRef<number>();
@@ -296,23 +297,21 @@ export default function SurveySectionAccordion(props: Props) {
             onClick={async (event) => {
               event.stopPropagation();
               event.preventDefault();
+
+              // Remove all IDs from the section JSON to prevent unwanted references
               const copiedSurveySection = replaceTranslationsWithNull(
                 replaceIdsWithNull({ ...props.section }, -1),
               );
 
-              try {
-                const res = await request(`/api/surveys/clipboard/`, {
-                  method: 'POST',
-                  body: {
-                    page: null,
-                    section: copiedSurveySection,
-                  },
-                });
+              console.log(copiedSurveySection);
 
-                console.log(res);
-              } catch (_err) {
-                console.log(`Error while copying page section`);
-              }
+              // Store section to locale storage for other browser tabs to get access to it
+              localStorage.setItem(
+                'clipboard-content',
+                JSON.stringify({ section: copiedSurveySection }),
+              );
+              // Store section to context for the currently active browser tab to get access to it
+              setSection(copiedSurveySection);
             }}
           >
             <ContentCopy />

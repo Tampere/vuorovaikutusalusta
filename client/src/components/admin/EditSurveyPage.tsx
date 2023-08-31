@@ -35,6 +35,7 @@ import {
   replaceTranslationsWithNull,
 } from '@src/utils/schemaValidation';
 import { request } from '@src/utils/request';
+import { useClipboard } from '@src/stores/ClipboardContext';
 
 const useStyles = makeStyles({
   button: {
@@ -63,6 +64,7 @@ export default function EditSurveyPage() {
   } = useSurvey();
   const history = useHistory();
   const { tr, surveyLanguage } = useTranslations();
+  const { section } = useClipboard();
   const { showToast } = useToasts();
 
   const page = useMemo(() => {
@@ -291,19 +293,13 @@ export default function EditSurveyPage() {
         }}
       >
         <Fab
+          disabled={!section}
           color="secondary"
           sx={{ marginRight: '1rem' }}
           aria-label={'attach-section-from-clipboard'}
           size="small"
-          onClick={async () => {
-            const res = (await request(
-              `/api/surveys/clipboard/section`,
-            )) as any;
-
-            console.log(res);
-            const section = res.section as SurveyPageSection;
-            console.log(section);
-            addSection(page.id, { ...section });
+          onClick={() => {
+            section && addSection(page.id, { ...section });
           }}
         >
           <ContentPaste />
