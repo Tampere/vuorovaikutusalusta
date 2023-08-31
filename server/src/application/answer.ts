@@ -692,6 +692,45 @@ function createCSVHeaders(sectionMetadata: SectionHeader[]) {
           });
         }
         break;
+      case 'multi-matrix':
+        sectionHead.details.subjects.forEach(
+          (subject: LocalizedText, idx: number) => {
+            sectionHead.details.classes.forEach(
+              (className: LocalizedText, index: number) => {
+                const key = getHeaderKey(
+                  sectionHead.pageIndex,
+                  sectionHead.sectionIndex,
+                  idx + 1,
+                  index + 1,
+                );
+                allHeaders.push({
+                  [key]: `s${sectionHead.pageIndex + 1}k${
+                    sectionHead.sectionIndex + 1
+                  }: ${sectionHead.title['fi']} - ${subject['fi']} - ${
+                    className['fi']
+                  }`,
+                });
+              },
+            );
+
+            if (sectionHead.details.allowEmptyAnswer) {
+              const key = getHeaderKey(
+                sectionHead.pageIndex,
+                sectionHead.sectionIndex,
+                idx + 1,
+                -1,
+              );
+              allHeaders.push({
+                [key]: `s${sectionHead.pageIndex + 1}k${
+                  sectionHead.sectionIndex + 1
+                }: ${sectionHead.title['fi']} - ${subject['fi']} - ${
+                  tr.dontKnow
+                }`,
+              });
+            }
+          },
+        );
+        break;
       case 'matrix':
         sectionHead.details.subjects.forEach(
           (subject: LocalizedText, idx: number) => {
@@ -811,6 +850,23 @@ function submissionAnswersToJson(
             answer.valueOptionId ?? -1,
           )
         ] = answer.valueOptionId ? 1 : answer.valueText ?? '';
+        break;
+      case 'multi-matrix':
+        sectionDetails.details.subjects.forEach((subject, index) => {
+          const classIndexes = JSON.stringify(answer.valueJson?.[index]);
+          JSON.parse(classIndexes).forEach((optionIndex: string) => {
+            const optionIdx = Number(optionIndex);
+            ret[
+              getHeaderKey(
+                sectionDetails.pageIndex,
+                answer.sectionIndex,
+                index + 1,
+                optionIdx >= 0 ? optionIdx + 1 : optionIdx,
+              )
+            ] = 1;
+          });
+        });
+
         break;
       case 'matrix':
         sectionDetails.details.subjects.forEach((_subject, index) => {
