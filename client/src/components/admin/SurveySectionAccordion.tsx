@@ -68,6 +68,7 @@ import {
   replaceTranslationsWithNull,
 } from '@src/utils/schemaValidation';
 import { useClipboard } from '@src/stores/ClipboardContext';
+import { useToasts } from '@src/stores/ToastContext';
 
 const useStyles = makeStyles({
   accordion: {
@@ -106,6 +107,7 @@ export default function SurveySectionAccordion(props: Props) {
   const classes = useStyles();
   const { tr, surveyLanguage, initializeLocalizedObject } = useTranslations();
   const { setSection, clipboardPage } = useClipboard();
+  const { showToast } = useToasts();
 
   // Index is used inside a callback function -> useRef is required in React to catch all updates
   const indexRef = useRef<number>();
@@ -315,6 +317,10 @@ export default function SurveySectionAccordion(props: Props) {
               );
               // Store section to context for the currently active browser tab to get access to it
               setSection(copiedSurveySection);
+              showToast({
+                message: tr.EditSurveyPage.sectionCopied,
+                severity: 'success',
+              });
             }}
           >
             <ContentCopy />

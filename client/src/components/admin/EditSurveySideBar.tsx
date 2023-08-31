@@ -3,6 +3,7 @@ import {
   IconButton,
   List,
   ListItem,
+  ListItemButton,
   ListItemIcon,
   ListItemText,
   Theme,
@@ -54,6 +55,11 @@ const useStyles = makeStyles((theme: Theme) => ({
   disabled: {
     pointerEvents: 'none',
     opacity: 0.4,
+  },
+  listItemButton: {
+    '&:hover': {
+      backgroundColor: '#747474',
+    },
   },
 }));
 
@@ -167,6 +173,10 @@ export default function EditSurveySideBar(props: Props) {
                               );
                               // Store page to context for the currently active browser tab to get access to it
                               setClipboardPage(copiedSurveyPage);
+                              showToast({
+                                message: tr.EditSurvey.pageCopied,
+                                severity: 'success',
+                              });
                             }}
                           >
                             <ContentCopy />
@@ -222,14 +232,16 @@ export default function EditSurveySideBar(props: Props) {
               alignSelf: 'center',
             }}
           ></div>
-          <ListItem
+          <ListItemButton
+            className={classes.listItemButton}
+            disabled={!clipboardPage}
             sx={{
               display: 'flex',
               flexDirection: 'row',
               justifyContent: 'space-around',
+              width: '100%',
             }}
             onClick={async () => {
-              // TODO: disabloi nappi jos ei löydy sivua
               setNewPageDisabled(true);
               try {
                 // Create new blank page and set its contents from Clipboard -context
@@ -250,7 +262,7 @@ export default function EditSurveySideBar(props: Props) {
           >
             <ContentPaste />
             {tr.EditSurvey.attachNewPage}
-          </ListItem>
+          </ListItemButton>
         </div>
       </List>
       <Divider />

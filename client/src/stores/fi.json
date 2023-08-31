@@ -40,7 +40,7 @@
     "displayPrivacyStatement": "Näytä tietosuoja ja tiedonhallinta -linkki alatunnisteessa",
     "copyPage": "Kopioi sivu",
     "attachNewPage": "Liitä sivu",
-    "pageCopied": "Sivu kopioitu leikepöydälle. Voit nyt liittää kopioidun sivun mihin tahansa kyselyyn."
+    "pageCopied": "Sivu kopioitu leikepöydälle. Voit nyt liittää kopioidun sivun haluamallesi kyselylle."
   },
   "EditSurveyInfo": {
     "title": "Kyselyn otsikko",
@@ -107,6 +107,7 @@
       "original": "Alkuperäinen koko",
       "fitted": "Sovita näkymään"
     },
+    "sectionCopied": "Osio kopioitu leikepöydälle. Voit nyt liittää kopioidun osion haluamallesi kyselylle.",
     "attachSection": "Uusi osio leikepöydältä"
   },
   "FileUpload": {
