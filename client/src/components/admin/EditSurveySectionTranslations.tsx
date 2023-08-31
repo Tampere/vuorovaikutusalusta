@@ -100,7 +100,7 @@ export default function EditSurveySectionTranslations({
                     />
                     {languages
                       .map((supportedLanguage) =>
-                        Boolean(option.info?.[supportedLanguage])
+                        Boolean(option.info?.[supportedLanguage]),
                       )
                       .includes(true) && (
                       <div
@@ -163,7 +163,7 @@ export default function EditSurveySectionTranslations({
           />
         </div>
       )}
-      {section.type === 'matrix' && (
+      {(section.type === 'matrix' || section.type === 'multi-matrix') && (
         <div>
           {section.classes &&
             section.classes.map((matrixClass, classIndex) => (
