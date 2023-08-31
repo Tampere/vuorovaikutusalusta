@@ -11,8 +11,8 @@ import React, {
  * Reducer state type
  */
 type State = {
-  page: SurveyPage;
-  section: SurveyPageSection;
+  clipboardPage: SurveyPage;
+  clipboardSection: SurveyPageSection;
 };
 
 /**
@@ -21,11 +21,11 @@ type State = {
 type Action =
   | {
       type: 'SET_SECTION';
-      section: SurveyPageSection;
+      clipboardSection: SurveyPageSection;
     }
   | {
       type: 'SET_PAGE';
-      page: SurveyPage;
+      clipboardPage: SurveyPage;
     };
 
 /**
@@ -42,8 +42,8 @@ interface Props {
 
 /** Translation context initial values */
 const stateDefaults: State = {
-  page: null,
-  section: null,
+  clipboardPage: null,
+  clipboardSection: null,
 };
 
 export const ClipboardContext = React.createContext<Context>(null);
@@ -57,18 +57,19 @@ export function useClipboard() {
   }
   const [state, dispatch] = context;
 
-  const setSection = (section: SurveyPageSection) => {
-    dispatch({ type: 'SET_SECTION', section });
+  const setSection = (clipboardSection: SurveyPageSection) => {
+    dispatch({ type: 'SET_SECTION', clipboardSection });
   };
 
-  const setPage = (page: SurveyPage) => {
-    dispatch({ type: 'SET_PAGE', page });
+  const setClipboardPage = (clipboardPage: SurveyPage) => {
+    dispatch({ type: 'SET_PAGE', clipboardPage });
   };
 
   return {
     setSection,
-    setPage,
-    section: state.section,
+    setClipboardPage: setClipboardPage,
+    clipboardSection: state.clipboardSection,
+    clipboardPage: state.clipboardPage,
   };
 }
 
@@ -78,12 +79,12 @@ function reducer(state: State, action: Action): State {
     case 'SET_SECTION':
       return {
         ...state,
-        section: action.section,
+        clipboardSection: action.clipboardSection,
       };
     case 'SET_PAGE':
       return {
         ...state,
-        page: action.page,
+        clipboardPage: action.clipboardPage,
       };
     default:
       throw new Error('Invalid action type');
@@ -104,11 +105,12 @@ export default function ClipboardProvider({ children }: Props) {
         const clipboardContent = JSON.parse(event.newValue);
         console.log('Data in localStorage updated:', clipboardContent);
         const {
-          section,
-          page,
-        }: { section: SurveyPageSection; page: SurveyPage } = clipboardContent;
-        page && dispatch({ type: 'SET_PAGE', page });
-        section && dispatch({ type: 'SET_SECTION', section });
+          clipboardSection,
+          clipboardPage,
+        }: { clipboardSection: SurveyPageSection; clipboardPage: SurveyPage } =
+          clipboardContent;
+        clipboardPage && dispatch({ type: 'SET_PAGE', clipboardPage });
+        clipboardSection && dispatch({ type: 'SET_SECTION', clipboardSection });
       }
     };
 

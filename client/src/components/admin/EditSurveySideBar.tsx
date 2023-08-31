@@ -1,4 +1,3 @@
-import { SurveyPage } from '@interfaces/survey';
 import {
   Divider,
   IconButton,
@@ -35,7 +34,7 @@ import {
   replaceIdsWithNull,
   replaceTranslationsWithNull,
 } from '@src/utils/schemaValidation';
-import { request } from '@src/utils/request';
+import { useClipboard } from '@src/stores/ClipboardContext';
 
 const useStyles = makeStyles((theme: Theme) => ({
   '@keyframes pulse': {
@@ -81,6 +80,7 @@ export default function EditSurveySideBar(props: Props) {
   } = useSurvey();
   const { tr, surveyLanguage, language } = useTranslations();
   const { showToast } = useToasts();
+  const { clipboardSection, setClipboardPage, clipboardPage } = useClipboard();
 
   return (
     <SideBar
@@ -157,22 +157,16 @@ export default function EditSurveySideBar(props: Props) {
                                   replaceIdsWithNull({ ...page, id: -1 }, -1),
                                 );
 
-                              try {
-                                const res = await request(
-                                  `/api/surveys/clipboard/`,
-                                  {
-                                    method: 'POST',
-                                    body: {
-                                      page: copiedSurveyPage,
-                                      section: null,
-                                    },
-                                  },
-                                );
-
-                                console.log(res);
-                              } catch (_err) {
-                                console.log(`Error while copying page`);
-                              }
+                              // Store section to locale storage for other browser tabs to get access to it
+                              localStorage.setItem(
+                                'clipboard-content',
+                                JSON.stringify({
+                                  clipboardPage: copiedSurveyPage,
+                                  clipboardSection,
+                                }),
+                              );
+                              // Store page to context for the currently active browser tab to get access to it
+                              setClipboardPage(copiedSurveyPage);
                             }}
                           >
                             <ContentCopy />
@@ -197,7 +191,6 @@ export default function EditSurveySideBar(props: Props) {
               flexDirection: 'row',
               justifyContent: 'space-around',
             }}
-            button
             className={`${
               newPageDisabled || activeSurveyLoading ? classes.disabled : ''
             } ${newPageLoading ? classes.loading : ''}`}
@@ -236,20 +229,15 @@ export default function EditSurveySideBar(props: Props) {
               justifyContent: 'space-around',
             }}
             onClick={async () => {
+              // TODO: disabloi nappi jos ei löydy sivua
               setNewPageDisabled(true);
               try {
-                const page = await createPage();
-                history.push(`${url}/sivut/${page.id}?lang=${language}`);
+                // Create new blank page and set its contents from Clipboard -context
+                const blankPage = await createPage();
+                history.push(`${url}/sivut/${blankPage.id}?lang=${language}`);
                 setNewPageDisabled(false);
 
-                const res = (await request(
-                  `/api/surveys/clipboard/page`,
-                )) as any;
-
-                console.log(res);
-                const newPage = res.page as SurveyPage;
-
-                editPage({ ...newPage, id: page.id });
+                editPage({ ...clipboardPage, id: blankPage.id });
               } catch (error) {
                 showToast({
                   severity: 'error',

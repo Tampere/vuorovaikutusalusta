@@ -26,15 +26,8 @@ import Fieldset from '../Fieldset';
 import AddSurveySectionActions from './AddSurveySectionActions';
 import FileUpload from './FileUpload';
 import SurveySections from './SurveySections';
-import {
-  SurveyPageSection,
-  SurveyPageSidebarImageSize,
-} from '@interfaces/survey';
-import {
-  replaceIdsWithNull,
-  replaceTranslationsWithNull,
-} from '@src/utils/schemaValidation';
-import { request } from '@src/utils/request';
+import { SurveyPageSidebarImageSize } from '@interfaces/survey';
+
 import { useClipboard } from '@src/stores/ClipboardContext';
 
 const useStyles = makeStyles({
@@ -64,7 +57,7 @@ export default function EditSurveyPage() {
   } = useSurvey();
   const history = useHistory();
   const { tr, surveyLanguage } = useTranslations();
-  const { section } = useClipboard();
+  const { clipboardSection } = useClipboard();
   const { showToast } = useToasts();
 
   const page = useMemo(() => {
@@ -293,13 +286,14 @@ export default function EditSurveyPage() {
         }}
       >
         <Fab
-          disabled={!section}
+          disabled={!clipboardSection}
           color="secondary"
           sx={{ marginRight: '1rem' }}
           aria-label={'attach-section-from-clipboard'}
           size="small"
           onClick={() => {
-            section && addSection(page.id, { ...section });
+            // Copy content from Clipboard context to active survey
+            clipboardSection && addSection(page.id, { ...clipboardSection });
           }}
         >
           <ContentPaste />
