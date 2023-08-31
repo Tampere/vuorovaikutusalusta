@@ -78,16 +78,16 @@ async function convertPdfToBuffer(pdf: typeof PDFDocument) {
 
 function prepareMapAnswers(
   survey: Survey,
-  answerEntries: AnswerEntry[]
+  answerEntries: AnswerEntry[],
 ): ScreenshotJobData {
   return answerEntries
     .filter(
-      (entry): entry is AnswerEntry & { type: 'map' } => entry.type === 'map'
+      (entry): entry is AnswerEntry & { type: 'map' } => entry.type === 'map',
     )
     .reduce(
       (jobData, entry) => {
         const page = survey.pages.find((page) =>
-          page.sections.some((section) => section.id === entry.sectionId)
+          page.sections.some((section) => section.id === entry.sectionId),
         );
         return {
           ...jobData,
@@ -100,7 +100,7 @@ function prepareMapAnswers(
               visibleLayerIds: answer.mapLayers ?? page.sidebar.mapLayers,
               question: page.sections.find(
                 (section): section is SurveyMapQuestion =>
-                  section.id === entry.sectionId
+                  section.id === entry.sectionId,
               ),
             })),
           ],
@@ -109,7 +109,7 @@ function prepareMapAnswers(
       {
         mapUrl: survey.mapUrl,
         answers: [],
-      } as ScreenshotJobData
+      } as ScreenshotJobData,
     );
 }
 
@@ -118,7 +118,7 @@ async function getFrontPage(
   submissionId: number,
   timestamp: Date,
   answerEntries: AnswerEntry[],
-  language: LanguageCode
+  language: LanguageCode,
 ): Promise<Content> {
   const tr = useTranslations(language);
   const image = survey.backgroundImageName
@@ -133,7 +133,7 @@ async function getFrontPage(
   const attachmentFileNames = answerEntries
     .filter(
       (entry): entry is AnswerEntry & { type: 'attachment' } =>
-        entry.type === 'attachment'
+        entry.type === 'attachment',
     )
     .map((entry) => entry.value[0]?.fileName)
     .filter(Boolean);
@@ -174,7 +174,7 @@ async function getFrontPage(
     // Add the remaining "info fields" from one array as they have identical styling
     [
       ...(survey.email?.info ?? []).map(
-        (item) => `${item.name?.[language]}: ${item.value?.[language]}`
+        (item) => `${item.name?.[language]}: ${item.value?.[language]}`,
       ),
       `${tr.submissionId}: ${submissionId}`,
       `${tr.responseTime}: ${moment(timestamp).format('DD.MM.YYYY HH:mm')}`,
@@ -194,7 +194,7 @@ async function getFrontPage(
 function getOptionSelectionText(
   value: string | number,
   options: SectionOption[],
-  language: LanguageCode
+  language: LanguageCode,
 ) {
   const tr = useTranslations(language);
 
@@ -211,14 +211,14 @@ function getContent(
   screenshots: ScreenshotJobReturnData[],
   options: SectionOption[],
   isSubQuestion = false,
-  language: LanguageCode
+  language: LanguageCode,
 ): Content[] {
   if (!answerEntry) {
     return null;
   }
   const tr = useTranslations(language);
   const sectionIndex = sections.findIndex(
-    (section) => answerEntry.sectionId === section.id
+    (section) => answerEntry.sectionId === section.id,
   );
   const section = sections[sectionIndex];
 
@@ -295,6 +295,29 @@ function getContent(
         },
       ];
     }
+    case 'multi-matrix': {
+      const question = section as SurveyMatrixQuestion;
+      console.log(question.classes);
+      return [
+        heading,
+        {
+          ul: question.subjects.map((subject, index) => ({
+            text: `${subject?.[language]}: ${
+              answerEntry.value[index].length > 0
+                ? answerEntry.value[index]
+                    .map((classIndex: string) =>
+                      classIndex === '-1'
+                        ? tr.dontKnow
+                        : question.classes[Number(classIndex)]?.[language],
+                    )
+                    .join(', ')
+                : '-'
+            }`,
+            style,
+          })),
+        },
+      ];
+    }
     case 'sorting': {
       return [
         heading,
@@ -321,7 +344,7 @@ function getContent(
           const screenshot = screenshots.find(
             (screenshot) =>
               screenshot.sectionId === answerEntry.sectionId &&
-              screenshot.index === index
+              screenshot.index === index,
           );
           return {
             columns: [
@@ -353,7 +376,7 @@ function getContent(
                     [],
                     options,
                     true,
-                    language
+                    language,
                   );
                 }),
               ],
@@ -379,20 +402,20 @@ export async function generatePdf(
   survey: Survey,
   submission: { id: number; timestamp: Date },
   answerEntries: AnswerEntry[],
-  language: LanguageCode
+  language: LanguageCode,
 ) {
   const start = Date.now();
   const options = await getOptionsForSurvey(survey.id);
 
   const sections = survey.pages.reduce(
     (sections, page) => [...sections, ...page.sections],
-    [] as SurveyPageSection[]
+    [] as SurveyPageSection[],
   );
   const screenshotJobData = prepareMapAnswers(survey, answerEntries);
   const screenshots = await getScreenshots(screenshotJobData);
 
   logger.debug(
-    `Fetched ${screenshots.length} screenshots in ${Date.now() - start}ms`
+    `Fetched ${screenshots.length} screenshots in ${Date.now() - start}ms`,
   );
 
   const content: Content = [
@@ -401,7 +424,7 @@ export async function generatePdf(
       submission.id,
       submission.timestamp,
       answerEntries,
-      language
+      language,
     ),
     ...sections.map((section) =>
       getContent(
@@ -410,8 +433,8 @@ export async function generatePdf(
         screenshots,
         options,
         false,
-        language
-      )
+        language,
+      ),
     ),
   ];
 
