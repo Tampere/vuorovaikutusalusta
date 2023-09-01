@@ -99,16 +99,16 @@ export default function ClipboardProvider({ children }: Props) {
    */
   useEffect(() => {
     // Event listener for the storage event
-    const handleStorageChange = (event: any) => {
+    const handleStorageChange = (event: StorageEvent) => {
       if (event.key === 'clipboard-content') {
         // Handle the change, e.g., update your component's state
         const clipboardContent = JSON.parse(event.newValue);
-        console.log('Data in localStorage updated:', clipboardContent);
         const {
           clipboardSection,
           clipboardPage,
         }: { clipboardSection: SurveyPageSection; clipboardPage: SurveyPage } =
           clipboardContent;
+
         clipboardPage && dispatch({ type: 'SET_PAGE', clipboardPage });
         clipboardSection && dispatch({ type: 'SET_SECTION', clipboardSection });
       }
