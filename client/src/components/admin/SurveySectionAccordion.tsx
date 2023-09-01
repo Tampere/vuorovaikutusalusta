@@ -95,7 +95,6 @@ interface Props {
 
 export default function SurveySectionAccordion(props: Props) {
   const [deleteConfirmDialogOpen, setDeleteConfirmDialogOpen] = useState(false);
-
   const classes = useStyles();
   const { tr, surveyLanguage, initializeLocalizedObject } = useTranslations();
 
@@ -355,6 +354,7 @@ export default function SurveySectionAccordion(props: Props) {
       <ConfirmDialog
         open={deleteConfirmDialogOpen}
         text={tr.EditSurveyPage.confirmDeleteSection}
+        submitColor="error"
         onClose={(result) => {
           setDeleteConfirmDialogOpen(false);
           if (result) {

@@ -475,9 +475,7 @@ type LanguageCode = 'fi' | 'en';
 /**
  * Type for localization typing
  */
-type LocalizedText = {
-  [code in LanguageCode]: string;
-};
+type LocalizedText = Record<LanguageCode, string>;
 
 /**
  * Intersected subset of answers for map subquestions.
