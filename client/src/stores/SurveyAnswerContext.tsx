@@ -193,7 +193,7 @@ export function useSurveyAnswers() {
       const value = answer.value as string[][];
       for (const row of value) {
         if (row.includes('-1')) {
-          break;
+          continue;
         } else if (
           // If either limit is defined and that limit is broken, the answer is invalid
           (question.answerLimits?.max &&
