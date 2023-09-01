@@ -21,6 +21,7 @@ import { makeStyles } from '@mui/styles';
 
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { CheckBox } from '@mui/icons-material';
 
 interface Props {
   value: string[][];
@@ -28,6 +29,7 @@ interface Props {
   setDirty: (dirty: boolean) => void;
   question: SurveyMultiMatrixQuestion;
   validationErrors: ('required' | 'answerLimits' | 'minValue' | 'maxValue')[];
+  setBackdropOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 interface ComponentState {
@@ -63,6 +65,7 @@ export default function MultiMatrixQuestion({
   question,
   validationErrors,
   setDirty,
+  setBackdropOpen,
 }: Props) {
   const { tr, surveyLanguage } = useTranslations();
   const classes = useStyles();
@@ -237,7 +240,7 @@ export default function MultiMatrixQuestion({
                   return (
                     <TableCell
                       scope="col"
-                      key={index}
+                      key={index.toString()}
                       className={`${classes.matrixCell} ${classes.matrixText}`}
                     >
                       {entry?.[surveyLanguage] ?? index}
@@ -366,6 +369,8 @@ export default function MultiMatrixQuestion({
                         sx={{ minWidth: 160, maxWidth: 200, m: 1 }}
                       >
                         <Select
+                          onOpen={() => setBackdropOpen(true)}
+                          onClose={() => setBackdropOpen(false)}
                           multiple
                           renderValue={() =>
                             getSelectionRenderValue(subjectIndex)
@@ -385,11 +390,19 @@ export default function MultiMatrixQuestion({
                               key={classIndex}
                               value={String(classIndex)}
                             >
+                              <Checkbox
+                                checked={value[subjectIndex].includes(
+                                  classIndex.toString(),
+                                )}
+                              />
                               {entry?.[surveyLanguage]}
                             </MenuItem>
                           ))}
                           {question.allowEmptyAnswer && (
                             <MenuItem value={'-1'}>
+                              <Checkbox
+                                checked={value[subjectIndex].includes('-1')}
+                              />
                               {tr.MatrixQuestion.emptyAnswer}
                             </MenuItem>
                           )}
@@ -424,6 +437,8 @@ export default function MultiMatrixQuestion({
                   {subject?.[surveyLanguage]}
                 </FormLabel>
                 <Select
+                  onOpen={() => setBackdropOpen(true)}
+                  onClose={() => setBackdropOpen(false)}
                   displayEmpty
                   multiple
                   renderValue={() => getSelectionRenderValue(subjectIndex)}
@@ -439,11 +454,17 @@ export default function MultiMatrixQuestion({
                   </MenuItem>
                   {question.classes.map((entry, classIndex) => (
                     <MenuItem key={classIndex} value={classIndex.toString()}>
+                      <Checkbox
+                        checked={value[subjectIndex].includes(
+                          classIndex.toString(),
+                        )}
+                      />
                       {entry?.[surveyLanguage]}
                     </MenuItem>
                   ))}
                   {question.allowEmptyAnswer && (
                     <MenuItem value={'-1'}>
+                      <Checkbox checked={value[subjectIndex].includes('-1')} />
                       {tr.MatrixQuestion.emptyAnswer}
                     </MenuItem>
                   )}

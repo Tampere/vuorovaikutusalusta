@@ -3,7 +3,12 @@ import type {
   MapQuestionAnswer,
   SurveyQuestion as SurveyQuestionType,
 } from '@interfaces/survey';
-import { FormControl, FormHelperText, FormLabel } from '@mui/material';
+import {
+  FormControl,
+  FormHelperText,
+  FormLabel,
+  backdropClasses,
+} from '@mui/material';
 import { visuallyHidden } from '@mui/utils';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import { useTranslations } from '@src/stores/TranslationContext';
@@ -33,6 +38,7 @@ function SurveyQuestion({ question, pageUnfinished, mobileDrawerOpen }: Props) {
   const { tr, surveyLanguage } = useTranslations();
   const [dirty, setDirty] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [backdropOpen, setBackdropOpen] = useState(false);
   const infoDialogRef = useRef(null);
 
   const value = useMemo(
@@ -58,6 +64,7 @@ function SurveyQuestion({ question, pageUnfinished, mobileDrawerOpen }: Props) {
           e.relatedTarget &&
           !e.currentTarget.contains(e.relatedTarget as Node) &&
           !dialogOpen &&
+          !backdropOpen &&
           !infoDialogRef?.current?.infoDialogOpen &&
           !mobileDrawerOpen
         ) {
@@ -226,6 +233,7 @@ function SurveyQuestion({ question, pageUnfinished, mobileDrawerOpen }: Props) {
           }}
           question={question}
           setDirty={setDirty}
+          setBackdropOpen={setBackdropOpen}
         />
       )}
       {question.type === 'multi-matrix' && (
@@ -240,6 +248,7 @@ function SurveyQuestion({ question, pageUnfinished, mobileDrawerOpen }: Props) {
           }}
           question={question}
           setDirty={setDirty}
+          setBackdropOpen={setBackdropOpen}
           validationErrors={validationErrors}
         />
       )}

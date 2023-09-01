@@ -27,6 +27,7 @@ interface Props {
   onChange: (value: string[]) => void;
   setDirty: (dirty: boolean) => void;
   question: SurveyMatrixQuestion;
+  setBackdropOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 interface ComponentState {
@@ -56,7 +57,12 @@ const useStyles = makeStyles({
   },
 });
 
-export default function MatrixQuestion({ value, onChange, question }: Props) {
+export default function MatrixQuestion({
+  value,
+  onChange,
+  question,
+  setBackdropOpen,
+}: Props) {
   const { tr, surveyLanguage } = useTranslations();
   const classes = useStyles();
   const isMobileWidth = useMediaQuery('(max-width:430px)');
@@ -275,6 +281,8 @@ export default function MatrixQuestion({ value, onChange, question }: Props) {
                     <TableCell>
                       <FormControl size="small" sx={{ minWidth: 160, m: 1 }}>
                         <Select
+                          onOpen={() => setBackdropOpen(true)}
+                          onClose={() => setBackdropOpen(false)}
                           id="matrix-select"
                           value={value?.[subjectIndex] ?? ''}
                           onChange={(event: SelectChangeEvent<string>) =>
@@ -325,6 +333,8 @@ export default function MatrixQuestion({ value, onChange, question }: Props) {
                   {subject?.[surveyLanguage]}
                 </FormLabel>
                 <Select
+                  onOpen={() => setBackdropOpen(true)}
+                  onClose={() => setBackdropOpen(false)}
                   id="matrix-select"
                   displayEmpty
                   value={value?.[subjectIndex] ?? ''}
