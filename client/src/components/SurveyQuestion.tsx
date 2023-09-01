@@ -3,12 +3,7 @@ import type {
   MapQuestionAnswer,
   SurveyQuestion as SurveyQuestionType,
 } from '@interfaces/survey';
-import {
-  FormControl,
-  FormHelperText,
-  FormLabel,
-  backdropClasses,
-} from '@mui/material';
+import { FormControl, FormHelperText, FormLabel } from '@mui/material';
 import { visuallyHidden } from '@mui/utils';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import { useTranslations } from '@src/stores/TranslationContext';

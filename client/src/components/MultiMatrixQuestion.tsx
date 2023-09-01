@@ -21,7 +21,6 @@ import { makeStyles } from '@mui/styles';
 
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { CheckBox } from '@mui/icons-material';
 
 interface Props {
   value: string[][];
