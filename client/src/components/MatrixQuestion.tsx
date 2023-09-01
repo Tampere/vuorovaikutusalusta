@@ -56,12 +56,7 @@ const useStyles = makeStyles({
   },
 });
 
-export default function MatrixQuestion({
-  value,
-  onChange,
-  setDirty,
-  question,
-}: Props) {
+export default function MatrixQuestion({ value, onChange, question }: Props) {
   const { tr, surveyLanguage } = useTranslations();
   const classes = useStyles();
   const isMobileWidth = useMediaQuery('(max-width:430px)');

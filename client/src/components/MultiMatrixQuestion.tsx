@@ -1,10 +1,10 @@
 import { SurveyMultiMatrixQuestion } from '@interfaces/survey';
 import {
+  Checkbox,
   FormControl,
   FormHelperText,
   FormLabel,
   MenuItem,
-  Radio,
   Select,
   Stack,
   Table,
@@ -60,7 +60,6 @@ const useStyles = makeStyles({
 export default function MultiMatrixQuestion({
   value,
   onChange,
-  setDirty,
   question,
   validationErrors,
 }: Props) {
@@ -71,7 +70,6 @@ export default function MultiMatrixQuestion({
     isOverflow: false,
     breakPoint: 0,
   });
-
   const radioRef = useRef(null);
   const selectRef = useRef(null);
 
@@ -145,6 +143,7 @@ export default function MultiMatrixQuestion({
     const values = value.map((val, index) =>
       index === subjectIndex ? updateAnswerRow(val) : [...val],
     );
+
     onChange(values);
   }
 
@@ -162,7 +161,6 @@ export default function MultiMatrixQuestion({
       index === subjectIndex ? updateAnswerRow(val) : [...val],
     );
     onChange(values);
-    setDirty(true);
   }
 
   function getSelectionRenderValue(subjectIndex: number) {
@@ -266,13 +264,13 @@ export default function MultiMatrixQuestion({
                         key={classIndex.toString()}
                         className={classes.matrixCell}
                       >
-                        <Radio
+                        <Checkbox
                           name={`question-${subjectIndex}`}
                           checked={value[subjectIndex].includes(
                             classIndex.toString(),
                           )}
                           value={classIndex}
-                          onClick={(event) => {
+                          onChange={(event) => {
                             handleChange(
                               subjectIndex,
                               (event.target as HTMLInputElement).value,
@@ -283,11 +281,11 @@ export default function MultiMatrixQuestion({
                     ))}
                     {question.allowEmptyAnswer && (
                       <TableCell className={classes.matrixCell}>
-                        <Radio
+                        <Checkbox
                           name={`question-${subjectIndex}`}
                           checked={value[subjectIndex][0] === '-1'}
                           value={-1}
-                          onClick={(event) => {
+                          onChange={(event) => {
                             handleChange(
                               subjectIndex,
                               (event.target as HTMLInputElement).value,
