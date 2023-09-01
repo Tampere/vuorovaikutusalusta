@@ -20,7 +20,7 @@ import { visuallyHidden } from '@mui/utils';
 import { makeStyles } from '@mui/styles';
 
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 interface Props {
   value: string[][];
@@ -62,6 +62,7 @@ export default function MultiMatrixQuestion({
   onChange,
   question,
   validationErrors,
+  setDirty,
 }: Props) {
   const { tr, surveyLanguage } = useTranslations();
   const classes = useStyles();
@@ -72,6 +73,15 @@ export default function MultiMatrixQuestion({
   });
   const radioRef = useRef(null);
   const selectRef = useRef(null);
+
+  useEffect(() => {
+    if (
+      question?.answerLimits?.max &&
+      value.some((row) => row.length > question.answerLimits.max)
+    ) {
+      setDirty(true);
+    }
+  }, [value]);
 
   React.useLayoutEffect(() => {
     if (!radioRef.current) {

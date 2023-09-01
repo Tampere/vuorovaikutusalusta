@@ -192,7 +192,9 @@ export function useSurveyAnswers() {
     if (question.type === 'multi-matrix') {
       const value = answer.value as string[][];
       for (const row of value) {
-        if (
+        if (row.includes('-1')) {
+          break;
+        } else if (
           // If either limit is defined and that limit is broken, the answer is invalid
           (question.answerLimits?.max &&
             row.length > question.answerLimits.max) ||
