@@ -141,7 +141,6 @@ export default function MatrixQuestion({
     const values = [...value];
     values[subjectIndex] = event.target.value;
     onChange(values);
-    setDirty(true);
   }
 
   return (

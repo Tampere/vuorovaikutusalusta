@@ -146,7 +146,6 @@ export default function MultiMatrixQuestion({
       index === subjectIndex ? updateAnswerRow(val) : [...val],
     );
     onChange(values);
-    setDirty(true);
   }
 
   function handleSelectChange(subjectIndex: number, classIndexes: string[]) {
