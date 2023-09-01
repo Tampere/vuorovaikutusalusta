@@ -7,11 +7,9 @@ import React from 'react';
 interface Props {
   data: string;
   tooltip?: string;
-  msg?: string;
-  icon?: any;
 }
 
-export default function CopyToClipboard({ data, tooltip, icon, msg }: Props) {
+export default function CopyToClipboard({ data, tooltip }: Props) {
   const { tr } = useTranslations();
   const { showToast } = useToasts();
 
@@ -19,25 +17,22 @@ export default function CopyToClipboard({ data, tooltip, icon, msg }: Props) {
     <Tooltip title={tooltip ?? tr.CopyToClipboard.tooltip}>
       <IconButton
         size="small"
-        onClick={async (event: React.MouseEvent<HTMLButtonElement>) => {
-          event.stopPropagation();
-          event.preventDefault();
-
+        onClick={async () => {
           try {
             await navigator.clipboard.writeText(data);
             showToast({
               severity: 'success',
-              message: msg ?? tr.CopyToClipboard.successful,
+              message: tr.CopyToClipboard.successful,
             });
           } catch (error) {
             showToast({
               severity: 'error',
-              message: msg ?? tr.CopyToClipboard.fail,
+              message: tr.CopyToClipboard.fail,
             });
           }
         }}
       >
-        {icon ?? <FileCopyIcon />}
+        <FileCopyIcon />
       </IconButton>
     </Tooltip>
   );
