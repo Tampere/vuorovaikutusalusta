@@ -93,14 +93,28 @@ async function validateEntriesByAnswerLimits(answerEntries: AnswerEntry[]) {
     if (question) {
       const min = question.min;
       const max = question.max;
-      const answerCount = (entry.value as (number | string)[]).length;
-      if (
-        (min != null && answerCount < min) ||
-        (max != null && answerCount > max)
-      ) {
-        throw new BadRequestError(
-          `Answer for question ${entry.sectionId} must have between ${min} and ${max} selections`,
-        );
+      if (entry.type === 'multi-matrix') {
+        entry.value.some((answerRowValues) => {
+          // Don't validate if empty answer is allowed and used
+          if (answerRowValues.length === 1 && answerRowValues[0] === '-1') {
+            return false;
+          }
+          const answerCount = answerRowValues.length;
+          return (
+            (min != null && answerCount < min) ||
+            (max != null && answerCount > max)
+          );
+        });
+      } else {
+        const answerCount: number = (entry.value as (number | string)[]).length;
+        if (
+          (min != null && answerCount < min) ||
+          (max != null && answerCount > max)
+        ) {
+          throw new BadRequestError(
+            `Answer for question ${entry.sectionId} must have between ${min} and ${max} selections`,
+          );
+        }
       }
     }
   });

@@ -297,7 +297,7 @@ function getContent(
     }
     case 'multi-matrix': {
       const question = section as SurveyMatrixQuestion;
-      console.log(question.classes);
+
       return [
         heading,
         {
