@@ -6,15 +6,12 @@ import {
   FormLabel,
   Skeleton,
   TextField,
-  Typography,
   ToggleButton,
   ToggleButtonGroup,
   FormControl,
   Radio,
   RadioGroup,
-  Fab,
 } from '@mui/material';
-import { ContentPaste } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useToasts } from '@src/stores/ToastContext';
@@ -27,8 +24,6 @@ import AddSurveySectionActions from './AddSurveySectionActions';
 import FileUpload from './FileUpload';
 import SurveySections from './SurveySections';
 import { SurveyPageSidebarImageSize } from '@interfaces/survey';
-
-import { useClipboard } from '@src/stores/ClipboardContext';
 
 const useStyles = makeStyles({
   button: {
@@ -57,7 +52,6 @@ export default function EditSurveyPage() {
   } = useSurvey();
   const history = useHistory();
   const { tr, surveyLanguage } = useTranslations();
-  const { clipboardSection } = useClipboard();
   const { showToast } = useToasts();
 
   const page = useMemo(() => {
@@ -277,29 +271,6 @@ export default function EditSurveyPage() {
           setExpandedSection(section);
         }}
       />
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'row',
-          alignItems: 'center',
-          marginLeft: '0.5rem',
-        }}
-      >
-        <Fab
-          disabled={!clipboardSection}
-          color="secondary"
-          sx={{ marginRight: '1rem' }}
-          aria-label={'attach-section-from-clipboard'}
-          size="small"
-          onClick={() => {
-            // Copy content from Clipboard context to active survey
-            clipboardSection && addSection(page.id, { ...clipboardSection });
-          }}
-        >
-          <ContentPaste />
-        </Fab>
-        <Typography>{tr.EditSurveyPage.attachSection}</Typography>
-      </div>
       <AddSurveySectionActions
         disabled={loading}
         onAdd={(newSection) => {

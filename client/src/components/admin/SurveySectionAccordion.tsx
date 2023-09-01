@@ -86,6 +86,14 @@ const useStyles = makeStyles({
   answerLimitInput: {
     marginRight: '1rem',
   },
+  customAccordionSummary: {
+    flexDirection: 'row-reverse',
+    margin: 0,
+  },
+  contentGutters: {
+    alignItems: 'center',
+    margin: 0,
+  },
 });
 
 interface Props {
@@ -284,12 +292,19 @@ export default function SurveySectionAccordion(props: Props) {
           expandIcon={<ExpandMore />}
           aria-controls={`${props.name}-content`}
           id={`${props.name}-header`}
+          className={classes.customAccordionSummary}
+          classes={{ contentGutters: classes.contentGutters }}
         >
-          {accordion.tooltip ? (
-            <Tooltip title={accordion.tooltip}>{accordion.icon as any}</Tooltip>
-          ) : (
-            accordion.icon
-          )}
+          <div style={{ display: 'flex' }}>
+            {accordion.tooltip ? (
+              <Tooltip title={accordion.tooltip}>
+                {accordion.icon as any}
+              </Tooltip>
+            ) : (
+              accordion.icon
+            )}
+          </div>
+
           <Typography className={classes.sectionTitle}>
             {props.section.title?.[surveyLanguage] || (
               <em>{tr.EditSurveyPage.untitledSection}</em>
@@ -304,8 +319,6 @@ export default function SurveySectionAccordion(props: Props) {
               const copiedSurveySection = replaceTranslationsWithNull(
                 replaceIdsWithNull({ ...props.section }, -1),
               );
-
-              console.log(copiedSurveySection);
 
               // Store section to locale storage for other browser tabs to get access to it
               localStorage.setItem(
