@@ -95,13 +95,13 @@ export default function SurveyList() {
             setNewSurveyLoading(true);
             try {
               const newSurvey = await createNewSurvey();
-              setNewSurveyLoading(false);
               history.push(`/kyselyt/${newSurvey.id}`);
             } catch (error) {
               showToast({
                 severity: 'error',
                 message: tr.SurveyList.errorCreatingNewSurvey,
               });
+            } finally {
               setNewSurveyLoading(false);
             }
           }}
