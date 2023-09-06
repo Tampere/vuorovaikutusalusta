@@ -1,4 +1,4 @@
-export function replaceIdsWithNull(obj: any, depth: number) {
+export function replaceIdsWithNull(obj: any, depth = -1) {
   if (typeof obj !== 'object' || obj === null) {
     return obj;
   }

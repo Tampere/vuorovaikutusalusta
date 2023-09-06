@@ -155,12 +155,12 @@ export default function EditSurveySideBar(props: Props) {
                             }
                           />
                           <IconButton
-                            onClick={async (event) => {
+                            onClick={(event) => {
                               event.stopPropagation();
                               event.preventDefault();
                               const copiedSurveyPage =
                                 replaceTranslationsWithNull(
-                                  replaceIdsWithNull({ ...page, id: -1 }, -1),
+                                  replaceIdsWithNull({ ...page, id: -1 }),
                                 );
 
                               // Store section to locale storage for other browser tabs to get access to it

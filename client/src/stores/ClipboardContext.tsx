@@ -103,6 +103,8 @@ export default function ClipboardProvider({ children }: Props) {
       if (event.key === 'clipboard-content') {
         // Handle the change, e.g., update your component's state
         const clipboardContent = JSON.parse(event.newValue);
+        if (!clipboardContent) return;
+
         const {
           clipboardSection,
           clipboardPage,
@@ -116,6 +118,24 @@ export default function ClipboardProvider({ children }: Props) {
 
     // Add the event listener when the component mounts
     window.addEventListener('storage', handleStorageChange);
+
+    // Find out if there is some content already in the localStorage: this use case comes into question if the user navigates
+    // in the same tab to a different survey. The front makes then a fresh page request that causes the ClipBoard context
+    // to rerender and thus it misses all previously stored clipboard contents
+    const clipboardContent = JSON.parse(
+      localStorage.getItem('clipboard-content'),
+    );
+
+    if (!clipboardContent) return;
+
+    const {
+      clipboardSection,
+      clipboardPage,
+    }: { clipboardSection: SurveyPageSection; clipboardPage: SurveyPage } =
+      clipboardContent;
+
+    clipboardPage && dispatch({ type: 'SET_PAGE', clipboardPage });
+    clipboardSection && dispatch({ type: 'SET_SECTION', clipboardSection });
 
     // Clean up the event listener when the component unmounts
     return () => {

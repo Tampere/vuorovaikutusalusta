@@ -317,7 +317,7 @@ export default function SurveySectionAccordion(props: Props) {
 
               // Remove all IDs from the section JSON to prevent unwanted references
               const copiedSurveySection = replaceTranslationsWithNull(
-                replaceIdsWithNull({ ...props.section }, -1),
+                replaceIdsWithNull({ ...props.section }),
               );
 
               // Store section to locale storage for other browser tabs to get access to it
