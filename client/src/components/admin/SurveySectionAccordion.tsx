@@ -21,6 +21,7 @@ import {
   Checkbox,
   FormControlLabel,
   FormGroup,
+  IconButton,
   TextField,
   Tooltip,
   Typography,
@@ -41,6 +42,7 @@ import {
   Subject,
   TextFields,
   ViewComfy,
+  ContentCopy,
 } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
@@ -61,6 +63,12 @@ import EditRadioQuestion from './EditRadioQuestion';
 import EditSliderQuestion from './EditSliderQuestion';
 import EditSortingQuestion from './EditSortingQuestion';
 import EditTextSection from './EditTextSection';
+import {
+  replaceIdsWithNull,
+  replaceTranslationsWithNull,
+} from '@src/utils/schemaValidation';
+import { useClipboard } from '@src/stores/ClipboardContext';
+import { useToasts } from '@src/stores/ToastContext';
 
 const useStyles = makeStyles({
   accordion: {
@@ -77,6 +85,14 @@ const useStyles = makeStyles({
   },
   answerLimitInput: {
     marginRight: '1rem',
+  },
+  customAccordionSummary: {
+    flexDirection: 'row-reverse',
+    margin: 0,
+  },
+  contentGutters: {
+    alignItems: 'center',
+    margin: 0,
   },
 });
 
@@ -97,6 +113,8 @@ export default function SurveySectionAccordion(props: Props) {
   const [deleteConfirmDialogOpen, setDeleteConfirmDialogOpen] = useState(false);
   const classes = useStyles();
   const { tr, surveyLanguage, initializeLocalizedObject } = useTranslations();
+  const { setSection, clipboardPage } = useClipboard();
+  const { showToast } = useToasts();
 
   // Index is used inside a callback function -> useRef is required in React to catch all updates
   const indexRef = useRef<number>();
@@ -273,17 +291,52 @@ export default function SurveySectionAccordion(props: Props) {
           expandIcon={<ExpandMore />}
           aria-controls={`${props.name}-content`}
           id={`${props.name}-header`}
+          className={classes.customAccordionSummary}
+          classes={{ contentGutters: classes.contentGutters }}
         >
-          {accordion.tooltip ? (
-            <Tooltip title={accordion.tooltip}>{accordion.icon as any}</Tooltip>
-          ) : (
-            accordion.icon
-          )}
+          <div style={{ display: 'flex' }}>
+            {accordion.tooltip ? (
+              <Tooltip title={accordion.tooltip}>
+                {accordion.icon as any}
+              </Tooltip>
+            ) : (
+              accordion.icon
+            )}
+          </div>
+
           <Typography className={classes.sectionTitle}>
             {props.section.title?.[surveyLanguage] || (
               <em>{tr.EditSurveyPage.untitledSection}</em>
             )}
           </Typography>
+          <IconButton
+            onClick={async (event) => {
+              event.stopPropagation();
+              event.preventDefault();
+
+              // Remove all IDs from the section JSON to prevent unwanted references
+              const copiedSurveySection = replaceTranslationsWithNull(
+                replaceIdsWithNull({ ...props.section }),
+              );
+
+              // Store section to locale storage for other browser tabs to get access to it
+              localStorage.setItem(
+                'clipboard-content',
+                JSON.stringify({
+                  clipboardSection: copiedSurveySection,
+                  clipboardPage,
+                }),
+              );
+              // Store section to context for the currently active browser tab to get access to it
+              setSection(copiedSurveySection);
+              showToast({
+                message: tr.EditSurveyPage.sectionCopied,
+                severity: 'success',
+              });
+            }}
+          >
+            <ContentCopy />
+          </IconButton>
           <div {...props.provided.dragHandleProps} style={{ display: 'flex' }}>
             <DragIndicator />
           </div>

@@ -25,7 +25,7 @@
     "toFrontPage": "Back to the front page",
     "info": "Basic information",
     "email": "Email",
-    "newPage": "New page",
+    "newPage": "Create page",
     "newPageFailed": "Error while creating a new page. Please try again later.",
     "thanksPage": "Thanks page",
     "translations": "Translations",
@@ -37,7 +37,10 @@
     "deleteSurveyFailed": "Error while deleting the survey. Please try again later.",
     "deleteSurveySuccessful": "Survey successfully deleted!",
     "allowSavingUnfinished": "Allow saving an unfinished survey",
-    "displayPrivacyStatement": "Display link for data protection and management in the footer"
+    "displayPrivacyStatement": "Display link for data protection and management in the footer",
+    "copyPage": "Copy page",
+    "attachNewPage": "Attach page",
+    "pageCopied": "Page copied to clipboard. Use can now attach the page to any survey."
   },
   "EditSurveyInfo": {
     "title": "Survey title",
@@ -103,7 +106,8 @@
     "imageScalingLabel": {
       "original": "Original size",
       "fitted": "Fitted to page size"
-    }
+    },
+    "attachSection": "Copy section from clipboard"
   },
   "FileUpload": {
     "deleteFile": "Delete file",

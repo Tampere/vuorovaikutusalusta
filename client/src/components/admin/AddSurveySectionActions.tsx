@@ -4,6 +4,7 @@ import {
   Article,
   AttachFile,
   CheckBox,
+  ContentPaste,
   FormatListNumbered,
   Image,
   LibraryAddCheck,
@@ -18,6 +19,9 @@ import {
 import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { ReactNode, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { useClipboard } from '@src/stores/ClipboardContext';
+import { useSurvey } from '@src/stores/SurveyContext';
 
 const useStyles = makeStyles({
   actionItem: {
@@ -36,6 +40,12 @@ interface Props {
 export default function AddSurveySectionActions(props: Props) {
   const classes = useStyles();
   const { tr, initializeLocalizedObject } = useTranslations();
+  const { addSection } = useSurvey();
+  const { clipboardSection } = useClipboard();
+  const { pageId } = useParams<{
+    pageId: string;
+  }>();
+
   // Sequence for making each section ID unique before they're added to database
   const [sectionSequence, setSectionSequence] = useState(-1);
 
@@ -310,6 +320,39 @@ export default function AddSurveySectionActions(props: Props) {
                 </div>
               </Grid>
             ))}
+          <Grid item style={{ padding: '0.5rem' }}>
+            <div className={classes.actionItem}>
+              <Fab
+                disabled={!clipboardSection}
+                color="secondary"
+                aria-label={'attach-section-from-clipboard'}
+                size="small"
+                onClick={() => {
+                  // Copy content from Clipboard context to active survey
+                  if (clipboardSection) {
+                    addSection(Number(pageId), {
+                      ...clipboardSection,
+                      id: sectionSequence,
+                    });
+                    setSectionSequence((prev) => prev - 1);
+                  }
+                }}
+              >
+                <ContentPaste />
+              </Fab>
+              <Typography>{tr.EditSurveyPage.attachSection}</Typography>
+            </div>
+          </Grid>
+
+          <Grid
+            item
+            style={{
+              padding: '0.5rem',
+              display: 'flex',
+              flexDirection: 'row',
+              alignItems: 'center',
+            }}
+          ></Grid>
         </Grid>
       </Grid>
     </Grid>
