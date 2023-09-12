@@ -75,64 +75,6 @@ export function EditMultiMatrixQuestion({
         <FormControlLabel
           control={
             <Checkbox
-              name="limit-answers"
-              disabled={disabled}
-              checked={Boolean(section.answerLimits)}
-              onChange={(event) => {
-                onChange({
-                  ...section,
-                  answerLimits: event.target.checked
-                    ? {
-                        min: null,
-                        max: null,
-                      }
-                    : null,
-                });
-              }}
-            />
-          }
-          label={tr.SurveySections.limitAnswers}
-        />
-      </FormGroup>
-      {section.answerLimits && (
-        <FormGroup row>
-          <TextField
-            sx={{
-              marginRight: '1rem',
-            }}
-            id="min-answers"
-            disabled={disabled}
-            type="number"
-            variant="standard"
-            label={tr.SurveySections.minAnswers}
-            InputLabelProps={{ shrink: true }}
-            value={section.answerLimits?.min ?? ''}
-            onChange={(event) => {
-              handleAnswerLimitsMinChange(
-                !event.target.value.length ? null : Number(event.target.value),
-              );
-            }}
-          />
-          <TextField
-            id="max-answers"
-            disabled={disabled}
-            type="number"
-            variant="standard"
-            label={tr.SurveySections.maxAnswers}
-            InputLabelProps={{ shrink: true }}
-            value={section.answerLimits?.max ?? ''}
-            onChange={(event) => {
-              handleAnswerLimitsMaxChange(
-                !event.target.value.length ? null : Number(event.target.value),
-              );
-            }}
-          />
-        </FormGroup>
-      )}
-      <FormGroup row>
-        <FormControlLabel
-          control={
-            <Checkbox
               name="is-required"
               checked={section.isRequired}
               onChange={(event) => {
@@ -222,7 +164,64 @@ export function EditMultiMatrixQuestion({
         }}
         title={tr.SurveySections.subjects}
       />
-
+      <FormGroup row>
+        <FormControlLabel
+          control={
+            <Checkbox
+              name="limit-answers"
+              disabled={disabled}
+              checked={Boolean(section.answerLimits)}
+              onChange={(event) => {
+                onChange({
+                  ...section,
+                  answerLimits: event.target.checked
+                    ? {
+                        min: null,
+                        max: null,
+                      }
+                    : null,
+                });
+              }}
+            />
+          }
+          label={tr.SurveySections.limitAnswers}
+        />
+      </FormGroup>
+      {section.answerLimits && (
+        <FormGroup row>
+          <TextField
+            sx={{
+              marginRight: '1rem',
+            }}
+            id="min-answers"
+            disabled={disabled}
+            type="number"
+            variant="standard"
+            label={tr.SurveySections.minAnswers}
+            InputLabelProps={{ shrink: true }}
+            value={section.answerLimits?.min ?? ''}
+            onChange={(event) => {
+              handleAnswerLimitsMinChange(
+                !event.target.value.length ? null : Number(event.target.value),
+              );
+            }}
+          />
+          <TextField
+            id="max-answers"
+            disabled={disabled}
+            type="number"
+            variant="standard"
+            label={tr.SurveySections.maxAnswers}
+            InputLabelProps={{ shrink: true }}
+            value={section.answerLimits?.max ?? ''}
+            onChange={(event) => {
+              handleAnswerLimitsMaxChange(
+                !event.target.value.length ? null : Number(event.target.value),
+              );
+            }}
+          />
+        </FormGroup>
+      )}
       <FormGroup row>
         <FormControlLabel
           control={
