@@ -67,6 +67,7 @@ export default function EditMatrixQuestion({ section, onChange }: Props) {
             <div key={`matrix-class-${index}`} style={{ position: 'relative' }}>
               <Tooltip title={entry[surveyLanguage] ?? ''}>
                 <TextField
+                  inputProps={{ autoFocus: true }}
                   style={{
                     marginRight: '0.25rem',
                     backgroundColor: 'rgba(0,0,0,0.2)',
