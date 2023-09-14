@@ -75,7 +75,7 @@ export default function MultiMatrixQuestion({
   });
   const radioRef = useRef(null);
   const selectRef = useRef(null);
-
+  console.log(value);
   useEffect(() => {
     if (
       question?.answerLimits?.max &&
@@ -278,6 +278,11 @@ export default function MultiMatrixQuestion({
                         className={classes.matrixCell}
                       >
                         <Checkbox
+                          disabled={
+                            value[subjectIndex].length ===
+                              question.answerLimits?.max &&
+                            !value[subjectIndex].includes(String(classIndex))
+                          }
                           name={`question-${subjectIndex}`}
                           checked={value[subjectIndex].includes(
                             classIndex.toString(),

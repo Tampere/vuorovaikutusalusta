@@ -351,9 +351,9 @@
   "SurveyQuestion": {
     "errorFieldIsRequired": "Vastaus on pakollinen.",
     "accessibilityTooltip": "Vastaathan kysymykseen:",
-    "answerLimitsMinMax": "Valitse vähintään {min}, enintään {max} vaihtoehtoa",
-    "answerLimitsMin": "Valitse vähintään {min} vaihtoehtoa",
-    "answerLimitsMax": "Valitse enintään {max} vaihtoehtoa",
+    "answerLimitsMinMax": "Valitse vähintään {min}, enintään {max} vaihtoehtoa.",
+    "answerLimitsMin": "Valitse vähintään {min} vaihtoehtoa.",
+    "answerLimitsMax": "Valitse enintään {max} vaihtoehtoa.",
     "customAnswer": "Jokin muu (täsmennä alla)",
     "customAnswerField": "Täsmennä vastaustasi tässä.",
     "charactersRemaining": "{x} merkki(ä) jäljellä.",
