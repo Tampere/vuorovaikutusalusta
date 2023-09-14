@@ -248,6 +248,7 @@ export default function MultiMatrixQuestion({
                 })}
                 {question.allowEmptyAnswer && (
                   <TableCell
+                    sx={{ backgroundColor: '#efefef' }}
                     scope="col"
                     className={`${classes.matrixCell} ${classes.matrixText}`}
                   >
@@ -292,7 +293,10 @@ export default function MultiMatrixQuestion({
                       </TableCell>
                     ))}
                     {question.allowEmptyAnswer && (
-                      <TableCell className={classes.matrixCell}>
+                      <TableCell
+                        className={classes.matrixCell}
+                        sx={{ backgroundColor: '#efefef' }}
+                      >
                         <Checkbox
                           name={`question-${subjectIndex}`}
                           checked={value[subjectIndex][0] === '-1'}

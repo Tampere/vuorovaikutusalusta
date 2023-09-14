@@ -171,6 +171,7 @@ export default function MatrixQuestion({
                 {question.allowEmptyAnswer && (
                   <TableCell
                     scope="col"
+                    sx={{ backgroundColor: '#efefef' }}
                     className={`${classes.matrixCell} ${classes.matrixText}`}
                   >
                     {tr.MatrixQuestion.emptyAnswer}
@@ -211,7 +212,10 @@ export default function MatrixQuestion({
                       </TableCell>
                     ))}
                     {question.allowEmptyAnswer && (
-                      <TableCell className={classes.matrixCell}>
+                      <TableCell
+                        className={classes.matrixCell}
+                        sx={{ backgroundColor: '#efefef' }}
+                      >
                         <Radio
                           name={`question-${subjectIndex}`}
                           checked={value[subjectIndex] === '-1'}
