@@ -408,6 +408,13 @@ export default function MultiMatrixQuestion({
                             <MenuItem
                               key={classIndex}
                               value={String(classIndex)}
+                              disabled={
+                                value[subjectIndex].length ===
+                                  question.answerLimits?.max &&
+                                !value[subjectIndex].includes(
+                                  String(classIndex),
+                                )
+                              }
                             >
                               <Checkbox
                                 checked={value[subjectIndex].includes(
@@ -418,7 +425,10 @@ export default function MultiMatrixQuestion({
                             </MenuItem>
                           ))}
                           {question.allowEmptyAnswer && (
-                            <MenuItem value={'-1'}>
+                            <MenuItem
+                              value={'-1'}
+                              sx={{ backgroundColor: '#efefef' }}
+                            >
                               <Checkbox
                                 checked={value[subjectIndex].includes('-1')}
                               />
@@ -472,7 +482,15 @@ export default function MultiMatrixQuestion({
                     {tr.SurveySections.selectAnswer}
                   </MenuItem>
                   {question.classes.map((entry, classIndex) => (
-                    <MenuItem key={classIndex} value={classIndex.toString()}>
+                    <MenuItem
+                      key={classIndex}
+                      value={classIndex.toString()}
+                      disabled={
+                        value[subjectIndex].length ===
+                          question.answerLimits?.max &&
+                        !value[subjectIndex].includes(String(classIndex))
+                      }
+                    >
                       <Checkbox
                         checked={value[subjectIndex].includes(
                           classIndex.toString(),
@@ -482,7 +500,7 @@ export default function MultiMatrixQuestion({
                     </MenuItem>
                   ))}
                   {question.allowEmptyAnswer && (
-                    <MenuItem value={'-1'}>
+                    <MenuItem value={'-1'} sx={{ backgroundColor: '#efefef' }}>
                       <Checkbox checked={value[subjectIndex].includes('-1')} />
                       {tr.MatrixQuestion.emptyAnswer}
                     </MenuItem>
