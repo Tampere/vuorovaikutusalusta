@@ -26,7 +26,7 @@ export function EditMultiMatrixQuestion({
   disabled,
 }: Props) {
   const { tr, initializeLocalizedObject, surveyLanguage } = useTranslations();
-
+  console.log(section);
   function clampValue(value: number, min: number, max: number) {
     return value === null ? null : Math.max(Math.min(max, value), min);
   }
@@ -137,13 +137,15 @@ export function EditMultiMatrixQuestion({
                   onChange({
                     ...section,
                     classes: updatedClasses,
-                    answerLimits: {
-                      ...section.answerLimits,
-                      max:
-                        section.answerLimits.max > updatedClasses.length
-                          ? updatedClasses.length
-                          : section.answerLimits.max,
-                    },
+                    answerLimits: section.answerLimits
+                      ? {
+                          ...section.answerLimits,
+                          max:
+                            section.answerLimits.max > updatedClasses.length
+                              ? updatedClasses.length
+                              : section.answerLimits.max,
+                        }
+                      : null,
                   });
                 }}
                 style={{ position: 'absolute', top: '-1rem', right: '0.1rem' }}
