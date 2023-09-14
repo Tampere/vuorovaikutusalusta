@@ -10,7 +10,7 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import React from 'react';
+import React, { createRef } from 'react';
 import QuestionOptions from './QuestionOptions';
 import { useTranslations } from '@src/stores/TranslationContext';
 
@@ -26,7 +26,7 @@ export function EditMultiMatrixQuestion({
   disabled,
 }: Props) {
   const { tr, initializeLocalizedObject, surveyLanguage } = useTranslations();
-  console.log(section);
+
   function clampValue(value: number, min: number, max: number) {
     return value === null ? null : Math.max(Math.min(max, value), min);
   }
@@ -114,6 +114,7 @@ export function EditMultiMatrixQuestion({
             <div key={`matrix-class-${index}`} style={{ position: 'relative' }}>
               <Tooltip title={entry[surveyLanguage] ?? ''}>
                 <TextField
+                  inputProps={{ autoFocus: true }}
                   style={{
                     marginRight: '0.25rem',
                     backgroundColor: 'rgba(0,0,0,0.2)',
