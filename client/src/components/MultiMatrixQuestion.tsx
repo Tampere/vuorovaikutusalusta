@@ -14,10 +14,10 @@ import {
   TableHead,
   TableRow,
   useMediaQuery,
+  Theme,
 } from '@mui/material';
+import { SystemStyleObject } from '@mui/system';
 import { visuallyHidden } from '@mui/utils';
-
-import { makeStyles } from '@mui/styles';
 
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
@@ -36,7 +36,9 @@ interface ComponentState {
   breakPoint: number;
 }
 
-const useStyles = makeStyles({
+type StyleKeys = 'matrixRow' | 'matrixCell' | 'matrixText' | 'stickyLeft';
+
+const styles: Record<StyleKeys, SystemStyleObject<Theme>> = {
   matrixRow: {
     display: 'flex',
     flexDirection: 'row',
@@ -56,7 +58,7 @@ const useStyles = makeStyles({
     zIndex: 1,
     textAlign: 'left',
   },
-});
+};
 
 export default function MultiMatrixQuestion({
   value,
@@ -67,7 +69,6 @@ export default function MultiMatrixQuestion({
   setBackdropOpen,
 }: Props) {
   const { tr, surveyLanguage } = useTranslations();
-  const classes = useStyles();
   const isMobileWidth = useMediaQuery('(max-width:430px)');
   const [componentState, setComponentState] = useState<ComponentState>({
     isOverflow: false,
@@ -234,13 +235,13 @@ export default function MultiMatrixQuestion({
             )}
             <TableHead>
               <TableRow>
-                <TableCell scope="col" className={classes.stickyLeft} />
+                <TableCell scope="col" sx={styles.stickyLeft} />
                 {question.classes.map((entry, index) => {
                   return (
                     <TableCell
                       scope="col"
                       key={index.toString()}
-                      className={`${classes.matrixCell} ${classes.matrixText}`}
+                      sx={{ ...styles.matrixCell, ...styles.matrixText }}
                     >
                       {entry?.[surveyLanguage] ?? index}
                     </TableCell>
@@ -248,9 +249,12 @@ export default function MultiMatrixQuestion({
                 })}
                 {question.allowEmptyAnswer && (
                   <TableCell
-                    sx={{ backgroundColor: '#efefef' }}
+                    sx={{
+                      backgroundColor: '#efefef',
+                      ...styles.matrixCell,
+                      ...styles.matrixText,
+                    }}
                     scope="col"
-                    className={`${classes.matrixCell} ${classes.matrixText}`}
                   >
                     {tr.MatrixQuestion.emptyAnswer}
                   </TableCell>
@@ -264,18 +268,18 @@ export default function MultiMatrixQuestion({
                     <TableCell
                       component="th"
                       scope="row"
-                      className={[
-                        classes.stickyLeft,
-                        classes.matrixCell,
-                        classes.matrixText,
-                      ].join(' ')}
+                      sx={{
+                        ...styles.stickyLeft,
+                        ...styles.matrixCell,
+                        ...styles.matrixText,
+                      }}
                     >
                       {subject?.[surveyLanguage]}
                     </TableCell>
                     {question.classes.map((_entry, classIndex) => (
                       <TableCell
                         key={classIndex.toString()}
-                        className={classes.matrixCell}
+                        sx={styles.matrixCell}
                       >
                         <Checkbox
                           disabled={
@@ -299,8 +303,10 @@ export default function MultiMatrixQuestion({
                     ))}
                     {question.allowEmptyAnswer && (
                       <TableCell
-                        className={classes.matrixCell}
-                        sx={{ backgroundColor: '#efefef' }}
+                        sx={{
+                          backgroundColor: '#efefef',
+                          ...styles.matrixCell,
+                        }}
                       >
                         <Checkbox
                           name={`question-${subjectIndex}`}
@@ -338,18 +344,23 @@ export default function MultiMatrixQuestion({
               <TableRow>
                 <TableCell
                   scope="col"
-                  className={[
-                    classes.stickyLeft,
-                    classes.matrixCell,
-                    classes.matrixText,
-                  ].join(' ')}
+                  sx={{
+                    ...styles.stickyLeft,
+                    ...styles.matrixCell,
+                    ...styles.matrixText,
+                  }}
                 >
                   {tr.MatrixQuestion.subject}
                 </TableCell>
                 <TableCell
                   scope="col"
-                  className={[classes.matrixCell, classes.matrixText].join(' ')}
-                  sx={{ '&&': { textAlign: 'left' } }}
+                  sx={{
+                    '&&': {
+                      textAlign: 'left',
+                      ...styles.matrixCell,
+                      ...styles.matrixText,
+                    },
+                  }}
                 >
                   {tr.MatrixQuestion.response}
                 </TableCell>
@@ -362,11 +373,11 @@ export default function MultiMatrixQuestion({
                     <TableCell
                       component="th"
                       scope="row"
-                      className={[
-                        classes.stickyLeft,
-                        classes.matrixCell,
-                        classes.matrixText,
-                      ].join(' ')}
+                      sx={{
+                        ...styles.stickyLeft,
+                        ...styles.matrixCell,
+                        ...styles.matrixText,
+                      }}
                     >
                       {subject?.[surveyLanguage]}
                     </TableCell>
