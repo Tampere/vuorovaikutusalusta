@@ -10,7 +10,7 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import React, { createRef } from 'react';
+import React from 'react';
 import QuestionOptions from './QuestionOptions';
 import { useTranslations } from '@src/stores/TranslationContext';
 
@@ -32,8 +32,12 @@ export function EditMultiMatrixQuestion({
   }
 
   function handleAnswerLimitsMinChange(value: number) {
-    // Clamp value between 1 and amount of options
-    const min = clampValue(value, 1, section.classes.length);
+    // Clamp value between 0 and amount of options
+    const min = clampValue(
+      value,
+      section.isRequired ? 1 : 0,
+      section.classes.length,
+    );
     // Accept original max value when 1) new min is empty, 2) old max was empty, or 3) old max is greater than new min
     const max =
       min === null ||
