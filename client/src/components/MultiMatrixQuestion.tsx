@@ -1,3 +1,4 @@
+import { useTheme } from '@emotion/react';
 import { SurveyMultiMatrixQuestion } from '@interfaces/survey';
 import {
   Checkbox,
@@ -77,6 +78,7 @@ export default function MultiMatrixQuestion({
   const radioRef = useRef(null);
   const selectRef = useRef(null);
   console.log(value);
+
   useEffect(() => {
     if (
       question?.answerLimits?.max &&
@@ -282,6 +284,12 @@ export default function MultiMatrixQuestion({
                         sx={styles.matrixCell}
                       >
                         <Checkbox
+                          sx={{
+                            '&.Mui-focusVisible': {
+                              border: (theme) =>
+                                `solid 2px ${theme.palette.primary.main}`,
+                            },
+                          }}
                           disabled={
                             value[subjectIndex].length ===
                               question.answerLimits?.max &&
@@ -309,6 +317,12 @@ export default function MultiMatrixQuestion({
                         }}
                       >
                         <Checkbox
+                          sx={{
+                            '&.Mui-focusVisible': {
+                              border: (theme) =>
+                                `solid 2px ${theme.palette.primary.main}`,
+                            },
+                          }}
                           name={`question-${subjectIndex}`}
                           checked={value[subjectIndex][0] === '-1'}
                           value={-1}
@@ -371,6 +385,7 @@ export default function MultiMatrixQuestion({
                 return (
                   <TableRow key={subjectIndex}>
                     <TableCell
+                      aria-label={`Vastatut kysymykset 0/3`}
                       component="th"
                       scope="row"
                       sx={{
