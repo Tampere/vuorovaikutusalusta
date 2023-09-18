@@ -390,6 +390,14 @@
     "subject": "Aihe",
     "response": "Vastaus"
   },
+  "MultiMatrixQuestion": {
+    "answerClass": "Vastausvaihtoehto",
+    "optionsSelected": "{x} vastausvaihtoehtoa valittuna",
+    "maxAnswerLimitReached": "Maksimivastausmäärä valittuna",
+    "unansweredRow": "Kysymyksen rivillä {x} on liian vähän valittuja vastauksia.",
+    "unansweredRows": "Kysymyksen riveillä {x} on liian vähän valittuja vastauksia.",
+    "and": "ja"
+  },
   "ImageSection": {
     "openInNewTab": "Avaa kuva uudella välilehdellä"
   },

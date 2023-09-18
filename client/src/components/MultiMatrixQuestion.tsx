@@ -1,4 +1,3 @@
-import { useTheme } from '@emotion/react';
 import { SurveyMultiMatrixQuestion } from '@interfaces/survey';
 import {
   Checkbox,
@@ -77,7 +76,6 @@ export default function MultiMatrixQuestion({
   });
   const radioRef = useRef(null);
   const selectRef = useRef(null);
-  console.log(value);
 
   useEffect(() => {
     if (
@@ -209,6 +207,46 @@ export default function MultiMatrixQuestion({
       .replace('{max}', `${question.answerLimits.max}`);
   }, [question.answerLimits, surveyLanguage]);
 
+  const unAnsweredRowsText = useMemo(() => {
+    if (!question.answerLimits) {
+      return null;
+    }
+
+    const unansweredRows = value
+      .map((rowAnswers, index) => {
+        if (rowAnswers.length < question.answerLimits.min) {
+          return index + 1;
+        }
+      })
+      .filter((val) => val);
+
+    if (unansweredRows.length > 1) {
+      return tr.MultiMatrixQuestion.unansweredRows.replace(
+        '{x}',
+        unansweredRows
+          .join(', ')
+          .replace(/, ([^,]*)$/, ` ${tr.MultiMatrixQuestion.and} $1`),
+      );
+    }
+    return tr.MultiMatrixQuestion.unansweredRow.replace(
+      '{x}',
+      unansweredRows.join(', '),
+    );
+  }, value);
+
+  function getRowSelectionsText(subjectIndex: number) {
+    if (
+      question.answerLimits?.max &&
+      value[subjectIndex]?.length >= question.answerLimits.max
+    ) {
+      return tr.MultiMatrixQuestion.maxAnswerLimitReached;
+    }
+    return tr.MultiMatrixQuestion.optionsSelected.replace(
+      '{x}',
+      String(value[subjectIndex].length),
+    );
+  }
+
   return (
     <>
       {answerLimitText && (
@@ -218,11 +256,15 @@ export default function MultiMatrixQuestion({
             style={{ marginLeft: 0, marginBottom: '0.5em' }}
             id={`checkbox-helper-label-${question.id}`}
           >
-            {answerLimitText}
+            {`${answerLimitText}\n${
+              validationErrors?.includes('answerLimits')
+                ? unAnsweredRowsText
+                : ''
+            } `}
           </FormHelperText>
           {validationErrors && validationErrors.includes('answerLimits') && (
             <FormHelperText style={visuallyHidden} role="alert">
-              {`${question.title?.[surveyLanguage]}, ${answerLimitText}`}
+              {`${question.title?.[surveyLanguage]}, ${answerLimitText}\n${unAnsweredRowsText}`}
             </FormHelperText>
           )}
         </>
@@ -271,8 +313,8 @@ export default function MultiMatrixQuestion({
                       component="th"
                       scope="row"
                       sx={{
-                        ...styles.stickyLeft,
                         ...styles.matrixCell,
+                        ...styles.stickyLeft,
                         ...styles.matrixText,
                       }}
                     >
@@ -284,10 +326,21 @@ export default function MultiMatrixQuestion({
                         sx={styles.matrixCell}
                       >
                         <Checkbox
+                          inputProps={{
+                            className: `checkbox-${question.id}`,
+                            'aria-label': `${
+                              classIndex === 0 ? subject?.[surveyLanguage] : ''
+                            } ${getRowSelectionsText(subjectIndex)}`,
+                            'aria-describedby':
+                              classIndex === 0
+                                ? `checkbox-helper-label-${question.id}`
+                                : null,
+                          }}
                           sx={{
                             '&.Mui-focusVisible': {
                               border: (theme) =>
                                 `solid 2px ${theme.palette.primary.main}`,
+                              margin: '-2px',
                             },
                           }}
                           disabled={
@@ -317,10 +370,15 @@ export default function MultiMatrixQuestion({
                         }}
                       >
                         <Checkbox
+                          inputProps={{
+                            className: `checkbox-${question.id}`,
+                            'aria-label': getRowSelectionsText(subjectIndex),
+                          }}
                           sx={{
                             '&.Mui-focusVisible': {
                               border: (theme) =>
                                 `solid 2px ${theme.palette.primary.main}`,
+                              margin: '-2px',
                             },
                           }}
                           name={`question-${subjectIndex}`}

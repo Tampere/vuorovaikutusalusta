@@ -390,6 +390,14 @@
     "subject": "Subject",
     "response": "Response"
   },
+  "MultiMatrixQuestion": {
+    "answerClass": "Option",
+    "optionsSelected": "{x} options selected",
+    "maxAnswerLimitReached": "Maximum answer limit reached",
+    "unansweredRow": "Question row {x} needs more answers to be selected",
+    "unansweredRows": "Question rows {x} need more answers to be selected.",
+    "and": "and"
+  },
   "ImageSection": {
     "openInNewTab": "Open image on a new tab"
   },
