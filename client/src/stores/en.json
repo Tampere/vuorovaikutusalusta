@@ -196,10 +196,15 @@
     "image": "Image",
     "selectImage": "Choose background image",
     "addNewImage": "Add a new image",
-    "files": "File"
+    "files": "File",
+    "imageSizeExceeded": "Image maximum size is {x} MB",
+    "imageUploadError": "Image uploading failed",
+    "imageDownloadError": "Image downloading failed",
+    "multipleImagesDownloadError": "Error while downloading images",
+    "imageDeleteError": "Error while deleting image"
   },
   "DropZone": {
-    "dropFiles": "Drop file here or click to choose the file"
+    "dropFiles": "Click to select a file or drop it here (max {x} MB)."
   },
   "EditTextSection": {
     "text": "Text",

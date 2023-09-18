@@ -16,6 +16,7 @@ import {
 } from '@mui/material';
 import { Cancel, PhotoLibrary } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
+import { useToasts } from '@src/stores/ToastContext';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { request } from '@src/utils/request';
@@ -56,11 +57,14 @@ interface Props {
   imageType: ImageType;
 }
 
+const MEGAS = 10;
+const MAX_FILE_SIZE = MEGAS * 1000 * 1000; // ten megabytes
+
 export default function SurveyImageList({ imageType }: Props) {
   const classes = useStyles();
   const { tr } = useTranslations();
   const { editSurvey, activeSurvey } = useSurvey();
-
+  const { showToast } = useToasts();
   const [images, setImages] = useState<File[]>([]);
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
   const [imageAttributions, setImageAttributions] = useState<string>('');
@@ -76,18 +80,34 @@ export default function SurveyImageList({ imageType }: Props) {
     setActiveImage(getActiveImage());
   });
 
-  async function getImages() {
-    const res = await request<File[]>(
-      `/api/file/${
-        imageType === 'backgroundImage'
-          ? 'background-images'
-          : imageType === 'thanksPageImage'
-          ? 'thanks-page-images'
-          : ''
-      }`
-    );
+  function fileSizeValidator(file) {
+    if (file.size > MAX_FILE_SIZE) {
+      return {
+        code: 'file-size-exceeded',
+        message: tr.SurveyImageList.imageSizeExceeded.replace('{x}', MEGAS),
+      };
+    }
+  }
 
-    setImages(res);
+  async function getImages() {
+    try {
+      const res = await request<File[]>(
+        `/api/file/${
+          imageType === 'backgroundImage'
+            ? 'background-images'
+            : imageType === 'thanksPageImage'
+            ? 'thanks-page-images'
+            : ''
+        }`,
+      );
+
+      setImages(res);
+    } catch (error) {
+      showToast({
+        severity: 'error',
+        message: tr.SurveyImageList.multipleImagesDownloadError,
+      });
+    }
   }
 
   function handleListItemClick(fileName?: string, filePath?: string[]) {
@@ -119,22 +139,40 @@ export default function SurveyImageList({ imageType }: Props) {
   async function handleDeletingImage(
     event: React.MouseEvent,
     fileName: string,
-    filePath: string[]
+    filePath: string[],
   ) {
     event.stopPropagation();
-    await fetch(
-      `/api/file${filePath.length > 0 ? '/' : ''}${filePath.join(
-        '/'
-      )}/${fileName}`,
-      { method: 'DELETE' }
-    );
+    try {
+      await fetch(
+        `/api/file${filePath.length > 0 ? '/' : ''}${filePath.join(
+          '/',
+        )}/${fileName}`,
+        { method: 'DELETE' },
+      );
+    } catch (error) {
+      showToast({
+        severity: 'error',
+        message: tr.SurveyImageList.imageDeleteError,
+      });
+    }
 
     getImages();
   }
 
-  const { acceptedFiles, getRootProps, getInputProps } = useDropzone({
-    maxFiles: 1,
-  });
+  const { acceptedFiles, fileRejections, getRootProps, getInputProps } =
+    useDropzone({
+      maxFiles: 1,
+      validator: fileSizeValidator,
+    });
+
+  useEffect(() => {
+    if (fileRejections?.length > 0) {
+      showToast({
+        severity: 'error',
+        message: fileRejections[0].errors[0].message,
+      });
+    }
+  }, [fileRejections]);
 
   const files = acceptedFiles?.map((file: any) => (
     <div key={file.path}>
@@ -158,20 +196,27 @@ export default function SurveyImageList({ imageType }: Props) {
     formData.append('attributions', imageAttributions);
     imageAltText && formData.append('imageAltText', imageAltText);
 
-    await fetch(
-      `/api/file/${
-        imageType === 'backgroundImage'
-          ? 'background-images'
-          : imageType === 'thanksPageImage'
-          ? 'thanks-page-images'
-          : ''
-      }`,
-      { method: 'POST', body: formData }
-    );
-    acceptedFiles.shift();
-    getImages();
-    setImageAltText('');
-    setImageAttributions('');
+    try {
+      await fetch(
+        `/api/file/${
+          imageType === 'backgroundImage'
+            ? 'background-images'
+            : imageType === 'thanksPageImage'
+            ? 'thanks-page-images'
+            : ''
+        }`,
+        { method: 'POST', body: formData },
+      );
+      acceptedFiles.shift();
+      getImages();
+      setImageAltText('');
+      setImageAttributions('');
+    } catch (error) {
+      showToast({
+        severity: 'error',
+        message: tr.SurveyImageList.imageUploadError,
+      });
+    }
   }
 
   function handleEmptyImage() {
@@ -203,7 +248,7 @@ export default function SurveyImageList({ imageType }: Props) {
           images?.find(
             (image) =>
               image.fileName === activeSurvey.backgroundImageName &&
-              image.filePath.join() === activeSurvey.backgroundImagePath.join()
+              image.filePath.join() === activeSurvey.backgroundImagePath.join(),
           ) ?? null
         );
       case 'thanksPageImage':
@@ -211,7 +256,8 @@ export default function SurveyImageList({ imageType }: Props) {
           images?.find(
             (image) =>
               image.fileName === activeSurvey.thanksPage.imageName &&
-              image.filePath.join() === activeSurvey.thanksPage.imagePath.join()
+              image.filePath.join() ===
+                activeSurvey.thanksPage.imagePath.join(),
           ) ?? null
         );
     }
@@ -364,7 +410,7 @@ export default function SurveyImageList({ imageType }: Props) {
           <div {...getRootProps({ className: 'dropzone' })}>
             <input {...getInputProps()} />
             <p style={{ color: 'purple', cursor: 'pointer' }}>
-              {tr.DropZone.dropFiles}
+              {tr.DropZone.dropFiles.replace('{x}', MEGAS)}
             </p>
           </div>
           {acceptedFiles?.length ? (

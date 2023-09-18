@@ -197,10 +197,15 @@
     "image": "Kuva",
     "selectImage": "Valitse taustakuva",
     "addNewImage": "Lisää uusi kuva",
-    "files": "Tiedosto"
+    "files": "Tiedosto",
+    "imageSizeExceeded": "Kuvan maksimikoko on {x} Mt",
+    "imageUploadError": "Virhe tallennettaessa kuvaa",
+    "imageDownloadError": "Virhe ladattaessa kuvaa",
+    "multipleImagesDownloadError": "Kuvien lataaminen epäonnistui",
+    "imageDeleteError": "Virhe poistettaessa kuvaa"
   },
   "DropZone": {
-    "dropFiles": "Raahaa tiedosto tähän tai klikkaa valitaksesi tiedosto"
+    "dropFiles": "Valitse tiedosto klikkaamalla tai pudottamalla se tähän (enint. {x} Mt)."
   },
   "EditTextSection": {
     "text": "Teksti",
