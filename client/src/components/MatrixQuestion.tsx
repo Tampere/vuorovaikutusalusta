@@ -240,11 +240,6 @@ export default function MatrixQuestion({
           sx={{ marginTop: 2 }}
         >
           <Table size="small">
-            {question.title && (
-              <caption style={visuallyHidden}>
-                {question.title?.[surveyLanguage]}
-              </caption>
-            )}
             <TableHead>
               <TableRow>
                 <TableCell

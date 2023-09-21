@@ -398,7 +398,9 @@
     "answerLimitsMinMax": "Choose a minimum of {min} and a maximum of {max} options from each row.",
     "answerLimitsMin": "Choose a minimum of {min} options from each row.",
     "answerLimitsMax": "Choose a maximum of {max} options from each row.",
+    "selected": "selected",
     "SR": {
+      "isRequired": "Please select at least one option on each row.",
       "mustSelectMore": "Please select {x} more options from this row.",
       "maySelectMore": "You may select {x} more options from this row.",
       "maxSelected": "You have selected the maximum number of options from this row.",

@@ -182,7 +182,7 @@ export default function MultiMatrixQuestion({
       return;
     }
     if (valueList.length > 1) {
-      return `${valueList.length} valittu`; // TODO: Use translation
+      return `${valueList.length} ${tr.MultiMatrixQuestion.selected}`;
     }
     if (valueList[0] === '-1') {
       return tr.MatrixQuestion.emptyAnswer;
@@ -235,13 +235,15 @@ export default function MultiMatrixQuestion({
   }, value);
 
   function getSRRowFeedback(subjectIndex: number) {
+    let count = value[subjectIndex].length;
     if (question.answerLimits === null) {
+      if (question.isRequired && count == 0) {
+        return tr.MultiMatrixQuestion.SR.isRequired;
+      }
       return;
     }
 
-    let count = value[subjectIndex].length;
     let limits = question.answerLimits;
-
     if (count < limits.min) {
       return tr.MultiMatrixQuestion.SR.mustSelectMore.replace(
         '{x}',

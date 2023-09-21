@@ -398,7 +398,9 @@
     "answerLimitsMinMax": "Valitse vähintään {min}, enintään {max} vaihtoehtoa kultakin riviltä.",
     "answerLimitsMin": "Valitse vähintään {min} vaihtoehtoa kultakin riviltä.",
     "answerLimitsMax": "Valitse enintään {max} vaihtoehtoa kultakin riviltä",
+    "selected": "valittu",
     "SR": {
+      "isRequired": "Valitse vähintään yksi vaihtoehto joka riviltä.",
       "mustSelectMore": "Valitse vielä {x} vaihtoehtoa tältä riviltä.",
       "maySelectMore": "Voit valita vielä {x} vaihtoehtoa tältä riviltä.",
       "maxSelected": "Olet valinnut enimmäismäärän vaihtoehtoja tältä riviltä",
