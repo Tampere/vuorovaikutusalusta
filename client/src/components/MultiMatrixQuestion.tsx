@@ -235,15 +235,19 @@ export default function MultiMatrixQuestion({
   }, value);
 
   function getSRRowFeedback(subjectIndex: number) {
+    if (value[subjectIndex].includes('-1')) {
+      // IDK already selected on this row
+      return tr.MultiMatrixQuestion.SR.replacingIDK;
+    }
     let count = value[subjectIndex].length;
-    if (question.answerLimits === null) {
-      if (question.isRequired && count == 0) {
-        return tr.MultiMatrixQuestion.SR.isRequired;
-      }
+    if (question.answerLimits === null && !question.isRequired) {
       return;
     }
 
     let limits = question.answerLimits;
+    if (limits.min === null && question.isRequired && count === 0) {
+      return tr.MultiMatrixQuestion.SR.isRequired;
+    }
     if (count < limits.min) {
       return tr.MultiMatrixQuestion.SR.mustSelectMore.replace(
         '{x}',

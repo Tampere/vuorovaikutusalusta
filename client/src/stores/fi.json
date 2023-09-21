@@ -404,7 +404,8 @@
       "mustSelectMore": "Valitse vielä {x} vaihtoehtoa tältä riviltä.",
       "maySelectMore": "Voit valita vielä {x} vaihtoehtoa tältä riviltä.",
       "maxSelected": "Olet valinnut enimmäismäärän vaihtoehtoja tältä riviltä",
-      "IDK": "Tämä vaihtoehto korvaa rivin muut vaihtoehdot."
+      "IDK": "Tämä vaihtoehto korvaa rivin muut vaihtoehdot.",
+      "replacingIDK": "Valinta korvaa nykyisen \"En osaa sanoa\" -vaihtoehdon."
     }
   },
   "ImageSection": {
