@@ -434,9 +434,9 @@ export default function MultiMatrixQuestion({
                 <TableCell
                   scope="col"
                   sx={{
-                    ...styles.stickyLeft,
                     ...styles.matrixCell,
                     ...styles.matrixText,
+                    ...styles.stickyLeft,
                   }}
                 >
                   {tr.MatrixQuestion.subject}
@@ -460,13 +460,12 @@ export default function MultiMatrixQuestion({
                 return (
                   <TableRow key={subjectIndex}>
                     <TableCell
-                      aria-label={`Vastatut kysymykset 0/3`}
                       component="th"
                       scope="row"
                       sx={{
-                        ...styles.stickyLeft,
                         ...styles.matrixCell,
                         ...styles.matrixText,
+                        ...styles.stickyLeft,
                       }}
                     >
                       {subject?.[surveyLanguage]}
@@ -498,6 +497,7 @@ export default function MultiMatrixQuestion({
                             <MenuItem
                               key={classIndex}
                               value={String(classIndex)}
+                              aria-describedby={`SR-row-fill-status-${question.id}-${subjectIndex}`}
                               disabled={
                                 value[subjectIndex].length ===
                                   question.answerLimits?.max &&
@@ -527,6 +527,12 @@ export default function MultiMatrixQuestion({
                           )}
                         </Select>
                       </FormControl>
+                      <p
+                        style={visuallyHidden}
+                        id={`SR-row-fill-status-${question.id}-${subjectIndex}`}
+                      >
+                        {getSRRowFeedback(subjectIndex)}
+                      </p>
                     </TableCell>
                   </TableRow>
                 );
@@ -575,6 +581,7 @@ export default function MultiMatrixQuestion({
                     <MenuItem
                       key={classIndex}
                       value={classIndex.toString()}
+                      aria-describedby={`SR-row-fill-status-${question.id}-${subjectIndex}`}
                       disabled={
                         value[subjectIndex].length ===
                           question.answerLimits?.max &&
@@ -596,6 +603,13 @@ export default function MultiMatrixQuestion({
                     </MenuItem>
                   )}
                 </Select>
+
+                <p
+                  style={visuallyHidden}
+                  id={`SR-row-fill-status-${question.id}-${subjectIndex}`}
+                >
+                  {getSRRowFeedback(subjectIndex)}
+                </p>
               </FormControl>
             );
           })}
