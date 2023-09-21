@@ -392,11 +392,18 @@
   },
   "MultiMatrixQuestion": {
     "answerClass": "Vastausvaihtoehto",
-    "optionsSelected": "{x} vastausvaihtoehtoa valittuna",
-    "maxAnswerLimitReached": "Maksimivastausmäärä valittuna",
     "unansweredRow": "Kysymyksen rivillä {x} on liian vähän valittuja vastauksia.",
     "unansweredRows": "Kysymyksen riveillä {x} on liian vähän valittuja vastauksia.",
-    "and": "ja"
+    "and": "ja",
+    "answerLimitsMinMax": "Valitse vähintään {min}, enintään {max} vaihtoehtoa kultakin riviltä.",
+    "answerLimitsMin": "Valitse vähintään {min} vaihtoehtoa kultakin riviltä.",
+    "answerLimitsMax": "Valitse enintään {max} vaihtoehtoa kultakin riviltä",
+    "SR": {
+      "mustSelectMore": "Valitse vielä {x} vaihtoehtoa tältä riviltä.",
+      "maySelectMore": "Voit valita vielä {x} vaihtoehtoa tältä riviltä.",
+      "maxSelected": "Olet valinnut enimmäismäärän vaihtoehtoja tältä riviltä",
+      "IDK": "Tämä vaihtoehto korvaa rivin muut vaihtoehdot."
+    }
   },
   "ImageSection": {
     "openInNewTab": "Avaa kuva uudella välilehdellä"

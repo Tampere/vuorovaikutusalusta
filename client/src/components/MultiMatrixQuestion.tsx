@@ -182,7 +182,7 @@ export default function MultiMatrixQuestion({
       return;
     }
     if (valueList.length > 1) {
-      return `${valueList.length} valittu`;
+      return `${valueList.length} valittu`; // TODO: Use translation
     }
     if (valueList[0] === '-1') {
       return tr.MatrixQuestion.emptyAnswer;
@@ -196,11 +196,11 @@ export default function MultiMatrixQuestion({
     }
     return (
       question.answerLimits.min && question.answerLimits.max
-        ? tr.SurveyQuestion.answerLimitsMinMax
+        ? tr.MultiMatrixQuestion.answerLimitsMinMax
         : question.answerLimits.min
-        ? tr.SurveyQuestion.answerLimitsMin
+        ? tr.MultiMatrixQuestion.answerLimitsMin
         : question.answerLimits.max
-        ? tr.SurveyQuestion.answerLimitsMax
+        ? tr.MultiMatrixQuestion.answerLimitsMax
         : ''
     )
       .replace('{min}', `${question.answerLimits.min}`)
@@ -234,17 +234,29 @@ export default function MultiMatrixQuestion({
     );
   }, value);
 
-  function getRowSelectionsText(subjectIndex: number) {
-    if (
-      question.answerLimits?.max &&
-      value[subjectIndex]?.length >= question.answerLimits.max
-    ) {
-      return tr.MultiMatrixQuestion.maxAnswerLimitReached;
+  function getSRRowFeedback(subjectIndex: number) {
+    if (question.answerLimits === null) {
+      return;
     }
-    return tr.MultiMatrixQuestion.optionsSelected.replace(
-      '{x}',
-      String(value[subjectIndex].length),
-    );
+
+    let count = value[subjectIndex].length;
+    let limits = question.answerLimits;
+
+    if (count < limits.min) {
+      return tr.MultiMatrixQuestion.SR.mustSelectMore.replace(
+        '{x}',
+        String(limits.min - count),
+      );
+    }
+    if (count < limits.max) {
+      return tr.MultiMatrixQuestion.SR.maySelectMore.replace(
+        '{x}',
+        String(limits.max - count),
+      );
+    }
+    if (count >= limits.max) {
+      return tr.MultiMatrixQuestion.SR.maxSelected;
+    }
   }
 
   return (
@@ -272,11 +284,6 @@ export default function MultiMatrixQuestion({
       {!isMobileWidth && !componentState.isOverflow && (
         <TableContainer id={`${question.id}-input`} ref={radioRef}>
           <Table size="small">
-            {question.title && (
-              <caption style={visuallyHidden}>
-                {question.title?.[surveyLanguage]}
-              </caption>
-            )}
             <TableHead>
               <TableRow>
                 <TableCell scope="col" sx={styles.stickyLeft} />
@@ -320,48 +327,52 @@ export default function MultiMatrixQuestion({
                     >
                       {subject?.[surveyLanguage]}
                     </TableCell>
-                    {question.classes.map((_entry, classIndex) => (
-                      <TableCell
-                        key={classIndex.toString()}
-                        sx={styles.matrixCell}
-                      >
-                        <Checkbox
-                          inputProps={{
-                            className: `checkbox-${question.id}`,
-                            'aria-label': `${
-                              classIndex === 0 ? subject?.[surveyLanguage] : ''
-                            } ${getRowSelectionsText(subjectIndex)}`,
-                            'aria-describedby':
-                              classIndex === 0
-                                ? `checkbox-helper-label-${question.id}`
-                                : null,
-                          }}
-                          sx={{
-                            '&.Mui-focusVisible': {
-                              border: (theme) =>
-                                `solid 2px ${theme.palette.primary.main}`,
-                              margin: '-2px',
-                            },
-                          }}
-                          disabled={
-                            value[subjectIndex].length ===
-                              question.answerLimits?.max &&
-                            !value[subjectIndex].includes(String(classIndex))
-                          }
-                          name={`question-${subjectIndex}`}
-                          checked={value[subjectIndex].includes(
-                            classIndex.toString(),
+                    {question.classes.map((_entry, classIndex) => {
+                      return (
+                        <TableCell
+                          key={classIndex.toString()}
+                          sx={styles.matrixCell}
+                        >
+                          {classIndex === 0 && (
+                            <p
+                              style={visuallyHidden}
+                              id={`SR-row-fill-status-${question.id}-${subjectIndex}`}
+                            >
+                              {getSRRowFeedback(subjectIndex)}
+                            </p>
                           )}
-                          value={classIndex}
-                          onChange={(event) => {
-                            handleChange(
-                              subjectIndex,
-                              (event.target as HTMLInputElement).value,
-                            );
-                          }}
-                        />
-                      </TableCell>
-                    ))}
+                          <Checkbox
+                            inputProps={{
+                              className: `checkbox-${question.id}`,
+                              'aria-describedby': `SR-row-fill-status-${question.id}-${subjectIndex}`,
+                            }}
+                            sx={{
+                              '&.Mui-focusVisible': {
+                                border: (theme) =>
+                                  `solid 2px ${theme.palette.primary.main}`,
+                                margin: '-2px',
+                              },
+                            }}
+                            disabled={
+                              value[subjectIndex].length ===
+                                question.answerLimits?.max &&
+                              !value[subjectIndex].includes(String(classIndex))
+                            }
+                            name={`question-${subjectIndex}`}
+                            checked={value[subjectIndex].includes(
+                              classIndex.toString(),
+                            )}
+                            value={classIndex}
+                            onChange={(event) => {
+                              handleChange(
+                                subjectIndex,
+                                (event.target as HTMLInputElement).value,
+                              );
+                            }}
+                          />
+                        </TableCell>
+                      );
+                    })}
                     {question.allowEmptyAnswer && (
                       <TableCell
                         sx={{
@@ -372,7 +383,7 @@ export default function MultiMatrixQuestion({
                         <Checkbox
                           inputProps={{
                             className: `checkbox-${question.id}`,
-                            'aria-label': getRowSelectionsText(subjectIndex),
+                            'aria-label': tr.MultiMatrixQuestion.SR.IDK,
                           }}
                           sx={{
                             '&.Mui-focusVisible': {
