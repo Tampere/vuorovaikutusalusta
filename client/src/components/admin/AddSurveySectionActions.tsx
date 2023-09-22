@@ -22,6 +22,7 @@ import React, { ReactNode, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useClipboard } from '@src/stores/ClipboardContext';
 import { useSurvey } from '@src/stores/SurveyContext';
+import { useToasts } from '@src/stores/ToastContext';
 
 const useStyles = makeStyles({
   actionItem: {
@@ -42,6 +43,7 @@ export default function AddSurveySectionActions(props: Props) {
   const { tr, initializeLocalizedObject } = useTranslations();
   const { addSection } = useSurvey();
   const { clipboardSection } = useClipboard();
+  const { showToast } = useToasts();
   const { pageId } = useParams<{
     pageId: string;
   }>();
@@ -335,6 +337,14 @@ export default function AddSurveySectionActions(props: Props) {
                       id: sectionSequence,
                     });
                     setSectionSequence((prev) => prev - 1);
+
+                    if (clipboardSection.type === 'map') {
+                      showToast({
+                        severity: 'warning',
+                        autoHideDuration: 30000,
+                        message: tr.EditSurveyPage.sectionAttached,
+                      });
+                    }
                   }
                 }}
               >
