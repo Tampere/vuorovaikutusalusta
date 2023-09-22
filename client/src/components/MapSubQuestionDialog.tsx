@@ -19,7 +19,7 @@ import {
   useSurveyAnswers,
 } from '@src/stores/SurveyAnswerContext';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import CheckBoxQuestion from './CheckBoxQuestion';
 import FreeTextQuestion from './FreeTextQuestion';
 import NumericQuestion from './NumericQuestion';
@@ -77,8 +77,8 @@ export default function MapSubQuestionDialog({
   const [answers, setAnswers] = useState<SurveyMapSubQuestionAnswer[]>([
     ...(existingAnswer?.subQuestionAnswers ?? []),
   ]);
+  const dialogRef = useRef(null);
   const [dirty, setDirty] = useState<boolean[]>([]);
-  const [infoDialogOpen, setInfoDialogOpen] = useState(false);
   const classes = useStyles();
   const { getValidationErrors } = useSurveyAnswers();
   const { tr, surveyLanguage } = useTranslations();
@@ -133,7 +133,7 @@ export default function MapSubQuestionDialog({
                 ) &&
                 !e.currentTarget.contains(e.relatedTarget as Node) &&
                 open &&
-                !infoDialogOpen
+                !dialogRef?.current?.infoDialogOpen
               ) {
                 dirty[index] = true;
                 setDirty([...dirty]);
@@ -151,8 +151,7 @@ export default function MapSubQuestionDialog({
               {question.title?.[surveyLanguage]} {question.isRequired && '*'}
               {question.info && question.info?.[surveyLanguage] && (
                 <SectionInfo
-                  infoDialogOpen={infoDialogOpen}
-                  setInfoDialogOpen={setInfoDialogOpen}
+                  ref={dialogRef}
                   infoText={question.info?.[surveyLanguage]}
                   subject={question.title?.[surveyLanguage]}
                 />

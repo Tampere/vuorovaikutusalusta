@@ -20,6 +20,7 @@ export type SurveyQuestion =
   | SurveyMapQuestion
   | SurveySortingQuestion
   | SurveySliderQuestion
+  | SurveyMultiMatrixQuestion
   | SurveyMatrixQuestion
   | SurveyGroupedCheckboxQuestion
   | SurveyAttachmentQuestion;
@@ -206,6 +207,21 @@ export interface SurveyMatrixQuestion extends CommonSurveyPageQuestion {
   classes: LocalizedText[];
   subjects: LocalizedText[];
   allowEmptyAnswer: boolean;
+}
+
+/**
+ * Multiple choice matrix question
+ */
+
+export interface SurveyMultiMatrixQuestion extends CommonSurveyPageQuestion {
+  type: 'multi-matrix';
+  classes: LocalizedText[];
+  subjects: LocalizedText[];
+  allowEmptyAnswer: boolean;
+  answerLimits: {
+    min?: number;
+    max?: number;
+  };
 }
 
 /**
@@ -540,6 +556,10 @@ export type AnswerEntry = {
   | {
       type: 'matrix';
       value: string[];
+    }
+  | {
+      type: 'multi-matrix';
+      value: string[][];
     }
   | {
       type: 'grouped-checkbox';

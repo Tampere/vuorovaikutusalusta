@@ -31,7 +31,7 @@ router.get(
     res.set('Content-type', row.mimeType);
     res.set('File-details', JSON.stringify({ name: row.name }));
     res.status(200).send(row.data);
-  })
+  }),
 );
 
 /**
@@ -42,16 +42,15 @@ router.post(
   upload.single('file'),
   ensureAuthenticated(),
   asyncHandler(async (req, res) => {
-    console.log(req.file);
     const { buffer, originalname, mimetype } = req.file;
     const { name } = await storeAdminInstructions(
       originalname,
       parseMimeType(mimetype),
-      buffer
+      buffer,
     );
 
     res.status(200).json({ message: `File ${name} succesfully stored` });
-  })
+  }),
 );
 
 /**
@@ -83,7 +82,7 @@ router.post(
       surveyId: surveyId == null ? null : Number(surveyId),
     });
     res.status(200).json({ id });
-  })
+  }),
 );
 
 /**
@@ -98,7 +97,7 @@ router.get(
     const row = await getImages(filePathArray);
 
     res.status(200).json(row);
-  })
+  }),
 );
 
 /**
@@ -120,7 +119,7 @@ router.get(
     res.set('Content-type', row.mimeType);
     res.set('File-details', JSON.stringify(row.details));
     res.status(200).send(row.data);
-  })
+  }),
 );
 
 /**
@@ -142,7 +141,7 @@ router.delete(
 
     await removeFile(fileName, filePathArray);
     res.status(200).send();
-  })
+  }),
 );
 
 export default router;

@@ -131,6 +131,7 @@
     "sortingQuestion": "Add sorting question",
     "sliderQuestion": "Add slider question",
     "matrixQuestion": "Add likert scale question",
+    "multiMatrixQuestion": "Add multiple choice likert scale question",
     "groupedCheckboxQuestion": "Add grouped checkbox question",
     "imageSection": "Add image section",
     "documentSection": "Add document section",
@@ -151,6 +152,7 @@
     "sortingQuestion": "Sorting question",
     "sliderQuestion": "Slider question",
     "matrixQuestion": "Likert scale question",
+    "multiMatrixQuestion": "Multiple choice likert scale question",
     "groupedCheckboxQuestion": "Grouped checkbox question",
     "imageSection": "Image section",
     "documentSection": "Document section",
@@ -396,6 +398,24 @@
     "emptyAnswer": "I don't know",
     "subject": "Subject",
     "response": "Response"
+  },
+  "MultiMatrixQuestion": {
+    "answerClass": "Option",
+    "unansweredRow": "Question row {x} needs more answers to be selected",
+    "unansweredRows": "Question rows {x} need more answers to be selected.",
+    "and": "and",
+    "answerLimitsMinMax": "Choose a minimum of {min} and a maximum of {max} options from each row.",
+    "answerLimitsMin": "Choose a minimum of {min} options from each row.",
+    "answerLimitsMax": "Choose a maximum of {max} options from each row.",
+    "selected": "selected",
+    "SR": {
+      "isRequired": "Please select at least one option on each row.",
+      "mustSelectMore": "Please select {x} more options from this row.",
+      "maySelectMore": "You may select {x} more options from this row.",
+      "maxSelected": "You have selected the maximum number of options from this row.",
+      "IDK": "This option replaces the others on this row.",
+      "replacingIDK": "Replaces the currently selected \"I don't know\" -option."
+    }
   },
   "ImageSection": {
     "openInNewTab": "Open image on a new tab"

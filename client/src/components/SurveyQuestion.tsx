@@ -1,13 +1,13 @@
 import type {
   FileAnswer,
   MapQuestionAnswer,
-  SurveyQuestion,
+  SurveyQuestion as SurveyQuestionType,
 } from '@interfaces/survey';
 import { FormControl, FormHelperText, FormLabel } from '@mui/material';
 import { visuallyHidden } from '@mui/utils';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import AttachmentQuestion from './AttachmentQuestion';
 import CheckBoxQuestion from './CheckBoxQuestion';
 import FreeTextQuestion from './FreeTextQuestion';
@@ -19,9 +19,10 @@ import RadioQuestion from './RadioQuestion';
 import SectionInfo from './SectionInfo';
 import SliderQuestion from './SliderQuestion';
 import SortingQuestion from './SortingQuestion';
+import MultiMatrixQuestion from './MultiMatrixQuestion';
 
 interface Props {
-  question: SurveyQuestion;
+  question: SurveyQuestionType;
   pageUnfinished: boolean;
   mobileDrawerOpen: boolean;
 }
@@ -32,6 +33,8 @@ function SurveyQuestion({ question, pageUnfinished, mobileDrawerOpen }: Props) {
   const { tr, surveyLanguage } = useTranslations();
   const [dirty, setDirty] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [backdropOpen, setBackdropOpen] = useState(false);
+  const infoDialogRef = useRef(null);
 
   const value = useMemo(
     () => answers.find((answer) => answer.sectionId === question.id)?.value,
@@ -56,6 +59,8 @@ function SurveyQuestion({ question, pageUnfinished, mobileDrawerOpen }: Props) {
           e.relatedTarget &&
           !e.currentTarget.contains(e.relatedTarget as Node) &&
           !dialogOpen &&
+          !backdropOpen &&
+          !infoDialogRef?.current?.infoDialogOpen &&
           !mobileDrawerOpen
         ) {
           setDirty(true);
@@ -96,8 +101,7 @@ function SurveyQuestion({ question, pageUnfinished, mobileDrawerOpen }: Props) {
         )}
         {question.info && question.info?.[surveyLanguage] && (
           <SectionInfo
-            infoDialogOpen={dialogOpen}
-            setInfoDialogOpen={setDialogOpen}
+            ref={infoDialogRef}
             hiddenFromScreenReader={false}
             infoText={question.info?.[surveyLanguage]}
             subject={question.title?.[surveyLanguage]}
@@ -224,6 +228,23 @@ function SurveyQuestion({ question, pageUnfinished, mobileDrawerOpen }: Props) {
           }}
           question={question}
           setDirty={setDirty}
+          setBackdropOpen={setBackdropOpen}
+        />
+      )}
+      {question.type === 'multi-matrix' && (
+        <MultiMatrixQuestion
+          value={value as string[][]}
+          onChange={(value) => {
+            updateAnswer({
+              sectionId: question.id,
+              type: question.type,
+              value,
+            });
+          }}
+          question={question}
+          setDirty={setDirty}
+          setBackdropOpen={setBackdropOpen}
+          validationErrors={validationErrors}
         />
       )}
       {question.type === 'grouped-checkbox' && (

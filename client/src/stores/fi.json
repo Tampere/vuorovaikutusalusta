@@ -133,7 +133,8 @@
     "freeTextQuestion": "Lisää vapaatekstikysymys",
     "sortingQuestion": "Lisää järjestyskysymys",
     "sliderQuestion": "Lisää liukukytkinkysymys",
-    "matrixQuestion": "Lisää likert -kysymys",
+    "matrixQuestion": "Lisää likert-kysymys",
+    "multiMatrixQuestion": "Lisää monivalinta-likert-kysymys",
     "groupedCheckboxQuestion": "Lisää ryhmitetty monivalintakysymys",
     "imageSection": "Lisää kuvaosio",
     "documentSection": "Lisää liiteosio",
@@ -153,7 +154,8 @@
     "freeTextQuestion": "Vapaatekstikysymys",
     "sortingQuestion": "Järjestyskysymys",
     "sliderQuestion": "Liukukytkinkysymys",
-    "matrixQuestion": "Likert -kysymys",
+    "matrixQuestion": "Likert-kysymys",
+    "multiMatrixQuestion": "Monivalinta-likert-kysymys",
     "groupedCheckboxQuestion": "Ryhmitetty monivalintakysymys",
     "imageSection": "Kuvaosio",
     "documentSection": "Liiteosio",
@@ -361,9 +363,9 @@
   "SurveyQuestion": {
     "errorFieldIsRequired": "Vastaus on pakollinen.",
     "accessibilityTooltip": "Vastaathan kysymykseen:",
-    "answerLimitsMinMax": "Valitse vähintään {min}, enintään {max} vaihtoehtoa",
-    "answerLimitsMin": "Valitse vähintään {min} vaihtoehtoa",
-    "answerLimitsMax": "Valitse enintään {max} vaihtoehtoa",
+    "answerLimitsMinMax": "Valitse vähintään {min}, enintään {max} vaihtoehtoa.",
+    "answerLimitsMin": "Valitse vähintään {min} vaihtoehtoa.",
+    "answerLimitsMax": "Valitse enintään {max} vaihtoehtoa.",
     "customAnswer": "Jokin muu (täsmennä alla)",
     "customAnswerField": "Täsmennä vastaustasi tässä.",
     "charactersRemaining": "{x} merkki(ä) jäljellä.",
@@ -399,6 +401,24 @@
     "emptyAnswer": "En osaa sanoa",
     "subject": "Aihe",
     "response": "Vastaus"
+  },
+  "MultiMatrixQuestion": {
+    "answerClass": "Vastausvaihtoehto",
+    "unansweredRow": "Kysymyksen rivillä {x} on liian vähän valittuja vastauksia.",
+    "unansweredRows": "Kysymyksen riveillä {x} on liian vähän valittuja vastauksia.",
+    "and": "ja",
+    "answerLimitsMinMax": "Valitse vähintään {min}, enintään {max} vaihtoehtoa kultakin riviltä.",
+    "answerLimitsMin": "Valitse vähintään {min} vaihtoehtoa kultakin riviltä.",
+    "answerLimitsMax": "Valitse enintään {max} vaihtoehtoa kultakin riviltä",
+    "selected": "valittu",
+    "SR": {
+      "isRequired": "Valitse vähintään yksi vaihtoehto joka riviltä.",
+      "mustSelectMore": "Valitse vielä {x} vaihtoehtoa tältä riviltä.",
+      "maySelectMore": "Voit valita vielä {x} vaihtoehtoa tältä riviltä.",
+      "maxSelected": "Olet valinnut enimmäismäärän vaihtoehtoja tältä riviltä",
+      "IDK": "Tämä vaihtoehto korvaa rivin muut vaihtoehdot.",
+      "replacingIDK": "Valinta korvaa nykyisen \"En osaa sanoa\" -vaihtoehdon."
+    }
   },
   "ImageSection": {
     "openInNewTab": "Avaa kuva uudella välilehdellä"

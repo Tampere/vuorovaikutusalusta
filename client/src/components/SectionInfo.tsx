@@ -6,7 +6,7 @@ import {
   IconButton,
   Tooltip,
 } from '@mui/material';
-import React from 'react';
+import React, { forwardRef, useImperativeHandle, useState } from 'react';
 import { Help as HelpIcon } from '@mui/icons-material';
 import ReactMarkdown from 'react-markdown';
 import rehypeExternalLinks from 'rehype-external-links';
@@ -18,20 +18,20 @@ interface Props {
   infoText: string;
   style?: React.CSSProperties;
   hiddenFromScreenReader?: boolean;
-  infoDialogOpen: boolean;
-  setInfoDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export default function SectionInfo({
-  subject,
-  infoText,
-  style,
-  hiddenFromScreenReader = false,
-  infoDialogOpen,
-  setInfoDialogOpen,
-}: Props) {
+export default forwardRef(function SectionInfo(
+  { subject, infoText, style, hiddenFromScreenReader = false }: Props,
+  ref,
+) {
   const { tr } = useTranslations();
   const dialogId = useId();
+
+  const [infoDialogOpen, setInfoDialogOpen] = useState(false);
+
+  useImperativeHandle(ref, () => {
+    return { infoDialogOpen };
+  });
 
   return (
     <div style={style ?? {}} aria-hidden={hiddenFromScreenReader}>
@@ -67,4 +67,4 @@ export default function SectionInfo({
       </Dialog>
     </div>
   );
-}
+});

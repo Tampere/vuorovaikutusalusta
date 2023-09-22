@@ -158,7 +158,7 @@ export default function EditSurveyPage() {
                               // changes are detected correctly (the order won't matter anyway)
                               [...page.sidebar.mapLayers, layer.id].sort()
                             : page.sidebar.mapLayers.filter(
-                                (layerId) => layerId !== layer.id
+                                (layerId) => layerId !== layer.id,
                               );
                           editPage({
                             ...page,

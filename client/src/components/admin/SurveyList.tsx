@@ -39,7 +39,11 @@ export default function SurveyList() {
     async function updateSurveys() {
       try {
         setSurveys(
-          await getSurveys(abortController, showAuthoredOnly, showPublishedOnly)
+          await getSurveys(
+            abortController,
+            showAuthoredOnly,
+            showPublishedOnly,
+          ),
         );
         abortController = null;
       } catch (error) {
@@ -97,8 +101,9 @@ export default function SurveyList() {
                 severity: 'error',
                 message: tr.SurveyList.errorCreatingNewSurvey,
               });
+            } finally {
+              setNewSurveyLoading(false);
             }
-            setNewSurveyLoading(false);
           }}
         >
           {tr.SurveyList.createNewSurvey}

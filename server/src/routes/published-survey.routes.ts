@@ -27,7 +27,7 @@ router.get(
       throw new ForbiddenError(`Survey with name ${req.params.name} not found`);
     }
     res.json(survey);
-  })
+  }),
 );
 
 /**
@@ -67,7 +67,7 @@ router.post(
       answerEntries,
       unfinishedToken,
       false,
-      answerLanguage
+      answerLanguage,
     );
     // We are done with this request - start sending the emails in the background
     res.status(201).send();
@@ -82,7 +82,7 @@ router.post(
       survey,
       { id: submissionId, timestamp },
       answerEntries,
-      answerLanguage
+      answerLanguage,
     );
 
     // Send the report to the submitter, if they provided their email address
@@ -111,7 +111,7 @@ router.post(
         includeAttachments: true,
       });
     });
-  })
+  }),
 );
 
 /**
@@ -148,7 +148,7 @@ router.post(
       answerEntries,
       unfinishedToken,
       true,
-      language
+      language,
     );
     res.json({ token: newToken });
 
@@ -159,7 +159,7 @@ router.post(
       survey,
       language,
     });
-  })
+  }),
 );
 
 /**
@@ -179,7 +179,7 @@ router.get(
     const answers = await getUnfinishedAnswerEntries(String(req.query.token));
     const language = await getSurveyAnswerLanguage(String(req.query.token));
     res.json({ answers, language });
-  })
+  }),
 );
 
 export default router;

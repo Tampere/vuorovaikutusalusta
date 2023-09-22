@@ -101,7 +101,6 @@ export default function SurveyLandingPage({
 }: Props) {
   const classes = useStyles({ imageName: survey?.backgroundImageName ?? '' });
   const { tr, surveyLanguage } = useTranslations();
-  const lowHeight = useMediaQuery('(max-height: 400px)');
   const mediumWidth = useMediaQuery('(max-width: 640px)');
   return (
     <Stack

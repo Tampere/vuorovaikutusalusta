@@ -15,6 +15,7 @@ import {
   Subject,
   TextFields,
   ViewComfy,
+  ViewComfyAlt,
 } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
@@ -140,6 +141,19 @@ export default function AddSurveySectionActions(props: Props) {
       subjects: [],
       allowEmptyAnswer: false,
     },
+    'multi-matrix': {
+      type: 'multi-matrix',
+      isRequired: false,
+      title: initializeLocalizedObject(''),
+      info: null,
+      classes: [],
+      subjects: [],
+      allowEmptyAnswer: false,
+      answerLimits: {
+        min: 0,
+        max: 1,
+      },
+    },
     'grouped-checkbox': {
       type: 'grouped-checkbox',
       isRequired: false,
@@ -234,6 +248,12 @@ export default function AddSurveySectionActions(props: Props) {
       label: tr.AddSurveySectionActions.matrixQuestion,
       ariaLabel: 'add-matrix-question',
       icon: <ViewComfy />,
+    },
+    {
+      type: 'multi-matrix',
+      label: tr.AddSurveySectionActions.multiMatrixQuestion,
+      ariaLabel: 'add-multiple-choice-matrix-question',
+      icon: <ViewComfyAlt />,
     },
     {
       type: 'grouped-checkbox',

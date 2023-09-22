@@ -27,6 +27,7 @@ interface Props {
   onChange: (value: string[]) => void;
   setDirty: (dirty: boolean) => void;
   question: SurveyMatrixQuestion;
+  setBackdropOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 interface ComponentState {
@@ -59,8 +60,8 @@ const useStyles = makeStyles({
 export default function MatrixQuestion({
   value,
   onChange,
-  setDirty,
   question,
+  setBackdropOpen,
 }: Props) {
   const { tr, surveyLanguage } = useTranslations();
   const classes = useStyles();
@@ -141,7 +142,6 @@ export default function MatrixQuestion({
     const values = [...value];
     values[subjectIndex] = event.target.value;
     onChange(values);
-    setDirty(true);
   }
 
   return (
@@ -171,6 +171,7 @@ export default function MatrixQuestion({
                 {question.allowEmptyAnswer && (
                   <TableCell
                     scope="col"
+                    sx={{ backgroundColor: '#efefef' }}
                     className={`${classes.matrixCell} ${classes.matrixText}`}
                   >
                     {tr.MatrixQuestion.emptyAnswer}
@@ -211,7 +212,10 @@ export default function MatrixQuestion({
                       </TableCell>
                     ))}
                     {question.allowEmptyAnswer && (
-                      <TableCell className={classes.matrixCell}>
+                      <TableCell
+                        className={classes.matrixCell}
+                        sx={{ backgroundColor: '#efefef' }}
+                      >
                         <Radio
                           name={`question-${subjectIndex}`}
                           checked={value[subjectIndex] === '-1'}
@@ -236,11 +240,6 @@ export default function MatrixQuestion({
           sx={{ marginTop: 2 }}
         >
           <Table size="small">
-            {question.title && (
-              <caption style={visuallyHidden}>
-                {question.title?.[surveyLanguage]}
-              </caption>
-            )}
             <TableHead>
               <TableRow>
                 <TableCell
@@ -281,6 +280,8 @@ export default function MatrixQuestion({
                     <TableCell>
                       <FormControl size="small" sx={{ minWidth: 160, m: 1 }}>
                         <Select
+                          onOpen={() => setBackdropOpen(true)}
+                          onClose={() => setBackdropOpen(false)}
                           id="matrix-select"
                           value={value?.[subjectIndex] ?? ''}
                           onChange={(event: SelectChangeEvent<string>) =>
@@ -331,6 +332,8 @@ export default function MatrixQuestion({
                   {subject?.[surveyLanguage]}
                 </FormLabel>
                 <Select
+                  onOpen={() => setBackdropOpen(true)}
+                  onClose={() => setBackdropOpen(false)}
                   id="matrix-select"
                   displayEmpty
                   value={value?.[subjectIndex] ?? ''}
