@@ -18,9 +18,10 @@ import { FileAnswer } from '@interfaces/survey';
 
 interface Props {
   surveyId: number;
+  submissionCount: number;
 }
 
-export default function DataExport({ surveyId }: Props) {
+export default function DataExport({ surveyId, submissionCount }: Props) {
   const [displayDialog, setDisplayDialog] = useState(false);
   const [selectedFileFormats, setSelectedFileFormats] = useState({
     csv: true,
@@ -60,7 +61,7 @@ export default function DataExport({ surveyId }: Props) {
         `/api/answers/${surveyId}/file-export/geopackage`,
         {
           method: 'POST',
-        }
+        },
       );
 
       if (!res.ok) {
@@ -93,7 +94,7 @@ export default function DataExport({ surveyId }: Props) {
   async function exportAttachments() {
     try {
       const files = (await request(
-        `/api/answers/${surveyId}/file-export/attachments`
+        `/api/answers/${surveyId}/file-export/attachments`,
       )) as FileAnswer[];
 
       const zip = new JSZip();
@@ -101,8 +102,8 @@ export default function DataExport({ surveyId }: Props) {
         zip.file(
           file.fileName,
           file.fileString.replace(allowedFilesRegex, ''),
-          { base64: true }
-        )
+          { base64: true },
+        ),
       );
       const blob = await zip.generateAsync({ type: 'blob' });
       saveAs(blob, 'vastaukset.zip');
@@ -118,7 +119,7 @@ export default function DataExport({ surveyId }: Props) {
         variant="contained"
         onClick={() => setDisplayDialog((prev) => !prev)}
       >
-        {tr.DataExport.exportAnswers}
+        {`${tr.DataExport.exportAnswers} (${submissionCount})`}
       </Button>
       <Dialog open={displayDialog} onClose={() => setDisplayDialog(false)}>
         <DialogTitle> {tr.DataExport.surveyAnswerExport} </DialogTitle>

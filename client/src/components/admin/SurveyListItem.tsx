@@ -65,7 +65,7 @@ export default function SurveyListItem(props: Props) {
       window.location.port ? `:${window.location.port}` : ''
     }/${survey.name}`;
   }, [survey.name]);
-
+  console.log(survey);
   return (
     <>
       <Card
@@ -177,7 +177,10 @@ export default function SurveyListItem(props: Props) {
             {' '}
             {tr.SurveyList.copySurvey}{' '}
           </LoadingButton>
-          <DataExport surveyId={survey.id} />
+          <DataExport
+            surveyId={survey.id}
+            submissionCount={survey?.submissionCount ?? 0}
+          />
         </CardActions>
       </Card>
       <ConfirmDialog

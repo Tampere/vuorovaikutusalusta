@@ -445,6 +445,10 @@ export interface Survey {
    * Should a link for the privacy statement be displayed
    */
   displayPrivacyStatement: boolean;
+  /**
+   * Number of submissions for the survey
+   */
+  submissionCount: number;
 }
 
 /**
