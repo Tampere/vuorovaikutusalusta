@@ -36,6 +36,7 @@ import {
   replaceTranslationsWithNull,
 } from '@src/utils/schemaValidation';
 import { useClipboard } from '@src/stores/ClipboardContext';
+import { SurveyPage } from '@interfaces/survey';
 
 const useStyles = makeStyles((theme: Theme) => ({
   '@keyframes pulse': {
@@ -160,8 +161,12 @@ export default function EditSurveySideBar(props: Props) {
                               event.preventDefault();
                               const copiedSurveyPage =
                                 replaceTranslationsWithNull(
-                                  replaceIdsWithNull({ ...page, id: -1 }),
-                                );
+                                  replaceIdsWithNull({
+                                    ...page,
+                                    id: -1,
+                                    sidebar: { ...page.sidebar, mapLayers: [] },
+                                  }),
+                                ) as SurveyPage;
 
                               // Store section to locale storage for other browser tabs to get access to it
                               localStorage.setItem(
@@ -250,6 +255,11 @@ export default function EditSurveySideBar(props: Props) {
                 setNewPageDisabled(false);
 
                 editPage({ ...clipboardPage, id: blankPage.id });
+                showToast({
+                  severity: 'warning',
+                  message: tr.EditSurvey.pageAttached,
+                  autoHideDuration: 30000,
+                });
               } catch (error) {
                 showToast({
                   severity: 'error',
