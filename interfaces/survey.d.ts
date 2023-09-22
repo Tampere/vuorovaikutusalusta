@@ -686,4 +686,13 @@ export interface SurveyEmailInfoItem {
   value: LocalizedText;
 }
 
+/**
+ * Submission
+ */
+export interface Submission {
+  id: number;
+  timestamp: Date;
+  answerEntries?: AnswerEntry[];
+}
+
 export type ImageType = 'backgroundImage' | 'thanksPageImage';
