@@ -239,12 +239,12 @@ export default function MultiMatrixQuestion({
       // IDK already selected on this row
       return tr.MultiMatrixQuestion.SR.replacingIDK;
     }
-    let count = value[subjectIndex].length;
+    const count = value[subjectIndex].length;
     if (question.answerLimits === null && !question.isRequired) {
       return;
     }
 
-    let limits = question.answerLimits;
+    const limits = question.answerLimits;
     if (limits.min === null && question.isRequired && count === 0) {
       return tr.MultiMatrixQuestion.SR.isRequired;
     }
