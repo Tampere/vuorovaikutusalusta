@@ -25,7 +25,7 @@
     "toFrontPage": "Etusivulle",
     "info": "Kyselyn perustiedot",
     "email": "Sähköposti",
-    "newPage": "Uusi sivu",
+    "newPage": "Luo sivu",
     "newPageFailed": "Uuden sivun luomisessa tapahtui virhe. Yritä myöhemmin uudestaan.",
     "thanksPage": "Kiitos-sivu",
     "translations": "Käännökset",
@@ -37,7 +37,11 @@
     "deleteSurveyFailed": "Kyselyn poistamisessa tapahtui virhe. Yritä myöhemmin uudestaan.",
     "deleteSurveySuccessful": "Kysely poistettiin onnistuneesti!",
     "allowSavingUnfinished": "Salli kyselyn tallentaminen keskeneräisenä",
-    "displayPrivacyStatement": "Näytä tietosuoja ja tiedonhallinta -linkki alatunnisteessa"
+    "displayPrivacyStatement": "Näytä tietosuoja ja tiedonhallinta -linkki alatunnisteessa",
+    "copyPage": "Kopioi sivu",
+    "attachNewPage": "Liitä sivu",
+    "pageAttached": "Huomaa, että karttatasovalinnat eivät kopioidu. Tarkista karttatasovalinnat ja korjaa tarvittaessa karttajulkaisuosoitetta.",
+    "pageCopied": "Sivu kopioitu leikepöydälle. Voit nyt liittää kopioidun sivun haluamallesi kyselylle."
   },
   "EditSurveyInfo": {
     "title": "Kyselyn otsikko",
@@ -103,7 +107,10 @@
     "imageScalingLabel": {
       "original": "Alkuperäinen koko",
       "fitted": "Sovita näkymään"
-    }
+    },
+    "sectionCopied": "Osio kopioitu leikepöydälle. Voit nyt liittää kopioidun osion haluamallesi kyselylle.",
+    "sectionAttached": "Huomaa, että karttatasovalinnat eivät kopioidu. Tarkista karttatasovalinnat ja korjaa tarvittaessa karttajulkaisuosoitetta",
+    "attachSection": "Uusi osio leikepöydältä"
   },
   "FileUpload": {
     "deleteFile": "Poista tiedosto",
@@ -194,10 +201,15 @@
     "image": "Kuva",
     "selectImage": "Valitse taustakuva",
     "addNewImage": "Lisää uusi kuva",
-    "files": "Tiedosto"
+    "files": "Tiedosto",
+    "imageSizeExceeded": "Kuvan maksimikoko on {x} Mt",
+    "imageUploadError": "Virhe tallennettaessa kuvaa",
+    "imageDownloadError": "Virhe ladattaessa kuvaa",
+    "multipleImagesDownloadError": "Kuvien lataaminen epäonnistui",
+    "imageDeleteError": "Virhe poistettaessa kuvaa"
   },
   "DropZone": {
-    "dropFiles": "Raahaa tiedosto tähän tai klikkaa valitaksesi tiedosto"
+    "dropFiles": "Valitse tiedosto klikkaamalla tai pudottamalla se tähän (enint. {x} Mt)."
   },
   "EditTextSection": {
     "text": "Teksti",
@@ -466,7 +478,6 @@
     "submit": "Lähetä",
     "cancel": "Peruuta"
   },
-
   "MapInfoBox": {
     "answer": "Vastaus"
   },

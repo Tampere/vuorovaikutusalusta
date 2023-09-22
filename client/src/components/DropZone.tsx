@@ -1,4 +1,3 @@
-import { Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useEffect } from 'react';
@@ -28,7 +27,7 @@ const useStyles = makeStyles({
     '&:focus-visible': {
       outline: '2px solid black',
       outlineOffset: '2px',
-    }
+    },
   },
 });
 
@@ -54,11 +53,11 @@ export default function DropZone({ maxFiles, fileCallback, children }: Props) {
     <section className={classes.container}>
       <div
         {...getRootProps({ className: `dropzone ${classes.dropzone}` })}
-        aria-label={children ? tr.AttachmentQuestion.replace : '' }
+        aria-label={children ? tr.AttachmentQuestion.replace : ''}
       >
         <input {...getInputProps()} />
         <div style={{ cursor: 'pointer' }}>
-          <Typography color='primary'>{children ? children : tr.DropZone.dropFiles}</Typography>
+          {children ? children : tr.DropZone.dropFiles}
         </div>
       </div>
     </section>

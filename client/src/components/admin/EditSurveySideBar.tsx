@@ -1,13 +1,15 @@
 import {
   Divider,
+  IconButton,
   List,
   ListItem,
+  ListItemButton,
   ListItemIcon,
   ListItemText,
   Theme,
 } from '@mui/material';
 import {
-  AddCircle,
+  Add,
   ArrowBack,
   DragIndicator,
   FavoriteBorder,
@@ -16,6 +18,8 @@ import {
   Language,
   Mail,
   Preview,
+  ContentCopy,
+  ContentPaste,
 } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { useSurvey } from '@src/stores/SurveyContext';
@@ -26,6 +30,13 @@ import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { useHistory, useRouteMatch } from 'react-router-dom';
 import ListItemLink from '../ListItemLink';
 import SideBar from '../SideBar';
+
+import {
+  replaceIdsWithNull,
+  replaceTranslationsWithNull,
+} from '@src/utils/schemaValidation';
+import { useClipboard } from '@src/stores/ClipboardContext';
+import { SurveyPage } from '@interfaces/survey';
 
 const useStyles = makeStyles((theme: Theme) => ({
   '@keyframes pulse': {
@@ -46,6 +57,11 @@ const useStyles = makeStyles((theme: Theme) => ({
     pointerEvents: 'none',
     opacity: 0.4,
   },
+  listItemButton: {
+    '&:hover': {
+      backgroundColor: '#747474',
+    },
+  },
 }));
 
 interface Props {
@@ -64,12 +80,14 @@ export default function EditSurveySideBar(props: Props) {
     activeSurvey,
     originalActiveSurvey,
     createPage,
+    editPage,
     newPageLoading,
     activeSurveyLoading,
     movePage,
   } = useSurvey();
   const { tr, surveyLanguage, language } = useTranslations();
   const { showToast } = useToasts();
+  const { clipboardSection, setClipboardPage, clipboardPage } = useClipboard();
 
   return (
     <SideBar
@@ -137,6 +155,37 @@ export default function EditSurveySideBar(props: Props) {
                               )
                             }
                           />
+                          <IconButton
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              event.preventDefault();
+                              const copiedSurveyPage =
+                                replaceTranslationsWithNull(
+                                  replaceIdsWithNull({
+                                    ...page,
+                                    id: -1,
+                                    sidebar: { ...page.sidebar, mapLayers: [] },
+                                  }),
+                                ) as SurveyPage;
+
+                              // Store section to locale storage for other browser tabs to get access to it
+                              localStorage.setItem(
+                                'clipboard-content',
+                                JSON.stringify({
+                                  clipboardPage: copiedSurveyPage,
+                                  clipboardSection,
+                                }),
+                              );
+                              // Store page to context for the currently active browser tab to get access to it
+                              setClipboardPage(copiedSurveyPage);
+                              showToast({
+                                message: tr.EditSurvey.pageCopied,
+                                severity: 'success',
+                              });
+                            }}
+                          >
+                            <ContentCopy />
+                          </IconButton>
                           <div {...provided.dragHandleProps}>
                             <DragIndicator />
                           </div>
@@ -150,32 +199,81 @@ export default function EditSurveySideBar(props: Props) {
             )}
           </Droppable>
         </DragDropContext>
-        <ListItem
-          button
-          className={`${
-            newPageDisabled || activeSurveyLoading ? classes.disabled : ''
-          } ${newPageLoading ? classes.loading : ''}`}
-          onClick={async () => {
-            setNewPageDisabled(true);
-            try {
-              const page = await createPage();
-              history.push(`${url}/sivut/${page.id}?lang=${language}`);
-              setNewPageDisabled(false);
-            } catch (error) {
-              showToast({
-                severity: 'error',
-                message: tr.EditSurvey.newPageFailed,
-              });
-              setNewPageDisabled(false);
-              throw error;
-            }
-          }}
-        >
-          <ListItemIcon>
-            <AddCircle />
-          </ListItemIcon>
-          <ListItemText primary={tr.EditSurvey.newPage} />
-        </ListItem>
+        <div style={{ display: 'flex', flexDirection: 'row' }}>
+          <ListItem
+            sx={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'space-around',
+            }}
+            className={`${
+              newPageDisabled || activeSurveyLoading ? classes.disabled : ''
+            } ${newPageLoading ? classes.loading : ''}`}
+            onClick={async () => {
+              setNewPageDisabled(true);
+              try {
+                const page = await createPage();
+                history.push(`${url}/sivut/${page.id}?lang=${language}`);
+                setNewPageDisabled(false);
+              } catch (error) {
+                showToast({
+                  severity: 'error',
+                  message: tr.EditSurvey.newPageFailed,
+                });
+                setNewPageDisabled(false);
+                throw error;
+              }
+            }}
+          >
+            <ListItemIcon>
+              <Add />
+            </ListItemIcon>
+            <ListItemText primary={tr.EditSurvey.newPage} />
+          </ListItem>
+          <div
+            style={{
+              height: '2rem',
+              borderRight: '1px solid white',
+              alignSelf: 'center',
+            }}
+          ></div>
+          <ListItemButton
+            className={classes.listItemButton}
+            disabled={!clipboardPage}
+            sx={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'space-around',
+              width: '100%',
+            }}
+            onClick={async () => {
+              setNewPageDisabled(true);
+              try {
+                // Create new blank page and set its contents from Clipboard -context
+                const blankPage = await createPage();
+                history.push(`${url}/sivut/${blankPage.id}?lang=${language}`);
+                setNewPageDisabled(false);
+
+                editPage({ ...clipboardPage, id: blankPage.id });
+                showToast({
+                  severity: 'warning',
+                  message: tr.EditSurvey.pageAttached,
+                  autoHideDuration: 30000,
+                });
+              } catch (error) {
+                showToast({
+                  severity: 'error',
+                  message: tr.EditSurvey.newPageFailed,
+                });
+                setNewPageDisabled(false);
+                throw error;
+              }
+            }}
+          >
+            <ContentPaste />
+            {tr.EditSurvey.attachNewPage}
+          </ListItemButton>
+        </div>
       </List>
       <Divider />
       <List>

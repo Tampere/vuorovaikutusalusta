@@ -13,6 +13,7 @@ import ToastProvider from '@src/stores/ToastContext';
 import AdminFrontPage from './AdminFrontPage';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import LanguageRouter from '../LanguageRouter';
+import ClipboardProvider from '@src/stores/ClipboardContext';
 
 export default function AdminApplication() {
   return (
@@ -26,6 +27,7 @@ export default function AdminApplication() {
         SurveyProvider,
         TranslationProvider,
         ToastProvider,
+        ClipboardProvider,
       ]}
     >
       <CssBaseline />

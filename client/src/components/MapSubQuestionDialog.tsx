@@ -128,7 +128,11 @@ export default function MapSubQuestionDialog({
             onBlur={(e: React.FocusEvent<HTMLFieldSetElement>) => {
               if (
                 e.relatedTarget &&
+                !(e.relatedTarget as HTMLButtonElement).classList.contains(
+                  'cancel-button',
+                ) &&
                 !e.currentTarget.contains(e.relatedTarget as Node) &&
+                open &&
                 !dialogRef?.current?.infoDialogOpen
               ) {
                 dirty[index] = true;
@@ -235,6 +239,7 @@ export default function MapSubQuestionDialog({
         )}
         <div style={{ flexGrow: 1 }} />
         <Button
+          className="cancel-button"
           variant="outlined"
           onClick={() => {
             onCancel();
