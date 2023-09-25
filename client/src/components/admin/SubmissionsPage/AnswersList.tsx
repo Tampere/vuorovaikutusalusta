@@ -8,13 +8,12 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
-  Button,
   Typography,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { isAnswerEmpty } from '@src/stores/SurveyAnswerContext';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import SurveyQuestion from '@src/components/SurveyQuestion';
 
 interface Props {
@@ -79,7 +78,6 @@ const useStyles = makeStyles({
 });
 
 export default function AnswersList({
-  isPublic,
   selectedQuestion,
   selectedAnswer,
   setSelectedAnswer,
@@ -88,13 +86,6 @@ export default function AnswersList({
 }: Props) {
   const classes = useStyles();
   const { tr } = useTranslations();
-  const [modifyAnswers, setModifyAnswers] = useState<{
-    modify: boolean;
-    questionToModify: number;
-  }>({
-    modify: false,
-    questionToModify: null,
-  });
 
   /**
    * All answers flattened from all submissions
@@ -114,7 +105,6 @@ export default function AnswersList({
       [] as AnswerItem[],
     );
   }, [submissions]);
-
   /**
    * Currently visible answers
    */
@@ -127,28 +117,6 @@ export default function AnswersList({
             !isAnswerEmpty(selectedQuestion, answer.entry.value),
         );
   }, [allAnswers, selectedQuestion]);
-
-  const attachmentAnswers = useMemo(() => {
-    if (!selectedAnswer) return;
-    selectedAnswer.submissionId;
-    const answersInCurrentSubmission = submissions.find(
-      (submission) => submission.id === selectedAnswer.submissionId,
-    );
-
-    const answers = answersInCurrentSubmission.answerEntries.filter(
-      (answerEntry) => answerEntry.type === 'attachment',
-    );
-
-    return answers;
-  }, [selectedAnswer]);
-
-  const attachmentQuestions = useMemo(() => {
-    if (!surveyQuestions) return;
-
-    return surveyQuestions.filter(
-      (surveyQuestion) => surveyQuestion.type === 'attachment',
-    );
-  }, [surveyQuestions, modifyAnswers]);
 
   return (
     <div>
@@ -218,74 +186,6 @@ export default function AnswersList({
                           ),
                         ),
                     )}
-                    {!isPublic && attachmentQuestions?.length ? (
-                      <>
-                        <Typography
-                          variant="h6"
-                          style={{ marginTop: '1.5rem' }}
-                        >
-                          {' '}
-                          {tr.SurveySubmissionsPage.attachments}:{' '}
-                        </Typography>
-                        {attachmentQuestions?.map((question, index) => (
-                          <div
-                            key={`attachment-answer-${index}`}
-                            style={{
-                              marginTop: '0.75em',
-                              marginBottom: '1.5em',
-                              display: 'flex',
-                              flexDirection: 'row',
-                              justifyContent: 'flex-start',
-                              alignItems: 'flex-start',
-                            }}
-                          >
-                            {modifyAnswers?.questionToModify !==
-                              question.id && (
-                              <div
-                                style={{
-                                  display: 'flex',
-                                  flexDirection: 'row',
-                                  width: '100%',
-                                }}
-                              >
-                                <SurveyQuestion
-                                  readOnly
-                                  pageUnfinished={false}
-                                  mobileDrawerOpen={false}
-                                  question={question}
-                                  value={
-                                    attachmentAnswers?.find(
-                                      (answer) =>
-                                        question.id === answer.sectionId,
-                                    )?.value
-                                  }
-                                />
-                                <div
-                                  style={{
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    justifyContent: 'flex-end',
-                                  }}
-                                >
-                                  <Button
-                                    disabled={modifyAnswers.modify}
-                                    variant="text"
-                                    onClick={() =>
-                                      setModifyAnswers({
-                                        modify: true,
-                                        questionToModify: question.id,
-                                      })
-                                    }
-                                  >
-                                    {tr.commands.edit}
-                                  </Button>
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                      </>
-                    ) : null}
                   </>
                 ) : (
                   <SurveyQuestion

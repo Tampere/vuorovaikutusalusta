@@ -650,6 +650,15 @@ function dbAnswerEntriesToAnswerEntries(
           });
           break;
         }
+        case 'multi-matrix':
+          {
+            entries.push({
+              sectionId: row.section_id,
+              type: 'multi-matrix',
+              value: row.value_json as string[][],
+            });
+          }
+          break;
         case 'attachment': {
           entries.push({
             sectionId: row.section_id,
@@ -660,8 +669,12 @@ function dbAnswerEntriesToAnswerEntries(
           });
           break;
         }
-        default:
+        case 'text':
+        case 'image':
+        case 'document':
           break;
+        default:
+          assertNever(row.section_type);
       }
       return entries;
     }, [] as AnswerEntry[]);
