@@ -313,7 +313,8 @@
     "notPublished": "Ei julkaistu",
     "showAuthoredOnly": "Näytä vain omat kyselyt",
     "showPublishedOnly": "Näytä vain avoinna olevat kyselyt",
-    "copySurvey": "Kopioi"
+    "copySurvey": "Kopioi",
+    "answers": "Vastaukset"
   },
   "SurveyPage": {
     "errorSurveyNotFound": "Kyselyä ei löytynyt, tai se ei ole avoinna. Tarkista osoite ja yritä uudestaan.",
@@ -524,7 +525,8 @@
   "SurveySubmissionsPage": {
     "attachments": "Liitteet",
     "noAttachments": "Ei liitteitä",
-    "showAll": "Näytä kaikki vastaukset"
+    "showAll": "Näytä kaikki vastaukset",
+    "toHomePage": "Etusivulle"
   },
   "navigation": {
     "next": "Seuraava",

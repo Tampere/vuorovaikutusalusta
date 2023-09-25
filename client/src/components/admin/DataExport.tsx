@@ -18,10 +18,9 @@ import { FileAnswer } from '@interfaces/survey';
 
 interface Props {
   surveyId: number;
-  submissionCount: number;
 }
 
-export default function DataExport({ surveyId, submissionCount }: Props) {
+export default function DataExport({ surveyId }: Props) {
   const [displayDialog, setDisplayDialog] = useState(false);
   const [selectedFileFormats, setSelectedFileFormats] = useState({
     csv: true,
@@ -115,11 +114,11 @@ export default function DataExport({ surveyId, submissionCount }: Props) {
   return (
     <>
       <Button
-        style={{ marginLeft: 'auto' }}
+        sx={{ margin: 'auto' }}
         variant="contained"
         onClick={() => setDisplayDialog((prev) => !prev)}
       >
-        {`${tr.DataExport.exportAnswers} (${submissionCount})`}
+        {tr.DataExport.exportAnswers}
       </Button>
       <Dialog open={displayDialog} onClose={() => setDisplayDialog(false)}>
         <DialogTitle> {tr.DataExport.surveyAnswerExport} </DialogTitle>

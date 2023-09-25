@@ -313,7 +313,8 @@
     "notPublished": "Unpublished",
     "showAuthoredOnly": "Show authored surveys only",
     "showPublishedOnly": "Show published surveys only",
-    "copySurvey": "Copy survey"
+    "copySurvey": "Copy survey",
+    "answers": "Answers"
   },
   "SurveyPage": {
     "errorSurveyNotFound": "Survey was not found, or it is not published. Please check the address and try again.",
@@ -524,7 +525,8 @@
   "SurveySubmissionsPage": {
     "attachments": "Attachments",
     "noAttachments": "No attachments",
-    "showAll": "Display all answers"
+    "showAll": "Display all answers",
+    "toHomePage": "To home page"
   },
   "navigation": {
     "next": "Next",

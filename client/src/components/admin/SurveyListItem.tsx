@@ -14,7 +14,6 @@ import {
 } from '@src/controllers/SurveyController';
 import { useToasts } from '@src/stores/ToastContext';
 import { makeStyles } from '@mui/styles';
-import DataExport from './DataExport';
 import LoadingButton from '../LoadingButton';
 import { NavLink, useRouteMatch } from 'react-router-dom';
 
@@ -177,12 +176,15 @@ export default function SurveyListItem(props: Props) {
             {' '}
             {tr.SurveyList.copySurvey}{' '}
           </LoadingButton>
-          <DataExport
-            surveyId={survey.id}
-            submissionCount={survey?.submissionCount ?? 0}
-          />
+          <Button
+            component={NavLink}
+            style={{ marginLeft: 'auto' }}
+            variant="contained"
+            to={`vastaukset/${survey.id}`}
+          >
+            {`${tr.SurveyList.answers} (${survey?.submissionCount ?? 0})`}
+          </Button>
         </CardActions>
-        <Link href={`/admin/vastaukset/${survey.id}`}>vastaukset</Link>
       </Card>
       <ConfirmDialog
         open={publishConfirmDialogOpen}

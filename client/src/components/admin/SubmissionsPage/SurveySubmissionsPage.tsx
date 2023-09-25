@@ -1,5 +1,5 @@
 import { Submission, Survey, SurveyQuestion } from '@interfaces/survey';
-import { Box, CircularProgress, Link, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, Typography } from '@mui/material';
 import { Map } from '@mui/icons-material';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import { useTranslations } from '@src/stores/TranslationContext';
@@ -9,6 +9,8 @@ import { useParams } from 'react-router-dom';
 import AnswerMap from './AnswerMap';
 import AnswersList, { AnswerSelection } from './AnswersList';
 import SplitPaneLayout from './SplitPaneLayout';
+import DataExport from '../DataExport';
+import { Link as RouterLink } from 'react-router-dom';
 
 interface Props {
   isPublic?: boolean;
@@ -138,10 +140,22 @@ export default function SurveySubmissionsPage({ isPublic }: Props) {
     <SplitPaneLayout
       defaultSize="30%"
       mainPane={
-        <>
-          <Link href="/admin">
-            <Typography>Etusivulle</Typography>
-          </Link>
+        <Box
+          sx={{
+            width: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 2,
+            justifyContent: 'center',
+          }}
+        >
+          <Button
+            component={RouterLink}
+            to="/admin"
+            sx={{ padding: 2, margin: 'auto' }}
+          >
+            <Typography>{tr.SurveySubmissionsPage.toHomePage}</Typography>
+          </Button>
           <AnswersList
             modifyAnswerCallback={() => setRefreshSurvey((prev) => !prev)}
             isPublic={isPublic}
@@ -152,7 +166,8 @@ export default function SurveySubmissionsPage({ isPublic }: Props) {
             surveyQuestions={surveyQuestions}
             surveyId={Number(surveyId)}
           />
-        </>
+          <DataExport surveyId={survey.id} />
+        </Box>
       }
       sidePane={
         <AnswerMap
