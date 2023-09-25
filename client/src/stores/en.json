@@ -159,7 +159,8 @@
     "groupedCheckboxQuestion": "Grouped checkbox question",
     "imageSection": "Image section",
     "documentSection": "Document section",
-    "attachmentSection": "Attachment section"
+    "attachmentSection": "Attachment section",
+    "question": "Question"
   },
   "SurveySections": {
     "limitAnswers": "Limit the number of answers",
@@ -463,6 +464,14 @@
     "text": "If you want a copy of your answers, please write your email address in the provided field.",
     "email": "Email address (optional)"
   },
+  "AnswersList": {
+    "answers": "Answers",
+    "selectQuestion": "Select a question first",
+    "noAnswers": "Selected question has no answers.",
+    "answer": "Answer",
+    "hideOldResponses": "Hide old comments...",
+    "showOldResponses": "Display {x} older comments"
+  },
   "AppBarUserMenu": {
     "label": "User menu",
     "logout": "Logout",
@@ -511,6 +520,11 @@
     "optionInfo": "Option info",
     "emailInfo": "Email",
     "thanksPage": "Thank you -page"
+  },
+  "SurveySubmissionsPage": {
+    "attachments": "Attachments",
+    "noAttachments": "No attachments",
+    "showAll": "Display all answers"
   },
   "navigation": {
     "next": "Next",

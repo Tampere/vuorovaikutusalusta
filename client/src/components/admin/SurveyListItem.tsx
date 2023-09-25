@@ -65,7 +65,7 @@ export default function SurveyListItem(props: Props) {
       window.location.port ? `:${window.location.port}` : ''
     }/${survey.name}`;
   }, [survey.name]);
-  console.log(survey);
+
   return (
     <>
       <Card
@@ -182,6 +182,7 @@ export default function SurveyListItem(props: Props) {
             submissionCount={survey?.submissionCount ?? 0}
           />
         </CardActions>
+        <Link href={`/admin/vastaukset/${survey.id}`}>vastaukset</Link>
       </Card>
       <ConfirmDialog
         open={publishConfirmDialogOpen}

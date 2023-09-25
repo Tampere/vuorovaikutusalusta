@@ -60,15 +60,7 @@ declare module 'oskari-rpc' {
           centerTo: boolean;
           cursor?: string;
           prio?: number;
-          featureStyle?: {
-            stroke?: {
-              color: string;
-              width: number;
-            };
-            fill?: {
-              color: string;
-            };
-          };
+          featureStyle?: FeatureStyle;
         },
       ],
     ) => void;
@@ -114,7 +106,7 @@ declare module 'oskari-rpc' {
           offsetX: number;
           offsetY: number;
           size: number;
-        },
+        } & MarkerStyle,
         id: string,
       ],
     ) => void;
@@ -217,6 +209,31 @@ declare module 'oskari-rpc' {
      */
     actionParams: any;
   }) => void;
+
+  /**
+   * Style for a feature
+   */
+  export interface FeatureStyle {
+    stroke?: {
+      color: string;
+      width: number;
+      lineDash?: number[];
+      lineCap?: 'dashed' | 'butt' | 'round';
+    };
+    fill?: {
+      color: string;
+    };
+  }
+
+  /**
+   * Style for a marker
+   */
+  export interface MarkerStyle {
+    shape: string | number;
+    size: number;
+    color?: string;
+    msg?: string;
+  }
 
   /**
    * All Oskari events

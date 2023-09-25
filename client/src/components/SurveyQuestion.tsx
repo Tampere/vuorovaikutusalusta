@@ -1,6 +1,8 @@
 import type {
+  AnswerEntry,
   FileAnswer,
   MapQuestionAnswer,
+  Submission,
   SurveyQuestion as SurveyQuestionType,
 } from '@interfaces/survey';
 import { FormControl, FormHelperText, FormLabel } from '@mui/material';
@@ -25,9 +27,19 @@ interface Props {
   question: SurveyQuestionType;
   pageUnfinished: boolean;
   mobileDrawerOpen: boolean;
+  readOnly?: boolean;
+  value?: AnswerEntry['value'];
+  submission?: Submission;
 }
 
-function SurveyQuestion({ question, pageUnfinished, mobileDrawerOpen }: Props) {
+function SurveyQuestion({
+  question,
+  pageUnfinished,
+  mobileDrawerOpen,
+  readOnly = false,
+  submission,
+  ...props
+}: Props) {
   const { answers, updateAnswer, getValidationErrors, survey } =
     useSurveyAnswers();
   const { tr, surveyLanguage } = useTranslations();
@@ -37,8 +49,14 @@ function SurveyQuestion({ question, pageUnfinished, mobileDrawerOpen }: Props) {
   const infoDialogRef = useRef(null);
 
   const value = useMemo(
-    () => answers.find((answer) => answer.sectionId === question.id)?.value,
-    [answers, question],
+    () =>
+      typeof props.value !== 'undefined'
+        ? props.value
+        : // If submission is given via props, use them instead of context
+          (submission?.answerEntries ?? answers).find(
+            (answer) => answer.sectionId === question.id,
+          )?.value,
+    [answers, submission, question, props.value],
   );
 
   const validationErrors = useMemo(
@@ -48,6 +66,7 @@ function SurveyQuestion({ question, pageUnfinished, mobileDrawerOpen }: Props) {
 
   return (
     <FormControl
+      disabled={readOnly}
       component="fieldset"
       required={question.isRequired}
       aria-required={question.isRequired}

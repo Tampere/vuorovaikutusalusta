@@ -57,7 +57,7 @@ const stateDefaults: State = {
 };
 
 // Section types that won't have an answer (e.g. text sections)
-const nonQuestionSectionTypes: SurveyPageSection['type'][] = [
+export const nonQuestionSectionTypes: SurveyPageSection['type'][] = [
   'text',
   'image',
   'document',
@@ -143,6 +143,42 @@ export function getEmptyAnswer(section: SurveyPageSection): AnswerEntry {
         `No default value defined for questions of type "${section.type}"`,
       );
   }
+}
+
+/**
+ * Checks if given answervalue for a question is empty/unanswered
+ * @param question Question
+ * @param value Answer value
+ * @returns Is the answer empty?
+ */
+export function isAnswerEmpty(
+  question: SurveyQuestion,
+  value: AnswerEntry['value'],
+) {
+  // Matrix is considered incomplete, if the answer array doesn't contain as many answers (exluding nulls) as there are rows in the matrix
+  if (question.type === 'matrix') {
+    if (
+      (value as string[]).filter((answer) => answer).length !==
+      question.subjects?.length
+    ) {
+      return true;
+    }
+  }
+  // Sorting is considered incomplete, if the array contains any nullish values
+  if (question.type === 'sorting') {
+    if (!value || (value as number[]).some((value) => value == null)) {
+      return true;
+    }
+  }
+  // If value is an array, check the array length - otherwise check for its emptiness
+  else if (
+    Array.isArray(value)
+      ? !value.length
+      : value == null || !value.toString().length
+  ) {
+    return true;
+  }
+  return false;
 }
 
 /**
