@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "skipLibCheck": true,
-    "noEmit": true,
     "lib": ["dom", "es6"],
     "esModuleInterop": true,
     "jsx": "react",
