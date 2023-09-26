@@ -1,35 +1,14 @@
 import React from 'react';
-import { AppBar, Box, Toolbar, Typography } from '@mui/material';
+import { Box, Toolbar } from '@mui/material';
 import SurveyList from './SurveyList';
+import { AdminAppBar } from './AdminAppBar';
 import { useTranslations } from '@src/stores/TranslationContext';
-import AppBarUserMenu from './AppBarUserMenu';
-import LanguageMenu from '../LanguageMenu';
-import SurveyLanguageMenu from '../SurveyLanguageMenu';
-import { AdminInstructionButton } from './AdminInstructionButton';
 
 export default function AdminFrontPage() {
   const { tr } = useTranslations();
   return (
     <Box sx={{ display: 'flex' }}>
-      <AppBar position="fixed">
-        <Toolbar style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Typography variant="h6" noWrap component="div">
-            {tr.SurveyList.title}
-          </Typography>
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              justifySelf: 'flex-end',
-            }}
-          >
-            <SurveyLanguageMenu />
-            <LanguageMenu />
-            <AdminInstructionButton />
-            <AppBarUserMenu />
-          </div>
-        </Toolbar>
-      </AppBar>
+      <AdminAppBar labels={[tr.AnswersList.answers]} />
       <Box
         component="main"
         sx={{

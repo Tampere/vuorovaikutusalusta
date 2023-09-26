@@ -291,7 +291,10 @@
     "errorFetchingColors": "Värien haussa tapahtui virhe. Yritä myöhemmin uudelleen."
   },
   "SurveyList": {
-    "title": "Vuorovaikutusalusta - Kyselyt",
+    "title": {
+      "main": "Vuorovaikutusalusta",
+      "frontPage": "Kyselyt"
+    },
     "errorFetchingSurveys": "Virhe haettaessa kyselyitä. Yritä myöhemmin uudestaan.",
     "editSurvey": "Muokkaa kyselyä",
     "publishNow": "Julkaise nyt",

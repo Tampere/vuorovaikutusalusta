@@ -291,7 +291,10 @@
     "errorFetchingColors": "Error while accessing colors. Please try again later."
   },
   "SurveyList": {
-    "title": "Interaction platform - Surveys",
+    "title": {
+      "main": "Interaction platform",
+      "frontPage": "Surveys"
+    },
     "errorFetchingSurveys": "Error while accessing surveys. Please try again later.",
     "editSurvey": "Edit survey",
     "publishNow": "Publish now",

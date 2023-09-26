@@ -11,6 +11,7 @@ import AnswersList, { AnswerSelection } from './AnswersList';
 import SplitPaneLayout from './SplitPaneLayout';
 import DataExport from '../DataExport';
 import { Link as RouterLink } from 'react-router-dom';
+import { AdminAppBar } from '../AdminAppBar';
 
 interface Props {
   isPublic?: boolean;
@@ -137,67 +138,70 @@ export default function SurveySubmissionsPage({ isPublic }: Props) {
       <Typography variant="body1">{errorMessage}</Typography>
     </Box>
   ) : (
-    <SplitPaneLayout
-      defaultSize="30%"
-      mainPane={
-        <Box
-          sx={{
-            width: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 2,
-            justifyContent: 'center',
-          }}
-        >
-          <Button
-            component={RouterLink}
-            to="/admin"
-            sx={{ padding: 2, margin: 'auto' }}
+    <Box>
+      <AdminAppBar labels={[survey.name, tr.AnswersList.answers]} />
+      <SplitPaneLayout
+        defaultSize="30%"
+        mainPane={
+          <Box
+            sx={{
+              width: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 2,
+              justifyContent: 'center',
+            }}
           >
-            <Typography>{tr.SurveySubmissionsPage.toHomePage}</Typography>
-          </Button>
-          <AnswersList
-            modifyAnswerCallback={() => setRefreshSurvey((prev) => !prev)}
+            <Button
+              component={RouterLink}
+              to="/admin"
+              sx={{ padding: 2, margin: 'auto' }}
+            >
+              <Typography>{tr.SurveySubmissionsPage.toHomePage}</Typography>
+            </Button>
+            <AnswersList
+              modifyAnswerCallback={() => setRefreshSurvey((prev) => !prev)}
+              isPublic={isPublic}
+              submissions={submissions}
+              selectedQuestion={selectedQuestion}
+              selectedAnswer={selectedAnswer}
+              setSelectedAnswer={setSelectedAnswer}
+              surveyQuestions={surveyQuestions}
+              surveyId={Number(surveyId)}
+            />
+            <DataExport surveyId={survey.id} />
+          </Box>
+        }
+        sidePane={
+          <AnswerMap
             isPublic={isPublic}
+            survey={survey}
             submissions={submissions}
             selectedQuestion={selectedQuestion}
+            onAnswerClick={(answer) => {
+              setSelectedAnswer(answer);
+            }}
+            onSelectQuestion={(question) => {
+              setSelectedQuestion(question);
+            }}
             selectedAnswer={selectedAnswer}
-            setSelectedAnswer={setSelectedAnswer}
             surveyQuestions={surveyQuestions}
-            surveyId={Number(surveyId)}
           />
-          <DataExport surveyId={survey.id} />
-        </Box>
-      }
-      sidePane={
-        <AnswerMap
-          isPublic={isPublic}
-          survey={survey}
-          submissions={submissions}
-          selectedQuestion={selectedQuestion}
-          onAnswerClick={(answer) => {
-            setSelectedAnswer(answer);
-          }}
-          onSelectQuestion={(question) => {
-            setSelectedQuestion(question);
-          }}
-          selectedAnswer={selectedAnswer}
-          surveyQuestions={surveyQuestions}
-        />
-      }
-      mobileDrawer={{
-        open: mobileDrawerOpen,
-        setOpen: (open) => {
-          setMobileDrawerOpen(open);
-        },
-        chipProps: {
-          color: 'secondary',
-          icon: <Map />,
-          label: tr.SurveyStepper.openMap,
-        },
-        helperText: null,
-        title: null,
-      }}
-    />
+        }
+        mobileDrawer={{
+          open: mobileDrawerOpen,
+          setOpen: (open) => {
+            setMobileDrawerOpen(open);
+          },
+          chipProps: {
+            color: 'secondary',
+            icon: <Map />,
+            label: tr.SurveyStepper.openMap,
+          },
+          helperText: null,
+          title: null,
+        }}
+      />
+    </Box>
   );
 }
