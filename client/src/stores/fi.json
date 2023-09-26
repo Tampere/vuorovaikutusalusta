@@ -159,7 +159,8 @@
     "groupedCheckboxQuestion": "Ryhmitetty monivalintakysymys",
     "imageSection": "Kuvaosio",
     "documentSection": "Liiteosio",
-    "attachmentSection": "Vastausliite"
+    "attachmentSection": "Vastausliite",
+    "question": "Kysymys"
   },
   "SurveySections": {
     "limitAnswers": "Rajoita vastauslukumäärää",
@@ -312,7 +313,8 @@
     "notPublished": "Ei julkaistu",
     "showAuthoredOnly": "Näytä vain omat kyselyt",
     "showPublishedOnly": "Näytä vain avoinna olevat kyselyt",
-    "copySurvey": "Kopioi"
+    "copySurvey": "Kopioi",
+    "answers": "Vastaukset"
   },
   "SurveyPage": {
     "errorSurveyNotFound": "Kyselyä ei löytynyt, tai se ei ole avoinna. Tarkista osoite ja yritä uudestaan.",
@@ -463,6 +465,14 @@
     "text": "Jos haluat saada kopion vastauksestasi, anna sähköpostiosoitteesi oheiseen kenttään.",
     "email": "Sähköposti (valinnainen)"
   },
+  "AnswersList": {
+    "answers": "Vastaukset",
+    "selectQuestion": "Valitse kysymys ensin",
+    "noAnswers": "Valittuun kysymykseen ei ole vastauksia.",
+    "answer": "Vastaus",
+    "hideOldResponses": "Piilota vanhat kommentit...",
+    "showOldResponses": "Näytä {x} vanhempaa kommenttia..."
+  },
   "AppBarUserMenu": {
     "label": "Käyttäjävalikko",
     "logout": "Kirjaudu ulos",
@@ -511,6 +521,12 @@
     "optionInfo": "Vaihtoehdon lisätiedot",
     "emailInfo": "Sähköposti",
     "thanksPage": "Kiitos-sivu"
+  },
+  "SurveySubmissionsPage": {
+    "attachments": "Liitteet",
+    "noAttachments": "Ei liitteitä",
+    "showAll": "Näytä kaikki vastaukset",
+    "toHomePage": "Etusivulle"
   },
   "navigation": {
     "next": "Seuraava",

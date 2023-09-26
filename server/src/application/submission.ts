@@ -2,6 +2,7 @@ import {
   AnswerEntry,
   LanguageCode,
   MapQuestionAnswer,
+  Submission,
   SurveyMapSubQuestionAnswer,
   SurveyPageSection,
 } from '@interfaces/survey';
@@ -36,6 +37,12 @@ interface DBAnswerEntry {
   value_file: string;
   value_file_name: string;
   map_layers: number[];
+}
+
+interface DBSubmission {
+  id: number;
+  created_at: Date;
+  updated_at: Date;
 }
 
 /**
@@ -643,6 +650,15 @@ function dbAnswerEntriesToAnswerEntries(
           });
           break;
         }
+        case 'multi-matrix':
+          {
+            entries.push({
+              sectionId: row.section_id,
+              type: 'multi-matrix',
+              value: row.value_json as string[][],
+            });
+          }
+          break;
         case 'attachment': {
           entries.push({
             sectionId: row.section_id,
@@ -653,8 +669,12 @@ function dbAnswerEntriesToAnswerEntries(
           });
           break;
         }
-        default:
+        case 'text':
+        case 'image':
+        case 'document':
           break;
+        default:
+          assertNever(row.section_type);
       }
       return entries;
     }, [] as AnswerEntry[]);
@@ -779,4 +799,29 @@ export async function getTimestamp(submissionId: number) {
     [submissionId],
   );
   return updated_at;
+}
+
+/**
+ * Gets all finished submissions (with all answer entries) for a given survey ID
+ * @param surveyId Survey ID
+ * @returns Submissions
+ */
+export async function getSubmissionsForSurvey(surveyId: number) {
+  const rows = await getDb().manyOrNone<DBSubmission>(
+    `SELECT
+      s.id,
+      s.updated_at
+    FROM
+      data.submission s
+    WHERE survey_id = $(surveyId) AND unfinished_token IS NULL
+    ORDER BY updated_at ASC`,
+    { surveyId },
+  );
+  return Promise.all<Submission>(
+    rows.map(async (row) => ({
+      id: row.id,
+      timestamp: row.updated_at,
+      answerEntries: await getAnswerEntries(row.id),
+    })),
+  );
 }

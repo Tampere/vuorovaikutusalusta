@@ -60,7 +60,7 @@ export default function DataExport({ surveyId }: Props) {
         `/api/answers/${surveyId}/file-export/geopackage`,
         {
           method: 'POST',
-        }
+        },
       );
 
       if (!res.ok) {
@@ -93,7 +93,7 @@ export default function DataExport({ surveyId }: Props) {
   async function exportAttachments() {
     try {
       const files = (await request(
-        `/api/answers/${surveyId}/file-export/attachments`
+        `/api/answers/${surveyId}/file-export/attachments`,
       )) as FileAnswer[];
 
       const zip = new JSZip();
@@ -101,8 +101,8 @@ export default function DataExport({ surveyId }: Props) {
         zip.file(
           file.fileName,
           file.fileString.replace(allowedFilesRegex, ''),
-          { base64: true }
-        )
+          { base64: true },
+        ),
       );
       const blob = await zip.generateAsync({ type: 'blob' });
       saveAs(blob, 'vastaukset.zip');
@@ -114,7 +114,7 @@ export default function DataExport({ surveyId }: Props) {
   return (
     <>
       <Button
-        style={{ marginLeft: 'auto' }}
+        sx={{ margin: 'auto' }}
         variant="contained"
         onClick={() => setDisplayDialog((prev) => !prev)}
       >

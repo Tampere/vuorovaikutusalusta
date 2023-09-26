@@ -30,6 +30,12 @@ interface State {
   };
   answerGeometries: GeoJSON.FeatureCollection;
   modifying: boolean;
+  mapFeatureColorScheme: {
+    primaryColor: string;
+    primaryFillColor: string;
+    secondaryColor: string;
+    secondaryFillColor: string;
+  };
 }
 
 type Action =
@@ -88,6 +94,12 @@ const stateDefaults: State = {
     features: [],
   },
   modifying: false,
+  mapFeatureColorScheme: {
+    primaryColor: '#000000',
+    primaryFillColor: 'rgba(0,0,0,0.3)',
+    secondaryColor: '#3e37bf',
+    secondaryFillColor: 'rgba(62, 55, 191, 0.6)',
+  },
 };
 
 /**
@@ -216,7 +228,7 @@ export function useSurveyMap() {
                 feature.properties.question,
               ),
             },
-          ],
+          ] as any,
         );
       } else {
         state.rpcChannel.postRequest('MapModulePlugin.AddMarkerRequest', [
@@ -233,7 +245,13 @@ export function useSurveyMap() {
               ? 64
               : 12,
           },
-          `answer:${feature.properties.question.id}:${feature.properties.index}`,
+          `answer:${feature.properties.question.id}:${
+            feature.properties.index
+          }${
+            feature.properties.submissionId != null
+              ? `:${feature.properties.submissionId}`
+              : ''
+          }`,
         ]);
       }
     });

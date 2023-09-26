@@ -445,6 +445,10 @@ export interface Survey {
    * Should a link for the privacy statement be displayed
    */
   displayPrivacyStatement: boolean;
+  /**
+   * Number of submissions for the survey
+   */
+  submissionCount: number;
 }
 
 /**
@@ -680,6 +684,15 @@ export interface MapStrokeColor {
 export interface SurveyEmailInfoItem {
   name: LocalizedText;
   value: LocalizedText;
+}
+
+/**
+ * Submission
+ */
+export interface Submission {
+  id: number;
+  timestamp: Date;
+  answerEntries?: AnswerEntry[];
 }
 
 export type ImageType = 'backgroundImage' | 'thanksPageImage';
