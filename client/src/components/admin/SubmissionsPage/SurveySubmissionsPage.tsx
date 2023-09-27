@@ -1,7 +1,16 @@
 import { Submission, Survey, SurveyQuestion } from '@interfaces/survey';
-import { Box, Button, CircularProgress, Typography } from '@mui/material';
+import {
+  Autocomplete,
+  Box,
+  CircularProgress,
+  TextField,
+  Typography,
+} from '@mui/material';
 import { Map } from '@mui/icons-material';
-import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
+import {
+  nonQuestionSectionTypes,
+  useSurveyAnswers,
+} from '@src/stores/SurveyAnswerContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { request } from '@src/utils/request';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -10,14 +19,9 @@ import AnswerMap from './AnswerMap';
 import AnswersList, { AnswerSelection } from './AnswersList';
 import SplitPaneLayout from './SplitPaneLayout';
 import DataExport from '../DataExport';
-import { Link as RouterLink } from 'react-router-dom';
 import { AdminAppBar } from '../AdminAppBar';
 
-interface Props {
-  isPublic?: boolean;
-}
-
-export default function SurveySubmissionsPage({ isPublic }: Props) {
+export default function SurveySubmissionsPage() {
   const { name, surveyId } = useParams<{ name: string; surveyId: string }>();
   const [error, setError] = useState(null);
   const [submissions, setSubmissions] = useState<Submission[]>(null);
@@ -31,7 +35,7 @@ export default function SurveySubmissionsPage({ isPublic }: Props) {
     useState<SurveyQuestion>(null);
 
   const { survey, setSurvey } = useSurveyAnswers();
-  const { tr } = useTranslations();
+  const { tr, language } = useTranslations();
 
   const loading = useMemo(() => {
     return surveyLoading || submissionsLoading || responsesLoading;
@@ -72,9 +76,7 @@ export default function SurveySubmissionsPage({ isPublic }: Props) {
     }
     setSubmissionsLoading(true);
     async function fetchSubmissions() {
-      const submissionUrl = isPublic
-        ? `/api/surveys/${survey.id}/public-submissions`
-        : `/api/surveys/${survey.id}/submissions`;
+      const submissionUrl = `/api/surveys/${survey.id}/submissions`;
       try {
         const submissions = await request<Submission[]>(submissionUrl);
         setSubmissions(
@@ -108,11 +110,32 @@ export default function SurveySubmissionsPage({ isPublic }: Props) {
     fetchResponses();
   }, [survey]);
 
+  // TODO: Could surveyQuestions and questions be combined into a single variable?
   const surveyQuestions = useMemo(() => {
     if (!survey) return;
     return survey?.pages.reduce((prevValue, currentValue) => {
       return [...prevValue, ...currentValue.sections];
     }, []);
+  }, [survey]);
+
+  // All map type questions across the entire survey
+  const questions = useMemo(() => {
+    if (!survey) return;
+    return survey.pages.reduce(
+      (questions, page) => [
+        ...questions,
+        ...page.sections.filter(
+          (section): section is SurveyQuestion =>
+            !nonQuestionSectionTypes.includes(section.type),
+        ),
+      ],
+      [
+        {
+          id: 0,
+          title: { [language]: tr.SurveySubmissionsPage.summary },
+        },
+      ] as SurveyQuestion[],
+    );
   }, [survey]);
 
   return loading ? (
@@ -138,30 +161,43 @@ export default function SurveySubmissionsPage({ isPublic }: Props) {
       <Typography variant="body1">{errorMessage}</Typography>
     </Box>
   ) : (
-    <Box>
+    <>
       <AdminAppBar labels={[survey.name, tr.AnswersList.answers]} />
       <SplitPaneLayout
         defaultSize="30%"
         mainPane={
           <Box
             sx={{
+              marginTop: '100px',
               width: '100%',
               display: 'flex',
               flexDirection: 'column',
               gap: 2,
               justifyContent: 'center',
+              padding: '1rem',
             }}
           >
-            <Button
-              component={RouterLink}
-              to="/admin"
-              sx={{ padding: 2, margin: 'auto' }}
-            >
-              <Typography>{tr.SurveySubmissionsPage.toHomePage}</Typography>
-            </Button>
+            <Autocomplete
+              options={questions}
+              getOptionLabel={(question) => question.title[language]}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label={tr.SurveySection.question}
+                  style={{ backgroundColor: '#fff' }}
+                />
+              )}
+              value={selectedQuestion}
+              onChange={(_, value) => {
+                if (!value || typeof value === 'string') {
+                  // Ignore empty values and custom selections
+                  return;
+                }
+                setSelectedQuestion(value);
+              }}
+            />
             <AnswersList
               modifyAnswerCallback={() => setRefreshSurvey((prev) => !prev)}
-              isPublic={isPublic}
               submissions={submissions}
               selectedQuestion={selectedQuestion}
               selectedAnswer={selectedAnswer}
@@ -174,18 +210,16 @@ export default function SurveySubmissionsPage({ isPublic }: Props) {
         }
         sidePane={
           <AnswerMap
-            isPublic={isPublic}
             survey={survey}
             submissions={submissions}
             selectedQuestion={selectedQuestion}
             onAnswerClick={(answer) => {
               setSelectedAnswer(answer);
             }}
-            onSelectQuestion={(question) => {
-              setSelectedQuestion(question);
-            }}
+            onSelectQuestion={(question) => setSelectedQuestion(question)}
             selectedAnswer={selectedAnswer}
             surveyQuestions={surveyQuestions}
+            questions={questions}
           />
         }
         mobileDrawer={{
@@ -202,6 +236,6 @@ export default function SurveySubmissionsPage({ isPublic }: Props) {
           title: null,
         }}
       />
-    </Box>
+    </>
   );
 }

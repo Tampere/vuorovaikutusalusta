@@ -528,7 +528,7 @@
   "SurveySubmissionsPage": {
     "attachments": "Liitteet",
     "noAttachments": "Ei liitteitä",
-    "showAll": "Näytä kaikki vastaukset",
+    "summary": "Yhteenveto",
     "toHomePage": "Etusivulle"
   },
   "navigation": {

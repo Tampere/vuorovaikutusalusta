@@ -17,7 +17,6 @@ import React, { useMemo } from 'react';
 import SurveyQuestion from '@src/components/SurveyQuestion';
 
 interface Props {
-  isPublic: boolean;
   selectedQuestion: Question;
   selectedAnswer: AnswerSelection;
   setSelectedAnswer: (answer: AnswerSelection) => void;

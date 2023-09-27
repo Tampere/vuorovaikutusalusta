@@ -528,7 +528,7 @@
   "SurveySubmissionsPage": {
     "attachments": "Attachments",
     "noAttachments": "No attachments",
-    "showAll": "Display all answers",
+    "summary": "Summary",
     "toHomePage": "To home page"
   },
   "navigation": {
