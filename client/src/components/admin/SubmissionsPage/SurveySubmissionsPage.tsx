@@ -1,9 +1,11 @@
 import { Submission, Survey, SurveyQuestion } from '@interfaces/survey';
 import {
-  Autocomplete,
   Box,
   CircularProgress,
-  TextField,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
   Typography,
 } from '@mui/material';
 import { Map } from '@mui/icons-material';
@@ -20,6 +22,7 @@ import AnswersList, { AnswerSelection } from './AnswersList';
 import SplitPaneLayout from './SplitPaneLayout';
 import DataExport from '../DataExport';
 import { AdminAppBar } from '../AdminAppBar';
+import { SurveyQuestionSummary } from './SurveyQuestionSummary';
 
 export default function SurveySubmissionsPage() {
   const { name, surveyId } = useParams<{ name: string; surveyId: string }>();
@@ -177,35 +180,55 @@ export default function SurveySubmissionsPage() {
               padding: '1rem',
             }}
           >
-            <Autocomplete
-              options={questions}
-              getOptionLabel={(question) => question.title[language]}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label={tr.SurveySection.question}
-                  style={{ backgroundColor: '#fff' }}
-                />
-              )}
-              value={selectedQuestion}
-              onChange={(_, value) => {
-                if (!value || typeof value === 'string') {
-                  // Ignore empty values and custom selections
-                  return;
-                }
-                setSelectedQuestion(value);
-              }}
-            />
-            <AnswersList
-              modifyAnswerCallback={() => setRefreshSurvey((prev) => !prev)}
-              submissions={submissions}
-              selectedQuestion={selectedQuestion}
-              selectedAnswer={selectedAnswer}
-              setSelectedAnswer={setSelectedAnswer}
-              surveyQuestions={surveyQuestions}
-              surveyId={Number(surveyId)}
-            />
+            <FormControl size="medium" variant="filled" fullWidth>
+              <InputLabel id="select-label">
+                {tr.SurveySection.question}
+              </InputLabel>
+
+              <Select
+                sx={{ fontWeight: 400, fontSize: '24px' }}
+                value={selectedQuestion?.id ?? 0}
+                label={tr.SurveySection.question}
+                onChange={(event) => {
+                  if (!questions) return;
+                  setSelectedQuestion(
+                    questions.find(
+                      (question) => question.id === event.target.value,
+                    ),
+                  );
+                }}
+              >
+                {questions.map((question) => (
+                  <MenuItem key={question.id} value={question.id}>
+                    {question.title[language]}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            {submissions?.length && (
+              <Typography sx={{ fontWeight: 500, fontSize: '14px' }}>
+                {tr.SurveySubmissionsPage.answerCount.replace(
+                  '{x}',
+                  String(submissions.length),
+                )}
+              </Typography>
+            )}
             <DataExport surveyId={survey.id} />
+            {selectedQuestion?.id === 0 ? (
+              <SurveyQuestionSummary
+                setSelectedQuestion={setSelectedQuestion}
+              />
+            ) : (
+              <AnswersList
+                modifyAnswerCallback={() => setRefreshSurvey((prev) => !prev)}
+                submissions={submissions}
+                selectedQuestion={selectedQuestion}
+                selectedAnswer={selectedAnswer}
+                setSelectedAnswer={setSelectedAnswer}
+                surveyQuestions={surveyQuestions}
+                surveyId={Number(surveyId)}
+              />
+            )}
           </Box>
         }
         sidePane={

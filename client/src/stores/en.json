@@ -529,7 +529,9 @@
     "attachments": "Attachments",
     "noAttachments": "No attachments",
     "summary": "Summary",
-    "toHomePage": "To home page"
+    "toHomePage": "To home page",
+    "answerCount": "Total answer count: {x}",
+    "pageNumber": "Page {x}:"
   },
   "navigation": {
     "next": "Next",

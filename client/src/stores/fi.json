@@ -529,7 +529,9 @@
     "attachments": "Liitteet",
     "noAttachments": "Ei liitteitä",
     "summary": "Yhteenveto",
-    "toHomePage": "Etusivulle"
+    "toHomePage": "Etusivulle",
+    "answerCount": "Vastauksia yhteensä: {x} kpl",
+    "pageNumber": "Sivu {x}:"
   },
   "navigation": {
     "next": "Seuraava",

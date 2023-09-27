@@ -119,15 +119,6 @@ export default function AnswersList({
 
   return (
     <div>
-      <Typography variant="h4" style={{ margin: '1rem' }}>
-        {tr.AnswersList.answers}
-      </Typography>
-      {!selectedQuestion && (
-        <Typography>{tr.AnswersList.selectQuestion}</Typography>
-      )}
-      {selectedQuestion && !answers.length && (
-        <Typography>{tr.AnswersList.noAnswers}</Typography>
-      )}
       {selectedQuestion &&
         answers.length > 0 &&
         answers.map((answer, index) => (

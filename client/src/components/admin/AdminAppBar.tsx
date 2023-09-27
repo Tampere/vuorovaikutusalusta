@@ -50,7 +50,7 @@ export function AdminAppBar({
           {withHomeLink && (
             <ListItem>
               <Typography
-                variant="h6"
+                variant="subtitle1"
                 noWrap
                 component={NavLink}
                 to="/"
@@ -68,7 +68,7 @@ export function AdminAppBar({
           )}
           {labels.map((item, index) => (
             <ListItem key={`${item}-${index}`}>
-              <Typography noWrap variant="h6" component="p">
+              <Typography noWrap variant="subtitle1" component="p">
                 {item}
               </Typography>
             </ListItem>
