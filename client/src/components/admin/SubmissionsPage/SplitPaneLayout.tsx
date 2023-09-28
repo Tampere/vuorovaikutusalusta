@@ -40,7 +40,6 @@ export default function SplitPaneLayout({
   mainPane,
   sidePane,
   mobileDrawer,
-  defaultSize,
 }: Props) {
   const [isResizing, setIsResizing] = useState(false);
   const theme = useTheme();
@@ -71,6 +70,8 @@ export default function SplitPaneLayout({
           // Workaround: https://github.com/tomkp/react-split-pane/issues/241#issuecomment-677091968
           pane2Style={{ pointerEvents: isResizing ? 'none' : 'auto' }}
           allowResize={false}
+          onDragStarted={() => setIsResizing(true)}
+          onDragFinished={() => setIsResizing(false)}
         >
           {mainPane}
           {sidePane || <div />}
