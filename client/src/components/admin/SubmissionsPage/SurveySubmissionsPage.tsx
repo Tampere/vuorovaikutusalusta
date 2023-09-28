@@ -1,4 +1,9 @@
-import { Submission, Survey, SurveyQuestion } from '@interfaces/survey';
+import {
+  AnswerEntry,
+  Submission,
+  Survey,
+  SurveyQuestion,
+} from '@interfaces/survey';
 import {
   Box,
   CircularProgress,
@@ -10,6 +15,7 @@ import {
 } from '@mui/material';
 import { Map } from '@mui/icons-material';
 import {
+  isAnswerEmpty,
   nonQuestionSectionTypes,
   useSurveyAnswers,
 } from '@src/stores/SurveyAnswerContext';
@@ -18,11 +24,35 @@ import { request } from '@src/utils/request';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import AnswerMap from './AnswerMap';
-import AnswersList, { AnswerSelection } from './AnswersList';
+import AnswersList, { AnswerItem, AnswerSelection } from './AnswersList';
 import SplitPaneLayout from './SplitPaneLayout';
 import DataExport from '../DataExport';
 import { AdminAppBar } from '../AdminAppBar';
 import { SurveyQuestionSummary } from './SurveyQuestionSummary';
+
+function isMapEntry(
+  entry: AnswerEntry,
+): entry is AnswerEntry & { type: 'map' } {
+  return entry.type === 'map';
+}
+
+function answerEntryToItems(
+  submission: Submission,
+  entry: AnswerEntry,
+): AnswerItem[] {
+  if (!isMapEntry(entry)) {
+    return [{ submission, entry }];
+  }
+  return entry.value.map((value, index) => ({
+    submission,
+    entry: {
+      sectionId: entry.sectionId,
+      type: entry.type,
+      value: [value],
+      index,
+    },
+  }));
+}
 
 export default function SurveySubmissionsPage() {
   const { name, surveyId } = useParams<{ name: string; surveyId: string }>();
@@ -141,6 +171,37 @@ export default function SurveySubmissionsPage() {
     );
   }, [survey]);
 
+  /**
+   * All answers flattened from all submissions
+   */
+  const allAnswers = useMemo(() => {
+    return submissions?.reduce(
+      (answerEntries, submission) => [
+        ...answerEntries,
+        ...submission.answerEntries.reduce(
+          (items, entry) => [
+            ...items,
+            ...answerEntryToItems(submission, entry),
+          ],
+          [] as AnswerItem[],
+        ),
+      ],
+      [] as AnswerItem[],
+    );
+  }, [submissions]);
+  /**
+   * Currently visible answers
+   */
+  const answers = useMemo(() => {
+    return selectedQuestion?.id === 0 || !selectedQuestion
+      ? allAnswers
+      : allAnswers.filter(
+          (answer) =>
+            answer.entry.sectionId === selectedQuestion.id &&
+            !isAnswerEmpty(selectedQuestion, answer.entry.value),
+        );
+  }, [allAnswers, selectedQuestion]);
+
   return loading ? (
     <Box
       sx={{
@@ -167,11 +228,10 @@ export default function SurveySubmissionsPage() {
     <>
       <AdminAppBar labels={[survey.name, tr.AnswersList.answers]} />
       <SplitPaneLayout
-        defaultSize="30%"
         mainPane={
           <Box
             sx={{
-              marginTop: '100px',
+              marginTop: { xs: '10px', md: '70px' },
               width: '100%',
               display: 'flex',
               flexDirection: 'column',
@@ -205,29 +265,39 @@ export default function SurveySubmissionsPage() {
                 ))}
               </Select>
             </FormControl>
-            {submissions?.length && (
-              <Typography sx={{ fontWeight: 500, fontSize: '14px' }}>
-                {tr.SurveySubmissionsPage.answerCount.replace(
-                  '{x}',
-                  String(submissions.length),
-                )}
-              </Typography>
-            )}
-            <DataExport surveyId={survey.id} />
+
             {selectedQuestion?.id === 0 ? (
-              <SurveyQuestionSummary
-                setSelectedQuestion={setSelectedQuestion}
-              />
+              <>
+                <Typography sx={{ fontWeight: 500, fontSize: '14px' }}>
+                  {tr.SurveySubmissionsPage.answerCount.replace(
+                    '{x}',
+                    String(submissions?.length ?? 0),
+                  )}
+                </Typography>
+                <DataExport surveyId={survey.id} />
+                <SurveyQuestionSummary
+                  setSelectedQuestion={setSelectedQuestion}
+                />
+              </>
             ) : (
-              <AnswersList
-                modifyAnswerCallback={() => setRefreshSurvey((prev) => !prev)}
-                submissions={submissions}
-                selectedQuestion={selectedQuestion}
-                selectedAnswer={selectedAnswer}
-                setSelectedAnswer={setSelectedAnswer}
-                surveyQuestions={surveyQuestions}
-                surveyId={Number(surveyId)}
-              />
+              <>
+                <Typography sx={{ fontWeight: 500, fontSize: '14px' }}>
+                  {tr.SurveySubmissionsPage.answerCount.replace(
+                    '{x}',
+                    String(answers?.length ?? 0),
+                  )}
+                </Typography>
+                <AnswersList
+                  answers={answers}
+                  modifyAnswerCallback={() => setRefreshSurvey((prev) => !prev)}
+                  submissions={submissions}
+                  selectedQuestion={selectedQuestion}
+                  selectedAnswer={selectedAnswer}
+                  setSelectedAnswer={setSelectedAnswer}
+                  surveyQuestions={surveyQuestions}
+                  surveyId={Number(surveyId)}
+                />
+              </>
             )}
           </Box>
         }

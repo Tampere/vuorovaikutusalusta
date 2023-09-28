@@ -472,7 +472,8 @@
     "answers": "Vastaukset",
     "selectQuestion": "Valitse kysymys ensin",
     "noAnswers": "Valittuun kysymykseen ei ole vastauksia.",
-    "answer": "Vastaus",
+    "respondent": "Vastaaja {x}",
+    "mapMarkingIndex": "Karttamerkintä {x}",
     "hideOldResponses": "Piilota vanhat kommentit...",
     "showOldResponses": "Näytä {x} vanhempaa kommenttia..."
   },
@@ -531,6 +532,7 @@
     "summary": "Yhteenveto",
     "toHomePage": "Etusivulle",
     "answerCount": "Vastauksia yhteensä: {x} kpl",
+    "respondentCount": "Vastaajia yhteensä {x} kpl",
     "pageNumber": "Sivu {x}:"
   },
   "navigation": {

@@ -10,13 +10,15 @@ import {
   AccordionSummary,
   Typography,
 } from '@mui/material';
+import { KeyboardArrowDownSharp } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
-import { isAnswerEmpty } from '@src/stores/SurveyAnswerContext';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { useMemo } from 'react';
+import React from 'react';
 import SurveyQuestion from '@src/components/SurveyQuestion';
+import { format } from 'date-fns';
 
 interface Props {
+  answers: AnswerItem[];
   selectedQuestion: Question;
   selectedAnswer: AnswerSelection;
   setSelectedAnswer: (answer: AnswerSelection) => void;
@@ -32,33 +34,9 @@ export interface AnswerSelection {
   index: number;
 }
 
-interface AnswerItem {
+export interface AnswerItem {
   submission: Submission;
   entry: AnswerEntry & { index?: number };
-}
-
-function isMapEntry(
-  entry: AnswerEntry,
-): entry is AnswerEntry & { type: 'map' } {
-  return entry.type === 'map';
-}
-
-function answerEntryToItems(
-  submission: Submission,
-  entry: AnswerEntry,
-): AnswerItem[] {
-  if (!isMapEntry(entry)) {
-    return [{ submission, entry }];
-  }
-  return entry.value.map((value, index) => ({
-    submission,
-    entry: {
-      sectionId: entry.sectionId,
-      type: entry.type,
-      value: [value],
-      index,
-    },
-  }));
 }
 
 function isItemSelected(item: AnswerItem, selection: AnswerSelection) {
@@ -77,45 +55,15 @@ const useStyles = makeStyles({
 });
 
 export default function AnswersList({
+  answers,
   selectedQuestion,
   selectedAnswer,
   setSelectedAnswer,
-  submissions,
+
   surveyQuestions,
 }: Props) {
   const classes = useStyles();
   const { tr } = useTranslations();
-
-  /**
-   * All answers flattened from all submissions
-   */
-  const allAnswers = useMemo(() => {
-    return submissions.reduce(
-      (answerEntries, submission) => [
-        ...answerEntries,
-        ...submission.answerEntries.reduce(
-          (items, entry) => [
-            ...items,
-            ...answerEntryToItems(submission, entry),
-          ],
-          [] as AnswerItem[],
-        ),
-      ],
-      [] as AnswerItem[],
-    );
-  }, [submissions]);
-  /**
-   * Currently visible answers
-   */
-  const answers = useMemo(() => {
-    return selectedQuestion?.id === 0 || !selectedQuestion
-      ? allAnswers
-      : allAnswers.filter(
-          (answer) =>
-            answer.entry.sectionId === selectedQuestion.id &&
-            !isAnswerEmpty(selectedQuestion, answer.entry.value),
-        );
-  }, [allAnswers, selectedQuestion]);
 
   return (
     <div>
@@ -123,6 +71,10 @@ export default function AnswersList({
         answers.length > 0 &&
         answers.map((answer, index) => (
           <Accordion
+            sx={{
+              '&:last-child)': { borderBottom: 0 },
+            }}
+            elevation={0}
             key={index}
             expanded={isItemSelected(answer, selectedAnswer)}
             TransitionProps={{
@@ -141,12 +93,47 @@ export default function AnswersList({
               }
             }}
           >
-            <AccordionSummary classes={{ content: classes.answerHeading }}>
+            <AccordionSummary
+              sx={{
+                margin: 0,
+                padding: 0,
+                flexDirection: 'row-reverse',
+                '& .MuiAccordionSummary-expandIconWrapper.Mui-expanded': {
+                  transform: 'rotate(180deg)',
+                },
+                '& .MuiAccordionSummary-content': {
+                  margin: 0,
+                },
+              }}
+              expandIcon={<KeyboardArrowDownSharp />}
+              classes={{ content: classes.answerHeading }}
+            >
               <div style={{ flexGrow: 1 }}>
-                {tr.AnswersList.answer} {answer.submission.id}/
-                {answer.entry.sectionId}
-                {answer.entry.index != null ? `/${answer.entry.index}` : ''}
+                <Typography
+                  sx={{
+                    fontWeight: isItemSelected(answer, selectedAnswer)
+                      ? 700
+                      : 400,
+                  }}
+                >
+                  {tr.AnswersList.respondent.replace(
+                    '{x}',
+                    String(answer.submission.id),
+                  )}
+                  {answer.entry.index != null
+                    ? `, ${tr.AnswersList.mapMarkingIndex.replace(
+                        '{x}',
+                        String(answer.entry.index + 1),
+                      )}`.toLowerCase()
+                    : ''}
+                </Typography>
               </div>
+              {(index === 0 ||
+                answer.submission.id !== answers[index - 1].submission.id) && (
+                <Typography style={{ color: '#797979' }}>
+                  {format(answer.submission.timestamp, 'dd.MM.yyyy')}
+                </Typography>
+              )}
             </AccordionSummary>
             {isItemSelected(answer, selectedAnswer) && (
               <AccordionDetails>
