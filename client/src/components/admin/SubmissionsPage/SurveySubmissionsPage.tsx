@@ -29,6 +29,7 @@ import SplitPaneLayout from './SplitPaneLayout';
 import DataExport from '../DataExport';
 import { AdminAppBar } from '../AdminAppBar';
 import { SurveyQuestionSummary } from './SurveyQuestionSummary';
+import { DataChart } from './DataChart';
 
 function isMapEntry(
   entry: AnswerEntry,
@@ -274,6 +275,10 @@ export default function SurveySubmissionsPage() {
                     String(submissions?.length ?? 0),
                   )}
                 </Typography>
+                <DataChart
+                  submissions={submissions}
+                  submissionsLoading={submissionsLoading}
+                />
                 <DataExport surveyId={survey.id} />
                 <SurveyQuestionSummary
                   setSelectedQuestion={setSelectedQuestion}

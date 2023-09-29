@@ -533,7 +533,17 @@
     "toHomePage": "Etusivulle",
     "answerCount": "Vastauksia yhteensä: {x} kpl",
     "respondentCount": "Vastaajia yhteensä {x} kpl",
-    "pageNumber": "Sivu {x}:"
+    "pageNumber": "Sivu {x}:",
+    "dataChart": {
+      "tooltipTotal": "Kokonaisvastausmäärä",
+      "tooltipCurrent": "Vastausmäärä",
+      "xAxisLabel": { "byDay": "Vaustauspäivä", "byWeek": "Viikkonumero" },
+      "yAxisTotalLabel": "Vastausmäärä yhteensä",
+      "yAxisLabel": {
+        "byDay": "Päivittäinen vastausmäärä",
+        "byWeek": "Viikottainen vastausmäärä"
+      }
+    }
   },
   "navigation": {
     "next": "Seuraava",

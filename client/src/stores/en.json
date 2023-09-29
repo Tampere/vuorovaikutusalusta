@@ -533,7 +533,17 @@
     "toHomePage": "To home page",
     "answerCount": "Total answer count: {x}",
     "respondentCount": "Total respondents {x}",
-    "pageNumber": "Page {x}:"
+    "pageNumber": "Page {x}:",
+    "dataChart": {
+      "tooltipTotal": "Total answers",
+      "tooltipCurrent": "Answers",
+      "xAxisLabel": { "byDay": "Answer day", "byWeek": "Week number" },
+      "yAxisTotalLabel": "Total answers",
+      "yAxisLabel": {
+        "byDay": "Answers by day",
+        "byWeek": "Answers by week"
+      }
+    }
   },
   "navigation": {
     "next": "Next",
