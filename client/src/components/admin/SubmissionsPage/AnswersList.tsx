@@ -59,7 +59,6 @@ export default function AnswersList({
   selectedQuestion,
   selectedAnswer,
   setSelectedAnswer,
-
   surveyQuestions,
 }: Props) {
   const classes = useStyles();
@@ -73,7 +72,7 @@ export default function AnswersList({
           <Accordion
             sx={{
               borderTop: '1px solid rgba(0, 0, 0, 0.15)',
-              '&:first-child, &:last-child': { borderTop: 0 },
+              '&:first-of-type, &:last-child': { borderTop: 0 },
             }}
             elevation={0}
             key={index}

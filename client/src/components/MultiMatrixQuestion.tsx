@@ -29,6 +29,7 @@ interface Props {
   question: SurveyMultiMatrixQuestion;
   validationErrors: ('required' | 'answerLimits' | 'minValue' | 'maxValue')[];
   setBackdropOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  readOnly?: boolean;
 }
 
 interface ComponentState {
@@ -67,6 +68,7 @@ export default function MultiMatrixQuestion({
   validationErrors,
   setDirty,
   setBackdropOpen,
+  readOnly = false,
 }: Props) {
   const { tr, surveyLanguage } = useTranslations();
   const isMobileWidth = useMediaQuery('(max-width:430px)');
@@ -360,9 +362,12 @@ export default function MultiMatrixQuestion({
                               },
                             }}
                             disabled={
-                              value[subjectIndex].length ===
+                              readOnly ||
+                              (value[subjectIndex].length ===
                                 question.answerLimits?.max &&
-                              !value[subjectIndex].includes(String(classIndex))
+                                !value[subjectIndex].includes(
+                                  String(classIndex),
+                                ))
                             }
                             name={`question-${subjectIndex}`}
                             checked={value[subjectIndex].includes(
@@ -499,11 +504,12 @@ export default function MultiMatrixQuestion({
                               value={String(classIndex)}
                               aria-describedby={`SR-row-fill-status-${question.id}-${subjectIndex}`}
                               disabled={
-                                value[subjectIndex].length ===
+                                readOnly ||
+                                (value[subjectIndex].length ===
                                   question.answerLimits?.max &&
-                                !value[subjectIndex].includes(
-                                  String(classIndex),
-                                )
+                                  !value[subjectIndex].includes(
+                                    String(classIndex),
+                                  ))
                               }
                             >
                               <Checkbox
@@ -583,9 +589,10 @@ export default function MultiMatrixQuestion({
                       value={classIndex.toString()}
                       aria-describedby={`SR-row-fill-status-${question.id}-${subjectIndex}`}
                       disabled={
-                        value[subjectIndex].length ===
+                        readOnly ||
+                        (value[subjectIndex].length ===
                           question.answerLimits?.max &&
-                        !value[subjectIndex].includes(String(classIndex))
+                          !value[subjectIndex].includes(String(classIndex)))
                       }
                     >
                       <Checkbox
