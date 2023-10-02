@@ -538,12 +538,9 @@
       "tooltipWeekLabel": "Week {x}, Year",
       "tooltipTotal": "Total answers",
       "tooltipCurrent": "Answers",
-      "xAxisLabel": { "byDay": "Answer day", "byWeek": "Week number" },
+      "xAxisLabel": { "byDay": "Day", "byWeek": "Week" },
       "yAxisTotalLabel": "Total answers",
-      "yAxisLabel": {
-        "byDay": "Answers by day",
-        "byWeek": "Answers by week"
-      }
+      "yAxisLabel": "Answers"
     }
   },
   "navigation": {

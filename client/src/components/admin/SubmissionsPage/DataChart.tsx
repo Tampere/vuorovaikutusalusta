@@ -10,7 +10,7 @@ import {
   Tooltip,
 } from 'recharts';
 import React from 'react';
-import { format, getMonth, getWeek, getYear, parse } from 'date-fns';
+import { format, getWeek, getYear, parse } from 'date-fns';
 import { Box, Skeleton, useTheme } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
 
@@ -21,32 +21,10 @@ interface Props {
 
 const SCALE_THRESHOLD = 9;
 
-const mockData: any[] = [];
-for (let i = 0; i < 52; i++) {
-  const date = format(
-    new Date(new Date().valueOf() - ((20 - i) / 1000) * 1e12),
-    'dd.MM.yyyy',
-  );
-  const weekNum = getWeek(parse(date, 'dd.MM.yyyy', new Date()));
-  const year = getYear(parse(date, 'dd.MM.yyyy', new Date()));
-  const submissionCount = Math.floor(Math.random() * 24);
-  mockData.push({
-    date: date,
-    weekAndYear: `${weekNum}-${year}`,
-    submissionCount: submissionCount,
-    week: getWeek(parse(date, 'dd.MM.yyyy', new Date())),
-    month: getMonth(parse(date, 'dd.MM.yyyy', new Date())),
-    cumulativeCount:
-      i === 0
-        ? submissionCount
-        : mockData[i - 1].cumulativeCount + submissionCount,
-  });
-}
-
 function getDataByWeek(data: any[]) {
   return Object.values(
     data.reduce((dataByWeek, data) => {
-      const year = getYear(parse(data.date, 'dd.MM.yyyy', new Date()));
+      const year = getYear(parse(data.date, 'd.M.yyyy', new Date()));
       return {
         ...dataByWeek,
         [data.weekAndYear]: dataByWeek[data.weekAndYear]
@@ -80,7 +58,7 @@ export function DataChart({ submissions, submissionsLoading }: Props) {
     return <Skeleton variant="rectangular" height={'390'} />;
   }
 
-  let submissionsData = Object.entries(
+  const submissionsData = Object.entries(
     submissions?.reduce(
       (data, submission) => {
         const timestamp = format(submission.timestamp, 'dd.MM.yyyy');
@@ -104,7 +82,6 @@ export function DataChart({ submissions, submissionsLoading }: Props) {
         date: date,
         weekAndYear: `${weekNum}-${year}`,
         week: weekNum,
-        month: getMonth(parse(date, 'dd.MM.yyyy', new Date())),
         submissionCount: submissionIds.length,
       };
     })
@@ -122,7 +99,7 @@ export function DataChart({ submissions, submissionsLoading }: Props) {
       ],
       [],
     );
-  submissionsData = mockData;
+
   const displayByWeek = submissionsData.length > SCALE_THRESHOLD;
 
   return (
@@ -142,7 +119,14 @@ export function DataChart({ submissions, submissionsLoading }: Props) {
             displayByWeek ? getDataByWeek(submissionsData) : submissionsData
           }
         >
-          <XAxis dataKey={displayByWeek ? 'week' : 'date'}>
+          <XAxis
+            dataKey={displayByWeek ? 'week' : 'date'}
+            tickFormatter={(data) =>
+              displayByWeek
+                ? data
+                : format(parse(data, 'dd.MM.yyyy', new Date()), 'd.M')
+            }
+          >
             <Label
               value={
                 displayByWeek
@@ -156,11 +140,7 @@ export function DataChart({ submissions, submissionsLoading }: Props) {
           <YAxis yAxisId="left">
             <Label
               angle={-90}
-              value={
-                displayByWeek
-                  ? tr.SurveySubmissionsPage.dataChart.yAxisLabel.byWeek
-                  : tr.SurveySubmissionsPage.dataChart.yAxisLabel.byDay
-              }
+              value={tr.SurveySubmissionsPage.dataChart.yAxisLabel}
               position="insideLeft"
               style={{ textAnchor: 'middle' }}
             />
@@ -200,7 +180,8 @@ export function DataChart({ submissions, submissionsLoading }: Props) {
             type="monotone"
             dot={false}
             dataKey="cumulativeCount"
-            fill={theme.palette.success.main}
+            strokeWidth={2}
+            stroke={theme.palette.secondary.main}
           />
         </ComposedChart>
       </ResponsiveContainer>

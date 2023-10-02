@@ -539,14 +539,11 @@
       "tooltipTotal": "Kokonaisvastausmäärä",
       "tooltipCurrent": "Vastausmäärä",
       "xAxisLabel": {
-        "byDay": "Vastauspäivä",
-        "byWeek": "Viikkonumero"
+        "byDay": "Päivä",
+        "byWeek": "Viikko"
       },
-      "yAxisTotalLabel": "Vastausmäärä yhteensä",
-      "yAxisLabel": {
-        "byDay": "Päivittäinen vastausmäärä",
-        "byWeek": "Viikottainen vastausmäärä"
-      }
+      "yAxisTotalLabel": "Vastauskertymä",
+      "yAxisLabel": "Vastauksia"
     }
   },
   "navigation": {
