@@ -67,8 +67,17 @@ export function AdminAppBar({
             </ListItem>
           )}
           {labels.map((item, index) => (
-            <ListItem key={`${item}-${index}`}>
-              <Typography noWrap variant="subtitle1" component="p">
+            <ListItem
+              key={`${item}-${index}`}
+              sx={{ maxWidth: index === 0 ? '300px' : 'auto' }}
+            >
+              <Typography
+                noWrap
+                variant="subtitle1"
+                component="p"
+                sx={{ textOverflow: 'ellipsis' }}
+                title={item}
+              >
                 {item}
               </Typography>
             </ListItem>

@@ -535,9 +535,13 @@
     "respondentCount": "Vastaajia yhteensä {x} kpl",
     "pageNumber": "Sivu {x}:",
     "dataChart": {
+      "tooltipWeekLabel": "Viikko {x}, Vuosi",
       "tooltipTotal": "Kokonaisvastausmäärä",
       "tooltipCurrent": "Vastausmäärä",
-      "xAxisLabel": { "byDay": "Vaustauspäivä", "byWeek": "Viikkonumero" },
+      "xAxisLabel": {
+        "byDay": "Vastauspäivä",
+        "byWeek": "Viikkonumero"
+      },
       "yAxisTotalLabel": "Vastausmäärä yhteensä",
       "yAxisLabel": {
         "byDay": "Päivittäinen vastausmäärä",

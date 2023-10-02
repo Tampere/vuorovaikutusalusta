@@ -535,6 +535,7 @@
     "respondentCount": "Total respondents {x}",
     "pageNumber": "Page {x}:",
     "dataChart": {
+      "tooltipWeekLabel": "Week {x}, Year",
       "tooltipTotal": "Total answers",
       "tooltipCurrent": "Answers",
       "xAxisLabel": { "byDay": "Answer day", "byWeek": "Week number" },

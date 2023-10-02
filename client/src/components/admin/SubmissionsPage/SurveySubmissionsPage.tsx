@@ -69,7 +69,7 @@ export default function SurveySubmissionsPage() {
     useState<SurveyQuestion>(null);
 
   const { survey, setSurvey } = useSurveyAnswers();
-  const { tr, language } = useTranslations();
+  const { tr, language, surveyLanguage } = useTranslations();
 
   const loading = useMemo(() => {
     return surveyLoading || submissionsLoading || responsesLoading;
@@ -227,7 +227,9 @@ export default function SurveySubmissionsPage() {
     </Box>
   ) : (
     <>
-      <AdminAppBar labels={[survey.name, tr.AnswersList.answers]} />
+      <AdminAppBar
+        labels={[survey.title[surveyLanguage], tr.AnswersList.answers]}
+      />
       <SplitPaneLayout
         mainPane={
           <Box

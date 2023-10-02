@@ -10,7 +10,7 @@ import {
   Tooltip,
 } from 'recharts';
 import React from 'react';
-import { format, getMonth, getWeek, parse } from 'date-fns';
+import { format, getMonth, getWeek, getYear, parse } from 'date-fns';
 import { Box, Skeleton, useTheme } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
 
@@ -22,14 +22,17 @@ interface Props {
 const SCALE_THRESHOLD = 9;
 
 const mockData: any[] = [];
-for (let i = 0; i < 8; i++) {
+for (let i = 0; i < 52; i++) {
   const date = format(
-    new Date(new Date().valueOf() - ((10 - i) / 1000) * 1e12),
+    new Date(new Date().valueOf() - ((20 - i) / 1000) * 1e12),
     'dd.MM.yyyy',
   );
+  const weekNum = getWeek(parse(date, 'dd.MM.yyyy', new Date()));
+  const year = getYear(parse(date, 'dd.MM.yyyy', new Date()));
   const submissionCount = Math.floor(Math.random() * 24);
   mockData.push({
     date: date,
+    weekAndYear: `${weekNum}-${year}`,
     submissionCount: submissionCount,
     week: getWeek(parse(date, 'dd.MM.yyyy', new Date())),
     month: getMonth(parse(date, 'dd.MM.yyyy', new Date())),
@@ -43,12 +46,14 @@ for (let i = 0; i < 8; i++) {
 function getDataByWeek(data: any[]) {
   return Object.values(
     data.reduce((dataByWeek, data) => {
+      const year = getYear(parse(data.date, 'dd.MM.yyyy', new Date()));
       return {
         ...dataByWeek,
-        [data.week]: dataByWeek[data.week]
+        [data.weekAndYear]: dataByWeek[data.weekAndYear]
           ? {
-              ...dataByWeek[data.week],
+              ...dataByWeek[data.weekAndYear],
               week: data.week,
+              year: year,
               submissionCount:
                 dataByWeek[data.week].submissionCount + data.submissionCount,
               cumulativeCount: Math.max(
@@ -58,6 +63,7 @@ function getDataByWeek(data: any[]) {
             }
           : {
               week: data.week,
+              year: year,
               submissionCount: data.submissionCount,
               cumulativeCount: data.cumulativeCount,
             },
@@ -74,7 +80,7 @@ export function DataChart({ submissions, submissionsLoading }: Props) {
     return <Skeleton variant="rectangular" height={'390'} />;
   }
 
-  const submissionsData = Object.entries(
+  let submissionsData = Object.entries(
     submissions?.reduce(
       (data, submission) => {
         const timestamp = format(submission.timestamp, 'dd.MM.yyyy');
@@ -89,12 +95,19 @@ export function DataChart({ submissions, submissionsLoading }: Props) {
       {} as Record<string, number[]>,
     ),
   )
-    .map(([date, submissionIds]) => ({
-      date: date,
-      week: getWeek(parse(date, 'dd.MM.yyyy', new Date())),
-      month: getMonth(parse(date, 'dd.MM.yyyy', new Date())),
-      submissionCount: submissionIds.length,
-    }))
+    .map(([date, submissionIds]) => {
+      const weekNum = getWeek(
+        parse(date, 'dd.MM.yyyy', new Date(), { weekStartsOn: 1 }),
+      );
+      const year = getYear(parse(date, 'dd.MM.yyyy', new Date()));
+      return {
+        date: date,
+        weekAndYear: `${weekNum}-${year}`,
+        week: weekNum,
+        month: getMonth(parse(date, 'dd.MM.yyyy', new Date())),
+        submissionCount: submissionIds.length,
+      };
+    })
 
     .reduce(
       (prev, current, index) => [
@@ -109,14 +122,13 @@ export function DataChart({ submissions, submissionsLoading }: Props) {
       ],
       [],
     );
-
+  submissionsData = mockData;
   const displayByWeek = submissionsData.length > SCALE_THRESHOLD;
 
   return (
     <Box
       style={{
         height: '390px',
-        border: '1px solid #FF6B6B',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
@@ -130,10 +142,7 @@ export function DataChart({ submissions, submissionsLoading }: Props) {
             displayByWeek ? getDataByWeek(submissionsData) : submissionsData
           }
         >
-          <XAxis
-            dataKey={displayByWeek ? 'week' : 'date'}
-            //tickFormatter={(val) => val.slice(0, -5)}
-          >
+          <XAxis dataKey={displayByWeek ? 'week' : 'date'}>
             <Label
               value={
                 displayByWeek
@@ -143,6 +152,7 @@ export function DataChart({ submissions, submissionsLoading }: Props) {
               position="bottom"
             />
           </XAxis>
+
           <YAxis yAxisId="left">
             <Label
               angle={-90}
@@ -158,7 +168,7 @@ export function DataChart({ submissions, submissionsLoading }: Props) {
           <YAxis yAxisId="right" orientation="right">
             <Label
               fontStyle="bold"
-              angle={-90}
+              angle={90}
               value={tr.SurveySubmissionsPage.dataChart.yAxisTotalLabel}
               position="insideRight"
               style={{ textAnchor: 'middle' }}
@@ -171,6 +181,14 @@ export function DataChart({ submissions, submissionsLoading }: Props) {
                 ? tr.SurveySubmissionsPage.dataChart.tooltipCurrent
                 : tr.SurveySubmissionsPage.dataChart.tooltipTotal,
             ]}
+            labelFormatter={(label, data) =>
+              displayByWeek
+                ? `${tr.SurveySubmissionsPage.dataChart.tooltipWeekLabel.replace(
+                    '{x}',
+                    label,
+                  )} ${data[0]?.payload.year}`
+                : label
+            }
           />
           <Bar
             yAxisId="left"

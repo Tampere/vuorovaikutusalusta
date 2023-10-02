@@ -72,7 +72,8 @@ export default function AnswersList({
         answers.map((answer, index) => (
           <Accordion
             sx={{
-              '&:last-child)': { borderBottom: 0 },
+              borderTop: '1px solid rgba(0, 0, 0, 0.15)',
+              '&:first-child, &:last-child': { borderTop: 0 },
             }}
             elevation={0}
             key={index}
@@ -136,7 +137,7 @@ export default function AnswersList({
               )}
             </AccordionSummary>
             {isItemSelected(answer, selectedAnswer) && (
-              <AccordionDetails>
+              <AccordionDetails sx={{ borderTop: 0 }}>
                 {answer.entry.type === 'map' ? (
                   <>
                     {(answer.entry as AnswerEntry & { type: 'map' }).value.map(

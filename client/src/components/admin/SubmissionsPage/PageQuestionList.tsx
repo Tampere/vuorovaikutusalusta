@@ -55,7 +55,7 @@ function getQuestionIcon(
 }
 
 export function PageQuestionList({ questions, handleClick }: Props) {
-  const { language } = useTranslations();
+  const { surveyLanguage } = useTranslations();
 
   return (
     <>
@@ -66,7 +66,7 @@ export function PageQuestionList({ questions, handleClick }: Props) {
               <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Box sx={{ display: 'flex', gap: 1 }}>
                   {getQuestionIcon(question.type)}
-                  <Typography>{question.title[language]}</Typography>
+                  <Typography>{question.title[surveyLanguage]}</Typography>
                 </Box>
 
                 <ArrowForwardIosSharp sx={{ color: '#41BBFF' }} />
