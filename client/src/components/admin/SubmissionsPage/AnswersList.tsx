@@ -11,7 +11,6 @@ import {
   Typography,
 } from '@mui/material';
 import { KeyboardArrowDownSharp } from '@mui/icons-material';
-import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React from 'react';
 import SurveyQuestion from '@src/components/SurveyQuestion';
@@ -48,12 +47,6 @@ function isItemSelected(item: AnswerItem, selection: AnswerSelection) {
   );
 }
 
-const useStyles = makeStyles({
-  answerHeading: {
-    alignItems: 'center',
-  },
-});
-
 export default function AnswersList({
   answers,
   selectedQuestion,
@@ -61,7 +54,6 @@ export default function AnswersList({
   setSelectedAnswer,
   surveyQuestions,
 }: Props) {
-  const classes = useStyles();
   const { tr } = useTranslations();
 
   return (
@@ -106,7 +98,6 @@ export default function AnswersList({
                 },
               }}
               expandIcon={<KeyboardArrowDownSharp />}
-              classes={{ content: classes.answerHeading }}
             >
               <div style={{ flexGrow: 1 }}>
                 <Typography

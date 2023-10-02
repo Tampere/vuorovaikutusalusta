@@ -164,6 +164,10 @@ export function isAnswerEmpty(
       return true;
     }
   }
+  // Multi matrix question is unanswered if every row is empty
+  if (question.type === 'multi-matrix') {
+    return (value as string[][]).every((row) => row.length === 0);
+  }
   // Sorting is considered incomplete, if the array contains any nullish values
   if (question.type === 'sorting') {
     if (!value || (value as number[]).some((value) => value == null)) {
