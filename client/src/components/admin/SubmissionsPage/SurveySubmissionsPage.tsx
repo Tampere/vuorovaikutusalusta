@@ -69,7 +69,7 @@ export default function SurveySubmissionsPage() {
     useState<SurveyQuestion>(null);
 
   const { survey, setSurvey } = useSurveyAnswers();
-  const { tr, language, surveyLanguage } = useTranslations();
+  const { tr, surveyLanguage } = useTranslations();
 
   const loading = useMemo(() => {
     return surveyLoading || submissionsLoading || responsesLoading;
@@ -166,7 +166,7 @@ export default function SurveySubmissionsPage() {
       [
         {
           id: 0,
-          title: { [language]: tr.SurveySubmissionsPage.summary },
+          title: { [surveyLanguage]: tr.SurveySubmissionsPage.summary },
         },
       ] as SurveyQuestion[],
     );
@@ -263,7 +263,7 @@ export default function SurveySubmissionsPage() {
               >
                 {questions.map((question) => (
                   <MenuItem key={question.id} value={question.id}>
-                    {question.title[language]}
+                    {question.title[surveyLanguage]}
                   </MenuItem>
                 ))}
               </Select>

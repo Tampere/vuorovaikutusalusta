@@ -14,7 +14,7 @@ interface Props {
 
 export function SurveyQuestionSummary({ setSelectedQuestion }: Props) {
   const { survey } = useSurveyAnswers();
-  const { tr, language } = useTranslations();
+  const { tr, surveyLanguage } = useTranslations();
 
   return (
     <>
@@ -25,7 +25,7 @@ export function SurveyQuestionSummary({ setSelectedQuestion }: Props) {
               '{x}',
               String(index + 1),
             )}{' '}
-            {page.title[language]}
+            {page.title[surveyLanguage]}
           </Typography>
           <PageQuestionList
             handleClick={(question: SurveyQuestion) =>
