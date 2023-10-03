@@ -64,7 +64,11 @@ export default function SplitPaneLayout({
           minSize={200}
           maxSize={-200}
           // Allow scrolling for the stepper pane
-          pane1Style={{ overflowY: 'auto', width: '600px' }}
+          pane1Style={{
+            overflowY: 'auto',
+            width: '600px',
+            borderRight: '1px solid #00000033',
+          }}
           // Dirty hack to fix iframe resizing issues with the split pane library
           // Issue: https://github.com/tomkp/react-split-pane/issues/361
           // Workaround: https://github.com/tomkp/react-split-pane/issues/241#issuecomment-677091968

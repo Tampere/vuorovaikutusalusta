@@ -59,10 +59,23 @@ export function PageQuestionList({ questions, handleClick }: Props) {
 
   return (
     <>
-      <List>
+      <List sx={{ margin: '0 -1rem' }}>
         {questions.map((question) => (
-          <ListItem key={question.id} sx={{ padding: '4px 6px' }}>
-            <CardActionArea onClick={() => handleClick(question)}>
+          <ListItem
+            key={question.id}
+            sx={{
+              padding: 0,
+            }}
+          >
+            <CardActionArea
+              onClick={() => handleClick(question)}
+              sx={{
+                '&.MuiButtonBase-root': {
+                  padding: '4px 1rem',
+                  '&:hover': { backgroundColor: '#41BBFF33' },
+                },
+              }}
+            >
               <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Box sx={{ display: 'flex', gap: 1 }}>
                   {getQuestionIcon(question.type)}

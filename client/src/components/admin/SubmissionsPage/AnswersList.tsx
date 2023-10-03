@@ -57,7 +57,7 @@ export default function AnswersList({
   const { tr } = useTranslations();
 
   return (
-    <div>
+    <div style={{ margin: '0 -1rem' }}>
       {selectedQuestion &&
         answers.length > 0 &&
         answers.map((answer, index) => (
@@ -87,12 +87,14 @@ export default function AnswersList({
           >
             <AccordionSummary
               sx={{
-                margin: 0,
-                padding: 0,
                 flexDirection: 'row-reverse',
                 '& .MuiAccordionSummary-expandIconWrapper.Mui-expanded': {
                   transform: 'rotate(180deg)',
                 },
+                '&.MuiButtonBase-root': {
+                  '&:hover': { backgroundColor: '#41BBFF33' },
+                },
+
                 '& .MuiAccordionSummary-content': {
                   margin: 0,
                 },
@@ -127,7 +129,9 @@ export default function AnswersList({
               )}
             </AccordionSummary>
             {isItemSelected(answer, selectedAnswer) && (
-              <AccordionDetails sx={{ borderTop: 0 }}>
+              <AccordionDetails
+                sx={{ borderTop: 0, padding: '0 2rem 1rem 2rem' }}
+              >
                 {answer.entry.type === 'map' ? (
                   <>
                     {(answer.entry as AnswerEntry & { type: 'map' }).value.map(
