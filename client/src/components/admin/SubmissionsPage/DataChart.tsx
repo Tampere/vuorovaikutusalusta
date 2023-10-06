@@ -14,6 +14,23 @@ import { format, getWeek, getYear, parse } from 'date-fns';
 import { Box, Skeleton, useTheme } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
 
+interface SubmissionData {
+  date: string;
+  weekAndYear: string;
+  week: number;
+  submissionCount: number;
+  cumulativeCount: number;
+}
+
+interface SubmissionDataByWeek {
+  [key: string]: {
+    week: number;
+    year: number;
+    submissionCount: number;
+    cumulativeCount: number;
+  };
+}
+
 interface Props {
   submissions: Submission[];
   submissionsLoading: boolean;
@@ -21,7 +38,7 @@ interface Props {
 
 const SCALE_THRESHOLD = 9;
 
-function getDataByWeek(data: any[]) {
+function getDataByWeek(data: SubmissionData[]) {
   return Object.values(
     data.reduce((dataByWeek, data) => {
       const year = getYear(parse(data.date, 'd.M.yyyy', new Date()));
@@ -46,7 +63,7 @@ function getDataByWeek(data: any[]) {
               cumulativeCount: data.cumulativeCount,
             },
       };
-    }, {}),
+    }, {} as SubmissionDataByWeek),
   ).map((val) => val);
 }
 
