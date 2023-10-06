@@ -36,7 +36,7 @@ export default function DataExport({ surveyId }: Props) {
   async function exportCSV() {
     try {
       const res = await fetch(`/api/answers/${surveyId}/file-export/csv`, {
-        method: 'POST',
+        method: 'GET',
       });
 
       const csvText = await res.text();
@@ -59,7 +59,7 @@ export default function DataExport({ surveyId }: Props) {
       const res = await fetch(
         `/api/answers/${surveyId}/file-export/geopackage`,
         {
-          method: 'POST',
+          method: 'GET',
         },
       );
 

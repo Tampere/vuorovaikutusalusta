@@ -150,7 +150,7 @@ export default function OskariMap({
    * Update features and markers onto the map
    */
   useEffect(() => {
-    if (!isMapReady) {
+    if (!isMapReady || !features) {
       return;
     }
 
@@ -161,7 +161,7 @@ export default function OskariMap({
    * Update visible layers onto the map
    */
   useEffect(() => {
-    if (!isMapReady) {
+    if (!isMapReady || !layers) {
       return;
     }
     setVisibleLayers(layers);

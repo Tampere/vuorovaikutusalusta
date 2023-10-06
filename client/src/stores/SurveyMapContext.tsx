@@ -36,6 +36,7 @@ interface State {
     secondaryColor: string;
     secondaryFillColor: string;
   };
+  defaultView: GeoJSON.FeatureCollection;
 }
 
 type Action =
@@ -77,12 +78,16 @@ type Action =
   | {
       type: 'SET_MODIFYING';
       value: boolean;
+    }
+  | {
+      type: 'SET_DEFAULT_VIEW';
+      value: GeoJSON.FeatureCollection;
     };
 
 type Context = [State, React.Dispatch<Action>];
 
 const stateDefaults: State = {
-  visibleLayers: [],
+  visibleLayers: null,
   allLayers: [],
   rpcChannel: null,
   helperText: null,
@@ -100,6 +105,7 @@ const stateDefaults: State = {
     secondaryColor: '#3e37bf',
     secondaryFillColor: 'rgba(62, 55, 191, 0.6)',
   },
+  defaultView: null,
 };
 
 /**
@@ -173,6 +179,75 @@ function getDrawingEventId(
   selectionType?: MapQuestionSelectionType,
 ) {
   return `map-answer:${questionId}${selectionType ? `:${selectionType}` : ''}`;
+}
+
+export function useAdminMap() {
+  const context = useContext(SurveyMapContext);
+
+  if (!context) {
+    throw new Error('useSurveyMap must be used within the SurveyMapProvider');
+  }
+
+  const [state, dispatch] = context;
+
+  const isMapReady = useMemo(
+    () => Boolean(state.rpcChannel),
+    [state.rpcChannel],
+  );
+
+  function startDrawingRequest() {
+    state.rpcChannel.postRequest('DrawTools.StartDrawingRequest', [
+      'DefaultViewSelection',
+      'Square',
+      { allowMultipleDrawing: 'single' },
+    ]);
+
+    const drawingHandler: DrawingEventHandler = (event) => {
+      if (event.id === 'DefaultViewSelection' && event.isFinished) {
+        console.log(event.geojson);
+        dispatch({
+          type: 'SET_DEFAULT_VIEW',
+          value: event.geojson,
+        });
+      }
+    };
+    state.rpcChannel.handleEvent('DrawingEvent', drawingHandler);
+  }
+  function drawDefaultView() {
+    if (!state.defaultView) return;
+    console.log('drawing default view: ', state.defaultView);
+    state.rpcChannel.postRequest('MapModulePlugin.AddFeaturesToMapRequest', [
+      state.defaultView,
+      {
+        centerTo: true,
+        clearPrevious: true,
+      },
+    ] as any);
+  }
+
+  return {
+    ...state,
+    isMapReady,
+    startDrawingRequest,
+    drawDefaultView,
+    /**
+     * Set RPC channel for controlling the map
+     * @param rpcChannel
+     */
+    setRpcChannel(rpcChannel: Channel) {
+      dispatch({ type: 'SET_RPC_CHANNEL', rpcChannel });
+    },
+    setDefaultView(viewGeometry: GeoJSON.FeatureCollection) {
+      dispatch({ type: 'SET_DEFAULT_VIEW', value: viewGeometry });
+    },
+    zoomToDefaultView() {
+      if (!state.rpcChannel) return;
+      state.rpcChannel.postRequest('MapModulePlugin.ZoomToFeaturesRequest', [
+        null,
+        { id: ['drawFeature0'] },
+      ]);
+    },
+  };
 }
 
 /**
@@ -634,6 +709,11 @@ function reducer(state: State, action: Action): State {
         ...state,
         modifying: action.value,
       };
+    case 'SET_DEFAULT_VIEW':
+      return {
+        ...state,
+        defaultView: action.value,
+      };
     default:
       throw new Error('Invalid action type');
   }
@@ -661,6 +741,7 @@ export default function SurveyMapProvider({
     if (!state.rpcChannel) {
       return;
     }
+
     state.rpcChannel.getAllLayers((allLayers) => {
       const layers = allLayers.map((layer) => layer.id);
       dispatch({ type: 'SET_ALL_LAYERS', layers });
@@ -683,7 +764,7 @@ export default function SurveyMapProvider({
       // Update visibility for each layer - only show it if current page has that layer visible
       state.rpcChannel.postRequest(
         'MapModulePlugin.MapLayerVisibilityRequest',
-        [layerId, state.visibleLayers.includes(layerId)],
+        [layerId, state.visibleLayers?.includes?.(layerId) ?? false],
       );
     });
   }, [state.rpcChannel, state.allLayers, state.visibleLayers]);
