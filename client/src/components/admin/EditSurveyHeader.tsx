@@ -19,7 +19,7 @@ export default function EditSurveyHeader(props: Props) {
         width: { md: `calc(100% - ${props.sideBarWidth}px)` },
         ml: { md: `${props.sideBarWidth}px` },
       }}
-      labels={[originalActiveSurvey.title[surveyLanguage]]}
+      labels={[originalActiveSurvey?.title?.[surveyLanguage] ?? '']}
       withHomeLink={false}
     />
   );
