@@ -8,7 +8,7 @@ export default function AdminFrontPage() {
   const { tr } = useTranslations();
   return (
     <Box sx={{ display: 'flex' }}>
-      <AdminAppBar labels={[tr.AnswersList.answers]} />
+      <AdminAppBar labels={[tr.SurveyList.title.frontPage]} />
       <Box
         component="main"
         sx={{
