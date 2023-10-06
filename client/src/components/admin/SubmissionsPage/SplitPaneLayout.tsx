@@ -11,17 +11,8 @@ import {
   useTheme,
 } from '@mui/material';
 import { Close } from '@mui/icons-material';
-import { makeStyles } from '@mui/styles';
 import React, { ReactNode, useState } from 'react';
 import SplitPane from 'react-split-pane';
-
-const useStyles = makeStyles({
-  root: {
-    width: '100%',
-    height: '100vh',
-    display: 'flex',
-  },
-});
 
 interface Props {
   mainPane: ReactNode;
@@ -44,10 +35,15 @@ export default function SplitPaneLayout({
   const [isResizing, setIsResizing] = useState(false);
   const theme = useTheme();
   const mdUp = useMediaQuery(theme.breakpoints.up('md'));
-  const classes = useStyles();
 
   return (
-    <div className={classes.root}>
+    <Box
+      sx={{
+        width: '100%',
+        height: '100vh',
+        display: 'flex',
+      }}
+    >
       {/* Side pane doesn't exist on any page - show the page in 1 column */}
       {sidePane == null && (
         <div
@@ -165,6 +161,6 @@ export default function SplitPaneLayout({
           <div style={{ marginTop: 50, width: '100%' }}>{mainPane}</div>
         </Box>
       )}
-    </div>
+    </Box>
   );
 }

@@ -234,7 +234,6 @@ export default function SurveySubmissionsPage() {
         mainPane={
           <Box
             sx={{
-              marginTop: { xs: '10px', md: '70px' },
               width: '100%',
               display: 'flex',
               flexDirection: 'column',
