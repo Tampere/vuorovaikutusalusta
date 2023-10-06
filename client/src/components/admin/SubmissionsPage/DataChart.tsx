@@ -141,7 +141,7 @@ export function DataChart({ submissions, submissionsLoading }: Props) {
             tickFormatter={(data) =>
               displayByWeek
                 ? data
-                : format(parse(data, 'dd.MM.yyyy', new Date()), 'd.M')
+                : format(parse(data, 'dd.MM.yyyy', new Date()), 'd.M.')
             }
           >
             <Label
