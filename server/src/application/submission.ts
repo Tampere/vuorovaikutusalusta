@@ -782,10 +782,8 @@ export async function getAnswerEntries(submissionId: number) {
   `,
     [submissionId],
   );
-  if (!rows.length) {
-    throw new Error(`Submission with ID ${submissionId} not found`);
-  }
-  return dbAnswerEntriesToAnswerEntries(rows);
+
+  return rows.length ? dbAnswerEntriesToAnswerEntries(rows) : [];
 }
 
 /**
