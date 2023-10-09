@@ -107,7 +107,6 @@ function SurveyQuestion({
           display: 'flex',
           alignItems: 'center',
           color: survey.sectionTitleColor ?? '#000000',
-          opacity: 0.87,
         }}
       >
         <h3>
