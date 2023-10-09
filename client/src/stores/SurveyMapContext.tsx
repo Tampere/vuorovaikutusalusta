@@ -113,6 +113,9 @@ const stateDefaults: State = {
  */
 export const SurveyMapContext = createContext<Context>(null);
 
+// Default view layer id
+const defaultViewLayer = 'defaultView';
+
 // Layer ID for answer geometries
 const answerGeometryLayer = 'answers';
 
@@ -183,6 +186,10 @@ function getDrawingEventId(
 
 export function useAdminMap() {
   const context = useContext(SurveyMapContext);
+  const featureStyle = {
+    fill: { color: '#00000000' },
+    stroke: { lineDash: 10 },
+  };
 
   if (!context) {
     throw new Error('useSurveyMap must be used within the SurveyMapProvider');
@@ -199,18 +206,29 @@ export function useAdminMap() {
     state.rpcChannel.postRequest('DrawTools.StartDrawingRequest', [
       'DefaultViewSelection',
       'Square',
-      { allowMultipleDrawing: 'single' },
+      {
+        allowMultipleDrawing: 'single',
+        style: {
+          draw: { fill: { color: '#00000000' } },
+          modify: { fill: { color: '#00000000' } },
+        },
+      },
     ]);
 
     const drawingHandler: DrawingEventHandler = (event) => {
       if (event.id === 'DefaultViewSelection' && event.isFinished) {
         console.log(event.geojson);
+        state.rpcChannel.postRequest(
+          'MapModulePlugin.RemoveFeaturesFromMapRequest',
+          [null, null, defaultViewLayer],
+        );
         dispatch({
           type: 'SET_DEFAULT_VIEW',
           value: event.geojson,
         });
       }
     };
+
     state.rpcChannel.handleEvent('DrawingEvent', drawingHandler);
   }
   function drawDefaultView() {
@@ -221,6 +239,8 @@ export function useAdminMap() {
       {
         centerTo: true,
         clearPrevious: true,
+        layerId: defaultViewLayer,
+        featureStyle: featureStyle,
       },
     ] as any);
   }
@@ -332,9 +352,29 @@ export function useSurveyMap() {
     });
   }
 
+  function centerToDefaultView(
+    featureCollection: GeoJSON.FeatureCollection,
+    style: object = {},
+  ) {
+    state.rpcChannel.postRequest(
+      'MapModulePlugin.RemoveFeaturesFromMapRequest',
+      [null, null, defaultViewLayer],
+    );
+    state.rpcChannel.postRequest('MapModulePlugin.AddFeaturesToMapRequest', [
+      featureCollection,
+      {
+        centerTo: true,
+        clearPrevious: true,
+        layerId: defaultViewLayer,
+        featureStyle: style,
+      },
+    ] as any);
+  }
+
   return {
     ...state,
     isMapReady,
+    centerToDefaultView,
     /**
      * Set visible layers
      * @param layers Visible layers
@@ -371,7 +411,7 @@ export function useSurveyMap() {
         // Open editing dialog via context
         dispatch({
           type: 'SET_EDITING_MAP_ANSWER',
-          value: { questionId: question.id, index },
+          value: { questionId: question?.id, index },
         });
       });
 

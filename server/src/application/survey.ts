@@ -190,7 +190,7 @@ const surveyPageColumnSet = getColumnSet<DBSurveyPage>('survey_page', [
     cast: 'json',
   },
   'sidebar_image_size',
-  getGeoJSONColumn('default_map_view'),
+  getGeoJSONColumn('default_map_view', 3067),
 ]);
 
 /**
