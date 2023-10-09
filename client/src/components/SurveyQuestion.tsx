@@ -252,6 +252,7 @@ function SurveyQuestion({
       )}
       {question.type === 'multi-matrix' && (
         <MultiMatrixQuestion
+          readOnly={readOnly}
           value={value as string[][]}
           onChange={(value) => {
             updateAnswer({

@@ -15,6 +15,7 @@ import React, { useState } from 'react';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 import { FileAnswer } from '@interfaces/survey';
+import { Download } from '@mui/icons-material';
 
 interface Props {
   surveyId: number;
@@ -114,7 +115,8 @@ export default function DataExport({ surveyId }: Props) {
   return (
     <>
       <Button
-        sx={{ margin: 'auto' }}
+        startIcon={<Download />}
+        sx={{ marginRight: 'auto' }}
         variant="contained"
         onClick={() => setDisplayDialog((prev) => !prev)}
       >

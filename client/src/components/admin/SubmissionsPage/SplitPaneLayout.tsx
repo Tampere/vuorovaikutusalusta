@@ -1,4 +1,5 @@
 import {
+  Box,
   Chip,
   ChipProps,
   Drawer,
@@ -10,17 +11,8 @@ import {
   useTheme,
 } from '@mui/material';
 import { Close } from '@mui/icons-material';
-import { makeStyles } from '@mui/styles';
 import React, { ReactNode, useState } from 'react';
 import SplitPane from 'react-split-pane';
-
-const useStyles = makeStyles({
-  root: {
-    width: '100%',
-    height: '100vh',
-    display: 'flex',
-  },
-});
 
 interface Props {
   mainPane: ReactNode;
@@ -39,15 +31,19 @@ export default function SplitPaneLayout({
   mainPane,
   sidePane,
   mobileDrawer,
-  defaultSize,
 }: Props) {
   const [isResizing, setIsResizing] = useState(false);
   const theme = useTheme();
   const mdUp = useMediaQuery(theme.breakpoints.up('md'));
-  const classes = useStyles();
 
   return (
-    <div className={classes.root}>
+    <Box
+      sx={{
+        width: '100%',
+        height: '100vh',
+        display: 'flex',
+      }}
+    >
       {/* Side pane doesn't exist on any page - show the page in 1 column */}
       {sidePane == null && (
         <div
@@ -60,22 +56,22 @@ export default function SplitPaneLayout({
       {mdUp && sidePane != null && (
         <SplitPane
           split="vertical"
-          defaultSize={defaultSize ?? '50%'}
           style={{ position: 'static' }}
           minSize={200}
           maxSize={-200}
           // Allow scrolling for the stepper pane
-          pane1Style={{ overflowY: 'auto' }}
+          pane1Style={{
+            overflowY: 'auto',
+            width: '600px',
+            borderRight: '1px solid #00000033',
+          }}
           // Dirty hack to fix iframe resizing issues with the split pane library
           // Issue: https://github.com/tomkp/react-split-pane/issues/361
           // Workaround: https://github.com/tomkp/react-split-pane/issues/241#issuecomment-677091968
           pane2Style={{ pointerEvents: isResizing ? 'none' : 'auto' }}
-          onDragStarted={() => {
-            setIsResizing(true);
-          }}
-          onDragFinished={() => {
-            setIsResizing(false);
-          }}
+          allowResize={false}
+          onDragStarted={() => setIsResizing(true)}
+          onDragFinished={() => setIsResizing(false)}
         >
           {mainPane}
           {sidePane || <div />}
@@ -90,16 +86,21 @@ export default function SplitPaneLayout({
       )}
       {/* Mobile: side pane exists and current page has some - render the drawer and the button to show it */}
       {!mdUp && sidePane != null && sidePane !== false && (
-        <>
-          <div style={{ marginTop: 50, width: '100%' }}>{mainPane}</div>
-
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            marginTop: '70px',
+            alignItems: 'stretch',
+            width: '100%',
+          }}
+        >
           <Paper
-            elevation={3}
+            elevation={0}
             style={{
               position: 'fixed',
-              top: 0,
-              left: 0,
-              right: 0,
+              left: '50%',
+              transform: 'translateX(-50%)',
               height: 50,
               display: 'flex',
               alignItems: 'center',
@@ -157,8 +158,9 @@ export default function SplitPaneLayout({
             </Paper>
             <div style={{ flexGrow: 1, position: 'relative' }}>{sidePane}</div>
           </Drawer>
-        </>
+          <div style={{ marginTop: 50, width: '100%' }}>{mainPane}</div>
+        </Box>
       )}
-    </div>
+    </Box>
   );
 }
