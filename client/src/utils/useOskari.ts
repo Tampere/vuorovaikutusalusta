@@ -51,7 +51,8 @@ export function useOskari() {
     useState<DrawingEventHandler | null>(null);
   const [allLayers, setAllLayers] = useState<number[] | null>(null);
   const [features, setFeatures] = useState<Feature[]>([]);
-  const [defaultMapView, setDefaultMapView] = useState<FeatureCollection>(null);
+  const [_defaultMapView, setDefaultMapView] =
+    useState<FeatureCollection>(null);
 
   // Make current features available inside callbacks
   const getCurrentFeatures = useCurrent(features);
@@ -158,10 +159,6 @@ export function useOskari() {
     };
     rpcChannel.handleEvent('DrawingEvent', drawingHandler);
     setDrawingEventHandler(() => drawingHandler);
-  }
-
-  function getDefaultMapView() {
-    return defaultMapView;
   }
 
   /**
