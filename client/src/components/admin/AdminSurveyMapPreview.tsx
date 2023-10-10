@@ -3,6 +3,7 @@ import React from 'react';
 import { AdminMap } from './AdminMap';
 import { SurveyPage } from '@interfaces/survey';
 import { useTranslations } from '@src/stores/TranslationContext';
+import { useAdminMap } from '@src/stores/SurveyMapContext';
 
 interface Props {
   isOpen: boolean;
@@ -24,7 +25,8 @@ export function AdminSurveyMapPreview({
   setModifyView,
 }: Props) {
   const { tr } = useTranslations();
-
+  const { clearView } = useAdminMap();
+  console.log(page);
   return (
     <Backdrop
       open={isOpen}
@@ -76,7 +78,11 @@ export function AdminSurveyMapPreview({
         >
           {modifyView ? (
             <>
-              <Button color="error" sx={{ marginRight: 'auto' }}>
+              <Button
+                onClick={() => clearView()}
+                color="error"
+                sx={{ marginRight: 'auto' }}
+              >
                 {tr.EditSurveyPage.mapViewButtons.clear}
               </Button>
               <Button

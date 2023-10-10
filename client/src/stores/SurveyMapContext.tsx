@@ -223,6 +223,7 @@ export function useAdminMap() {
 
     const drawingHandler: DrawingEventHandler = (event) => {
       if (event.id === 'DefaultViewSelection' && event.isFinished) {
+        console.log('event is finished');
         state.rpcChannel.postRequest(
           'MapModulePlugin.RemoveFeaturesFromMapRequest',
           [null, null, defaultViewLayer],
@@ -250,11 +251,32 @@ export function useAdminMap() {
     ] as any);
   }
 
+  function clearView() {
+    // Clear recent features
+    state.rpcChannel.postRequest('DrawTools.StopDrawingRequest', [
+      'DefaultViewSelection',
+      true,
+      true,
+    ]);
+    // Clear previously drawn features
+    state.rpcChannel.postRequest(
+      'MapModulePlugin.RemoveFeaturesFromMapRequest',
+      [null, null, defaultViewLayer],
+    );
+    dispatch({
+      type: 'SET_DEFAULT_VIEW',
+      value: null,
+    });
+    startDrawingRequest();
+  }
+  console.log(state.defaultView);
+
   return {
     ...state,
     isMapReady,
     startDrawingRequest,
     drawDefaultView,
+    clearView,
     /**
      * Set RPC channel for controlling the map
      * @param rpcChannel
