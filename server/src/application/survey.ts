@@ -983,10 +983,12 @@ function dbSurveyJoinToPage(dbSurveyJoin: DBSurveyJoin): SurveyPage {
           imageName: dbSurveyJoin.page_sidebar_image_name,
           imageAltText: dbSurveyJoin.page_sidebar_image_alt_text,
           imageSize: dbSurveyJoin.page_sidebar_image_size,
-          defaultMapView: geometryToGeoJSONFeatureCollection(
-            dbSurveyJoin.default_map_view,
-            {},
-          ),
+          defaultMapView: dbSurveyJoin.default_map_view
+            ? geometryToGeoJSONFeatureCollection(
+                dbSurveyJoin.default_map_view,
+                {},
+              )
+            : null,
         },
       };
 }
@@ -1112,7 +1114,8 @@ function surveyPagesToRows(
       sidebar_image_name: surveyPage.sidebar.imageName,
       sidebar_image_alt_text: surveyPage.sidebar.imageAltText,
       sidebar_image_size: surveyPage.sidebar.imageSize,
-      default_map_view: surveyPage.sidebar.defaultMapView.features[0].geometry,
+      default_map_view:
+        surveyPage.sidebar.defaultMapView?.features[0]?.geometry ?? null,
     } as DBSurveyPage;
   });
 }

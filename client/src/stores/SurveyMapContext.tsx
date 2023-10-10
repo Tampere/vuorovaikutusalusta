@@ -188,7 +188,7 @@ export function useAdminMap() {
   const context = useContext(SurveyMapContext);
   const featureStyle = {
     fill: { color: '#00000000' },
-    stroke: { lineDash: 10 },
+    stroke: { color: '#FF4747', lineDash: 6 },
   };
 
   if (!context) {

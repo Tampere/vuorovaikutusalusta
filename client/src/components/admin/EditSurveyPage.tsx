@@ -12,7 +12,9 @@ import {
   Radio,
   RadioGroup,
   Box,
+  Typography,
 } from '@mui/material';
+import { ClearSharp, CheckSharp } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useToasts } from '@src/stores/ToastContext';
@@ -58,14 +60,15 @@ export default function EditSurveyPage() {
   const { showToast } = useToasts();
   const { setDefaultView } = useAdminMap();
   const [mapPreviewOpen, setMapPreviewOpen] = useState(false);
+  const [modifyMapView, setModifyMapView] = useState(false);
 
   const page = useMemo(() => {
     return activeSurvey.pages.find((page) => page.id === Number(pageId));
   }, [activeSurvey, pageId]);
 
-  // set page sidebar map default geometry for map context if available
+  // set page sidebar map default geometry for admin map context if available
   useEffect(() => {
-    if (!page.sidebar.defaultMapView) return;
+    if (!page?.sidebar?.defaultMapView) return;
     setDefaultView(page.sidebar.defaultMapView);
   }, [page]);
 
@@ -85,7 +88,13 @@ export default function EditSurveyPage() {
   useEffect(() => {
     setLoading(activeSurveyLoading);
   }, [activeSurveyLoading]);
-  console.log(activeSurvey);
+
+  function handleDeleteDefaultView() {
+    setDefaultView(null);
+    editPage({ ...page, sidebar: { ...page.sidebar, defaultMapView: null } });
+  }
+
+  console.log(activeSurvey, page);
   return !page ? null : (
     <Fieldset loading={loading}>
       <TextField
@@ -187,27 +196,84 @@ export default function EditSurveyPage() {
                   ))}
               </FormGroup>
             </div>
-            <div>
+            <Box
+              sx={{
+                minWidth: '270px',
+                '& .MuiButtonBase-root': { padding: '4px 10px' },
+              }}
+            >
               <FormLabel htmlFor="mapview-button-container">
                 {tr.EditSurveyPage.defaultMapView}
               </FormLabel>
               <Box
-                id="mapview-button-container"
-                sx={{ display: 'flex', justifyContent: 'space-between' }}
+                pt={1.5}
+                display="flex"
+                gap={1}
+                id="default-map-status-container"
               >
-                <Box>
-                  <Button onClick={() => setMapPreviewOpen(true)}>
+                {page.sidebar.defaultMapView ? (
+                  <>
+                    <CheckSharp color="success" />
+                    <Typography>
+                      {tr.EditSurveyPage.defaultMapViewStatus.set}
+                    </Typography>
+                  </>
+                ) : (
+                  <>
+                    <ClearSharp sx={{ color: '#0000008A' }} />
+                    <Typography>
+                      {tr.EditSurveyPage.defaultMapViewStatus.notSet}
+                    </Typography>
+                  </>
+                )}
+              </Box>
+              {page.sidebar.defaultMapView ? (
+                <Box
+                  id="mapview-button-container"
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    gap: 2,
+                    marginTop: '12px',
+                  }}
+                >
+                  <Button
+                    variant="contained"
+                    onClick={() => setMapPreviewOpen(true)}
+                  >
                     {tr.EditSurveyPage.mapViewButtons.showMap}
                   </Button>
-                  <Button>
+                  <Button
+                    variant="outlined"
+                    onClick={() => {
+                      setModifyMapView(true);
+                      setMapPreviewOpen(true);
+                    }}
+                  >
                     {tr.EditSurveyPage.mapViewButtons.modifyDefaultView}
                   </Button>
+
+                  <Button
+                    sx={{ marginLeft: 'auto' }}
+                    color="error"
+                    onClick={() => handleDeleteDefaultView()}
+                  >
+                    {tr.EditSurveyPage.mapViewButtons.deleteDefaultView}
+                  </Button>
                 </Box>
-                <Button>
-                  {tr.EditSurveyPage.mapViewButtons.deleteDefaultView}
+              ) : (
+                <Button
+                  sx={{ marginTop: '12px' }}
+                  variant="contained"
+                  onClick={() => {
+                    setModifyMapView(true);
+                    setMapPreviewOpen(true);
+                  }}
+                >
+                  {tr.EditSurveyPage.mapViewButtons.set}
                 </Button>
-              </Box>
-            </div>
+              )}
+            </Box>
           </Box>
         ))}
       {page.sidebar.type === 'image' && (
@@ -323,7 +389,6 @@ export default function EditSurveyPage() {
             setLoading(true);
             try {
               await deletePage(page.id);
-              setLoading(false);
             } catch (error) {
               showToast({
                 severity: 'error',
@@ -339,6 +404,8 @@ export default function EditSurveyPage() {
         url={activeSurvey.mapUrl}
         isOpen={mapPreviewOpen}
         setIsOpen={setMapPreviewOpen}
+        modifyView={modifyMapView}
+        setModifyView={setModifyMapView}
         page={page}
         handleSave={() =>
           editPage({

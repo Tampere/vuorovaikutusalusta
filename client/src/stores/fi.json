@@ -99,10 +99,16 @@
     "warningNoAvailableMapLayers": "Oskari-karttajulkaisusta ei löytynyt näytettäviä karttatasoja.",
     "mapLayers": "Sivulla näytettävät karttatasot",
     "defaultMapView": "Kartan oletusnäkymä tällä sivulla",
+    "defaultMapViewStatus": { "set": "Asetettu", "notSet": "Ei asetettu" },
+    "defaultMapViewInfo": "Merkitse hiirellä klikkaamalla kartalta alue, jonka haluat näkyvän kysymyssivulla.",
     "mapViewButtons": {
+      "set": "Aseta",
       "showMap": "Näytä",
       "modifyDefaultView": "Muokkaa",
-      "deleteDefaultView": "Poista"
+      "deleteDefaultView": "Poista",
+      "close": "Sulje",
+      "clear": "Tyhjennä",
+      "cancel": "Peruuta"
     },
     "untitledSection": "Nimetön osio",
     "title": "Otsikko",
