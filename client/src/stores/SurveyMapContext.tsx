@@ -239,7 +239,7 @@ export function useAdminMap() {
   }
   function drawDefaultView() {
     if (!state.defaultView) return;
-    console.log('drawing default view: ', state.defaultView);
+
     state.rpcChannel.postRequest('MapModulePlugin.AddFeaturesToMapRequest', [
       state.defaultView,
       {

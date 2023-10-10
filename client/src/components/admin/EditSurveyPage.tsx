@@ -94,7 +94,6 @@ export default function EditSurveyPage() {
     editPage({ ...page, sidebar: { ...page.sidebar, defaultMapView: null } });
   }
 
-  console.log(activeSurvey, page);
   return !page ? null : (
     <Fieldset loading={loading}>
       <TextField
