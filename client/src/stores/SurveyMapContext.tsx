@@ -205,12 +205,18 @@ export function useAdminMap() {
   function startDrawingRequest() {
     state.rpcChannel.postRequest('DrawTools.StartDrawingRequest', [
       'DefaultViewSelection',
-      'Square',
+      'Box',
       {
         allowMultipleDrawing: 'single',
         style: {
-          draw: { fill: { color: '#00000000' } },
-          modify: { fill: { color: '#00000000' } },
+          draw: {
+            fill: { color: '#00000000' },
+            stroke: { color: '#FF4747', lineDash: 6, width: 2 },
+          },
+          modify: {
+            fill: { color: '#00000000' },
+            stroke: { color: '#FF4747', lineDash: 6, width: 2 },
+          },
         },
       },
     ]);

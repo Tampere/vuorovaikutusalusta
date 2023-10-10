@@ -1,5 +1,4 @@
 import { SurveyPage } from '@interfaces/survey';
-import { useSurvey } from '@src/stores/SurveyContext';
 import { useAdminMap } from '@src/stores/SurveyMapContext';
 import OskariRPC from 'oskari-rpc';
 import React, { useEffect, useRef } from 'react';
