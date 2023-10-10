@@ -223,7 +223,6 @@ export function useAdminMap() {
 
     const drawingHandler: DrawingEventHandler = (event) => {
       if (event.id === 'DefaultViewSelection' && event.isFinished) {
-        console.log(event.geojson);
         state.rpcChannel.postRequest(
           'MapModulePlugin.RemoveFeaturesFromMapRequest',
           [null, null, defaultViewLayer],
@@ -265,13 +264,6 @@ export function useAdminMap() {
     },
     setDefaultView(viewGeometry: GeoJSON.FeatureCollection) {
       dispatch({ type: 'SET_DEFAULT_VIEW', value: viewGeometry });
-    },
-    zoomToDefaultView() {
-      if (!state.rpcChannel) return;
-      state.rpcChannel.postRequest('MapModulePlugin.ZoomToFeaturesRequest', [
-        null,
-        { id: ['drawFeature0'] },
-      ]);
     },
   };
 }
