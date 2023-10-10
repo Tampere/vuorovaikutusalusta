@@ -1,8 +1,7 @@
 import { SurveyPage } from '@interfaces/survey';
-import { CircularProgress } from '@mui/material';
 import { useAdminMap } from '@src/stores/SurveyMapContext';
 import OskariRPC from 'oskari-rpc';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 interface Props {
   url: string;
@@ -17,8 +16,8 @@ export function AdminMap({ url, page }: Props) {
     startDrawingRequest,
     drawDefaultView,
     setDefaultView,
+    setVisibleLayers,
   } = useAdminMap();
-  const [readyToDraw, setReadyToDraw] = useState(false);
 
   /**
    * More crossbrowser-safe alternative to detecting origin from URL
@@ -52,6 +51,7 @@ export function AdminMap({ url, page }: Props) {
 
   useEffect(() => {
     if (isMapReady) {
+      setVisibleLayers(page.sidebar.mapLayers);
       setDefaultView(page.sidebar.defaultMapView);
       drawDefaultView();
       startDrawingRequest();

@@ -93,7 +93,7 @@ export default function EditSurveyPage() {
     setDefaultView(null);
     editPage({ ...page, sidebar: { ...page.sidebar, defaultMapView: null } });
   }
-  console.log(defaultView);
+
   return !page ? null : (
     <Fieldset loading={loading}>
       <TextField

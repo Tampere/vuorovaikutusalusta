@@ -26,7 +26,7 @@ export function AdminSurveyMapPreview({
 }: Props) {
   const { tr } = useTranslations();
   const { clearView } = useAdminMap();
-  console.log(page);
+
   return (
     <Backdrop
       open={isOpen}
