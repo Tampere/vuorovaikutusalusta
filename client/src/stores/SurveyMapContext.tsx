@@ -36,6 +36,7 @@ interface State {
     secondaryColor: string;
     secondaryFillColor: string;
   };
+  oskariVersion: number;
 }
 
 type Action =
@@ -77,6 +78,10 @@ type Action =
   | {
       type: 'SET_MODIFYING';
       value: boolean;
+    }
+  | {
+      type: 'SET_OSKARI_VERSION';
+      value: number;
     };
 
 type Context = [State, React.Dispatch<Action>];
@@ -100,6 +105,7 @@ const stateDefaults: State = {
     secondaryColor: '#3e37bf',
     secondaryFillColor: 'rgba(62, 55, 191, 0.6)',
   },
+  oskariVersion: null,
 };
 
 /**
@@ -192,10 +198,14 @@ export function useSurveyMap() {
   const drawingRef = useRef<boolean>();
   drawingRef.current = state.questionId != null;
 
-  const isMapReady = useMemo(
-    () => Boolean(state.rpcChannel),
-    [state.rpcChannel],
-  );
+  const isMapReady = useMemo(() => {
+    state.rpcChannel?.getInfo((oskariInfo) => {
+      const oskariVersion = Number(oskariInfo.version.split('.').join(''));
+      dispatch({ type: 'SET_OSKARI_VERSION', value: oskariVersion });
+    });
+
+    return Boolean(state.rpcChannel);
+  }, [state.rpcChannel]);
 
   /**
    * Draws given geometries as features onto the map
@@ -231,19 +241,23 @@ export function useSurveyMap() {
           ] as any,
         );
       } else {
+        const isCustomIcon =
+          !!feature.properties.question.featureStyles?.point?.markerIcon;
         state.rpcChannel.postRequest('MapModulePlugin.AddMarkerRequest', [
           {
             x: (feature.geometry as any).coordinates[0],
             y: (feature.geometry as any).coordinates[1],
-            shape:
-              feature.properties.question.featureStyles?.point?.markerIcon ?? 0,
+            shape: isCustomIcon
+              ? feature.properties.question.featureStyles?.point?.markerIcon
+              : 0,
             offsetX: 0,
             offsetY: 0,
-            // Different sizes for custom SVG vs the default marker icon
-            // TODO both should be in pixels but they're not - some problems with SVG viewport size?
-            size: feature.properties.question.featureStyles?.point?.markerIcon
-              ? 64
-              : 12,
+            size:
+              isCustomIcon &&
+              state.oskariVersion >= 270 &&
+              state.oskariVersion < 290
+                ? 64
+                : 6,
           },
           `answer:${feature.properties.question.id}:${
             feature.properties.index
@@ -633,6 +647,11 @@ function reducer(state: State, action: Action): State {
       return {
         ...state,
         modifying: action.value,
+      };
+    case 'SET_OSKARI_VERSION':
+      return {
+        ...state,
+        oskariVersion: action.value,
       };
     default:
       throw new Error('Invalid action type');

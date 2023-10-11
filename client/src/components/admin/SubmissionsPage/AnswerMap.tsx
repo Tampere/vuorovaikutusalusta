@@ -66,7 +66,7 @@ export default function AnswerMap({
                   ...features,
                   ...answer.value.map((value, index) => {
                     return {
-                      id: `feature-${question.id}-${index}-${submission.id}`,
+                      id: `feature-${question?.id}-${index}-${submission?.id}`,
                       type: 'Feature',
                       geometry: value.geometry.geometry,
                       properties: {

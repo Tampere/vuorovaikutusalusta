@@ -304,6 +304,11 @@ export function useSurveyAnswers() {
      * @param survey
      */
     setSurvey(survey: Survey) {
+      if (!survey) {
+        dispatch({ type: 'SET_SURVEY', survey });
+        dispatch({ type: 'SET_ANSWERS', answers: [] });
+        return;
+      }
       dispatch({ type: 'SET_SURVEY', survey });
       // Get all sections across survey pages
       const sections = survey.pages

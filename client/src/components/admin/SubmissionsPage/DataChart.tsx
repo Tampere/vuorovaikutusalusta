@@ -36,11 +36,12 @@ interface Props {
   submissionsLoading: boolean;
 }
 
-const SCALE_THRESHOLD = 9;
+const SCALE_THRESHOLD = 31;
 
-function getDataByWeek(data: SubmissionData[]) {
+function getDataByWeek(dataList: SubmissionData[]) {
+  if (!dataList?.length) return [];
   return Object.values(
-    data.reduce((dataByWeek, data) => {
+    dataList.reduce((dataByWeek, data) => {
       const year = getYear(parse(data.date, 'd.M.yyyy', new Date()));
       return {
         ...dataByWeek,
@@ -50,9 +51,10 @@ function getDataByWeek(data: SubmissionData[]) {
               week: data.week,
               year: year,
               submissionCount:
-                dataByWeek[data.week].submissionCount + data.submissionCount,
+                dataByWeek[data.weekAndYear].submissionCount +
+                data.submissionCount,
               cumulativeCount: Math.max(
-                dataByWeek[data.week].cumulativeCount,
+                dataByWeek[data.weekAndYear].cumulativeCount,
                 data.cumulativeCount,
               ),
             }

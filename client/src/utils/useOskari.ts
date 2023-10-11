@@ -6,7 +6,7 @@ import OskariRPC, {
   MarkerClickEventHandler,
   MarkerStyle,
 } from 'oskari-rpc';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { isPointFeature } from './geometry';
 import { useCurrent } from './useCurrent';
 
@@ -48,6 +48,7 @@ export function useOskari() {
     useState<MarkerClickEventHandler | null>(null);
   const [allLayers, setAllLayers] = useState<number[] | null>(null);
   const [features, setFeatures] = useState<Feature[]>([]);
+  const [oskariVersion, setOskariVersion] = useState(null);
 
   // Make current features available inside callbacks
   const getCurrentFeatures = useCurrent(features);
@@ -263,6 +264,15 @@ export function useOskari() {
     });
   }
 
+  useEffect(() => {
+    if (!rpcChannel || oskariVersion) return;
+    rpcChannel?.getInfo((oskariInfo) => {
+      const oskariVersion = Number(oskariInfo.version.split('.').join(''));
+      setOskariVersion(oskariVersion);
+    });
+    return () => setRpcChannel(null);
+  }, [rpcChannel]);
+
   return {
     initializeMap,
     isMapReady: Boolean(rpcChannel) && Boolean(allLayers),
@@ -271,5 +281,6 @@ export function useOskari() {
     drawFeatures,
     zoomToFeatures,
     setVisibleLayers,
+    oskariVersion,
   };
 }
