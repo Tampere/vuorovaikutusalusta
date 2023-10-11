@@ -101,6 +101,9 @@ export default function SurveySubmissionsPage() {
       setSurveyLoading(false);
     }
     fetchSurvey();
+
+    // cleanup to prevent old survey mixing up with the new one when moving between submission pages
+    return () => setSurvey(null);
   }, [name, surveyId]);
 
   // Fetch submissions from server after the survey has been loaded
@@ -108,6 +111,7 @@ export default function SurveySubmissionsPage() {
     if (survey == null) {
       return;
     }
+
     setSubmissionsLoading(true);
     async function fetchSubmissions() {
       const submissionUrl = `/api/surveys/${survey.id}/submissions`;
@@ -253,6 +257,7 @@ export default function SurveySubmissionsPage() {
                 label={tr.SurveySection.question}
                 onChange={(event) => {
                   if (!questions) return;
+                  setSelectedAnswer(null);
                   setSelectedQuestion(
                     questions.find(
                       (question) => question.id === event.target.value,
