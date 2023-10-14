@@ -15,7 +15,7 @@ const useStyles = makeStyles({
 /**
  * Max length of a custom answer in radio/checkbox questions
  */
-const customAnswerMaxLength = 100;
+const customAnswerMaxLength = 250;
 
 interface Props {
   autoFocus?: boolean;
