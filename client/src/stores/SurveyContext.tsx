@@ -111,6 +111,12 @@ type Action =
       sectionIndex: number;
     }
   | {
+      type: 'DELETE_FOLLOW_UP_SECTION';
+      pageId: number;
+      parentSectionId: number;
+      followUpSectionId: number;
+    }
+  | {
       type: 'SET_AVAILABLE_MAP_LAYERS';
       layers: MapLayer[];
     }
@@ -374,6 +380,18 @@ export function useSurvey() {
      */
     deleteSection(pageId: number, sectionIndex: number) {
       dispatch({ type: 'DELETE_SECTION', pageId, sectionIndex });
+    },
+    deleteFollowUpSection(
+      pageId: number,
+      parentSectionId: number,
+      followUpSectionId: number,
+    ) {
+      dispatch({
+        type: 'DELETE_FOLLOW_UP_SECTION',
+        pageId,
+        parentSectionId,
+        followUpSectionId,
+      });
     },
     /**
      * Move a section into a new index.
@@ -694,6 +712,30 @@ function reducer(state: State, action: Action): State {
                   ...page,
                   sections: page.sections.filter(
                     (_, index) => index !== action.sectionIndex,
+                  ),
+                }
+              : page,
+          ),
+        },
+      };
+    case 'DELETE_FOLLOW_UP_SECTION':
+      return {
+        ...state,
+        activeSurvey: {
+          ...state.activeSurvey,
+          pages: state.activeSurvey.pages.map((page) =>
+            action.pageId === page.id
+              ? {
+                  ...page,
+                  sections: page.sections.map((section) =>
+                    action.parentSectionId === section.id
+                      ? {
+                          ...section,
+                          followUpSections: section.followUpSections.filter(
+                            (sect) => action.followUpSectionId !== sect.id,
+                          ),
+                        }
+                      : section,
                   ),
                 }
               : page,

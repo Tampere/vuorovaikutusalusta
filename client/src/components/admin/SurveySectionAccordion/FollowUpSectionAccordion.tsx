@@ -100,7 +100,7 @@ interface Props {
   isLastItem: boolean;
   index: number;
   parentSectionIndex: number;
-  section: SurveyPageSection;
+  section: SurveyFollowUpSection;
   parentSection: SurveyPageSection;
   expanded: boolean;
   className?: string;

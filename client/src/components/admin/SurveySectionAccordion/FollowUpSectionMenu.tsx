@@ -3,7 +3,7 @@ import { useTranslations } from '@src/stores/TranslationContext';
 import React, { ReactNode, useEffect, useState } from 'react';
 import AddSurveySectionActions from '../AddSurveySectionActions';
 import { useSurvey } from '@src/stores/SurveyContext';
-import { SurveyPageSection } from '@interfaces/survey';
+import { SurveyFollowUpSection, SurveyPageSection } from '@interfaces/survey';
 import { FollowUpSectionDetails } from './FollowUpSectionDetails';
 
 interface Props {
@@ -14,7 +14,7 @@ interface Props {
   };
   pageId: number;
   parentTitle: string;
-  section: SurveyPageSection;
+  section: SurveyFollowUpSection;
   parentSection: SurveyPageSection;
   parentSectionIndex: number;
 }
@@ -28,7 +28,8 @@ export function FollowUpSectionMenu({
   pageId,
 }: Props) {
   const { tr } = useTranslations();
-  const { activeSurveyLoading, editFollowUpSection } = useSurvey();
+  const { activeSurveyLoading, editFollowUpSection, deleteFollowUpSection } =
+    useSurvey();
   const [loading, setLoading] = useState(true);
   const [sectionActionsOpen, setSectionActionsOpen] = useState(false);
 
@@ -74,7 +75,7 @@ export function FollowUpSectionMenu({
       {!sectionActionsOpen && section?.type ? (
         <FollowUpSectionDetails
           setDeleteConfirmDialogOpen={() =>
-            console.log('setting delete confirm dialog open')
+            deleteFollowUpSection(pageId, parentSection.id, section.id)
           }
           accordion={accordion}
           handleEdit={(section) =>
