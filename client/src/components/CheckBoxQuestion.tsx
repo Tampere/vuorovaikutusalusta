@@ -5,40 +5,47 @@ import {
   FormGroup,
   FormHelperText,
   TextField,
-} from '@material-ui/core';
-import { makeStyles } from '@material-ui/styles';
+} from '@mui/material';
+import { visuallyHidden } from '@mui/utils';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { useEffect, useMemo, useState } from 'react';
-
-const useStyles = makeStyles({
-  labelStyles: {
-    lineHeight: 1.2,
-    marginBottom: '0.5em',
-    marginTop: '0.5em',
-  },
-});
+import React, { createRef, useEffect, useMemo, useRef, useState } from 'react';
 
 /**
  * Max length of a custom answer in radio/checkbox questions
  */
-const customAnswerMaxLength = 100;
+const customAnswerMaxLength = 250;
 
 interface Props {
+  autoFocus?: boolean;
   value: (string | number)[];
   onChange: (value: (string | number)[]) => void;
   question: SurveyCheckboxQuestion;
   setDirty: (dirty: boolean) => void;
+  validationErrors?: string[];
 }
 
 export default function CheckBoxQuestion({
+  autoFocus = false,
   value,
   onChange,
   question,
   setDirty,
+  validationErrors = null,
 }: Props) {
   const [customAnswerValue, setCustomAnswerValue] = useState('');
   const { tr, surveyLanguage } = useTranslations();
-  const classes = useStyles();
+  const actionRef = useRef([]);
+
+  if (autoFocus) {
+    actionRef.current = question.options.map(
+      (_, i) => actionRef.current[i] ?? createRef(),
+    );
+  }
+
+  useEffect(() => {
+    // autoFocus prop won't trigger focus styling, must be done manually
+    autoFocus && actionRef.current[0]?.current.focusVisible();
+  }, []);
 
   const answerLimitText = useMemo(() => {
     if (!question.answerLimits) {
@@ -68,23 +75,29 @@ export default function CheckBoxQuestion({
     <>
       {answerLimitText && (
         // Align this helper text with the form label
-        <FormHelperText style={{ marginLeft: 0 }}>
-          {answerLimitText}
-        </FormHelperText>
+        <>
+          <FormHelperText
+            style={{ marginLeft: 0 }}
+            id={`checkbox-helper-label-${question.id}`}
+          >
+            {answerLimitText}
+          </FormHelperText>
+          {validationErrors && validationErrors.includes('answerLimits') && (
+            <FormHelperText style={visuallyHidden} role="alert">
+              {`${question.title?.[surveyLanguage]}, ${answerLimitText}`}
+            </FormHelperText>
+          )}
+        </>
       )}
-      <FormGroup
-        aria-label={question.title?.[surveyLanguage]}
-        aria-describedby={answerLimitText}
-        onBlur={() => {
-          setDirty(true);
-        }}
-      >
-        {question.options.map((option) => (
+      <FormGroup>
+        {question.options.map((option, index) => (
           <FormControlLabel
             key={option.id}
             label={option.text?.[surveyLanguage] ?? ''}
             control={
               <Checkbox
+                action={actionRef.current[index]}
+                autoFocus={index === 0 && autoFocus}
                 // TS can't infer the precise memoized value type from question.type, but for checkboxes it's always an array
                 checked={value.includes(option.id)}
                 onChange={(event) => {
@@ -99,7 +112,11 @@ export default function CheckBoxQuestion({
                 name={option.text?.[surveyLanguage]}
               />
             }
-            classes={{ label: classes.labelStyles }}
+            sx={{
+              lineHeight: 1.2,
+              marginBottom: '0.5em',
+              marginTop: '0.5em',
+            }}
           />
         ))}
         {question.allowCustomAnswer && (
@@ -118,16 +135,21 @@ export default function CheckBoxQuestion({
               />
             }
             label={tr.SurveyQuestion.customAnswer}
-            classes={{ label: classes.labelStyles }}
+            sx={{
+              lineHeight: 1.2,
+              marginBottom: '0.5em',
+              marginTop: '0.5em',
+            }}
           />
         )}
         {value.includes(customAnswerValue) && (
           <TextField
             value={customAnswerValue}
             required={question.isRequired}
+            placeholder={tr.SurveyQuestion.customAnswerField}
             inputProps={{
               maxLength: customAnswerMaxLength,
-              'aria-label': tr.SurveyQuestion.customAnswer,
+              'aria-label': tr.SurveyQuestion.customAnswerField,
             }}
             onChange={(event) => {
               setCustomAnswerValue(event.currentTarget.value);
@@ -135,8 +157,8 @@ export default function CheckBoxQuestion({
                 value.map((option) =>
                   typeof option === 'string'
                     ? event.currentTarget.value
-                    : option
-                )
+                    : option,
+                ),
               );
             }}
           />

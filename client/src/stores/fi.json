@@ -25,7 +25,7 @@
     "toFrontPage": "Etusivulle",
     "info": "Kyselyn perustiedot",
     "email": "Sähköposti",
-    "newPage": "Uusi sivu",
+    "newPage": "Luo sivu",
     "newPageFailed": "Uuden sivun luomisessa tapahtui virhe. Yritä myöhemmin uudestaan.",
     "thanksPage": "Kiitos-sivu",
     "translations": "Käännökset",
@@ -36,7 +36,12 @@
     "deleteSurveyConfirm": "Haluatko varmasti poistaa koko kyselyn? Toimintoa ei voi perua.",
     "deleteSurveyFailed": "Kyselyn poistamisessa tapahtui virhe. Yritä myöhemmin uudestaan.",
     "deleteSurveySuccessful": "Kysely poistettiin onnistuneesti!",
-    "allowSavingUnfinished": "Salli kyselyn tallentaminen keskeneräisenä"
+    "allowSavingUnfinished": "Salli kyselyn tallentaminen keskeneräisenä",
+    "displayPrivacyStatement": "Näytä tietosuoja ja tiedonhallinta -linkki alatunnisteessa",
+    "copyPage": "Kopioi sivu",
+    "attachNewPage": "Liitä sivu",
+    "pageAttached": "Huomaa, että karttatasovalinnat eivät kopioidu. Tarkista karttatasovalinnat ja korjaa tarvittaessa karttajulkaisuosoitetta.",
+    "pageCopied": "Sivu kopioitu leikepöydälle. Voit nyt liittää kopioidun sivun haluamallesi kyselylle."
   },
   "EditSurveyInfo": {
     "title": "Kyselyn otsikko",
@@ -53,6 +58,7 @@
     "availableMapLayers": "Saatavilla olevat karttatasot:",
     "startDate": "Alkamisaika",
     "endDate": "Loppumisaika",
+    "selectDateAndTime": "Valitse päivämäärä ja aika",
     "theme": "Teema",
     "selectTheme": "Valitse teema",
     "themeFetchFailed": "Teemojen hakemisessa tapahtui virhe. Yritä myöhemmin uudestaan.",
@@ -88,6 +94,7 @@
       "map": "Kartta",
       "image": "Kuva"
     },
+    "sidebarLabel": "Navigointivalikko",
     "warningNoMapUrl": "Kyselylle ei ole määritetty Oskari-karttajulkaisua.",
     "warningNoAvailableMapLayers": "Oskari-karttajulkaisusta ei löytynyt näytettäviä karttatasoja.",
     "mapLayers": "Sivulla näytettävät karttatasot",
@@ -95,7 +102,15 @@
     "title": "Otsikko",
     "deleteSection": "Poista osio",
     "confirmDeleteSection": "Haluatko varmasti poistaa tämän osion?",
-    "imageAltText": "Kuvan vaihtoehtoinen teksti"
+    "imageAltText": "Kuvan vaihtoehtoinen teksti",
+    "imageScaling": "Kuvan skaalaus",
+    "imageScalingLabel": {
+      "original": "Alkuperäinen koko",
+      "fitted": "Sovita näkymään"
+    },
+    "sectionCopied": "Osio kopioitu leikepöydälle. Voit nyt liittää kopioidun osion haluamallesi kyselylle.",
+    "sectionAttached": "Huomaa, että karttatasovalinnat eivät kopioidu. Tarkista karttatasovalinnat ja korjaa tarvittaessa karttajulkaisuosoitetta",
+    "attachSection": "Uusi osio leikepöydältä"
   },
   "FileUpload": {
     "deleteFile": "Poista tiedosto",
@@ -118,7 +133,8 @@
     "freeTextQuestion": "Lisää vapaatekstikysymys",
     "sortingQuestion": "Lisää järjestyskysymys",
     "sliderQuestion": "Lisää liukukytkinkysymys",
-    "matrixQuestion": "Lisää likert -kysymys",
+    "matrixQuestion": "Lisää likert-kysymys",
+    "multiMatrixQuestion": "Lisää monivalinta-likert-kysymys",
     "groupedCheckboxQuestion": "Lisää ryhmitetty monivalintakysymys",
     "imageSection": "Lisää kuvaosio",
     "documentSection": "Lisää liiteosio",
@@ -126,7 +142,8 @@
   },
   "SliderQuestion": {
     "defaultMinLabel": "Täysin eri mieltä",
-    "defaultMaxLabel": "Täysin samaa mieltä"
+    "defaultMaxLabel": "Täysin samaa mieltä",
+    "scale": "Asteikko"
   },
   "SurveySection": {
     "radioQuestion": "Valintakysymys",
@@ -137,11 +154,13 @@
     "freeTextQuestion": "Vapaatekstikysymys",
     "sortingQuestion": "Järjestyskysymys",
     "sliderQuestion": "Liukukytkinkysymys",
-    "matrixQuestion": "Likert -kysymys",
+    "matrixQuestion": "Likert-kysymys",
+    "multiMatrixQuestion": "Monivalinta-likert-kysymys",
     "groupedCheckboxQuestion": "Ryhmitetty monivalintakysymys",
     "imageSection": "Kuvaosio",
     "documentSection": "Liiteosio",
-    "attachmentSection": "Vastausliite"
+    "attachmentSection": "Vastausliite",
+    "question": "Kysymys"
   },
   "SurveySections": {
     "limitAnswers": "Rajoita vastauslukumäärää",
@@ -156,30 +175,42 @@
     "sectionInfo": "Anna lisätietoja kysymykseen liittyen",
     "allowEmptyAnswer": "Salli “En osaa sanoa” -vaihtoehto",
     "optionInfo": "Kysymysvaihtoehdon lisätiedot",
-    "removeOption": "Poista vastausvaihtoehto"
+    "removeOption": "Poista vastausvaihtoehto",
+    "selectAnswer": "Valitse vastaus"
   },
   "NumericQuestion": {
     "minValue": "Arvon pitää olla vähintään {minValue}",
     "maxValue": "Arvon pitää olla enintään {maxValue}",
-    "minMaxValue": "Arvon pitää olla {minValue} ja {maxValue} välissä"
+    "minMaxValue": "Arvon pitää olla lukujen {minValue} ja {maxValue} välissä"
   },
   "AttachmentQuestion": {
     "addedFile": "Lisätty tiedosto",
     "fileUploadError": "Virhe ladattaessa tiedostoa",
     "fileSizeLimitError": "Ladattavan tiedoston koko ei saa olla yli 10MB",
     "unsupportedFileFormat": "Tiedostoformaattia ei tueta",
-    "attachmentFileFormats": "Sallitut tiedostoformaatit: jpg, jpeg, png, pdf, docx, xlsx."
+    "attachmentFileFormats": "Sallitut tiedostoformaatit: jpg, jpeg, png, pdf, docx, xlsx.",
+    "deleteUploadedFile": "Poista ladattu tiedosto",
+    "replace": "Korvaa valittu liite napsauttamalla."
   },
   "SurveyImageList": {
     "attributions": "Tekijänoikeustiedot",
-    "noImage": "Ei taustakuvaa",
+    "noBackgroundImage": "Ei taustakuvaa",
+    "noThanksPageImage": "Ei Kiitos-sivun kuvaa",
+    "noImage": "Ei kuvaa",
     "surveyImage": "Kyselyn taustakuva",
+    "thanksPageImage": "Kiitos-sivun kuva",
+    "image": "Kuva",
     "selectImage": "Valitse taustakuva",
     "addNewImage": "Lisää uusi kuva",
-    "files": "Tiedosto"
+    "files": "Tiedosto",
+    "imageSizeExceeded": "Kuvan maksimikoko on {x} Mt",
+    "imageUploadError": "Virhe tallennettaessa kuvaa",
+    "imageDownloadError": "Virhe ladattaessa kuvaa",
+    "multipleImagesDownloadError": "Kuvien lataaminen epäonnistui",
+    "imageDeleteError": "Virhe poistettaessa kuvaa"
   },
   "DropZone": {
-    "dropFiles": "Raahaa tiedosto tähän tai klikkaa valitaksesi tiedosto"
+    "dropFiles": "Valitse tiedosto klikkaamalla tai pudottamalla se tähän (enint. {x} Mt)."
   },
   "EditTextSection": {
     "text": "Teksti",
@@ -260,7 +291,10 @@
     "errorFetchingColors": "Värien haussa tapahtui virhe. Yritä myöhemmin uudelleen."
   },
   "SurveyList": {
-    "title": "Vuorovaikutusalusta - Kyselyt",
+    "title": {
+      "main": "Vuorovaikutusalusta",
+      "frontPage": "Kyselyt"
+    },
     "errorFetchingSurveys": "Virhe haettaessa kyselyitä. Yritä myöhemmin uudestaan.",
     "editSurvey": "Muokkaa kyselyä",
     "publishNow": "Julkaise nyt",
@@ -282,7 +316,8 @@
     "notPublished": "Ei julkaistu",
     "showAuthoredOnly": "Näytä vain omat kyselyt",
     "showPublishedOnly": "Näytä vain avoinna olevat kyselyt",
-    "copySurvey": "Kopioi"
+    "copySurvey": "Kopioi",
+    "answers": "Vastaukset"
   },
   "SurveyPage": {
     "errorSurveyNotFound": "Kyselyä ei löytynyt, tai se ei ole avoinna. Tarkista osoite ja yritä uudestaan.",
@@ -294,7 +329,7 @@
     "errorLoadingUnfinished": "Tallennettujen vastausten lataamisessa tapahtui virhe. Yritä myöhemmin uudestaan."
   },
   "UnavailableSurvey": {
-    "surveyNotPublished": "Kiitos mielenkiinnostasi! Kysely on sulkeutunut eikä siihen voi enää vastata.",
+    "surveyNotPublished": "Kiitos mielenkiinnostasi! Kysely ei ole tällä hetkellä avoinna eikä siihen voi vastata.",
     "treTopicalInfo": "Tampereen kaupungin ajankohtaisiin asioihin pääset tutustumaan alla olevasta linkistä.",
     "tre": "Tampereen kaupunki"
   },
@@ -312,9 +347,16 @@
     "submit": "Lähetä",
     "errorSubmittingSurvey": "Kyselyn lähettämisessä tapahtui virhe. Ole hyvä ja yritä myöhemmin uudestaan.",
     "openMap": "Avaa kartta",
+    "closeMap": "Sulje kartta",
     "openImage": "Avaa kuva",
-    "unfinishedAnswers": "Vastaa kaikkiin pakolliseksi merkittyihin kysymyksiin",
-    "saveAsUnfinished": "Tallenna keskeneräisenä"
+    "closeImage": "Sulje kuva",
+    "unfinishedAnswers": "Vastaa kaikkiin pakolliseksi merkittyihin kysymyksiin.",
+    "unfinishedAnswersInfo": "Seuraavat kysymykset ovat vastaamatta:",
+    "saveAsUnfinished": "Tallenna keskeneräisenä",
+    "step": "Vaihe",
+    "outOf": "/",
+    "completedStep": "Täytetty vaihe",
+    "futureStep": "Tuleva vaihe"
   },
   "SaveAsUnfinishedDialog": {
     "description": "Voit tallentaa kyselyn keskeneräisenä antamalla sähköpostiosoitteesi. Sähköpostiisi toimitetaan linkki, josta pääset jatkamaan vastaamista kyselyn ollessa auki.",
@@ -324,21 +366,26 @@
     "errorSaving": "Vastaustesi tallennuksessa tapahtui virhe. Ole hyvä ja yritä myöhemmin uudestaan."
   },
   "SurveyQuestion": {
-    "errorFieldIsRequired": "Kenttä on pakollinen.",
-    "answerLimitsMinMax": "Valitse vähintään {min}, enintään {max} vaihtoehtoa",
-    "answerLimitsMin": "Valitse vähintään {min} vaihtoehtoa",
-    "answerLimitsMax": "Valitse enintään {max} vaihtoehtoa",
-    "customAnswer": "Jokin muu, mikä?",
+    "errorFieldIsRequired": "Vastaus on pakollinen.",
+    "accessibilityTooltip": "Vastaathan kysymykseen:",
+    "answerLimitsMinMax": "Valitse vähintään {min}, enintään {max} vaihtoehtoa.",
+    "answerLimitsMin": "Valitse vähintään {min} vaihtoehtoa.",
+    "answerLimitsMax": "Valitse enintään {max} vaihtoehtoa.",
+    "customAnswer": "Jokin muu (täsmennä alla)",
+    "customAnswerField": "Täsmennä vastaustasi tässä.",
     "charactersRemaining": "{x} merkki(ä) jäljellä.",
     "showInfo": "Näytä lisätietoja",
     "info": "Lisätietoja"
   },
   "MapQuestion": {
+    "mapSelectionButtons": "Kartan valintapainikkeet",
     "selectionTypes": {
-      "point": "Piste",
-      "line": "Viiva",
-      "area": "Alue"
+      "point": "Pistemerkintä",
+      "line": "Viivamerkintä",
+      "area": "Aluemerkintä"
     },
+    "markingsMade": "merkintää tehtynä.",
+    "subQuestionDialog": "Alakysymysnäkymä",
     "selectionHelperText": {
       "point": "Sijoita piste oikeaan paikkaan klikkaamalla kartalla oikeassa kohdassa.",
       "line": "Aloita piirtäminen klikkaamalla aloituskohtaa. Jatka piirtämistä klikkaamalla kartalla uudestaan, lopeta piirtäminen klikkaamalla viimeistä pistettä uudestaan.",
@@ -350,11 +397,33 @@
     "confirmRemoveAnswer": "Haluatko varmasti poistaa tämän karttavastauksen?"
   },
   "SurveyMap": {
+    "browsingInstructions": "Liikuta karttanäkymää nuolinäppäimillä. Lähennä ja loitonna plus- ja miinusnäppäimillä.",
     "editGeometries": "Muokkaa piirtämiäsi karttamerkintöjä",
-    "finishEditingGeometries": "Lopeta karttamerkintöjen muokkaus"
+    "finishEditingGeometries": "Lopeta karttamerkintöjen muokkaus",
+    "iFrameTitle": "Karttanäkymä"
   },
   "MatrixQuestion": {
-    "emptyAnswer": "En osaa sanoa"
+    "emptyAnswer": "En osaa sanoa",
+    "subject": "Aihe",
+    "response": "Vastaus"
+  },
+  "MultiMatrixQuestion": {
+    "answerClass": "Vastausvaihtoehto",
+    "unansweredRow": "Kysymyksen rivillä {x} on liian vähän valittuja vastauksia.",
+    "unansweredRows": "Kysymyksen riveillä {x} on liian vähän valittuja vastauksia.",
+    "and": "ja",
+    "answerLimitsMinMax": "Valitse vähintään {min}, enintään {max} vaihtoehtoa kultakin riviltä.",
+    "answerLimitsMin": "Valitse vähintään {min} vaihtoehtoa kultakin riviltä.",
+    "answerLimitsMax": "Valitse enintään {max} vaihtoehtoa kultakin riviltä",
+    "selected": "valittu",
+    "SR": {
+      "isRequired": "Valitse vähintään yksi vaihtoehto joka riviltä.",
+      "mustSelectMore": "Valitse vielä {x} vaihtoehtoa tältä riviltä.",
+      "maySelectMore": "Voit valita vielä {x} vaihtoehtoa tältä riviltä.",
+      "maxSelected": "Olet valinnut enimmäismäärän vaihtoehtoja tältä riviltä",
+      "IDK": "Tämän vaihtoehdon valinta korvaa rivin muut valinnat.",
+      "replacingIDK": "Valinta korvaa nykyisen \"En osaa sanoa\" -vaihtoehdon."
+    }
   },
   "ImageSection": {
     "openInNewTab": "Avaa kuva uudella välilehdellä"
@@ -362,7 +431,17 @@
   "SortingQuestion": {
     "empty": "Tyhjä",
     "rankForOption": "Järjestysnumero vaihtoehdolle: {option}",
-    "sortedOptions": "Vaihtoehdot järjestettyinä"
+    "sortedOptions": "Vaihtoehdot järjestettyinä",
+    "orderComplete": "Vaihtoehdot ovat nyt oikeassa järjestyksessä.",
+    "confirmationGuide": "Valitse lopuksi vastauksen vahvistusvalintaruutu.",
+    "inPosition": "Sijalla ",
+    "announcement": {
+      "focus": "Siirrä tätä vaihtoehtoa painamalla välilyöntiä. Saattaa olla tarpeen aktivoida kohdistustila.",
+      "grab": "Tartuit vaihtoehtoon sijalla {position} . Siirrä ylös tai alaspäin nuolinäppäimillä.",
+      "move": "Nyt sijalla {position} kautta {length} . Aseta tähän painamalla välilyöntiä.",
+      "drop": "Asetettu sijalle {position} .",
+      "droppedInPlace": "Asetettu alkuperäiselle paikalleen sijalle {position}"
+    }
   },
   "DocumentSection": {
     "attachment": "Liite"
@@ -389,8 +468,29 @@
     "text": "Jos haluat saada kopion vastauksestasi, anna sähköpostiosoitteesi oheiseen kenttään.",
     "email": "Sähköposti (valinnainen)"
   },
+  "AnswersList": {
+    "answers": "Vastaukset",
+    "selectQuestion": "Valitse kysymys ensin",
+    "noAnswers": "Valittuun kysymykseen ei ole vastauksia.",
+    "respondent": "Vastaaja {x}",
+    "mapMarkingIndex": "Karttamerkintä {x}",
+    "hideOldResponses": "Piilota vanhat kommentit...",
+    "showOldResponses": "Näytä {x} vanhempaa kommenttia..."
+  },
   "AppBarUserMenu": {
-    "logout": "Kirjaudu ulos"
+    "label": "Käyttäjävalikko",
+    "logout": "Kirjaudu ulos",
+    "updateInstructions": "Päivitä käyttöohjeet"
+  },
+  "InstructionsDialog": {
+    "fetchingError": "Virhe haettaessa nykyisiä käyttöohjeita",
+    "currentInstructions": "Nykyiset käyttöohjeet",
+    "uploadNewInstructions": "Uuden käyttöohjeen lataaminen",
+    "wrongFileFormat": "Tiedoston tulee olla pdf-muodossa",
+    "fileUploadError": "Virhe ladattaessa tiedostoa",
+    "fileSizeLimitError": "Ladattavan tiedoston koko ei saa olla yli {x}MB",
+    "submit": "Lähetä",
+    "cancel": "Peruuta"
   },
   "MapInfoBox": {
     "answer": "Vastaus"
@@ -399,11 +499,13 @@
     "text": "Tämä on testikysely. Vastauksia ei tallenneta, eikä niistä lähetetä sähköpostia."
   },
   "LanguageMenu": {
+    "languageControl": "Language / Kieli",
     "changeLanguage": "Vaihda palvelun kieltä",
     "fi": "Suomi",
     "en": "English"
   },
   "SurveyLanguageMenu": {
+    "languageControl": "Language / Kieli",
     "changeSurveyLanguage": "Vaihda kyselyn kieltä",
     "surveyLanguage": "Kyselyn kieli"
   },
@@ -424,6 +526,26 @@
     "emailInfo": "Sähköposti",
     "thanksPage": "Kiitos-sivu"
   },
+  "SurveySubmissionsPage": {
+    "attachments": "Liitteet",
+    "noAttachments": "Ei liitteitä",
+    "summary": "Yhteenveto",
+    "toHomePage": "Etusivulle",
+    "answerCount": "Vastauksia yhteensä: {x} kpl",
+    "respondentCount": "Vastaajia yhteensä {x} kpl",
+    "pageNumber": "Sivu {x}:",
+    "dataChart": {
+      "tooltipWeekLabel": "Viikko {x}, Vuosi",
+      "tooltipTotal": "Kokonaisvastausmäärä",
+      "tooltipCurrent": "Vastausmäärä",
+      "xAxisLabel": {
+        "byDay": "Päivä",
+        "byWeek": "Viikko"
+      },
+      "yAxisTotalLabel": "Vastauskertymä",
+      "yAxisLabel": "Vastauksia"
+    }
+  },
   "navigation": {
     "next": "Seuraava",
     "back": "Takaisin"
@@ -443,5 +565,14 @@
     "yes": "Kyllä",
     "no": "Ei",
     "ok": "OK"
-  }
+  },
+  "FooterLinks": {
+    "accessibility": "Saavutettavuusseloste",
+    "privacyStatement": "Tietosuojaseloste"
+  },
+  "IconAltTexts": {
+    "treBannerAltText": "Tampereen vaakunalogo",
+    "treLogoAltText": "Tampere Finland -logo"
+  },
+  "adminInstructions": "Avaa käyttöohje"
 }

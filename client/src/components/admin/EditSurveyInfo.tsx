@@ -1,6 +1,7 @@
 import { User } from '@interfaces/user';
 import {
   Autocomplete,
+  Box,
   Checkbox,
   FormControlLabel,
   FormHelperText,
@@ -9,12 +10,16 @@ import {
   Skeleton,
   TextField,
   Typography,
-} from '@material-ui/core';
-import DateTimePicker from '@material-ui/lab/DateTimePicker';
-import { makeStyles } from '@material-ui/styles';
+} from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
+import fiLocale from 'date-fns/locale/fi';
+import enLocale from 'date-fns/locale/en-GB';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import CopyToClipboard from '../CopyToClipboard';
@@ -24,6 +29,7 @@ import LoadingButton from '../LoadingButton';
 import ColorSelect from './ColorSelect';
 import SurveyImageList from './SurveyImageList';
 import ThemeSelect from './ThemeSelect';
+import { assertNever } from '@src/utils/typeCheck';
 
 const useStyles = makeStyles({
   dateTimePicker: {
@@ -51,7 +57,7 @@ export default function EditSurveyInfo() {
     availableMapLayers,
     availableMapLayersLoading,
   } = useSurvey();
-  const { tr, surveyLanguage } = useTranslations();
+  const { tr, surveyLanguage, language } = useTranslations();
   const { showToast } = useToasts();
   const history = useHistory();
 
@@ -66,7 +72,7 @@ export default function EditSurveyInfo() {
       setUsersLoading(true);
       try {
         const users = await fetch('/api/users/others').then(
-          (response) => response.json() as Promise<User[]>
+          (response) => response.json() as Promise<User[]>,
         );
         setUsers(users);
       } catch (error) {
@@ -80,6 +86,17 @@ export default function EditSurveyInfo() {
 
     fetchOtherUsers();
   }, []);
+
+  const localLanguage = useMemo(() => {
+    switch (language) {
+      case 'fi':
+        return fiLocale;
+      case 'en':
+        return enLocale;
+      default:
+        return assertNever(language);
+    }
+  }, [language]);
 
   return (
     <>
@@ -200,56 +217,67 @@ export default function EditSurveyInfo() {
             </ul>
           </div>
         )}
-        <SurveyImageList />
-        <ThemeSelect
-          value={activeSurvey.theme?.id}
-          onChange={(theme) => {
-            editSurvey({
-              ...activeSurvey,
-              theme,
-            });
+        <SurveyImageList imageType={'backgroundImage'} />
+        <Box
+          sx={{
+            width: '206px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 3,
           }}
-        />
-        <ColorSelect
-          label={tr.EditSurveyInfo.titleColor}
-          value={activeSurvey.sectionTitleColor}
-          onChange={(color) => {
-            editSurvey({
-              ...activeSurvey,
-              sectionTitleColor: color,
-            });
-          }}
-        />
-        <DateTimePicker
-          label={tr.EditSurveyInfo.startDate}
-          value={activeSurvey.startDate}
-          inputFormat="dd.MM.yyyy HH:mm"
-          mask="__.__.____ __:__"
-          onChange={(value) => {
-            editSurvey({
-              ...activeSurvey,
-              startDate: value,
-            });
-          }}
-          renderInput={(params: any) => (
-            <TextField className={classes.dateTimePicker} {...params} />
-          )}
-        />
-        <DateTimePicker
-          label={tr.EditSurveyInfo.endDate}
-          value={activeSurvey.endDate}
-          inputFormat="dd.MM.yyyy HH:mm"
-          mask="__.__.____ __:__"
-          onChange={(value) => {
-            editSurvey({
-              ...activeSurvey,
-              endDate: value,
-            });
-          }}
-          renderInput={(params: any) => (
-            <TextField className={classes.dateTimePicker} {...params} />
-          )}
-        />
+        >
+          <ThemeSelect
+            value={activeSurvey.theme?.id}
+            onChange={(theme) => {
+              editSurvey({
+                ...activeSurvey,
+                theme,
+              });
+            }}
+          />
+          <ColorSelect
+            label={tr.EditSurveyInfo.titleColor}
+            value={activeSurvey.sectionTitleColor}
+            onChange={(color) => {
+              editSurvey({
+                ...activeSurvey,
+                sectionTitleColor: color,
+              });
+            }}
+          />
+          <LocalizationProvider
+            dateAdapter={AdapterDateFns}
+            adapterLocale={localLanguage}
+            localeText={{
+              dateTimePickerToolbarTitle: tr.EditSurveyInfo.selectDateAndTime,
+            }}
+          >
+            <DateTimePicker
+              label={tr.EditSurveyInfo.startDate}
+              value={activeSurvey.startDate}
+              ampm={false}
+              format="dd.MM.yyyy HH:mm"
+              onChange={(value: Date) => {
+                editSurvey({
+                  ...activeSurvey,
+                  startDate: value,
+                });
+              }}
+            />
+            <DateTimePicker
+              label={tr.EditSurveyInfo.endDate}
+              value={activeSurvey.endDate}
+              format="dd.MM.yyyy HH:mm"
+              onChange={(value: Date) => {
+                editSurvey({
+                  ...activeSurvey,
+                  endDate: value,
+                });
+              }}
+            />
+          </LocalizationProvider>
+        </Box>
+
         <FormControlLabel
           control={
             <Checkbox
@@ -264,6 +292,23 @@ export default function EditSurveyInfo() {
             />
           }
           label={tr.EditSurvey.allowSavingUnfinished}
+        />
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={activeSurvey.displayPrivacyStatement}
+              onChange={(event) =>
+                editSurvey({
+                  ...activeSurvey,
+                  displayPrivacyStatement: event.target.checked,
+                })
+              }
+              inputProps={{
+                'aria-label': `${tr.EditSurvey.displayPrivacyStatement}`,
+              }}
+            />
+          }
+          label={tr.EditSurvey.displayPrivacyStatement}
         />
         <div>
           <FormControlLabel

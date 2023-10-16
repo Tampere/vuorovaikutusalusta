@@ -1,6 +1,6 @@
 import { MapStrokeColor } from '@interfaces/survey';
-import { FormControl, InputLabel, MenuItem, Select } from '@material-ui/core';
-import { makeStyles } from '@material-ui/styles';
+import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { request } from '@src/utils/request';

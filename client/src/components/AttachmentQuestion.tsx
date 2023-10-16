@@ -1,6 +1,6 @@
-import { FileAnswer } from '@interfaces/survey';
-import { IconButton, Typography } from '@material-ui/core';
-import { Delete } from '@material-ui/icons';
+import { FileAnswer, SurveyAttachmentQuestion } from '@interfaces/survey';
+import { IconButton, Typography } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React from 'react';
@@ -10,12 +10,14 @@ interface Props {
   value: FileAnswer[];
   onChange: (value: FileAnswer[]) => void;
   setDirty: (dirty: boolean) => void;
+  question: SurveyAttachmentQuestion;
 }
 
 export default function AttachmentQuestion({
   value,
   setDirty,
   onChange,
+  question,
 }: Props) {
   const { tr } = useTranslations();
   const { showToast } = useToasts();
@@ -39,7 +41,7 @@ export default function AttachmentQuestion({
 
   const dropzoneContent = value?.length ? (
     <div>
-      <Typography> {tr.AttachmentQuestion.addedFile}: </Typography>
+      <Typography color='info'> {tr.AttachmentQuestion.addedFile}: </Typography>
       {value?.map((file, index) => {
         return (
           <div
@@ -50,19 +52,19 @@ export default function AttachmentQuestion({
               alignItems: 'center',
             }}
           >
-            <Typography style={{ color: 'purple' }}>
+            <Typography color='primary' >
               {' '}
               {file.fileName}{' '}
             </Typography>
             <IconButton
-              aria-label="delete-uploaded-file"
+              aria-label={tr.AttachmentQuestion.deleteUploadedFile}
               onClick={(event) => {
                 event.stopPropagation();
                 value.splice(index, 1);
                 onChange(value);
               }}
             >
-              <Delete />
+              <DeleteIcon />
             </IconButton>
           </div>
         );
@@ -71,7 +73,7 @@ export default function AttachmentQuestion({
   ) : null;
 
   return (
-    <div>
+    <div id={`${question.id}-input`}>
       <DropZone
         maxFiles={1}
         fileCallback={async (files: File[]) => {

@@ -1,11 +1,11 @@
-import { Survey, SurveyEmailInfoItem } from '@interfaces/survey';
+import { LocalizedText, Survey, SurveyEmailInfoItem } from '@interfaces/survey';
 import {
   Checkbox,
   FormControlLabel,
   FormHelperText,
   Typography,
-} from '@material-ui/core';
-import { makeStyles } from '@material-ui/styles';
+} from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React from 'react';
@@ -48,37 +48,67 @@ const useStyles = makeStyles({
   },
 });
 
-function surveyToTranslationJSON(survey: Survey): string {
-  const surveyPages = survey.pages.map((page) => {
-    return {
-      title: page.title,
-      sections: page.sections.map((section: any) => {
-        return {
-          title: section.title,
-          ...(section?.info && { info: section.info }),
-          ...(section?.body && { body: section.body }),
-          ...(section?.options && {
-            options: { text: section.options.text, info: section.options.info },
-          }),
-          ...(section?.classes && { classes: section.classes }),
-          ...(section?.subjects && { subjects: section.subjects }),
-        };
-      }),
-    };
-  });
-  return JSON.stringify({
-    title: survey.title,
-    subtitle: survey.subtitle,
-    thanksPage: {
-      title: survey.thanksPage,
-      text: survey.thanksPage,
-    },
-    email: {
-      subject: survey.email.subject,
-      body: survey.email.body,
-    },
-    pages: surveyPages,
-  });
+function surveyToTranslationString(survey: Survey) {
+  const columnHeaders = 'Label \t fi \t en \n';
+  const surveyStrings: string[] = [];
+
+  function isPartialLocalizedText(
+    value: unknown,
+  ): value is Partial<LocalizedText> {
+    return (
+      typeof value === 'object' &&
+      value !== null &&
+      ('fi' in value || 'en' in value)
+    );
+  }
+
+  function isObject(value: unknown): value is object {
+    return !!value && typeof value === 'object';
+  }
+
+  function getRowString(
+    label: string,
+    valueFi: string,
+    valueEn: string,
+  ): string {
+    return `${label} \t ${valueFi ?? ''} \t ${valueEn ?? ''} \n`;
+  }
+
+  // Uses recursion to loop through the entire Survey object and to add all values of objects of type LocalizedText to the clipboard
+  function addRowString(obj: unknown, label: string, index: number = 0) {
+    if (Array.isArray(obj)) {
+      index = 1;
+      obj.forEach((item) => addRowString(item, `${label}.[${index}]`, index++));
+    }
+    if (!isObject(obj)) {
+      return;
+    }
+
+    if (isPartialLocalizedText(obj)) {
+      surveyStrings.push(
+        getRowString(`${label}`, obj?.fi ?? '', obj?.en ?? ''),
+      );
+      return;
+    }
+
+    Object.entries(obj).forEach(([key, value]) => {
+      if (!value) {
+        return;
+      } else if (Array.isArray(value)) {
+        index = 1;
+        value.forEach((item) => {
+          addRowString(item, `${label}.${key}[${index}]`, index++);
+        });
+      } else if (typeof value === 'object' && !isPartialLocalizedText(value)) {
+        addRowString(value, `${label}.${key}[${index}]`, index);
+      } else if (isPartialLocalizedText(value)) {
+        surveyStrings.push(getRowString(`${label}.${key}`, value.fi, value.en));
+      }
+    });
+  }
+
+  addRowString(survey, 'Survey');
+  return [columnHeaders, ...surveyStrings].join('');
 }
 
 export default function EditSurveyTranslations() {
@@ -125,7 +155,7 @@ export default function EditSurveyTranslations() {
               <Typography>
                 {tr.EditSurveyTranslations.copyTextFields}
               </Typography>
-              <CopyToClipboard data={surveyToTranslationJSON(activeSurvey)} />
+              <CopyToClipboard data={surveyToTranslationString(activeSurvey)} />
             </div>
             <Typography variant="h5">
               {tr.EditSurveyTranslations.supportedLanguages}:{' '}
@@ -211,7 +241,7 @@ export default function EditSurveyTranslations() {
                         <RichTextEditor
                           value={activeSurvey.email.body?.[lang] ?? ''}
                           missingValue={Boolean(
-                            !activeSurvey.email.body?.[lang]
+                            !activeSurvey.email.body?.[lang],
                           )}
                           onChange={(value) =>
                             editSurvey({
@@ -227,8 +257,8 @@ export default function EditSurveyTranslations() {
                           }
                           editorHeight={'100px'}
                         />
-                        {activeSurvey.email.info.map(
-                          (infoRow: SurveyEmailInfoItem, index) => (
+                        {activeSurvey?.email?.info?.map(
+                          (infoRow: SurveyEmailInfoItem, index: number) => (
                             <div
                               key={`email-info-${index}`}
                               className={classes.keyValueContainer}
@@ -280,7 +310,7 @@ export default function EditSurveyTranslations() {
                                 }}
                               />
                             </div>
-                          )
+                          ),
                         )}
                       </>
                     )}
@@ -345,7 +375,7 @@ export default function EditSurveyTranslations() {
                                   editSection(
                                     page.id,
                                     sectionIndex,
-                                    editedSection
+                                    editedSection,
                                   )
                                 }
                               />
@@ -379,7 +409,7 @@ export default function EditSurveyTranslations() {
                       <RichTextEditor
                         value={activeSurvey.thanksPage.text?.[lang] ?? ''}
                         missingValue={Boolean(
-                          !activeSurvey.thanksPage.text?.[lang]
+                          !activeSurvey.thanksPage.text?.[lang],
                         )}
                         onChange={(value) =>
                           editSurvey({

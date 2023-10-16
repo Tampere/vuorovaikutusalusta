@@ -1,13 +1,15 @@
 import React from 'react';
 import { useSurvey } from '@src/stores/SurveyContext';
 import Fieldset from '../Fieldset';
-import { TextField } from '@material-ui/core';
+import { TextField } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
 import RichTextEditor from '../RichTextEditor';
+import SurveyImageList from './SurveyImageList';
 
 export default function EditSurveyThanksPage() {
   const { activeSurvey, activeSurveyLoading, editSurvey } = useSurvey();
   const { tr, surveyLanguage } = useTranslations();
+
   return (
     <Fieldset loading={activeSurveyLoading}>
       <TextField
@@ -42,6 +44,7 @@ export default function EditSurveyThanksPage() {
           });
         }}
       />
+      <SurveyImageList imageType={'thanksPageImage'} />
     </Fieldset>
   );
 }

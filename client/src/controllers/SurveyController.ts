@@ -27,6 +27,30 @@ export async function creteSurveyFromPrevious(baseSurveyId: number) {
 }
 
 /**
+ * Update a survey
+ */
+
+export async function updateSurvey(id: number, activeSurvey: Survey) {
+  const survey = await request<SerializedSurvey>(`/api/surveys/${id}`, {
+    method: 'PUT',
+    body: activeSurvey,
+  });
+  return deserializeSurvey(survey);
+}
+
+/**
+ * Get one survey
+ */
+
+export async function getSurvey(id: number) {
+  const survey = await request<SerializedSurvey>(`/api/surveys/${id}`, {
+    method: 'GET',
+  });
+
+  return deserializeSurvey(survey);
+}
+
+/**
  * Get all premade surveys
  */
 export async function getSurveys(

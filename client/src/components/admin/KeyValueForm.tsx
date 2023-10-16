@@ -11,8 +11,8 @@ import {
   TableRow,
   TextField,
   Tooltip,
-} from '@material-ui/core';
-import { Add, Delete } from '@material-ui/icons';
+} from '@mui/material';
+import { Add, Delete } from '@mui/icons-material';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React from 'react';
 

@@ -7,7 +7,7 @@ import {
   DialogTitle,
   TextField,
   Typography,
-} from '@material-ui/core';
+} from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { Survey } from '@interfaces/survey';
 
@@ -34,7 +34,9 @@ export default function DeleteSurveyDialog({ survey, onClose, open }: Props) {
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
     >
-      <DialogTitle>{tr.DeleteSurveyDialog.dialogTitle} </DialogTitle>
+      <DialogTitle id="alert-dialog-title">
+        {tr.DeleteSurveyDialog.dialogTitle}{' '}
+      </DialogTitle>
       <DialogContent>
         <div style={{ display: 'flex', flexDirection: 'row' }}>
           <Typography> {tr.DeleteSurveyDialog.surveyName}: </Typography>
@@ -51,7 +53,10 @@ export default function DeleteSurveyDialog({ survey, onClose, open }: Props) {
           </Typography>
         </div>
         <br />
-        <Typography style={{ fontWeight: 'bold' }}>
+        <Typography
+          id="alert-dialog-description"
+          style={{ fontWeight: 'bold' }}
+        >
           {' '}
           {tr.DeleteSurveyDialog.warningMessage}
         </Typography>

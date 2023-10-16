@@ -6,8 +6,8 @@ import {
   DialogTitle,
   TextField,
   Typography,
-} from '@material-ui/core';
-import { makeStyles } from '@material-ui/styles';
+} from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
@@ -83,21 +83,27 @@ export default function SaveAsUnfinishedDialog({
     <Dialog
       open={open}
       onClose={() => {
+        setEmailDirty(false);
         onCancel();
       }}
+      aria-describedby='save-dialog-content'
     >
       <DialogTitle>{tr.SurveyStepper.saveAsUnfinished}</DialogTitle>
       <DialogContent>
-        <Typography variant="body1" className={classes.paragraph}>
-          {tr.SaveAsUnfinishedDialog.description}
-        </Typography>
-        <Typography variant="body1" className={classes.paragraph}>
-          {tr.SaveAsUnfinishedDialog.disclaimer}
-        </Typography>
+        <div id='save-dialog-content'>
+          <Typography variant="body1" className={classes.paragraph}>
+            {tr.SaveAsUnfinishedDialog.description}
+          </Typography>
+          <Typography variant="body1" className={classes.paragraph}>
+            {tr.SaveAsUnfinishedDialog.disclaimer}
+          </Typography>
+        </div>
         <TextField
+          autoFocus
           aria-label={tr.SaveAsUnfinishedDialog.email}
           label={tr.SaveAsUnfinishedDialog.email}
           required
+          name='email'
           error={emailDirty && !email.length}
           value={email}
           inputProps={{ type: 'email' }}
@@ -108,13 +114,28 @@ export default function SaveAsUnfinishedDialog({
           onBlur={() => {
             setEmailDirty(true);
           }}
+          sx={{
+            '& .MuiOutlinedInput-root.Mui-focused': {
+              outlineOffset: '.5em', // Outline obstructs label otherwise
+            }
+          }}
         />
       </DialogContent>
       <DialogActions>
-        <Button onClick={onCancel} disabled={loading}>
+        <Button
+          onClick={() => {
+            setEmailDirty(false);
+            onCancel();
+          }}
+          disabled={loading}
+        >
           {tr.commands.cancel}
         </Button>
-        <Button onClick={handleSave} disabled={loading || !email.length}>
+        <Button
+          variant='contained'
+          onClick={handleSave}
+          disabled={loading || !email.length}
+        >
           {tr.options.ok}
         </Button>
       </DialogActions>

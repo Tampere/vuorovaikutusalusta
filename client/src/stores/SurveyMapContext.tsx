@@ -4,11 +4,11 @@ import {
   SurveyMapQuestion,
 } from '@interfaces/survey';
 import { LineString, Point, Polygon } from 'geojson';
-import { Channel, DrawingEventHandler } from 'oskari-rpc';
+import { Channel, DrawingEventHandler, Layer } from 'oskari-rpc';
 import parseCSSColor from 'parse-css-color';
 import React, {
-  createContext,
   ReactNode,
+  createContext,
   useContext,
   useEffect,
   useMemo,
@@ -30,6 +30,13 @@ interface State {
   };
   answerGeometries: GeoJSON.FeatureCollection;
   modifying: boolean;
+  mapFeatureColorScheme: {
+    primaryColor: string;
+    primaryFillColor: string;
+    secondaryColor: string;
+    secondaryFillColor: string;
+  };
+  oskariVersion: number;
 }
 
 type Action =
@@ -71,6 +78,10 @@ type Action =
   | {
       type: 'SET_MODIFYING';
       value: boolean;
+    }
+  | {
+      type: 'SET_OSKARI_VERSION';
+      value: number;
     };
 
 type Context = [State, React.Dispatch<Action>];
@@ -88,6 +99,13 @@ const stateDefaults: State = {
     features: [],
   },
   modifying: false,
+  mapFeatureColorScheme: {
+    primaryColor: '#000000',
+    primaryFillColor: 'rgba(0,0,0,0.3)',
+    secondaryColor: '#3e37bf',
+    secondaryFillColor: 'rgba(62, 55, 191, 0.6)',
+  },
+  oskariVersion: null,
 };
 
 /**
@@ -114,7 +132,7 @@ const defaultFeatureStyle = {
 
 function getFeatureStyle(
   selectionType: MapQuestionSelectionType,
-  question: SurveyMapQuestion
+  question: SurveyMapQuestion,
 ) {
   // Use default style for points
   if (selectionType === 'point') {
@@ -158,7 +176,7 @@ function getFeatureStyle(
  */
 function getDrawingEventId(
   questionId: number,
-  selectionType?: MapQuestionSelectionType
+  selectionType?: MapQuestionSelectionType,
 ) {
   return `map-answer:${questionId}${selectionType ? `:${selectionType}` : ''}`;
 }
@@ -180,10 +198,14 @@ export function useSurveyMap() {
   const drawingRef = useRef<boolean>();
   drawingRef.current = state.questionId != null;
 
-  const isMapReady = useMemo(
-    () => Boolean(state.rpcChannel),
-    [state.rpcChannel]
-  );
+  const isMapReady = useMemo(() => {
+    state.rpcChannel?.getInfo((oskariInfo) => {
+      const oskariVersion = Number(oskariInfo.version.split('.').join(''));
+      dispatch({ type: 'SET_OSKARI_VERSION', value: oskariVersion });
+    });
+
+    return Boolean(state.rpcChannel);
+  }, [state.rpcChannel]);
 
   /**
    * Draws given geometries as features onto the map
@@ -193,7 +215,7 @@ export function useSurveyMap() {
     // Clear previous geometries
     state.rpcChannel.postRequest(
       'MapModulePlugin.RemoveFeaturesFromMapRequest',
-      [null, null, answerGeometryLayer]
+      [null, null, answerGeometryLayer],
     );
     state.rpcChannel.postRequest('MapModulePlugin.RemoveMarkersRequest', []);
     // Add current features one by one to get the correct styles
@@ -213,27 +235,37 @@ export function useSurveyMap() {
               cursor: 'pointer',
               featureStyle: getFeatureStyle(
                 feature.geometry.type === 'Polygon' ? 'area' : 'line',
-                feature.properties.question
+                feature.properties.question,
               ),
             },
-          ]
+          ] as any,
         );
       } else {
+        const isCustomIcon =
+          !!feature.properties.question.featureStyles?.point?.markerIcon;
         state.rpcChannel.postRequest('MapModulePlugin.AddMarkerRequest', [
           {
             x: (feature.geometry as any).coordinates[0],
             y: (feature.geometry as any).coordinates[1],
-            shape:
-              feature.properties.question.featureStyles?.point?.markerIcon ?? 0,
+            shape: isCustomIcon
+              ? feature.properties.question.featureStyles?.point?.markerIcon
+              : 0,
             offsetX: 0,
             offsetY: 0,
-            // Different sizes for custom SVG vs the default marker icon
-            // TODO both should be in pixels but they're not - some problems with SVG viewport size?
-            size: feature.properties.question.featureStyles?.point?.markerIcon
-              ? 64
-              : 12,
+            size:
+              isCustomIcon &&
+              state.oskariVersion >= 270 &&
+              state.oskariVersion < 290
+                ? 64
+                : 6,
           },
-          `answer:${feature.properties.question.id}:${feature.properties.index}`,
+          `answer:${feature.properties.question.id}:${
+            feature.properties.index
+          }${
+            feature.properties.submissionId != null
+              ? `:${feature.properties.submissionId}`
+              : ''
+          }`,
         ]);
       }
     });
@@ -304,7 +336,7 @@ export function useSurveyMap() {
       if (state.questionId) {
         const previousEventId = getDrawingEventId(
           state.questionId,
-          state.selectionType
+          state.selectionType,
         );
         state.rpcChannel.postRequest('DrawTools.StopDrawingRequest', [
           previousEventId,
@@ -409,7 +441,7 @@ export function useSurveyMap() {
       // Remove all static features from the map
       state.rpcChannel.postRequest(
         'MapModulePlugin.RemoveFeaturesFromMapRequest',
-        [null, null, answerGeometryLayer]
+        [null, null, answerGeometryLayer],
       );
       state.rpcChannel.postRequest('MapModulePlugin.RemoveMarkersRequest', []);
 
@@ -464,8 +496,8 @@ export function useSurveyMap() {
     onModify(
       questionId: number,
       callback: (
-        features: GeoJSON.Feature<Point | LineString | Polygon>[]
-      ) => void
+        features: GeoJSON.Feature<Point | LineString | Polygon>[],
+      ) => void,
     ) {
       // Create a handler for any modification DrawingEvents
       const handler: DrawingEventHandler = (event) => {
@@ -523,7 +555,7 @@ export function useSurveyMap() {
       }
       state.rpcChannel.postRequest(
         'MapModulePlugin.RemoveFeaturesFromMapRequest',
-        [null, null, answerGeometryLayer]
+        [null, null, answerGeometryLayer],
       );
       drawAnswerGeometries(geometries);
     },
@@ -547,6 +579,18 @@ export function useSurveyMap() {
      */
     get drawing() {
       return state.questionId !== null;
+    },
+    /**
+     * Get all current layers
+     * @returns
+     */
+    async getAllLayers() {
+      if (!state.rpcChannel) {
+        return [];
+      }
+      return new Promise<Layer[]>((resolve) => {
+        state.rpcChannel.getAllLayers((layers) => resolve(layers));
+      });
     },
   };
 }
@@ -604,6 +648,11 @@ function reducer(state: State, action: Action): State {
         ...state,
         modifying: action.value,
       };
+    case 'SET_OSKARI_VERSION':
+      return {
+        ...state,
+        oskariVersion: action.value,
+      };
     default:
       throw new Error('Invalid action type');
   }
@@ -653,7 +702,7 @@ export default function SurveyMapProvider({
       // Update visibility for each layer - only show it if current page has that layer visible
       state.rpcChannel.postRequest(
         'MapModulePlugin.MapLayerVisibilityRequest',
-        [layerId, state.visibleLayers.includes(layerId)]
+        [layerId, state.visibleLayers.includes(layerId)],
       );
     });
   }, [state.rpcChannel, state.allLayers, state.visibleLayers]);

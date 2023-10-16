@@ -1,9 +1,10 @@
 import { SurveyFreeTextQuestion } from '@interfaces/survey';
-import { FormHelperText, TextField } from '@material-ui/core';
+import { FormHelperText, TextField } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React from 'react';
 
 interface Props {
+  autoFocus?: boolean;
   question: SurveyFreeTextQuestion;
   value: string;
   onChange: (value: string) => void;
@@ -12,6 +13,7 @@ interface Props {
 }
 
 export default function FreeTextQuestion({
+  autoFocus = false,
   question,
   value,
   onChange,
@@ -22,6 +24,7 @@ export default function FreeTextQuestion({
   return (
     <>
       <TextField
+        autoFocus={autoFocus}
         value={value}
         multiline
         required={question.isRequired}
@@ -34,11 +37,11 @@ export default function FreeTextQuestion({
           setDirty(true);
           onChange(event.target.value);
         }}
-        onBlur={() => {
-          setDirty(true);
-        }}
       />
-      <FormHelperText id={`${question.id}-helper-text`}>
+      <FormHelperText
+        aria-hidden={value.length < 0.95 * maxLength}
+        id={`${question.id}-helper-text`}
+      >
         {tr.SurveyQuestion.charactersRemaining.replace(
           '{x}',
           String(maxLength - value.length)

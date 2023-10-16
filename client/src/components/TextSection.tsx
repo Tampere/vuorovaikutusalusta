@@ -25,11 +25,11 @@ export default function TextSection({ section }: Props) {
         }}
       >
         {section.title?.[surveyLanguage] && (
-          <h2
+          <h3
             style={{ color: survey.sectionTitleColor ?? '#000000', margin: 0 }}
           >
             {section.title?.[surveyLanguage]}
-          </h2>
+          </h3>
         )}
         {section.info && section.info?.[surveyLanguage] && (
           <SectionInfo

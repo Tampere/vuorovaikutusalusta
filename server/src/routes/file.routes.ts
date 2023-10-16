@@ -1,11 +1,15 @@
 import {
+  getAdminInstructions,
+  storeAdminInstructions,
+} from '@src/application/admin';
+import {
   getFile,
   getImages,
   removeFile,
   storeFile,
 } from '@src/application/survey';
 import { ensureAuthenticated } from '@src/auth';
-import { validateRequest } from '@src/utils';
+import { parseMimeType, validateRequest } from '@src/utils';
 import { Router } from 'express';
 import asyncHandler from 'express-async-handler';
 import { param } from 'express-validator';
@@ -13,6 +17,41 @@ import multer from 'multer';
 
 const router = Router();
 const upload = multer({ limits: { fileSize: 10 * 1000 * 1000 } });
+
+/**
+ * Endpoint for getting admin instructions
+ */
+router.get(
+  '/instructions',
+
+  ensureAuthenticated(),
+  asyncHandler(async (_req, res) => {
+    const row = await getAdminInstructions();
+
+    res.set('Content-type', row.mimeType);
+    res.set('File-details', JSON.stringify({ name: row.name }));
+    res.status(200).send(row.data);
+  }),
+);
+
+/**
+ * Endpoint for posting new admin instructions
+ */
+router.post(
+  '/instructions',
+  upload.single('file'),
+  ensureAuthenticated(),
+  asyncHandler(async (req, res) => {
+    const { buffer, originalname, mimetype } = req.file;
+    const { name } = await storeAdminInstructions(
+      originalname,
+      parseMimeType(mimetype),
+      buffer,
+    );
+
+    res.status(200).json({ message: `File ${name} succesfully stored` });
+  }),
+);
 
 /**
  * Endpoint for inserting a single file
@@ -43,7 +82,22 @@ router.post(
       surveyId: surveyId == null ? null : Number(surveyId),
     });
     res.status(200).json({ id });
-  })
+  }),
+);
+
+/**
+ * Endpoint for fetching all available survey images with certain type specified by filepath
+ */
+router.get(
+  '/:filePath?',
+  ensureAuthenticated(),
+  asyncHandler(async (req, res) => {
+    const { filePath } = req.params;
+    const filePathArray = filePath?.split('/') ?? [];
+    const row = await getImages(filePathArray);
+
+    res.status(200).json(row);
+  }),
 );
 
 /**
@@ -65,19 +119,7 @@ router.get(
     res.set('Content-type', row.mimeType);
     res.set('File-details', JSON.stringify(row.details));
     res.status(200).send(row.data);
-  })
-);
-
-/**
- * Endpoint for fetching all available survey background images
- */
-router.get(
-  '/',
-  ensureAuthenticated(),
-  asyncHandler(async (req, res) => {
-    const row = await getImages();
-    res.status(200).json(row);
-  })
+  }),
 );
 
 /**
@@ -99,7 +141,7 @@ router.delete(
 
     await removeFile(fileName, filePathArray);
     res.status(200).send();
-  })
+  }),
 );
 
 export default router;

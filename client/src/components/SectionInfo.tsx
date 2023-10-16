@@ -5,25 +5,36 @@ import {
   DialogContent,
   IconButton,
   Tooltip,
-} from '@material-ui/core';
-import React, { useState } from 'react';
-import { Help as HelpIcon } from '@material-ui/icons';
+} from '@mui/material';
+import React, { forwardRef, useImperativeHandle, useState } from 'react';
+import { Help as HelpIcon } from '@mui/icons-material';
 import ReactMarkdown from 'react-markdown';
 import rehypeExternalLinks from 'rehype-external-links';
 import { useTranslations } from '@src/stores/TranslationContext';
+import useId from '@mui/material/utils/useId';
 
 interface Props {
   subject: string;
   infoText: string;
   style?: React.CSSProperties;
+  hiddenFromScreenReader?: boolean;
 }
 
-export default function SectionInfo({ subject, infoText, style }: Props) {
-  const [infoDialogOpen, setInfoDialogOpen] = useState(false);
+export default forwardRef(function SectionInfo(
+  { subject, infoText, style, hiddenFromScreenReader = false }: Props,
+  ref,
+) {
   const { tr } = useTranslations();
+  const dialogId = useId();
+
+  const [infoDialogOpen, setInfoDialogOpen] = useState(false);
+
+  useImperativeHandle(ref, () => {
+    return { infoDialogOpen };
+  });
 
   return (
-    <div style={style ?? {}}>
+    <div style={style ?? {}} aria-hidden={hiddenFromScreenReader}>
       <Tooltip title={tr.SurveyQuestion.showInfo}>
         <IconButton
           aria-label={`${tr.SurveyQuestion.showInfo}: ${subject}`}
@@ -32,18 +43,20 @@ export default function SectionInfo({ subject, infoText, style }: Props) {
           <HelpIcon color="primary" fontSize="medium" />
         </IconButton>
       </Tooltip>
-      <Dialog onClose={() => setInfoDialogOpen(false)} open={infoDialogOpen}>
-        <DialogContent
-          tabIndex={0}
-          aria-label={`${tr.SurveyQuestion.info}: ${subject}`}
-        >
+      <Dialog
+        aria-describedby={`${dialogId}-dialog-content`}
+        onClose={() => setInfoDialogOpen(false)}
+        open={infoDialogOpen}
+      >
+        <DialogContent id={`${dialogId}-dialog-content`}>
           <ReactMarkdown rehypePlugins={[rehypeExternalLinks]}>
             {infoText}
           </ReactMarkdown>
         </DialogContent>
         <DialogActions>
           <Button
-            tabIndex={1}
+            className="close-section-info-button"
+            autoFocus
             color="primary"
             variant="contained"
             onClick={() => setInfoDialogOpen(false)}
@@ -54,4 +67,4 @@ export default function SectionInfo({ subject, infoText, style }: Props) {
       </Dialog>
     </div>
   );
-}
+});

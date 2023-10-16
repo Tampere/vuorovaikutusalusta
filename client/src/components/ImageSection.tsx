@@ -1,5 +1,5 @@
 import { SurveyImageSection } from '@interfaces/survey';
-import { FormLabel, Link } from '@material-ui/core';
+import { FormLabel, Link } from '@mui/material';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { getFullFilePath } from '@src/utils/path';
@@ -16,7 +16,7 @@ export default function ImageSection({ section }: Props) {
 
   const fullFilePath = useMemo(
     () => getFullFilePath(section.filePath, section.fileName),
-    [section.filePath, section.fileName]
+    [section.filePath, section.fileName],
   );
 
   return (
@@ -29,7 +29,7 @@ export default function ImageSection({ section }: Props) {
         }}
       >
         <FormLabel
-          component="legend"
+          component="h3"
           style={{ color: survey.sectionTitleColor ?? '#000000' }}
         >
           {section.title?.[surveyLanguage]}

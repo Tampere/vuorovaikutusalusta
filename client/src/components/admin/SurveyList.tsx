@@ -4,10 +4,11 @@ import { useState } from 'react';
 import { createNewSurvey, getSurveys } from '@src/controllers/SurveyController';
 import { useToasts } from '@src/stores/ToastContext';
 import SurveyListItem from './SurveyListItem';
-import { FormControlLabel, Skeleton, Switch } from '@material-ui/core';
-import { makeStyles } from '@material-ui/styles';
+import { FormControlLabel, Skeleton, Switch } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import LoadingButton from '../LoadingButton';
+import { useHistory } from 'react-router-dom';
 
 const useStyles = makeStyles({
   root: {
@@ -31,13 +32,18 @@ export default function SurveyList() {
   const classes = useStyles();
   const { showToast } = useToasts();
   const { tr } = useTranslations();
+  const history = useHistory();
 
   useEffect(() => {
     let abortController = new AbortController();
     async function updateSurveys() {
       try {
         setSurveys(
-          await getSurveys(abortController, showAuthoredOnly, showPublishedOnly)
+          await getSurveys(
+            abortController,
+            showAuthoredOnly,
+            showPublishedOnly,
+          ),
         );
         abortController = null;
       } catch (error) {
@@ -56,7 +62,7 @@ export default function SurveyList() {
       abortController?.abort();
     };
   }, [showAuthoredOnly, showPublishedOnly]);
-
+  
   return (
     <div className={classes.root}>
       <div className={classes.actions}>
@@ -89,14 +95,15 @@ export default function SurveyList() {
             setNewSurveyLoading(true);
             try {
               const newSurvey = await createNewSurvey();
-              window.open(`/admin/kyselyt/${newSurvey.id}`);
+              history.push(`/kyselyt/${newSurvey.id}`);
             } catch (error) {
               showToast({
                 severity: 'error',
                 message: tr.SurveyList.errorCreatingNewSurvey,
               });
+            } finally {
+              setNewSurveyLoading(false);
             }
-            setNewSurveyLoading(false);
           }}
         >
           {tr.SurveyList.createNewSurvey}

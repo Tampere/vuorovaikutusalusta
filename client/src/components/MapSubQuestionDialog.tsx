@@ -12,14 +12,14 @@ import {
   FormControl,
   FormHelperText,
   FormLabel,
-} from '@material-ui/core';
-import { makeStyles } from '@material-ui/styles';
+} from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import {
   getEmptyAnswer,
   useSurveyAnswers,
 } from '@src/stores/SurveyAnswerContext';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import CheckBoxQuestion from './CheckBoxQuestion';
 import FreeTextQuestion from './FreeTextQuestion';
 import NumericQuestion from './NumericQuestion';
@@ -77,8 +77,8 @@ export default function MapSubQuestionDialog({
   const [answers, setAnswers] = useState<SurveyMapSubQuestionAnswer[]>([
     ...(existingAnswer?.subQuestionAnswers ?? []),
   ]);
+  const dialogRef = useRef(null);
   const [dirty, setDirty] = useState<boolean[]>([]);
-
   const classes = useStyles();
   const { getValidationErrors } = useSurveyAnswers();
   const { tr, surveyLanguage } = useTranslations();
@@ -93,7 +93,7 @@ export default function MapSubQuestionDialog({
     } else {
       // New map answer - set subquestion answers empty
       const answers = subQuestions?.map(
-        (question) => getEmptyAnswer(question) as SurveyMapSubQuestionAnswer
+        (question) => getEmptyAnswer(question) as SurveyMapSubQuestionAnswer,
       );
       setAnswers(answers);
     }
@@ -107,7 +107,7 @@ export default function MapSubQuestionDialog({
       return;
     }
     return subQuestions.map((question) =>
-      getValidationErrors(question, answers)
+      getValidationErrors(question, answers),
     );
   }, [answers, subQuestions]);
 
@@ -115,39 +115,52 @@ export default function MapSubQuestionDialog({
     <Dialog
       open={open}
       onClose={onCancel}
-      aria-label="subquestion dialog"
-      aria-describedby="subquestion-dialog-content"
+      aria-label={tr.MapQuestion.subQuestionDialog}
     >
       {title && <DialogTitle>{title}</DialogTitle>}
-      <DialogContent
-        id="subquestion-dialog-content"
-        className={classes.content}
-      >
+      <DialogContent className={classes.content}>
         {subQuestions?.map((question, index) => (
           <FormControl
+            component="fieldset"
             key={question.id}
             error={dirty?.[index] && validationErrors?.[index].length > 0}
             style={{ width: '100%' }}
+            onBlur={(e: React.FocusEvent<HTMLFieldSetElement>) => {
+              if (
+                e.relatedTarget &&
+                !(e.relatedTarget as HTMLButtonElement).classList.contains(
+                  'cancel-button',
+                ) &&
+                !e.currentTarget.contains(e.relatedTarget as Node) &&
+                open &&
+                !dialogRef?.current?.infoDialogOpen
+              ) {
+                dirty[index] = true;
+                setDirty([...dirty]);
+              }
+            }}
           >
-            <div
+            <FormLabel
+              component="legend"
               style={{
                 display: 'flex',
                 flexDirection: 'row',
                 alignItems: 'center',
               }}
             >
-              <FormLabel htmlFor={`${question.id}-input`}>
-                {question.title?.[surveyLanguage]} {question.isRequired && '*'}
-              </FormLabel>
+              {question.title?.[surveyLanguage]} {question.isRequired && '*'}
               {question.info && question.info?.[surveyLanguage] && (
                 <SectionInfo
+                  ref={dialogRef}
                   infoText={question.info?.[surveyLanguage]}
                   subject={question.title?.[surveyLanguage]}
                 />
               )}
-            </div>
+            </FormLabel>
+
             {question.type === 'checkbox' ? (
               <CheckBoxQuestion
+                autoFocus={index === 0}
                 value={answers[index]?.value as (number | string)[]}
                 onChange={(value) => {
                   answers[index].value = value;
@@ -161,6 +174,7 @@ export default function MapSubQuestionDialog({
               />
             ) : question.type === 'radio' ? (
               <RadioQuestion
+                autoFocus={index === 0}
                 value={answers[index]?.value as number | string}
                 onChange={(value) => {
                   answers[index].value = value;
@@ -174,6 +188,7 @@ export default function MapSubQuestionDialog({
               />
             ) : question.type === 'free-text' ? (
               <FreeTextQuestion
+                autoFocus={index === 0}
                 value={answers[index]?.value as string}
                 onChange={(value) => {
                   answers[index].value = value;
@@ -188,6 +203,7 @@ export default function MapSubQuestionDialog({
               />
             ) : question.type === 'numeric' ? (
               <NumericQuestion
+                autoFocus={index === 0}
                 value={answers[index]?.value as number}
                 onChange={(value) => {
                   answers[index].value = value;
@@ -216,13 +232,15 @@ export default function MapSubQuestionDialog({
             onClick={() => {
               onDelete();
             }}
-            variant="contained"
+            color="error"
           >
             {tr.MapQuestion.removeAnswer}
           </Button>
         )}
         <div style={{ flexGrow: 1 }} />
         <Button
+          className="cancel-button"
+          variant="outlined"
           onClick={() => {
             onCancel();
           }}
@@ -230,6 +248,7 @@ export default function MapSubQuestionDialog({
           {tr.commands.cancel}
         </Button>
         <Button
+          variant="contained"
           onClick={() => {
             onSubmit(answers);
           }}

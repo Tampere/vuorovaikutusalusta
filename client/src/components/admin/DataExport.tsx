@@ -7,7 +7,7 @@ import {
   DialogTitle,
   FormControlLabel,
   Typography,
-} from '@material-ui/core';
+} from '@mui/material';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { request } from '@src/utils/request';
@@ -15,6 +15,7 @@ import React, { useState } from 'react';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 import { FileAnswer } from '@interfaces/survey';
+import { Download } from '@mui/icons-material';
 
 interface Props {
   surveyId: number;
@@ -35,12 +36,14 @@ export default function DataExport({ surveyId }: Props) {
 
   async function exportCSV() {
     try {
-      const res = (await request(`/api/answers/${surveyId}/file-export/csv`, {
+      const res = await fetch(`/api/answers/${surveyId}/file-export/csv`, {
         method: 'POST',
-      })) as string;
+      });
+
+      const csvText = await res.text();
 
       const link = document.createElement('a');
-      link.href = `data:text/csv;charset=utf-8,${encodeURI(res)}`;
+      link.href = `data:text/csv;charset=utf-8,${encodeURI(csvText)}`;
       link.target = '_blank';
       link.download = 'data.csv';
       link.click();
@@ -58,7 +61,7 @@ export default function DataExport({ surveyId }: Props) {
         `/api/answers/${surveyId}/file-export/geopackage`,
         {
           method: 'POST',
-        }
+        },
       );
 
       if (!res.ok) {
@@ -91,7 +94,7 @@ export default function DataExport({ surveyId }: Props) {
   async function exportAttachments() {
     try {
       const files = (await request(
-        `/api/answers/${surveyId}/file-export/attachments`
+        `/api/answers/${surveyId}/file-export/attachments`,
       )) as FileAnswer[];
 
       const zip = new JSZip();
@@ -99,8 +102,8 @@ export default function DataExport({ surveyId }: Props) {
         zip.file(
           file.fileName,
           file.fileString.replace(allowedFilesRegex, ''),
-          { base64: true }
-        )
+          { base64: true },
+        ),
       );
       const blob = await zip.generateAsync({ type: 'blob' });
       saveAs(blob, 'vastaukset.zip');
@@ -112,7 +115,8 @@ export default function DataExport({ surveyId }: Props) {
   return (
     <>
       <Button
-        style={{ marginLeft: 'auto' }}
+        startIcon={<Download />}
+        sx={{ marginRight: 'auto' }}
         variant="contained"
         onClick={() => setDisplayDialog((prev) => !prev)}
       >

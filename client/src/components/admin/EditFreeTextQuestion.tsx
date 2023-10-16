@@ -4,7 +4,7 @@ import {
   FormControlLabel,
   FormGroup,
   TextField,
-} from '@material-ui/core';
+} from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React from 'react';
 

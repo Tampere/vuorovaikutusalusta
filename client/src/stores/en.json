@@ -25,7 +25,7 @@
     "toFrontPage": "Back to the front page",
     "info": "Basic information",
     "email": "Email",
-    "newPage": "New page",
+    "newPage": "Create page",
     "newPageFailed": "Error while creating a new page. Please try again later.",
     "thanksPage": "Thanks page",
     "translations": "Translations",
@@ -36,7 +36,12 @@
     "deleteSurveyConfirm": "Are you sure you want to delete the survey? This action cannot be reversed.",
     "deleteSurveyFailed": "Error while deleting the survey. Please try again later.",
     "deleteSurveySuccessful": "Survey successfully deleted!",
-    "allowSavingUnfinished": "Allow saving an unfinished survey"
+    "allowSavingUnfinished": "Allow saving an unfinished survey",
+    "displayPrivacyStatement": "Display link for data protection and management in the footer",
+    "copyPage": "Copy page",
+    "attachNewPage": "Attach page",
+    "pageAttached": "Please note that selected map layers are not copied. Check map layer selections and fix published map url if needed.",
+    "pageCopied": "Page copied to clipboard. Use can now attach the page to any survey."
   },
   "EditSurveyInfo": {
     "title": "Survey title",
@@ -53,6 +58,7 @@
     "availableMapLayers": "Available map layers:",
     "startDate": "Start date",
     "endDate": "End date",
+    "selectDateAndTime": "Select date and time",
     "theme": "Theme",
     "selectTheme": "Choose a theme",
     "themeFetchFailed": "Failed to access survey themes. Please try again later.",
@@ -88,6 +94,7 @@
       "map": "Map",
       "image": "Image"
     },
+    "sidebarLabel": "Navigation menu",
     "warningNoMapUrl": "Oskari map publication url has not been set.",
     "warningNoAvailableMapLayers": "No available map layers found from the Oskari map publication.",
     "mapLayers": "Map layers shown on the survey page",
@@ -95,7 +102,15 @@
     "title": "Title",
     "deleteSection": "Delete section",
     "confirmDeleteSection": "Are you sure you want to delete this section?",
-    "imageAltText": "Alternative text for the image"
+    "imageAltText": "Alternative text for the image",
+    "imageScaling": "Image scaling",
+    "imageScalingLabel": {
+      "original": "Original size",
+      "fitted": "Fitted to page size"
+    },
+    "sectionCopied": "Section copied to clipboard and can now be attached to a question.",
+    "sectionAttached": "Please note that selected map layers are not copied. Check map layer selections and fix published map url if needed.",
+    "attachSection": "Copy section from clipboard"
   },
   "FileUpload": {
     "deleteFile": "Delete file",
@@ -119,6 +134,7 @@
     "sortingQuestion": "Add sorting question",
     "sliderQuestion": "Add slider question",
     "matrixQuestion": "Add likert scale question",
+    "multiMatrixQuestion": "Add multiple choice likert scale question",
     "groupedCheckboxQuestion": "Add grouped checkbox question",
     "imageSection": "Add image section",
     "documentSection": "Add document section",
@@ -126,7 +142,8 @@
   },
   "SliderQuestion": {
     "defaultMinLabel": "Strongly disagree",
-    "defaultMaxLabel": "Strongly agree"
+    "defaultMaxLabel": "Strongly agree",
+    "scale": "Scale"
   },
   "SurveySection": {
     "radioQuestion": "Radio button question (single choice)",
@@ -138,10 +155,12 @@
     "sortingQuestion": "Sorting question",
     "sliderQuestion": "Slider question",
     "matrixQuestion": "Likert scale question",
+    "multiMatrixQuestion": "Multiple choice likert scale question",
     "groupedCheckboxQuestion": "Grouped checkbox question",
     "imageSection": "Image section",
     "documentSection": "Document section",
-    "attachmentSection": "Attachment section"
+    "attachmentSection": "Attachment section",
+    "question": "Question"
   },
   "SurveySections": {
     "limitAnswers": "Limit the number of answers",
@@ -156,7 +175,8 @@
     "sectionInfo": "Additional information related to the section",
     "allowEmptyAnswer": "Allow 'I don't know' -answers",
     "optionInfo": "Answer option information",
-    "removeOption": "Delete answer option"
+    "removeOption": "Delete answer option",
+    "selectAnswer": "Select an answer"
   },
   "NumericQuestion": {
     "minValue": "Minimum value {minValue}",
@@ -168,18 +188,29 @@
     "fileUploadError": "Error while uploading file",
     "fileSizeLimitError": "File size cannot exceed 10MB",
     "unsupportedFileFormat": "Unsupported file format",
-    "attachmentFileFormats": "Supported file formats: jpg, jpeg, png, pdf, docx, xlsx."
+    "attachmentFileFormats": "Supported file formats: jpg, jpeg, png, pdf, docx, xlsx.",
+    "deleteUploadedFile": "Delete uploaded file",
+    "replace": "Replace the selected file by clicking here."
   },
   "SurveyImageList": {
     "attributions": "Copyright & attributions",
-    "noImage": "No background image",
+    "noBackgroundImage": "No background image",
+    "noThanksPageImage": "No thank you page image",
+    "noImage": "No image",
     "surveyImage": "Survey background image",
+    "thanksPageImage": "Image for thank you page",
+    "image": "Image",
     "selectImage": "Choose background image",
     "addNewImage": "Add a new image",
-    "files": "File"
+    "files": "File",
+    "imageSizeExceeded": "Image maximum size is {x} MB",
+    "imageUploadError": "Image uploading failed",
+    "imageDownloadError": "Image downloading failed",
+    "multipleImagesDownloadError": "Error while downloading images",
+    "imageDeleteError": "Error while deleting image"
   },
   "DropZone": {
-    "dropFiles": "Drop file here or click to choose the file"
+    "dropFiles": "Click to select a file or drop it here (max {x} MB)."
   },
   "EditTextSection": {
     "text": "Text",
@@ -260,7 +291,10 @@
     "errorFetchingColors": "Error while accessing colors. Please try again later."
   },
   "SurveyList": {
-    "title": "Interaction platform - Surveys",
+    "title": {
+      "main": "Interaction platform",
+      "frontPage": "Surveys"
+    },
     "errorFetchingSurveys": "Error while accessing surveys. Please try again later.",
     "editSurvey": "Edit survey",
     "publishNow": "Publish now",
@@ -282,7 +316,8 @@
     "notPublished": "Unpublished",
     "showAuthoredOnly": "Show authored surveys only",
     "showPublishedOnly": "Show published surveys only",
-    "copySurvey": "Copy survey"
+    "copySurvey": "Copy survey",
+    "answers": "Answers"
   },
   "SurveyPage": {
     "errorSurveyNotFound": "Survey was not found, or it is not published. Please check the address and try again.",
@@ -294,7 +329,7 @@
     "errorLoadingUnfinished": "Failed to load previously stored answers. Please try again later."
   },
   "UnavailableSurvey": {
-    "surveyNotPublished": "The survey is closed and answering is not possible anymore. Thank You for your interest on the survey!",
+    "surveyNotPublished": "The survey is not available at the moment. Thank You for your interest on the survey!",
     "treTopicalInfo": "You can access topical issues of the city of Tampere from the link below.",
     "tre": "The city of Tampere"
   },
@@ -312,9 +347,16 @@
     "submit": "Submit",
     "errorSubmittingSurvey": "Error while submitting the survey. Please try again later.",
     "openMap": "Open the map",
+    "closeMap": "Close the map",
     "openImage": "Open the image",
-    "unfinishedAnswers": "Please, answer all mandatory questions",
-    "saveAsUnfinished": "Save unfinished survey"
+    "closeImage": "Close the image",
+    "unfinishedAnswers": "Please, answer all mandatory questions.",
+    "unfinishedAnswersInfo": "The following answers need to be answered:",
+    "saveAsUnfinished": "Save unfinished survey",
+    "step": "Step",
+    "outOf": "out of",
+    "completedStep": "Completed step",
+    "futureStep": "Future step"
   },
   "SaveAsUnfinishedDialog": {
     "description": "You can save the unfinished survey by providing your email address. A link will be sent to your email, from which you can access your unfinished survey provided that the survey is still open.",
@@ -324,21 +366,26 @@
     "errorSaving": "Error while saving answers. Please try again later."
   },
   "SurveyQuestion": {
-    "errorFieldIsRequired": "Field is mandatory.",
+    "errorFieldIsRequired": "Answer is mandatory.",
+    "accessibilityTooltip": "Please answer question:",
     "answerLimitsMinMax": "Choose a minimum of {min} and a maximum of {max} options",
     "answerLimitsMin": "Choose a minimum of {min} options",
     "answerLimitsMax": "Choose a maximum of {max} options",
-    "customAnswer": "Something else, what?",
+    "customAnswer": "Other (specify below)",
+    "customAnswerField": "Specify your answer here.",
     "charactersRemaining": "{x} character(s) left.",
     "showInfo": "Show additional information",
     "info": "Additional information"
   },
   "MapQuestion": {
+    "mapSelectionButtons": "Map selection buttons",
     "selectionTypes": {
-      "point": "Point",
-      "line": "Line",
-      "area": "Area"
+      "point": "Point marking",
+      "line": "Line marking",
+      "area": "Area marking"
     },
+    "markingsMade": "markings made.",
+    "subQuestionDialog": "Subquestion dialog",
     "selectionHelperText": {
       "point": "Draw point on the desired location by clicking the map on that location.",
       "line": "Start drawing by clicking the starting point on the map. Continue drawing by clicking on the next point on the map. Stop drawing by clicking the last point of the line again.",
@@ -350,11 +397,33 @@
     "confirmRemoveAnswer": "Are you sure you want to delete this answer?"
   },
   "SurveyMap": {
+    "browsingInstructions": "Pan the map view with the arrow keys, zoom in and out using plus and minus keys.",
     "editGeometries": "Modify your previous map answers",
-    "finishEditingGeometries": "Stop modifying map answers"
+    "finishEditingGeometries": "Stop modifying map answers",
+    "iFrameTitle": "Map view"
   },
   "MatrixQuestion": {
-    "emptyAnswer": "I don't know"
+    "emptyAnswer": "I don't know",
+    "subject": "Subject",
+    "response": "Response"
+  },
+  "MultiMatrixQuestion": {
+    "answerClass": "Option",
+    "unansweredRow": "Question row {x} needs more answers to be selected",
+    "unansweredRows": "Question rows {x} need more answers to be selected.",
+    "and": "and",
+    "answerLimitsMinMax": "Choose a minimum of {min} and a maximum of {max} options from each row.",
+    "answerLimitsMin": "Choose a minimum of {min} options from each row.",
+    "answerLimitsMax": "Choose a maximum of {max} options from each row.",
+    "selected": "selected",
+    "SR": {
+      "isRequired": "Please select at least one option on each row.",
+      "mustSelectMore": "Please select {x} more options from this row.",
+      "maySelectMore": "You may select {x} more options from this row.",
+      "maxSelected": "You have selected the maximum number of options from this row.",
+      "IDK": "This option replaces the others on this row.",
+      "replacingIDK": "Replaces the currently selected \"I don't know\" -option."
+    }
   },
   "ImageSection": {
     "openInNewTab": "Open image on a new tab"
@@ -362,7 +431,17 @@
   "SortingQuestion": {
     "empty": "Empty",
     "rankForOption": "Rank for the option: {option}",
-    "sortedOptions": "Options sorted"
+    "sortedOptions": "Options sorted",
+    "orderComplete": "The items are now in the correct order.",
+    "confirmationGuide": "When ready, check the box to confirm your answer.",
+    "inPosition": "In position ",
+    "announcement": {
+      "focus": "Move this item by pressing spacebar. You may need to activate focus mode.",
+      "grab": "Picked up from position {position} . Move with arrow keys.",
+      "move": "Now at position {position} out of {length} . Set here by pressing spacebar.",
+      "drop": "Set to position {position} .",
+      "droppedInPlace": "Replaced to the original position {position} ."
+    }
   },
   "DocumentSection": {
     "attachment": "Attachment"
@@ -376,21 +455,42 @@
     "surveyToBeDeleted": "name of the survey to be deleted"
   },
   "GroupedCheckBoxQuestion": {
-    "helperText": "Choose options from the groups listed below.",
-    "helperTextMin": "Choose a minimum of {min} options.",
-    "helperTextMax": "Choose a maximum of {max} options.",
-    "helperTextMinMax": "Choose a minimum of {min} and a maximum of {max} options.",
-    "indicatorText": "You have chosen {numbers} options.",
-    "indicatorTextMaxReached": "You have chosen all {numbers} options.",
-    "optionsSelectedInGroup": "{number} options chosen."
+    "helperText": "Select options from the groups listed below.",
+    "helperTextMin": "Select a minimum of {min} options.",
+    "helperTextMax": "Select a maximum of {max} options.",
+    "helperTextMinMax": "Select a minimum of {min} and a maximum of {max} options.",
+    "indicatorText": "You have selected {numbers} options.",
+    "indicatorTextMaxReached": "You have selected all {numbers} options.",
+    "optionsSelectedInGroup": "{number} options selected."
   },
   "SubmissionInfoDialog": {
     "title": "Submit answers",
     "text": "If you want a copy of your answers, please write your email address in the provided field.",
     "email": "Email address (optional)"
   },
+  "AnswersList": {
+    "answers": "Answers",
+    "selectQuestion": "Select a question first",
+    "noAnswers": "Selected question has no answers.",
+    "respondent": "Respondent {x}",
+    "mapMarkingIndex": "Map marking {x}",
+    "hideOldResponses": "Hide old comments...",
+    "showOldResponses": "Display {x} older comments"
+  },
   "AppBarUserMenu": {
-    "logout": "Logout"
+    "label": "User menu",
+    "logout": "Logout",
+    "updateInstructions": "Update user instructions"
+  },
+  "InstructionsDialog": {
+    "fetchingError": "Error while fetching current user instructions",
+    "currentInstructions": "Current instructions",
+    "uploadNewInstructions": "Upload new instructions",
+    "wrongFileFormat": "The file needs to be in pdf format",
+    "fileUploadError": "Error while uploading file",
+    "fileSizeLimitError": "File size cannot exceed {x}MB",
+    "submit": "Send",
+    "cancel": "Cancel"
   },
   "MapInfoBox": {
     "answer": "Answer"
@@ -399,11 +499,13 @@
     "text": "This is a test survey. Survey answers are not saved nor are any email reports sent."
   },
   "LanguageMenu": {
+    "languageControl": "Language / Kieli",
     "changeLanguage": "Change service language",
     "fi": "Suomi",
     "en": "English"
   },
   "SurveyLanguageMenu": {
+    "languageControl": "Language / Kieli",
     "changeSurveyLanguage": "Change language of the survey",
     "surveyLanguage": "Survey language"
   },
@@ -424,6 +526,23 @@
     "emailInfo": "Email",
     "thanksPage": "Thank you -page"
   },
+  "SurveySubmissionsPage": {
+    "attachments": "Attachments",
+    "noAttachments": "No attachments",
+    "summary": "Summary",
+    "toHomePage": "To home page",
+    "answerCount": "Total answer count: {x}",
+    "respondentCount": "Total respondents {x}",
+    "pageNumber": "Page {x}:",
+    "dataChart": {
+      "tooltipWeekLabel": "Week {x}, Year",
+      "tooltipTotal": "Total answers",
+      "tooltipCurrent": "Answers",
+      "xAxisLabel": { "byDay": "Day", "byWeek": "Week" },
+      "yAxisTotalLabel": "Total answers",
+      "yAxisLabel": "Answers"
+    }
+  },
   "navigation": {
     "next": "Next",
     "back": "Back"
@@ -443,5 +562,14 @@
     "yes": "Yes",
     "no": "No",
     "ok": "OK"
-  }
+  },
+  "FooterLinks": {
+    "accessibility": "Accessibility report",
+    "privacyStatement": "Data protection statement"
+  },
+  "IconAltTexts": {
+    "treBannerAltText": "Tampere banner",
+    "treLogoAltText": "Tampere Finland logo"
+  },
+  "adminInstructions": "Open user manual"
 }

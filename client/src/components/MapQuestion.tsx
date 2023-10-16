@@ -11,24 +11,27 @@ import {
   ToggleButton,
   ToggleButtonGroup,
   Typography,
-} from '@material-ui/core';
+  useMediaQuery,
+} from '@mui/material';
 import { useSurveyMap } from '@src/stores/SurveyMapContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useEffect, useRef, useState } from 'react';
 import ConfirmDialog from './ConfirmDialog';
-import AreaIcon from './icons/AreaIcon';
-import LineIcon from './icons/LineIcon';
-import PointIcon from './icons/PointIcon';
 import MapSubQuestionDialog from './MapSubQuestionDialog';
 
 interface Props {
   value: MapQuestionAnswer[];
   onChange: (value: MapQuestionAnswer[]) => void;
   question: SurveyMapQuestion;
-  setDirty: (dirty: boolean) => void;
+  setDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export default function MapQuestion({ value, onChange, question }: Props) {
+export default function MapQuestion({
+  value,
+  onChange,
+  question,
+  setDialogOpen,
+}: Props) {
   const [drawingCancelled, setDrawingCancelled] = useState(false);
   const drawingCancelledRef = useRef(drawingCancelled);
   const [selectionType, setSelectionType] =
@@ -38,6 +41,7 @@ export default function MapQuestion({ value, onChange, question }: Props) {
     useState<(answers: SurveyMapSubQuestionAnswer[]) => void>(null);
   const [deleteConfirmDialogOpen, setDeleteConfirmDialogOpen] = useState(false);
   const [clearConfirmDialogOpen, setClearConfirmDialogOpen] = useState(false);
+
   const {
     draw,
     isMapReady,
@@ -63,7 +67,7 @@ export default function MapQuestion({ value, onChange, question }: Props) {
         valueRef.current.map((answer, index) => ({
           ...answer,
           geometry: features[index],
-        }))
+        })),
       );
     });
     // On unmount unregister the event handler
@@ -118,6 +122,7 @@ export default function MapQuestion({ value, onChange, question }: Props) {
           selectionType,
           geometry,
           subQuestionAnswers,
+          mapLayers: [],
         },
       ]);
       setSelectionType(null);
@@ -153,6 +158,8 @@ export default function MapQuestion({ value, onChange, question }: Props) {
     }
   }, [drawing]);
 
+  const mobileWidth = useMediaQuery('(max-width:600px)');
+
   async function getSubQuestionAnswers() {
     // Don't open the dialog at all if there are no subquestions
     if (!question.subQuestions?.length) {
@@ -165,29 +172,58 @@ export default function MapQuestion({ value, onChange, question }: Props) {
           () => (answers: SurveyMapSubQuestionAnswer[]) => {
             resolve(answers);
             setSubQuestionDialogOpen(false);
-          }
+          },
         );
-      }
+      },
     );
   }
 
+  useEffect(() => {
+    setDialogOpen(
+      deleteConfirmDialogOpen || clearConfirmDialogOpen || subQuestionDialogOpen
+        ? true
+        : false,
+    );
+  }, [deleteConfirmDialogOpen, clearConfirmDialogOpen, subQuestionDialogOpen]);
+
   function getToggleButton(selectionType: MapQuestionSelectionType) {
+    const markingCount = value?.filter(
+      (answer) => answer.selectionType === selectionType,
+    ).length;
     return (
       <ToggleButton
+        id={`${question.id}-draw-button`}
         value={selectionType}
-        aria-label={selectionType}
+        aria-label={`${tr.MapQuestion.selectionTypes[selectionType]}
+          ${
+            markingCount > 0
+              ? ` ${markingCount} ${tr.MapQuestion.markingsMade}`
+              : ''
+          }`}
         disabled={!isMapReady}
       >
-        <Badge
-          badgeContent={
-            value?.filter((answer) => answer.selectionType === selectionType)
-              .length
-          }
-          color="secondary"
-        >
-          {selectionType === 'point' && <PointIcon width="2rem" />}
-          {selectionType === 'line' && <LineIcon width="2rem" />}
-          {selectionType === 'area' && <AreaIcon width="2rem" />}
+        <Badge badgeContent={markingCount} color="secondary">
+          {selectionType === 'point' && (
+            <img
+              style={{ height: '2rem' }}
+              src={`/api/feature-styles/icons/point_icon`}
+              alt=""
+            />
+          )}
+          {selectionType === 'line' && (
+            <img
+              style={{ height: '2rem' }}
+              src={`/api/feature-styles/icons/line_icon`}
+              alt=""
+            />
+          )}
+          {selectionType === 'area' && (
+            <img
+              style={{ height: '2rem' }}
+              src={`/api/feature-styles/icons/area_icon`}
+              alt=""
+            />
+          )}
         </Badge>
         <Typography style={{ marginLeft: '1rem' }}>
           {tr.MapQuestion.selectionTypes[selectionType]}
@@ -198,14 +234,18 @@ export default function MapQuestion({ value, onChange, question }: Props) {
 
   return (
     <>
-      <div style={{ display: 'flex', flexDirection: 'column' }}>
+      <div
+        id={`${question.id}-input`}
+        style={{ display: 'flex', flexDirection: 'column' }}
+      >
         <ToggleButtonGroup
           value={selectionType}
           exclusive
           onChange={(_, newValue) => {
             setSelectionType(newValue);
           }}
-          aria-label="map-selection-type"
+          aria-label={tr.MapQuestion.mapSelectionButtons}
+          orientation={mobileWidth ? 'vertical' : 'horizontal'}
         >
           {question.selectionTypes.includes('point') &&
             getToggleButton('point')}
@@ -244,8 +284,8 @@ export default function MapQuestion({ value, onChange, question }: Props) {
             value.map((answer, index) =>
               index === editingMapAnswer.index
                 ? { ...answer, subQuestionAnswers: answers }
-                : answer
-            )
+                : answer,
+            ),
           );
           stopEditingMapAnswer();
         }}
@@ -262,19 +302,35 @@ export default function MapQuestion({ value, onChange, question }: Props) {
         subQuestions={question.subQuestions}
         onSubmit={(answers) => {
           handleSubQuestionDialogClose(answers);
+          setTimeout(() => {
+            (
+              document.getElementById(
+                `${question.id}-draw-button`,
+              ) as HTMLButtonElement
+            )?.focus();
+          }, 1);
         }}
         onCancel={() => {
           handleSubQuestionDialogClose(null);
+
+          setTimeout(() => {
+            (
+              document.getElementById(
+                `${question.id}-draw-button`,
+              ) as HTMLButtonElement
+            )?.focus();
+          }, 1);
         }}
       />
       {/* Confirm dialog for deleting a map answer */}
       <ConfirmDialog
         open={deleteConfirmDialogOpen}
         text={tr.MapQuestion.confirmRemoveAnswer}
+        submitColor="error"
         onClose={(result) => {
           if (result) {
             onChange(
-              value.filter((_, index) => index !== editingMapAnswer.index)
+              value.filter((_, index) => index !== editingMapAnswer.index),
             );
             stopEditingMapAnswer();
           }
@@ -285,6 +341,7 @@ export default function MapQuestion({ value, onChange, question }: Props) {
       <ConfirmDialog
         open={clearConfirmDialogOpen}
         text={tr.MapQuestion.confirmClearAnswers}
+        submitColor="error"
         onClose={(result) => {
           if (result) {
             onChange([]);

@@ -1,7 +1,8 @@
-import { Fab, Tooltip } from '@material-ui/core';
-import { Check, Edit } from '@material-ui/icons';
+import { Fab, Tooltip } from '@mui/material';
+import { Check, Edit } from '@mui/icons-material';
 import { useSurveyMap } from '@src/stores/SurveyMapContext';
 import { useTranslations } from '@src/stores/TranslationContext';
+import { visuallyHidden } from '@mui/utils';
 import OskariRPC from 'oskari-rpc';
 import React, { useEffect, useRef } from 'react';
 
@@ -68,8 +69,13 @@ export default function SurveyMap(props: Props) {
   return (
     props.url && (
       <>
+        <p style={visuallyHidden}>
+          {tr.SurveyMap.browsingInstructions}
+        </p>
         <iframe
           ref={iframeRef}
+          title={tr.SurveyMap.iFrameTitle}
+          aria-describedby="mapEmbedInstructions"
           style={{
             border: 0,
             width: '100%',
@@ -85,7 +91,7 @@ export default function SurveyMap(props: Props) {
               style={{ position: 'absolute', bottom: '1rem', right: '1rem' }}
               variant="extended"
               color="primary"
-              aria-label="edit-geometries"
+              aria-label={tr.SurveyMap.editGeometries}
               onClick={() => {
                 startModifying();
               }}
@@ -100,7 +106,7 @@ export default function SurveyMap(props: Props) {
               style={{ position: 'absolute', bottom: '1rem', right: '1rem' }}
               variant="extended"
               color="primary"
-              aria-label="save-geometries"
+              aria-label={tr.SurveyMap.finishEditingGeometries}
               onClick={() => {
                 stopModifying();
               }}

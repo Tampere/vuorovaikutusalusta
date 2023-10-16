@@ -4,6 +4,7 @@ import {
   SurveyPage,
   SurveyPageSection,
 } from '@interfaces/survey';
+import { getSurvey, updateSurvey } from '@src/controllers/SurveyController';
 import { request } from '@src/utils/request';
 import { useDebounce } from '@src/utils/useDebounce';
 import React, {
@@ -205,7 +206,7 @@ export function useSurvey() {
               // Set all map layers visible by default
               mapLayers: state.availableMapLayers.map((layer) => layer.id),
             } as Partial<SurveyPage>,
-          }
+          },
         );
         dispatch({
           type: 'ADD_PAGE',
@@ -228,10 +229,9 @@ export function useSurvey() {
       dispatch({
         type: 'START_LOADING_ACTIVE_SURVEY',
       });
+
       try {
-        const survey = await request<Survey>(`/api/surveys/${id}`, {
-          method: 'GET',
-        });
+        const survey = await getSurvey(id);
         dispatch({
           type: 'SET_ACTIVE_SURVEY',
           survey,
@@ -289,7 +289,7 @@ export function useSurvey() {
     movePage(pageId: number, index: number) {
       const page = state.activeSurvey.pages.find((page) => page.id === pageId);
       const otherPages = state.activeSurvey.pages.filter(
-        (page) => page.id !== pageId
+        (page) => page.id !== pageId,
       );
       dispatch({
         type: 'SET_PAGES',
@@ -317,7 +317,7 @@ export function useSurvey() {
     editSection(
       pageId: number,
       sectionIndex: number,
-      section: SurveyPageSection
+      section: SurveyPageSection,
     ) {
       dispatch({ type: 'EDIT_SECTION', pageId, sectionIndex, section });
     },
@@ -339,7 +339,7 @@ export function useSurvey() {
       const page = state.activeSurvey.pages.find((page) => page.id === pageId);
       const section = page.sections[oldIndex];
       const otherSections = page.sections.filter(
-        (_, index) => index !== oldIndex
+        (_, index) => index !== oldIndex,
       );
       dispatch({
         type: 'SET_SECTIONS',
@@ -357,9 +357,9 @@ export function useSurvey() {
     async saveChanges() {
       dispatch({ type: 'START_LOADING_ACTIVE_SURVEY' });
       try {
-        const survey = await request<Survey>(
-          `/api/surveys/${state.activeSurvey.id}`,
-          { method: 'PUT', body: state.activeSurvey }
+        const survey = await updateSurvey(
+          state.activeSurvey.id,
+          state.activeSurvey,
         );
         dispatch({
           type: 'SET_ACTIVE_SURVEY',
@@ -410,7 +410,7 @@ function reducer(state: State, action: Action): State {
       return {
         ...state,
         activeSurvey: { ...action.survey },
-        originalActiveSurvey: JSON.parse(JSON.stringify(action.survey)),
+        originalActiveSurvey: structuredClone(action.survey),
       };
     case 'START_LOADING_ACTIVE_SURVEY':
       return {
@@ -468,7 +468,7 @@ function reducer(state: State, action: Action): State {
         activeSurvey: {
           ...state.activeSurvey,
           pages: state.activeSurvey.pages.map((page) =>
-            action.page.id === page.id ? { ...action.page } : page
+            action.page.id === page.id ? { ...action.page } : page,
           ),
         },
       };
@@ -478,14 +478,14 @@ function reducer(state: State, action: Action): State {
         activeSurvey: {
           ...state.activeSurvey,
           pages: state.activeSurvey.pages.filter(
-            (page) => action.pageId !== page.id
+            (page) => action.pageId !== page.id,
           ),
         },
         // Reflect the change to the original survey - the change was already made server-side
         originalActiveSurvey: {
           ...state.originalActiveSurvey,
           pages: state.originalActiveSurvey.pages.filter(
-            (page) => action.pageId !== page.id
+            (page) => action.pageId !== page.id,
           ),
         },
       };
@@ -497,7 +497,7 @@ function reducer(state: State, action: Action): State {
           pages: state.activeSurvey.pages.map((page) =>
             action.pageId === page.id
               ? { ...page, sections: action.sections }
-              : page
+              : page,
           ),
         },
       };
@@ -512,7 +512,7 @@ function reducer(state: State, action: Action): State {
                   ...page,
                   sections: [...page.sections, action.section],
                 }
-              : page
+              : page,
           ),
         },
       };
@@ -530,10 +530,10 @@ function reducer(state: State, action: Action): State {
                       ? {
                           ...action.section,
                         }
-                      : section
+                      : section,
                   ),
                 }
-              : page
+              : page,
           ),
         },
       };
@@ -547,10 +547,10 @@ function reducer(state: State, action: Action): State {
               ? {
                   ...page,
                   sections: page.sections.filter(
-                    (_, index) => index !== action.sectionIndex
+                    (_, index) => index !== action.sectionIndex,
                   ),
                 }
-              : page
+              : page,
           ),
         },
       };
@@ -629,7 +629,9 @@ export default function SurveyProvider({ children }: { children: ReactNode }) {
       dispatch({ type: 'START_LOADING_AVAILABLE_MAP_LAYERS' });
       try {
         const layers = await request<MapLayer[]>(
-          `/api/map/available-layers?url=${encodeURIComponent(debouncedmapUrl)}`
+          `/api/map/available-layers?url=${encodeURIComponent(
+            debouncedmapUrl,
+          )}`,
         );
         dispatch({
           type: 'SET_AVAILABLE_MAP_LAYERS',

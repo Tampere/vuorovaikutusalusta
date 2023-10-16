@@ -2,6 +2,7 @@ import {
   AnswerEntry,
   LanguageCode,
   MapQuestionAnswer,
+  Submission,
   SurveyMapSubQuestionAnswer,
   SurveyPageSection,
 } from '@interfaces/survey';
@@ -17,6 +18,7 @@ import {
   NotFoundError,
 } from '@src/error';
 import logger from '@src/logger';
+import { assertNever } from '@src/utils';
 import { LineString, Point, Polygon } from 'geojson';
 
 /**
@@ -34,6 +36,13 @@ interface DBAnswerEntry {
   parent_entry_id: number;
   value_file: string;
   value_file_name: string;
+  map_layers: number[];
+}
+
+interface DBSubmission {
+  id: number;
+  created_at: Date;
+  updated_at: Date;
 }
 
 /**
@@ -61,6 +70,7 @@ const answerEntryColumnSet = (inputSRID: number) =>
     'parent_entry_id',
     'value_file',
     'value_file_name',
+    'map_layers',
   ]);
 
 /**
@@ -82,7 +92,7 @@ async function validateEntriesByAnswerLimits(answerEntries: AnswerEntry[]) {
     WHERE
       id = ANY ($1) AND
       details->'answerLimits' IS NOT NULL`,
-    [answerEntries.map((entry) => entry.sectionId)]
+    [answerEntries.map((entry) => entry.sectionId)],
   );
   // Validate each entry against the question answer limits
   answerEntries.forEach((entry) => {
@@ -90,14 +100,28 @@ async function validateEntriesByAnswerLimits(answerEntries: AnswerEntry[]) {
     if (question) {
       const min = question.min;
       const max = question.max;
-      const answerCount = (entry.value as (number | string)[]).length;
-      if (
-        (min != null && answerCount < min) ||
-        (max != null && answerCount > max)
-      ) {
-        throw new BadRequestError(
-          `Answer for question ${entry.sectionId} must have between ${min} and ${max} selections`
-        );
+      if (entry.type === 'multi-matrix') {
+        entry.value.some((answerRowValues) => {
+          // Don't validate if empty answer is allowed and used
+          if (answerRowValues.length === 1 && answerRowValues[0] === '-1') {
+            return false;
+          }
+          const answerCount = answerRowValues.length;
+          return (
+            (min != null && answerCount < min) ||
+            (max != null && answerCount > max)
+          );
+        });
+      } else {
+        const answerCount: number = (entry.value as (number | string)[]).length;
+        if (
+          (min != null && answerCount < min) ||
+          (max != null && answerCount > max)
+        ) {
+          throw new BadRequestError(
+            `Answer for question ${entry.sectionId} must have between ${min} and ${max} selections`,
+          );
+        }
       }
     }
   });
@@ -118,7 +142,7 @@ async function validateEntriesByIsRequired(answerEntries: AnswerEntry[]) {
     WHERE
       id = ANY ($1) AND
       (details->>'isRequired')::boolean`,
-    [answerEntries.map((entry) => entry.sectionId)]
+    [answerEntries.map((entry) => entry.sectionId)],
   );
 
   // Check if there is a non-null answer for each required question
@@ -128,11 +152,11 @@ async function validateEntriesByIsRequired(answerEntries: AnswerEntry[]) {
         (entry) =>
           entry.value != null &&
           (typeof entry.value !== 'string' || entry.value !== '') &&
-          entry.sectionId === question.id
+          entry.sectionId === question.id,
       )
     ) {
       throw new BadRequestError(
-        `Answer for question ${question.id} is required`
+        `Answer for question ${question.id} is required`,
       );
     }
   });
@@ -162,7 +186,7 @@ export async function createSurveySubmission(
   answerEntries: AnswerEntry[],
   unfinishedToken: string,
   unfinished = false,
-  language: LanguageCode
+  language: LanguageCode,
 ) {
   // Only validate the entries if saving the final submission (not unfinished)
   if (!unfinished) {
@@ -172,7 +196,7 @@ export async function createSurveySubmission(
   const oldRow = unfinishedToken
     ? await getDb().oneOrNone<{ created_at: Date }>(
         'DELETE FROM data.submission WHERE unfinished_token = $1 RETURNING created_at',
-        [unfinishedToken]
+        [unfinishedToken],
       )
     : null;
 
@@ -197,12 +221,12 @@ export async function createSurveySubmission(
         COALESCE($3, gen_random_uuid()),
         $4
     ) RETURNING id, unfinished_token, updated_at;`,
-    [surveyID, oldRow?.created_at ?? null, unfinishedToken ?? null, language]
+    [surveyID, oldRow?.created_at ?? null, unfinishedToken ?? null, language],
   );
 
   if (!submissionRow) {
     logger.error(
-      `Error while creating submission for survey with id: ${surveyID}, answer entries: ${answerEntries}`
+      `Error while creating submission for survey with id: ${surveyID}, answer entries: ${answerEntries}`,
     );
     throw new InternalServerError(`Error while creating submission for survey`);
   }
@@ -214,8 +238,8 @@ export async function createSurveySubmission(
   const entryIds = await getDb().manyOrNone<{ id: number }>(
     `${getMultiInsertQuery(
       entryRows,
-      answerEntryColumnSet(inputSRID)
-    )} RETURNING id;`
+      answerEntryColumnSet(inputSRID),
+    )} RETURNING id;`,
   );
 
   // Insert subquestion answers for the newly created entries
@@ -231,16 +255,16 @@ export async function createSurveySubmission(
       const subQuestionAnswerRows = answerEntriesToRows(
         id,
         entry.subQuestionAnswers as AnswerEntry[],
-        entryId
+        entryId,
       );
       // Insert the rows
       await getDb().manyOrNone<{ id: number }>(
         getMultiInsertQuery(
           subQuestionAnswerRows,
-          answerEntryColumnSet(inputSRID)
-        )
+          answerEntryColumnSet(inputSRID),
+        ),
       );
-    })
+    }),
   );
 
   return {
@@ -259,7 +283,7 @@ export async function createSurveySubmission(
  */
 function getSRIDFromEntries(submissionEntries: AnswerEntry[]) {
   const geometryEntry = submissionEntries.find(
-    (entry) => entry.type === 'map' && entry.value.length > 0
+    (entry) => entry.type === 'map' && entry.value.length > 0,
   );
   if (!geometryEntry) return null;
 
@@ -278,7 +302,7 @@ function getSRIDFromEntries(submissionEntries: AnswerEntry[]) {
 function answerEntriesToRows(
   submissionID: number,
   submissionEntries: AnswerEntry[],
-  parentEntryId: number = null
+  parentEntryId: number = null,
 ) {
   return submissionEntries.reduce((entries, entry) => {
     let newEntries: DBAnswerEntryWithSubQuestionAnswers[];
@@ -297,6 +321,7 @@ function answerEntriesToRows(
             value_json: null,
             value_file: null,
             value_file_name: null,
+            map_layers: null,
           },
         ];
         break;
@@ -314,6 +339,7 @@ function answerEntriesToRows(
             value_json: null,
             value_file: null,
             value_file_name: null,
+            map_layers: null,
           },
         ];
         break;
@@ -334,6 +360,7 @@ function answerEntriesToRows(
                     value_json: null,
                     value_file: null,
                     value_file_name: null,
+                    map_layers: null,
                   };
                 }),
               ]
@@ -349,6 +376,7 @@ function answerEntriesToRows(
                   value_json: null,
                   value_file: null,
                   value_file_name: null,
+                  map_layers: null,
                 },
               ];
         break;
@@ -365,6 +393,7 @@ function answerEntriesToRows(
             value_json: null,
             value_file: null,
             value_file_name: null,
+            map_layers: null,
           },
         ];
         break;
@@ -381,6 +410,7 @@ function answerEntriesToRows(
             value_json: null,
             value_file: null,
             value_file_name: null,
+            map_layers: value.mapLayers,
             // Save subquestion answers under the entry for inserting them with correct parent entry ID later on
             subQuestionAnswers: value.subQuestionAnswers,
           };
@@ -400,6 +430,7 @@ function answerEntriesToRows(
             value_json: JSON.stringify(entry.value),
             value_file: null,
             value_file_name: null,
+            map_layers: null,
           },
         ];
         break;
@@ -416,6 +447,7 @@ function answerEntriesToRows(
             value_json: null,
             value_file: null,
             value_file_name: null,
+            map_layers: null,
           },
         ];
         break;
@@ -432,6 +464,24 @@ function answerEntriesToRows(
             value_json: JSON.stringify(entry.value),
             value_file: null,
             value_file_name: null,
+            map_layers: null,
+          },
+        ];
+        break;
+      case 'multi-matrix':
+        newEntries = [
+          {
+            submission_id: submissionID,
+            section_id: entry.sectionId,
+            parent_entry_id: parentEntryId,
+            value_text: null,
+            value_option_id: null,
+            value_geometry: null,
+            value_numeric: null,
+            value_json: JSON.stringify(entry.value),
+            value_file: null,
+            value_file_name: null,
+            map_layers: null,
           },
         ];
         break;
@@ -448,7 +498,11 @@ function answerEntriesToRows(
             value_json: null,
             value_file: value.fileString,
             value_file_name: value.fileName,
+            map_layers: null,
           })) ?? [];
+        break;
+      default:
+        assertNever(entry);
     }
 
     return [...entries, ...(newEntries ?? [])];
@@ -461,7 +515,7 @@ function dbAnswerEntriesToAnswerEntries(
     // value_feature: GeoJSONWithCRS<Feature<Point | LineString | Polygon>>;
     value_geometry: Point | LineString | Polygon;
   })[],
-  parentEntryId: number = null
+  parentEntryId: number = null,
 ) {
   return rows
     .filter((row) => row.parent_entry_id === parentEntryId)
@@ -487,7 +541,7 @@ function dbAnswerEntriesToAnswerEntries(
           // Try to find an existing entry for this section
           let entry = entries.find(
             (entry): entry is AnswerEntry & { type: 'checkbox' } =>
-              entry.sectionId === row.section_id
+              entry.sectionId === row.section_id,
           );
           // If the entry doesn't exist, create it
           if (
@@ -506,7 +560,7 @@ function dbAnswerEntriesToAnswerEntries(
           // Try to find an existing entry for this section
           let entry = entries.find(
             (entry): entry is AnswerEntry & { type: 'grouped-checkbox' } =>
-              entry.sectionId === row.section_id
+              entry.sectionId === row.section_id,
           );
           // If the entry doesn't exist, create it
           if (
@@ -536,7 +590,7 @@ function dbAnswerEntriesToAnswerEntries(
           // Try to find an existing entry for this section
           let entry = entries.find(
             (entry): entry is AnswerEntry & { type: 'map' } =>
-              entry.sectionId === row.section_id
+              entry.sectionId === row.section_id,
           );
           // If the entry doesn't exist, create it
           if (
@@ -561,10 +615,11 @@ function dbAnswerEntriesToAnswerEntries(
               geometry: row.value_geometry,
               properties: {},
             },
+            mapLayers: row.map_layers,
             // The function should only return map subquestion answers because of filtering - assume the type here
             subQuestionAnswers: dbAnswerEntriesToAnswerEntries(
               rows,
-              row.id
+              row.id,
             ) as SurveyMapSubQuestionAnswer[],
           };
           if (value != null) {
@@ -595,6 +650,15 @@ function dbAnswerEntriesToAnswerEntries(
           });
           break;
         }
+        case 'multi-matrix':
+          {
+            entries.push({
+              sectionId: row.section_id,
+              type: 'multi-matrix',
+              value: row.value_json as string[][],
+            });
+          }
+          break;
         case 'attachment': {
           entries.push({
             sectionId: row.section_id,
@@ -605,8 +669,12 @@ function dbAnswerEntriesToAnswerEntries(
           });
           break;
         }
-        default:
+        case 'text':
+        case 'image':
+        case 'document':
           break;
+        default:
+          assertNever(row.section_type);
       }
       return entries;
     }, [] as AnswerEntry[]);
@@ -622,7 +690,7 @@ export async function getSurveyAnswerLanguage(token: string) {
     `
     SELECT language FROM data.submission WHERE submission.unfinished_token = $1;
   `,
-    [token]
+    [token],
   );
 
   return row?.language;
@@ -655,6 +723,7 @@ export async function getUnfinishedAnswerEntries(token: string) {
       ae.value_json,
       ae.value_file,
       ae.value_file_name,
+      ae.map_layers,
       ps.type AS section_type,
       ps.parent_section AS parent_section
     FROM
@@ -663,7 +732,7 @@ export async function getUnfinishedAnswerEntries(token: string) {
       INNER JOIN data.page_section ps ON ps.id = ae.section_id
     WHERE s.unfinished_token = $1
   `,
-      [token]
+      [token],
     )
     .catch(() => {
       throw new BadRequestError(`Invalid token`);
@@ -700,6 +769,7 @@ export async function getAnswerEntries(submissionId: number) {
       ae.value_json,
       ae.value_file,
       ae.value_file_name,
+      ae.map_layers,
       ps.type AS section_type,
       ps.parent_section AS parent_section
     FROM
@@ -710,12 +780,10 @@ export async function getAnswerEntries(submissionId: number) {
     WHERE s.id = $1
     ORDER BY sp.idx, ps.idx ASC
   `,
-    [submissionId]
+    [submissionId],
   );
-  if (!rows.length) {
-    throw new Error(`Submission with ID ${submissionId} not found`);
-  }
-  return dbAnswerEntriesToAnswerEntries(rows);
+
+  return rows.length ? dbAnswerEntriesToAnswerEntries(rows) : [];
 }
 
 /**
@@ -726,7 +794,32 @@ export async function getAnswerEntries(submissionId: number) {
 export async function getTimestamp(submissionId: number) {
   const { updated_at } = await getDb().one<{ updated_at: Date }>(
     `SELECT updated_at FROM data.submission WHERE id = $1`,
-    [submissionId]
+    [submissionId],
   );
   return updated_at;
+}
+
+/**
+ * Gets all finished submissions (with all answer entries) for a given survey ID
+ * @param surveyId Survey ID
+ * @returns Submissions
+ */
+export async function getSubmissionsForSurvey(surveyId: number) {
+  const rows = await getDb().manyOrNone<DBSubmission>(
+    `SELECT
+      s.id,
+      s.updated_at
+    FROM
+      data.submission s
+    WHERE survey_id = $(surveyId) AND unfinished_token IS NULL
+    ORDER BY updated_at ASC`,
+    { surveyId },
+  );
+  return Promise.all<Submission>(
+    rows.map(async (row) => ({
+      id: row.id,
+      timestamp: row.updated_at,
+      answerEntries: await getAnswerEntries(row.id),
+    })),
+  );
 }

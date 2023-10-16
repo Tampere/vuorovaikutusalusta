@@ -10,9 +10,9 @@ import {
   FormGroup,
   FormControlLabel,
   Checkbox,
-} from '@material-ui/core';
-import { Add, DragIndicator, ExpandMore } from '@material-ui/icons';
-import { makeStyles } from '@material-ui/styles';
+} from '@mui/material';
+import { Add, DragIndicator, ExpandMore } from '@mui/icons-material';
+import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useState } from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';

@@ -13,10 +13,11 @@ import moment from 'moment';
 import PDFDocument from 'pdfkit';
 import PdfPrinter from 'pdfmake';
 import { Content } from 'pdfmake/interfaces';
+import { getDb } from '../database';
 import {
-  getScreenshots,
   ScreenshotJobData,
   ScreenshotJobReturnData,
+  getScreenshots,
 } from './screenshot';
 import { getFile, getOptionsForSurvey } from './survey';
 
@@ -47,6 +48,15 @@ const fonts = {
   },
 };
 
+async function getStaticIconSvg(name: string) {
+  const { svg } = await getDb().oneOrNone<{
+    svg: Buffer;
+  }>('SELECT svg FROM application.static_icons WHERE name=$(name)', {
+    name,
+  });
+  return svg.toString();
+}
+
 /**
  * Converts a PDFDocument to a Buffer
  * @param pdf The PDFDocument to convert
@@ -68,16 +78,16 @@ async function convertPdfToBuffer(pdf: typeof PDFDocument) {
 
 function prepareMapAnswers(
   survey: Survey,
-  answerEntries: AnswerEntry[]
+  answerEntries: AnswerEntry[],
 ): ScreenshotJobData {
   return answerEntries
     .filter(
-      (entry): entry is AnswerEntry & { type: 'map' } => entry.type === 'map'
+      (entry): entry is AnswerEntry & { type: 'map' } => entry.type === 'map',
     )
     .reduce(
       (jobData, entry) => {
         const page = survey.pages.find((page) =>
-          page.sections.some((section) => section.id === entry.sectionId)
+          page.sections.some((section) => section.id === entry.sectionId),
         );
         return {
           ...jobData,
@@ -87,10 +97,10 @@ function prepareMapAnswers(
               sectionId: entry.sectionId,
               index,
               feature: answer.geometry,
-              visibleLayerIds: page.sidebar.mapLayers,
+              visibleLayerIds: answer.mapLayers ?? page.sidebar.mapLayers,
               question: page.sections.find(
                 (section): section is SurveyMapQuestion =>
-                  section.id === entry.sectionId
+                  section.id === entry.sectionId,
               ),
             })),
           ],
@@ -99,7 +109,7 @@ function prepareMapAnswers(
       {
         mapUrl: survey.mapUrl,
         answers: [],
-      } as ScreenshotJobData
+      } as ScreenshotJobData,
     );
 }
 
@@ -108,21 +118,40 @@ async function getFrontPage(
   submissionId: number,
   timestamp: Date,
   answerEntries: AnswerEntry[],
-  language: LanguageCode
+  language: LanguageCode,
 ): Promise<Content> {
   const tr = useTranslations(language);
   const image = survey.backgroundImageName
     ? await getFile(survey.backgroundImageName, survey.backgroundImagePath)
     : null;
+
+  const [logo, banner] = await Promise.all([
+    getStaticIconSvg('tre_logo'),
+    getStaticIconSvg('tre_banner'),
+  ]);
+
   const attachmentFileNames = answerEntries
     .filter(
       (entry): entry is AnswerEntry & { type: 'attachment' } =>
-        entry.type === 'attachment'
+        entry.type === 'attachment',
     )
     .map((entry) => entry.value[0]?.fileName)
     .filter(Boolean);
   return [
-    // TODO header logo from DB
+    {
+      svg: logo,
+      width: 200,
+      absolutePosition: { x: 360, y: 20 },
+    },
+    {
+      svg: banner,
+      width: 100,
+      absolutePosition: { x: 40, y: 780 },
+    },
+    {
+      text: '',
+      margin: [0, image ? 120 : 300, 0, 0],
+    },
     image && {
       image: `data:image/png;base64,${image.data.toString('base64')}`,
       width: 498.9,
@@ -145,7 +174,7 @@ async function getFrontPage(
     // Add the remaining "info fields" from one array as they have identical styling
     [
       ...(survey.email?.info ?? []).map(
-        (item) => `${item.name?.[language]}: ${item.value?.[language]}`
+        (item) => `${item.name?.[language]}: ${item.value?.[language]}`,
       ),
       `${tr.submissionId}: ${submissionId}`,
       `${tr.responseTime}: ${moment(timestamp).format('DD.MM.YYYY HH:mm')}`,
@@ -158,7 +187,6 @@ async function getFrontPage(
         fontSize: 12,
         margin: [0, 0, 0, 10],
       })),
-    // TODO footer logo from DB
     { text: '', pageBreak: 'after' },
   ];
 }
@@ -166,7 +194,7 @@ async function getFrontPage(
 function getOptionSelectionText(
   value: string | number,
   options: SectionOption[],
-  language: LanguageCode
+  language: LanguageCode,
 ) {
   const tr = useTranslations(language);
 
@@ -183,21 +211,19 @@ function getContent(
   screenshots: ScreenshotJobReturnData[],
   options: SectionOption[],
   isSubQuestion = false,
-  language: LanguageCode
+  language: LanguageCode,
 ): Content[] {
   if (!answerEntry) {
     return null;
   }
   const tr = useTranslations(language);
   const sectionIndex = sections.findIndex(
-    (section) => answerEntry.sectionId === section.id
+    (section) => answerEntry.sectionId === section.id,
   );
   const section = sections[sectionIndex];
 
   const heading: Content = {
-    text: `${isSubQuestion ? tr.subquestion : tr.question} #${
-      sectionIndex + 1
-    }: ${section.title?.[language]}`,
+    text: section.title?.[language],
     style: isSubQuestion ? 'subQuestionTitle' : 'questionTitle',
   };
 
@@ -269,15 +295,43 @@ function getContent(
         },
       ];
     }
-    case 'sorting': {
+    case 'multi-matrix': {
+      const question = section as SurveyMatrixQuestion;
+
       return [
         heading,
         {
-          ol: answerEntry.value.map((value) => ({
-            text: `${getOptionSelectionText(value, options, language)}`,
+          ul: question.subjects.map((subject, index) => ({
+            text: `${subject?.[language]}: ${
+              answerEntry.value[index].length > 0
+                ? answerEntry.value[index]
+                    .map((classIndex: string) =>
+                      classIndex === '-1'
+                        ? tr.dontKnow
+                        : question.classes[Number(classIndex)]?.[language],
+                    )
+                    .join(', ')
+                : '-'
+            }`,
             style,
           })),
         },
+      ];
+    }
+    case 'sorting': {
+      return [
+        heading,
+        !answerEntry.value
+          ? {
+              text: '-',
+              style,
+            }
+          : {
+              ol: answerEntry.value.map((value) => ({
+                text: `${getOptionSelectionText(value, options, language)}`,
+                style,
+              })),
+            },
       ];
     }
     case 'map': {
@@ -290,27 +344,44 @@ function getContent(
           const screenshot = screenshots.find(
             (screenshot) =>
               screenshot.sectionId === answerEntry.sectionId &&
-              screenshot.index === index
+              screenshot.index === index,
           );
-          return [
-            {
-              image:
-                'data:image/png;base64,' + screenshot.image.toString('base64'),
-              width: 300,
-              style,
-            },
-            ...answer.subQuestionAnswers.map((subQuestionAnswer) => {
-              const mapQuestion = section as SurveyMapQuestion;
-              return getContent(
-                subQuestionAnswer,
-                mapQuestion.subQuestions,
-                [],
-                options,
-                true,
-                language
-              );
-            }),
-          ];
+          return {
+            columns: [
+              {
+                image:
+                  'data:image/png;base64,' +
+                  screenshot.image.toString('base64'),
+                width: 200,
+                style,
+              },
+              [
+                { text: 'Merkintä:', style: 'subQuestionTitle' },
+                {
+                  text: `${index + 1}/${answerEntry.value.length}`,
+                  style: 'subQuestionAnswer',
+                },
+                { text: 'Näkyvät tasot:', style: 'subQuestionTitle' },
+                {
+                  text: !screenshot.layerNames.length
+                    ? '-'
+                    : screenshot.layerNames.join(', '),
+                  style: 'subQuestionAnswer',
+                },
+                ...answer.subQuestionAnswers.map((subQuestionAnswer) => {
+                  const mapQuestion = section as SurveyMapQuestion;
+                  return getContent(
+                    subQuestionAnswer,
+                    mapQuestion.subQuestions,
+                    [],
+                    options,
+                    true,
+                    language,
+                  );
+                }),
+              ],
+            ],
+          };
         }),
       ];
     }
@@ -331,20 +402,20 @@ export async function generatePdf(
   survey: Survey,
   submission: { id: number; timestamp: Date },
   answerEntries: AnswerEntry[],
-  language: LanguageCode
+  language: LanguageCode,
 ) {
   const start = Date.now();
   const options = await getOptionsForSurvey(survey.id);
 
   const sections = survey.pages.reduce(
     (sections, page) => [...sections, ...page.sections],
-    [] as SurveyPageSection[]
+    [] as SurveyPageSection[],
   );
   const screenshotJobData = prepareMapAnswers(survey, answerEntries);
   const screenshots = await getScreenshots(screenshotJobData);
 
   logger.debug(
-    `Fetched ${screenshots.length} screenshots in ${Date.now() - start}ms`
+    `Fetched ${screenshots.length} screenshots in ${Date.now() - start}ms`,
   );
 
   const content: Content = [
@@ -353,7 +424,7 @@ export async function generatePdf(
       submission.id,
       submission.timestamp,
       answerEntries,
-      language
+      language,
     ),
     ...sections.map((section) =>
       getContent(
@@ -362,8 +433,8 @@ export async function generatePdf(
         screenshots,
         options,
         false,
-        language
-      )
+        language,
+      ),
     ),
   ];
 
@@ -383,12 +454,13 @@ export async function generatePdf(
         margin: [0, 0, 0, 20],
       },
       subQuestionTitle: {
-        fontSize: 14,
+        fontSize: 12,
         bold: true,
-        margin: [10, 0, 0, 10],
+        margin: [5, 0, 0, 5],
       },
       subQuestionAnswer: {
-        margin: [10, 0, 0, 20],
+        margin: [5, 0, 0, 5],
+        fontSize: 12,
       },
     },
   });

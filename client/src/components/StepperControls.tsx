@@ -1,5 +1,5 @@
-import { Button } from '@material-ui/core';
-import { makeStyles } from '@material-ui/styles';
+import { Button } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useState } from 'react';
 import SaveAsUnfinishedDialog from './SaveAsUnfinishedDialog';

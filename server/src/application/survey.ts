@@ -4,13 +4,14 @@ import {
   SectionOption,
   SectionOptionGroup,
   Survey,
-  SurveyBackgroundImage,
   SurveyCheckboxQuestion,
   SurveyEmailInfoItem,
+  SurveyImage,
   SurveyMapQuestion,
   SurveyMapSubQuestion,
   SurveyPage,
   SurveyPageSection,
+  SurveyPageSidebarImageSize,
   SurveyPageSidebarType,
   SurveyRadioQuestion,
   SurveyTheme,
@@ -45,10 +46,13 @@ interface DBSurvey {
   start_date: Date;
   end_date: Date;
   allow_test_survey: boolean;
+  display_privacy_statement: boolean;
   created_at: Date;
   updated_at: Date;
   thanks_page_title: LocalizedText;
   thanks_page_text: LocalizedText;
+  thanks_page_image_name: string;
+  thanks_page_image_path: string[];
   background_image_name: string;
   background_image_path: string[];
   section_title_color: string;
@@ -59,6 +63,7 @@ interface DBSurvey {
   email_info: SurveyEmailInfoItem[];
   allow_saving_unfinished: boolean;
   localisation_enabled: boolean;
+  submission_count?: number;
 }
 
 /**
@@ -78,6 +83,7 @@ interface DBSurveyPage {
   sidebar_image_path: string[];
   sidebar_image_name: string;
   sidebar_image_alt_text: LocalizedText;
+  sidebar_image_size: SurveyPageSidebarImageSize;
 }
 
 /**
@@ -130,6 +136,7 @@ type DBSurveyJoin = DBSurvey & {
   page_sidebar_image_path: string[];
   page_sidebar_image_name: string;
   page_sidebar_image_alt_text: LocalizedText;
+  page_sidebar_image_size: SurveyPageSidebarImageSize;
   section_id: number;
   section_title: LocalizedText;
   section_title_color: string;
@@ -174,6 +181,7 @@ const surveyPageColumnSet = getColumnSet<DBSurveyPage>('survey_page', [
     name: 'sidebar_image_alt_text',
     cast: 'json',
   },
+  'sidebar_image_size',
 ]);
 
 /**
@@ -224,7 +232,8 @@ export async function getSurvey(params: { id: number } | { name: string }) {
           page.sidebar_map_layers as page_sidebar_map_layers,
           page.sidebar_image_path as page_sidebar_image_path,
           page.sidebar_image_name as page_sidebar_image_name,
-          page.sidebar_image_alt_text as page_sidebar_image_alt_text
+          page.sidebar_image_alt_text as page_sidebar_image_alt_text,
+          page.sidebar_image_size as page_sidebar_image_size
         FROM
           (
             SELECT
@@ -247,26 +256,26 @@ export async function getSurvey(params: { id: number } | { name: string }) {
       section_idx ASC,
       option_idx ASC;
   `,
-    ['id' in params ? params.id : params.name]
+    ['id' in params ? params.id : params.name],
   );
 
   if (!rows.length) {
     throw new NotFoundError(
       'id' in params
         ? `Survey with ID ${params.id} not found`
-        : `Survey with name ${params.name} not found`
+        : `Survey with name ${params.name} not found`,
     );
   }
 
   // Get all option groups in its own query if needed
   const optionGroupIds = Array.from(
-    new Set(rows.map((row) => row.option_group_id).filter(Boolean))
+    new Set(rows.map((row) => row.option_group_id).filter(Boolean)),
   );
   const optionGroups = !optionGroupIds.length
     ? []
     : await getDb().manyOrNone<DBOptionGroup>(
         `SELECT * FROM data.option_group WHERE id = ANY ($1) ORDER BY idx ASC`,
-        [optionGroupIds]
+        [optionGroupIds],
       );
 
   return rows.reduce((survey, row) => {
@@ -279,14 +288,14 @@ export async function getSurvey(params: { id: number } | { name: string }) {
 
     // Try to find the pre-existing page section object
     let section = page.sections.find(
-      (section) => section.id === row.section_id
+      (section) => section.id === row.section_id,
     );
     if (!section && (section = dbSurveyJoinToSection(row))) {
       // Section not yet added - add converted row to survey page
       if (row.section_parent_section != null) {
         // Parent section should already exist because of the ordering by parent section rule
         const parentSection = page.sections.find(
-          (section) => section.id === row.section_parent_section
+          (section) => section.id === row.section_parent_section,
         ) as SurveyMapQuestion;
         // Initialize subquestion array if it doesn't yet exist
         if (!parentSection.subQuestions) {
@@ -294,7 +303,7 @@ export async function getSurvey(params: { id: number } | { name: string }) {
         }
         // Try to find the pre-existing subquestion - if none is found, create it from the row
         let subQuestion = parentSection.subQuestions.find(
-          (subQuestion) => subQuestion.id === section.id
+          (subQuestion) => subQuestion.id === section.id,
         );
         if (
           !subQuestion &&
@@ -321,7 +330,7 @@ export async function getSurvey(params: { id: number } | { name: string }) {
       const question = section as SurveyRadioQuestion | SurveyCheckboxQuestion;
       // Try to find the pre-existing question option object
       let option = question.options.find(
-        (option) => option.id === row.option_id
+        (option) => option.id === row.option_id,
       );
       if (!option && (option = dbSurveyJoinToOption(row))) {
         // Option not yet added - add converted row to section
@@ -332,13 +341,13 @@ export async function getSurvey(params: { id: number } | { name: string }) {
     // Gather grouped options only for grouped checkbox questions
     if (section?.type === 'grouped-checkbox') {
       let group = section.groups.find(
-        (group) => group?.id === row.option_group_id
+        (group) => group?.id === row.option_group_id,
       );
 
       // If the group wasn't added yet, add it from the different query result
       if (!group) {
         const dbGroup = optionGroups.find(
-          (group) => group.id === row.option_group_id
+          (group) => group.id === row.option_group_id,
         );
         // Add option group if it was found (otherwise ignore)
         if (dbGroup) {
@@ -369,11 +378,20 @@ export async function getSurvey(params: { id: number } | { name: string }) {
  */
 export async function getSurveys(
   authorId?: string,
-  filterByPublished?: boolean
+  filterByPublished?: boolean,
 ) {
   const rows = await getDb().manyOrNone<DBSurvey>(
-    `SELECT * FROM data.survey WHERE ($1 IS NULL OR author_id = $1) ORDER BY updated_at DESC`,
-    [authorId, filterByPublished]
+    `SELECT
+    COUNT(sub) AS submission_count,
+    survey.*
+  FROM
+    data.survey survey
+    LEFT JOIN data.submission sub ON sub.survey_id = survey.id
+  WHERE
+    ($1 IS NULL OR author_id = $1)
+  GROUP BY survey.id
+  ORDER BY updated_at DESC`,
+    [authorId, filterByPublished],
   );
   return rows
     .map((row) => dbSurveyToSurvey(row))
@@ -387,7 +405,7 @@ export async function getSurveys(
 export async function createSurvey(user: User) {
   const surveyRow = await getDb().one<DBSurvey>(
     `INSERT INTO data.survey (author_id) VALUES ($1) RETURNING *`,
-    [user.id]
+    [user.id],
   );
 
   if (!surveyRow) {
@@ -455,7 +473,7 @@ async function upsertSection(section: DBSurveyPageSection, index: number) {
       info: section.info,
       fileName: section.file_name,
       filePath: section.file_path,
-    }
+    },
   );
 }
 
@@ -500,7 +518,7 @@ async function upsertOption(option: DBSectionOption, index: number) {
       index,
       groupId: option.group_id,
       info: option.info,
-    }
+    },
   );
 }
 
@@ -539,7 +557,7 @@ async function upsertOptionGroup(group: DBOptionGroup, index: number) {
       name: group.name,
       sectionId: group.section_id,
       index,
-    }
+    },
   );
 }
 
@@ -550,25 +568,25 @@ async function upsertOptionGroup(group: DBOptionGroup, index: number) {
  */
 async function deleteRemovedSections(
   surveyId: number,
-  newSections: DBSurveyPageSection[]
+  newSections: DBSurveyPageSection[],
 ) {
   // Get all existing sections
   const rows = await getDb().manyOrNone<{ id: number }>(
     `SELECT id FROM data.page_section WHERE parent_section IS NULL AND survey_page_id IN (
        SELECT id FROM data.survey_page WHERE survey_id = $1
     )`,
-    [surveyId]
+    [surveyId],
   );
   const existingSectionIds = rows.map((row) => row.id);
 
   // All existing sections that aren't included in new sections should be removed
   const removedSectionIds = existingSectionIds.filter((id) =>
-    (newSections ?? []).every((newSection) => newSection.id !== id)
+    (newSections ?? []).every((newSection) => newSection.id !== id),
   );
   if (removedSectionIds.length) {
     await getDb().none(
       `DELETE FROM data.page_section WHERE id = ANY ($1) OR parent_section = ANY ($1)`,
-      [removedSectionIds]
+      [removedSectionIds],
     );
   }
 }
@@ -580,18 +598,18 @@ async function deleteRemovedSections(
  */
 async function deleteRemovedSubQuestions(
   parentSectionId: number,
-  newSubQuestions: SurveyMapSubQuestion[]
+  newSubQuestions: SurveyMapSubQuestion[],
 ) {
   // Get all existing sections
   const rows = await getDb().manyOrNone<{ id: number }>(
     `SELECT id FROM data.page_section WHERE parent_section = $1`,
-    [parentSectionId]
+    [parentSectionId],
   );
   const existingSubQuestionIds = rows.map((row) => row.id);
 
   // All existing sections that aren't included in new sections should be removed
   const removedSubQuestionIds = existingSubQuestionIds.filter((id) =>
-    (newSubQuestions ?? []).every((newSubQuestion) => newSubQuestion.id !== id)
+    (newSubQuestions ?? []).every((newSubQuestion) => newSubQuestion.id !== id),
   );
   if (removedSubQuestionIds.length) {
     await getDb().none(`DELETE FROM data.page_section WHERE id = ANY ($1)`, [
@@ -609,24 +627,24 @@ async function deleteRemovedSubQuestions(
 async function deleteRemovedOptions(
   sectionId: number,
   newOptions: SectionOption[],
-  optionGroupId?: number
+  optionGroupId?: number,
 ) {
   // Get all existing options
   const rows =
     optionGroupId != null
       ? await getDb().manyOrNone<{ id: number }>(
           `SELECT id FROM data.option WHERE section_id = $1 AND group_id = $2`,
-          [sectionId, optionGroupId]
+          [sectionId, optionGroupId],
         )
       : await getDb().manyOrNone<{ id: number }>(
           `SELECT id FROM data.option WHERE section_id = $1 AND group_id IS NULL`,
-          [sectionId]
+          [sectionId],
         );
   const existingOptionIds = rows.map((row) => row.id);
 
   // All existing options that aren't included in new options should be removed
   const removedOptionIds = existingOptionIds.filter((id) =>
-    (newOptions ?? []).every((newOption) => newOption.id !== id)
+    (newOptions ?? []).every((newOption) => newOption.id !== id),
   );
   if (removedOptionIds.length) {
     await getDb().none(`DELETE FROM data.option WHERE id = ANY ($1)`, [
@@ -643,18 +661,18 @@ async function deleteRemovedOptions(
  */
 async function deleteRemovedOptionGroups(
   sectionId: number,
-  newGroups: SectionOptionGroup[]
+  newGroups: SectionOptionGroup[],
 ) {
   // Get all existing option groups
   const rows = await getDb().manyOrNone<{ id: number }>(
     `SELECT id FROM data.option_group WHERE section_id = $1`,
-    [sectionId]
+    [sectionId],
   );
   const existingGroupIds = rows.map((row) => row.id);
 
   // All existing groups that aren't included in new groups should be removed
   const removedGroupIds = existingGroupIds.filter((id) =>
-    (newGroups ?? []).every((newGroup) => newGroup.id !== id)
+    (newGroups ?? []).every((newGroup) => newGroup.id !== id),
   );
   if (removedGroupIds.length) {
     await getDb().none(`DELETE FROM data.option_group WHERE id = ANY ($1)`, [
@@ -685,16 +703,19 @@ export async function updateSurvey(survey: Survey) {
         thanks_page_text = $12,
         background_image_name = $13,
         background_image_path = $14,
-        admins = $15,
-        theme_id = $16,
-        section_title_color = $17,
-        email_enabled = $18,
-        email_auto_send_to = $19,
-        email_subject = $20,
-        email_body = $21,
-        email_info = $22::json,
-        allow_saving_unfinished = $23,
-        localisation_enabled = $24
+        thanks_page_image_name = $15,
+        thanks_page_image_path = $16,
+        admins = $17,
+        theme_id = $18,
+        section_title_color = $19,
+        email_enabled = $20,
+        email_auto_send_to = $21,
+        email_subject = $22,
+        email_body = $23,
+        email_info = $24::json,
+        allow_saving_unfinished = $25,
+        localisation_enabled = $26,
+        display_privacy_statement = $27
       WHERE id = $1 RETURNING *`,
       [
         survey.id,
@@ -711,6 +732,8 @@ export async function updateSurvey(survey: Survey) {
         survey.thanksPage.text,
         survey.backgroundImageName ?? null,
         survey.backgroundImagePath ?? null,
+        survey.thanksPage.imageName ?? null,
+        survey.thanksPage.imagePath ?? null,
         survey.admins,
         survey.theme?.id ?? null,
         survey.sectionTitleColor,
@@ -721,13 +744,14 @@ export async function updateSurvey(survey: Survey) {
         JSON.stringify(survey.email.info),
         survey.allowSavingUnfinished,
         survey.localisationEnabled,
-      ]
+        survey.displayPrivacyStatement,
+      ],
     )
     .catch((error) => {
       throw error.constraint === 'survey_name_key'
         ? new BadRequestError(
             `Survey name ${survey.name} already exists`,
-            'duplicate_survey_name'
+            'duplicate_survey_name',
           )
         : error;
     });
@@ -740,8 +764,8 @@ export async function updateSurvey(survey: Survey) {
   await getDb().none(
     getMultiUpdateQuery(
       surveyPagesToRows(survey.pages, survey.id),
-      surveyPageColumnSet
-    ) + ' WHERE t.id = v.id'
+      surveyPageColumnSet,
+    ) + ' WHERE t.id = v.id',
   );
 
   // Form a flat array of all new section rows under each page
@@ -754,8 +778,8 @@ export async function updateSurvey(survey: Survey) {
 
   // Update all sections
   await Promise.all(
-    sections.map(async (section, index) => {
-      const sectionRow = await upsertSection(section, index);
+    sections.map(async (section) => {
+      const sectionRow = await upsertSection(section, section.idx);
 
       // Delete options that were removed
       await deleteRemovedOptions(section.id, section.options);
@@ -774,7 +798,7 @@ export async function updateSurvey(survey: Survey) {
         const subQuestions = surveySectionsToRows(
           section.subQuestions,
           section.survey_page_id,
-          sectionRow.id
+          sectionRow.id,
         );
         // Update each subquestion in its own block
         await Promise.all(
@@ -788,11 +812,11 @@ export async function updateSurvey(survey: Survey) {
             if (subQuestion.options?.length) {
               const options = optionsToRows(
                 subQuestion.options,
-                subQuestionRow.id
+                subQuestionRow.id,
               );
               await Promise.all(options.map(upsertOption));
             }
-          })
+          }),
         );
       }
 
@@ -810,7 +834,7 @@ export async function updateSurvey(survey: Survey) {
                 section_id: sectionRow.id,
                 idx: index,
               },
-              index
+              index,
             );
 
             // Delete removed options from the group
@@ -820,13 +844,13 @@ export async function updateSurvey(survey: Survey) {
             const options = optionsToRows(
               group.options,
               sectionRow.id,
-              groupRow.id
+              groupRow.id,
             );
             await Promise.all(options.map(upsertOption));
-          })
+          }),
         );
       }
-    })
+    }),
   );
 
   return await getSurvey({ id: survey.id });
@@ -839,7 +863,7 @@ export async function updateSurvey(survey: Survey) {
 export async function deleteSurvey(id: Number) {
   const row = await getDb().oneOrNone<DBSurvey>(
     `DELETE FROM data.survey WHERE id = $1 RETURNING *`,
-    [id]
+    [id],
   );
 
   if (!row) {
@@ -860,7 +884,7 @@ function isPublished(survey: Pick<Survey, 'startDate' | 'endDate'>) {
   return Boolean(
     survey.startDate &&
       now > survey.startDate &&
-      (!survey.endDate || now < survey.endDate)
+      (!survey.endDate || now < survey.endDate),
   );
 }
 
@@ -870,7 +894,7 @@ function isPublished(survey: Pick<Survey, 'startDate' | 'endDate'>) {
  * @returns Survey containing the database entries
  */
 function dbSurveyToSurvey(
-  dbSurvey: DBSurvey | DBSurveyJoin
+  dbSurvey: DBSurvey | DBSurveyJoin,
 ): Omit<Survey, 'createdAt' | 'updatedAt'> {
   const survey = {
     id: dbSurvey.id,
@@ -885,9 +909,12 @@ function dbSurveyToSurvey(
     startDate: dbSurvey.start_date,
     endDate: dbSurvey.end_date,
     allowTestSurvey: dbSurvey.allow_test_survey,
+    displayPrivacyStatement: dbSurvey.display_privacy_statement,
     thanksPage: {
       title: dbSurvey.thanks_page_title,
       text: dbSurvey.thanks_page_text,
+      imageName: dbSurvey.thanks_page_image_name,
+      imagePath: dbSurvey.thanks_page_image_path,
     },
     backgroundImageName: dbSurvey.background_image_name,
     backgroundImagePath: dbSurvey.background_image_path,
@@ -906,6 +933,7 @@ function dbSurveyToSurvey(
   };
   return {
     ...survey,
+    submissionCount: Number(dbSurvey.submission_count),
     isPublished: isPublished(survey),
     ...('theme_id' in dbSurvey && {
       theme: dbSurveyJoinToTheme(dbSurvey),
@@ -944,6 +972,7 @@ function dbSurveyJoinToPage(dbSurveyJoin: DBSurveyJoin): SurveyPage {
           imagePath: dbSurveyJoin.page_sidebar_image_path,
           imageName: dbSurveyJoin.page_sidebar_image_name,
           imageAltText: dbSurveyJoin.page_sidebar_image_alt_text,
+          imageSize: dbSurveyJoin.page_sidebar_image_size,
         },
       };
 }
@@ -995,7 +1024,7 @@ function dbSurveyJoinToOption(dbSurveyJoin: DBSurveyJoin): SectionOption {
  */
 export async function createSurveyPage(
   surveyId: number,
-  partialPage?: Partial<SurveyPage>
+  partialPage?: Partial<SurveyPage>,
 ) {
   const row = await getDb().one<DBSurveyPage>(
     `INSERT INTO data.survey_page (survey_id, idx, title, sidebar_map_layers)
@@ -1006,7 +1035,7 @@ export async function createSurveyPage(
        $2::json
      FROM data.survey_page WHERE survey_id = $1
      RETURNING *;`,
-    [surveyId, JSON.stringify(partialPage?.sidebar?.mapLayers ?? [])]
+    [surveyId, JSON.stringify(partialPage?.sidebar?.mapLayers ?? [])],
   );
 
   if (!row) {
@@ -1034,12 +1063,12 @@ export async function createSurveyPage(
 export async function deleteSurveyPage(id: number) {
   const row = await getDb().one<SurveyPage>(
     `DELETE FROM data.survey_page WHERE id = $1 RETURNING *`,
-    [id]
+    [id],
   );
 
   if (!row) {
     throw new InternalServerError(
-      `Error while deleting survey page with id: ${id}`
+      `Error while deleting survey page with id: ${id}`,
     );
   }
 
@@ -1054,7 +1083,7 @@ export async function deleteSurveyPage(id: number) {
  */
 function surveyPagesToRows(
   surveyPages: SurveyPage[],
-  surveyId: number
+  surveyId: number,
 ): DBSurveyPage[] {
   return surveyPages.map((surveyPage, index) => {
     return {
@@ -1067,6 +1096,7 @@ function surveyPagesToRows(
       sidebar_image_path: surveyPage.sidebar.imagePath,
       sidebar_image_name: surveyPage.sidebar.imageName,
       sidebar_image_alt_text: surveyPage.sidebar.imageAltText,
+      sidebar_image_size: surveyPage.sidebar.imageSize,
     } as DBSurveyPage;
   });
 }
@@ -1082,7 +1112,7 @@ function surveyPagesToRows(
 function surveySectionsToRows(
   surveySections: SurveyPageSection[],
   pageId: number,
-  parentSectionId?: number
+  parentSectionId?: number,
 ) {
   return surveySections.filter(Boolean).map((surveySection, index) => {
     const {
@@ -1131,7 +1161,7 @@ function surveySectionsToRows(
 function optionsToRows(
   sectionOptions: SectionOption[],
   sectionId: number,
-  optionGroupId?: number
+  optionGroupId?: number,
 ): DBSectionOption[] {
   return sectionOptions.map((option, index) => {
     return {
@@ -1161,12 +1191,12 @@ export async function publishSurvey(surveyId: number) {
       END
       WHERE id = $1 RETURNING *;
   `,
-    [surveyId]
+    [surveyId],
   );
 
   if (!row) {
     throw new InternalServerError(
-      `Error while publishing survey with id:${surveyId}`
+      `Error while publishing survey with id:${surveyId}`,
     );
   }
 
@@ -1182,12 +1212,12 @@ export async function unpublishSurvey(surveyId: number) {
     `
     UPDATE data.survey SET end_date = NOW() WHERE id = $1 RETURNING *;
   `,
-    [surveyId]
+    [surveyId],
   );
 
   if (!row) {
     throw new InternalServerError(
-      `Error while publishing survey with id:${surveyId}`
+      `Error while publishing survey with id:${surveyId}`,
     );
   }
 
@@ -1245,7 +1275,7 @@ export async function storeFile({
       name,
       mimetype,
       surveyId,
-    }
+    },
   );
 
   if (!row) {
@@ -1259,7 +1289,7 @@ export async function storeFile({
  * Get a single file with id from the database
  * @param fileName
  * @param filePath
- * @returns SurveyBackgroudImage
+ * @returns File
  */
 export async function getFile(fileName: string, filePath: string[]) {
   const row = await getDb().oneOrNone<{
@@ -1270,12 +1300,12 @@ export async function getFile(fileName: string, filePath: string[]) {
     `
     SELECT file, mime_type, details FROM data.files WHERE file_name = $1 AND file_path = $2;
   `,
-    [fileName, filePath]
+    [fileName, filePath],
   );
 
   if (!row) {
     throw new NotFoundError(
-      `File with fileName ${fileName} filePath ${filePath} not found`
+      `File with fileName ${fileName} filePath ${filePath} not found`,
     );
   }
 
@@ -1288,20 +1318,24 @@ export async function getFile(fileName: string, filePath: string[]) {
 
 /**
  * Get all survey images from the database
- * @returns SurveyBackgroundImage[]
+ * @returns SurveyImage[]
  */
-export async function getImages() {
-  const rows = await getDb().manyOrNone(`
-    SELECT id, details, file, file_name, file_path FROM data.files WHERE file_path = array[]::text[] ORDER BY created_at DESC;
-  `);
+export async function getImages(imagePath: string[]) {
+  const rows = await getDb().manyOrNone(
+    `
+    SELECT id, details, file, file_name, file_path FROM data.files WHERE file_path = $1;
+  `,
+    [imagePath],
+  );
 
   return rows.map((row) => ({
     id: row.id,
     data: row.file.toString('base64'),
     attributions: row.details?.attributions,
+    altText: row.details?.imageAltText,
     fileName: row.file_name,
     filePath: row.file_path,
-  })) as SurveyBackgroundImage[];
+  })) as SurveyImage[];
 }
 
 /**
@@ -1315,7 +1349,7 @@ export async function removeFile(fileName: string, filePath: string[]) {
     `
     DELETE FROM data.files WHERE file_name = $1 AND file_path = $2;
   `,
-    [fileName, filePath]
+    [fileName, filePath],
   );
 }
 
@@ -1347,7 +1381,7 @@ export async function getOptionsForSurvey(surveyId: number) {
       INNER JOIN data.survey_page sp ON sp.id = ps.survey_page_id
     WHERE sp.survey_id = $1
   `,
-    [surveyId]
+    [surveyId],
   );
 
   return rows.map(
@@ -1355,7 +1389,7 @@ export async function getOptionsForSurvey(surveyId: number) {
       id: row.id,
       text: row.text,
       info: row.info,
-    })
+    }),
   );
 }
 

@@ -20,6 +20,7 @@ export type SurveyQuestion =
   | SurveyMapQuestion
   | SurveySortingQuestion
   | SurveySliderQuestion
+  | SurveyMultiMatrixQuestion
   | SurveyMatrixQuestion
   | SurveyGroupedCheckboxQuestion
   | SurveyAttachmentQuestion;
@@ -209,6 +210,21 @@ export interface SurveyMatrixQuestion extends CommonSurveyPageQuestion {
 }
 
 /**
+ * Multiple choice matrix question
+ */
+
+export interface SurveyMultiMatrixQuestion extends CommonSurveyPageQuestion {
+  type: 'multi-matrix';
+  classes: LocalizedText[];
+  subjects: LocalizedText[];
+  allowEmptyAnswer: boolean;
+  answerLimits: {
+    min?: number;
+    max?: number;
+  };
+}
+
+/**
  * Grouped checkbox question
  */
 export interface SurveyGroupedCheckboxQuestion
@@ -232,6 +248,10 @@ export interface SurveyAttachmentQuestion extends CommonSurveyPageQuestion {
  * Type of the survey page sidebar
  */
 export type SurveyPageSidebarType = 'none' | 'map' | 'image';
+/**
+ * Survey page sidebar image size
+ */
+export type SurveyPageSidebarImageSize = 'original' | 'fitted';
 
 /**
  * Survey page side bar
@@ -257,6 +277,10 @@ export interface SurveyPageSidebar {
    * Alternative text for the sidebar image
    */
   imageAltText: LocalizedText;
+  /**
+   * Information how the picture is displayed
+   */
+  imageSize: SurveyPageSidebarImageSize;
 }
 
 /**
@@ -367,6 +391,14 @@ export interface Survey {
      * Text in markdown format
      */
     text: LocalizedText;
+    /**
+     * Name of the thanks page image
+     */
+    imageName?: string;
+    /**
+     * Path of the thanks page image
+     */
+    imagePath?: string[];
   };
   /**
    * Theme of the survey
@@ -409,6 +441,14 @@ export interface Survey {
    * Allow publishing surveys with different languages
    */
   localisationEnabled: boolean;
+  /**
+   * Should a link for the privacy statement be displayed
+   */
+  displayPrivacyStatement: boolean;
+  /**
+   * Number of submissions for the survey
+   */
+  submissionCount: number;
 }
 
 /**
@@ -455,9 +495,7 @@ type LanguageCode = 'fi' | 'en';
 /**
  * Type for localization typing
  */
-type LocalizedText = {
-  [code in LanguageCode]: string;
-};
+type LocalizedText = Record<LanguageCode, string>;
 
 /**
  * Intersected subset of answers for map subquestions.
@@ -472,6 +510,7 @@ export type SurveyMapSubQuestionAnswer = AnswerEntry & {
  */
 export interface MapQuestionAnswer {
   selectionType: MapQuestionSelectionType;
+  mapLayers: number[];
   geometry: GeoJSONWithCRS<
     GeoJSON.Feature<GeoJSON.Point | GeoJSON.LineString | GeoJSON.Polygon>
   >;
@@ -521,6 +560,10 @@ export type AnswerEntry = {
   | {
       type: 'matrix';
       value: string[];
+    }
+  | {
+      type: 'multi-matrix';
+      value: string[][];
     }
   | {
       type: 'grouped-checkbox';
@@ -577,13 +620,17 @@ export interface File {
 }
 
 /**
- * Image used as the background of the survey landing page
+ * Image used as the background of the survey landing page or in the thank you page
  */
-export interface SurveyBackgroundImage extends File {
+export interface SurveyImage extends File {
   /**
    * Image attributions (= who owns the image rights)
    */
   attributions: string;
+  /**
+   * Alternative text for the picture entered by the user
+   */
+  altText: string;
 }
 
 /**
@@ -638,3 +685,14 @@ export interface SurveyEmailInfoItem {
   name: LocalizedText;
   value: LocalizedText;
 }
+
+/**
+ * Submission
+ */
+export interface Submission {
+  id: number;
+  timestamp: Date;
+  answerEntries?: AnswerEntry[];
+}
+
+export type ImageType = 'backgroundImage' | 'thanksPageImage';

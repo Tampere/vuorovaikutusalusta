@@ -1,9 +1,10 @@
 import { SurveyPageSection } from '@interfaces/survey';
-import { Fab, Grid, Typography } from '@material-ui/core';
+import { Fab, Grid, Typography } from '@mui/material';
 import {
   Article,
   AttachFile,
   CheckBox,
+  ContentPaste,
   FormatListNumbered,
   Image,
   LibraryAddCheck,
@@ -14,10 +15,15 @@ import {
   Subject,
   TextFields,
   ViewComfy,
-} from '@material-ui/icons';
-import { makeStyles } from '@material-ui/styles';
+  ViewComfyAlt,
+} from '@mui/icons-material';
+import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { ReactNode, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { useClipboard } from '@src/stores/ClipboardContext';
+import { useSurvey } from '@src/stores/SurveyContext';
+import { useToasts } from '@src/stores/ToastContext';
 
 const useStyles = makeStyles({
   actionItem: {
@@ -36,6 +42,13 @@ interface Props {
 export default function AddSurveySectionActions(props: Props) {
   const classes = useStyles();
   const { tr, initializeLocalizedObject } = useTranslations();
+  const { addSection } = useSurvey();
+  const { clipboardSection } = useClipboard();
+  const { showToast } = useToasts();
+  const { pageId } = useParams<{
+    pageId: string;
+  }>();
+
   // Sequence for making each section ID unique before they're added to database
   const [sectionSequence, setSectionSequence] = useState(-1);
 
@@ -116,8 +129,8 @@ export default function AddSurveySectionActions(props: Props) {
       presentationType: 'literal',
       minValue: 0,
       maxValue: 10,
-      minLabel: null,
-      maxLabel: null,
+      minLabel: initializeLocalizedObject(''),
+      maxLabel: initializeLocalizedObject(''),
     },
     matrix: {
       type: 'matrix',
@@ -127,6 +140,19 @@ export default function AddSurveySectionActions(props: Props) {
       classes: [],
       subjects: [],
       allowEmptyAnswer: false,
+    },
+    'multi-matrix': {
+      type: 'multi-matrix',
+      isRequired: false,
+      title: initializeLocalizedObject(''),
+      info: null,
+      classes: [],
+      subjects: [],
+      allowEmptyAnswer: false,
+      answerLimits: {
+        min: 0,
+        max: 1,
+      },
     },
     'grouped-checkbox': {
       type: 'grouped-checkbox',
@@ -224,6 +250,12 @@ export default function AddSurveySectionActions(props: Props) {
       icon: <ViewComfy />,
     },
     {
+      type: 'multi-matrix',
+      label: tr.AddSurveySectionActions.multiMatrixQuestion,
+      ariaLabel: 'add-multiple-choice-matrix-question',
+      icon: <ViewComfyAlt />,
+    },
+    {
       type: 'grouped-checkbox',
       label: tr.AddSurveySectionActions.groupedCheckboxQuestion,
       ariaLabel: 'add-grouped-checkbox-question',
@@ -269,7 +301,7 @@ export default function AddSurveySectionActions(props: Props) {
         <Grid item xs={12} md={6}>
           {questionButtons
             .filter(
-              (button) => !props.types || props.types.includes(button.type)
+              (button) => !props.types || props.types.includes(button.type),
             )
             .map((button) => (
               <Grid item key={button.type} style={{ padding: '0.5rem' }}>
@@ -292,7 +324,7 @@ export default function AddSurveySectionActions(props: Props) {
         <Grid item xs={12} md={6}>
           {sectionButtons
             .filter(
-              (button) => !props.types || props.types.includes(button.type)
+              (button) => !props.types || props.types.includes(button.type),
             )
             .map((button) => (
               <Grid item key={button.type} style={{ padding: '0.5rem' }}>
@@ -310,6 +342,47 @@ export default function AddSurveySectionActions(props: Props) {
                 </div>
               </Grid>
             ))}
+          <Grid item style={{ padding: '0.5rem' }}>
+            <div className={classes.actionItem}>
+              <Fab
+                disabled={!clipboardSection}
+                color="secondary"
+                aria-label={'attach-section-from-clipboard'}
+                size="small"
+                onClick={() => {
+                  // Copy content from Clipboard context to active survey
+                  if (clipboardSection) {
+                    addSection(Number(pageId), {
+                      ...clipboardSection,
+                      id: sectionSequence,
+                    });
+                    setSectionSequence((prev) => prev - 1);
+
+                    if (clipboardSection.type === 'map') {
+                      showToast({
+                        severity: 'warning',
+                        autoHideDuration: 30000,
+                        message: tr.EditSurveyPage.sectionAttached,
+                      });
+                    }
+                  }
+                }}
+              >
+                <ContentPaste />
+              </Fab>
+              <Typography>{tr.EditSurveyPage.attachSection}</Typography>
+            </div>
+          </Grid>
+
+          <Grid
+            item
+            style={{
+              padding: '0.5rem',
+              display: 'flex',
+              flexDirection: 'row',
+              alignItems: 'center',
+            }}
+          ></Grid>
         </Grid>
       </Grid>
     </Grid>

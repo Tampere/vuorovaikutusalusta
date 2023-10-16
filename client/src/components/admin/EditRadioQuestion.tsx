@@ -1,7 +1,7 @@
 import React from 'react';
 import { SurveyRadioQuestion } from '@interfaces/survey';
 import QuestionOptions from './QuestionOptions';
-import { Checkbox, FormControlLabel, FormGroup } from '@material-ui/core';
+import { Checkbox, FormControlLabel, FormGroup } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
 
 interface Props {

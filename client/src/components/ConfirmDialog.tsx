@@ -6,14 +6,24 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-} from '@material-ui/core';
+} from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
+
+type PaletteColor =
+  | 'inherit'
+  | 'error'
+  | 'secondary'
+  | 'primary'
+  | 'info'
+  | 'success'
+  | 'warning';
 
 interface Props {
   title?: string;
   text: string;
   open: boolean;
   onClose: (result: boolean) => void;
+  submitColor?: PaletteColor;
 }
 
 export default function ConfirmDialog(props: Props) {
@@ -42,10 +52,16 @@ export default function ConfirmDialog(props: Props) {
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose(false)} autoFocus>
+        <Button autoFocus variant="outlined" onClick={handleClose(false)}>
           {tr.options.no}
         </Button>
-        <Button onClick={handleClose(true)}>{tr.options.yes}</Button>
+        <Button
+          variant="contained"
+          color={props.submitColor}
+          onClick={handleClose(true)}
+        >
+          {tr.options.yes}
+        </Button>
       </DialogActions>
     </Dialog>
   );

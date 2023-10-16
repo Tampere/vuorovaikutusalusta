@@ -4,7 +4,7 @@ import {
   FormControlLabel,
   FormHelperText,
   TextField,
-} from '@material-ui/core';
+} from '@mui/material';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { request } from '@src/utils/request';

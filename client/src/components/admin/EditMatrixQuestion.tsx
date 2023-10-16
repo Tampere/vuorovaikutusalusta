@@ -8,15 +8,14 @@ import {
   TextField,
   Tooltip,
   Typography,
-} from '@material-ui/core';
-import { Add, Cancel } from '@material-ui/icons';
+} from '@mui/material';
+import { Add, Cancel } from '@mui/icons-material';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React from 'react';
 import QuestionOptions from './QuestionOptions';
 
 interface Props {
   section: SurveyMatrixQuestion;
-  disabled?: boolean;
   onChange: (section: SurveyMatrixQuestion) => void;
 }
 
@@ -68,6 +67,7 @@ export default function EditMatrixQuestion({ section, onChange }: Props) {
             <div key={`matrix-class-${index}`} style={{ position: 'relative' }}>
               <Tooltip title={entry[surveyLanguage] ?? ''}>
                 <TextField
+                  inputProps={{ autoFocus: true }}
                   style={{
                     marginRight: '0.25rem',
                     backgroundColor: 'rgba(0,0,0,0.2)',

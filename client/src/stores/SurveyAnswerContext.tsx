@@ -8,8 +8,8 @@ import {
 } from '@interfaces/survey';
 import { request } from '@src/utils/request';
 import React, {
-  createContext,
   ReactNode,
+  createContext,
   useContext,
   useMemo,
   useReducer,
@@ -26,6 +26,10 @@ type Action =
   | {
       type: 'SET_SURVEY';
       survey: Survey;
+    }
+  | {
+      type: 'UPDATE_SURVEY_PAGE';
+      page: SurveyPage;
     }
   | {
       type: 'UPDATE_ANSWER';
@@ -53,7 +57,7 @@ const stateDefaults: State = {
 };
 
 // Section types that won't have an answer (e.g. text sections)
-const nonQuestionSectionTypes: SurveyPageSection['type'][] = [
+export const nonQuestionSectionTypes: SurveyPageSection['type'][] = [
   'text',
   'image',
   'document',
@@ -114,6 +118,14 @@ export function getEmptyAnswer(section: SurveyPageSection): AnswerEntry {
         type: section.type,
         value: new Array(section.subjects?.length ?? 1).fill(null),
       };
+    case 'multi-matrix':
+      return {
+        sectionId: section.id,
+        type: section.type,
+        value: new Array(section.subjects?.length ?? 1).fill(
+          new Array().fill(null),
+        ),
+      };
     case 'grouped-checkbox':
       return {
         sectionId: section.id,
@@ -128,9 +140,49 @@ export function getEmptyAnswer(section: SurveyPageSection): AnswerEntry {
       };
     default:
       throw new Error(
-        `No default value defined for questions of type "${section.type}"`
+        `No default value defined for questions of type "${section.type}"`,
       );
   }
+}
+
+/**
+ * Checks if given answervalue for a question is empty/unanswered
+ * @param question Question
+ * @param value Answer value
+ * @returns Is the answer empty?
+ */
+export function isAnswerEmpty(
+  question: SurveyQuestion,
+  value: AnswerEntry['value'],
+) {
+  // Matrix is considered incomplete, if the answer array doesn't contain as many answers (exluding nulls) as there are rows in the matrix
+  if (question.type === 'matrix') {
+    if (
+      (value as string[]).filter((answer) => answer).length !==
+      question.subjects?.length
+    ) {
+      return true;
+    }
+  }
+  // Multi matrix question is unanswered if every row is empty
+  if (question.type === 'multi-matrix') {
+    return (value as string[][]).every((row) => row.length === 0);
+  }
+  // Sorting is considered incomplete, if the array contains any nullish values
+  if (question.type === 'sorting') {
+    if (!value || (value as number[]).some((value) => value == null)) {
+      return true;
+    }
+  }
+  // If value is an array, check the array length - otherwise check for its emptiness
+  else if (
+    Array.isArray(value)
+      ? !value.length
+      : value == null || !value.toString().length
+  ) {
+    return true;
+  }
+  return false;
 }
 
 /**
@@ -139,7 +191,7 @@ export function getEmptyAnswer(section: SurveyPageSection): AnswerEntry {
  */
 export function useSurveyAnswers() {
   const context = useContext(SurveyAnswerContext);
-  const { setLanguage } = useTranslations();
+  const { setLanguage, surveyLanguage } = useTranslations();
   if (!context) {
     throw new Error('useSurvey must be used within the SurveyProvider');
   }
@@ -148,7 +200,7 @@ export function useSurveyAnswers() {
 
   function getValidationErrors(
     question: SurveyQuestion,
-    answers = state.answers
+    answers = state.answers,
   ) {
     const errors: ('answerLimits' | 'required' | 'minValue' | 'maxValue')[] =
       [];
@@ -162,7 +214,7 @@ export function useSurveyAnswers() {
       const nonEmptySelections = value.filter(
         (selection) =>
           selection != null &&
-          (typeof selection !== 'string' || selection.length > 0)
+          (typeof selection !== 'string' || selection.length > 0),
       );
       if (
         // If either limit is defined and that limit is broken, the answer is invalid
@@ -175,8 +227,32 @@ export function useSurveyAnswers() {
       }
     }
 
+    // Multi choice matrix question validation - check possible answer limits
+
+    if (question.type === 'multi-matrix') {
+      const value = answer.value as string[][];
+      for (const row of value) {
+        if (row.includes('-1')) {
+          continue;
+        } else if (
+          // If either limit is defined and that limit is broken, the answer is invalid
+          (question.answerLimits?.max &&
+            row.length > question.answerLimits.max) ||
+          (question.answerLimits?.min && row.length < question.answerLimits.min)
+        ) {
+          errors.push('answerLimits');
+          break;
+        }
+      }
+    }
+
     // Numeric question validation - check min & max values
-    if (question.type === 'numeric' && answer.value != null) {
+    if (
+      question.type === 'numeric' &&
+      answer.value != null &&
+      typeof answer.value === 'number' &&
+      !isNaN(answer.value)
+    ) {
       if (question.minValue != null && answer.value < question.minValue) {
         errors.push('minValue');
       }
@@ -195,14 +271,12 @@ export function useSurveyAnswers() {
           errors.push('required');
         }
       }
-      // Sorting is considered incomplete, if the array contains any nullish values
-      if (question.type === 'sorting') {
-        if (
-          !answer.value ||
-          (answer.value as number[]).some((value) => value == null)
-        ) {
-          errors.push('required');
-        }
+      // Multiple choice matrix is considered incomplete if any of the rows is empty
+      else if (
+        question.type === 'multi-matrix' &&
+        (answer.value as string[][]).some((row) => row.length === 0)
+      ) {
+        errors.push('required');
       }
       // If value is an array, check the array length - otherwise check for its emptiness
       else if (
@@ -230,6 +304,11 @@ export function useSurveyAnswers() {
      * @param survey
      */
     setSurvey(survey: Survey) {
+      if (!survey) {
+        dispatch({ type: 'SET_SURVEY', survey });
+        dispatch({ type: 'SET_ANSWERS', answers: [] });
+        return;
+      }
       dispatch({ type: 'SET_SURVEY', survey });
       // Get all sections across survey pages
       const sections = survey.pages
@@ -260,9 +339,27 @@ export function useSurveyAnswers() {
         // Skip sections that shouldn't get answers
         .filter(
           (section): section is SurveyQuestion =>
-            !nonQuestionSectionTypes.includes(section.type)
+            !nonQuestionSectionTypes.includes(section.type),
         )
         .some((section) => getValidationErrors(section).length);
+    },
+    /**
+     *
+     * @param page survey page
+     * @returns a list of objects with question titles as keys and an array of errors as values
+     */
+    getPageInvalidQuestions(page: SurveyPage) {
+      return (
+        page.sections
+          // Skip sections that shouldn't get answers
+          .filter(
+            (section): section is SurveyQuestion =>
+              !nonQuestionSectionTypes.includes(section.type),
+          )
+          .map((section) => ({
+            [section.title[surveyLanguage]]: getValidationErrors(section),
+          }))
+      );
     },
     /**
      * Fetch unfinished answer entries by token and set them into the context
@@ -274,7 +371,7 @@ export function useSurveyAnswers() {
         answers: AnswerEntry[];
         language: LanguageCode;
       }>(
-        `/api/published-surveys/${state.survey.name}/unfinished-submission?token=${token}`
+        `/api/published-surveys/${state.survey.name}/unfinished-submission?token=${token}`,
       );
       const { answers, language } = response;
       dispatch({
@@ -289,6 +386,17 @@ export function useSurveyAnswers() {
      */
     setUnfinishedToken(token: string) {
       dispatch({ type: 'SET_UNFINISHED_TOKEN', token });
+    },
+    /**
+     * Updates the given map layers to the state.
+     * @param page Page to be updated
+     * @param mapLayers Visible map layers
+     */
+    updatePageMapLayers(page: SurveyPage, mapLayers: number[]) {
+      dispatch({
+        type: 'UPDATE_SURVEY_PAGE',
+        page: { ...page, sidebar: { ...page.sidebar, mapLayers } },
+      });
     },
   };
 }
@@ -306,11 +414,21 @@ function reducer(state: State, action: Action): State {
         ...state,
         survey: action.survey,
       };
+    case 'UPDATE_SURVEY_PAGE':
+      return {
+        ...state,
+        survey: {
+          ...state.survey,
+          pages: state.survey.pages.map((page) =>
+            page.id === action.page.id ? action.page : page,
+          ),
+        },
+      };
     case 'UPDATE_ANSWER':
       return {
         ...state,
         answers: state.answers.map((answer) =>
-          answer.sectionId === action.answer.sectionId ? action.answer : answer
+          answer.sectionId === action.answer.sectionId ? action.answer : answer,
         ),
       };
     case 'UPDATE_ANSWERS':
@@ -319,7 +437,7 @@ function reducer(state: State, action: Action): State {
         answers: state.answers.map(
           (answer) =>
             action.answers.find((a) => a.sectionId === answer.sectionId) ??
-            answer
+            answer,
         ),
       };
     case 'SET_ANSWERS':

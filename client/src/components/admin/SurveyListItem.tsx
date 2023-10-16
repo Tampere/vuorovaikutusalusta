@@ -1,8 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { Survey } from '@interfaces/survey';
-import { Button, Card, Link, Theme, Typography } from '@material-ui/core';
-import { CardContent } from '@material-ui/core';
-import { CardActions } from '@material-ui/core';
+import { Button, Card, Link, Theme, Typography } from '@mui/material';
+import { CardContent } from '@mui/material';
+import { CardActions } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { format } from 'date-fns';
 import CopyToClipboard from '../CopyToClipboard';
@@ -13,9 +13,9 @@ import {
   unpublishSurvey,
 } from '@src/controllers/SurveyController';
 import { useToasts } from '@src/stores/ToastContext';
-import { makeStyles } from '@material-ui/styles';
-import DataExport from './DataExport';
+import { makeStyles } from '@mui/styles';
 import LoadingButton from '../LoadingButton';
+import { NavLink, useRouteMatch } from 'react-router-dom';
 
 const useStyles = makeStyles((theme: Theme) => ({
   '@keyframes pulse': {
@@ -52,8 +52,9 @@ export default function SurveyListItem(props: Props) {
   const [loading, setLoading] = useState(false);
 
   const classes = useStyles();
-  const { tr, language, surveyLanguage } = useTranslations();
+  const { tr, surveyLanguage } = useTranslations();
   const { showToast } = useToasts();
+  const { url } = useRouteMatch();
 
   const surveyUrl = useMemo(() => {
     if (!survey.name) {
@@ -142,13 +143,7 @@ export default function SurveyListItem(props: Props) {
             justifyContent: 'flex-start',
           }}
         >
-          <Button
-            onClick={() =>
-              window.open(
-                `/admin/kyselyt/${survey.id}/perustiedot?lang=${language}`
-              )
-            }
-          >
+          <Button component={NavLink} to={`${url}kyselyt/${survey.id}`}>
             {tr.SurveyList.editSurvey}
           </Button>
           {/* Allow publish only if it isn't yet published and has a name */}
@@ -181,11 +176,19 @@ export default function SurveyListItem(props: Props) {
             {' '}
             {tr.SurveyList.copySurvey}{' '}
           </LoadingButton>
-          <DataExport surveyId={survey.id} />
+          <Button
+            component={NavLink}
+            style={{ marginLeft: 'auto' }}
+            variant="contained"
+            to={`vastaukset/${survey.id}`}
+          >
+            {`${tr.SurveyList.answers} (${survey?.submissionCount ?? 0})`}
+          </Button>
         </CardActions>
       </Card>
       <ConfirmDialog
         open={publishConfirmDialogOpen}
+        submitColor="primary"
         title={survey.title?.[surveyLanguage] ?? ''}
         text={tr.SurveyList.confirmPublish}
         onClose={async (result) => {
@@ -212,6 +215,7 @@ export default function SurveyListItem(props: Props) {
       />
       <ConfirmDialog
         open={unpublishConfirmDialogOpen}
+        submitColor="error"
         title={survey.title?.[surveyLanguage] ?? ''}
         text={tr.SurveyList.confirmUnpublish}
         onClose={async (result) => {

@@ -8,7 +8,7 @@ import {
   FormControlLabel,
   FormGroup,
   FormLabel,
-} from '@material-ui/core';
+} from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useState } from 'react';
 import AddSurveySectionActions from './AddSurveySectionActions';

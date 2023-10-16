@@ -1,7 +1,8 @@
 import { SurveySliderQuestion } from '@interfaces/survey';
-import { FormLabel, Slider } from '@material-ui/core';
-import { makeStyles } from '@material-ui/styles';
+import { FormLabel, Slider } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
+import { visuallyHidden } from '@mui/utils';
 import React, { useMemo, useRef } from 'react';
 
 interface Props {
@@ -15,9 +16,6 @@ const useStyles = makeStyles({
   label: {
     cursor: 'pointer',
   },
-  emptyValue: {
-    color: '#ccc',
-  },
 });
 
 export default function SliderQuestion({
@@ -30,9 +28,9 @@ export default function SliderQuestion({
   const classes = useStyles();
   const sliderRef = useRef<HTMLElement>();
   const { tr } = useTranslations();
-
+  const verbalExtremes = question.presentationType === 'literal';
   const labels = useMemo(() => {
-    return question.presentationType === 'literal'
+    return verbalExtremes
       ? {
           min:
             question.minLabel?.[surveyLanguage] ??
@@ -54,6 +52,7 @@ export default function SliderQuestion({
 
   return (
     <div
+      id={`${question.id}-input`}
       style={{
         display: 'flex',
         flexDirection: 'column',
@@ -61,52 +60,55 @@ export default function SliderQuestion({
         maxWidth: '30rem',
       }}
     >
-      <div style={{ display: 'flex', flexDirection: 'row' }}>
-        <FormLabel
-          className={classes.label}
-          onClick={() => {
-            onChange(question.minValue);
-            sliderRef.current.querySelector('input').focus();
-          }}
-        >
-          {labels.min}
-        </FormLabel>
-        <div
-          style={{
-            flexGrow: 1,
-          }}
-        />
-        <FormLabel
-          className={classes.label}
-          onClick={() => {
-            onChange(question.maxValue);
-            sliderRef.current.querySelector('input').focus();
-          }}
-        >
-          {labels.max}
-        </FormLabel>
-      </div>
+      <FormLabel
+        sx={{ display: 'flex', justifyContent: 'space-between' }}
+        id={`${question.id}-value-label`}
+        className={classes.label}
+        required={false}
+      >
+        <span style={visuallyHidden}>{tr.SliderQuestion.scale}: </span>
+        <span>
+          {question.minValue}
+          {verbalExtremes && `: ${labels.min}`}
+        </span>
+        <span>
+          {question.maxValue}
+          {verbalExtremes && `: ${labels.max}`}
+        </span>
+      </FormLabel>
       <Slider
         aria-label={question.title?.[surveyLanguage]}
         ref={sliderRef}
-        className={value == null ? classes.emptyValue : ''}
+        slotProps={{
+          input: {
+            'aria-describedby': `${question.id}-value-label`,
+            'aria-required': question.isRequired,
+            'aria-invalid': question.isRequired && value === null,
+          },
+        }}
         value={value ?? visibleEmptyValue}
         min={question.minValue}
         max={question.maxValue}
         valueLabelDisplay="auto"
+        getAriaValueText={(v) => v.toString()}
         step={1}
         marks
+        sx={{
+          '.MuiSlider-track, .MuiSlider-rail': {
+            color: value === null ? '#ccc' : 'inherit',
+          },
+          '.MuiSlider-mark': {
+            color: value === null ? 'white' : 'inherit',
+          },
+        }}
         onClick={() => {
-          if (value == null) {
+          if (value === null) {
             onChange(visibleEmptyValue);
           }
         }}
         onChange={(_, value: number) => {
           setDirty(true);
           onChange(value);
-        }}
-        onBlur={() => {
-          setDirty(true);
         }}
       />
     </div>

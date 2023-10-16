@@ -5,7 +5,7 @@
 ###
 # Base image declaration
 ###
-FROM node:14.17.1-alpine AS base
+FROM node:20.5-alpine AS base
 
 ENV APPDIR /app
 
@@ -48,7 +48,7 @@ FROM base AS main
 
 # Install all dependencies (GDAL & others for Puppeteer)
 RUN apk update && apk add \
-  gdal \
+  gdal-tools \
   chromium \
   nss \
   freetype \

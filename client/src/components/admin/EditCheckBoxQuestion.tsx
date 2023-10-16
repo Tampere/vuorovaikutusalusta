@@ -5,9 +5,9 @@ import {
   FormControlLabel,
   FormGroup,
   TextField,
-} from '@material-ui/core';
+} from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
-import { makeStyles } from '@material-ui/styles';
+import { makeStyles } from '@mui/styles';
 import QuestionOptions from './QuestionOptions';
 
 const useStyles = makeStyles({

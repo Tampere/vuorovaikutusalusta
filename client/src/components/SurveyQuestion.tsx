@@ -1,12 +1,15 @@
-import {
+import type {
+  AnswerEntry,
   FileAnswer,
   MapQuestionAnswer,
-  SurveyQuestion,
+  Submission,
+  SurveyQuestion as SurveyQuestionType,
 } from '@interfaces/survey';
-import { FormControl, FormHelperText, FormLabel } from '@material-ui/core';
+import { FormControl, FormHelperText, FormLabel } from '@mui/material';
+import { visuallyHidden } from '@mui/utils';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import AttachmentQuestion from './AttachmentQuestion';
 import CheckBoxQuestion from './CheckBoxQuestion';
 import FreeTextQuestion from './FreeTextQuestion';
@@ -18,49 +21,112 @@ import RadioQuestion from './RadioQuestion';
 import SectionInfo from './SectionInfo';
 import SliderQuestion from './SliderQuestion';
 import SortingQuestion from './SortingQuestion';
+import MultiMatrixQuestion from './MultiMatrixQuestion';
 
 interface Props {
-  question: SurveyQuestion;
+  question: SurveyQuestionType;
+  pageUnfinished: boolean;
+  mobileDrawerOpen: boolean;
+  readOnly?: boolean;
+  value?: AnswerEntry['value'];
+  submission?: Submission;
 }
 
-export default function SurveyQuestion({ question }: Props) {
+function SurveyQuestion({
+  question,
+  pageUnfinished,
+  mobileDrawerOpen,
+  readOnly = false,
+  submission,
+  ...props
+}: Props) {
   const { answers, updateAnswer, getValidationErrors, survey } =
     useSurveyAnswers();
-  const [dirty, setDirty] = useState(false);
   const { tr, surveyLanguage } = useTranslations();
+  const [dirty, setDirty] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [backdropOpen, setBackdropOpen] = useState(false);
+  const infoDialogRef = useRef(null);
 
   const value = useMemo(
-    () => answers.find((answer) => answer.sectionId === question.id)?.value,
-    [answers, question]
+    () =>
+      typeof props.value !== 'undefined'
+        ? props.value
+        : // If submission is given via props, use them instead of context
+          (submission?.answerEntries ?? answers).find(
+            (answer) => answer.sectionId === question.id,
+          )?.value,
+    [answers, submission, question, props.value],
   );
 
   const validationErrors = useMemo(
-    () => (dirty ? getValidationErrors(question) : []),
-    [dirty, question, value]
+    () => (dirty || pageUnfinished ? getValidationErrors(question) : []),
+    [dirty, question, value, pageUnfinished],
   );
 
   return (
-    <FormControl error={validationErrors.length > 0} style={{ width: '100%' }}>
-      <div
+    <FormControl
+      disabled={readOnly}
+      component="fieldset"
+      required={question.isRequired}
+      aria-required={question.isRequired}
+      aria-invalid={validationErrors.includes('required')}
+      error={validationErrors.length > 0}
+      style={{ width: '100%' }}
+      onBlur={(e: React.FocusEvent<HTMLFieldSetElement>) => {
+        if (
+          e.relatedTarget &&
+          !e.currentTarget.contains(e.relatedTarget as Node) &&
+          !dialogOpen &&
+          !backdropOpen &&
+          !infoDialogRef?.current?.infoDialogOpen &&
+          !mobileDrawerOpen
+        ) {
+          setDirty(true);
+        }
+      }}
+    >
+      {/* Show the required error only for empty values (not when answer limits are broken in checkbox questions) */}
+      {validationErrors.includes('required') && (
+        <>
+          <FormHelperText
+            id={`${question.id}-required-text`}
+            sx={{ marginLeft: 0 }}
+          >
+            {tr.SurveyQuestion.errorFieldIsRequired}
+          </FormHelperText>
+          <FormHelperText style={visuallyHidden} role="alert">
+            {tr.SurveyQuestion.accessibilityTooltip}{' '}
+            {question.title?.[surveyLanguage]}
+          </FormHelperText>
+        </>
+      )}
+      <FormLabel
+        component="legend"
         style={{
           display: 'flex',
-          flexDirection: 'row',
           alignItems: 'center',
+          color: survey.sectionTitleColor ?? '#000000',
         }}
       >
-        <FormLabel
-          htmlFor={`${question.id}-input`}
-          style={{ color: survey.sectionTitleColor ?? '#000000' }}
-        >
-          {question.title?.[surveyLanguage]} {question.isRequired && '*'}
-        </FormLabel>
+        <h3>
+          {question.title?.[surveyLanguage]}
+          <span aria-hidden="true"> </span>
+        </h3>
+        {question.type == 'sorting' && (
+          <span style={visuallyHidden}>
+            {tr.SortingQuestion.confirmationGuide}
+          </span>
+        )}
         {question.info && question.info?.[surveyLanguage] && (
           <SectionInfo
+            ref={infoDialogRef}
+            hiddenFromScreenReader={false}
             infoText={question.info?.[surveyLanguage]}
             subject={question.title?.[surveyLanguage]}
           />
         )}
-      </div>
+      </FormLabel>
 
       {/* Radio question */}
       {question.type === 'radio' && (
@@ -90,6 +156,7 @@ export default function SurveyQuestion({ question }: Props) {
           }}
           question={question}
           setDirty={setDirty}
+          validationErrors={validationErrors}
         />
       )}
       {/* Free text question */}
@@ -127,6 +194,7 @@ export default function SurveyQuestion({ question }: Props) {
       {question.type === 'map' && (
         <MapQuestion
           value={value as MapQuestionAnswer[]}
+          setDialogOpen={setDialogOpen}
           onChange={(value) => {
             updateAnswer({
               sectionId: question.id,
@@ -135,7 +203,6 @@ export default function SurveyQuestion({ question }: Props) {
             });
           }}
           question={question}
-          setDirty={setDirty}
         />
       )}
       {/* Sorting question */}
@@ -180,6 +247,24 @@ export default function SurveyQuestion({ question }: Props) {
           }}
           question={question}
           setDirty={setDirty}
+          setBackdropOpen={setBackdropOpen}
+        />
+      )}
+      {question.type === 'multi-matrix' && (
+        <MultiMatrixQuestion
+          readOnly={readOnly}
+          value={value as string[][]}
+          onChange={(value) => {
+            updateAnswer({
+              sectionId: question.id,
+              type: question.type,
+              value,
+            });
+          }}
+          question={question}
+          setDirty={setDirty}
+          setBackdropOpen={setBackdropOpen}
+          validationErrors={validationErrors}
         />
       )}
       {question.type === 'grouped-checkbox' && (
@@ -198,6 +283,7 @@ export default function SurveyQuestion({ question }: Props) {
       )}
       {question.type === 'attachment' && (
         <AttachmentQuestion
+          question={question}
           value={value as FileAnswer[]}
           setDirty={setDirty}
           onChange={(value) =>
@@ -209,12 +295,8 @@ export default function SurveyQuestion({ question }: Props) {
           }
         />
       )}
-      {/* Show the required error only for empty values (not when answer limits are broken in checkbox questions) */}
-      {validationErrors.includes('required') && (
-        <FormHelperText id={`${question.id}-required-text`}>
-          {tr.SurveyQuestion.errorFieldIsRequired}
-        </FormHelperText>
-      )}
     </FormControl>
   );
 }
+
+export default SurveyQuestion;

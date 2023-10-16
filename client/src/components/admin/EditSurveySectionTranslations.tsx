@@ -4,7 +4,7 @@ import {
   SurveyMapSubQuestion,
   SurveyPageSection,
 } from '@interfaces/survey';
-import { makeStyles } from '@material-ui/styles';
+import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React from 'react';
 import RichTextEditor from '../RichTextEditor';
@@ -100,7 +100,7 @@ export default function EditSurveySectionTranslations({
                     />
                     {languages
                       .map((supportedLanguage) =>
-                        Boolean(option.info?.[supportedLanguage])
+                        Boolean(option.info?.[supportedLanguage]),
                       )
                       .includes(true) && (
                       <div
@@ -163,7 +163,7 @@ export default function EditSurveySectionTranslations({
           />
         </div>
       )}
-      {section.type === 'matrix' && (
+      {(section.type === 'matrix' || section.type === 'multi-matrix') && (
         <div>
           {section.classes &&
             section.classes.map((matrixClass, classIndex) => (

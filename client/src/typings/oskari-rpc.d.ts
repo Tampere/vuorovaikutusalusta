@@ -23,8 +23,8 @@ declare module 'oskari-rpc' {
           showMeasureOnMap?: boolean;
           selfIntersection?: boolean;
           geojson?: GeoJSON.GeoJSON;
-        }
-      ]
+        },
+      ],
     ) => void;
 
     /**
@@ -32,7 +32,7 @@ declare module 'oskari-rpc' {
      */
     export type StopDrawingRequest = (
       name: 'DrawTools.StopDrawingRequest',
-      params: [id: string, clearCurrent?: boolean, supressEvent?: boolean]
+      params: [id: string, clearCurrent?: boolean, supressEvent?: boolean],
     ) => void;
   }
 
@@ -45,7 +45,7 @@ declare module 'oskari-rpc' {
      */
     export type MapLayerVisibilityRequest = (
       name: 'MapModulePlugin.MapLayerVisibilityRequest',
-      params: [layerId: number, visibility: boolean]
+      params: [layerId: number, visibility: boolean],
     ) => void;
     /**
      * Add features to map request
@@ -60,17 +60,9 @@ declare module 'oskari-rpc' {
           centerTo: boolean;
           cursor?: string;
           prio?: number;
-          featureStyle?: {
-            stroke?: {
-              color: string;
-              width: number;
-            };
-            fill?: {
-              color: string;
-            };
-          };
-        }
-      ]
+          featureStyle?: FeatureStyle;
+        },
+      ],
     ) => void;
 
     /**
@@ -85,8 +77,8 @@ declare module 'oskari-rpc' {
         },
         featureFilter: {
           [key: string]: string[];
-        }
-      ]
+        },
+      ],
     ) => void;
 
     /**
@@ -97,8 +89,8 @@ declare module 'oskari-rpc' {
       params: [
         featureFilterKey: string,
         featureFilterValue: string | number,
-        layerId: string
-      ]
+        layerId: string,
+      ],
     ) => void;
 
     /**
@@ -114,9 +106,9 @@ declare module 'oskari-rpc' {
           offsetX: number;
           offsetY: number;
           size: number;
-        },
-        id: string
-      ]
+        } & MarkerStyle,
+        id: string,
+      ],
     ) => void;
 
     /**
@@ -124,7 +116,7 @@ declare module 'oskari-rpc' {
      */
     export type RemoveMarkersRequest = (
       name: 'MapModulePlugin.RemoveMarkersRequest',
-      params: number[]
+      params: number[],
     ) => void;
   }
 
@@ -162,8 +154,8 @@ declare module 'oskari-rpc' {
             },
         options: {
           hidePrevious?: boolean;
-        }
-      ]
+        },
+      ],
     ) => void;
 
     /**
@@ -171,7 +163,7 @@ declare module 'oskari-rpc' {
      */
     export type HideInfoBoxRequest = (
       name: 'InfoBox.HideInfoBoxRequest',
-      params: [id: string]
+      params: [id: string],
     ) => void;
   }
 
@@ -219,6 +211,31 @@ declare module 'oskari-rpc' {
   }) => void;
 
   /**
+   * Style for a feature
+   */
+  export interface FeatureStyle {
+    stroke?: {
+      color: string;
+      width: number;
+      lineDash?: number[];
+      lineCap?: 'dashed' | 'butt' | 'round';
+    };
+    fill?: {
+      color: string;
+    };
+  }
+
+  /**
+   * Style for a marker
+   */
+  export interface MarkerStyle {
+    shape: string | number;
+    size: number;
+    color?: string;
+    msg?: string;
+  }
+
+  /**
    * All Oskari events
    */
   namespace Event {
@@ -227,7 +244,7 @@ declare module 'oskari-rpc' {
      */
     export type DrawingEvent = (
       name: 'DrawingEvent',
-      callback: DrawingEventHandler
+      callback: DrawingEventHandler,
     ) => void;
 
     /**
@@ -235,7 +252,7 @@ declare module 'oskari-rpc' {
      */
     export type FeatureEvent = (
       name: 'FeatureEvent',
-      callback: FeatureEventHandler
+      callback: FeatureEventHandler,
     ) => void;
 
     /**
@@ -243,7 +260,7 @@ declare module 'oskari-rpc' {
      */
     export type MarkerClickEvent = (
       name: 'MarkerClickEvent',
-      callback: MarkerClickEventHandler
+      callback: MarkerClickEventHandler,
     ) => void;
 
     /**
@@ -251,7 +268,7 @@ declare module 'oskari-rpc' {
      */
     export type InfoboxActionEvent = (
       name: 'InfoboxActionEvent',
-      callback: InfoboxActionEventHandler
+      callback: InfoboxActionEventHandler,
     ) => void;
   }
 
@@ -262,6 +279,7 @@ declare module 'oskari-rpc' {
     getSupportedEvents: (callback: (events: unknown[]) => void) => void;
     getSupportedRequests: (callback: (requests: unknown[]) => void) => void;
     getSupportedFunctions: (callback: (functions: unknown[]) => void) => void;
+    getInfo: (callback: (info: any) => void) => void;
     /**
      * Post an Oskari request
      */
@@ -287,7 +305,7 @@ declare module 'oskari-rpc' {
      */
     unregisterEventHandler: (
       name: string,
-      handler: (...args: any) => void
+      handler: (...args: any) => void,
     ) => void;
   }
 
@@ -312,6 +330,10 @@ declare module 'oskari-rpc' {
      * Name of the map layer
      */
     name: string;
+    /**
+     * Is the layer visible?
+     */
+    visible: boolean;
   }
 
   export interface Synchronizer {
@@ -328,11 +350,11 @@ declare module 'oskari-rpc' {
   const OskariRPC: {
     connect: (
       iframeElement: HTMLIFrameElement,
-      iframeDomain: string
+      iframeDomain: string,
     ) => Channel;
     synchronizerFactory: (
       channel: Channel,
-      handlers: Handler[]
+      handlers: Handler[],
     ) => Synchronizer;
     VERSION: string;
   };

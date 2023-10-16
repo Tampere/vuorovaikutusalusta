@@ -1,47 +1,28 @@
 import { Survey } from '@interfaces/survey';
-import { Box, Link, Theme, Typography } from '@material-ui/core';
-import { makeStyles } from '@material-ui/styles';
+import {
+  Box,
+  Button,
+  Link,
+  Theme,
+  Typography,
+  Stack,
+  useMediaQuery,
+} from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { getClassList } from '@src/utils/classes';
 import React from 'react';
-import TreBanner from './logos/TreBanner';
-import TreLogo from './logos/TreLogo';
+import Footer from './Footer';
 
 const useStyles = makeStyles((theme: Theme & { [customKey: string]: any }) => ({
-  root: (props: any) => ({
-    display: 'flex',
-    width: '100%',
-    minHeight: '-webkit-fill-available',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    ...(props?.imageName && {
-      backgroundImage: `url("/api/file/${props.imageName}")`,
-    }),
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-    backgroundAttachment: 'fixed',
-    backgroundColor: theme.landingPage?.backgroundColor ?? '#fff',
-  }),
-  header: {
-    display: 'flex',
-    flexDirection: 'row',
-    width: '100%',
-    justifyContent: 'flex-end',
-  },
-  headerLogo: {
-    width: '30rem',
-    maxWidth: '100%',
-  },
   heading: {
-    textTransform: 'uppercase',
     fontSize: '2rem',
     wordBreak: 'break-word',
     hyphens: 'auto',
     textAlign: 'center',
     fontWeight: 800,
     lineHeight: 1.5,
-    margin: '1rem',
+    margin: '2rem',
     '& span': {
       backgroundColor: theme.palette.primary.main,
       color: theme.palette.primary.contrastText,
@@ -77,38 +58,26 @@ const useStyles = makeStyles((theme: Theme & { [customKey: string]: any }) => ({
     color: theme.palette.secondary.contrastText,
     padding: '0.5rem',
     textDecoration: 'none',
-    marginTop: '1.5rem',
+    transition: 'transform 200ms ease-out',
     '&:hover': {
-      // TODO: hover effect for start button?
+      transform: 'scale(1.1)',
     },
     ...theme.landingPage?.start,
     [theme.breakpoints.down(600)]: {
       fontSize: '6vw',
     },
   },
-  footer: {
-    display: 'flex',
-    flexDirection: 'row',
-    width: '100%',
-    justifyContent: 'space-between',
-    marginTop: '2rem',
-    gap: '1rem',
-  },
-  footerLogo: {
-    display: 'flex',
-    marginLeft: '0.5rem',
-    marginBottom: '0.5rem',
-    alignItems: 'flex-end',
-  },
+
   imageCopyright: {
-    alignSelf: 'flex-end',
+    position: 'absolute',
+    right: 0,
+    bottom: 0,
     backgroundColor: theme.palette.primary.main,
     color: theme.palette.primary.contrastText,
-    padding: '1rem',
+    padding: '0.6rem',
   },
   testSurveyHeader: {
-    padding: '1rem',
-    width: '100%',
+    padding: '2px',
     background: 'red',
     color: 'white',
     textAlign: 'center',
@@ -132,57 +101,132 @@ export default function SurveyLandingPage({
 }: Props) {
   const classes = useStyles({ imageName: survey?.backgroundImageName ?? '' });
   const { tr, surveyLanguage } = useTranslations();
-
+  const mediumWidth = useMediaQuery('(max-width: 640px)');
   return (
-    <Box className={classes.root}>
+    <Stack
+      direction="column"
+      justifyContent="space-between"
+      alignItems="stretch"
+      style={{ minHeight: '100svh' }} // primary
+      sx={{
+        width: '100%',
+        minHeight: '100vh', // as a fallback if svh not supported
+        ...(survey?.backgroundImageName && {
+          backgroundImage: `url("/api/file/background-images/${survey?.backgroundImageName}")`,
+        }),
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed',
+      }}
+    >
       {isTestSurvey && (
-        <div className={classes.testSurveyHeader}>
-          {tr.TestSurveyFrame.text}
-        </div>
+        <Box
+          className="test-survey-header"
+          sx={{ position: 'absolute', width: '100%' }}
+        >
+          <div className={classes.testSurveyHeader}>
+            {tr.TestSurveyFrame.text}
+          </div>
+        </Box>
       )}
-      <div className={classes.header}>
-        <div className={classes.headerLogo}>
-          <TreLogo />
-        </div>
-      </div>
-      <div
-        style={{
+      <Box
+        className="header-content"
+        sx={{
+          position: 'relative',
+          height: '20vh',
+          display: 'flex',
+          justifyContent: 'flex-end',
+          alignItems: 'flex-start',
+        }}
+      >
+        <img
+          style={{
+            maxWidth: '60%',
+            maxHeight: '100%',
+          }}
+          src={`/api/feature-styles/icons/tre_logo`}
+          alt={tr.IconAltTexts.treLogoAltText}
+        />
+      </Box>
+      <Box
+        className="middle-content"
+        sx={{
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          flexGrow: 1,
         }}
       >
-        <h1 className={getClassList([classes.heading, classes.title])}>
-          <span>{survey.title?.[surveyLanguage]}</span>
-        </h1>
-        {survey.subtitle?.[surveyLanguage] && (
-          <h2 className={getClassList([classes.heading, classes.subtitle])}>
-            <span>{survey.subtitle?.[surveyLanguage]}</span>
-          </h2>
-        )}
-        <Link
-          component="button"
-          variant="body2"
-          className={classes.start}
-          onClick={onStart}
-        >
-          {continueUnfinished
-            ? tr.SurveyPage.continueSurveyLink
-            : tr.SurveyPage.startSurveyLink}
-        </Link>
-      </div>
-      <div className={classes.footer}>
-        <div className={classes.footerLogo}>
-          <TreBanner />
+        <div>
+          <h1 className={getClassList([classes.heading, classes.title])}>
+            <span>{survey.title?.[surveyLanguage]}</span>
+          </h1>
+          {survey.subtitle?.[surveyLanguage] && (
+            <h2 className={getClassList([classes.heading, classes.subtitle])}>
+              <span>{survey.subtitle?.[surveyLanguage]}</span>
+            </h2>
+          )}
         </div>
+        <Button onClick={onStart}>
+          <Typography variant="body1" className={classes.start}>
+            {continueUnfinished
+              ? tr.SurveyPage.continueSurveyLink
+              : tr.SurveyPage.startSurveyLink}
+          </Typography>
+        </Button>
+      </Box>
+      <Box
+        className="footer-content"
+        sx={{
+          position: 'relative',
+          minHeight: '20vh',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'flex-end',
+          alignItems: 'center',
+          whiteSpace: 'nowrap',
+        }}
+      >
+        <Footer>
+          <Link
+            color="primary"
+            underline="hover"
+            href="https://www.tampere.fi/asioi-kaupungin-kanssa/oskari-karttakyselypalvelun-saavutettavuusseloste"
+            target="_blank"
+          >
+            {tr.FooterLinks.accessibility}
+          </Link>
+          {survey.displayPrivacyStatement && (
+            <Link
+              color="primary"
+              underline="hover"
+              href="https://www.tampere.fi/tietosuoja-ja-tiedonhallinta/tietosuojaselosteet"
+              target="_blank"
+            >
+              {tr.FooterLinks.privacyStatement}
+            </Link>
+          )}
+        </Footer>
+        <img
+          style={{
+            minWidth: '130px',
+            maxWidth: '20%',
+            position: !mediumWidth ? 'absolute' : 'static',
+            left: !mediumWidth ? '0' : 'auto',
+            bottom: 0,
+            marginLeft: '0.5rem',
+            marginBottom: '0.5rem',
+          }}
+          src={`/api/feature-styles/icons/tre_banner`}
+          alt={tr.IconAltTexts.treBannerAltText}
+        />
+
         {surveyBackgroundImage?.attributions ? (
           <Typography className={classes.imageCopyright} variant="body2">
             {surveyBackgroundImage.attributions}
           </Typography>
         ) : null}
-      </div>
-    </Box>
+      </Box>
+    </Stack>
   );
 }
