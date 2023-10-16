@@ -52,7 +52,15 @@ interface CommonSurveyPageSection {
    * Toggler whether the section info should be shown
    */
   showInfo?: boolean;
+  /**
+   * Follow-up sections
+   */
+  followUpSections?: SurveyFollowUpSection[];
 }
+
+type SurveyFollowUpSection = SurveyPageSection & {
+  conditions: number[];
+};
 
 /**
  * Common fields for survey page questions

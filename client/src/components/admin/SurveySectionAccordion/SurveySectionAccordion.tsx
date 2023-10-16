@@ -16,23 +16,18 @@ import {
 } from '@interfaces/survey';
 import {
   Accordion,
-  AccordionDetails,
   AccordionSummary,
-  Button,
-  Checkbox,
-  FormControlLabel,
-  FormGroup,
   IconButton,
-  TextField,
   Tooltip,
   Typography,
 } from '@mui/material';
 import {
+  DragIndicator,
+  ExpandMore,
+  ContentCopy,
   Article,
   AttachFile,
   CheckBox,
-  DragIndicator,
-  ExpandMore,
   FormatListNumbered,
   Image,
   LibraryAddCheck,
@@ -44,35 +39,33 @@ import {
   TextFields,
   ViewComfy,
   ViewComfyAlt,
-  ContentCopy,
 } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { ReactNode, useMemo, useRef, useState } from 'react';
 import { DraggableProvided } from 'react-beautiful-dnd';
-import ConfirmDialog from '../ConfirmDialog';
-import RichTextEditor from '../RichTextEditor';
-import EditAttachmentSection from './EditAttachmentSection';
-import EditCheckBoxQuestion from './EditCheckBoxQuestion';
-import EditDocumentSection from './EditDocumentSection';
-import EditFreeTextQuestion from './EditFreeTextQuestion';
-import EditGroupedCheckBoxQuestion from './EditGroupedCheckBoxQuestion';
-import EditImageSection from './EditImageSection';
-import EditMapQuestion from './EditMapQuestion';
-import EditMatrixQuestion from './EditMatrixQuestion';
-import EditNumericQuestion from './EditNumericQuestion';
-import EditRadioQuestion from './EditRadioQuestion';
-import EditSliderQuestion from './EditSliderQuestion';
-import EditSortingQuestion from './EditSortingQuestion';
-import EditTextSection from './EditTextSection';
-import { EditMultiMatrixQuestion } from './EditMultiMatrixQuestion';
+import ConfirmDialog from '../../ConfirmDialog';
 import {
   replaceIdsWithNull,
   replaceTranslationsWithNull,
 } from '@src/utils/schemaValidation';
 import { useClipboard } from '@src/stores/ClipboardContext';
 import { useToasts } from '@src/stores/ToastContext';
-
+import { SectionDetails } from './SectionDetails';
+import EditAttachmentSection from '../EditAttachmentSection';
+import EditCheckBoxQuestion from '../EditCheckBoxQuestion';
+import EditRadioQuestion from '../EditRadioQuestion';
+import EditNumericQuestion from '../EditNumericQuestion';
+import EditMapQuestion from '../EditMapQuestion';
+import EditFreeTextQuestion from '../EditFreeTextQuestion';
+import EditTextSection from '../EditTextSection';
+import EditSortingQuestion from '../EditSortingQuestion';
+import EditSliderQuestion from '../EditSliderQuestion';
+import EditMatrixQuestion from '../EditMatrixQuestion';
+import EditDocumentSection from '../EditDocumentSection';
+import EditImageSection from '../EditImageSection';
+import EditGroupedCheckBoxQuestion from '../EditGroupedCheckBoxQuestion';
+import { EditMultiMatrixQuestion } from '../EditMultiMatrixQuestion';
 
 const useStyles = makeStyles({
   accordion: {
@@ -111,12 +104,13 @@ interface Props {
   onEdit: (index: number, section: SurveyPageSection) => void;
   onDelete: (index: number) => void;
   provided: DraggableProvided;
+  pageId?: number;
 }
 
 export default function SurveySectionAccordion(props: Props) {
   const [deleteConfirmDialogOpen, setDeleteConfirmDialogOpen] = useState(false);
   const classes = useStyles();
-  const { tr, surveyLanguage, initializeLocalizedObject } = useTranslations();
+  const { tr, surveyLanguage } = useTranslations();
   const { setSection, clipboardPage } = useClipboard();
   const { showToast } = useToasts();
 
@@ -293,7 +287,6 @@ export default function SurveySectionAccordion(props: Props) {
   return (
     <>
       <Accordion
-        {...props.provided.draggableProps}
         ref={props.provided.innerRef}
         expanded={props.expanded}
         onChange={(_, isExpanded) => {
@@ -308,7 +301,7 @@ export default function SurveySectionAccordion(props: Props) {
           className={classes.customAccordionSummary}
           classes={{ contentGutters: classes.contentGutters }}
         >
-          <div style={{ display: 'flex' }}>
+          <div style={{ display: 'flex', paddingLeft: '1rem' }}>
             {accordion.tooltip ? (
               <Tooltip title={accordion.tooltip}>
                 {accordion.icon as any}
@@ -355,68 +348,14 @@ export default function SurveySectionAccordion(props: Props) {
             <DragIndicator />
           </div>
         </AccordionSummary>
-        <AccordionDetails className={classes.content}>
-          <TextField
-            autoFocus
-            disabled={props.disabled}
-            label={tr.EditSurveyPage.title}
-            value={props.section.title?.[surveyLanguage] ?? null}
-            variant="standard"
-            onChange={(event) => {
-              handleEdit({
-                ...props.section,
-                title: {
-                  ...props.section.title,
-                  [surveyLanguage]: event.target.value,
-                },
-              });
-            }}
-          />
-          {accordion.form}
-          <FormGroup row>
-            <FormControlLabel
-              label={tr.SurveySections.sectionInfo}
-              control={
-                <Checkbox
-                  name="section-info"
-                  checked={props.section.showInfo ?? false}
-                  onChange={(event) =>
-                    handleEdit({
-                      ...props.section,
-                      showInfo: event.target.checked,
-                      info: !event.target.checked
-                        ? initializeLocalizedObject(null)
-                        : props.section.info,
-                    })
-                  }
-                />
-              }
-            />
-          </FormGroup>
-          {props.section.showInfo && (
-            <RichTextEditor
-              value={props.section.info?.[surveyLanguage] ?? ''}
-              label={tr.EditTextSection.text}
-              onChange={(value) =>
-                handleEdit({
-                  ...props.section,
-                  info: { ...props.section.info, [surveyLanguage]: value },
-                })
-              }
-            />
-          )}
-          <FormGroup row>
-            <Button
-              variant="contained"
-              disabled={props.disabled}
-              onClick={() => {
-                setDeleteConfirmDialogOpen(true);
-              }}
-            >
-              {tr.EditSurveyPage.deleteSection}
-            </Button>
-          </FormGroup>
-        </AccordionDetails>
+        <SectionDetails
+          pageId={props.pageId}
+          disabled={props.disabled}
+          section={props.section}
+          handleEdit={handleEdit}
+          accordion={accordion}
+          setDeleteConfirmDialogOpen={setDeleteConfirmDialogOpen}
+        />
       </Accordion>
       <ConfirmDialog
         open={deleteConfirmDialogOpen}

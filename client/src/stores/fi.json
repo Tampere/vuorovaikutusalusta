@@ -101,6 +101,7 @@
     "untitledSection": "Nimetön osio",
     "title": "Otsikko",
     "deleteSection": "Poista osio",
+    "addFollowUpQuestion": "Lisää jatkokysymys",
     "confirmDeleteSection": "Haluatko varmasti poistaa tämän osion?",
     "imageAltText": "Kuvan vaihtoehtoinen teksti",
     "imageScaling": "Kuvan skaalaus",
@@ -110,7 +111,14 @@
     },
     "sectionCopied": "Osio kopioitu leikepöydälle. Voit nyt liittää kopioidun osion haluamallesi kyselylle.",
     "sectionAttached": "Huomaa, että karttatasovalinnat eivät kopioidu. Tarkista karttatasovalinnat ja korjaa tarvittaessa karttajulkaisuosoitetta",
-    "attachSection": "Uusi osio leikepöydältä"
+    "attachSection": "Uusi osio leikepöydältä",
+    "followUpSection": {
+      "title": "Jatkokysymys kysymykselle",
+      "conditions": "Ehdot",
+      "question": "Kysymys",
+      "changeType": "Vaihda kysymystyyppi",
+      "cancel": "Peruuta"
+    }
   },
   "FileUpload": {
     "deleteFile": "Poista tiedosto",

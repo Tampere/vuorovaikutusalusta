@@ -101,6 +101,7 @@
     "untitledSection": "Untitled section",
     "title": "Title",
     "deleteSection": "Delete section",
+    "addFollowUpQuestion": "Add follow-up question",
     "confirmDeleteSection": "Are you sure you want to delete this section?",
     "imageAltText": "Alternative text for the image",
     "imageScaling": "Image scaling",
@@ -110,7 +111,14 @@
     },
     "sectionCopied": "Section copied to clipboard and can now be attached to a question.",
     "sectionAttached": "Please note that selected map layers are not copied. Check map layer selections and fix published map url if needed.",
-    "attachSection": "Copy section from clipboard"
+    "attachSection": "Copy section from clipboard",
+    "followUpSection": {
+      "title": "Follow-up question for ",
+      "conditions": "Conditions",
+      "question": "Question",
+      "changeType": "Change question type",
+      "cancel": "Cancel"
+    }
   },
   "FileUpload": {
     "deleteFile": "Delete file",

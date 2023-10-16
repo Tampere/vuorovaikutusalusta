@@ -1,6 +1,7 @@
 import {
   MapLayer,
   Survey,
+  SurveyFollowUpSection,
   SurveyPage,
   SurveyPageSection,
 } from '@interfaces/survey';
@@ -80,10 +81,23 @@ type Action =
       section: SurveyPageSection;
     }
   | {
+      type: 'ADD_FOLLOW_UP_SECTION';
+      pageId: number;
+      parentSectionId: number;
+      section: SurveyFollowUpSection;
+    }
+  | {
       type: 'EDIT_SECTION';
       pageId: number;
       sectionIndex: number;
       section: SurveyPageSection;
+    }
+  | {
+      type: 'EDIT_FOLLOW_UP_SECTION';
+      pageId: number;
+      parentSectionIndex: number;
+      parentSectionId: number;
+      section: SurveyFollowUpSection;
     }
   | {
       type: 'DELETE_SECTION';
@@ -308,6 +322,18 @@ export function useSurvey() {
     addSection(pageId: number, section: SurveyPageSection) {
       dispatch({ type: 'ADD_SECTION', pageId, section });
     },
+    addFollowUpSection(
+      pageId: number,
+      parentSectionId: number,
+      section: SurveyFollowUpSection,
+    ) {
+      dispatch({
+        type: 'ADD_FOLLOW_UP_SECTION',
+        pageId,
+        parentSectionId,
+        section,
+      });
+    },
     /**
      * Edits an existing section of a given page.
      * @param pageId Page ID
@@ -320,6 +346,20 @@ export function useSurvey() {
       section: SurveyPageSection,
     ) {
       dispatch({ type: 'EDIT_SECTION', pageId, sectionIndex, section });
+    },
+    editFollowUpSection(
+      pageId: number,
+      parentSectionId: number,
+      parentSectionIndex: number,
+      section: SurveyFollowUpSection | SurveyPageSection,
+    ) {
+      dispatch({
+        type: 'EDIT_FOLLOW_UP_SECTION',
+        pageId,
+        parentSectionId,
+        parentSectionIndex,
+        section,
+      });
     },
     /**
      * Deletes section with given section index and page ID
@@ -516,6 +556,30 @@ function reducer(state: State, action: Action): State {
           ),
         },
       };
+    case 'ADD_FOLLOW_UP_SECTION':
+      return {
+        ...state,
+        activeSurvey: {
+          ...state.activeSurvey,
+          pages: state.activeSurvey.pages.map((page) =>
+            action.pageId === page.id
+              ? {
+                  ...page,
+                  sections: page.sections.map((sect) =>
+                    sect.id === action.parentSectionId
+                      ? {
+                          ...sect,
+                          followUpSections: sect?.followUpSections
+                            ? [...sect.followUpSections, action.section]
+                            : [action.section],
+                        }
+                      : sect,
+                  ),
+                }
+              : page,
+          ),
+        },
+      };
     case 'EDIT_SECTION':
       return {
         ...state,
@@ -531,6 +595,33 @@ function reducer(state: State, action: Action): State {
                           ...action.section,
                         }
                       : section,
+                  ),
+                }
+              : page,
+          ),
+        },
+      };
+    case 'EDIT_FOLLOW_UP_SECTION':
+      return {
+        ...state,
+        activeSurvey: {
+          ...state.activeSurvey,
+          pages: state.activeSurvey.pages.map((page) =>
+            action.pageId === page.id
+              ? {
+                  ...page,
+                  sections: page.sections.map((sect) =>
+                    sect.id === action.parentSectionId
+                      ? {
+                          ...sect,
+                          followUpSections: sect.followUpSections.map(
+                            (followUpSection) =>
+                              followUpSection.id === action.section.id
+                                ? { ...followUpSection, ...action.section }
+                                : followUpSection,
+                          ),
+                        }
+                      : sect,
                   ),
                 }
               : page,

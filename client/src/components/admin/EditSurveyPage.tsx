@@ -74,7 +74,7 @@ export default function EditSurveyPage() {
   useEffect(() => {
     setLoading(activeSurveyLoading);
   }, [activeSurveyLoading]);
-
+  console.log(activeSurvey);
   return !page ? null : (
     <Fieldset loading={loading}>
       <TextField
@@ -263,8 +263,7 @@ export default function EditSurveyPage() {
         </div>
       )}
       <SurveySections
-        pageId={page.id}
-        sections={page.sections}
+        page={page}
         disabled={loading}
         expandedSection={expandedSection}
         onExpandedSectionChange={(section) => {
