@@ -31,7 +31,7 @@ export function FollowUpSections({
           {parentSection?.followUpSections?.map((sect, index) => (
             <Draggable
               key={`${parentSection.id}-${sect.id}`}
-              draggableId={`${parentSection.id}-${sect.id}`}
+              draggableId={String(sect.id)}
               index={index}
             >
               {(provided, _snapshot) => {

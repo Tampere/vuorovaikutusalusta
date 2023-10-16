@@ -187,7 +187,6 @@ export default function AddSurveySectionActions(props: Props) {
 
   function handleAdd(type: SurveyPageSection['type']) {
     return () => {
-      console.log('followupsecitonID: ', props.followUpSectionId);
       const id = props.followUpSectionId ?? sectionSequence;
       if (!props.followUpSectionId) setSectionSequence(sectionSequence - 1);
       props.onAdd({

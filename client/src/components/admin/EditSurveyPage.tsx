@@ -74,7 +74,7 @@ export default function EditSurveyPage() {
   useEffect(() => {
     setLoading(activeSurveyLoading);
   }, [activeSurveyLoading]);
-  console.log(activeSurvey);
+
   return !page ? null : (
     <Fieldset loading={loading}>
       <TextField

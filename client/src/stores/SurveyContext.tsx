@@ -76,6 +76,12 @@ type Action =
       sections: SurveyPageSection[];
     }
   | {
+      type: 'SET_FOLLOW_UP_SECTIONS';
+      pageId: number;
+      parentSectionId: number;
+      followUpSections: SurveyFollowUpSection[];
+    }
+  | {
       type: 'ADD_SECTION';
       pageId: number;
       section: SurveyPageSection;
@@ -97,7 +103,7 @@ type Action =
       pageId: number;
       parentSectionIndex: number;
       parentSectionId: number;
-      section: SurveyFollowUpSection;
+      section: SurveyFollowUpSection | SurveyPageSection;
     }
   | {
       type: 'DELETE_SECTION';
@@ -391,6 +397,34 @@ export function useSurvey() {
         ],
       });
     },
+    moveFollowUpSection(
+      pageId: number,
+      parentSectionId: number,
+      oldIndex: number,
+      newIndex: number,
+    ) {
+      const page = state.activeSurvey.pages.find((page) => page.id === pageId);
+
+      const parentSection = page.sections.find(
+        (sect) => sect.id === parentSectionId,
+      );
+
+      const followUpSection = parentSection.followUpSections[oldIndex];
+      const otherSections = parentSection.followUpSections.filter(
+        (_, index) => index !== oldIndex,
+      );
+
+      dispatch({
+        type: 'SET_FOLLOW_UP_SECTIONS',
+        pageId,
+        parentSectionId,
+        followUpSections: [
+          ...otherSections.slice(0, newIndex),
+          followUpSection,
+          ...otherSections.slice(newIndex),
+        ],
+      });
+    },
     /**
      * Saves changes to the active survey
      */
@@ -537,6 +571,27 @@ function reducer(state: State, action: Action): State {
           pages: state.activeSurvey.pages.map((page) =>
             action.pageId === page.id
               ? { ...page, sections: action.sections }
+              : page,
+          ),
+        },
+      };
+    case 'SET_FOLLOW_UP_SECTIONS':
+      return {
+        ...state,
+        activeSurvey: {
+          ...state.activeSurvey,
+          pages: state.activeSurvey.pages.map((page) =>
+            action.pageId === page.id
+              ? {
+                  ...page,
+                  sections: page.sections.map((sect) => ({
+                    ...sect,
+                    followUpSections:
+                      sect.id === action.parentSectionId
+                        ? action.followUpSections
+                        : sect.followUpSections,
+                  })),
+                }
               : page,
           ),
         },

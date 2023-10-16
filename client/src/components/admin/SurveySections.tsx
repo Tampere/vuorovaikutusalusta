@@ -13,7 +13,8 @@ interface Props {
 }
 
 export default function SurveySections(props: Props) {
-  const { editSection, deleteSection, moveSection } = useSurvey();
+  const { editSection, deleteSection, moveSection, moveFollowUpSection } =
+    useSurvey();
 
   return (
     <DragDropContext
@@ -21,19 +22,34 @@ export default function SurveySections(props: Props) {
         if (!event.destination) {
           return;
         }
-        if (event.type.includes('followUpSection')) {
-          console.log('jatkokysymystä siirretty');
-          return;
-        }
+
         const id = Number(event.draggableId);
-        const oldIndex = props.page.sections.findIndex(
-          (section) => section.id === id,
-        );
-        const newIndex = event.destination.index;
-        moveSection(props.page.id, oldIndex, event.destination.index);
-        // If the section was expanded, re-expand with the new index
-        if (props.expandedSection === oldIndex) {
-          props.onExpandedSectionChange(newIndex);
+
+        if (event.type.includes('followUpSection')) {
+          const parentSection = props.page.sections.find((sect) =>
+            sect.followUpSections.find((s) => s.id === id),
+          );
+
+          const oldIndex = parentSection.followUpSections.findIndex(
+            (sect) => sect.id === id,
+          );
+          const newIndex = event.destination.index;
+          moveFollowUpSection(
+            props.page.id,
+            parentSection.id,
+            oldIndex,
+            newIndex,
+          );
+        } else {
+          const oldIndex = props.page.sections.findIndex(
+            (section) => section.id === id,
+          );
+          const newIndex = event.destination.index;
+          moveSection(props.page.id, oldIndex, event.destination.index);
+          // If the section was expanded, re-expand with the new index
+          if (props.expandedSection === oldIndex) {
+            props.onExpandedSectionChange(newIndex);
+          }
         }
       }}
     >
