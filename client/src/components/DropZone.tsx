@@ -31,13 +31,21 @@ const useStyles = makeStyles({
   },
 });
 
+const DEFAULT_MAX_FILE_SIZE = '10';
+
 interface Props {
   maxFiles: number;
   fileCallback: (files: File[]) => void;
   children?: React.ReactNode;
+  maxFileSize?: number;
 }
 
-export default function DropZone({ maxFiles, fileCallback, children }: Props) {
+export default function DropZone({
+  maxFiles,
+  fileCallback,
+  children,
+  maxFileSize,
+}: Props) {
   const classes = useStyles();
   const { tr } = useTranslations();
   const { acceptedFiles, getRootProps, getInputProps } = useDropzone({
@@ -57,7 +65,12 @@ export default function DropZone({ maxFiles, fileCallback, children }: Props) {
       >
         <input {...getInputProps()} />
         <div style={{ cursor: 'pointer' }}>
-          {children ? children : tr.DropZone.dropFiles}
+          {children
+            ? children
+            : tr.DropZone.dropFiles.replace(
+                '{x}',
+                maxFileSize ? String(maxFileSize) : DEFAULT_MAX_FILE_SIZE,
+              )}
         </div>
       </div>
     </section>

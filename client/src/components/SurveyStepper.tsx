@@ -443,6 +443,7 @@ export default function SurveyStepper({
                                 '& .MuiInputBase-root': {
                                   backgroundColor: 'white',
                                 },
+                                gap: '30px',
                               }}
                               className="follow-up-sections-container"
                             >
@@ -452,7 +453,6 @@ export default function SurveyStepper({
                                 sx={{
                                   fontWeight: 700,
                                   color: '#676767',
-                                  marginBottom: '1rem',
                                 }}
                               >
                                 {tr.SurveyStepper.followUpSections}
