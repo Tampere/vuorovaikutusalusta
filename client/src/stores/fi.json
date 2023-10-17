@@ -350,6 +350,7 @@
     "fail": "Arvon leikepöydälle kopioinnissa tapahtui virhe. Yritä myöhemmin uudestaan."
   },
   "SurveyStepper": {
+    "followUpSections": "Jatkokysymykset:",
     "next": "Seuraava",
     "previous": "Edellinen",
     "submit": "Lähetä",

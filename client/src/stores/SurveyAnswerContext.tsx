@@ -311,8 +311,21 @@ export function useSurveyAnswers() {
       }
       dispatch({ type: 'SET_SURVEY', survey });
       // Get all sections across survey pages
+      function getSectionsFollowUpSections(sections: SurveyPageSection[]) {
+        return sections
+          .map((section) => section?.followUpSections ?? [])
+          .flat(1);
+      }
+
       const sections = survey.pages
-        .reduce((sections, page) => [...sections, ...page.sections], [])
+        .reduce(
+          (sections, page) => [
+            ...sections,
+            ...page.sections,
+            ...getSectionsFollowUpSections(page.sections),
+          ],
+          [],
+        )
         // Skip sections that shouldn't get answers
         .filter((section) => !nonQuestionSectionTypes.includes(section.type));
       dispatch({

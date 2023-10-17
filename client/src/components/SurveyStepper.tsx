@@ -425,11 +425,61 @@ export default function SurveyStepper({
                       ) : section.type === 'document' ? (
                         <DocumentSection section={section} />
                       ) : (
-                        <SurveyQuestion
-                          question={section}
-                          pageUnfinished={pageUnfinished}
-                          mobileDrawerOpen={mobileDrawerOpen}
-                        />
+                        <>
+                          <SurveyQuestion
+                            question={section}
+                            pageUnfinished={pageUnfinished}
+                            mobileDrawerOpen={mobileDrawerOpen}
+                          />
+                          {section?.followUpSections?.length > 0 && (
+                            <Box
+                              sx={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                backgroundColor: '#E4E4E4',
+                                borderRadius: '6px',
+                                padding: '0.75rem',
+                                margin: '0.75rem 0',
+                                '& .MuiInputBase-root': {
+                                  backgroundColor: 'white',
+                                },
+                              }}
+                              className="follow-up-sections-container"
+                            >
+                              <Typography
+                                variant="body1"
+                                component="h4"
+                                sx={{
+                                  fontWeight: 700,
+                                  color: '#676767',
+                                  marginBottom: '1rem',
+                                }}
+                              >
+                                {tr.SurveyStepper.followUpSections}
+                              </Typography>
+                              {section.followUpSections.map((sect) =>
+                                sect.type === 'text' ? (
+                                  <TextSection key={sect.id} section={sect} />
+                                ) : sect.type === 'image' ? (
+                                  <ImageSection key={sect.id} section={sect} />
+                                ) : sect.type === 'document' ? (
+                                  <DocumentSection
+                                    key={sect.id}
+                                    section={sect}
+                                  />
+                                ) : (
+                                  <SurveyQuestion
+                                    isFollowUp
+                                    key={sect.id}
+                                    question={sect}
+                                    pageUnfinished={pageUnfinished}
+                                    mobileDrawerOpen={mobileDrawerOpen}
+                                  />
+                                ),
+                              )}
+                            </Box>
+                          )}
+                        </>
                       )}
                     </div>
                   ))}

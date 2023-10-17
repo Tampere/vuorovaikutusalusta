@@ -350,6 +350,7 @@
     "fail": "Failed to copy the value to the clipboard. Please try again later."
   },
   "SurveyStepper": {
+    "followUpSections": "Follow-up questions:",
     "next": "Next",
     "previous": "Previous",
     "submit": "Submit",

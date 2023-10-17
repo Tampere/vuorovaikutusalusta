@@ -21,6 +21,7 @@ export default function FreeTextQuestion({
   maxLength = 500,
 }: Props) {
   const { tr } = useTranslations();
+  console.log('freetext', typeof value);
   return (
     <>
       <TextField
@@ -39,12 +40,12 @@ export default function FreeTextQuestion({
         }}
       />
       <FormHelperText
-        aria-hidden={value.length < 0.95 * maxLength}
+        aria-hidden={(value?.length ?? 0) < 0.95 * maxLength}
         id={`${question.id}-helper-text`}
       >
         {tr.SurveyQuestion.charactersRemaining.replace(
           '{x}',
-          String(maxLength - value.length)
+          String(maxLength - (value?.length ?? 0)),
         )}
       </FormHelperText>
     </>

@@ -5,7 +5,12 @@ import type {
   Submission,
   SurveyQuestion as SurveyQuestionType,
 } from '@interfaces/survey';
-import { FormControl, FormHelperText, FormLabel } from '@mui/material';
+import {
+  FormControl,
+  FormHelperText,
+  FormLabel,
+  Typography,
+} from '@mui/material';
 import { visuallyHidden } from '@mui/utils';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import { useTranslations } from '@src/stores/TranslationContext';
@@ -30,6 +35,7 @@ interface Props {
   readOnly?: boolean;
   value?: AnswerEntry['value'];
   submission?: Submission;
+  isFollowUp?: boolean;
 }
 
 function SurveyQuestion({
@@ -58,6 +64,8 @@ function SurveyQuestion({
           )?.value,
     [answers, submission, question, props.value],
   );
+  console.log('answers', answers);
+  console.log(question.type, typeof value, value);
 
   const validationErrors = useMemo(
     () => (dirty || pageUnfinished ? getValidationErrors(question) : []),
@@ -109,10 +117,13 @@ function SurveyQuestion({
           color: survey.sectionTitleColor ?? '#000000',
         }}
       >
-        <h3>
+        <Typography
+          component="h3"
+          variant={props.isFollowUp ? 'followUpSectionTitle' : 'questionTitle'}
+        >
           {question.title?.[surveyLanguage]}
           <span aria-hidden="true"> </span>
-        </h3>
+        </Typography>
         {question.type == 'sorting' && (
           <span style={visuallyHidden}>
             {tr.SortingQuestion.confirmationGuide}
