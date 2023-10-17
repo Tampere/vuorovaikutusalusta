@@ -6,6 +6,7 @@ import {
   Survey,
   SurveyCheckboxQuestion,
   SurveyEmailInfoItem,
+  SurveyFollowUpSection,
   SurveyImage,
   SurveyMapQuestion,
   SurveyMapSubQuestion,
@@ -101,6 +102,7 @@ interface DBSurveyPageSection {
   info: LocalizedText;
   file_name: string;
   file_path: string[];
+  predecessor_section: number;
 }
 
 /**
@@ -144,6 +146,7 @@ type DBSurveyJoin = DBSurvey & {
   section_type: string;
   section_details: object;
   section_parent_section: number;
+  section_predecessor_section: number;
   section_info: LocalizedText;
   section_file_name: string;
   section_file_path: string[];
@@ -221,7 +224,8 @@ export async function getSurvey(params: { id: number } | { name: string }) {
         section.parent_section as section_parent_section,
         section.info as section_info,
         section.file_name as section_file_name,
-        section.file_path as section_file_path
+        section.file_path as section_file_path,
+        section.predecessor_section as section_predecessor_section
       FROM (
         SELECT
           survey.*,
@@ -252,6 +256,7 @@ export async function getSurvey(params: { id: number } | { name: string }) {
     LEFT JOIN data.option option ON survey_page_section.section_id = option.section_id
     ORDER BY
       section_parent_section ASC NULLS FIRST,
+      section_predecessor_section ASC NULLS FIRST,
       page_idx ASC,
       section_idx ASC,
       option_idx ASC;
@@ -292,31 +297,52 @@ export async function getSurvey(params: { id: number } | { name: string }) {
     );
     if (!section && (section = dbSurveyJoinToSection(row))) {
       // Section not yet added - add converted row to survey page
-      if (row.section_parent_section != null) {
+
+      if (
+        row.section_parent_section != null ||
+        row.section_predecessor_section != null
+      ) {
+        const column =
+          row.section_parent_section != null
+            ? 'section_parent_section'
+            : 'section_predecessor_section';
+        const key =
+          row.section_parent_section != null
+            ? 'subQuestions'
+            : 'followUpSections';
+
         // Parent section should already exist because of the ordering by parent section rule
         const parentSection = page.sections.find(
-          (section) => section.id === row.section_parent_section,
-        ) as SurveyMapQuestion;
-        // Initialize subquestion array if it doesn't yet exist
-        if (!parentSection.subQuestions) {
-          parentSection.subQuestions = [];
-        }
-        // Try to find the pre-existing subquestion - if none is found, create it from the row
-        let subQuestion = parentSection.subQuestions.find(
-          (subQuestion) => subQuestion.id === section.id,
+          (section) => section.id === row[column],
         );
-        if (
-          !subQuestion &&
-          (subQuestion = dbSurveyJoinToSection(row) as SurveyMapSubQuestion)
-        ) {
-          // Subquestion didn't yet exist - add it to the parent section
-          parentSection.subQuestions.push(subQuestion);
+
+        // Initialize subquestion or follow-up section array if it doesn't yet exist
+        if (!parentSection[key]) {
+          parentSection[key] = [];
         }
+
+        // Try to find the pre-existing subquestion or follow-up section - if none is found, create it from the row
+        let linkedSection =
+          key === 'subQuestions'
+            ? (parentSection as SurveyMapQuestion)[key].find(
+                (linkedSection) => linkedSection.id === section.id,
+              )
+            : parentSection[key].find(
+                (linkedSection) => linkedSection.id === section.id,
+              );
+        if (
+          !linkedSection &&
+          (linkedSection = dbSurveyJoinToSection(row) as SurveyMapSubQuestion)
+        ) {
+          // Subquestion or follow-up question didn't yet exist - add it to the parent section
+          parentSection[key].push(linkedSection);
+        }
+
         // If question contains options, add the option in the current row there
-        if ('options' in subQuestion) {
+        if ('options' in linkedSection) {
           const option = dbSurveyJoinToOption(row);
           if (option) {
-            subQuestion.options.push(option);
+            linkedSection.options.push(option);
           }
         }
       } else {
@@ -428,7 +454,7 @@ async function upsertSection(section: DBSurveyPageSection, index: number) {
   // Negative IDs can be assigned as temporary IDs for e.g. drag and drop - change them to null
   return await getDb().one<DBSurveyPageSection>(
     `
-    INSERT INTO data.page_section (id, survey_page_id, idx, title, type, body, details, parent_section, info, file_name, file_path)
+    INSERT INTO data.page_section (id, survey_page_id, idx, title, type, body, details, parent_section, info, file_name, file_path, predecessor_section)
     VALUES (
       COALESCE(
         CASE
@@ -446,7 +472,8 @@ async function upsertSection(section: DBSurveyPageSection, index: number) {
       $(parentSection),
       $(info),
       $(fileName),
-      $(filePath)
+      $(filePath),
+      $(predecessorSection)
     )
     ON CONFLICT (id) DO
       UPDATE SET
@@ -458,7 +485,8 @@ async function upsertSection(section: DBSurveyPageSection, index: number) {
         parent_section = $(parentSection),
         info = $(info),
         file_name = $(fileName),
-        file_path = $(filePath)
+        file_path = $(filePath),
+        predecessor_section = $(predecessorSection)
     RETURNING *
   `,
     {
@@ -473,6 +501,7 @@ async function upsertSection(section: DBSurveyPageSection, index: number) {
       info: section.info,
       fileName: section.file_name,
       filePath: section.file_path,
+      predecessorSection: section.predecessor_section,
     },
   );
 }
@@ -614,6 +643,40 @@ async function deleteRemovedSubQuestions(
   if (removedSubQuestionIds.length) {
     await getDb().none(`DELETE FROM data.page_section WHERE id = ANY ($1)`, [
       removedSubQuestionIds,
+    ]);
+  }
+}
+
+/**
+ * When updating a section, deletes all follow-up sections or subquestions that should be removed from DB.
+ * @param parentSectionId Parent section ID
+ * @param newFollowUpSections New follow-up sections
+ */
+async function deleteRemovedLinkedSections(
+  parentSectionId: number,
+  newSubQuestions: SurveyMapSubQuestion[],
+  newFollowUpSections: SurveyPageSection[],
+) {
+  // Get all existing sections
+  const rows = await getDb().manyOrNone<{ id: number }>(
+    `SELECT id FROM data.page_section WHERE predecessor_section = $1 OR parent_section = $1`,
+    [parentSectionId],
+  );
+
+  const existingQuestionIds = rows.map((row) => row.id);
+
+  const newSections = [
+    ...(newSubQuestions ?? []),
+    ...(newFollowUpSections ?? []),
+  ];
+
+  // All existing sections that aren't included in new sections should be removed
+  const removedQuestionIds = existingQuestionIds.filter((id) =>
+    (newSections ?? []).every((newQuestion) => newQuestion.id !== id),
+  );
+  if (removedQuestionIds.length) {
+    await getDb().none(`DELETE FROM data.page_section WHERE id = ANY ($1)`, [
+      removedQuestionIds,
     ]);
   }
 }
@@ -790,29 +853,42 @@ export async function updateSurvey(survey: Survey) {
         await Promise.all(options.map(upsertOption));
       }
 
-      // Delete removed subquestion sections
-      await deleteRemovedSubQuestions(section.id, section.subQuestions);
+      // Delete removed subquestion and follow-up sections
+      await deleteRemovedLinkedSections(
+        section.id,
+        section.subQuestions,
+        section.followUpSections,
+      );
 
-      // If there are subquestions, update them
-      if (section.subQuestions?.length) {
-        const subQuestions = surveySectionsToRows(
-          section.subQuestions,
-          section.survey_page_id,
-          sectionRow.id,
-        );
-        // Update each subquestion in its own block
+      // If there are subquestions or follow-up sections, update them
+      if (section.subQuestions?.length || section.followUpSections?.length) {
+        const linkedSections = [
+          ...surveySectionsToRows(
+            section?.subQuestions ?? [],
+            section.survey_page_id,
+            sectionRow.id,
+          ),
+          ...surveySectionsToRows(
+            section?.followUpSections ?? [],
+            section.survey_page_id,
+            null,
+            sectionRow.id,
+          ),
+        ];
+
+        // Update each subquestion and follow-up section in its own block
         await Promise.all(
-          subQuestions.map(async (subQuestion, index) => {
-            const subQuestionRow = await upsertSection(subQuestion, index);
+          linkedSections.map(async (linkedSection, index) => {
+            const sectionRow = await upsertSection(linkedSection, index);
 
             // Delete subquestion options that were removed
-            await deleteRemovedOptions(subQuestion.id, subQuestion.options);
+            await deleteRemovedOptions(linkedSection.id, linkedSection.options);
 
             // Update/insert the remaining subquestion options
-            if (subQuestion.options?.length) {
+            if (linkedSection.options?.length) {
               const options = optionsToRows(
-                subQuestion.options,
-                subQuestionRow.id,
+                linkedSection.options,
+                sectionRow.id,
               );
               await Promise.all(options.map(upsertOption));
             }
@@ -1113,6 +1189,7 @@ function surveySectionsToRows(
   surveySections: SurveyPageSection[],
   pageId: number,
   parentSectionId?: number,
+  predecessorSectionId?: number,
 ) {
   return surveySections.filter(Boolean).map((surveySection, index) => {
     const {
@@ -1122,6 +1199,7 @@ function surveySectionsToRows(
       body = undefined,
       options = undefined,
       subQuestions = undefined,
+      followUpSections = undefined,
       info = undefined,
       groups = undefined,
       fileName = undefined,
@@ -1138,14 +1216,17 @@ function surveySectionsToRows(
       details,
       options,
       subQuestions,
+      followUpSections,
       groups,
       parent_section: parentSectionId ?? null,
+      predecessor_section: predecessorSectionId ?? null,
       info: info,
       file_name: fileName,
       file_path: filePath,
     } as DBSurveyPageSection & {
       options: SectionOption[];
       subQuestions: SurveyMapSubQuestion[];
+      followUpSections: SurveyFollowUpSection[];
       groups: SectionOptionGroup[];
     };
   });
