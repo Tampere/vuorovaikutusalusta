@@ -5,6 +5,7 @@ import AddSurveySectionActions from '../AddSurveySectionActions';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { SurveyFollowUpSection, SurveyPageSection } from '@interfaces/survey';
 import { FollowUpSectionDetails } from './FollowUpSectionDetails';
+import { FollowUpSectionConditions } from './FollowUpSectionConditions';
 
 interface Props {
   accordion: {
@@ -62,15 +63,17 @@ export function FollowUpSectionMenu({
       }}
     >
       <Typography>
-        {`${tr.EditSurveyPage.followUpSection.title} `}
+        {`${tr.FollowUpSection.title} `}
         <i>{parentTitle}</i>
       </Typography>
       <Divider orientation="horizontal">
-        <Typography>{tr.EditSurveyPage.followUpSection.conditions}</Typography>
+        <Typography>{tr.FollowUpSection.conditions.title}</Typography>
       </Divider>
-      <div></div>
+      <div>
+        <FollowUpSectionConditions />
+      </div>
       <Divider orientation="horizontal">
-        <Typography>{tr.EditSurveyPage.followUpSection.question}</Typography>
+        <Typography>{tr.FollowUpSection.question}</Typography>
       </Divider>
       {!sectionActionsOpen && section?.type ? (
         <FollowUpSectionDetails
@@ -109,8 +112,8 @@ export function FollowUpSectionMenu({
           onClick={() => setSectionActionsOpen((prev) => !prev)}
         >
           {!sectionActionsOpen && section?.type
-            ? tr.EditSurveyPage.followUpSection.changeType
-            : tr.EditSurveyPage.followUpSection.cancel}
+            ? tr.FollowUpSection.changeType
+            : tr.FollowUpSection.cancel}
         </Button>
       )}
     </Box>

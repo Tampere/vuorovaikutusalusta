@@ -111,15 +111,39 @@
     },
     "sectionCopied": "Section copied to clipboard and can now be attached to a question.",
     "sectionAttached": "Please note that selected map layers are not copied. Check map layer selections and fix published map url if needed.",
-    "attachSection": "Copy section from clipboard",
-    "followUpSection": {
-      "title": "Follow-up question for ",
-      "conditions": "Conditions",
-      "question": "Question",
-      "changeType": "Change question type",
-      "cancel": "Cancel"
-    }
+    "attachSection": "Copy section from clipboard"
   },
+  "FollowUpSection": {
+    "title": "Follow-up question for ",
+    "conditions": {
+      "title": "Conditions",
+      "connectives": {
+        "title": "Show follow-up question if",
+        "allConditionsMet": "all the following conditions are met:",
+        "anyConditionMet": "any of the following conditions is met:",
+        "noConditionsMet": "none of the following conditions are met:",
+        "otherFollowupsNotMet": "conditions for other follow-up questions are not met"
+      },
+      "answer": "Answer",
+      "chooseCondition": "choose a condition",
+      "insertValue": "insert value",
+      "connectiveConjunctions": {
+        "allConditionsMet": "and",
+        "anyConditionMet": "or",
+        "noConditionsMet": "nor"
+      },
+      "types": {
+        "equals": "equals",
+        "lessThan": "is less than",
+        "greaterThan": "is greater than"
+      },
+      "validationError": ""
+    },
+    "question": "Question",
+    "changeType": "Change question type",
+    "cancel": "Cancel"
+  },
+
   "FileUpload": {
     "deleteFile": "Delete file",
     "addedFile": "Uploaded file",

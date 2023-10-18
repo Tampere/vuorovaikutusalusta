@@ -111,15 +111,39 @@
     },
     "sectionCopied": "Osio kopioitu leikepöydälle. Voit nyt liittää kopioidun osion haluamallesi kyselylle.",
     "sectionAttached": "Huomaa, että karttatasovalinnat eivät kopioidu. Tarkista karttatasovalinnat ja korjaa tarvittaessa karttajulkaisuosoitetta",
-    "attachSection": "Uusi osio leikepöydältä",
-    "followUpSection": {
-      "title": "Jatkokysymys kysymykselle",
-      "conditions": "Ehdot",
-      "question": "Kysymys",
-      "changeType": "Vaihda kysymystyyppi",
-      "cancel": "Peruuta"
-    }
+    "attachSection": "Uusi osio leikepöydältä"
   },
+  "FollowUpSection": {
+    "title": "Jatkokysymys kysymykselle",
+    "conditions": {
+      "title": "Ehdot",
+      "connectives": {
+        "title": "Näytä jatkokysymys, jos",
+        "allConditionsMet": "kaikki seuraavat ehdot täyttyvät:",
+        "anyConditionMet": "yksikin seuraavista ehdoista täyttyy:",
+        "noConditionsMet": "mikää seuraavista ehdoista ei täyty:",
+        "otherFollowupsNotMet": "muiden jatkokysymysten ehdot eivät täyty"
+      },
+      "answer": "Vastaus",
+      "chooseCondition": "valitse ehto",
+      "insertValue": "syötä vertailuarvo",
+      "connectiveConjunctions": {
+        "allConditionsMet": "ja",
+        "anyConditionMet": "tai",
+        "noConditionsMet": "eikä"
+      },
+      "types": {
+        "equals": "on yhtäsuuri kuin",
+        "lessThan": "on pienempi kuin",
+        "greaterThan": "on suurempi kuin"
+      },
+      "validationError": "Vertailuarvon täytyy olla luku"
+    },
+    "question": "Kysymys",
+    "changeType": "Vaihda kysymystyyppi",
+    "cancel": "Peruuta"
+  },
+
   "FileUpload": {
     "deleteFile": "Poista tiedosto",
     "addedFile": "Valittu tiedosto",

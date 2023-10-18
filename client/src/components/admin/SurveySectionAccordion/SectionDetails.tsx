@@ -112,11 +112,11 @@ export function SectionDetails({
           {tr.EditSurveyPage.deleteSection}
         </Button>
         {['radio', 'checkbox', 'numeric', 'slider'].includes(section.type) &&
-          // no button for subquestions and draft questions
+          // no button for subquestions
           // pageId should not be passed for map subquestions
-          section.id >= 0 &&
           pageId && (
             <Button
+              disabled={section.id < 0} // no follow-up sections for draft questions
               onClick={() => {
                 addFollowUpSection(pageId, section.id, emptyFollowUpSection);
                 setFollowUpSectionSequence((prev) => prev - 1);

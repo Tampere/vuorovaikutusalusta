@@ -704,3 +704,9 @@ export interface Submission {
 }
 
 export type ImageType = 'backgroundImage' | 'thanksPageImage';
+
+export type Condition =
+  | { type: 'equals'; value: string | number }
+  | { type: 'lessThan'; value: number }
+  | { type: 'greaterThan'; value: number }
+  | { type: 'isFallback'; value: boolean };
