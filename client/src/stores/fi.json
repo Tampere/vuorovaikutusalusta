@@ -117,8 +117,8 @@
     "title": "Jatkokysymys kysymykselle",
     "conditions": {
       "title": "Ehdot",
+      "connectiveTitle": "Näytä jatkokysymys, jos",
       "connectives": {
-        "title": "Näytä jatkokysymys, jos",
         "allConditionsMet": "kaikki seuraavat ehdot täyttyvät:",
         "anyConditionMet": "yksikin seuraavista ehdoista täyttyy:",
         "noConditionsMet": "mikää seuraavista ehdoista ei täyty:",

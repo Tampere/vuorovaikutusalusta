@@ -101,7 +101,6 @@ type Action =
   | {
       type: 'EDIT_FOLLOW_UP_SECTION';
       pageId: number;
-      parentSectionIndex: number;
       parentSectionId: number;
       section: SurveyFollowUpSection | SurveyPageSection;
     }
@@ -362,14 +361,13 @@ export function useSurvey() {
     editFollowUpSection(
       pageId: number,
       parentSectionId: number,
-      parentSectionIndex: number,
       section: SurveyFollowUpSection | SurveyPageSection,
     ) {
+      console.log('editin', section);
       dispatch({
         type: 'EDIT_FOLLOW_UP_SECTION',
         pageId,
         parentSectionId,
-        parentSectionIndex,
         section,
       });
     },

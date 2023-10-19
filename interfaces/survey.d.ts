@@ -59,7 +59,7 @@ interface CommonSurveyPageSection {
 }
 
 type SurveyFollowUpSection = SurveyPageSection & {
-  conditions: number[];
+  conditions: Condition[];
 };
 
 /**

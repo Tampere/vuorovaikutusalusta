@@ -117,8 +117,8 @@
     "title": "Follow-up question for ",
     "conditions": {
       "title": "Conditions",
+      "connectiveTitle": "Show follow-up question if",
       "connectives": {
-        "title": "Show follow-up question if",
         "allConditionsMet": "all the following conditions are met:",
         "anyConditionMet": "any of the following conditions is met:",
         "noConditionsMet": "none of the following conditions are met:",

@@ -1,7 +1,7 @@
-import { Condition } from '@interfaces/survey';
+import { Condition, SurveyFollowUpSection } from '@interfaces/survey';
 import {
-  Box,
   FormControl,
+  FormGroup,
   FormLabel,
   MenuItem,
   OutlinedInput,
@@ -9,37 +9,42 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
+import { useSurvey } from '@src/stores/SurveyContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { assertNever, isNumeric } from '@src/utils/typeCheck';
 import React, { useState } from 'react';
 
+type RowCondition = Exclude<
+  Condition,
+  {
+    type: 'isFallback';
+    value: boolean;
+  }
+>;
+
 interface ConditionRowProps {
   label: string;
+  updateCondition: (updatedCondition: Condition) => void;
+  condition: RowCondition;
 }
 
-function ConditionRow({ label }: ConditionRowProps) {
+function ConditionRow({
+  label,
+  updateCondition,
+  condition,
+}: ConditionRowProps) {
   const { tr } = useTranslations();
   const [error, setError] = useState(false);
-  type selectableCondition = Exclude<
-    Condition,
-    {
-      type: 'isFallback';
-      value: boolean;
-    }
-  >;
 
   const [selectedCondition, setSelectedCondition] =
-    useState<selectableCondition>({
-      type: null,
-      value: null,
-    });
-  console.log(selectedCondition);
+    useState<RowCondition>(condition);
+
   function handleConditionValueChange(value: string | number) {
-    console.log(value);
     if (!selectedCondition.type) return;
-    console.log('value', value, selectedCondition.type);
+    console.log(selectedCondition.type);
     switch (selectedCondition.type) {
       case 'equals':
+        updateCondition({ ...selectedCondition, value: value });
         setSelectedCondition({ ...selectedCondition, value: value });
         break;
       case 'greaterThan':
@@ -50,9 +55,13 @@ function ConditionRow({ label }: ConditionRowProps) {
           return;
         }
 
+        updateCondition({
+          ...selectedCondition,
+          value: value === '' ? null : Number(value),
+        });
         setSelectedCondition({
           ...selectedCondition,
-          value: value === '' ? null : value,
+          value: value === '' ? null : Number(value),
         });
         break;
       default:
@@ -61,7 +70,15 @@ function ConditionRow({ label }: ConditionRowProps) {
   }
 
   return (
-    <Box sx={{ alignItems: 'flex-start', display: 'flex', gap: '6px' }}>
+    <FormControl
+      sx={{
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        display: 'flex',
+        gap: '6px',
+        marginTop: '5px',
+      }}
+    >
       <FormLabel
         sx={{
           flex: 1,
@@ -69,7 +86,9 @@ function ConditionRow({ label }: ConditionRowProps) {
           textAlign: 'right',
           transform: 'translateY(50%)',
         }}
-      >{`${label} ${tr.FollowUpSection.conditions.answer}`}</FormLabel>
+      >
+        {label}
+      </FormLabel>
       <Select
         sx={{
           flex: 2,
@@ -97,7 +116,7 @@ function ConditionRow({ label }: ConditionRowProps) {
         }}
         onChange={(event) => {
           setSelectedCondition({
-            type: event.target.value as selectableCondition['type'],
+            type: event.target.value as RowCondition['type'],
             value: null,
           });
           setError(false);
@@ -124,28 +143,40 @@ function ConditionRow({ label }: ConditionRowProps) {
           '& .MuiFormHelperText-root': { backgroundColor: '' },
         }}
       />
-    </Box>
+    </FormControl>
   );
 }
 
-export function FollowUpSectionConditions() {
-  const { tr } = useTranslations();
+interface Props {
+  pageId: number;
+  parentSectionId: number;
+  followUpSection: SurveyFollowUpSection;
+}
 
+export function FollowUpSectionConditions({
+  pageId,
+  parentSectionId,
+  followUpSection,
+}: Props) {
+  const { tr } = useTranslations();
+  const { editFollowUpSection } = useSurvey();
+  //const [conditionSequence, setConditionSequence] = useState(-1);
+  const conditions = followUpSection?.conditions ?? [];
+  console.log(conditions);
   type Connective = keyof typeof tr.FollowUpSection.conditions.connectives;
 
   const [connective, setConnective] = useState<Connective>(
     'otherFollowupsNotMet',
   );
-  const [conditions, setConditions] = useState<Condition[]>([]);
-  console.log(connective);
+
   return (
-    <Box>
+    <FormGroup>
       <FormControl
         fullWidth
         sx={{ flexDirection: 'row', gap: '6px', alignItems: 'center' }}
       >
         <FormLabel sx={{ fontWeight: 700, flex: 1, color: '#000' }}>
-          {tr.FollowUpSection.conditions.connectives.title}
+          {tr.FollowUpSection.conditions.connectiveTitle}
         </FormLabel>
         <Select
           sx={{
@@ -176,47 +207,53 @@ export function FollowUpSectionConditions() {
           marginTop: '10px',
         }}
       >
-        {connective !== 'otherFollowupsNotMet' && (
-          <>
-            {conditions.map((condition, index) => (
-              <ConditionRow
-                key={index}
-                label={
-                  index === 0
-                    ? tr.FollowUpSection.conditions.answer
-                    : connective === 'title'
-                    ? ''
-                    : tr.FollowUpSection.conditions.connectiveConjunctions[
-                        connective
-                      ]
-                }
-              />
-            ))}
-            <ConditionRow
-              label={
-                conditions.length === 0 || connective === 'title'
-                  ? ''
-                  : tr.FollowUpSection.conditions.connectiveConjunctions[
-                      connective
-                    ]
-              }
-            />
-          </>
-        )}
+        {connective !== 'otherFollowupsNotMet' &&
+          conditions?.[0]?.type !== 'isFallback' && (
+            <>
+              {conditions.map((condition: RowCondition, index) => (
+                <ConditionRow
+                  condition={condition}
+                  updateCondition={(updatedCondition) => {
+                    console.log('updated condition: ', updatedCondition);
+                    editFollowUpSection(pageId, parentSectionId, {
+                      ...followUpSection,
+                      conditions: conditions.map((cond, i) =>
+                        i === index ? updatedCondition : cond,
+                      ),
+                    });
+                  }}
+                  key={index}
+                  label={
+                    index === 0
+                      ? tr.FollowUpSection.conditions.answer
+                      : `${tr.FollowUpSection.conditions.connectiveConjunctions[connective]} ${tr.FollowUpSection.conditions.answer}`
+                  }
+                />
+              ))}
+              {(conditions?.length === 0 ||
+                (conditions.slice(-1)[0].value !== null &&
+                  conditions.slice(-1)[0].value !== '')) && (
+                <ConditionRow
+                  key={conditions.length}
+                  condition={{ type: null, value: null }}
+                  updateCondition={(updatedCondition) => {
+                    editFollowUpSection(pageId, parentSectionId, {
+                      ...followUpSection,
+                      conditions: followUpSection.conditions?.concat(
+                        updatedCondition,
+                      ) ?? [updatedCondition],
+                    });
+                  }}
+                  label={
+                    !conditions?.length || conditions.length === 0
+                      ? tr.FollowUpSection.conditions.answer
+                      : `${tr.FollowUpSection.conditions.connectiveConjunctions[connective]} ${tr.FollowUpSection.conditions.answer}`
+                  }
+                />
+              )}
+            </>
+          )}
       </FormControl>
-    </Box>
+    </FormGroup>
   );
 }
-
-/**
- * 
- * 
- * 
- * handleConditionSelect={(condition: Condition) =>
-                    setConditions((prev) => {
-                      return prev.map((cond, i) =>
-                        i === index ? condition : cond,
-                      );
-                    })
-                  }
- */

@@ -70,7 +70,11 @@ export function FollowUpSectionMenu({
         <Typography>{tr.FollowUpSection.conditions.title}</Typography>
       </Divider>
       <div>
-        <FollowUpSectionConditions />
+        <FollowUpSectionConditions
+          parentSectionId={parentSection.id}
+          pageId={pageId}
+          followUpSection={section}
+        />
       </div>
       <Divider orientation="horizontal">
         <Typography>{tr.FollowUpSection.question}</Typography>
@@ -82,12 +86,7 @@ export function FollowUpSectionMenu({
           }
           accordion={accordion}
           handleEdit={(section) =>
-            editFollowUpSection(
-              pageId,
-              parentSection.id,
-              parentSectionIndex,
-              section,
-            )
+            editFollowUpSection(pageId, parentSection.id, section)
           }
           section={section}
         />
@@ -95,12 +94,7 @@ export function FollowUpSectionMenu({
         <AddSurveySectionActions
           disabled={loading}
           onAdd={(section) =>
-            editFollowUpSection(
-              pageId,
-              parentSection.id,
-              parentSectionIndex,
-              section,
-            )
+            editFollowUpSection(pageId, parentSection.id, section)
           }
           followUpSectionId={section.id}
         />

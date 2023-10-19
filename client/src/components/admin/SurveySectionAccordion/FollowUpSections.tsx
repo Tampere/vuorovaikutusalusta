@@ -58,12 +58,7 @@ export function FollowUpSections({
                         setExpandedFollowUpSection(isExpanded ? index : null);
                       }}
                       onEdit={(section) => {
-                        editFollowUpSection(
-                          page.id,
-                          parentSection.id,
-                          parentSectionIndex,
-                          section,
-                        );
+                        editFollowUpSection(page.id, parentSection.id, section);
                       }}
                       onDelete={(index) => {
                         deleteSection(page.id, index);

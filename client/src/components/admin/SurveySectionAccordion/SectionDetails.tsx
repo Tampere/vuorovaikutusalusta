@@ -44,7 +44,7 @@ export function SectionDetails({
     title: null,
     fileName: null,
     filePath: null,
-    conditions: [1, 2, 3],
+    conditions: null,
     id: followUpSectionSequence,
   };
 
