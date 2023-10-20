@@ -41,7 +41,7 @@ function ConditionRow({
 
   function handleConditionValueChange(value: string | number) {
     if (!selectedCondition.type) return;
-    console.log(selectedCondition.type);
+
     switch (selectedCondition.type) {
       case 'equals':
         updateCondition({ ...selectedCondition, value: value });
@@ -162,11 +162,11 @@ export function FollowUpSectionConditions({
   const { editFollowUpSection } = useSurvey();
   //const [conditionSequence, setConditionSequence] = useState(-1);
   const conditions = followUpSection?.conditions ?? [];
-  console.log(conditions);
-  type Connective = keyof typeof tr.FollowUpSection.conditions.connectives;
+
+  type Connective = typeof followUpSection.connective;
 
   const [connective, setConnective] = useState<Connective>(
-    'otherFollowupsNotMet',
+    followUpSection?.connective ?? 'otherFollowupsNotMet',
   );
 
   return (
@@ -187,7 +187,13 @@ export function FollowUpSectionConditions({
           value={connective}
           label={connective}
           input={<OutlinedInput />}
-          onChange={(event) => setConnective(event.target.value as Connective)}
+          onChange={(event) => {
+            editFollowUpSection(pageId, parentSectionId, {
+              ...followUpSection,
+              connective: event.target.value as Connective,
+            });
+            setConnective(event.target.value as Connective);
+          }}
         >
           {Object.entries(tr.FollowUpSection.conditions.connectives).map(
             ([key, value], index) =>
@@ -214,7 +220,6 @@ export function FollowUpSectionConditions({
                 <ConditionRow
                   condition={condition}
                   updateCondition={(updatedCondition) => {
-                    console.log('updated condition: ', updatedCondition);
                     editFollowUpSection(pageId, parentSectionId, {
                       ...followUpSection,
                       conditions: conditions.map((cond, i) =>

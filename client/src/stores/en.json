@@ -120,7 +120,7 @@
       "connectiveTitle": "Show follow-up question if",
       "connectives": {
         "allConditionsMet": "all the following conditions are met:",
-        "anyConditionMet": "any of the following conditions is met:",
+        "anyConditionsMet": "any of the following conditions is met:",
         "noConditionsMet": "none of the following conditions are met:",
         "otherFollowupsNotMet": "conditions for other follow-up questions are not met"
       },
@@ -129,7 +129,7 @@
       "insertValue": "insert value",
       "connectiveConjunctions": {
         "allConditionsMet": "and",
-        "anyConditionMet": "or",
+        "anyConditionsMet": "or",
         "noConditionsMet": "nor"
       },
       "types": {

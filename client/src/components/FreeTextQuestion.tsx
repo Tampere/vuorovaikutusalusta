@@ -21,7 +21,7 @@ export default function FreeTextQuestion({
   maxLength = 500,
 }: Props) {
   const { tr } = useTranslations();
-  console.log('freetext', typeof value);
+
   return (
     <>
       <TextField

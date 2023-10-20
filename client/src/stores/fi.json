@@ -120,7 +120,7 @@
       "connectiveTitle": "Näytä jatkokysymys, jos",
       "connectives": {
         "allConditionsMet": "kaikki seuraavat ehdot täyttyvät:",
-        "anyConditionMet": "yksikin seuraavista ehdoista täyttyy:",
+        "anyConditionsMet": "yksikin seuraavista ehdoista täyttyy:",
         "noConditionsMet": "mikää seuraavista ehdoista ei täyty:",
         "otherFollowupsNotMet": "muiden jatkokysymysten ehdot eivät täyty"
       },
@@ -129,7 +129,7 @@
       "insertValue": "syötä vertailuarvo",
       "connectiveConjunctions": {
         "allConditionsMet": "ja",
-        "anyConditionMet": "tai",
+        "anyConditionsMet": "tai",
         "noConditionsMet": "eikä"
       },
       "types": {

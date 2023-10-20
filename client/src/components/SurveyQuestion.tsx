@@ -64,8 +64,6 @@ function SurveyQuestion({
           )?.value,
     [answers, submission, question, props.value],
   );
-  console.log('answers', answers);
-  console.log(question.type, typeof value, value);
 
   const validationErrors = useMemo(
     () => (dirty || pageUnfinished ? getValidationErrors(question) : []),

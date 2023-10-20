@@ -1,4 +1,5 @@
 import {
+  Condition,
   File,
   LocalizedText,
   SectionOption,
@@ -18,7 +19,12 @@ import {
   SurveyTheme,
 } from '@interfaces/survey';
 import { User } from '@interfaces/user';
-import { getColumnSet, getDb, getMultiUpdateQuery } from '@src/database';
+import {
+  getColumnSet,
+  getDb,
+  getMultiInsertQuery,
+  getMultiUpdateQuery,
+} from '@src/database';
 import {
   BadRequestError,
   InternalServerError,
@@ -103,6 +109,7 @@ interface DBSurveyPageSection {
   file_name: string;
   file_path: string[];
   predecessor_section: number;
+  connective: SurveyFollowUpSection['connective'];
 }
 
 /**
@@ -115,6 +122,15 @@ interface DBSectionOption {
   section_id: number;
   info?: LocalizedText;
   group_id: number;
+}
+
+interface DBSectionCondition {
+  id?: number;
+  section_id: number;
+  equals: string;
+  less_than: number;
+  greater_than: number;
+  is_fallback: boolean;
 }
 
 /**
@@ -150,6 +166,7 @@ type DBSurveyJoin = DBSurvey & {
   section_info: LocalizedText;
   section_file_name: string;
   section_file_path: string[];
+  section_connective: SurveyFollowUpSection['connective'];
   option_id: number;
   option_text: LocalizedText;
   option_group_id: number;
@@ -197,6 +214,17 @@ const sectionOptionColumnSet = getColumnSet<DBSectionOption>('option', [
   { name: 'info', cast: 'json' },
 ]);
 
+const conditionColumnSet = getColumnSet<DBSectionCondition>(
+  'section_conditions',
+  [
+    { name: 'section_id', cast: 'int' },
+    'equals',
+    { name: 'less_than', cast: 'int' },
+    { name: 'greater_than', cast: 'int' },
+    { name: 'is_fallback', cast: 'boolean' },
+  ],
+);
+
 /**
  * Gets the survey with given ID or name from the database.
  * @param params Query parameter (search by ID or name)
@@ -225,7 +253,8 @@ export async function getSurvey(params: { id: number } | { name: string }) {
         section.info as section_info,
         section.file_name as section_file_name,
         section.file_path as section_file_path,
-        section.predecessor_section as section_predecessor_section
+        section.predecessor_section as section_predecessor_section,
+        section.connective as section_connective
       FROM (
         SELECT
           survey.*,
@@ -283,6 +312,11 @@ export async function getSurvey(params: { id: number } | { name: string }) {
         [optionGroupIds],
       );
 
+  // Get all follow-up section conditions from the database
+  const allConditions = await getSectionConditions(
+    rows.map((row) => row.section_id),
+  );
+
   return rows.reduce((survey, row) => {
     // Try to find the pre-existing page object
     let page = survey.pages.find((page) => page.id === row.page_id);
@@ -330,12 +364,28 @@ export async function getSurvey(params: { id: number } | { name: string }) {
             : parentSection[key].find(
                 (linkedSection) => linkedSection.id === section.id,
               );
-        if (
-          !linkedSection &&
-          (linkedSection = dbSurveyJoinToSection(row) as SurveyMapSubQuestion)
-        ) {
-          // Subquestion or follow-up question didn't yet exist - add it to the parent section
-          parentSection[key].push(linkedSection);
+        if (!linkedSection) {
+          if (
+            key === 'subQuestions' &&
+            (linkedSection = dbSurveyJoinToSection(row) as SurveyMapSubQuestion)
+          ) {
+            // Subquestion didn't yet exist - add it to the parent section
+            parentSection[key].push(linkedSection);
+          } else if (
+            key === 'followUpSections' &&
+            (linkedSection = dbSurveyJoinToSection(
+              row,
+            ) as SurveyFollowUpSection)
+          ) {
+            linkedSection = {
+              ...linkedSection,
+              conditions: allConditions
+                .filter((cond) => cond.section_id === linkedSection.id)
+                .map((cond) => dbSectionConditionToCondition(cond)),
+            } as SurveyFollowUpSection;
+            // Follow-up question didn't yet exist - add it to the parent section
+            parentSection[key].push(linkedSection as SurveyFollowUpSection);
+          }
         }
 
         // If question contains options, add the option in the current row there
@@ -454,7 +504,7 @@ async function upsertSection(section: DBSurveyPageSection, index: number) {
   // Negative IDs can be assigned as temporary IDs for e.g. drag and drop - change them to null
   return await getDb().one<DBSurveyPageSection>(
     `
-    INSERT INTO data.page_section (id, survey_page_id, idx, title, type, body, details, parent_section, info, file_name, file_path, predecessor_section)
+    INSERT INTO data.page_section (id, survey_page_id, idx, title, type, body, details, parent_section, info, file_name, file_path, predecessor_section, connective)
     VALUES (
       COALESCE(
         CASE
@@ -473,7 +523,8 @@ async function upsertSection(section: DBSurveyPageSection, index: number) {
       $(info),
       $(fileName),
       $(filePath),
-      $(predecessorSection)
+      $(predecessorSection),
+      $(connective)
     )
     ON CONFLICT (id) DO
       UPDATE SET
@@ -486,7 +537,8 @@ async function upsertSection(section: DBSurveyPageSection, index: number) {
         info = $(info),
         file_name = $(fileName),
         file_path = $(filePath),
-        predecessor_section = $(predecessorSection)
+        predecessor_section = $(predecessorSection),
+        connective = $(connective)
     RETURNING *
   `,
     {
@@ -502,6 +554,7 @@ async function upsertSection(section: DBSurveyPageSection, index: number) {
       fileName: section.file_name,
       filePath: section.file_path,
       predecessorSection: section.predecessor_section,
+      connective: section.connective,
     },
   );
 }
@@ -591,6 +644,57 @@ async function upsertOptionGroup(group: DBOptionGroup, index: number) {
 }
 
 /**
+ * Inserts new conditions and updates existing conditions in the database
+ * @param sectionId
+ * @param conditions
+ */
+async function upsertSectionConditions(
+  sectionId: number,
+  conditions: Condition[],
+) {
+  const conditionRows = conditionsToRows(conditions, sectionId);
+
+  const upsertQuery =
+    getMultiInsertQuery(conditionRows, conditionColumnSet) +
+    ` ON CONFLICT (id) DO UPDATE SET 
+        equals = excluded.equals, 
+        less_than = excluded.less_than, 
+        greater_than = excluded.greater_than, 
+        is_fallback = excluded.is_fallback 
+      RETURNING *`;
+
+  const rows = await getDb().manyOrNone(upsertQuery);
+
+  if (conditions?.length > 0 && !rows)
+    throw new Error('Unable to upsert conditions');
+  return rows;
+}
+
+/**
+ *
+ * @param conditions
+ * @returns
+ */
+async function deleteSectionConditions(conditions: Condition[]) {
+  const conditionIds = conditions.map((condition) => condition.id);
+
+  const rows = await getDb().manyOrNone(
+    'DELETE FROM data.section_conditions WHERE id = ANY ($1) ',
+    [conditionIds],
+  );
+
+  if (!rows) throw new Error('Error deleting conditions');
+  return rows;
+}
+
+async function getSectionConditions(sectionIds: number[]) {
+  return await getDb().manyOrNone(
+    'SELECT id, section_id, equals, less_than, greater_than, is_fallback FROM data.section_conditions WHERE section_id = ANY ($1)',
+    [sectionIds],
+  );
+}
+
+/**
  * When updating a survey, deletes all sections that should be removed from DB.
  * @param surveyId Survey ID
  * @param newSections New sections
@@ -617,33 +721,6 @@ async function deleteRemovedSections(
       `DELETE FROM data.page_section WHERE id = ANY ($1) OR parent_section = ANY ($1)`,
       [removedSectionIds],
     );
-  }
-}
-
-/**
- * When updating a section, deletes all subquestions that should be removed from DB.
- * @param parentSectionId Parent section ID
- * @param newSubQuestions New subquestions
- */
-async function deleteRemovedSubQuestions(
-  parentSectionId: number,
-  newSubQuestions: SurveyMapSubQuestion[],
-) {
-  // Get all existing sections
-  const rows = await getDb().manyOrNone<{ id: number }>(
-    `SELECT id FROM data.page_section WHERE parent_section = $1`,
-    [parentSectionId],
-  );
-  const existingSubQuestionIds = rows.map((row) => row.id);
-
-  // All existing sections that aren't included in new sections should be removed
-  const removedSubQuestionIds = existingSubQuestionIds.filter((id) =>
-    (newSubQuestions ?? []).every((newSubQuestion) => newSubQuestion.id !== id),
-  );
-  if (removedSubQuestionIds.length) {
-    await getDb().none(`DELETE FROM data.page_section WHERE id = ANY ($1)`, [
-      removedSubQuestionIds,
-    ]);
   }
 }
 
@@ -881,10 +958,10 @@ export async function updateSurvey(survey: Survey) {
           linkedSections.map(async (linkedSection, index) => {
             const sectionRow = await upsertSection(linkedSection, index);
 
-            // Delete subquestion options that were removed
+            // Delete options that were removed
             await deleteRemovedOptions(linkedSection.id, linkedSection.options);
 
-            // Update/insert the remaining subquestion options
+            // Update/insert the remaining options
             if (linkedSection.options?.length) {
               const options = optionsToRows(
                 linkedSection.options,
@@ -894,6 +971,26 @@ export async function updateSurvey(survey: Survey) {
             }
           }),
         );
+        // Refresh conditions
+        if (section.followUpSections) {
+          const oldConditions = await getSectionConditions([section.id]);
+
+          await Promise.all(
+            section.followUpSections.map(async ({ id, conditions }) => {
+              const newConditionsIds = conditions
+                .map((cond) => cond.id)
+                .filter(Boolean);
+              const sectionsToDelete = oldConditions.filter(
+                (cond) => !newConditionsIds.includes(cond.id),
+              );
+              if (conditions?.length > 0) {
+                await upsertSectionConditions(id, conditions);
+              }
+
+              await deleteSectionConditions(sectionsToDelete);
+            }),
+          );
+        }
       }
 
       // Delete removed option groups
@@ -1070,6 +1167,9 @@ function dbSurveyJoinToSection(dbSurveyJoin: DBSurveyJoin): SurveyPageSection {
         info: dbSurveyJoin.section_info,
         fileName: dbSurveyJoin.section_file_name,
         filePath: dbSurveyJoin.section_file_path,
+        ...(dbSurveyJoin.section_connective
+          ? { connective: dbSurveyJoin.section_connective }
+          : {}),
         // Trust that the JSON in the DB fits the rest of the detail fields
         ...(dbSurveyJoin.section_details as any),
         // Add an initial empty option array if the type allows options
@@ -1092,6 +1192,32 @@ function dbSurveyJoinToOption(dbSurveyJoin: DBSurveyJoin): SectionOption {
         text: dbSurveyJoin.option_text,
         info: dbSurveyJoin.option_info,
       };
+}
+
+function dbSectionConditionToCondition(
+  dbSectionCondition: DBSectionCondition,
+): Condition {
+  const [type, value] = Object.entries(dbSectionCondition).find(
+    ([key, value]) =>
+      ['equals', 'less_than', 'greater_than', 'is_fallback'].includes(key) &&
+      !!value,
+  );
+
+  const types: Record<
+    keyof Omit<DBSectionCondition, 'id' | 'section_id'>,
+    Condition['type']
+  > = {
+    equals: 'equals',
+    less_than: 'lessThan',
+    greater_than: 'greaterThan',
+    is_fallback: 'isFallback',
+  };
+
+  return {
+    id: dbSectionCondition.id,
+    type: types[type],
+    value: value,
+  };
 }
 
 /**
@@ -1179,7 +1305,7 @@ function surveyPagesToRows(
 
 /**
  * Function for converting an array of survey page sections into an array of survey page section db rows.
- * If section contains options and/or subquestions, they are returned as unmodified.
+ * If section contains options and/or subquestions or follow-up sections, they are returned as unmodified.
  * @param surveySections
  * @param pageId
  * @param parentSectionId
@@ -1204,6 +1330,8 @@ function surveySectionsToRows(
       groups = undefined,
       fileName = undefined,
       filePath = undefined,
+      connective = undefined,
+      conditions = undefined,
       ...details
     } = { ...surveySection };
     return {
@@ -1220,16 +1348,30 @@ function surveySectionsToRows(
       groups,
       parent_section: parentSectionId ?? null,
       predecessor_section: predecessorSectionId ?? null,
+      connective,
       info: info,
       file_name: fileName,
       file_path: filePath,
+      conditions,
     } as DBSurveyPageSection & {
       options: SectionOption[];
       subQuestions: SurveyMapSubQuestion[];
       followUpSections: SurveyFollowUpSection[];
       groups: SectionOptionGroup[];
+      conditions: Condition[];
     };
   });
+}
+
+function conditionsToRows(conditions: Condition[], sectionId: number) {
+  return conditions.map((condition) => ({
+    id: condition.id,
+    section_id: sectionId,
+    equals: condition.type === 'equals' ? condition.value : null,
+    less_than: condition.type === 'lessThan' ? condition.value : null,
+    greater_than: condition.type === 'greaterThan' ? condition.value : null,
+    is_fallback: condition.type === 'isFallback',
+  }));
 }
 
 /**

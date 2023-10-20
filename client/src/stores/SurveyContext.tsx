@@ -363,7 +363,6 @@ export function useSurvey() {
       parentSectionId: number,
       section: SurveyFollowUpSection | SurveyPageSection,
     ) {
-      console.log('editin', section);
       dispatch({
         type: 'EDIT_FOLLOW_UP_SECTION',
         pageId,

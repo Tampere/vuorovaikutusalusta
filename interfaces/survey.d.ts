@@ -33,7 +33,7 @@ export type SurveyQuestion =
 export type SurveyMapSubQuestion = Exclude<SurveyQuestion, SurveyMapQuestion>;
 
 /**
- * Common fields for survey page sections
+ * Common fields for survey page sectionsx
  */
 interface CommonSurveyPageSection {
   /**
@@ -60,6 +60,11 @@ interface CommonSurveyPageSection {
 
 type SurveyFollowUpSection = SurveyPageSection & {
   conditions: Condition[];
+  connective:
+    | 'allConditionsMet'
+    | 'anyConditionsMet'
+    | 'noConditionsMet'
+    | 'otherFollowupsNotMet';
 };
 
 /**
@@ -705,8 +710,9 @@ export interface Submission {
 
 export type ImageType = 'backgroundImage' | 'thanksPageImage';
 
-export type Condition =
+export type Condition = { id?: number } & (
   | { type: 'equals'; value: string | number }
   | { type: 'lessThan'; value: number }
   | { type: 'greaterThan'; value: number }
-  | { type: 'isFallback'; value: boolean };
+  | { type: 'isFallback'; value: boolean }
+);
