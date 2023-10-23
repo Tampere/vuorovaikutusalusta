@@ -117,25 +117,13 @@
     "title": "Follow-up question for ",
     "conditions": {
       "title": "Conditions",
-      "connectiveTitle": "Show follow-up question if",
-      "connectives": {
-        "allConditionsMet": "all the following conditions are met:",
-        "anyConditionsMet": "any of the following conditions is met:",
-        "noConditionsMet": "none of the following conditions are met:",
-        "otherFollowupsNotMet": "conditions for other follow-up questions are not met"
-      },
-      "answer": "Answer",
       "chooseCondition": "choose a condition",
       "insertValue": "insert value",
-      "connectiveConjunctions": {
-        "allConditionsMet": "and",
-        "anyConditionsMet": "or",
-        "noConditionsMet": "nor"
-      },
+
       "types": {
-        "equals": "equals",
-        "lessThan": "is less than",
-        "greaterThan": "is greater than"
+        "equals": "Answer equals",
+        "lessThan": "or Answer is less than",
+        "greaterThan": "or Answer is greater than"
       },
       "validationError": ""
     },

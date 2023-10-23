@@ -289,7 +289,58 @@ export function useSurveyAnswers() {
     }
     return errors;
   }
+  /*
+  function followUpSectionConditionsMet(
+    question: SurveyQuestion,
+    answers = state.answers,
+    conditions: Condition[],
+  ) {
+    // Find the answer that corresponds to the question
+    const answer = answers.find((answer) => answer.sectionId === question.id);
 
+    type ConnectiveFilterType = Record<
+      Exclude<SurveyFollowUpSection['connective'], 'otherFollowupsNotMet'>,
+      (answers: any) => boolean
+    >;
+    type ComparatorType = Record<
+      Condition['type'],
+      (answerValue: any, conditionValue: any) => boolean
+    >;
+
+    const filterWithConnectives: ConnectiveFilterType = {
+      allConditionsMet: (
+        answers: any,
+        comparator: ComparatorType[],
+        conditions: Condition[],
+      ) =>
+        answers.every((answer) =>
+          conditions.every((cond) => comparators[cond.type]),
+        ),
+    };
+
+    const comparators: ComparatorType = {
+      equals: (answerValue: any, conditionValue: any) =>
+        answerValue === conditionValue,
+      lessThan: (answerValue: any, conditionValue: any) =>
+        answerValue < conditionValue,
+      greaterThan: (answerValue: any, conditionValue: any) =>
+        answerValue > conditionValue,
+    };
+
+    function valuesMeetConditions(values: (number | string)[]) {
+
+    switch (question.type) {
+      case 'radio':
+        answer.value;
+      case 'checkbox':
+      case 'numeric':
+
+      case 'slider':
+      default:
+        return;
+    }
+  }
+*/
   return {
     ...state,
     /**

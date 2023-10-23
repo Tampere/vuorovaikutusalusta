@@ -1,5 +1,5 @@
 import {
-  Condition,
+  Conditions,
   File,
   LocalizedText,
   SectionOption,
@@ -109,7 +109,6 @@ interface DBSurveyPageSection {
   file_name: string;
   file_path: string[];
   predecessor_section: number;
-  connective: SurveyFollowUpSection['connective'];
 }
 
 /**
@@ -130,7 +129,6 @@ interface DBSectionCondition {
   equals: string;
   less_than: number;
   greater_than: number;
-  is_fallback: boolean;
 }
 
 /**
@@ -166,7 +164,6 @@ type DBSurveyJoin = DBSurvey & {
   section_info: LocalizedText;
   section_file_name: string;
   section_file_path: string[];
-  section_connective: SurveyFollowUpSection['connective'];
   option_id: number;
   option_text: LocalizedText;
   option_group_id: number;
@@ -218,10 +215,9 @@ const conditionColumnSet = getColumnSet<DBSectionCondition>(
   'section_conditions',
   [
     { name: 'section_id', cast: 'int' },
-    'equals',
+    { name: 'equals', cast: 'int' },
     { name: 'less_than', cast: 'int' },
     { name: 'greater_than', cast: 'int' },
-    { name: 'is_fallback', cast: 'boolean' },
   ],
 );
 
@@ -253,8 +249,7 @@ export async function getSurvey(params: { id: number } | { name: string }) {
         section.info as section_info,
         section.file_name as section_file_name,
         section.file_path as section_file_path,
-        section.predecessor_section as section_predecessor_section,
-        section.connective as section_connective
+        section.predecessor_section as section_predecessor_section
       FROM (
         SELECT
           survey.*,
@@ -379,9 +374,11 @@ export async function getSurvey(params: { id: number } | { name: string }) {
           ) {
             linkedSection = {
               ...linkedSection,
-              conditions: allConditions
-                .filter((cond) => cond.section_id === linkedSection.id)
-                .map((cond) => dbSectionConditionToCondition(cond)),
+              conditions: dbSectionConditionsToConditions(
+                allConditions.filter(
+                  (cond) => cond.section_id === linkedSection.id,
+                ),
+              ),
             } as SurveyFollowUpSection;
             // Follow-up question didn't yet exist - add it to the parent section
             parentSection[key].push(linkedSection as SurveyFollowUpSection);
@@ -504,7 +501,7 @@ async function upsertSection(section: DBSurveyPageSection, index: number) {
   // Negative IDs can be assigned as temporary IDs for e.g. drag and drop - change them to null
   return await getDb().one<DBSurveyPageSection>(
     `
-    INSERT INTO data.page_section (id, survey_page_id, idx, title, type, body, details, parent_section, info, file_name, file_path, predecessor_section, connective)
+    INSERT INTO data.page_section (id, survey_page_id, idx, title, type, body, details, parent_section, info, file_name, file_path, predecessor_section)
     VALUES (
       COALESCE(
         CASE
@@ -523,8 +520,7 @@ async function upsertSection(section: DBSurveyPageSection, index: number) {
       $(info),
       $(fileName),
       $(filePath),
-      $(predecessorSection),
-      $(connective)
+      $(predecessorSection)
     )
     ON CONFLICT (id) DO
       UPDATE SET
@@ -537,8 +533,7 @@ async function upsertSection(section: DBSurveyPageSection, index: number) {
         info = $(info),
         file_name = $(fileName),
         file_path = $(filePath),
-        predecessor_section = $(predecessorSection),
-        connective = $(connective)
+        predecessor_section = $(predecessorSection)
     RETURNING *
   `,
     {
@@ -554,7 +549,6 @@ async function upsertSection(section: DBSurveyPageSection, index: number) {
       fileName: section.file_name,
       filePath: section.file_path,
       predecessorSection: section.predecessor_section,
-      connective: section.connective,
     },
   );
 }
@@ -650,22 +644,22 @@ async function upsertOptionGroup(group: DBOptionGroup, index: number) {
  */
 async function upsertSectionConditions(
   sectionId: number,
-  conditions: Condition[],
+  conditions: Conditions,
 ) {
   const conditionRows = conditionsToRows(conditions, sectionId);
+  if (conditionRows.length === 0) return;
 
   const upsertQuery =
     getMultiInsertQuery(conditionRows, conditionColumnSet) +
     ` ON CONFLICT (id) DO UPDATE SET 
         equals = excluded.equals, 
         less_than = excluded.less_than, 
-        greater_than = excluded.greater_than, 
-        is_fallback = excluded.is_fallback 
+        greater_than = excluded.greater_than
       RETURNING *`;
 
   const rows = await getDb().manyOrNone(upsertQuery);
 
-  if (conditions?.length > 0 && !rows)
+  if (Object.values(conditions).some((values) => values?.length > 0) && !rows)
     throw new Error('Unable to upsert conditions');
   return rows;
 }
@@ -675,12 +669,10 @@ async function upsertSectionConditions(
  * @param conditions
  * @returns
  */
-async function deleteSectionConditions(conditions: Condition[]) {
-  const conditionIds = conditions.map((condition) => condition.id);
-
+async function deleteSectionConditions(sectionIds: number[]) {
   const rows = await getDb().manyOrNone(
-    'DELETE FROM data.section_conditions WHERE id = ANY ($1) ',
-    [conditionIds],
+    'DELETE FROM data.section_conditions WHERE section_id = ANY ($1) ',
+    [sectionIds],
   );
 
   if (!rows) throw new Error('Error deleting conditions');
@@ -689,7 +681,7 @@ async function deleteSectionConditions(conditions: Condition[]) {
 
 async function getSectionConditions(sectionIds: number[]) {
   return await getDb().manyOrNone(
-    'SELECT id, section_id, equals, less_than, greater_than, is_fallback FROM data.section_conditions WHERE section_id = ANY ($1)',
+    'SELECT id, section_id, equals, less_than, greater_than FROM data.section_conditions WHERE section_id = ANY ($1)',
     [sectionIds],
   );
 }
@@ -973,21 +965,10 @@ export async function updateSurvey(survey: Survey) {
         );
         // Refresh conditions
         if (section.followUpSections) {
-          const oldConditions = await getSectionConditions([section.id]);
-
           await Promise.all(
             section.followUpSections.map(async ({ id, conditions }) => {
-              const newConditionsIds = conditions
-                .map((cond) => cond.id)
-                .filter(Boolean);
-              const sectionsToDelete = oldConditions.filter(
-                (cond) => !newConditionsIds.includes(cond.id),
-              );
-              if (conditions?.length > 0) {
-                await upsertSectionConditions(id, conditions);
-              }
-
-              await deleteSectionConditions(sectionsToDelete);
+              await deleteSectionConditions([id]);
+              await upsertSectionConditions(id, conditions);
             }),
           );
         }
@@ -1167,9 +1148,6 @@ function dbSurveyJoinToSection(dbSurveyJoin: DBSurveyJoin): SurveyPageSection {
         info: dbSurveyJoin.section_info,
         fileName: dbSurveyJoin.section_file_name,
         filePath: dbSurveyJoin.section_file_path,
-        ...(dbSurveyJoin.section_connective
-          ? { connective: dbSurveyJoin.section_connective }
-          : {}),
         // Trust that the JSON in the DB fits the rest of the detail fields
         ...(dbSurveyJoin.section_details as any),
         // Add an initial empty option array if the type allows options
@@ -1194,30 +1172,34 @@ function dbSurveyJoinToOption(dbSurveyJoin: DBSurveyJoin): SectionOption {
       };
 }
 
-function dbSectionConditionToCondition(
-  dbSectionCondition: DBSectionCondition,
-): Condition {
-  const [type, value] = Object.entries(dbSectionCondition).find(
-    ([key, value]) =>
-      ['equals', 'less_than', 'greater_than', 'is_fallback'].includes(key) &&
-      !!value,
+function dbSectionConditionsToConditions(
+  dbSectionConditions: DBSectionCondition[],
+): Conditions {
+  return dbSectionConditions.reduce(
+    (conditions, condition) => {
+      if (condition.equals) {
+        return {
+          ...conditions,
+          equals: [...conditions.equals, condition.equals],
+        };
+      } else if (condition.less_than) {
+        return {
+          ...conditions,
+          lessThan: [...conditions.equals, condition.less_than],
+        };
+      } else if (condition.greater_than) {
+        return {
+          ...conditions,
+          greaterThan: [...conditions.equals, condition.greater_than],
+        };
+      }
+    },
+    {
+      equals: [],
+      lessThan: [],
+      greaterThan: [],
+    },
   );
-
-  const types: Record<
-    keyof Omit<DBSectionCondition, 'id' | 'section_id'>,
-    Condition['type']
-  > = {
-    equals: 'equals',
-    less_than: 'lessThan',
-    greater_than: 'greaterThan',
-    is_fallback: 'isFallback',
-  };
-
-  return {
-    id: dbSectionCondition.id,
-    type: types[type],
-    value: value,
-  };
 }
 
 /**
@@ -1330,7 +1312,6 @@ function surveySectionsToRows(
       groups = undefined,
       fileName = undefined,
       filePath = undefined,
-      connective = undefined,
       conditions = undefined,
       ...details
     } = { ...surveySection };
@@ -1348,7 +1329,6 @@ function surveySectionsToRows(
       groups,
       parent_section: parentSectionId ?? null,
       predecessor_section: predecessorSectionId ?? null,
-      connective,
       info: info,
       file_name: fileName,
       file_path: filePath,
@@ -1358,20 +1338,32 @@ function surveySectionsToRows(
       subQuestions: SurveyMapSubQuestion[];
       followUpSections: SurveyFollowUpSection[];
       groups: SectionOptionGroup[];
-      conditions: Condition[];
+      conditions: Conditions;
     };
   });
 }
 
-function conditionsToRows(conditions: Condition[], sectionId: number) {
-  return conditions.map((condition) => ({
-    id: condition.id,
-    section_id: sectionId,
-    equals: condition.type === 'equals' ? condition.value : null,
-    less_than: condition.type === 'lessThan' ? condition.value : null,
-    greater_than: condition.type === 'greaterThan' ? condition.value : null,
-    is_fallback: condition.type === 'isFallback',
-  }));
+function conditionsToRows(conditions: Conditions, sectionId: number) {
+  return [
+    ...conditions.equals.map((val) => ({
+      section_id: sectionId,
+      equals: val,
+      less_than: null,
+      greater_than: null,
+    })),
+    ...conditions.greaterThan.map((val) => ({
+      section_id: sectionId,
+      greater_than: val,
+      equals: null,
+      less_than: null,
+    })),
+    ...conditions.lessThan.map((val) => ({
+      section_id: sectionId,
+      less_than: val,
+      equals: null,
+      greater_than: null,
+    })),
+  ];
 }
 
 /**

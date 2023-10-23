@@ -117,25 +117,13 @@
     "title": "Jatkokysymys kysymykselle",
     "conditions": {
       "title": "Ehdot",
-      "connectiveTitle": "Näytä jatkokysymys, jos",
-      "connectives": {
-        "allConditionsMet": "kaikki seuraavat ehdot täyttyvät:",
-        "anyConditionsMet": "yksikin seuraavista ehdoista täyttyy:",
-        "noConditionsMet": "mikää seuraavista ehdoista ei täyty:",
-        "otherFollowupsNotMet": "muiden jatkokysymysten ehdot eivät täyty"
-      },
-      "answer": "Vastaus",
       "chooseCondition": "valitse ehto",
       "insertValue": "syötä vertailuarvo",
-      "connectiveConjunctions": {
-        "allConditionsMet": "ja",
-        "anyConditionsMet": "tai",
-        "noConditionsMet": "eikä"
-      },
+
       "types": {
-        "equals": "on yhtäsuuri kuin",
-        "lessThan": "on pienempi kuin",
-        "greaterThan": "on suurempi kuin"
+        "equals": "Vastaus on yhtäsuuri kuin",
+        "lessThan": "tai Vastaus on pienempi kuin",
+        "greaterThan": "tai Vastaus on suurempi kuin"
       },
       "validationError": "Vertailuarvon täytyy olla luku"
     },

@@ -59,12 +59,7 @@ interface CommonSurveyPageSection {
 }
 
 type SurveyFollowUpSection = SurveyPageSection & {
-  conditions: Condition[];
-  connective:
-    | 'allConditionsMet'
-    | 'anyConditionsMet'
-    | 'noConditionsMet'
-    | 'otherFollowupsNotMet';
+  conditions: Conditions;
 };
 
 /**
@@ -710,9 +705,19 @@ export interface Submission {
 
 export type ImageType = 'backgroundImage' | 'thanksPageImage';
 
+/**
+ * Conditions to display follow-up section
+ */
+
+export interface Conditions {
+  equals: number[];
+  lessThan: number[];
+  greaterThan: number[];
+}
+
+/*
 export type Condition = { id?: number } & (
   | { type: 'equals'; value: string | number }
   | { type: 'lessThan'; value: number }
   | { type: 'greaterThan'; value: number }
-  | { type: 'isFallback'; value: boolean }
-);
+);*/

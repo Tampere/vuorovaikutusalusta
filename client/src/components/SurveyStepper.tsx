@@ -117,6 +117,7 @@ export default function SurveyStepper({
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [submissionInfoDialogOpen, setSubmissionInfoDialogOpen] =
     useState(false);
+  const [showFollowUpSections, _setShowFollowUpSections] = useState(true);
 
   const {
     isPageValid,
@@ -457,26 +458,30 @@ export default function SurveyStepper({
                               >
                                 {tr.SurveyStepper.followUpSections}
                               </Typography>
-                              {section.followUpSections.map((sect) =>
-                                sect.type === 'text' ? (
-                                  <TextSection key={sect.id} section={sect} />
-                                ) : sect.type === 'image' ? (
-                                  <ImageSection key={sect.id} section={sect} />
-                                ) : sect.type === 'document' ? (
-                                  <DocumentSection
-                                    key={sect.id}
-                                    section={sect}
-                                  />
-                                ) : (
-                                  <SurveyQuestion
-                                    isFollowUp
-                                    key={sect.id}
-                                    question={sect}
-                                    pageUnfinished={pageUnfinished}
-                                    mobileDrawerOpen={mobileDrawerOpen}
-                                  />
-                                ),
-                              )}
+                              {showFollowUpSections &&
+                                section.followUpSections.map((sect) =>
+                                  sect.type === 'text' ? (
+                                    <TextSection key={sect.id} section={sect} />
+                                  ) : sect.type === 'image' ? (
+                                    <ImageSection
+                                      key={sect.id}
+                                      section={sect}
+                                    />
+                                  ) : sect.type === 'document' ? (
+                                    <DocumentSection
+                                      key={sect.id}
+                                      section={sect}
+                                    />
+                                  ) : (
+                                    <SurveyQuestion
+                                      isFollowUp
+                                      key={sect.id}
+                                      question={sect}
+                                      pageUnfinished={pageUnfinished}
+                                      mobileDrawerOpen={mobileDrawerOpen}
+                                    />
+                                  ),
+                                )}
                             </Box>
                           )}
                         </>

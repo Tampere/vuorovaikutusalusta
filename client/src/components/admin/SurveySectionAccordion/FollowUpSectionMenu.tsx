@@ -16,7 +16,10 @@ interface Props {
   pageId: number;
   parentTitle: string;
   section: SurveyFollowUpSection;
-  parentSection: SurveyPageSection;
+  parentSection: Extract<
+    SurveyPageSection,
+    { type: 'numeric' | 'slider' | 'checkbox' | 'radio' }
+  >;
   parentSectionIndex: number;
 }
 
@@ -25,7 +28,6 @@ export function FollowUpSectionMenu({
   parentTitle,
   section,
   parentSection,
-  parentSectionIndex,
   pageId,
 }: Props) {
   const { tr } = useTranslations();
@@ -71,7 +73,7 @@ export function FollowUpSectionMenu({
       </Divider>
       <div>
         <FollowUpSectionConditions
-          parentSectionId={parentSection.id}
+          parentSection={parentSection}
           pageId={pageId}
           followUpSection={section}
         />
