@@ -19,15 +19,16 @@ export function SurveyFollowUpSections({
   pageUnfinished,
   mobileDrawerOpen,
 }: Props) {
-  const { followUpSectionConditionsMet } = useSurveyAnswers();
+  const { getFollowUpSectionsToDisplay } = useSurveyAnswers();
   const { tr } = useTranslations();
 
-  const followUpSectionsToDisplay =
-    section?.followUpSections.filter(
-      (_sect, index) => followUpSectionConditionsMet(section)?.[index],
-    ) ?? [];
+  const followUpSectionIds = getFollowUpSectionsToDisplay(section);
 
-  if (followUpSectionsToDisplay.length === 0) return null;
+  if (followUpSectionIds.length === 0) return null;
+
+  const followUpSectionsToDisplay = section.followUpSections.filter((sect) =>
+    followUpSectionIds.includes(sect.id),
+  );
 
   return (
     <Box
@@ -56,7 +57,7 @@ export function SurveyFollowUpSections({
         >
           {tr.SurveyStepper.followUpSections}
         </Typography>
-        {section.followUpSections.map((sect) =>
+        {followUpSectionsToDisplay.map((sect) =>
           sect.type === 'text' ? (
             <TextSection key={sect.id} section={sect} />
           ) : sect.type === 'image' ? (

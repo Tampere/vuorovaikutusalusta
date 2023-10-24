@@ -1,7 +1,9 @@
 import {
   AnswerEntry,
+  Conditions,
   LanguageCode,
   Survey,
+  SurveyFollowUpSection,
   SurveyPage,
   SurveyPageSection,
   SurveyQuestion,
@@ -15,7 +17,7 @@ import React, {
   useReducer,
 } from 'react';
 import { useTranslations } from './TranslationContext';
-import { isString } from '@src/utils/typeCheck';
+import { isFollowUpSectionParent, isString } from '@src/utils/typeCheck';
 
 interface State {
   answers: AnswerEntry[];
@@ -291,7 +293,14 @@ export function useSurveyAnswers() {
     return errors;
   }
 
-  function followUpSectionConditionsMet(question: SurveyQuestion) {
+  /**
+   * Checks is question follow-up section conditions are fulfilled and return list of
+   * follow-up question ids that should be displayed
+   * @param question
+   * @returns
+   */
+
+  function getFollowUpSectionsToDisplay(question: SurveyQuestion) {
     // Find the answer that corresponds to the question
 
     const answer = state.answers.find(
@@ -303,48 +312,54 @@ export function useSurveyAnswers() {
       question.followUpSections.length === 0 ||
       !answer?.value
     ) {
-      return;
+      return [];
     }
 
     switch (question.type) {
       case 'radio':
-        return question.followUpSections.map((section) =>
-          section.conditions.equals.some(
-            (answerId) =>
-              (isString(answer.value) ? -1 : answer.value) === answerId,
-          ),
-        );
-      case 'checkbox':
-        return question.followUpSections.map((section) =>
-          section.conditions.equals.some((answerId) =>
-            (answer as Extract<AnswerEntry, { type: 'checkbox' }>).value.some(
-              (val) => (isString(val) ? -1 : val) === answerId,
+        return question.followUpSections
+          .filter((section) =>
+            section.conditions.equals.some(
+              (answerId) =>
+                (isString(answer.value) ? -1 : answer.value) === answerId,
             ),
-          ),
-        );
+          )
+          .map((s) => s.id);
+      case 'checkbox':
+        return question.followUpSections
+          .filter((section) =>
+            section.conditions.equals.some((answerId) =>
+              (answer as Extract<AnswerEntry, { type: 'checkbox' }>).value.some(
+                (val) => (isString(val) ? -1 : val) === answerId,
+              ),
+            ),
+          )
+          .map((s) => s.id);
       case 'numeric':
       case 'slider':
-        return question.followUpSections.map((section) => {
-          const value = (
-            answer as Extract<AnswerEntry, { type: 'numeric' | 'slider' }>
-          ).value;
+        return question.followUpSections
+          .filter((section) => {
+            const value = (
+              answer as Extract<AnswerEntry, { type: 'numeric' | 'slider' }>
+            ).value;
 
-          return section.conditions.equals.some(
-            (conditionValue) => value === conditionValue,
-          )
-            ? true
-            : section.conditions.greaterThan.some(
-                (conditionValue) => value > conditionValue,
-              )
-            ? true
-            : section.conditions.lessThan.some(
-                (conditionValue) => value < conditionValue,
-              )
-            ? true
-            : false;
-        });
+            return section.conditions.equals.some(
+              (conditionValue) => value === conditionValue,
+            )
+              ? true
+              : section.conditions.greaterThan.some(
+                  (conditionValue) => value > conditionValue,
+                )
+              ? true
+              : section.conditions.lessThan.some(
+                  (conditionValue) => value < conditionValue,
+                )
+              ? true
+              : false;
+          })
+          .map((s) => s.id);
       default:
-        return;
+        return [];
     }
   }
 
@@ -353,7 +368,7 @@ export function useSurveyAnswers() {
     /**
      * Checks if follow-up question should be displayed
      */
-    followUpSectionConditionsMet,
+    getFollowUpSectionsToDisplay,
     /**
      * Update survey answer
      * @param answer Survey answer
@@ -417,7 +432,20 @@ export function useSurveyAnswers() {
           (section): section is SurveyQuestion =>
             !nonQuestionSectionTypes.includes(section.type),
         )
-        .some((section) => getValidationErrors(section).length);
+        .some((section) => {
+          if (isFollowUpSectionParent(section)) {
+            const displayedFollowUpIds = getFollowUpSectionsToDisplay(section);
+
+            return section.followUpSections
+              .filter(
+                (sect): sect is SurveyQuestion & { conditions: Conditions } =>
+                  displayedFollowUpIds.includes(sect.id) &&
+                  !nonQuestionSectionTypes.includes(sect.type),
+              )
+              .some((s) => getValidationErrors(s).length);
+          }
+          getValidationErrors(section).length;
+        });
     },
     /**
      *
