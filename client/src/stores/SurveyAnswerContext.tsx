@@ -1,6 +1,8 @@
 import {
   AnswerEntry,
+  Conditions,
   LanguageCode,
+  MapQuestionAnswer,
   Survey,
   SurveyPage,
   SurveyPageSection,
@@ -15,6 +17,7 @@ import React, {
   useReducer,
 } from 'react';
 import { useTranslations } from './TranslationContext';
+import { isString } from '@src/utils/typeCheck';
 
 interface State {
   answers: AnswerEntry[];
@@ -289,60 +292,70 @@ export function useSurveyAnswers() {
     }
     return errors;
   }
-  /*
-  function followUpSectionConditionsMet(
-    question: SurveyQuestion,
-    answers = state.answers,
-    conditions: Condition[],
-  ) {
+
+  function followUpSectionConditionsMet(question: SurveyQuestion) {
     // Find the answer that corresponds to the question
-    const answer = answers.find((answer) => answer.sectionId === question.id);
 
-    type ConnectiveFilterType = Record<
-      Exclude<SurveyFollowUpSection['connective'], 'otherFollowupsNotMet'>,
-      (answers: any) => boolean
-    >;
-    type ComparatorType = Record<
-      Condition['type'],
-      (answerValue: any, conditionValue: any) => boolean
-    >;
+    const answer = state.answers.find(
+      (answer) => answer.sectionId === question.id,
+    );
 
-    const filterWithConnectives: ConnectiveFilterType = {
-      allConditionsMet: (
-        answers: any,
-        comparator: ComparatorType[],
-        conditions: Condition[],
-      ) =>
-        answers.every((answer) =>
-          conditions.every((cond) => comparators[cond.type]),
-        ),
-    };
-
-    const comparators: ComparatorType = {
-      equals: (answerValue: any, conditionValue: any) =>
-        answerValue === conditionValue,
-      lessThan: (answerValue: any, conditionValue: any) =>
-        answerValue < conditionValue,
-      greaterThan: (answerValue: any, conditionValue: any) =>
-        answerValue > conditionValue,
-    };
-
-    function valuesMeetConditions(values: (number | string)[]) {
+    if (
+      !question?.followUpSections ||
+      question.followUpSections.length === 0 ||
+      !answer?.value
+    ) {
+      return;
+    }
 
     switch (question.type) {
       case 'radio':
-        answer.value;
+        return question.followUpSections.map((section) =>
+          section.conditions.equals.some(
+            (answerId) =>
+              (isString(answer.value) ? -1 : answer.value) === answerId,
+          ),
+        );
       case 'checkbox':
+        return question.followUpSections.map((section) =>
+          section.conditions.equals.some((answerId) =>
+            (answer as Extract<AnswerEntry, { type: 'checkbox' }>).value.some(
+              (val) => (isString(val) ? -1 : val) === answerId,
+            ),
+          ),
+        );
       case 'numeric':
-
       case 'slider':
+        return question.followUpSections.map((section) => {
+          const value = (
+            answer as Extract<AnswerEntry, { type: 'numeric' | 'slider' }>
+          ).value;
+
+          return section.conditions.equals.some(
+            (conditionValue) => value === conditionValue,
+          )
+            ? true
+            : section.conditions.greaterThan.some(
+                (conditionValue) => value > conditionValue,
+              )
+            ? true
+            : section.conditions.lessThan.some(
+                (conditionValue) => value < conditionValue,
+              )
+            ? true
+            : false;
+        });
       default:
         return;
     }
   }
-*/
+
   return {
     ...state,
+    /**
+     * Checks if follow-up question should be displayed
+     */
+    followUpSectionConditionsMet,
     /**
      * Update survey answer
      * @param answer Survey answer
@@ -379,6 +392,7 @@ export function useSurveyAnswers() {
         )
         // Skip sections that shouldn't get answers
         .filter((section) => !nonQuestionSectionTypes.includes(section.type));
+
       dispatch({
         type: 'SET_ANSWERS',
         answers: sections.map(getEmptyAnswer).filter(Boolean),

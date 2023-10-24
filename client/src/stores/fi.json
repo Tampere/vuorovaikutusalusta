@@ -119,7 +119,7 @@
       "title": "Ehdot",
       "chooseCondition": "valitse ehto",
       "insertValue": "syötä vertailuarvo",
-
+      "customAnswer": "Jokin muu, mikä?",
       "types": {
         "equals": "Vastaus on yhtäsuuri kuin",
         "lessThan": "tai Vastaus on pienempi kuin",

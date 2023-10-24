@@ -950,6 +950,16 @@ export async function updateSurvey(survey: Survey) {
           linkedSections.map(async (linkedSection, index) => {
             const sectionRow = await upsertSection(linkedSection, index);
 
+            // Refresh conditions for a follow-up section
+            if (linkedSection.predecessor_section) {
+              // use sectionRow id that was generated when saving follow-up section to db
+              await deleteSectionConditions([sectionRow.id]);
+              await upsertSectionConditions(
+                sectionRow.id,
+                linkedSection.conditions,
+              );
+            }
+
             // Delete options that were removed
             await deleteRemovedOptions(linkedSection.id, linkedSection.options);
 
@@ -963,15 +973,6 @@ export async function updateSurvey(survey: Survey) {
             }
           }),
         );
-        // Refresh conditions
-        if (section.followUpSections) {
-          await Promise.all(
-            section.followUpSections.map(async ({ id, conditions }) => {
-              await deleteSectionConditions([id]);
-              await upsertSectionConditions(id, conditions);
-            }),
-          );
-        }
       }
 
       // Delete removed option groups
@@ -1185,12 +1186,12 @@ function dbSectionConditionsToConditions(
       } else if (condition.less_than) {
         return {
           ...conditions,
-          lessThan: [...conditions.equals, condition.less_than],
+          lessThan: [...conditions.lessThan, condition.less_than],
         };
       } else if (condition.greater_than) {
         return {
           ...conditions,
-          greaterThan: [...conditions.equals, condition.greater_than],
+          greaterThan: [...conditions.greaterThan, condition.greater_than],
         };
       }
     },

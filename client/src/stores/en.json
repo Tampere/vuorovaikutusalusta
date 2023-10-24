@@ -119,7 +119,7 @@
       "title": "Conditions",
       "chooseCondition": "choose a condition",
       "insertValue": "insert value",
-
+      "customAnswer": "Something else, what?",
       "types": {
         "equals": "Answer equals",
         "lessThan": "or Answer is less than",

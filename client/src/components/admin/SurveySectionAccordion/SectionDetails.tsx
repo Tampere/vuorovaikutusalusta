@@ -44,8 +44,7 @@ export function SectionDetails({
     title: null,
     fileName: null,
     filePath: null,
-    conditions: [],
-    connective: 'otherFollowupsNotMet',
+    conditions: { equals: [], lessThan: [], greaterThan: [] },
     id: followUpSectionSequence,
   };
 

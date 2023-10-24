@@ -24,6 +24,7 @@ interface RowProps {
   conditions?: Conditions;
   textFieldValue?: number | string;
   onInput: (values: number[]) => void;
+  allowCustomAnswer?: boolean;
 }
 
 function ConditionRow({
@@ -33,6 +34,7 @@ function ConditionRow({
   conditions,
   onInput,
   textFieldValue = '',
+  allowCustomAnswer = false,
 }: RowProps) {
   const [validationError, setValidationError] = useState(false);
   const { tr, surveyLanguage } = useTranslations();
@@ -67,7 +69,7 @@ function ConditionRow({
           placeholder={tr.FollowUpSection.conditions.insertValue}
           onChange={(event) => {
             const { value } = event.target;
-            console.log(event.target.value);
+
             if (value !== '' && !isNumeric(value)) {
               setValidationError(true);
               return;
@@ -105,6 +107,12 @@ function ConditionRow({
               {option.text[surveyLanguage]}
             </MenuItem>
           ))}
+
+          {allowCustomAnswer && (
+            <MenuItem value={-1} key={-1}>
+              {tr.FollowUpSection.conditions.customAnswer}
+            </MenuItem>
+          )}
         </Select>
       )}
     </FormControl>
@@ -128,16 +136,16 @@ export function FollowUpSectionConditions({
   const { tr } = useTranslations();
   const { editFollowUpSection } = useSurvey();
 
-  const displayNumericConditions =
+  const parentIsNumeric =
     parentSection.type === 'numeric' || parentSection.type === 'slider';
-  console.log(parentSection);
 
   return (
     <FormGroup>
       <ConditionRow
-        conditionIsNumeric={displayNumericConditions}
+        allowCustomAnswer={!parentIsNumeric && parentSection?.allowCustomAnswer}
+        conditionIsNumeric={parentIsNumeric}
         label={tr.FollowUpSection.conditions.types.equals}
-        options={displayNumericConditions ? [] : parentSection.options}
+        options={parentIsNumeric ? [] : parentSection.options}
         conditions={followUpSection.conditions}
         textFieldValue={followUpSection.conditions.equals[0]}
         onInput={(values) =>
@@ -147,7 +155,7 @@ export function FollowUpSectionConditions({
           })
         }
       />
-      {displayNumericConditions && (
+      {parentIsNumeric && (
         <>
           <ConditionRow
             conditionIsNumeric

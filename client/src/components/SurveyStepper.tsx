@@ -46,6 +46,7 @@ import SurveyLanguageMenu from './SurveyLanguageMenu';
 import SurveyMap from './SurveyMap';
 import SurveyQuestion from './SurveyQuestion';
 import TextSection from './TextSection';
+import { SurveyFollowUpSections } from './SurveyFolloUpSections';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -141,6 +142,7 @@ export default function SurveyStepper({
   } = useSurveyMap();
   const classes = useStyles();
   const { tr, language, surveyLanguage } = useTranslations();
+  const { followUpSectionConditionsMet } = useSurveyAnswers();
   const theme = useTheme();
   const mdUp = useMediaQuery(theme.breakpoints.up('md'));
   const currentPage = useMemo<SurveyPage>(
@@ -432,58 +434,11 @@ export default function SurveyStepper({
                             pageUnfinished={pageUnfinished}
                             mobileDrawerOpen={mobileDrawerOpen}
                           />
-                          {section?.followUpSections?.length > 0 && (
-                            <Box
-                              sx={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                backgroundColor: '#E4E4E4',
-                                borderRadius: '6px',
-                                padding: '0.75rem',
-                                margin: '0.75rem 0',
-                                '& .MuiInputBase-root': {
-                                  backgroundColor: 'white',
-                                },
-                                gap: '30px',
-                              }}
-                              className="follow-up-sections-container"
-                            >
-                              <Typography
-                                variant="body1"
-                                component="h4"
-                                sx={{
-                                  fontWeight: 700,
-                                  color: '#676767',
-                                }}
-                              >
-                                {tr.SurveyStepper.followUpSections}
-                              </Typography>
-                              {showFollowUpSections &&
-                                section.followUpSections.map((sect) =>
-                                  sect.type === 'text' ? (
-                                    <TextSection key={sect.id} section={sect} />
-                                  ) : sect.type === 'image' ? (
-                                    <ImageSection
-                                      key={sect.id}
-                                      section={sect}
-                                    />
-                                  ) : sect.type === 'document' ? (
-                                    <DocumentSection
-                                      key={sect.id}
-                                      section={sect}
-                                    />
-                                  ) : (
-                                    <SurveyQuestion
-                                      isFollowUp
-                                      key={sect.id}
-                                      question={sect}
-                                      pageUnfinished={pageUnfinished}
-                                      mobileDrawerOpen={mobileDrawerOpen}
-                                    />
-                                  ),
-                                )}
-                            </Box>
-                          )}
+                          <SurveyFollowUpSections
+                            section={section}
+                            mobileDrawerOpen={mobileDrawerOpen}
+                            pageUnfinished={pageUnfinished}
+                          />
                         </>
                       )}
                     </div>
