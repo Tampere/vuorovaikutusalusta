@@ -1,8 +1,6 @@
 import {
   AnswerEntry,
-  Conditions,
   LanguageCode,
-  MapQuestionAnswer,
   Survey,
   SurveyPage,
   SurveyPageSection,

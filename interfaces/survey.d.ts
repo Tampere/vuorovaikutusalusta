@@ -10,6 +10,14 @@ export type SurveyPageSection =
   | SurveyDocumentSection;
 
 /**
+ * Survey page section which can have follow-up sections
+ */
+export type SurveyFollowUpSectionParent = Extract<
+  SurveyPageSection,
+  { type: 'numeric' | 'slider' | 'checkbox' | 'radio' }
+>;
+
+/**
  * Question section of a survey page
  */
 export type SurveyQuestion =
@@ -714,10 +722,3 @@ export interface Conditions {
   lessThan: number[];
   greaterThan: number[];
 }
-
-/*
-export type Condition = { id?: number } & (
-  | { type: 'equals'; value: string | number }
-  | { type: 'lessThan'; value: number }
-  | { type: 'greaterThan'; value: number }
-);*/

@@ -142,10 +142,18 @@ export function FollowUpSectionConditions({
   return (
     <FormGroup>
       <ConditionRow
-        allowCustomAnswer={!parentIsNumeric && parentSection?.allowCustomAnswer}
+        allowCustomAnswer={
+          !(
+            parentSection.type === 'numeric' || parentSection.type === 'slider'
+          ) && parentSection?.allowCustomAnswer
+        }
         conditionIsNumeric={parentIsNumeric}
         label={tr.FollowUpSection.conditions.types.equals}
-        options={parentIsNumeric ? [] : parentSection.options}
+        options={
+          parentSection.type === 'numeric' || parentSection.type === 'slider'
+            ? []
+            : parentSection.options
+        }
         conditions={followUpSection.conditions}
         textFieldValue={followUpSection.conditions.equals[0]}
         onInput={(values) =>

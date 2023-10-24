@@ -5,7 +5,10 @@ import { FollowUpSectionAccordion } from './FollowUpSectionAccordion';
 import { useSurvey } from '@src/stores/SurveyContext';
 
 interface Props {
-  parentSection: SurveyPageSection;
+  parentSection: Extract<
+    SurveyPageSection,
+    { type: 'numeric' | 'slider' | 'checkbox' | 'radio' }
+  >;
   page: SurveyPage;
   disabled: boolean;
   parentSectionIndex: number;

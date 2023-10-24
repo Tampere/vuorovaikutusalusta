@@ -14,7 +14,7 @@ import {
 import { visuallyHidden } from '@mui/utils';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import AttachmentQuestion from './AttachmentQuestion';
 import CheckBoxQuestion from './CheckBoxQuestion';
 import FreeTextQuestion from './FreeTextQuestion';
@@ -46,13 +46,8 @@ function SurveyQuestion({
   submission,
   ...props
 }: Props) {
-  const {
-    answers,
-    updateAnswer,
-    getValidationErrors,
-    survey,
-    followUpSectionConditionsMet,
-  } = useSurveyAnswers();
+  const { answers, updateAnswer, getValidationErrors, survey } =
+    useSurveyAnswers();
   const { tr, surveyLanguage } = useTranslations();
   const [dirty, setDirty] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);

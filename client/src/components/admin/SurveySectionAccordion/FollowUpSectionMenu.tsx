@@ -3,7 +3,10 @@ import { useTranslations } from '@src/stores/TranslationContext';
 import React, { ReactNode, useEffect, useState } from 'react';
 import AddSurveySectionActions from '../AddSurveySectionActions';
 import { useSurvey } from '@src/stores/SurveyContext';
-import { SurveyFollowUpSection, SurveyPageSection } from '@interfaces/survey';
+import {
+  SurveyFollowUpSection,
+  SurveyFollowUpSectionParent,
+} from '@interfaces/survey';
 import { FollowUpSectionDetails } from './FollowUpSectionDetails';
 import { FollowUpSectionConditions } from './FollowUpSectionConditions';
 
@@ -16,10 +19,7 @@ interface Props {
   pageId: number;
   parentTitle: string;
   section: SurveyFollowUpSection;
-  parentSection: Extract<
-    SurveyPageSection,
-    { type: 'numeric' | 'slider' | 'checkbox' | 'radio' }
-  >;
+  parentSection: SurveyFollowUpSectionParent;
   parentSectionIndex: number;
 }
 

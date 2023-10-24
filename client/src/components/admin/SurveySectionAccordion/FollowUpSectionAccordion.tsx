@@ -2,6 +2,7 @@ import {
   SurveyCheckboxQuestion,
   SurveyDocumentSection,
   SurveyFollowUpSection,
+  SurveyFollowUpSectionParent,
   SurveyFreeTextQuestion,
   SurveyGroupedCheckboxQuestion,
   SurveyImageSection,
@@ -101,7 +102,7 @@ interface Props {
   index: number;
   parentSectionIndex: number;
   section: SurveyFollowUpSection;
-  parentSection: SurveyPageSection;
+  parentSection: SurveyFollowUpSectionParent;
   expanded: boolean;
   className?: string;
   disabled?: boolean;

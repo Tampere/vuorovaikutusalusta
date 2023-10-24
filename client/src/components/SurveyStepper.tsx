@@ -46,7 +46,7 @@ import SurveyLanguageMenu from './SurveyLanguageMenu';
 import SurveyMap from './SurveyMap';
 import SurveyQuestion from './SurveyQuestion';
 import TextSection from './TextSection';
-import { SurveyFollowUpSections } from './SurveyFolloUpSections';
+import { SurveyFollowUpSections } from './SurveyFollowUpSections';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -118,7 +118,6 @@ export default function SurveyStepper({
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [submissionInfoDialogOpen, setSubmissionInfoDialogOpen] =
     useState(false);
-  const [showFollowUpSections, _setShowFollowUpSections] = useState(true);
 
   const {
     isPageValid,
@@ -142,7 +141,6 @@ export default function SurveyStepper({
   } = useSurveyMap();
   const classes = useStyles();
   const { tr, language, surveyLanguage } = useTranslations();
-  const { followUpSectionConditionsMet } = useSurveyAnswers();
   const theme = useTheme();
   const mdUp = useMediaQuery(theme.breakpoints.up('md'));
   const currentPage = useMemo<SurveyPage>(
