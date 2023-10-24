@@ -3,7 +3,6 @@ import {
   Conditions,
   LanguageCode,
   Survey,
-  SurveyFollowUpSection,
   SurveyPage,
   SurveyPageSection,
   SurveyQuestion,

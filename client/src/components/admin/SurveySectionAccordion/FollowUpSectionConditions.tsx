@@ -11,6 +11,7 @@ import {
   MenuItem,
   Select,
   TextField,
+  Typography,
 } from '@mui/material';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useTranslations } from '@src/stores/TranslationContext';
@@ -141,6 +142,11 @@ export function FollowUpSectionConditions({
 
   return (
     <FormGroup>
+      <Typography sx={{ fontWeight: 700 }}>
+        {parentIsNumeric
+          ? tr.FollowUpSection.conditions.labelForMultiple
+          : tr.FollowUpSection.conditions.labelForSingle}
+      </Typography>
       <ConditionRow
         allowCustomAnswer={
           !(

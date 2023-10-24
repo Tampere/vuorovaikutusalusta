@@ -116,6 +116,8 @@
   "FollowUpSection": {
     "title": "Follow-up question for ",
     "conditions": {
+      "labelForSingle": "Show follow-up question, if the following condition is met",
+      "labelForMultiple": "Show follow-up question, if any of the following conditions are met",
       "title": "Conditions",
       "chooseCondition": "choose a condition",
       "insertValue": "insert value",

@@ -117,6 +117,8 @@
     "title": "Jatkokysymys kysymykselle",
     "conditions": {
       "title": "Ehdot",
+      "labelForSingle": "Näytä jatkokysymys, jos seuraava ehto täyttyy",
+      "labelForMultiple": "Näytä jatkokysymys, jos yksikin seuraavista ehdoista täyttyy",
       "chooseCondition": "valitse ehto",
       "insertValue": "syötä vertailuarvo",
       "customAnswer": "Jokin muu, mikä?",
