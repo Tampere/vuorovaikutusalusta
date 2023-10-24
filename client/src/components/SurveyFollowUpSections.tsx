@@ -1,34 +1,53 @@
 import { Box, Typography } from '@mui/material';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import React from 'react';
-import { SurveyQuestion as SurveyQuestionType } from '@interfaces/survey';
+import {
+  SurveyFollowUpSection,
+  SurveyQuestion as SurveyQuestionType,
+} from '@interfaces/survey';
 import SurveyQuestion from './SurveyQuestion';
 import DocumentSection from './DocumentSection';
 import ImageSection from './ImageSection';
 import TextSection from './TextSection';
 import { useTranslations } from '@src/stores/TranslationContext';
+import { AnswerItem } from './admin/SubmissionsPage/AnswersList';
 
 interface Props {
   section: SurveyQuestionType;
   pageUnfinished: boolean;
   mobileDrawerOpen: boolean;
+  answer?: AnswerItem; // For submissions page
 }
 
 export function SurveyFollowUpSections({
   section,
   pageUnfinished,
   mobileDrawerOpen,
+  answer,
 }: Props) {
   const { getFollowUpSectionsToDisplay } = useSurveyAnswers();
   const { tr } = useTranslations();
 
-  const followUpSectionIds = getFollowUpSectionsToDisplay(section);
+  let followUpSectionsToDisplay: SurveyFollowUpSection[];
 
-  if (followUpSectionIds.length === 0) return null;
+  if (!answer) {
+    const followUpSectionIds = getFollowUpSectionsToDisplay(section);
 
-  const followUpSectionsToDisplay = section.followUpSections.filter((sect) =>
-    followUpSectionIds.includes(sect.id),
-  );
+    if (followUpSectionIds.length === 0) return null;
+
+    followUpSectionsToDisplay = section.followUpSections.filter((sect) =>
+      followUpSectionIds.includes(sect.id),
+    );
+  } else {
+    const answeredSectionIds = answer.submission.answerEntries
+      .filter((answer) => answer.value)
+      .map((answer) => answer.sectionId);
+    followUpSectionsToDisplay = section.followUpSections.filter((sect) =>
+      answeredSectionIds.includes(sect.id),
+    );
+
+    if (answeredSectionIds.length === 0) return null;
+  }
 
   return (
     <Box
@@ -58,7 +77,24 @@ export function SurveyFollowUpSections({
           {tr.SurveyStepper.followUpSections}
         </Typography>
         {followUpSectionsToDisplay.map((sect) =>
-          sect.type === 'text' ? (
+          sect.type !== 'text' &&
+          sect.type !== 'image' &&
+          sect.type !== 'document' &&
+          answer ? (
+            <SurveyQuestion
+              readOnly
+              value={
+                answer.submission.answerEntries.find(
+                  (entry) => entry.sectionId === sect.id,
+                ).value
+              }
+              isFollowUp
+              key={sect.id}
+              question={sect}
+              pageUnfinished={pageUnfinished}
+              mobileDrawerOpen={mobileDrawerOpen}
+            />
+          ) : sect.type === 'text' ? (
             <TextSection key={sect.id} section={sect} />
           ) : sect.type === 'image' ? (
             <ImageSection key={sect.id} section={sect} />
