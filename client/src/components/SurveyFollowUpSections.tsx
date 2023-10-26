@@ -50,7 +50,7 @@ export function SurveyFollowUpSections({
       answeredSectionIds.includes(sect.id),
     );
   }
-  console.log(followUpSectionsToDisplay);
+
   if (!followUpSectionsToDisplay || followUpSectionsToDisplay.length === 0)
     return null;
 
