@@ -71,3 +71,17 @@ export function assertNever(value: never): never {
     `Unhandled discriminated union member: ${JSON.stringify(value)}`,
   );
 }
+
+/**
+ * Function for getting alphabet characters with index
+ * @param num
+ * @returns
+ */
+export function indexToAlpha(num = 1) {
+  // ASCII value of first character
+  const a = 'a'.charCodeAt(0);
+  const numberToCharacter = (number: number) => {
+    return String.fromCharCode(a + number);
+  };
+  return numberToCharacter(num);
+}

@@ -29,7 +29,7 @@ export function SurveyFollowUpSections({
   const { tr } = useTranslations();
 
   let followUpSectionsToDisplay: SurveyFollowUpSection[];
-
+  // Sections are displayed in a survey
   if (!answer) {
     const followUpSectionIds = getFollowUpSectionsToDisplay(section);
 
@@ -38,16 +38,21 @@ export function SurveyFollowUpSections({
     followUpSectionsToDisplay = section.followUpSections.filter((sect) =>
       followUpSectionIds.includes(sect.id),
     );
+    // Sections are displayed in submissions page answer list
   } else {
     const answeredSectionIds = answer.submission.answerEntries
       .filter((answer) => answer.value)
       .map((answer) => answer.sectionId);
-    followUpSectionsToDisplay = section.followUpSections.filter((sect) =>
-      answeredSectionIds.includes(sect.id),
-    );
 
     if (answeredSectionIds.length === 0) return null;
+
+    followUpSectionsToDisplay = section.followUpSections?.filter((sect) =>
+      answeredSectionIds.includes(sect.id),
+    );
   }
+  console.log(followUpSectionsToDisplay);
+  if (!followUpSectionsToDisplay || followUpSectionsToDisplay.length === 0)
+    return null;
 
   return (
     <Box

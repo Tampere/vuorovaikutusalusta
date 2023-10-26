@@ -432,7 +432,10 @@ export function useSurveyAnswers() {
             !nonQuestionSectionTypes.includes(section.type),
         )
         .some((section) => {
-          if (isFollowUpSectionParent(section)) {
+          if (
+            isFollowUpSectionParent(section) &&
+            section.followUpSections?.length > 0
+          ) {
             const displayedFollowUpIds = getFollowUpSectionsToDisplay(section);
 
             return section.followUpSections

@@ -300,6 +300,7 @@ export async function getSurvey(params: { id: number } | { name: string }) {
   const optionGroupIds = Array.from(
     new Set(rows.map((row) => row.option_group_id).filter(Boolean)),
   );
+
   const optionGroups = !optionGroupIds.length
     ? []
     : await getDb().manyOrNone<DBOptionGroup>(
@@ -309,7 +310,7 @@ export async function getSurvey(params: { id: number } | { name: string }) {
 
   // Get all follow-up section conditions from the database
   const allConditions = await getSectionConditions(
-    rows.map((row) => row.section_id),
+    rows.map((row) => row.section_id).filter(Boolean),
   );
 
   return rows.reduce((survey, row) => {

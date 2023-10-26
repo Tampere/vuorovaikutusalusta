@@ -11,6 +11,7 @@ import moment from 'moment';
 import ogr2ogr from 'ogr2ogr';
 import { getAvailableMapLayers } from './map';
 import { getSurvey } from './survey';
+import { indexToAlpha } from '@src/utils';
 
 const tr = useTranslations('fi');
 
@@ -124,6 +125,7 @@ interface TypeDetails {
   details: JSON;
   optionTexts?: TextCell;
   pageIndex: number;
+  predecessorSection?: number;
 }
 
 /**
@@ -138,6 +140,7 @@ interface SectionHeader {
   type: string;
   details: JSON;
   parentSection: number;
+  predecessorSection: number;
   groupName: LocalizedText;
   groupIndex: number;
   pageIndex: number;
@@ -597,10 +600,12 @@ const getSectionHeaders = async (surveyId: number) =>
     opt.text,
     ps.id as "sectionId",
     ps.idx as "sectionIndex",
+    ps2.idx as "predecessorSectionIndex",
     ps.title,
     ps.type,
     ps.details,
     ps.parent_section as "parentSection",
+    ps.predecessor_section as "predecessorSection",
     og.name as "groupName",
     og.idx as "groupIndex",
     sp.idx as "pageIndex"
@@ -609,6 +614,7 @@ const getSectionHeaders = async (surveyId: number) =>
     LEFT JOIN data.option_group og ON opt.group_id = og.id
     LEFT JOIN data.survey_page sp ON ps.survey_page_id = sp.id
     LEFT JOIN data.survey s ON sp.survey_id = s.id
+    LEFT JOIN data.page_section ps2 ON ps.predecessor_section = ps2.id
     WHERE s.id = $1
       AND ps.type <> 'map'
       AND ps.type <> 'attachment'
@@ -616,7 +622,7 @@ const getSectionHeaders = async (surveyId: number) =>
       AND ps.type <> 'text'
       AND ps.type <> 'image'
       AND ps.parent_section IS NULL
-    ORDER BY "pageIndex", "sectionIndex", og.idx, opt.idx;
+    ORDER BY "pageIndex", COALESCE(ps2.idx, ps.idx), og.idx NULLS FIRST, opt.idx NULLS FIRST;
 `,
     [surveyId],
   );
@@ -634,10 +640,31 @@ function getHeaderKey(
   sectionIndex: number,
   groupIndex?: number,
   optionIndex?: number,
+  predecessorSection?: number,
+  predecessorPageAndIndex?: Record<number, string>,
 ) {
-  return `${pageIndex}-${sectionIndex}${groupIndex ? '-' + groupIndex : ''}${
+  let key = '';
+  if (predecessorSection) {
+    key += `${predecessorPageAndIndex[predecessorSection]}?`;
+  }
+
+  key += `${pageIndex}-${sectionIndex}${groupIndex ? '-' + groupIndex : ''}${
     optionIndex ? '-' + optionIndex : ''
   }`;
+
+  return key;
+}
+
+function getSectionDetailsForHeader(section, predecessorIndexes) {
+  if (section.predecessorSection) {
+    const [pageIndex, sectionIndex] =
+      predecessorIndexes[section.predecessorSection].split('-');
+    return `s${Number(pageIndex) + 1}k${Number(sectionIndex) + 1}${indexToAlpha(
+      section.sectionIndex,
+    )}`;
+  }
+
+  return `s${section.pageIndex + 1}k${section.sectionIndex + 1}`;
 }
 
 /**
@@ -646,17 +673,35 @@ function getHeaderKey(
  * @returns
  */
 function createCSVHeaders(sectionMetadata: SectionHeader[]) {
+  // Used to get indexes of follow-up section parents
+  const predecessorIndexes: Record<number, string> = sectionMetadata.reduce(
+    (data, section) => {
+      if (!section.predecessorSection) {
+        return {
+          ...data,
+          [section.sectionId]: `${section.pageIndex}-${section.sectionIndex}`,
+        };
+      }
+      return data;
+    },
+    {},
+  );
+
   const indexesToSections = sectionMetadata.reduce((group, section) => {
-    const { pageIndex, sectionIndex } = section;
-    group[`${pageIndex}-${sectionIndex}`] =
-      group[`${pageIndex}-${sectionIndex}`] ?? [];
-    group[`${pageIndex}-${sectionIndex}`].push(section);
+    const { pageIndex, sectionIndex, predecessorSection } = section;
+    let key = `${pageIndex}-${sectionIndex}`;
+    if (predecessorSection) {
+      key = `${predecessorIndexes[predecessorSection]}?${key}`;
+    }
+    group[key] = group[key] ?? [];
+    group[key].push(section);
     return group;
   }, {});
 
   const allHeaders = [];
   Object.keys(indexesToSections).map((indexKey) => {
     const sectionGroup = indexesToSections[indexKey];
+
     const sectionHead = sectionGroup[0];
     switch (sectionHead.type) {
       case 'radio':
@@ -668,14 +713,17 @@ function createCSVHeaders(sectionMetadata: SectionHeader[]) {
             section.sectionIndex,
             section.groupIndex,
             section.optionId,
+            section.predecessorSection,
+            predecessorIndexes,
           );
 
           allHeaders.push({
-            [key]: `s${section.pageIndex}k${section.sectionIndex}: ${
-              section.title?.['fi'] ?? ''
-            }${section.groupName ? ' - ' + section.groupName['fi'] : ''} - ${
-              section.text?.['fi'] ?? ''
-            }`,
+            [key]: `${getSectionDetailsForHeader(
+              section,
+              predecessorIndexes,
+            )}: ${section.title?.['fi'] ?? ''}${
+              section.groupName ? ' - ' + section.groupName['fi'] : ''
+            } - ${section.text?.['fi'] ?? ''}`,
           });
         });
         if (sectionHead.details.allowCustomAnswer) {
@@ -684,13 +732,17 @@ function createCSVHeaders(sectionMetadata: SectionHeader[]) {
             sectionHead.sectionIndex,
             null,
             -1,
+            sectionHead.predecessorSection,
+            predecessorIndexes,
           );
           allHeaders.push({
-            [key]: `s${sectionHead.pageIndex + 1}k${
-              sectionHead.sectionIndex + 1
-            }: ${sectionHead.title['fi']} - joku muu, mikä?`,
+            [key]: `${getSectionDetailsForHeader(
+              sectionHead,
+              predecessorIndexes,
+            )}: ${sectionHead.title['fi']} - joku muu mikä?`,
           });
         }
+
         break;
       case 'multi-matrix':
         sectionHead.details.subjects.forEach(
@@ -702,32 +754,19 @@ function createCSVHeaders(sectionMetadata: SectionHeader[]) {
                   sectionHead.sectionIndex,
                   idx + 1,
                   index + 1,
+                  sectionHead.predecessorSection,
+                  predecessorIndexes,
                 );
                 allHeaders.push({
-                  [key]: `s${sectionHead.pageIndex + 1}k${
-                    sectionHead.sectionIndex + 1
-                  }: ${sectionHead.title['fi']} - ${subject['fi']} - ${
+                  [key]: `${getSectionDetailsForHeader(
+                    sectionHead,
+                    predecessorIndexes,
+                  )}: ${sectionHead.title['fi']} - ${subject['fi']} - ${
                     className['fi']
                   }`,
                 });
               },
             );
-
-            if (sectionHead.details.allowEmptyAnswer) {
-              const key = getHeaderKey(
-                sectionHead.pageIndex,
-                sectionHead.sectionIndex,
-                idx + 1,
-                -1,
-              );
-              allHeaders.push({
-                [key]: `s${sectionHead.pageIndex + 1}k${
-                  sectionHead.sectionIndex + 1
-                }: ${sectionHead.title['fi']} - ${subject['fi']} - ${
-                  tr.dontKnow
-                }`,
-              });
-            }
           },
         );
         break;
@@ -738,11 +777,15 @@ function createCSVHeaders(sectionMetadata: SectionHeader[]) {
               sectionHead.pageIndex,
               sectionHead.sectionIndex,
               idx + 1,
+              null,
+              sectionHead.predecessorSection,
+              predecessorIndexes,
             );
             allHeaders.push({
-              [key]: `s${sectionHead.pageIndex + 1}k${
-                sectionHead.sectionIndex + 1
-              }: ${sectionHead.title['fi']} - ${subject['fi']}`,
+              [key]: `${getSectionDetailsForHeader(
+                sectionHead,
+                predecessorIndexes,
+              )}: ${sectionHead.title['fi']} - ${subject['fi']}`,
             });
           },
         );
@@ -754,11 +797,14 @@ function createCSVHeaders(sectionMetadata: SectionHeader[]) {
             section.sectionIndex,
             null,
             section.optionIndex + 1,
+            section.predecessorSection,
+            predecessorIndexes,
           );
           allHeaders.push({
-            [key]: `s${section.pageIndex + 1}k${section.sectionIndex + 1}: ${
-              section.title['fi']
-            } - ${section.optionIndex + 1}.`,
+            [key]: `${getSectionDetailsForHeader(
+              section,
+              predecessorIndexes,
+            )}: ${section.title['fi']} - ${section.optionIndex + 1}.`,
           });
         });
         break;
@@ -766,12 +812,13 @@ function createCSVHeaders(sectionMetadata: SectionHeader[]) {
       default:
         allHeaders.push({
           [getHeaderKey(sectionHead.pageIndex, sectionHead.sectionIndex)]:
-            `s${sectionHead.pageIndex + 1}k${sectionHead.sectionIndex + 1}: ${
+            `${getSectionDetailsForHeader(sectionHead, predecessorIndexes)}: ${
               sectionHead.title?.['fi']
             }` ?? '',
         });
     }
   });
+
   return allHeaders;
 }
 
@@ -785,6 +832,19 @@ function createCSVSubmissions(
   answerEntries: AnswerEntry[],
   sectionMetadata: SectionHeader[],
 ) {
+  // Used to get indexes of follow-up section parents
+  const predecessorIndexes: Record<number, string> = sectionMetadata.reduce(
+    (data, section) => {
+      if (!section.predecessorSection) {
+        return {
+          ...data,
+          [section.sectionId]: `${section.pageIndex}-${section.sectionIndex}`,
+        };
+      }
+      return data;
+    },
+    {},
+  );
   const sectionIdToDetails = sectionMetadata.reduce((group, section) => {
     const { sectionId, optionId, text } = section;
     group[sectionId] = {
@@ -795,6 +855,7 @@ function createCSVSubmissions(
         [optionId]: text?.['fi'] ?? '',
       },
       pageIndex: section.pageIndex,
+      predecessorSection: section?.predecessorSection ?? null,
     } as TypeDetails;
     return group;
   }, {});
@@ -814,6 +875,7 @@ function createCSVSubmissions(
       [key]: submissionAnswersToJson(
         value as AnswerEntry[],
         sectionIdToDetails,
+        predecessorIndexes,
       ),
       timeStamp: value[0].createdAt,
       submissionLanguage: value[0].submissionLanguage,
@@ -832,6 +894,7 @@ function createCSVSubmissions(
 function submissionAnswersToJson(
   answerEntries: AnswerEntry[],
   sectionIdToDetails,
+  predecessorIndexes,
 ) {
   const ret = {};
 
@@ -848,6 +911,8 @@ function submissionAnswersToJson(
             answer.sectionIndex,
             answer.groupIndex,
             answer.valueOptionId ?? -1,
+            sectionDetails.predecessorSection,
+            predecessorIndexes,
           )
         ] = answer.valueOptionId ? 1 : answer.valueText ?? '';
         break;
@@ -862,6 +927,8 @@ function submissionAnswersToJson(
                 answer.sectionIndex,
                 index + 1,
                 optionIdx >= 0 ? optionIdx + 1 : optionIdx,
+                sectionDetails.predecessorSection,
+                predecessorIndexes,
               )
             ] = 1;
           });
@@ -876,6 +943,9 @@ function submissionAnswersToJson(
               sectionDetails.pageIndex,
               answer.sectionIndex,
               index + 1,
+              null,
+              sectionDetails.predecessorSection,
+              predecessorIndexes,
             )
           ] = !classIndex
             ? ''
@@ -892,14 +962,24 @@ function submissionAnswersToJson(
               answer.sectionIndex,
               null,
               index + 1,
+              sectionDetails.predecessorSection,
+              predecessorIndexes,
             )
           ] = optionId ? sectionDetails?.optionTexts[String(optionId)] : '';
         });
         break;
       // numeric, free-text, slider
       default:
-        ret[getHeaderKey(sectionDetails.pageIndex, answer.sectionIndex)] =
-          getValue(answer, sectionDetails.type);
+        ret[
+          getHeaderKey(
+            sectionDetails.pageIndex,
+            answer.sectionIndex,
+            null,
+            null,
+            sectionDetails.predecessorSection,
+            predecessorIndexes,
+          )
+        ] = getValue(answer, sectionDetails.type);
         break;
     }
   });
