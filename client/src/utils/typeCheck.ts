@@ -17,7 +17,7 @@ export function isNumeric(val: unknown): val is number {
   return val && !isNaN(Number(val)) && !isNaN(parseFloat(String(val)));
 }
 
-export function isFollowUpSectionParent(
+export function isFollowUpSectionParentType(
   section: SurveyPageSection,
 ): section is SurveyFollowUpSectionParent {
   return (

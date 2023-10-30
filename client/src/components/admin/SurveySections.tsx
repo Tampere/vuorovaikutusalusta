@@ -4,7 +4,7 @@ import React from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import SurveySectionAccordion from './SurveySectionAccordion/SurveySectionAccordion';
 import { FollowUpSections } from './SurveySectionAccordion/FollowUpSections';
-import { isFollowUpSectionParent } from '@src/utils/typeCheck';
+import { isFollowUpSectionParentType } from '@src/utils/typeCheck';
 
 interface Props {
   page: SurveyPage;
@@ -88,7 +88,7 @@ export default function SurveySections(props: Props) {
                           props.onExpandedSectionChange(null);
                         }}
                       />
-                      {isFollowUpSectionParent(section) && (
+                      {isFollowUpSectionParentType(section) && (
                         <FollowUpSections
                           parentSectionIndex={index}
                           disabled={props.disabled}

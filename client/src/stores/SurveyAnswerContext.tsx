@@ -16,7 +16,7 @@ import React, {
   useReducer,
 } from 'react';
 import { useTranslations } from './TranslationContext';
-import { isFollowUpSectionParent, isString } from '@src/utils/typeCheck';
+import { isFollowUpSectionParentType, isString } from '@src/utils/typeCheck';
 
 interface State {
   answers: AnswerEntry[];
@@ -433,7 +433,7 @@ export function useSurveyAnswers() {
         )
         .some((section) => {
           if (
-            isFollowUpSectionParent(section) &&
+            isFollowUpSectionParentType(section) &&
             section.followUpSections?.length > 0
           ) {
             const displayedFollowUpIds = getFollowUpSectionsToDisplay(section);

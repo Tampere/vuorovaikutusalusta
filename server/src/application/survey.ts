@@ -126,6 +126,7 @@ interface DBSectionOption {
 interface DBSectionCondition {
   id?: number;
   section_id: number;
+  survey_page_id: number;
   equals: string;
   less_than: number;
   greater_than: number;
@@ -215,6 +216,7 @@ const conditionColumnSet = getColumnSet<DBSectionCondition>(
   'section_conditions',
   [
     { name: 'section_id', cast: 'int' },
+    { name: 'survey_page_id', cast: 'int' },
     { name: 'equals', cast: 'int' },
     { name: 'less_than', cast: 'int' },
     { name: 'greater_than', cast: 'int' },
@@ -308,7 +310,7 @@ export async function getSurvey(params: { id: number } | { name: string }) {
         [optionGroupIds],
       );
 
-  // Get all follow-up section conditions from the database
+  // Get all follow-up section and survey page conditions from the database
   const allConditions = await getSectionConditions(
     rows.map((row) => row.section_id).filter(Boolean),
   );
@@ -318,7 +320,7 @@ export async function getSurvey(params: { id: number } | { name: string }) {
     let page = survey.pages.find((page) => page.id === row.page_id);
     if (!page && (page = dbSurveyJoinToPage(row))) {
       // Page not yet added - add converted row to survey
-      survey.pages.push(page);
+      survey.pages.push(getPageWithConditions(page, allConditions));
     }
 
     // Try to find the pre-existing page section object
@@ -645,9 +647,10 @@ async function upsertOptionGroup(group: DBOptionGroup, index: number) {
  */
 async function upsertSectionConditions(
   sectionId: number,
+  pageId: number,
   conditions: Conditions,
 ) {
-  const conditionRows = conditionsToRows(conditions, sectionId);
+  const conditionRows = conditionsToRows(conditions, sectionId, pageId);
   if (conditionRows.length === 0) return;
 
   const upsertQuery =
@@ -670,10 +673,13 @@ async function upsertSectionConditions(
  * @param conditions
  * @returns
  */
-async function deleteSectionConditions(sectionIds: number[]) {
+async function deleteSectionConditions(
+  sectionIds: number[],
+  pageIds: number[],
+) {
   const rows = await getDb().manyOrNone(
-    'DELETE FROM data.section_conditions WHERE section_id = ANY ($1) ',
-    [sectionIds],
+    'DELETE FROM data.section_conditions WHERE section_id = ANY ($1) AND survey_page_id = ANY ($2) ',
+    [sectionIds, pageIds],
   );
 
   if (!rows) throw new Error('Error deleting conditions');
@@ -682,7 +688,7 @@ async function deleteSectionConditions(sectionIds: number[]) {
 
 async function getSectionConditions(sectionIds: number[]) {
   return await getDb().manyOrNone(
-    'SELECT id, section_id, equals, less_than, greater_than FROM data.section_conditions WHERE section_id = ANY ($1)',
+    'SELECT id, section_id, survey_page_id, equals, less_than, greater_than FROM data.section_conditions WHERE section_id = ANY ($1)',
     [sectionIds],
   );
 }
@@ -901,6 +907,15 @@ export async function updateSurvey(survey: Survey) {
     ) + ' WHERE t.id = v.id',
   );
 
+  // Update survey page conditions
+  await Promise.all(
+    survey.pages.map((page) => {
+      Object.entries(page.conditions).map(async ([sectionId, conditions]) => {
+        await upsertSectionConditions(Number(sectionId), page.id, conditions);
+      });
+    }),
+  );
+
   // Form a flat array of all new section rows under each page
   const sections = survey.pages.reduce((result, page) => {
     return [...result, ...surveySectionsToRows(page.sections, page.id)];
@@ -954,9 +969,10 @@ export async function updateSurvey(survey: Survey) {
             // Refresh conditions for a follow-up section
             if (linkedSection.predecessor_section) {
               // use sectionRow id that was generated when saving follow-up section to db
-              await deleteSectionConditions([sectionRow.id]);
+              await deleteSectionConditions([sectionRow.id], null);
               await upsertSectionConditions(
                 sectionRow.id,
+                null,
                 linkedSection.conditions,
               );
             }
@@ -1130,6 +1146,7 @@ function dbSurveyJoinToPage(dbSurveyJoin: DBSurveyJoin): SurveyPage {
           imageAltText: dbSurveyJoin.page_sidebar_image_alt_text,
           imageSize: dbSurveyJoin.page_sidebar_image_size,
         },
+        conditions: {},
       };
 }
 
@@ -1174,6 +1191,12 @@ function dbSurveyJoinToOption(dbSurveyJoin: DBSurveyJoin): SectionOption {
       };
 }
 
+/**
+ * Converts a DB condition query row(s) for a single section into section conditions
+ * @param dbSectionConditions
+ * @returns
+ */
+
 function dbSectionConditionsToConditions(
   dbSectionConditions: DBSectionCondition[],
 ): Conditions {
@@ -1202,6 +1225,42 @@ function dbSectionConditionsToConditions(
       greaterThan: [],
     },
   );
+}
+
+/**
+ * Appends conditions to a survey page
+ * @param page
+ * @param dbSectionConditions
+ */
+
+function getPageWithConditions(
+  page: SurveyPage,
+  dbSectionConditions: DBSectionCondition[],
+) {
+  const pageConditions = dbSectionConditions
+    .filter((row) => row.survey_page_id === page.id)
+    .reduce((pageConditions, conditionRow) => {
+      const newConditions = dbSectionConditionsToConditions([conditionRow]);
+
+      if (!pageConditions[conditionRow.section_id]) {
+        pageConditions[conditionRow.section_id] = newConditions;
+      } else {
+        const oldSectionConditions = pageConditions[conditionRow.section_id];
+
+        pageConditions[conditionRow.section_id] = {
+          equals: [...oldSectionConditions.equals, newConditions.equals],
+          lessThan: [...oldSectionConditions.lessThan, newConditions.lessThan],
+          greaterThan: [
+            ...oldSectionConditions.greaterThan,
+            newConditions.greaterThan,
+          ],
+        };
+      }
+
+      return pageConditions;
+    }, {});
+
+  return { ...page, conditions: pageConditions };
 }
 
 /**
@@ -1238,6 +1297,7 @@ export async function createSurveyPage(
       imagePath: [],
       imageName: null,
     },
+    conditions: {},
   } as SurveyPage;
 }
 
@@ -1345,22 +1405,36 @@ function surveySectionsToRows(
   });
 }
 
-function conditionsToRows(conditions: Conditions, sectionId: number) {
+/**
+ *
+ * @param conditions
+ * @param sectionId
+ * @returns
+ */
+
+function conditionsToRows(
+  conditions: Conditions,
+  sectionId: number,
+  pageId: number,
+) {
   return [
     ...conditions.equals.map((val) => ({
       section_id: sectionId,
+      survey_page_id: pageId,
       equals: val,
       less_than: null,
       greater_than: null,
     })),
     ...conditions.greaterThan.map((val) => ({
       section_id: sectionId,
+      survey_page_id: pageId,
       greater_than: val,
       equals: null,
       less_than: null,
     })),
     ...conditions.lessThan.map((val) => ({
       section_id: sectionId,
+      survey_page_id: pageId,
       less_than: val,
       equals: null,
       greater_than: null,

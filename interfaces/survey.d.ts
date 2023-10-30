@@ -319,6 +319,10 @@ export interface SurveyPage {
    * Page sections
    */
   sections: SurveyPageSection[];
+  /**
+   * Conditions to display the page in the survey
+   */
+  conditions?: SurveyPageConditions;
 }
 
 export interface Survey {
@@ -722,3 +726,5 @@ export interface Conditions {
   lessThan: number[];
   greaterThan: number[];
 }
+
+export type SurveyPageConditions = Record<SurveyPageSection['id'], Conditions>;

@@ -85,6 +85,14 @@
   },
   "EditSurveyPage": {
     "name": "Sivun nimi",
+    "conditions": {
+      "equals": "Näytä, jos vastaaja valitsee vaihtoehdon",
+      "numeric": {
+        "equals": "Näytä, jos vastaus on tasan",
+        "lessThan": "tai vastaus on enintään",
+        "greaterThan": "tai vastaus on vähintään"
+      }
+    },
     "deletePage": "Poista sivu",
     "confirmDeletePage": "Haluatko varmasti poistaa tämän sivun? Toimintoa ei voida perua.",
     "deletePageFailed": "Sivun poistamisessa tapahtui virhe. Yritä myöhemmin uudestaan.",
