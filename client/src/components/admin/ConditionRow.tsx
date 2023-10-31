@@ -47,7 +47,7 @@ function SelectPlaceholder({ selected, options }: SelectPlaceholderProps) {
     <Typography>
       {selectedOptionId === -1
         ? tr.EditSurveyPage.conditions.somethingElse
-        : options.find((option) => option.id === selectedOptionId).text[
+        : options.find((option) => option.id === selectedOptionId)?.text[
             surveyLanguage
           ]}
     </Typography>
