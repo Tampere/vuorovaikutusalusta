@@ -86,8 +86,11 @@
   "EditSurveyPage": {
     "name": "Sivun nimi",
     "conditions": {
+      "noSelections": "Ei valintoja",
+      "selections": "{x} valintaa",
       "label": "Lisää ehto sivulle",
       "equals": "Näytä, jos vastaaja valitsee vaihtoehdon",
+      "somethingElse": "Jokin muu, mikä?",
       "numeric": {
         "equals": "Näytä, jos vastaus on tasan",
         "lessThan": "tai vastaus on enintään",

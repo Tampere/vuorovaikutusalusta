@@ -2,15 +2,57 @@ import React, { useState } from 'react';
 
 import { Conditions, SectionOption } from '@interfaces/survey';
 import {
+  Checkbox,
   FormControl,
   FormLabel,
   MenuItem,
   Select,
   TextField,
+  Typography,
 } from '@mui/material';
 
 import { useTranslations } from '@src/stores/TranslationContext';
 import { isNumeric } from '@src/utils/typeCheck';
+
+interface SelectPlaceholderProps {
+  selected: number[];
+  options: SectionOption[];
+}
+
+function SelectPlaceholder({ selected, options }: SelectPlaceholderProps) {
+  const { tr, surveyLanguage } = useTranslations();
+
+  if (selected.length === 0) {
+    return (
+      <Typography sx={{ color: 'grey' }}>
+        {tr.EditSurveyPage.conditions.noSelections}
+      </Typography>
+    );
+  }
+
+  if (selected.length > 1) {
+    return (
+      <Typography>
+        {tr.EditSurveyPage.conditions.selections.replace(
+          '{x}',
+          String(selected.length),
+        )}
+      </Typography>
+    );
+  }
+
+  const selectedOptionId = selected[0];
+
+  return (
+    <Typography>
+      {selectedOptionId === -1
+        ? tr.EditSurveyPage.conditions.somethingElse
+        : options.find((option) => option.id === selectedOptionId).text[
+            surveyLanguage
+          ]}
+    </Typography>
+  );
+}
 
 interface RowProps {
   label: string;
@@ -100,16 +142,23 @@ export function ConditionRow({
             }
             onInput(value);
           }}
+          renderValue={(selected) => (
+            <SelectPlaceholder selected={selected} options={options} />
+          )}
         >
           {options?.map((option) => (
             <MenuItem value={option.id} key={option.id}>
-              {option.text[surveyLanguage]}
+              <Checkbox checked={conditions?.equals.includes(option.id)} />
+              <Typography>{option.text[surveyLanguage]}</Typography>
             </MenuItem>
           ))}
 
           {allowCustomAnswer && (
             <MenuItem value={-1} key={-1}>
-              {tr.FollowUpSection.conditions.customAnswer}
+              <Checkbox checked={conditions?.equals.includes(-1)} />
+              <Typography>
+                {tr.FollowUpSection.conditions.customAnswer}
+              </Typography>
             </MenuItem>
           )}
         </Select>

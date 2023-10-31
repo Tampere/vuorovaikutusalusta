@@ -86,8 +86,11 @@
   "EditSurveyPage": {
     "name": "Page title",
     "conditions": {
+      "noSelections": "No selections",
+      "selections": "{x} selections",
       "label": "Add conditions",
       "equals": "Show if the respondent selects",
+      "somethingElse": "Something else, what?",
       "numeric": {
         "equals": "Show if the response is exactly",
         "lessThan": "or if the response is at most",
