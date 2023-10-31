@@ -86,12 +86,14 @@
   "EditSurveyPage": {
     "name": "Sivun nimi",
     "conditions": {
+      "label": "Lisää ehto sivulle",
       "equals": "Näytä, jos vastaaja valitsee vaihtoehdon",
       "numeric": {
         "equals": "Näytä, jos vastaus on tasan",
         "lessThan": "tai vastaus on enintään",
         "greaterThan": "tai vastaus on vähintään"
-      }
+      },
+      "noConditionsSet": "Sivulla ei ole asetettuja ehtoja"
     },
     "deletePage": "Poista sivu",
     "confirmDeletePage": "Haluatko varmasti poistaa tämän sivun? Toimintoa ei voida perua.",
@@ -376,6 +378,7 @@
     "next": "Seuraava",
     "previous": "Edellinen",
     "submit": "Lähetä",
+    "conditionalPage": "ehdollinen sivu",
     "errorSubmittingSurvey": "Kyselyn lähettämisessä tapahtui virhe. Ole hyvä ja yritä myöhemmin uudestaan.",
     "openMap": "Avaa kartta",
     "closeMap": "Sulje kartta",

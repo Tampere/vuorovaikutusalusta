@@ -86,12 +86,14 @@
   "EditSurveyPage": {
     "name": "Page title",
     "conditions": {
+      "label": "Add conditions",
       "equals": "Show if the respondent selects",
       "numeric": {
         "equals": "Show if the response is exactly",
         "lessThan": "or if the response is at most",
         "greaterThan": "or if the response is at least"
-      }
+      },
+      "noConditionsSet": "There are no conditions set for this page"
     },
     "deletePage": "Delete page",
     "confirmDeletePage": "Are you sure you want to delete this page? The action cannot be reversed.",
@@ -376,6 +378,7 @@
     "next": "Next",
     "previous": "Previous",
     "submit": "Submit",
+    "conditionalPage": "conditional page",
     "errorSubmittingSurvey": "Error while submitting the survey. Please try again later.",
     "openMap": "Open the map",
     "closeMap": "Close the map",

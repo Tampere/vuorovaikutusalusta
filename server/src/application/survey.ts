@@ -12,6 +12,7 @@ import {
   SurveyMapQuestion,
   SurveyMapSubQuestion,
   SurveyPage,
+  SurveyPageConditions,
   SurveyPageSection,
   SurveyPageSidebarImageSize,
   SurveyPageSidebarType,
@@ -651,6 +652,7 @@ async function upsertSectionConditions(
   conditions: Conditions,
 ) {
   const conditionRows = conditionsToRows(conditions, sectionId, pageId);
+
   if (conditionRows.length === 0) return;
 
   const upsertQuery =
@@ -674,10 +676,17 @@ async function upsertSectionConditions(
  * @returns
  */
 async function deleteSectionConditions(
-  sectionIds: number[],
   pageIds: number[],
+  sectionIds?: number[],
 ) {
-  const rows = await getDb().manyOrNone(
+  let rows;
+  if (!sectionIds || sectionIds.length === 0) {
+    rows = await getDb().manyOrNone(
+      'DELETE FROM data.section_conditions WHERE survey_page_id = ANY ($2) ',
+      [sectionIds, pageIds],
+    );
+  }
+  rows = await getDb().manyOrNone(
     'DELETE FROM data.section_conditions WHERE section_id = ANY ($1) AND survey_page_id = ANY ($2) ',
     [sectionIds, pageIds],
   );
@@ -909,7 +918,14 @@ export async function updateSurvey(survey: Survey) {
 
   // Update survey page conditions
   await Promise.all(
-    survey.pages.map((page) => {
+    survey.pages.map(async (page) => {
+      // TODO combine these into a transaction
+
+      const sectionIds = Object.keys(page.conditions).map((sectionId) => {
+        return Number(sectionId);
+      });
+
+      await deleteSectionConditions([page.id], sectionIds);
       Object.entries(page.conditions).map(async ([sectionId, conditions]) => {
         await upsertSectionConditions(Number(sectionId), page.id, conditions);
       });
@@ -969,7 +985,7 @@ export async function updateSurvey(survey: Survey) {
             // Refresh conditions for a follow-up section
             if (linkedSection.predecessor_section) {
               // use sectionRow id that was generated when saving follow-up section to db
-              await deleteSectionConditions([sectionRow.id], null);
+              await deleteSectionConditions(null, [sectionRow.id]);
               await upsertSectionConditions(
                 sectionRow.id,
                 null,
@@ -1248,17 +1264,20 @@ function getPageWithConditions(
         const oldSectionConditions = pageConditions[conditionRow.section_id];
 
         pageConditions[conditionRow.section_id] = {
-          equals: [...oldSectionConditions.equals, newConditions.equals],
-          lessThan: [...oldSectionConditions.lessThan, newConditions.lessThan],
+          equals: [...oldSectionConditions.equals, ...newConditions.equals],
+          lessThan: [
+            ...oldSectionConditions.lessThan,
+            ...newConditions.lessThan,
+          ],
           greaterThan: [
             ...oldSectionConditions.greaterThan,
-            newConditions.greaterThan,
+            ...newConditions.greaterThan,
           ],
         };
       }
 
       return pageConditions;
-    }, {});
+    }, {} as SurveyPageConditions);
 
   return { ...page, conditions: pageConditions };
 }

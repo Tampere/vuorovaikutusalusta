@@ -312,10 +312,32 @@ export function useSurvey() {
      * @param index
      */
     movePage(pageId: number, index: number) {
-      const page = state.activeSurvey.pages.find((page) => page.id === pageId);
+      let page = state.activeSurvey.pages.find((page) => page.id === pageId);
+
       const otherPages = state.activeSurvey.pages.filter(
         (page) => page.id !== pageId,
       );
+
+      if (index === 0) {
+        // First page cannot have conditions
+        page = { ...page, conditions: {} };
+      } else {
+        // A page can only have conditions based on previous pages sections
+        const previousSectionIds = otherPages
+          .slice(0, index)
+          .map((page) => page.sections)
+          .flat(1)
+          .map((section) => section.id);
+        page = {
+          ...page,
+          conditions: Object.fromEntries(
+            Object.entries(page.conditions).filter(([sectionId, _conditions]) =>
+              previousSectionIds.includes(Number(sectionId)),
+            ),
+          ),
+        };
+      }
+
       dispatch({
         type: 'SET_PAGES',
         pages: [

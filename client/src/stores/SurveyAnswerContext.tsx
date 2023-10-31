@@ -289,7 +289,60 @@ export function useSurveyAnswers() {
         errors.push('required');
       }
     }
+
     return errors;
+  }
+
+  /**
+   * Check if given page with given conditions should be displayed
+   * @param page
+   * @returns
+   */
+
+  function getConditionalPageVisibility(page: SurveyPage) {
+    if (!page.conditions || Object.values(page.conditions).length === 0)
+      return true;
+
+    return state.answers.some((answerEntry) => {
+      const conditionForSection =
+        page.conditions?.[answerEntry.sectionId] ?? null;
+      // Page has no condition for this answer
+      if (!conditionForSection) return false;
+      switch (answerEntry.type) {
+        case 'radio':
+          return conditionForSection.equals.some(
+            (answerId) =>
+              (isString(answerEntry.value) ? -1 : answerEntry.value) ===
+              answerId,
+          );
+
+        case 'checkbox':
+          return conditionForSection.equals.some((answerId) =>
+            (
+              answerEntry as Extract<AnswerEntry, { type: 'checkbox' }>
+            ).value.some((val) => (isString(val) ? -1 : val) === answerId),
+          );
+
+        case 'numeric':
+        case 'slider':
+          return conditionForSection.equals.some(
+            (conditionValue) => answerEntry.value === conditionValue,
+          )
+            ? true
+            : conditionForSection.greaterThan.some(
+                (conditionValue) => answerEntry.value > conditionValue,
+              )
+            ? true
+            : conditionForSection.lessThan.some(
+                (conditionValue) => answerEntry.value < conditionValue,
+              )
+            ? true
+            : false;
+
+        default:
+          return false;
+      }
+    });
   }
 
   /**
@@ -362,12 +415,28 @@ export function useSurveyAnswers() {
     }
   }
 
+  /**
+   * Filter out answers for hidden conditional pages
+   * @param visiblePages
+   */
+  function getAnswersForSubmission(visiblePages: number[]) {
+    const visibleSectionIds = state.survey.pages
+      .filter((page) => visiblePages.includes(page.id))
+      .map((page) => page.sections)
+      .flat(1)
+      .map((section) => section.id);
+
+    return state.answers.filter((answer) =>
+      visibleSectionIds.includes(answer.sectionId),
+    );
+  }
+
   return {
     ...state,
-    /**
-     * Checks if follow-up question should be displayed
-     */
     getFollowUpSectionsToDisplay,
+    getConditionalPageVisibility,
+    getAnswersForSubmission,
+
     /**
      * Update survey answer
      * @param answer Survey answer
@@ -446,7 +515,8 @@ export function useSurveyAnswers() {
               )
               .some((s) => getValidationErrors(s).length);
           }
-          getValidationErrors(section).length;
+
+          return getValidationErrors(section).length;
         });
     },
     /**

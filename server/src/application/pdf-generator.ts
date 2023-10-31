@@ -216,7 +216,7 @@ function getContent(
   language: LanguageCode,
 ): Content[] {
   if (!answerEntry) {
-    return null;
+    return [];
   }
   const tr = useTranslations(language);
   const sectionIndex = sections.findIndex(
@@ -437,7 +437,6 @@ export async function generatePdf(
   logger.debug(
     `Fetched ${screenshots.length} screenshots in ${Date.now() - start}ms`,
   );
-
   const content: Content = [
     await getFrontPage(
       survey,

@@ -126,6 +126,8 @@ export default function SurveyStepper({
     getPageInvalidQuestions,
     updatePageMapLayers,
     updateAnswer,
+    getConditionalPageVisibility,
+    getAnswersForSubmission,
   } = useSurveyAnswers();
   const { showToast } = useToasts();
   const {
@@ -143,10 +145,22 @@ export default function SurveyStepper({
   const { tr, language, surveyLanguage } = useTranslations();
   const theme = useTheme();
   const mdUp = useMediaQuery(theme.breakpoints.up('md'));
-  const currentPage = useMemo<SurveyPage>(
-    () => survey.pages[pageNumber],
-    [survey, pageNumber],
-  );
+  const [visiblePages, setVisiblePages] = useState<number[]>(getVisiblePages());
+
+  function getVisiblePages() {
+    return survey.pages
+      .filter((page) => getConditionalPageVisibility(page))
+      .map((page) => page.id);
+  }
+
+  const [previousPage, currentPage, nextPage] = useMemo<SurveyPage[]>(() => {
+    if (pageNumber === 0) {
+      return [null, survey.pages[pageNumber], survey.pages[pageNumber + 1]];
+    } else if (pageNumber === survey.pages.length - 1) {
+      return [survey.pages[pageNumber - 1], survey.pages[pageNumber], null];
+    }
+    return survey.pages.slice(pageNumber - 1, pageNumber + 2);
+  }, [survey, pageNumber]);
 
   const currentPageErrorRef = useRef(null);
 
@@ -264,6 +278,7 @@ export default function SurveyStepper({
 
   function validateSurveyPage(page: SurveyPage) {
     // If a page is not finished, highlight it
+
     if (!isPageValid(page)) {
       setPageUnfinished(true);
 
@@ -279,12 +294,13 @@ export default function SurveyStepper({
       return;
     }
     setLoading(true);
+    const visibleAnswers = getAnswersForSubmission(visiblePages);
     try {
       await request(
         `/api/published-surveys/${survey.name}/submission${
           unfinishedToken ? `?token=${unfinishedToken}` : ''
         }`,
-        { method: 'POST', body: { entries: answers, info, language } },
+        { method: 'POST', body: { entries: visibleAnswers, info, language } },
       );
       setLoading(false);
       onComplete();
@@ -343,7 +359,10 @@ export default function SurveyStepper({
           connector={null}
         >
           {survey.pages.map((page, index) => (
-            <Step key={page.id} completed={index < pageNumber}>
+            <Step
+              key={page.id}
+              completed={index < pageNumber && visiblePages.includes(page.id)}
+            >
               <StepLabel
                 id={`${index}-page-top`}
                 aria-current={index === pageNumber ? 'step' : false}
@@ -360,6 +379,7 @@ export default function SurveyStepper({
                     margin: 0,
                     fontSize: '1em',
                     '&:focus': { outline: 'none' },
+                    color: visiblePages.includes(page.id) ? '' : 'grey',
                   }}
                 >
                   <span style={visuallyHidden}>
@@ -368,7 +388,11 @@ export default function SurveyStepper({
                     {tr.SurveyStepper.step} {index + 1} {tr.SurveyStepper.outOf}{' '}
                     {survey?.pages?.length}
                   </span>
-                  {page.title?.[language]}
+                  {`${page.title?.[language]} ${
+                    Object.values(page.conditions).length !== 0
+                      ? `(${tr.SurveyStepper.conditionalPage})`
+                      : ''
+                  }`}
                 </Typography>
               </StepLabel>
 
@@ -442,20 +466,38 @@ export default function SurveyStepper({
                     </div>
                   ))}
                   <StepperControls
+                    nextPage={nextPage}
+                    previousPage={previousPage}
                     isTestSurvey={isTestSurvey}
                     activeStep={index}
                     totalSteps={survey.pages.length}
                     onPrevious={async () => {
+                      const tempVisiblePages = getVisiblePages();
+                      setVisiblePages(tempVisiblePages);
                       if (currentPage.sidebar.type === 'map')
                         await saveMapLayers();
-                      setPageNumber(index - 1);
+                      // Skip conditional pages with unmet conditions
+                      if (!tempVisiblePages.includes(previousPage.id)) {
+                        setPageNumber(index - 2);
+                      } else {
+                        setPageNumber(index - 1);
+                      }
+
                       setPageUnfinished(false);
                     }}
                     onNext={async () => {
+                      const tempVisiblePages = getVisiblePages();
+                      setVisiblePages(tempVisiblePages);
                       if (validateSurveyPage(page)) {
                         if (currentPage.sidebar.type === 'map')
                           await saveMapLayers();
-                        setPageNumber(index + 1);
+                        // Skip conditional pages with unmet conditions
+
+                        if (!tempVisiblePages.includes(nextPage.id)) {
+                          setPageNumber(index + 2);
+                        } else {
+                          setPageNumber(index + 1);
+                        }
                       } else {
                         handleClick();
                       }

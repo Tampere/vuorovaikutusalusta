@@ -60,7 +60,7 @@ function SurveyPageCondition({
       conditions: {
         ...activePage.conditions,
         [sectionId]: {
-          ...(activePage.conditions?.[Number(sectionId)] ?? []),
+          ...(activePage.conditions?.[Number(sectionId)] ?? {}),
           [operator]: value,
         },
       } as SurveyPageConditions,
@@ -68,7 +68,7 @@ function SurveyPageCondition({
   }
 
   return (
-    <FormControl sx={{ margin: '1.5rem 0 ' }}>
+    <FormControl sx={{ margin: '1.5rem 0 ' }} fullWidth>
       <FormLabel>{sectionLabel}</FormLabel>
 
       <ConditionRow
@@ -120,6 +120,7 @@ export function EditSurveyPageConditions() {
   const { activeSurvey } = useSurvey();
   const { surveyLanguage } = useTranslations();
   const { editPage } = useSurvey();
+  const { tr } = useTranslations();
 
   const { pageId } = useParams<{
     pageId: string;
@@ -138,8 +139,8 @@ export function EditSurveyPageConditions() {
   if (activePageIndex === 0) return null;
 
   const activePage = activeSurvey.pages[activePageIndex];
-
   const previousPages = activeSurvey.pages.slice(0, activePageIndex);
+  const conditionList = Object.entries(activePage.conditions);
 
   const previousQuestions = previousPages
     .map((page, pageIndex) =>
@@ -200,7 +201,7 @@ export function EditSurveyPageConditions() {
             textAlign: 'left',
           }}
         >
-          Lisää ehto sivulle
+          {tr.EditSurveyPage.conditions.label}
         </FormLabel>
         <Select
           multiple
@@ -235,22 +236,28 @@ export function EditSurveyPageConditions() {
           ))}
         </Select>
       </FormControl>
-      {Object.entries(activePage.conditions).map(([sectionId, _conditions]) => {
-        const question = previousQuestions.find(
-          (q) => q.id === Number(sectionId),
-        );
-        return (
-          <SurveyPageCondition
-            sectionLabel={`Sivu ${question?.pageIndex + 1}: ${question?.title[
-              surveyLanguage
-            ]}`}
-            key={sectionId}
-            pages={previousPages}
-            activePage={activePage}
-            sectionId={sectionId}
-          />
-        );
-      })}
+      {conditionList?.length > 0 ? (
+        conditionList.map(([sectionId, _conditions]) => {
+          const question = previousQuestions.find(
+            (q) => q.id === Number(sectionId),
+          );
+          return (
+            <SurveyPageCondition
+              sectionLabel={`Sivu ${question?.pageIndex + 1}: ${question?.title[
+                surveyLanguage
+              ]}`}
+              key={sectionId}
+              pages={previousPages}
+              activePage={activePage}
+              sectionId={sectionId}
+            />
+          );
+        })
+      ) : (
+        <Typography sx={{ marginTop: '2rem' }}>
+          {tr.EditSurveyPage.conditions.noConditionsSet}
+        </Typography>
+      )}
     </Box>
   );
 }

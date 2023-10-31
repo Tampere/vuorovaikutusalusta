@@ -78,7 +78,7 @@ export function ConditionRow({
             flex: 1,
             '& .MuiInputBase-root': { backgroundColor: 'white' },
             '& .MuiInputBase-input': { paddingY: '0.75rem' },
-            '& .MuiFormHelperText-root': { backgroundColor: '' },
+            '& .MuiFormHelperText-root': { backgroundColor: null },
           }}
         />
       ) : (

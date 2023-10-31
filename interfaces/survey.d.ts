@@ -323,6 +323,11 @@ export interface SurveyPage {
    * Conditions to display the page in the survey
    */
   conditions?: SurveyPageConditions;
+
+  /**
+   * Are conditional page conditions fulfilled
+   */
+  isVisible?: boolean;
 }
 
 export interface Survey {
