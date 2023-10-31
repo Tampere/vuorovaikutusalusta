@@ -164,6 +164,10 @@ export function isAnswerEmpty(
       return true;
     }
   }
+  // Multi matrix question is unanswered if every row is empty
+  if (question.type === 'multi-matrix') {
+    return (value as string[][]).every((row) => row.length === 0);
+  }
   // Sorting is considered incomplete, if the array contains any nullish values
   if (question.type === 'sorting') {
     if (!value || (value as number[]).some((value) => value == null)) {
@@ -300,6 +304,11 @@ export function useSurveyAnswers() {
      * @param survey
      */
     setSurvey(survey: Survey) {
+      if (!survey) {
+        dispatch({ type: 'SET_SURVEY', survey });
+        dispatch({ type: 'SET_ANSWERS', answers: [] });
+        return;
+      }
       dispatch({ type: 'SET_SURVEY', survey });
       // Get all sections across survey pages
       const sections = survey.pages

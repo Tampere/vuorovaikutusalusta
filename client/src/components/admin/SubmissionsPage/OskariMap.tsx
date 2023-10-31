@@ -28,6 +28,7 @@ export default function OskariMap({
     drawFeatures,
     isMapReady,
     setVisibleLayers,
+    oskariVersion,
   } = useOskari();
   const { mapFeatureColorScheme } = useSurveyMap();
 
@@ -110,11 +111,12 @@ export default function OskariMap({
     isPrimaryStyle: boolean,
     withMessage: boolean = true,
   ): MarkerStyle {
-    const customIcon =
-      feature.properties.question.featureStyles?.point?.markerIcon;
+    const customIcon: string =
+      feature.properties.question?.featureStyles?.point?.markerIcon;
+
     const style = {
-      shape: customIcon ?? isPrimaryStyle ? 5 : 2,
-      size: customIcon ? 64 : 6,
+      shape: customIcon ?? (isPrimaryStyle ? 5 : 2),
+      size: customIcon && oskariVersion >= 270 && oskariVersion < 290 ? 64 : 6,
       color: isPrimaryStyle
         ? mapFeatureColorScheme.primaryColor
         : mapFeatureColorScheme.secondaryColor,
@@ -122,6 +124,7 @@ export default function OskariMap({
     if (withMessage) {
       return { ...style, msg: feature.properties.submissionId };
     }
+
     return style;
   }
 
@@ -155,7 +158,7 @@ export default function OskariMap({
     }
 
     drawFeatures(features, getFeatureStyle, getMarkerStyle);
-  }, [features, selectedAnswer, isMapReady]);
+  }, [features, selectedAnswer, isMapReady, oskariVersion]);
 
   /**
    * Update visible layers onto the map

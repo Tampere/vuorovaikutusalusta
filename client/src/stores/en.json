@@ -303,7 +303,10 @@
     "errorFetchingColors": "Error while accessing colors. Please try again later."
   },
   "SurveyList": {
-    "title": "Interaction platform - Surveys",
+    "title": {
+      "main": "Interaction platform",
+      "frontPage": "Surveys"
+    },
     "errorFetchingSurveys": "Error while accessing surveys. Please try again later.",
     "editSurvey": "Edit survey",
     "publishNow": "Publish now",
@@ -481,7 +484,8 @@
     "answers": "Answers",
     "selectQuestion": "Select a question first",
     "noAnswers": "Selected question has no answers.",
-    "answer": "Answer",
+    "respondent": "Respondent {x}",
+    "mapMarkingIndex": "Map marking {x}",
     "hideOldResponses": "Hide old comments...",
     "showOldResponses": "Display {x} older comments"
   },
@@ -537,8 +541,19 @@
   "SurveySubmissionsPage": {
     "attachments": "Attachments",
     "noAttachments": "No attachments",
-    "showAll": "Display all answers",
-    "toHomePage": "To home page"
+    "summary": "Summary",
+    "toHomePage": "To home page",
+    "answerCount": "Total answer count: {x}",
+    "respondentCount": "Total respondents {x}",
+    "pageNumber": "Page {x}:",
+    "dataChart": {
+      "tooltipWeekLabel": "Week {x}, Year",
+      "tooltipTotal": "Total answers",
+      "tooltipCurrent": "Answers",
+      "xAxisLabel": { "byDay": "Day", "byWeek": "Week" },
+      "yAxisTotalLabel": "Total answers",
+      "yAxisLabel": "Answers"
+    }
   },
   "navigation": {
     "next": "Next",

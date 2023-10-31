@@ -8,5 +8,5 @@ import { Feature, Geometry, Point } from 'geojson';
 export function isPointFeature(
   feature: Feature<Geometry>,
 ): feature is Feature<Point> {
-  return feature.geometry.type === 'Point';
+  return feature?.geometry?.type === 'Point';
 }

@@ -4,15 +4,11 @@ import {
   Survey,
   SurveyQuestion,
 } from '@interfaces/survey';
-import { Autocomplete, TextField } from '@mui/material';
-import { nonQuestionSectionTypes } from '@src/stores/SurveyAnswerContext';
-import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useEffect, useMemo } from 'react';
 import { AnswerSelection } from './AnswersList';
 import OskariMap from './OskariMap';
 
 interface Props {
-  isPublic: boolean;
   survey: Survey;
   submissions: Submission[];
   selectedQuestion: SurveyQuestion;
@@ -20,6 +16,7 @@ interface Props {
   onAnswerClick: (answer: AnswerSelection) => void;
   selectedAnswer: AnswerSelection;
   surveyQuestions: SurveyQuestion[];
+  questions: SurveyQuestion[];
 }
 
 export default function AnswerMap({
@@ -29,32 +26,9 @@ export default function AnswerMap({
   onSelectQuestion,
   onAnswerClick,
   selectedAnswer,
-  isPublic,
   surveyQuestions,
+  questions,
 }: Props) {
-  const { tr, language } = useTranslations();
-
-  // All map type questions across the entire survey
-  const questions = useMemo(
-    () =>
-      survey.pages.reduce(
-        (questions, page) => [
-          ...questions,
-          ...page.sections.filter(
-            (section): section is SurveyQuestion =>
-              !nonQuestionSectionTypes.includes(section.type),
-          ),
-        ],
-        [
-          {
-            id: 0,
-            title: { [language]: tr.SurveySubmissionsPage.showAll },
-          },
-        ] as SurveyQuestion[],
-      ),
-    [survey],
-  );
-
   // All answer geometries that should be shown on the map
   const features = useMemo<GeoJSON.Feature[]>(() => {
     // If no map question was selected OR if the selected question was not "select all", show nothing on the map
@@ -92,7 +66,7 @@ export default function AnswerMap({
                   ...features,
                   ...answer.value.map((value, index) => {
                     return {
-                      id: `feature-${question.id}-${index}-${submission.id}`,
+                      id: `feature-${question?.id}-${index}-${submission?.id}`,
                       type: 'Feature',
                       geometry: value.geometry.geometry,
                       properties: {
@@ -151,28 +125,6 @@ export default function AnswerMap({
           onAnswerClick({ submissionId, questionId: question.id, index });
         }}
         selectedAnswer={selectedAnswer}
-      />
-      <Autocomplete
-        style={{ position: 'absolute', top: 10, right: 10, minWidth: '20rem' }}
-        options={questions.filter((question) =>
-          isPublic ? question.type !== 'attachment' : question,
-        )}
-        getOptionLabel={(question) => question.title[language]}
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            label={tr.SurveySection.question}
-            style={{ backgroundColor: '#fff' }}
-          />
-        )}
-        value={selectedQuestion}
-        onChange={(_, value) => {
-          if (!value || typeof value === 'string') {
-            // Ignore empty values and custom selections
-            return;
-          }
-          onSelectQuestion(value);
-        }}
       />
     </>
   );

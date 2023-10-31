@@ -12,6 +12,9 @@
     "prebuild": "npm run lint && npm run test",
     "build": "vite build"
   },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,json}": "prettier --write --ignore-unknown"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ubigu/vuorovaikutusalusta.git"
@@ -62,6 +65,7 @@
     "react-markdown": "^7.0.1",
     "react-router-dom": "^5.2.0",
     "react-split-pane": "^0.1.92",
+    "recharts": "^2.8.0",
     "rehype-external-links": "^1.0.0",
     "remark-breaks": "^3.0.2"
   },

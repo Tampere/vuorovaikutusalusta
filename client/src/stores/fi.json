@@ -303,7 +303,10 @@
     "errorFetchingColors": "Värien haussa tapahtui virhe. Yritä myöhemmin uudelleen."
   },
   "SurveyList": {
-    "title": "Vuorovaikutusalusta - Kyselyt",
+    "title": {
+      "main": "Vuorovaikutusalusta",
+      "frontPage": "Kyselyt"
+    },
     "errorFetchingSurveys": "Virhe haettaessa kyselyitä. Yritä myöhemmin uudestaan.",
     "editSurvey": "Muokkaa kyselyä",
     "publishNow": "Julkaise nyt",
@@ -430,7 +433,7 @@
       "mustSelectMore": "Valitse vielä {x} vaihtoehtoa tältä riviltä.",
       "maySelectMore": "Voit valita vielä {x} vaihtoehtoa tältä riviltä.",
       "maxSelected": "Olet valinnut enimmäismäärän vaihtoehtoja tältä riviltä",
-      "IDK": "Tämä vaihtoehto korvaa rivin muut vaihtoehdot.",
+      "IDK": "Tämän vaihtoehdon valinta korvaa rivin muut valinnat.",
       "replacingIDK": "Valinta korvaa nykyisen \"En osaa sanoa\" -vaihtoehdon."
     }
   },
@@ -481,7 +484,8 @@
     "answers": "Vastaukset",
     "selectQuestion": "Valitse kysymys ensin",
     "noAnswers": "Valittuun kysymykseen ei ole vastauksia.",
-    "answer": "Vastaus",
+    "respondent": "Vastaaja {x}",
+    "mapMarkingIndex": "Karttamerkintä {x}",
     "hideOldResponses": "Piilota vanhat kommentit...",
     "showOldResponses": "Näytä {x} vanhempaa kommenttia..."
   },
@@ -537,8 +541,22 @@
   "SurveySubmissionsPage": {
     "attachments": "Liitteet",
     "noAttachments": "Ei liitteitä",
-    "showAll": "Näytä kaikki vastaukset",
-    "toHomePage": "Etusivulle"
+    "summary": "Yhteenveto",
+    "toHomePage": "Etusivulle",
+    "answerCount": "Vastauksia yhteensä: {x} kpl",
+    "respondentCount": "Vastaajia yhteensä {x} kpl",
+    "pageNumber": "Sivu {x}:",
+    "dataChart": {
+      "tooltipWeekLabel": "Viikko {x}, Vuosi",
+      "tooltipTotal": "Kokonaisvastausmäärä",
+      "tooltipCurrent": "Vastausmäärä",
+      "xAxisLabel": {
+        "byDay": "Päivä",
+        "byWeek": "Viikko"
+      },
+      "yAxisTotalLabel": "Vastauskertymä",
+      "yAxisLabel": "Vastauksia"
+    }
   },
   "navigation": {
     "next": "Seuraava",

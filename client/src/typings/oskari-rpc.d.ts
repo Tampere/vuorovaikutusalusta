@@ -295,6 +295,7 @@ declare module 'oskari-rpc' {
     getSupportedEvents: (callback: (events: unknown[]) => void) => void;
     getSupportedRequests: (callback: (requests: unknown[]) => void) => void;
     getSupportedFunctions: (callback: (functions: unknown[]) => void) => void;
+    getInfo: (callback: (info: any) => void) => void;
     /**
      * Post an Oskari request
      */
