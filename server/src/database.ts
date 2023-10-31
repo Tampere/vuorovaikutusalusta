@@ -41,7 +41,7 @@ export async function initializeDatabase() {
           logger.warn(`Error connecting to database: ${error}`);
           if (retryCount < connectRetries) {
             logger.info(
-              `Retrying database connection (${++retryCount}/${connectRetries})`
+              `Retrying database connection (${++retryCount}/${connectRetries})`,
             );
           }
           throw error;
@@ -52,7 +52,7 @@ export async function initializeDatabase() {
         minTimeout: connectRetryTimeout,
         // Exponential factor for increasing retry timeout per each retry (1 = timeout always fixed)
         factor: 1,
-      }
+      },
     );
     logger.info('Database connection initialized');
   } else {
@@ -78,7 +78,7 @@ export function getDb() {
  */
 export function getColumnSet<Row>(
   tableName: string,
-  columns: (keyof Row | Partial<PgPromise.Column>)[]
+  columns: (keyof Row | Partial<PgPromise.Column>)[],
 ) {
   return new pgp.helpers.ColumnSet(columns, {
     table: { table: tableName, schema: 'data' },
@@ -95,7 +95,7 @@ export function getColumnSet<Row>(
  */
 export function getGeoJSONColumn(
   name: string,
-  inputSRID: number = 3857
+  inputSRID: number = 3857,
 ): Partial<PgPromise.Column> {
   return {
     name,
@@ -107,12 +107,12 @@ export function getGeoJSONColumn(
         ? // If geometry provided with buffer radius, add ST_Buffer
           pgp.as.format(
             'public.ST_Buffer(public.ST_Transform(public.ST_SetSRID(public.ST_GeomFromGeoJSON($1), $2), $3), $4)',
-            [value, inputSRID, defaultSrid, value.properties.bufferRadius]
+            [value, inputSRID, defaultSrid, value.properties.bufferRadius],
           )
         : pgp.as.format(
             // Transform provided geometry to default SRID
             'public.ST_Transform(public.ST_SetSRID(public.ST_GeomFromGeoJSON($1), $2), $3)',
-            [value, inputSRID, defaultSrid]
+            [value, inputSRID, defaultSrid],
           );
     },
   };
@@ -125,7 +125,7 @@ export function getGeoJSONColumn(
  */
 export function getMultiInsertQuery<Row>(
   rows: Row[],
-  columnSet: PgPromise.ColumnSet
+  columnSet: PgPromise.ColumnSet,
 ) {
   return pgp.helpers.insert(rows, columnSet);
 }
@@ -137,7 +137,7 @@ export function getMultiInsertQuery<Row>(
  */
 export function getMultiUpdateQuery<Row>(
   rows: Row[],
-  columnSet: PgPromise.ColumnSet
+  columnSet: PgPromise.ColumnSet,
 ) {
   return pgp.helpers.update(rows, columnSet);
 }

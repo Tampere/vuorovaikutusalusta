@@ -3,6 +3,7 @@ import { ValidationChain, validationResult } from 'express-validator';
 import { BadRequestError } from './error';
 import { ImageType } from '@interfaces/survey';
 import { MimeType } from '@interfaces/admin';
+import { Geometry } from 'geojson';
 
 /**
  * Middleware function for validating a request against provided validation rules.
@@ -70,4 +71,15 @@ export function assertNever(value: never): never {
   throw new Error(
     `Unhandled discriminated union member: ${JSON.stringify(value)}`,
   );
+}
+
+export function geometryToGeoJSONFeatureCollection(
+  geometry: Geometry,
+  properties: Record<string, string>,
+): GeoJSON.FeatureCollection & { crs: string } {
+  return {
+    type: 'FeatureCollection',
+    crs: 'EPSG:3067',
+    features: [{ type: 'Feature', geometry: geometry, properties }],
+  };
 }

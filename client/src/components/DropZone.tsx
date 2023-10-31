@@ -31,6 +31,8 @@ const useStyles = makeStyles({
   },
 });
 
+const MEGAS = 10;
+
 interface Props {
   maxFiles: number;
   fileCallback: (files: File[]) => void;
@@ -57,7 +59,9 @@ export default function DropZone({ maxFiles, fileCallback, children }: Props) {
       >
         <input {...getInputProps()} />
         <div style={{ cursor: 'pointer' }}>
-          {children ? children : tr.DropZone.dropFiles}
+          {children
+            ? children
+            : tr.DropZone.dropFiles.replace('{x}', String(MEGAS))}
         </div>
       </div>
     </section>

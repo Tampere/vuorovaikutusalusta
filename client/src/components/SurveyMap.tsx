@@ -4,15 +4,17 @@ import { useSurveyMap } from '@src/stores/SurveyMapContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { visuallyHidden } from '@mui/utils';
 import OskariRPC from 'oskari-rpc';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 interface Props {
   url: string;
   layers: number[];
   onAnswer?: () => void;
+  defaultMapView?: GeoJSON.FeatureCollection;
 }
 
 export default function SurveyMap(props: Props) {
+  const [mapInitialized, setMapInitialized] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>();
   const {
     setRpcChannel,
@@ -23,7 +25,9 @@ export default function SurveyMap(props: Props) {
     startModifying,
     stopModifying,
     drawing,
+    centerToDefaultView,
   } = useSurveyMap();
+
   const { tr } = useTranslations();
 
   /**
@@ -63,15 +67,23 @@ export default function SurveyMap(props: Props) {
     // Initialize map whenever it gets ready
     if (isMapReady) {
       initializeMap();
+      setMapInitialized(true);
     }
   }, [isMapReady]);
+
+  useEffect(() => {
+    if (mapInitialized && props.defaultMapView) {
+      centerToDefaultView(props.defaultMapView, {
+        fill: { color: '#00000000' },
+        stroke: { color: '#00000000' },
+      });
+    }
+  }, [props.defaultMapView, mapInitialized]);
 
   return (
     props.url && (
       <>
-        <p style={visuallyHidden}>
-          {tr.SurveyMap.browsingInstructions}
-        </p>
+        <p style={visuallyHidden}>{tr.SurveyMap.browsingInstructions}</p>
         <iframe
           ref={iframeRef}
           title={tr.SurveyMap.iFrameTitle}

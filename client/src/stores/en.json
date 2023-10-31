@@ -98,6 +98,18 @@
     "warningNoMapUrl": "Oskari map publication url has not been set.",
     "warningNoAvailableMapLayers": "No available map layers found from the Oskari map publication.",
     "mapLayers": "Map layers shown on the survey page",
+    "defaultMapView": "Default map view for this page",
+    "defaultMapViewStatus": { "set": "Set", "notSet": "Not set" },
+    "defaultMapViewInfo": "Select the area from the map with mouse clicks.",
+    "mapViewButtons": {
+      "set": "Set",
+      "showMap": "Show",
+      "modifyDefaultView": "Modify",
+      "deleteDefaultView": "Delete",
+      "close": "Close",
+      "clear": "Clear",
+      "cancel": "Cancel"
+    },
     "untitledSection": "Untitled section",
     "title": "Title",
     "deleteSection": "Delete section",
