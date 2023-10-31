@@ -63,7 +63,9 @@ export function AdminSurveyMapPreview({
         )}
 
         <Box sx={{ flex: 1, margin: '0.5rem -10px' }}>
-          {isOpen && <AdminMap url={url} page={page} />}
+          {isOpen && (
+            <AdminMap allowDrawing={modifyView} url={url} page={page} />
+          )}
         </Box>
 
         <Box

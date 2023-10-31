@@ -6,9 +6,10 @@ import React, { useEffect, useRef } from 'react';
 interface Props {
   url: string;
   page: SurveyPage;
+  allowDrawing?: boolean;
 }
 
-export function AdminMap({ url, page }: Props) {
+export function AdminMap({ url, page, allowDrawing = false }: Props) {
   const iframeRef = useRef<HTMLIFrameElement>();
   const {
     setRpcChannel,
@@ -54,7 +55,7 @@ export function AdminMap({ url, page }: Props) {
       setVisibleLayers(page.sidebar.mapLayers);
       setDefaultView(page.sidebar.defaultMapView);
       drawDefaultView();
-      startDrawingRequest();
+      if (allowDrawing) startDrawingRequest();
     }
   }, [isMapReady]);
 

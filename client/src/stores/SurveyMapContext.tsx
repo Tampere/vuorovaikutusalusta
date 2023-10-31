@@ -218,15 +218,18 @@ export function useAdminMap() {
             stroke: { color: '#FF4747', lineDash: 6, width: 2 },
           },
         },
+        modifyControl: false,
       },
     ]);
 
     const drawingHandler: DrawingEventHandler = (event) => {
-      if (event.id === 'DefaultViewSelection' && event.isFinished) {
+      if (event.id === 'DefaultViewSelection' && state.defaultView) {
         state.rpcChannel.postRequest(
           'MapModulePlugin.RemoveFeaturesFromMapRequest',
           [null, null, defaultViewLayer],
         );
+      }
+      if (event.id === 'DefaultViewSelection' && event.isFinished) {
         dispatch({
           type: 'SET_DEFAULT_VIEW',
           value: event.geojson,
