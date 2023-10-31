@@ -144,6 +144,18 @@ interface DBOptionGroup {
 }
 
 /**
+ * DB condition row of table data.section_conditions
+ */
+interface DBAllConditions {
+  id: number;
+  section_id: number;
+  survey_page_id: number;
+  equals: string;
+  less_than: number;
+  greater_than: number;
+}
+
+/**
  * Type for join DB query containing survey row and selected page, section & option columns.
  */
 type DBSurveyJoin = DBSurvey & {
@@ -679,15 +691,15 @@ async function deleteSectionConditions(
   pageIds: number[],
   sectionIds?: number[],
 ) {
-  let rows;
+  let rows: { id: number }[];
   if (!sectionIds || sectionIds.length === 0) {
-    rows = await getDb().manyOrNone(
-      'DELETE FROM data.section_conditions WHERE survey_page_id = ANY ($2) ',
+    rows = await getDb().manyOrNone<{ id: number }>(
+      'DELETE FROM data.section_conditions WHERE survey_page_id = ANY ($2) RETURNING id',
       [sectionIds, pageIds],
     );
   }
-  rows = await getDb().manyOrNone(
-    'DELETE FROM data.section_conditions WHERE section_id = ANY ($1) AND survey_page_id = ANY ($2) ',
+  rows = await getDb().manyOrNone<{ id: number }>(
+    'DELETE FROM data.section_conditions WHERE section_id = ANY ($1) AND survey_page_id = ANY ($2) RETURNING id',
     [sectionIds, pageIds],
   );
 
@@ -696,7 +708,7 @@ async function deleteSectionConditions(
 }
 
 async function getSectionConditions(sectionIds: number[]) {
-  return await getDb().manyOrNone(
+  return await getDb().manyOrNone<DBAllConditions>(
     'SELECT id, section_id, survey_page_id, equals, less_than, greater_than FROM data.section_conditions WHERE section_id = ANY ($1)',
     [sectionIds],
   );
