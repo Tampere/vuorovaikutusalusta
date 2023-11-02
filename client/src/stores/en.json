@@ -89,12 +89,12 @@
       "noSelections": "No selections",
       "selections": "{x} selections",
       "label": "Add conditions",
-      "equals": "Show if the respondent selects",
+      "equals": "answer is exactly",
       "somethingElse": "Something else, what?",
       "numeric": {
-        "equals": "Show if the response is exactly",
-        "lessThan": "or if the response is at most",
-        "greaterThan": "or if the response is at least"
+        "equals": "Answer is exactly",
+        "lessThan": "or answer is at most",
+        "greaterThan": "or answer is at least"
       },
       "noConditionsSet": "There are no conditions set for this page"
     },
@@ -115,6 +115,7 @@
     "title": "Title",
     "deleteSection": "Delete section",
     "addFollowUpQuestion": "Add follow-up question",
+    "addFollowUpButtonTile": "Save the draft question to add a follow-up section",
     "confirmDeleteSection": "Are you sure you want to delete this section?",
     "imageAltText": "Alternative text for the image",
     "imageScaling": "Image scaling",
@@ -129,18 +130,18 @@
   "FollowUpSection": {
     "title": "Follow-up question for ",
     "conditions": {
-      "labelForSingle": "Show follow-up question, if the following condition is met",
-      "labelForMultiple": "Show follow-up question, if any of the following conditions are met",
+      "labelForSingle": "Show follow-up question, if the following condition is met:",
+      "labelForMultiple": "Show follow-up question, if any of the following conditions are met:",
       "title": "Conditions",
       "chooseCondition": "choose a condition",
       "insertValue": "insert value",
       "customAnswer": "Something else, what?",
       "types": {
-        "equals": "Answer equals",
-        "lessThan": "or Answer is less than",
-        "greaterThan": "or Answer is greater than"
+        "equals": "Answer is exactly",
+        "lessThan": "or answer is at most",
+        "greaterThan": "or answer is at least"
       },
-      "validationError": ""
+      "validationError": "Reference value must be a number."
     },
     "question": "Question",
     "changeType": "Change question type",
@@ -381,7 +382,7 @@
     "next": "Next",
     "previous": "Previous",
     "submit": "Submit",
-    "conditionalPage": "conditional page",
+    "conditionalPage": "conditional step",
     "errorSubmittingSurvey": "Error while submitting the survey. Please try again later.",
     "openMap": "Open the map",
     "closeMap": "Close the map",

@@ -36,6 +36,35 @@ export function FollowUpSectionMenu({
   const [loading, setLoading] = useState(true);
   const [sectionActionsOpen, setSectionActionsOpen] = useState(false);
 
+  function getFollowUpSectionLabel(type: typeof section.type) {
+    const sectionTranslations = tr.SurveySection;
+
+    const translationEntries: Record<
+      typeof type,
+      keyof typeof sectionTranslations
+    > = {
+      checkbox: 'checkBoxQuestion',
+      attachment: 'attachmentSection',
+      document: 'documentSection',
+      'free-text': 'freeTextQuestion',
+      'grouped-checkbox': 'groupedCheckboxQuestion',
+      image: 'imageSection',
+      map: 'mapQuestion',
+      matrix: 'matrixQuestion',
+      'multi-matrix': 'multiMatrixQuestion',
+      numeric: 'numericQuestion',
+      radio: 'radioQuestion',
+      slider: 'sliderQuestion',
+      sorting: 'sortingQuestion',
+      text: 'textSection',
+    };
+
+    if (!Object.keys(translationEntries).includes(type))
+      return sectionTranslations.question;
+
+    return sectionTranslations[translationEntries[type]];
+  }
+
   // Reflect loading status when e.g. the entire survey is being saved
   useEffect(() => {
     setLoading(activeSurveyLoading);
@@ -79,7 +108,7 @@ export function FollowUpSectionMenu({
         />
       </div>
       <Divider orientation="horizontal">
-        <Typography>{tr.FollowUpSection.question}</Typography>
+        <Typography>{getFollowUpSectionLabel(section.type)}</Typography>
       </Divider>
       {!sectionActionsOpen && section?.type ? (
         <FollowUpSectionDetails
@@ -95,9 +124,10 @@ export function FollowUpSectionMenu({
       ) : (
         <AddSurveySectionActions
           disabled={loading}
-          onAdd={(section) =>
-            editFollowUpSection(pageId, parentSection.id, section)
-          }
+          onAdd={(section) => {
+            editFollowUpSection(pageId, parentSection.id, section);
+            setSectionActionsOpen(false);
+          }}
           followUpSectionId={section.id}
         />
       )}

@@ -89,7 +89,7 @@
       "noSelections": "Ei valintoja",
       "selections": "{x} valintaa",
       "label": "Lisää ehto sivulle",
-      "equals": "Näytä, jos vastaaja valitsee vaihtoehdon",
+      "equals": "vastaus on tasan",
       "somethingElse": "Jokin muu, mikä?",
       "numeric": {
         "equals": "Näytä, jos vastaus on tasan",
@@ -115,6 +115,7 @@
     "title": "Otsikko",
     "deleteSection": "Poista osio",
     "addFollowUpQuestion": "Lisää jatkokysymys",
+    "addFollowUpButtonTile": "Tallenna kysymys lisätäksesi jatkokysymyksen",
     "confirmDeleteSection": "Haluatko varmasti poistaa tämän osion?",
     "imageAltText": "Kuvan vaihtoehtoinen teksti",
     "imageScaling": "Kuvan skaalaus",
@@ -130,17 +131,17 @@
     "title": "Jatkokysymys kysymykselle",
     "conditions": {
       "title": "Ehdot",
-      "labelForSingle": "Näytä jatkokysymys, jos seuraava ehto täyttyy",
-      "labelForMultiple": "Näytä jatkokysymys, jos yksikin seuraavista ehdoista täyttyy",
+      "labelForSingle": "Näytä jatkokysymys, jos seuraava ehto täyttyy:",
+      "labelForMultiple": "Näytä jatkokysymys, jos yksikin seuraavista ehdoista täyttyy:",
       "chooseCondition": "valitse ehto",
       "insertValue": "syötä vertailuarvo",
       "customAnswer": "Jokin muu, mikä?",
       "types": {
-        "equals": "Vastaus on yhtäsuuri kuin",
-        "lessThan": "tai Vastaus on pienempi kuin",
-        "greaterThan": "tai Vastaus on suurempi kuin"
+        "equals": "Vastaus on tasan",
+        "lessThan": "tai enintään",
+        "greaterThan": "tai vähintään"
       },
-      "validationError": "Vertailuarvon täytyy olla luku"
+      "validationError": "Vertailuarvon täytyy olla luku."
     },
     "question": "Kysymys",
     "changeType": "Vaihda kysymystyyppi",
@@ -381,7 +382,7 @@
     "next": "Seuraava",
     "previous": "Edellinen",
     "submit": "Lähetä",
-    "conditionalPage": "ehdollinen sivu",
+    "conditionalPage": "ehdollinen vaihe",
     "errorSubmittingSurvey": "Kyselyn lähettämisessä tapahtui virhe. Ole hyvä ja yritä myöhemmin uudestaan.",
     "openMap": "Avaa kartta",
     "closeMap": "Sulje kartta",

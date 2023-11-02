@@ -54,7 +54,10 @@ function SurveyPageCondition({
     return selectedQuestion.options;
   }
 
-  function handleConditionUpdate(operator: keyof Conditions, value: number[]) {
+  function handleConditionUpdate(
+    operator: keyof Conditions,
+    value: (number | string)[],
+  ) {
     editPage({
       ...activePage,
       conditions: {
@@ -136,7 +139,11 @@ export function EditSurveyPageConditions() {
     (page) => page.id === Number(pageId),
   );
 
-  if (activePageIndex === 0) return null;
+  if (
+    activePageIndex === 0 ||
+    activePageIndex === activeSurvey.pages.length - 1
+  )
+    return null;
 
   const activePage = activeSurvey.pages[activePageIndex];
   const previousPages = activeSurvey.pages.slice(0, activePageIndex);

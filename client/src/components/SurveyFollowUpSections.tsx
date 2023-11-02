@@ -1,6 +1,6 @@
-import { Box, Typography } from '@mui/material';
+import { Box, Collapse, Grow, Typography } from '@mui/material';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
-import React from 'react';
+import React, { useState } from 'react';
 import {
   SurveyFollowUpSection,
   SurveyQuestion as SurveyQuestionType,
@@ -26,16 +26,17 @@ export function SurveyFollowUpSections({
   answer,
 }: Props) {
   const { getFollowUpSectionsToDisplay } = useSurveyAnswers();
+
   const { tr } = useTranslations();
+
+  if (!section.followUpSections) return null;
 
   let followUpSectionsToDisplay: SurveyFollowUpSection[];
   // Sections are displayed in a survey
   if (!answer) {
     const followUpSectionIds = getFollowUpSectionsToDisplay(section);
 
-    if (followUpSectionIds.length === 0) return null;
-
-    followUpSectionsToDisplay = section.followUpSections.filter((sect) =>
+    followUpSectionsToDisplay = section.followUpSections?.filter((sect) =>
       followUpSectionIds.includes(sect.id),
     );
     // Sections are displayed in submissions page answer list
@@ -44,33 +45,28 @@ export function SurveyFollowUpSections({
       .filter((answer) => answer.value)
       .map((answer) => answer.sectionId);
 
-    if (answeredSectionIds.length === 0) return null;
-
     followUpSectionsToDisplay = section.followUpSections?.filter((sect) =>
       answeredSectionIds.includes(sect.id),
     );
   }
 
-  if (!followUpSectionsToDisplay || followUpSectionsToDisplay.length === 0)
-    return null;
-
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        backgroundColor: '#E4E4E4',
-        borderRadius: '6px',
-        padding: '0.75rem',
-        margin: '0.75rem 0',
-        '& .MuiInputBase-root': {
-          backgroundColor: 'white',
-        },
-        gap: '30px',
-      }}
-      className="follow-up-sections-container"
-    >
-      <>
+    <Collapse in={!!followUpSectionsToDisplay?.length} appear={!!answer}>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          backgroundColor: '#E4E4E4',
+          borderRadius: '6px',
+          padding: '0.75rem',
+          margin: '0.75rem 0',
+          '& .MuiInputBase-root': {
+            backgroundColor: 'white',
+          },
+          gap: '30px',
+        }}
+        className="follow-up-sections-container"
+      >
         <Typography
           variant="body1"
           component="h4"
@@ -81,6 +77,7 @@ export function SurveyFollowUpSections({
         >
           {tr.SurveyStepper.followUpSections}
         </Typography>
+
         {followUpSectionsToDisplay.map((sect) =>
           sect.type !== 'text' &&
           sect.type !== 'image' &&
@@ -100,11 +97,11 @@ export function SurveyFollowUpSections({
               mobileDrawerOpen={mobileDrawerOpen}
             />
           ) : sect.type === 'text' ? (
-            <TextSection key={sect.id} section={sect} />
+            <TextSection isFollowUp key={sect.id} section={sect} />
           ) : sect.type === 'image' ? (
-            <ImageSection key={sect.id} section={sect} />
+            <ImageSection isFollowUp key={sect.id} section={sect} />
           ) : sect.type === 'document' ? (
-            <DocumentSection key={sect.id} section={sect} />
+            <DocumentSection isFollowUp key={sect.id} section={sect} />
           ) : (
             <SurveyQuestion
               isFollowUp
@@ -115,7 +112,7 @@ export function SurveyFollowUpSections({
             />
           ),
         )}
-      </>
-    </Box>
+      </Box>
+    </Collapse>
   );
 }

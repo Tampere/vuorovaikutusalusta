@@ -318,8 +318,8 @@ export function useSurvey() {
         (page) => page.id !== pageId,
       );
 
-      if (index === 0) {
-        // First page cannot have conditions
+      if (index === 0 || index === state.activeSurvey?.pages?.length - 1) {
+        // First and last pages cannot have conditions
         page = { ...page, conditions: {} };
       } else {
         // A page can only have conditions based on previous pages sections

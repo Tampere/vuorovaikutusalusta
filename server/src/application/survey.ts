@@ -939,7 +939,17 @@ export async function updateSurvey(survey: Survey) {
 
       await deleteSectionConditions([page.id], sectionIds);
       Object.entries(page.conditions).map(async ([sectionId, conditions]) => {
-        await upsertSectionConditions(Number(sectionId), page.id, conditions);
+        // Filter out null values from conditions caused by trying to save "-" as numeric condition
+        const validConditions = {
+          equals: conditions.equals.filter(Boolean),
+          lessThan: conditions.lessThan.filter(Boolean),
+          greaterThan: conditions.greaterThan.filter(Boolean),
+        };
+        await upsertSectionConditions(
+          Number(sectionId),
+          page.id,
+          validConditions,
+        );
       });
     }),
   );
@@ -998,10 +1008,17 @@ export async function updateSurvey(survey: Survey) {
             if (linkedSection.predecessor_section) {
               // use sectionRow id that was generated when saving follow-up section to db
               await deleteSectionConditions(null, [sectionRow.id]);
+              // Filter out null values from conditions caused by trying to save "-" as numeric condition
+              const validConditions = {
+                equals: linkedSection.conditions.equals.filter(Boolean),
+                lessThan: linkedSection.conditions.lessThan.filter(Boolean),
+                greaterThan:
+                  linkedSection.conditions.greaterThan.filter(Boolean),
+              };
               await upsertSectionConditions(
                 sectionRow.id,
                 null,
-                linkedSection.conditions,
+                validConditions,
               );
             }
 

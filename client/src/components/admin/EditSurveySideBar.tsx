@@ -37,6 +37,7 @@ import {
 } from '@src/utils/schemaValidation';
 import { useClipboard } from '@src/stores/ClipboardContext';
 import { SurveyPage } from '@interfaces/survey';
+import { BranchIcon } from '../icons/BranchIcon';
 
 const useStyles = makeStyles((theme: Theme) => ({
   '@keyframes pulse': {
@@ -146,6 +147,9 @@ export default function EditSurveySideBar(props: Props) {
                           to={`${url}/sivut/${page.id}?lang=${language}`}
                         >
                           <ListItemIcon>
+                            {Object.keys(page?.conditions)?.length > 0 && (
+                              <BranchIcon />
+                            )}
                             <InsertDriveFileOutlined />
                           </ListItemIcon>
                           <ListItemText

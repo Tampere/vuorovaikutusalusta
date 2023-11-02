@@ -330,11 +330,11 @@ export function useSurveyAnswers() {
           )
             ? true
             : conditionForSection.greaterThan.some(
-                (conditionValue) => answerEntry.value > conditionValue,
+                (conditionValue) => answerEntry.value >= conditionValue,
               )
             ? true
             : conditionForSection.lessThan.some(
-                (conditionValue) => answerEntry.value < conditionValue,
+                (conditionValue) => answerEntry.value <= conditionValue,
               )
             ? true
             : false;
@@ -400,11 +400,11 @@ export function useSurveyAnswers() {
             )
               ? true
               : section.conditions.greaterThan.some(
-                  (conditionValue) => value > conditionValue,
+                  (conditionValue) => value >= conditionValue,
                 )
               ? true
               : section.conditions.lessThan.some(
-                  (conditionValue) => value < conditionValue,
+                  (conditionValue) => value <= conditionValue,
                 )
               ? true
               : false;
@@ -423,6 +423,8 @@ export function useSurveyAnswers() {
     const visibleSectionIds = state.survey.pages
       .filter((page) => visiblePages.includes(page.id))
       .map((page) => page.sections)
+      .flat(1)
+      .map((section) => [section, ...(section?.followUpSections ?? [])])
       .flat(1)
       .map((section) => section.id);
 

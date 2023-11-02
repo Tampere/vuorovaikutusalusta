@@ -6,6 +6,7 @@ import {
   FormControlLabel,
   FormGroup,
   TextField,
+  Tooltip,
 } from '@mui/material';
 import RichTextEditor from '@src/components/RichTextEditor';
 import { NewLineIcon } from '@src/components/icons/NewLineIcon';
@@ -115,18 +116,28 @@ export function SectionDetails({
           // no button for subquestions
           // pageId should not be passed for map subquestions
           pageId && (
-            <Button
-              disabled={section.id < 0} // no follow-up sections for draft questions
-              onClick={() => {
-                addFollowUpSection(pageId, section.id, emptyFollowUpSection);
-                setFollowUpSectionSequence((prev) => prev - 1);
-              }}
-              startIcon={<NewLineIcon />}
-              variant="contained"
-              sx={{ marginLeft: 'auto' }}
+            <Tooltip
+              sx={{ display: section.id < 0 ? 'none' : '' }}
+              title={tr.EditSurveyPage.addFollowUpButtonTile}
             >
-              {tr.EditSurveyPage.addFollowUpQuestion}
-            </Button>
+              <span style={{ marginLeft: 'auto' }}>
+                <Button
+                  disabled={section.id < 0} // no follow-up sections for draft questions
+                  onClick={() => {
+                    addFollowUpSection(
+                      pageId,
+                      section.id,
+                      emptyFollowUpSection,
+                    );
+                    setFollowUpSectionSequence((prev) => prev - 1);
+                  }}
+                  startIcon={<NewLineIcon />}
+                  variant="contained"
+                >
+                  {tr.EditSurveyPage.addFollowUpQuestion}
+                </Button>
+              </span>
+            </Tooltip>
           )}
       </FormGroup>
     </AccordionDetails>

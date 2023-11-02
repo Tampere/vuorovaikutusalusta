@@ -104,12 +104,12 @@ export function ConditionRow({
           helperText={
             validationError && tr.FollowUpSection.conditions.validationError
           }
-          value={textFieldValue}
+          value={isNaN(Number(textFieldValue)) ? '-' : textFieldValue}
           placeholder={tr.FollowUpSection.conditions.insertValue}
           onChange={(event) => {
             const { value } = event.target;
 
-            if (value !== '' && !isNumeric(value)) {
+            if (value !== '' && value !== '-' && !isNumeric(value)) {
               setValidationError(true);
               return;
             } else if (validationError) setValidationError(false);

@@ -13,6 +13,7 @@ import {
   Drawer,
   FormControl,
   FormHelperText,
+  Grow,
   IconButton,
   Link,
   Paper,
@@ -294,7 +295,9 @@ export default function SurveyStepper({
       return;
     }
     setLoading(true);
+
     const visibleAnswers = getAnswersForSubmission(visiblePages);
+
     try {
       await request(
         `/api/published-surveys/${survey.name}/submission${
