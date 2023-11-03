@@ -1,6 +1,6 @@
 import { Divider, Typography, Box, Button } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { ReactNode, useEffect, useState } from 'react';
+import React, { ReactNode, useEffect, useRef, useState } from 'react';
 import AddSurveySectionActions from '../AddSurveySectionActions';
 import { useSurvey } from '@src/stores/SurveyContext';
 import {
@@ -35,6 +35,7 @@ export function FollowUpSectionMenu({
     useSurvey();
   const [loading, setLoading] = useState(true);
   const [sectionActionsOpen, setSectionActionsOpen] = useState(false);
+  const buttonRef = useRef(null);
 
   function getFollowUpSectionLabel(type: typeof section.type) {
     const sectionTranslations = tr.SurveySection;
@@ -133,9 +134,18 @@ export function FollowUpSectionMenu({
       )}
       {section?.type && (
         <Button
+          ref={buttonRef}
           variant="contained"
           sx={{ marginLeft: 'auto' }}
-          onClick={() => setSectionActionsOpen((prev) => !prev)}
+          onClick={() => {
+            setSectionActionsOpen((prev) => !prev);
+            setTimeout(() => {
+              buttonRef?.current?.scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest',
+              });
+            }, 500);
+          }}
         >
           {!sectionActionsOpen && section?.type
             ? tr.FollowUpSection.changeType
