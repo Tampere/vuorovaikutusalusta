@@ -85,6 +85,7 @@ export function indexToAlpha(num = 1) {
     return String.fromCharCode(a + number);
   };
   return numberToCharacter(num);
+}
 
 export function geometryToGeoJSONFeatureCollection(
   geometry: Geometry,
@@ -95,5 +96,4 @@ export function geometryToGeoJSONFeatureCollection(
     crs: 'EPSG:3067',
     features: [{ type: 'Feature', geometry: geometry, properties }],
   };
-
 }
