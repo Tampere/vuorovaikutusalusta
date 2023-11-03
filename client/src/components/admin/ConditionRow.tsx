@@ -63,6 +63,7 @@ interface RowProps {
   onInput: (values: number[]) => void;
   allowCustomAnswer?: boolean;
   alignment?: 'left' | 'right';
+  labelPrefix?: string;
 }
 
 export function ConditionRow({
@@ -74,6 +75,7 @@ export function ConditionRow({
   textFieldValue = '',
   allowCustomAnswer = false,
   alignment = 'right',
+  labelPrefix = '',
 }: RowProps) {
   const [validationError, setValidationError] = useState(false);
   const { tr, surveyLanguage } = useTranslations();
@@ -96,6 +98,7 @@ export function ConditionRow({
           transform: validationError ? 'translateY(-50%)' : null,
         }}
       >
+        <span style={{ fontWeight: 'bold' }}>{`${labelPrefix} `}</span>
         {label}
       </FormLabel>
       {conditionIsNumeric ? (

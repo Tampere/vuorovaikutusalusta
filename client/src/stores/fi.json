@@ -88,15 +88,17 @@
     "conditions": {
       "noSelections": "Ei valintoja",
       "selections": "{x} valintaa",
-      "label": "Lisää ehto sivulle",
+      "label": "Näytä sivu",
+      "pageVisible": "aina",
+      "pageHasConditions": "jos seuraava ehto täyttyy",
+      "questionSelectorLabel": "Kysymyksen",
       "equals": "vastaus on tasan",
+      "contains": "Vastaus sisältää vaihtoehdon",
       "somethingElse": "Jokin muu, mikä?",
       "numeric": {
-        "equals": "Näytä, jos vastaus on tasan",
-        "lessThan": "tai vastaus on enintään",
-        "greaterThan": "tai vastaus on vähintään"
-      },
-      "noConditionsSet": "Sivulla ei ole asetettuja ehtoja"
+        "lessThan": "vastaus on enintään",
+        "greaterThan": "vastaus on vähintään"
+      }
     },
     "deletePage": "Poista sivu",
     "confirmDeletePage": "Haluatko varmasti poistaa tämän sivun? Toimintoa ei voida perua.",
@@ -138,8 +140,10 @@
       "customAnswer": "Jokin muu, mikä?",
       "types": {
         "equals": "Vastaus on tasan",
-        "lessThan": "tai enintään",
-        "greaterThan": "tai vähintään"
+        "contains": "Vastaus sisältää vaihtoehdon",
+        "lessThan": "enintään",
+        "greaterThan": "vähintään",
+        "or": "tai"
       },
       "validationError": "Vertailuarvon täytyy olla luku."
     },

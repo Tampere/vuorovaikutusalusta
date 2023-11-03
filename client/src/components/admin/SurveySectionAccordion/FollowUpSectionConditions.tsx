@@ -40,7 +40,11 @@ export function FollowUpSectionConditions({
           ) && parentSection?.allowCustomAnswer
         }
         conditionIsNumeric={parentIsNumeric}
-        label={tr.FollowUpSection.conditions.types.equals}
+        label={
+          tr.FollowUpSection.conditions.types[
+            parentIsNumeric ? 'equals' : 'contains'
+          ]
+        }
         options={
           parentSection.type === 'numeric' || parentSection.type === 'slider'
             ? []
@@ -59,6 +63,7 @@ export function FollowUpSectionConditions({
         <>
           <ConditionRow
             conditionIsNumeric
+            labelPrefix={tr.FollowUpSection.conditions.types.or}
             label={tr.FollowUpSection.conditions.types.greaterThan}
             textFieldValue={followUpSection.conditions.greaterThan[0]}
             onInput={(values) =>
@@ -74,6 +79,7 @@ export function FollowUpSectionConditions({
 
           <ConditionRow
             conditionIsNumeric
+            labelPrefix={tr.FollowUpSection.conditions.types.or}
             label={tr.FollowUpSection.conditions.types.lessThan}
             textFieldValue={followUpSection.conditions.lessThan[0]}
             onInput={(values) =>
