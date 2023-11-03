@@ -24,6 +24,7 @@ import {
   getColumnSet,
   getDb,
   getMultiInsertQuery,
+  getGeoJSONColumn,
   getMultiUpdateQuery,
 } from '@src/database';
 import {
@@ -31,6 +32,8 @@ import {
   InternalServerError,
   NotFoundError,
 } from '@src/error';
+import { geometryToGeoJSONFeatureCollection } from '@src/utils';
+import { Geometry } from 'geojson';
 
 const sectionTypesWithOptions: SurveyPageSection['type'][] = [
   'radio',
@@ -185,6 +188,7 @@ type DBSurveyJoin = DBSurvey & {
   theme_id: number;
   theme_name: string;
   theme_data: SurveyTheme;
+  default_map_view: Geometry;
 };
 
 /**
@@ -213,6 +217,7 @@ const surveyPageColumnSet = getColumnSet<DBSurveyPage>('survey_page', [
     cast: 'json',
   },
   'sidebar_image_size',
+  getGeoJSONColumn('default_map_view', 3067),
 ]);
 
 /**
@@ -276,7 +281,8 @@ export async function getSurvey(params: { id: number } | { name: string }) {
           page.sidebar_image_path as page_sidebar_image_path,
           page.sidebar_image_name as page_sidebar_image_name,
           page.sidebar_image_alt_text as page_sidebar_image_alt_text,
-          page.sidebar_image_size as page_sidebar_image_size
+          page.sidebar_image_size as page_sidebar_image_size,
+          public.ST_AsGeoJSON(public.ST_Transform(page.default_map_view, 3067))::json as default_map_view
         FROM
           (
             SELECT
@@ -1190,6 +1196,12 @@ function dbSurveyJoinToPage(dbSurveyJoin: DBSurveyJoin): SurveyPage {
           imageName: dbSurveyJoin.page_sidebar_image_name,
           imageAltText: dbSurveyJoin.page_sidebar_image_alt_text,
           imageSize: dbSurveyJoin.page_sidebar_image_size,
+          defaultMapView: dbSurveyJoin.default_map_view
+            ? geometryToGeoJSONFeatureCollection(
+                dbSurveyJoin.default_map_view,
+                {},
+              )
+            : null,
         },
         conditions: {},
       };
@@ -1344,6 +1356,7 @@ export async function createSurveyPage(
       mapLayers: partialPage?.sidebar?.mapLayers ?? [],
       imagePath: [],
       imageName: null,
+      defaultMapView: null,
     },
     conditions: {},
   } as SurveyPage;
@@ -1391,6 +1404,8 @@ function surveyPagesToRows(
       sidebar_image_name: surveyPage.sidebar.imageName,
       sidebar_image_alt_text: surveyPage.sidebar.imageAltText,
       sidebar_image_size: surveyPage.sidebar.imageSize,
+      default_map_view:
+        surveyPage.sidebar.defaultMapView?.features[0]?.geometry ?? null,
     } as DBSurveyPage;
   });
 }

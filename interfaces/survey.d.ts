@@ -282,6 +282,10 @@ export interface SurveyPageSidebar {
    */
   mapLayers: number[];
   /**
+   * Geometry for the default map view
+   */
+  defaultMapView: Geometry;
+  /**
    * Path of the sidebar image
    */
   imagePath: string[];

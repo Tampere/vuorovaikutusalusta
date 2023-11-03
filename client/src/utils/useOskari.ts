@@ -1,6 +1,7 @@
-import { Feature, Point } from 'geojson';
+import { Feature, FeatureCollection, Point } from 'geojson';
 import OskariRPC, {
   Channel,
+  DrawingEventHandler,
   FeatureEventHandler,
   FeatureStyle,
   MarkerClickEventHandler,
@@ -46,9 +47,14 @@ export function useOskari() {
     useState<FeatureEventHandler | null>(null);
   const [markerClickEventHandler, setMarkerClickEventHandler] =
     useState<MarkerClickEventHandler | null>(null);
+  const [drawingEventHandler, setDrawingEventHandler] =
+    useState<DrawingEventHandler | null>(null);
   const [allLayers, setAllLayers] = useState<number[] | null>(null);
   const [features, setFeatures] = useState<Feature[]>([]);
+  const [_defaultMapView, setDefaultMapView] =
+    useState<FeatureCollection>(null);
   const [oskariVersion, setOskariVersion] = useState(null);
+
 
   // Make current features available inside callbacks
   const getCurrentFeatures = useCurrent(features);
@@ -134,6 +140,27 @@ export function useOskari() {
     };
     rpcChannel.handleEvent('MarkerClickEvent', markerHandler);
     setMarkerClickEventHandler(() => markerHandler);
+  }
+
+  function startDrawingRequest() {
+    rpcChannel.postRequest('DrawTools.StartDrawingRequest', [
+      'DefaultViewSelection',
+      'Square',
+      { allowMultipleDrawing: 'single' },
+    ]);
+
+    if (drawingEventHandler) {
+      rpcChannel.unregisterEventHandler('DrawingEvent', drawingEventHandler);
+      setDrawingEventHandler(null);
+    }
+
+    const drawingHandler: DrawingEventHandler = (event) => {
+      if (event.id === 'DefaultViewSelection' && event.isFinished) {
+        setDefaultMapView(event.geojson);
+      }
+    };
+    rpcChannel.handleEvent('DrawingEvent', drawingHandler);
+    setDrawingEventHandler(() => drawingHandler);
   }
 
   /**
@@ -281,6 +308,7 @@ export function useOskari() {
     drawFeatures,
     zoomToFeatures,
     setVisibleLayers,
+    startDrawingRequest,
     oskariVersion,
   };
 }

@@ -31,7 +31,9 @@ const useStyles = makeStyles({
   },
 });
 
+
 const DEFAULT_MAX_FILE_SIZE = '10';
+
 
 interface Props {
   maxFiles: number;
@@ -71,6 +73,7 @@ export default function DropZone({
                 '{x}',
                 maxFileSize ? String(maxFileSize) : DEFAULT_MAX_FILE_SIZE,
               )}
+
         </div>
       </div>
     </section>

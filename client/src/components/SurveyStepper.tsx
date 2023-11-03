@@ -587,6 +587,7 @@ export default function SurveyStepper({
       case 'map':
         return (
           <SurveyMap
+            defaultMapView={currentPage.sidebar?.defaultMapView}
             url={survey.mapUrl}
             layers={currentPage.sidebar.mapLayers}
           />
