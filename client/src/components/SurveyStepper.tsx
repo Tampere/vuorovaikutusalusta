@@ -339,6 +339,30 @@ export default function SurveyStepper({
       });
   }
 
+  // Not for follow-up sections as they are not used in page conditions at the moment
+  function getSectionPageIndex(sectionId: number) {
+    return survey.pages.findIndex((page) =>
+      page.sections.some((section) => section.id === sectionId),
+    );
+  }
+
+  // The survey respondent has passed/answered all the questions which are used in given page conditions
+  function pageConditionsPassed(page: SurveyPage) {
+    return Object.keys(page.conditions)?.every(
+      (sectionId) => getSectionPageIndex(Number(sectionId)) < pageNumber,
+    );
+  }
+
+  function getConditionalPageTitle(page: SurveyPage) {
+    if (visiblePages.includes(page.id)) {
+      return page.title?.[surveyLanguage];
+    }
+    if (pageConditionsPassed(page)) {
+      return `${page.title?.[surveyLanguage]} (${tr.SurveyStepper.conditionalPageNotActivated})`;
+    }
+    return `${page.title?.[surveyLanguage]} (${tr.SurveyStepper.conditionalPage})`;
+  }
+
   const stepperPane = (
     <>
       {survey.localisationEnabled && (
@@ -382,7 +406,7 @@ export default function SurveyStepper({
                     margin: 0,
                     fontSize: '1em',
                     '&:focus': { outline: 'none' },
-                    color: visiblePages.includes(page.id) ? '' : 'grey',
+                    color: pageConditionsPassed(page) ? 'grey' : '',
                   }}
                 >
                   <span style={visuallyHidden}>
@@ -391,11 +415,7 @@ export default function SurveyStepper({
                     {tr.SurveyStepper.step} {index + 1} {tr.SurveyStepper.outOf}{' '}
                     {survey?.pages?.length}
                   </span>
-                  {`${page.title?.[language]} ${
-                    Object.values(page.conditions).length !== 0
-                      ? `(${tr.SurveyStepper.conditionalPage})`
-                      : ''
-                  }`}
+                  {getConditionalPageTitle(page)}
                 </Typography>
               </StepLabel>
 

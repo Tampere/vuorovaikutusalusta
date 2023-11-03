@@ -383,6 +383,7 @@
     "previous": "Previous",
     "submit": "Submit",
     "conditionalPage": "conditional step",
+    "conditionalPageNotActivated": "does not concern You",
     "errorSubmittingSurvey": "Error while submitting the survey. Please try again later.",
     "openMap": "Open the map",
     "closeMap": "Close the map",

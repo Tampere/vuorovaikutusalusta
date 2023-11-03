@@ -383,6 +383,7 @@
     "previous": "Edellinen",
     "submit": "Lähetä",
     "conditionalPage": "ehdollinen vaihe",
+    "conditionalPageNotActivated": "ei koske Teitä",
     "errorSubmittingSurvey": "Kyselyn lähettämisessä tapahtui virhe. Ole hyvä ja yritä myöhemmin uudestaan.",
     "openMap": "Avaa kartta",
     "closeMap": "Sulje kartta",
