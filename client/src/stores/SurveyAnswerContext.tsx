@@ -208,7 +208,7 @@ export function useSurveyAnswers() {
       [];
     // Find the answer that corresponds to the question
     const answer = answers.find((answer) => answer.sectionId === question.id);
-    if (!answer?.value) return errors;
+    if (!answer.hasOwnProperty('value')) return errors; // Shouldn't happen but used just in case to prevent errors
 
     // Checkbox question validation - check possible answer limits
     if (question.type === 'checkbox' || question.type === 'grouped-checkbox') {
