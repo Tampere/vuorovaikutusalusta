@@ -40,11 +40,12 @@ export function SectionDetails({
   // Sequence for making each follow-up section ID unique before they're added to database
   const [followUpSectionSequence, setFollowUpSectionSequence] = useState(-1);
 
-  const emptyFollowUpSection: SurveyFollowUpSection = {
-    type: null,
+  const defaultFollowUpSection: SurveyFollowUpSection = {
+    type: 'radio',
+    options: [],
+    allowCustomAnswer: false,
+    isRequired: false,
     title: null,
-    fileName: null,
-    filePath: null,
     conditions: { equals: [], lessThan: [], greaterThan: [] },
     id: followUpSectionSequence,
   };
@@ -127,7 +128,7 @@ export function SectionDetails({
                     addFollowUpSection(
                       pageId,
                       section.id,
-                      emptyFollowUpSection,
+                      defaultFollowUpSection,
                     );
                     setFollowUpSectionSequence((prev) => prev - 1);
                   }}
