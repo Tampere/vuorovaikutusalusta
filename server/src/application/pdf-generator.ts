@@ -3,6 +3,7 @@ import {
   LanguageCode,
   SectionOption,
   Survey,
+  SurveyFollowUpSection,
   SurveyMapQuestion,
   SurveyMatrixQuestion,
   SurveyPageSection,
@@ -211,10 +212,11 @@ function getContent(
   screenshots: ScreenshotJobReturnData[],
   options: SectionOption[],
   isSubQuestion = false,
+  isFollowUpSection = false,
   language: LanguageCode,
 ): Content[] {
   if (!answerEntry) {
-    return null;
+    return [];
   }
   const tr = useTranslations(language);
   const sectionIndex = sections.findIndex(
@@ -224,10 +226,18 @@ function getContent(
 
   const heading: Content = {
     text: section.title?.[language],
-    style: isSubQuestion ? 'subQuestionTitle' : 'questionTitle',
+    style: isSubQuestion
+      ? 'subQuestionTitle'
+      : isFollowUpSection
+      ? 'followUpSectionTitle'
+      : 'questionTitle',
   };
 
-  const style = isSubQuestion ? 'subQuestionAnswer' : 'answer';
+  const style = isSubQuestion
+    ? 'subQuestionAnswer'
+    : isFollowUpSection
+    ? 'followUpSectionAnswer'
+    : 'answer';
 
   switch (answerEntry.type) {
     case 'free-text':
@@ -376,6 +386,7 @@ function getContent(
                     [],
                     options,
                     true,
+                    false,
                     language,
                   );
                 }),
@@ -411,13 +422,21 @@ export async function generatePdf(
     (sections, page) => [...sections, ...page.sections],
     [] as SurveyPageSection[],
   );
+
+  const followUpSections = sections.reduce(
+    (followUps, section) => [
+      ...followUps,
+      ...(section?.followUpSections ?? []),
+    ],
+    [] as SurveyFollowUpSection[],
+  );
+
   const screenshotJobData = prepareMapAnswers(survey, answerEntries);
   const screenshots = await getScreenshots(screenshotJobData);
 
   logger.debug(
     `Fetched ${screenshots.length} screenshots in ${Date.now() - start}ms`,
   );
-
   const content: Content = [
     await getFrontPage(
       survey,
@@ -426,16 +445,28 @@ export async function generatePdf(
       answerEntries,
       language,
     ),
-    ...sections.map((section) =>
-      getContent(
+    ...sections.map((section) => [
+      ...getContent(
         answerEntries.find((entry) => entry.sectionId === section.id),
         sections,
         screenshots,
         options,
         false,
+        false,
         language,
       ),
-    ),
+      ...(section?.followUpSections?.map((section) =>
+        getContent(
+          answerEntries.find((entry) => entry.sectionId === section.id),
+          followUpSections,
+          screenshots,
+          options,
+          false,
+          true,
+          language,
+        ),
+      ) ?? []),
+    ]),
   ];
 
   const document = new PdfPrinter(fonts).createPdfKitDocument({
@@ -460,6 +491,16 @@ export async function generatePdf(
       },
       subQuestionAnswer: {
         margin: [5, 0, 0, 5],
+        fontSize: 12,
+      },
+      followUpSectionTitle: {
+        fontSize: 15,
+        color: '#696969',
+        bold: true,
+        margin: [5, 0, 0, 10],
+      },
+      followUpSectionAnswer: {
+        margin: [5, 0, 0, 15],
         fontSize: 12,
       },
     },

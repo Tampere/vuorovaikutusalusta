@@ -1,5 +1,5 @@
 import { SurveyImageSection } from '@interfaces/survey';
-import { FormLabel, Link } from '@mui/material';
+import { FormLabel, Link, Typography } from '@mui/material';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { getFullFilePath } from '@src/utils/path';
@@ -8,9 +8,10 @@ import SectionInfo from './SectionInfo';
 
 interface Props {
   section: SurveyImageSection;
+  isFollowUp?: boolean;
 }
 
-export default function ImageSection({ section }: Props) {
+export default function ImageSection({ section, isFollowUp = false }: Props) {
   const { survey } = useSurveyAnswers();
   const { tr, surveyLanguage, language } = useTranslations();
 
@@ -28,11 +29,13 @@ export default function ImageSection({ section }: Props) {
           alignItems: 'center',
         }}
       >
-        <FormLabel
-          component="h3"
-          style={{ color: survey.sectionTitleColor ?? '#000000' }}
-        >
-          {section.title?.[surveyLanguage]}
+        <FormLabel>
+          <Typography
+            variant={isFollowUp ? 'followUpSectionTitle' : 'questionTitle'}
+            sx={{ color: survey.sectionTitleColor ?? '#000000' }}
+          >
+            {section.title?.[surveyLanguage]}
+          </Typography>
         </FormLabel>
         {section.info && section.info?.[surveyLanguage] && (
           <SectionInfo

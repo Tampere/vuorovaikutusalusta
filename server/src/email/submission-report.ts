@@ -28,7 +28,7 @@ function getAttachments(answerEntries: AnswerEntry[]) {
   return answerEntries
     .filter(
       (entry): entry is AnswerEntry & { type: 'attachment' } =>
-        entry.type === 'attachment'
+        entry.type === 'attachment',
     )
     .reduce((files, entry) => {
       return [
@@ -38,7 +38,7 @@ function getAttachments(answerEntries: AnswerEntry[]) {
             ({
               filename: file.fileName,
               content: fileStringToBuffer(file.fileString),
-            } as Attachment)
+            } as Attachment),
         ),
       ];
     }, [] as Attachment[]);
@@ -64,8 +64,8 @@ export async function sendSubmissionReport({
   answerEntries: AnswerEntry[];
   includeAttachments: boolean;
 }) {
-  const subject = survey.email.subject[language] ?? survey.title[language];
-  const body = md.render(survey.email.body[language] ?? '');
+  const subject = survey.email.subject?.[language] ?? survey.title[language];
+  const body = md.render(survey.email.body?.[language] ?? '');
   const tr = useTranslations(language);
   const noReply = tr.noReply;
   const attachments: Attachment[] = [

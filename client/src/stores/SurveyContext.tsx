@@ -1,6 +1,7 @@
 import {
   MapLayer,
   Survey,
+  SurveyFollowUpSection,
   SurveyPage,
   SurveyPageSection,
 } from '@interfaces/survey';
@@ -75,9 +76,21 @@ type Action =
       sections: SurveyPageSection[];
     }
   | {
+      type: 'SET_FOLLOW_UP_SECTIONS';
+      pageId: number;
+      parentSectionId: number;
+      followUpSections: SurveyFollowUpSection[];
+    }
+  | {
       type: 'ADD_SECTION';
       pageId: number;
       section: SurveyPageSection;
+    }
+  | {
+      type: 'ADD_FOLLOW_UP_SECTION';
+      pageId: number;
+      parentSectionId: number;
+      section: SurveyFollowUpSection;
     }
   | {
       type: 'EDIT_SECTION';
@@ -86,9 +99,21 @@ type Action =
       section: SurveyPageSection;
     }
   | {
+      type: 'EDIT_FOLLOW_UP_SECTION';
+      pageId: number;
+      parentSectionId: number;
+      section: SurveyFollowUpSection | SurveyPageSection;
+    }
+  | {
       type: 'DELETE_SECTION';
       pageId: number;
       sectionIndex: number;
+    }
+  | {
+      type: 'DELETE_FOLLOW_UP_SECTION';
+      pageId: number;
+      parentSectionId: number;
+      followUpSectionId: number;
     }
   | {
       type: 'SET_AVAILABLE_MAP_LAYERS';
@@ -287,10 +312,32 @@ export function useSurvey() {
      * @param index
      */
     movePage(pageId: number, index: number) {
-      const page = state.activeSurvey.pages.find((page) => page.id === pageId);
+      let page = state.activeSurvey.pages.find((page) => page.id === pageId);
+
       const otherPages = state.activeSurvey.pages.filter(
         (page) => page.id !== pageId,
       );
+
+      if (index === 0 || index === state.activeSurvey?.pages?.length - 1) {
+        // First and last pages cannot have conditions
+        page = { ...page, conditions: {} };
+      } else {
+        // A page can only have conditions based on previous pages sections
+        const previousSectionIds = otherPages
+          .slice(0, index)
+          .map((page) => page.sections)
+          .flat(1)
+          .map((section) => section.id);
+        page = {
+          ...page,
+          conditions: Object.fromEntries(
+            Object.entries(page.conditions).filter(([sectionId, _conditions]) =>
+              previousSectionIds.includes(Number(sectionId)),
+            ),
+          ),
+        };
+      }
+
       dispatch({
         type: 'SET_PAGES',
         pages: [
@@ -308,6 +355,18 @@ export function useSurvey() {
     addSection(pageId: number, section: SurveyPageSection) {
       dispatch({ type: 'ADD_SECTION', pageId, section });
     },
+    addFollowUpSection(
+      pageId: number,
+      parentSectionId: number,
+      section: SurveyFollowUpSection,
+    ) {
+      dispatch({
+        type: 'ADD_FOLLOW_UP_SECTION',
+        pageId,
+        parentSectionId,
+        section,
+      });
+    },
     /**
      * Edits an existing section of a given page.
      * @param pageId Page ID
@@ -321,6 +380,18 @@ export function useSurvey() {
     ) {
       dispatch({ type: 'EDIT_SECTION', pageId, sectionIndex, section });
     },
+    editFollowUpSection(
+      pageId: number,
+      parentSectionId: number,
+      section: SurveyFollowUpSection | SurveyPageSection,
+    ) {
+      dispatch({
+        type: 'EDIT_FOLLOW_UP_SECTION',
+        pageId,
+        parentSectionId,
+        section,
+      });
+    },
     /**
      * Deletes section with given section index and page ID
      * @param pageId
@@ -328,6 +399,18 @@ export function useSurvey() {
      */
     deleteSection(pageId: number, sectionIndex: number) {
       dispatch({ type: 'DELETE_SECTION', pageId, sectionIndex });
+    },
+    deleteFollowUpSection(
+      pageId: number,
+      parentSectionId: number,
+      followUpSectionId: number,
+    ) {
+      dispatch({
+        type: 'DELETE_FOLLOW_UP_SECTION',
+        pageId,
+        parentSectionId,
+        followUpSectionId,
+      });
     },
     /**
      * Move a section into a new index.
@@ -347,6 +430,34 @@ export function useSurvey() {
         sections: [
           ...otherSections.slice(0, newIndex),
           section,
+          ...otherSections.slice(newIndex),
+        ],
+      });
+    },
+    moveFollowUpSection(
+      pageId: number,
+      parentSectionId: number,
+      oldIndex: number,
+      newIndex: number,
+    ) {
+      const page = state.activeSurvey.pages.find((page) => page.id === pageId);
+
+      const parentSection = page.sections.find(
+        (sect) => sect.id === parentSectionId,
+      );
+
+      const followUpSection = parentSection.followUpSections[oldIndex];
+      const otherSections = parentSection.followUpSections.filter(
+        (_, index) => index !== oldIndex,
+      );
+
+      dispatch({
+        type: 'SET_FOLLOW_UP_SECTIONS',
+        pageId,
+        parentSectionId,
+        followUpSections: [
+          ...otherSections.slice(0, newIndex),
+          followUpSection,
           ...otherSections.slice(newIndex),
         ],
       });
@@ -501,6 +612,27 @@ function reducer(state: State, action: Action): State {
           ),
         },
       };
+    case 'SET_FOLLOW_UP_SECTIONS':
+      return {
+        ...state,
+        activeSurvey: {
+          ...state.activeSurvey,
+          pages: state.activeSurvey.pages.map((page) =>
+            action.pageId === page.id
+              ? {
+                  ...page,
+                  sections: page.sections.map((sect) => ({
+                    ...sect,
+                    followUpSections:
+                      sect.id === action.parentSectionId
+                        ? action.followUpSections
+                        : sect.followUpSections,
+                  })),
+                }
+              : page,
+          ),
+        },
+      };
     case 'ADD_SECTION':
       return {
         ...state,
@@ -511,6 +643,30 @@ function reducer(state: State, action: Action): State {
               ? {
                   ...page,
                   sections: [...page.sections, action.section],
+                }
+              : page,
+          ),
+        },
+      };
+    case 'ADD_FOLLOW_UP_SECTION':
+      return {
+        ...state,
+        activeSurvey: {
+          ...state.activeSurvey,
+          pages: state.activeSurvey.pages.map((page) =>
+            action.pageId === page.id
+              ? {
+                  ...page,
+                  sections: page.sections.map((sect) =>
+                    sect.id === action.parentSectionId
+                      ? {
+                          ...sect,
+                          followUpSections: sect?.followUpSections
+                            ? [...sect.followUpSections, action.section]
+                            : [action.section],
+                        }
+                      : sect,
+                  ),
                 }
               : page,
           ),
@@ -537,6 +693,33 @@ function reducer(state: State, action: Action): State {
           ),
         },
       };
+    case 'EDIT_FOLLOW_UP_SECTION':
+      return {
+        ...state,
+        activeSurvey: {
+          ...state.activeSurvey,
+          pages: state.activeSurvey.pages.map((page) =>
+            action.pageId === page.id
+              ? {
+                  ...page,
+                  sections: page.sections.map((sect) =>
+                    sect.id === action.parentSectionId
+                      ? {
+                          ...sect,
+                          followUpSections: sect.followUpSections.map(
+                            (followUpSection) =>
+                              followUpSection.id === action.section.id
+                                ? { ...followUpSection, ...action.section }
+                                : followUpSection,
+                          ),
+                        }
+                      : sect,
+                  ),
+                }
+              : page,
+          ),
+        },
+      };
     case 'DELETE_SECTION':
       return {
         ...state,
@@ -548,6 +731,30 @@ function reducer(state: State, action: Action): State {
                   ...page,
                   sections: page.sections.filter(
                     (_, index) => index !== action.sectionIndex,
+                  ),
+                }
+              : page,
+          ),
+        },
+      };
+    case 'DELETE_FOLLOW_UP_SECTION':
+      return {
+        ...state,
+        activeSurvey: {
+          ...state.activeSurvey,
+          pages: state.activeSurvey.pages.map((page) =>
+            action.pageId === page.id
+              ? {
+                  ...page,
+                  sections: page.sections.map((section) =>
+                    action.parentSectionId === section.id
+                      ? {
+                          ...section,
+                          followUpSections: section.followUpSections.filter(
+                            (sect) => action.followUpSectionId !== sect.id,
+                          ),
+                        }
+                      : section,
                   ),
                 }
               : page,

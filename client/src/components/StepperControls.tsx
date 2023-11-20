@@ -3,6 +3,7 @@ import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useState } from 'react';
 import SaveAsUnfinishedDialog from './SaveAsUnfinishedDialog';
+import { SurveyPage } from '@interfaces/survey';
 
 const useStyles = makeStyles({
   root: {
@@ -25,6 +26,8 @@ interface Props {
   onSubmit: () => void;
   allowSavingUnfinished?: boolean;
   onSaveUnfinished?: (token: string) => void;
+  nextPage: SurveyPage;
+  previousPage: SurveyPage;
 }
 
 export default function StepperControls(props: Props) {

@@ -73,6 +73,20 @@ export function assertNever(value: never): never {
   );
 }
 
+/**
+ * Function for getting alphabet characters with index
+ * @param num
+ * @returns
+ */
+export function indexToAlpha(num = 1) {
+  // ASCII value of first character
+  const a = 'a'.charCodeAt(0);
+  const numberToCharacter = (number: number) => {
+    return String.fromCharCode(a + number);
+  };
+  return numberToCharacter(num);
+}
+
 export function geometryToGeoJSONFeatureCollection(
   geometry: Geometry,
   properties: Record<string, string>,

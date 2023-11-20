@@ -27,8 +27,10 @@ import AddSurveySectionActions from './AddSurveySectionActions';
 import FileUpload from './FileUpload';
 import SurveySections from './SurveySections';
 import { SurveyPageSidebarImageSize } from '@interfaces/survey';
+import { EditSurveyPageConditions } from './EditSurveyPageConditions';
 import { AdminSurveyMapPreview } from './AdminSurveyMapPreview';
 import { useAdminMap } from '@src/stores/SurveyMapContext';
+
 
 const useStyles = makeStyles({
   button: {
@@ -124,6 +126,7 @@ export default function EditSurveyPage() {
       >
         {tr.EditSurveyPage.deletePage}
       </Button>
+      <EditSurveyPageConditions />
       <FormGroup>
         <FormLabel>{tr.EditSurveyPage.selectSidebarType}</FormLabel>
         <ToggleButtonGroup
@@ -362,8 +365,7 @@ export default function EditSurveyPage() {
         </div>
       )}
       <SurveySections
-        pageId={page.id}
-        sections={page.sections}
+        page={page}
         disabled={loading}
         expandedSection={expandedSection}
         onExpandedSectionChange={(section) => {

@@ -1,5 +1,5 @@
 import { SurveyDocumentSection } from '@interfaces/survey';
-import { FormLabel, Link } from '@mui/material';
+import { FormLabel, Link, Typography } from '@mui/material';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import React, { useMemo } from 'react';
 import SectionInfo from './SectionInfo';
@@ -8,9 +8,13 @@ import { getFullFilePath } from '@src/utils/path';
 
 interface Props {
   section: SurveyDocumentSection;
+  isFollowUp?: boolean;
 }
 
-export default function DocumentSection({ section }: Props) {
+export default function DocumentSection({
+  section,
+  isFollowUp = false,
+}: Props) {
   const { survey } = useSurveyAnswers();
   const { tr, surveyLanguage } = useTranslations();
 
@@ -28,11 +32,13 @@ export default function DocumentSection({ section }: Props) {
           alignItems: 'center',
         }}
       >
-        <FormLabel
-          component="h3"
-          style={{ color: survey.sectionTitleColor ?? '#000000' }}
-        >
-          {section.title?.[surveyLanguage]}
+        <FormLabel>
+          <Typography
+            variant={isFollowUp ? 'followUpSectionTitle' : 'questionTitle'}
+            sx={{ color: survey.sectionTitleColor ?? '#000000' }}
+          >
+            {section.title?.[surveyLanguage]}
+          </Typography>
         </FormLabel>
         {section.info && section.info?.[surveyLanguage] && (
           <SectionInfo
