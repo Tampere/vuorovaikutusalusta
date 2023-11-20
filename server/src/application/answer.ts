@@ -315,7 +315,7 @@ async function answerEntriesToCSV(entries: CSVJson): Promise<string> {
   const { submissions, headers } = entries;
 
   let csvData = `Vastaustunniste,Vastauskieli,Aikaleima,${headers.map(
-    (header) => `${Object.values(header)[0]}`,
+    (header) => `"${Object.values(header)[0]}"`,
   )}\n`;
 
   for (let i = 0; i < submissions.length; ++i) {
@@ -378,13 +378,16 @@ export async function getGeoPackageFile(surveyId: number): Promise<Buffer> {
   }
 
   // Group features by question to add them to separate layers
-  const featuresByQuestion = features.reduce((questions, feature) => {
-    const { properties } = feature;
-    const questionTitle = properties['Kysymys'];
-    questions[questionTitle] = questions[questionTitle] ?? [];
-    questions[questionTitle].push(feature);
-    return questions;
-  }, {} as { [key: string]: Feature[] });
+  const featuresByQuestion = features.reduce(
+    (questions, feature) => {
+      const { properties } = feature;
+      const questionTitle = properties['Kysymys'];
+      questions[questionTitle] = questions[questionTitle] ?? [];
+      questions[questionTitle].push(feature);
+      return questions;
+    },
+    {} as { [key: string]: Feature[] },
+  );
 
   const tmpFilePath = `/tmp/geopackage_${Date.now()}.gpkg`;
 
@@ -766,9 +769,9 @@ function createCSVHeaders(sectionMetadata: SectionHeader[]) {
       default:
         allHeaders.push({
           [getHeaderKey(sectionHead.pageIndex, sectionHead.sectionIndex)]:
-            `s${sectionHead.pageIndex + 1}k${sectionHead.sectionIndex + 1}: ${
-              sectionHead.title?.['fi']
-            }` ?? '',
+            `s${sectionHead.pageIndex + 1}k${
+              sectionHead.sectionIndex + 1
+            }: ${sectionHead.title?.['fi']}` ?? '',
         });
     }
   });
