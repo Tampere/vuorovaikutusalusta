@@ -129,6 +129,7 @@ async function validateEntriesByAnswerLimits(answerEntries: AnswerEntry[]) {
 
 /**
  * Validate answer entries to contain answers required questions
+ * Disregard follow-up questions as they are conditionally answered
  * @param answerEntries Answer entries to validate
  */
 async function validateEntriesByIsRequired(answerEntries: AnswerEntry[]) {
@@ -141,7 +142,8 @@ async function validateEntriesByIsRequired(answerEntries: AnswerEntry[]) {
     FROM data.page_section
     WHERE
       id = ANY ($1) AND
-      (details->>'isRequired')::boolean`,
+      (details->>'isRequired')::boolean AND
+      predecessor_section = NULL`,
     [answerEntries.map((entry) => entry.sectionId)],
   );
 

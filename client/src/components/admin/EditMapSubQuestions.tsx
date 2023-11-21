@@ -2,7 +2,7 @@ import { SurveyMapQuestion, SurveyMapSubQuestion } from '@interfaces/survey';
 import { makeStyles } from '@mui/styles';
 import React from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
-import SurveySectionAccordion from './SurveySectionAccordion';
+import SurveySectionAccordion from './SurveySectionAccordion/SurveySectionAccordion';
 
 interface Props {
   mapQuestion: SurveyMapQuestion;
@@ -29,12 +29,12 @@ export default function EditMapSubQuestions(props: Props) {
         }
         const subQuestionId = Number(event.draggableId);
         const oldIndex = props.mapQuestion.subQuestions.findIndex(
-          (subQuestion) => subQuestion.id === subQuestionId
+          (subQuestion) => subQuestion.id === subQuestionId,
         );
         const subQuestion = props.mapQuestion.subQuestions[oldIndex];
         const newIndex = event.destination.index;
         const otherSubQuestions = props.mapQuestion.subQuestions.filter(
-          (subQuestion) => subQuestion.id !== subQuestionId
+          (subQuestion) => subQuestion.id !== subQuestionId,
         );
         props.onChange([
           ...otherSubQuestions.slice(0, newIndex),
@@ -72,7 +72,7 @@ export default function EditMapSubQuestions(props: Props) {
                     onEdit={(index, editedSection: SurveyMapSubQuestion) => {
                       // Replace the edited subquestion in the array
                       const subQuestions = props.mapQuestion.subQuestions.map(
-                        (section, i) => (i === index ? editedSection : section)
+                        (section, i) => (i === index ? editedSection : section),
                       );
                       props.onChange(subQuestions);
                     }}
@@ -80,7 +80,7 @@ export default function EditMapSubQuestions(props: Props) {
                       // Filter out the subquestion from the array
                       const subQuestions =
                         props.mapQuestion.subQuestions.filter(
-                          (_, i) => i !== index
+                          (_, i) => i !== index,
                         );
                       props.onChange(subQuestions);
                       // Reset expanded section to null

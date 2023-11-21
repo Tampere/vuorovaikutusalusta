@@ -6,12 +6,14 @@ import ReactMarkdown from 'react-markdown';
 import rehypeExternalLinks from 'rehype-external-links';
 import remarkBreaks from 'remark-breaks';
 import SectionInfo from './SectionInfo';
+import { Typography } from '@mui/material';
 
 interface Props {
   section: SurveyTextSection;
+  isFollowUp?: boolean;
 }
 
-export default function TextSection({ section }: Props) {
+export default function TextSection({ section, isFollowUp = false }: Props) {
   const { survey } = useSurveyAnswers();
   const { surveyLanguage } = useTranslations();
 
@@ -25,11 +27,12 @@ export default function TextSection({ section }: Props) {
         }}
       >
         {section.title?.[surveyLanguage] && (
-          <h3
-            style={{ color: survey.sectionTitleColor ?? '#000000', margin: 0 }}
+          <Typography
+            variant={isFollowUp ? 'followUpSectionTitle' : 'questionTitle'}
+            sx={{ color: survey.sectionTitleColor ?? '#000000', margin: 0 }}
           >
             {section.title?.[surveyLanguage]}
-          </h3>
+          </Typography>
         )}
         {section.info && section.info?.[surveyLanguage] && (
           <SectionInfo

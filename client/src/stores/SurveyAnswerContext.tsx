@@ -1,5 +1,6 @@
 import {
   AnswerEntry,
+  Conditions,
   LanguageCode,
   Survey,
   SurveyPage,
@@ -15,6 +16,7 @@ import React, {
   useReducer,
 } from 'react';
 import { useTranslations } from './TranslationContext';
+import { isFollowUpSectionParentType, isString } from '@src/utils/typeCheck';
 
 interface State {
   answers: AnswerEntry[];
@@ -206,6 +208,7 @@ export function useSurveyAnswers() {
       [];
     // Find the answer that corresponds to the question
     const answer = answers.find((answer) => answer.sectionId === question.id);
+    if (!answer.hasOwnProperty('value')) return errors; // Shouldn't happen but used just in case to prevent errors
 
     // Checkbox question validation - check possible answer limits
     if (question.type === 'checkbox' || question.type === 'grouped-checkbox') {
@@ -287,11 +290,156 @@ export function useSurveyAnswers() {
         errors.push('required');
       }
     }
+
     return errors;
+  }
+
+  /**
+   * Check if given page with given conditions should be displayed
+   * @param page
+   * @returns
+   */
+
+  function getConditionalPageVisibility(page: SurveyPage) {
+    if (!page.conditions || Object.values(page.conditions).length === 0)
+      return true;
+
+    return state.answers.some((answerEntry) => {
+      const conditionForSection =
+        page.conditions?.[answerEntry.sectionId] ?? null;
+      // Page has no condition for this answer
+      if (!conditionForSection) return false;
+      switch (answerEntry.type) {
+        case 'radio':
+          return conditionForSection.equals.some(
+            (answerId) =>
+              (isString(answerEntry.value) ? -1 : answerEntry.value) ===
+              answerId,
+          );
+
+        case 'checkbox':
+          return conditionForSection.equals.some((answerId) =>
+            (
+              answerEntry as Extract<AnswerEntry, { type: 'checkbox' }>
+            ).value.some((val) => (isString(val) ? -1 : val) === answerId),
+          );
+
+        case 'numeric':
+        case 'slider':
+          return conditionForSection.equals.some(
+            (conditionValue) => answerEntry.value === conditionValue,
+          )
+            ? true
+            : conditionForSection.greaterThan.some(
+                (conditionValue) => answerEntry.value >= conditionValue,
+              )
+            ? true
+            : conditionForSection.lessThan.some(
+                (conditionValue) => answerEntry.value <= conditionValue,
+              )
+            ? true
+            : false;
+
+        default:
+          return false;
+      }
+    });
+  }
+
+  /**
+   * Checks is question follow-up section conditions are fulfilled and return list of
+   * follow-up question ids that should be displayed
+   * @param question
+   * @returns
+   */
+
+  function getFollowUpSectionsToDisplay(question: SurveyQuestion) {
+    // Find the answer that corresponds to the question
+
+    const answer = state.answers.find(
+      (answer) => answer.sectionId === question.id,
+    );
+
+    if (
+      !question?.followUpSections ||
+      question.followUpSections.length === 0 ||
+      !answer?.value
+    ) {
+      return [];
+    }
+
+    switch (question.type) {
+      case 'radio':
+        return question.followUpSections
+          .filter((section) =>
+            section.conditions.equals.some(
+              (answerId) =>
+                (isString(answer.value) ? -1 : answer.value) === answerId,
+            ),
+          )
+          .map((s) => s.id);
+      case 'checkbox':
+        return question.followUpSections
+          .filter((section) =>
+            section.conditions.equals.some((answerId) =>
+              (answer as Extract<AnswerEntry, { type: 'checkbox' }>).value.some(
+                (val) => (isString(val) ? -1 : val) === answerId,
+              ),
+            ),
+          )
+          .map((s) => s.id);
+      case 'numeric':
+      case 'slider':
+        return question.followUpSections
+          .filter((section) => {
+            const value = (
+              answer as Extract<AnswerEntry, { type: 'numeric' | 'slider' }>
+            ).value;
+
+            return section.conditions.equals.some(
+              (conditionValue) => value === conditionValue,
+            )
+              ? true
+              : section.conditions.greaterThan.some(
+                  (conditionValue) => value >= conditionValue,
+                )
+              ? true
+              : section.conditions.lessThan.some(
+                  (conditionValue) => value <= conditionValue,
+                )
+              ? true
+              : false;
+          })
+          .map((s) => s.id);
+      default:
+        return [];
+    }
+  }
+
+  /**
+   * Filter out answers for hidden conditional pages
+   * @param visiblePages
+   */
+  function getAnswersForSubmission(visiblePages: number[]) {
+    const visibleSectionIds = state.survey.pages
+      .filter((page) => visiblePages.includes(page.id))
+      .map((page) => page.sections)
+      .flat(1)
+      .map((section) => [section, ...(section?.followUpSections ?? [])])
+      .flat(1)
+      .map((section) => section.id);
+
+    return state.answers.filter((answer) =>
+      visibleSectionIds.includes(answer.sectionId),
+    );
   }
 
   return {
     ...state,
+    getFollowUpSectionsToDisplay,
+    getConditionalPageVisibility,
+    getAnswersForSubmission,
+
     /**
      * Update survey answer
      * @param answer Survey answer
@@ -311,10 +459,24 @@ export function useSurveyAnswers() {
       }
       dispatch({ type: 'SET_SURVEY', survey });
       // Get all sections across survey pages
+      function getSectionsFollowUpSections(sections: SurveyPageSection[]) {
+        return sections
+          .map((section) => section?.followUpSections ?? [])
+          .flat(1);
+      }
+
       const sections = survey.pages
-        .reduce((sections, page) => [...sections, ...page.sections], [])
+        .reduce(
+          (sections, page) => [
+            ...sections,
+            ...page.sections,
+            ...getSectionsFollowUpSections(page.sections),
+          ],
+          [],
+        )
         // Skip sections that shouldn't get answers
         .filter((section) => !nonQuestionSectionTypes.includes(section.type));
+
       dispatch({
         type: 'SET_ANSWERS',
         answers: sections.map(getEmptyAnswer).filter(Boolean),
@@ -341,7 +503,24 @@ export function useSurveyAnswers() {
           (section): section is SurveyQuestion =>
             !nonQuestionSectionTypes.includes(section.type),
         )
-        .some((section) => getValidationErrors(section).length);
+        .some((section) => {
+          if (
+            isFollowUpSectionParentType(section) &&
+            section.followUpSections?.length > 0
+          ) {
+            const displayedFollowUpIds = getFollowUpSectionsToDisplay(section);
+
+            return section.followUpSections
+              .filter(
+                (sect): sect is SurveyQuestion & { conditions: Conditions } =>
+                  displayedFollowUpIds.includes(sect.id) &&
+                  !nonQuestionSectionTypes.includes(sect.type),
+              )
+              .some((s) => getValidationErrors(s).length);
+          }
+
+          return getValidationErrors(section).length;
+        });
     },
     /**
      *
