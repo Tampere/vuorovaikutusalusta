@@ -26,7 +26,6 @@ import {
 import {
   DragIndicator,
   ExpandMore,
-  ContentCopy,
   Article,
   AttachFile,
   CheckBox,
@@ -360,9 +359,7 @@ export function FollowUpSectionAccordion(props: Props) {
                 severity: 'success',
               });
             }}
-          >
-            <ContentCopy />
-          </IconButton>
+          ></IconButton>
           <div {...props.provided.dragHandleProps} style={{ display: 'flex' }}>
             <DragIndicator />
           </div>
