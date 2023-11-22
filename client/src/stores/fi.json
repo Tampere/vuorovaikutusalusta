@@ -85,6 +85,21 @@
   },
   "EditSurveyPage": {
     "name": "Sivun nimi",
+    "conditions": {
+      "noSelections": "Ei valintoja",
+      "selections": "{x} valintaa",
+      "label": "Näytä sivu",
+      "pageVisible": "aina",
+      "pageHasConditions": "jos seuraava ehto täyttyy",
+      "questionSelectorLabel": "Kysymyksen",
+      "equals": "vastaus on tasan",
+      "contains": "Vastaus sisältää vaihtoehdon",
+      "somethingElse": "Jokin muu, mikä?",
+      "numeric": {
+        "lessThan": "vastaus on enintään",
+        "greaterThan": "vastaus on vähintään"
+      }
+    },
     "deletePage": "Poista sivu",
     "confirmDeletePage": "Haluatko varmasti poistaa tämän sivun? Toimintoa ei voida perua.",
     "deletePageFailed": "Sivun poistamisessa tapahtui virhe. Yritä myöhemmin uudestaan.",
@@ -98,9 +113,23 @@
     "warningNoMapUrl": "Kyselylle ei ole määritetty Oskari-karttajulkaisua.",
     "warningNoAvailableMapLayers": "Oskari-karttajulkaisusta ei löytynyt näytettäviä karttatasoja.",
     "mapLayers": "Sivulla näytettävät karttatasot",
+    "defaultMapView": "Kartan oletusnäkymä tällä sivulla",
+    "defaultMapViewStatus": { "set": "Asetettu", "notSet": "Ei asetettu" },
+    "defaultMapViewInfo": "Merkitse hiirellä klikkaamalla kartalta alue, jonka haluat näkyvän kysymyssivulla.",
+    "mapViewButtons": {
+      "set": "Aseta",
+      "showMap": "Näytä",
+      "modifyDefaultView": "Muokkaa",
+      "deleteDefaultView": "Poista",
+      "close": "Sulje",
+      "clear": "Tyhjennä",
+      "cancel": "Peruuta"
+    },
     "untitledSection": "Nimetön osio",
     "title": "Otsikko",
     "deleteSection": "Poista osio",
+    "addFollowUpQuestion": "Lisää jatkokysymys",
+    "addFollowUpButtonTile": "Tallenna kysymys lisätäksesi jatkokysymyksen",
     "confirmDeleteSection": "Haluatko varmasti poistaa tämän osion?",
     "imageAltText": "Kuvan vaihtoehtoinen teksti",
     "imageScaling": "Kuvan skaalaus",
@@ -112,6 +141,29 @@
     "sectionAttached": "Huomaa, että karttatasovalinnat eivät kopioidu. Tarkista karttatasovalinnat ja korjaa tarvittaessa karttajulkaisuosoitetta",
     "attachSection": "Uusi osio leikepöydältä"
   },
+  "FollowUpSection": {
+    "title": "Jatkokysymys kysymykselle",
+    "conditions": {
+      "title": "Ehdot",
+      "labelForSingle": "Näytä jatkokysymys, jos seuraava ehto täyttyy:",
+      "labelForMultiple": "Näytä jatkokysymys, jos yksikin seuraavista ehdoista täyttyy:",
+      "chooseCondition": "valitse ehto",
+      "insertValue": "syötä vertailuarvo",
+      "customAnswer": "Jokin muu, mikä?",
+      "types": {
+        "equals": "Vastaus on tasan",
+        "contains": "Vastaus sisältää vaihtoehdon",
+        "lessThan": "enintään",
+        "greaterThan": "vähintään",
+        "or": "tai"
+      },
+      "validationError": "Vertailuarvon täytyy olla luku."
+    },
+    "question": "Kysymys",
+    "changeType": "Vaihda kysymystyyppi",
+    "cancel": "Peruuta"
+  },
+
   "FileUpload": {
     "deleteFile": "Poista tiedosto",
     "addedFile": "Valittu tiedosto",
@@ -342,9 +394,12 @@
     "fail": "Arvon leikepöydälle kopioinnissa tapahtui virhe. Yritä myöhemmin uudestaan."
   },
   "SurveyStepper": {
+    "followUpSections": "Jatkokysymykset:",
     "next": "Seuraava",
     "previous": "Edellinen",
     "submit": "Lähetä",
+    "conditionalPage": "ehdollinen vaihe",
+    "conditionalPageNotActivated": "ei koske Teitä",
     "errorSubmittingSurvey": "Kyselyn lähettämisessä tapahtui virhe. Ole hyvä ja yritä myöhemmin uudestaan.",
     "openMap": "Avaa kartta",
     "closeMap": "Sulje kartta",

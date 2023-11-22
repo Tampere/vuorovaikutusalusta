@@ -15,6 +15,7 @@ import { useTranslations } from '@src/stores/TranslationContext';
 import React from 'react';
 import SurveyQuestion from '@src/components/SurveyQuestion';
 import { format } from 'date-fns';
+import { SurveyFollowUpSections } from '@src/components/SurveyFollowUpSections';
 
 interface Props {
   answers: AnswerItem[];
@@ -129,9 +130,7 @@ export default function AnswersList({
               )}
             </AccordionSummary>
             {isItemSelected(answer, selectedAnswer) && (
-              <AccordionDetails
-                sx={{ borderTop: 0, padding: '0 2rem 1rem 2rem' }}
-              >
+              <AccordionDetails sx={{ borderTop: 0, padding: '1rem 2rem' }}>
                 {answer.entry.type === 'map' ? (
                   <>
                     {(answer.entry as AnswerEntry & { type: 'map' }).value.map(
@@ -160,21 +159,36 @@ export default function AnswersList({
                     )}
                   </>
                 ) : (
-                  <SurveyQuestion
-                    readOnly
-                    pageUnfinished={false}
-                    mobileDrawerOpen={false}
-                    question={
-                      selectedQuestion?.id === 0
-                        ? surveyQuestions.find(
-                            (question) =>
-                              question.id === answer.entry.sectionId,
-                          )
-                        : selectedQuestion
-                    }
-                    submission={answer.submission}
-                    value={answer.entry.value}
-                  />
+                  <>
+                    <SurveyQuestion
+                      readOnly
+                      pageUnfinished={false}
+                      mobileDrawerOpen={false}
+                      question={
+                        selectedQuestion?.id === 0
+                          ? surveyQuestions.find(
+                              (question) =>
+                                question.id === answer.entry.sectionId,
+                            )
+                          : selectedQuestion
+                      }
+                      submission={answer.submission}
+                      value={answer.entry.value}
+                    />
+                    <SurveyFollowUpSections
+                      answer={answer}
+                      section={
+                        selectedQuestion?.id === 0
+                          ? surveyQuestions.find(
+                              (question) =>
+                                question.id === answer.entry.sectionId,
+                            )
+                          : selectedQuestion
+                      }
+                      mobileDrawerOpen={false}
+                      pageUnfinished={false}
+                    />
+                  </>
                 )}
               </AccordionDetails>
             )}

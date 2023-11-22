@@ -12,6 +12,9 @@
     "prebuild": "npm run lint && npm run test",
     "build": "vite build"
   },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,json}": "prettier --write --ignore-unknown"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ubigu/vuorovaikutusalusta.git"

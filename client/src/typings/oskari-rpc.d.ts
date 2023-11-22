@@ -210,6 +210,14 @@ declare module 'oskari-rpc' {
     actionParams: any;
   }) => void;
 
+  export type MapClickEventHandler = (payload: {
+    lon: number;
+    lat: number;
+    x: number;
+    y: number;
+    ctrlKeyDown: boolean;
+  }) => void;
+
   /**
    * Style for a feature
    */
@@ -270,6 +278,14 @@ declare module 'oskari-rpc' {
       name: 'InfoboxActionEvent',
       callback: InfoboxActionEventHandler,
     ) => void;
+
+    /**
+     * Oskari map click event
+     */
+    export type MapClickedEvent = (
+      name: 'MapClickedEvent',
+      callback: MapClickEventHandler,
+    ) => void;
   }
 
   export interface Channel {
@@ -280,6 +296,7 @@ declare module 'oskari-rpc' {
     getSupportedRequests: (callback: (requests: unknown[]) => void) => void;
     getSupportedFunctions: (callback: (functions: unknown[]) => void) => void;
     getInfo: (callback: (info: any) => void) => void;
+    resetState: (callback: (data: any) => void) => void;
     /**
      * Post an Oskari request
      */
@@ -296,10 +313,12 @@ declare module 'oskari-rpc' {
     /**
      * Handle an Oskari event
      */
-    handleEvent: Event.DrawingEvent &
+    handleEvent: Event.MapClickedEvent &
+      Event.DrawingEvent &
       Event.FeatureEvent &
       Event.MarkerClickEvent &
       Event.InfoboxActionEvent;
+
     /**
      * Unregister any registered event handler
      */

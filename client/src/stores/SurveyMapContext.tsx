@@ -36,7 +36,10 @@ interface State {
     secondaryColor: string;
     secondaryFillColor: string;
   };
+
+  defaultView: GeoJSON.FeatureCollection;
   oskariVersion: number;
+
 }
 
 type Action =
@@ -80,14 +83,20 @@ type Action =
       value: boolean;
     }
   | {
+
+      type: 'SET_DEFAULT_VIEW';
+      value: GeoJSON.FeatureCollection;
+    }
+  | {
       type: 'SET_OSKARI_VERSION';
       value: number;
+
     };
 
 type Context = [State, React.Dispatch<Action>];
 
 const stateDefaults: State = {
-  visibleLayers: [],
+  visibleLayers: null,
   allLayers: [],
   rpcChannel: null,
   helperText: null,
@@ -105,13 +114,19 @@ const stateDefaults: State = {
     secondaryColor: '#3e37bf',
     secondaryFillColor: 'rgba(62, 55, 191, 0.6)',
   },
+
+  defaultView: null,
   oskariVersion: null,
+
 };
 
 /**
  * Context containing the state object and dispatch function.
  */
 export const SurveyMapContext = createContext<Context>(null);
+
+// Default view layer id
+const defaultViewLayer = 'defaultView';
 
 // Layer ID for answer geometries
 const answerGeometryLayer = 'answers';
@@ -179,6 +194,116 @@ function getDrawingEventId(
   selectionType?: MapQuestionSelectionType,
 ) {
   return `map-answer:${questionId}${selectionType ? `:${selectionType}` : ''}`;
+}
+
+export function useAdminMap() {
+  const context = useContext(SurveyMapContext);
+  const featureStyle = {
+    fill: { color: '#00000000' },
+    stroke: { color: '#FF4747', lineDash: 6 },
+  };
+
+  if (!context) {
+    throw new Error('useSurveyMap must be used within the SurveyMapProvider');
+  }
+
+  const [state, dispatch] = context;
+
+  const isMapReady = useMemo(
+    () => Boolean(state.rpcChannel),
+    [state.rpcChannel],
+  );
+
+  function startDrawingRequest() {
+    state.rpcChannel.postRequest('DrawTools.StartDrawingRequest', [
+      'DefaultViewSelection',
+      'Box',
+      {
+        allowMultipleDrawing: 'single',
+        style: {
+          draw: {
+            fill: { color: '#00000000' },
+            stroke: { color: '#FF4747', lineDash: 6, width: 2 },
+          },
+          modify: {
+            fill: { color: '#00000000' },
+            stroke: { color: '#FF4747', lineDash: 6, width: 2 },
+          },
+        },
+        modifyControl: false,
+      },
+    ]);
+
+    const drawingHandler: DrawingEventHandler = (event) => {
+      if (event.id === 'DefaultViewSelection' && state.defaultView) {
+        state.rpcChannel.postRequest(
+          'MapModulePlugin.RemoveFeaturesFromMapRequest',
+          [null, null, defaultViewLayer],
+        );
+      }
+      if (event.id === 'DefaultViewSelection' && event.isFinished) {
+        dispatch({
+          type: 'SET_DEFAULT_VIEW',
+          value: event.geojson,
+        });
+      }
+    };
+
+    state.rpcChannel.handleEvent('DrawingEvent', drawingHandler);
+  }
+  function drawDefaultView() {
+    if (!state.defaultView) return;
+
+    state.rpcChannel.postRequest('MapModulePlugin.AddFeaturesToMapRequest', [
+      state.defaultView,
+      {
+        centerTo: true,
+        clearPrevious: true,
+        layerId: defaultViewLayer,
+        featureStyle: featureStyle,
+      },
+    ] as any);
+  }
+
+  function clearView() {
+    // Clear recent features
+    state.rpcChannel.postRequest('DrawTools.StopDrawingRequest', [
+      'DefaultViewSelection',
+      true,
+      true,
+    ]);
+    // Clear previously drawn features
+    state.rpcChannel.postRequest(
+      'MapModulePlugin.RemoveFeaturesFromMapRequest',
+      [null, null, defaultViewLayer],
+    );
+    dispatch({
+      type: 'SET_DEFAULT_VIEW',
+      value: null,
+    });
+    startDrawingRequest();
+  }
+
+  return {
+    ...state,
+    isMapReady,
+    startDrawingRequest,
+    drawDefaultView,
+    clearView,
+    /**
+     * Set RPC channel for controlling the map
+     * @param rpcChannel
+     */
+    setRpcChannel(rpcChannel: Channel) {
+      dispatch({ type: 'SET_RPC_CHANNEL', rpcChannel });
+    },
+    setDefaultView(viewGeometry: GeoJSON.FeatureCollection) {
+      dispatch({ type: 'SET_DEFAULT_VIEW', value: viewGeometry });
+    },
+    setVisibleLayers(layers: number[]) {
+      dispatch({ type: 'SET_VISIBLE_LAYERS', layers });
+    },
+  };
 }
 
 /**
@@ -271,9 +396,29 @@ export function useSurveyMap() {
     });
   }
 
+  function centerToDefaultView(
+    featureCollection: GeoJSON.FeatureCollection,
+    style: object = {},
+  ) {
+    state.rpcChannel.postRequest(
+      'MapModulePlugin.RemoveFeaturesFromMapRequest',
+      [null, null, defaultViewLayer],
+    );
+    state.rpcChannel.postRequest('MapModulePlugin.AddFeaturesToMapRequest', [
+      featureCollection,
+      {
+        centerTo: true,
+        clearPrevious: true,
+        layerId: defaultViewLayer,
+        featureStyle: style,
+      },
+    ] as any);
+  }
+
   return {
     ...state,
     isMapReady,
+    centerToDefaultView,
     /**
      * Set visible layers
      * @param layers Visible layers
@@ -310,7 +455,7 @@ export function useSurveyMap() {
         // Open editing dialog via context
         dispatch({
           type: 'SET_EDITING_MAP_ANSWER',
-          value: { questionId: question.id, index },
+          value: { questionId: question?.id, index },
         });
       });
 
@@ -648,6 +793,12 @@ function reducer(state: State, action: Action): State {
         ...state,
         modifying: action.value,
       };
+
+    case 'SET_DEFAULT_VIEW':
+      return {
+        ...state,
+        defaultView: action.value,
+      }
     case 'SET_OSKARI_VERSION':
       return {
         ...state,
@@ -680,6 +831,7 @@ export default function SurveyMapProvider({
     if (!state.rpcChannel) {
       return;
     }
+
     state.rpcChannel.getAllLayers((allLayers) => {
       const layers = allLayers.map((layer) => layer.id);
       dispatch({ type: 'SET_ALL_LAYERS', layers });
@@ -702,7 +854,7 @@ export default function SurveyMapProvider({
       // Update visibility for each layer - only show it if current page has that layer visible
       state.rpcChannel.postRequest(
         'MapModulePlugin.MapLayerVisibilityRequest',
-        [layerId, state.visibleLayers.includes(layerId)],
+        [layerId, state.visibleLayers?.includes?.(layerId) ?? false],
       );
     });
   }, [state.rpcChannel, state.allLayers, state.visibleLayers]);

@@ -6,6 +6,13 @@ import {
 } from '@mui/material/styles';
 import { fiFI } from '@mui/material/locale';
 
+declare module '@mui/material/Typography' {
+  interface TypographyPropsVariantOverrides {
+    questionTitle: true;
+    followUpSectionTitle: true;
+  }
+}
+
 const idleOutlineStyle: CSSInterpolation = {
   outlineOffset: 0,
   outlineColor: 'rgba(0,0,0,.0);',
@@ -133,6 +140,26 @@ export const stepperOverrides: Components<Omit<Theme, 'components'>> = {
 
 export const textOverrides: Components<Omit<Theme, 'components'>> = {
   MuiTypography: {
+    variants: [
+      {
+        props: { variant: 'questionTitle' },
+        style: {
+          fontWeight: 700,
+          fontSize: '1.2em',
+          color: '#000000DE',
+          margin: '1em 0',
+        },
+      },
+      {
+        props: { variant: 'followUpSectionTitle' },
+        style: {
+          fontWeight: 700,
+          fontSize: '1em',
+          color: '#000000',
+          margin: '0.5em 0',
+        },
+      },
+    ],
     styleOverrides: {
       root: {
         textTransform: 'none',

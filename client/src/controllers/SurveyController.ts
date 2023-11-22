@@ -56,13 +56,13 @@ export async function getSurvey(id: number) {
 export async function getSurveys(
   abortController?: AbortController,
   showAuthoredOnly?: boolean,
-  showPublishedOnly?: boolean
+  showPublishedOnly?: boolean,
 ) {
   const surveys = await request<SerializedSurvey[]>(
     `${apiURL}?filterByAuthored=${showAuthoredOnly}&filterByPublished=${showPublishedOnly}`,
     {
       signal: abortController?.signal,
-    }
+    },
   );
   return surveys ? surveys.map(deserializeSurvey) : [];
 }
@@ -81,7 +81,7 @@ export async function createNewSurvey() {
 export async function publishSurvey(survey: Survey) {
   const response = await request<SerializedSurvey>(
     `${apiURL}/${survey.id}/publish`,
-    { method: 'POST' }
+    { method: 'POST' },
   );
   return deserializeSurvey(response);
 }
@@ -93,7 +93,7 @@ export async function publishSurvey(survey: Survey) {
 export async function unpublishSurvey(survey: Survey) {
   const response = await request<SerializedSurvey>(
     `${apiURL}/${survey.id}/unpublish`,
-    { method: 'POST' }
+    { method: 'POST' },
   );
   return deserializeSurvey(response);
 }

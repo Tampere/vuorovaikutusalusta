@@ -11,7 +11,10 @@ import {
   FormControl,
   Radio,
   RadioGroup,
+  Box,
+  Typography,
 } from '@mui/material';
+import { ClearSharp, CheckSharp } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useToasts } from '@src/stores/ToastContext';
@@ -24,6 +27,10 @@ import AddSurveySectionActions from './AddSurveySectionActions';
 import FileUpload from './FileUpload';
 import SurveySections from './SurveySections';
 import { SurveyPageSidebarImageSize } from '@interfaces/survey';
+import { EditSurveyPageConditions } from './EditSurveyPageConditions';
+import { AdminSurveyMapPreview } from './AdminSurveyMapPreview';
+import { useAdminMap } from '@src/stores/SurveyMapContext';
+
 
 const useStyles = makeStyles({
   button: {
@@ -35,7 +42,7 @@ export default function EditSurveyPage() {
   const [loading, setLoading] = useState(false);
   const [deleteConfirmDialogOpen, setDeleteConfirmDialogOpen] = useState(false);
   const [expandedSection, setExpandedSection] = useState<number>(null);
-
+  const { defaultView } = useAdminMap();
   const classes = useStyles();
   const { surveyId, pageId } = useParams<{
     surveyId: string;
@@ -53,10 +60,19 @@ export default function EditSurveyPage() {
   const history = useHistory();
   const { tr, surveyLanguage } = useTranslations();
   const { showToast } = useToasts();
+  const { setDefaultView } = useAdminMap();
+  const [mapPreviewOpen, setMapPreviewOpen] = useState(false);
+  const [modifyMapView, setModifyMapView] = useState(false);
 
   const page = useMemo(() => {
     return activeSurvey.pages.find((page) => page.id === Number(pageId));
   }, [activeSurvey, pageId]);
+
+  // set page sidebar map default geometry for admin map context if available
+  useEffect(() => {
+    if (!page?.sidebar?.defaultMapView) return;
+    setDefaultView(page.sidebar.defaultMapView);
+  }, [page]);
 
   // If page ID in URL doesn't exist, redirect to survey front page
   useEffect(() => {
@@ -74,6 +90,11 @@ export default function EditSurveyPage() {
   useEffect(() => {
     setLoading(activeSurveyLoading);
   }, [activeSurveyLoading]);
+
+  function handleDeleteDefaultView() {
+    setDefaultView(null);
+    editPage({ ...page, sidebar: { ...page.sidebar, defaultMapView: null } });
+  }
 
   return !page ? null : (
     <Fieldset loading={loading}>
@@ -105,6 +126,7 @@ export default function EditSurveyPage() {
       >
         {tr.EditSurveyPage.deletePage}
       </Button>
+      <EditSurveyPageConditions />
       <FormGroup>
         <FormLabel>{tr.EditSurveyPage.selectSidebarType}</FormLabel>
         <ToggleButtonGroup
@@ -138,43 +160,123 @@ export default function EditSurveyPage() {
         ) : !availableMapLayers.length ? (
           <div>{tr.EditSurveyPage.warningNoAvailableMapLayers}</div>
         ) : (
-          <div>
-            <FormLabel>{tr.EditSurveyPage.mapLayers}</FormLabel>
-            <FormGroup aria-label="map-layers">
-              {availableMapLayersLoading && (
-                <Skeleton variant="rectangular" height={200} width="100%" />
+          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <div>
+              <FormLabel>{tr.EditSurveyPage.mapLayers}</FormLabel>
+              <FormGroup aria-label="map-layers">
+                {availableMapLayersLoading && (
+                  <Skeleton variant="rectangular" height={200} width="100%" />
+                )}
+                {!availableMapLayersLoading &&
+                  availableMapLayers.map((layer) => (
+                    <FormControlLabel
+                      key={layer.id}
+                      label={layer.name}
+                      control={
+                        <Checkbox
+                          checked={page.sidebar.mapLayers?.includes(layer.id)}
+                          onChange={(event) => {
+                            const mapLayers = event.target.checked
+                              ? // When adding a new layer, re-sort the array to ensure that
+                                // changes are detected correctly (the order won't matter anyway)
+                                [...page.sidebar.mapLayers, layer.id].sort()
+                              : page.sidebar.mapLayers.filter(
+                                  (layerId) => layerId !== layer.id,
+                                );
+                            editPage({
+                              ...page,
+                              sidebar: {
+                                ...page.sidebar,
+                                mapLayers,
+                              },
+                            });
+                          }}
+                          name={layer.name}
+                        />
+                      }
+                    />
+                  ))}
+              </FormGroup>
+            </div>
+            <Box
+              sx={{
+                minWidth: '270px',
+                '& .MuiButtonBase-root': { padding: '4px 10px' },
+              }}
+            >
+              <FormLabel htmlFor="mapview-button-container">
+                {tr.EditSurveyPage.defaultMapView}
+              </FormLabel>
+              <Box
+                pt={1.5}
+                display="flex"
+                gap={1}
+                id="default-map-status-container"
+              >
+                {page.sidebar.defaultMapView ? (
+                  <>
+                    <CheckSharp color="success" />
+                    <Typography>
+                      {tr.EditSurveyPage.defaultMapViewStatus.set}
+                    </Typography>
+                  </>
+                ) : (
+                  <>
+                    <ClearSharp sx={{ color: '#0000008A' }} />
+                    <Typography>
+                      {tr.EditSurveyPage.defaultMapViewStatus.notSet}
+                    </Typography>
+                  </>
+                )}
+              </Box>
+              {page.sidebar.defaultMapView ? (
+                <Box
+                  id="mapview-button-container"
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    gap: 2,
+                    marginTop: '12px',
+                  }}
+                >
+                  <Button
+                    variant="contained"
+                    onClick={() => setMapPreviewOpen(true)}
+                  >
+                    {tr.EditSurveyPage.mapViewButtons.showMap}
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    onClick={() => {
+                      setModifyMapView(true);
+                      setMapPreviewOpen(true);
+                    }}
+                  >
+                    {tr.EditSurveyPage.mapViewButtons.modifyDefaultView}
+                  </Button>
+
+                  <Button
+                    sx={{ marginLeft: 'auto' }}
+                    color="error"
+                    onClick={() => handleDeleteDefaultView()}
+                  >
+                    {tr.EditSurveyPage.mapViewButtons.deleteDefaultView}
+                  </Button>
+                </Box>
+              ) : (
+                <Button
+                  sx={{ marginTop: '12px' }}
+                  variant="contained"
+                  onClick={() => {
+                    setModifyMapView(true);
+                    setMapPreviewOpen(true);
+                  }}
+                >
+                  {tr.EditSurveyPage.mapViewButtons.set}
+                </Button>
               )}
-              {!availableMapLayersLoading &&
-                availableMapLayers.map((layer) => (
-                  <FormControlLabel
-                    key={layer.id}
-                    label={layer.name}
-                    control={
-                      <Checkbox
-                        checked={page.sidebar.mapLayers?.includes(layer.id)}
-                        onChange={(event) => {
-                          const mapLayers = event.target.checked
-                            ? // When adding a new layer, re-sort the array to ensure that
-                              // changes are detected correctly (the order won't matter anyway)
-                              [...page.sidebar.mapLayers, layer.id].sort()
-                            : page.sidebar.mapLayers.filter(
-                                (layerId) => layerId !== layer.id,
-                              );
-                          editPage({
-                            ...page,
-                            sidebar: {
-                              ...page.sidebar,
-                              mapLayers,
-                            },
-                          });
-                        }}
-                        name={layer.name}
-                      />
-                    }
-                  />
-                ))}
-            </FormGroup>
-          </div>
+            </Box>
+          </Box>
         ))}
       {page.sidebar.type === 'image' && (
         <div>
@@ -263,8 +365,7 @@ export default function EditSurveyPage() {
         </div>
       )}
       <SurveySections
-        pageId={page.id}
-        sections={page.sections}
+        page={page}
         disabled={loading}
         expandedSection={expandedSection}
         onExpandedSectionChange={(section) => {
@@ -289,7 +390,6 @@ export default function EditSurveyPage() {
             setLoading(true);
             try {
               await deletePage(page.id);
-              setLoading(false);
             } catch (error) {
               showToast({
                 severity: 'error',
@@ -300,6 +400,23 @@ export default function EditSurveyPage() {
             }
           }
         }}
+      />
+      <AdminSurveyMapPreview
+        url={activeSurvey.mapUrl}
+        isOpen={mapPreviewOpen}
+        setIsOpen={setMapPreviewOpen}
+        modifyView={modifyMapView}
+        setModifyView={setModifyMapView}
+        page={page}
+        handleSave={() =>
+          editPage({
+            ...page,
+            sidebar: {
+              ...page.sidebar,
+              defaultMapView: defaultView,
+            },
+          })
+        }
       />
     </Fieldset>
   );

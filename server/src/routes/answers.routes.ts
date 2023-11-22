@@ -16,7 +16,7 @@ const router = Router();
 /**
  * Endpoint for getting answer entry files for the given survey
  */
-router.post(
+router.get(
   '/:id/file-export/csv',
   ensureAuthenticated(),
   validateRequest([
@@ -38,13 +38,13 @@ router.post(
       res.setHeader('Content-Disposition', 'attachment; filename="data.csv"');
       res.status(200).send(exportFiles);
     }
-  })
+  }),
 );
 
 /**
  * Endpoint for getting answer entry files for the given survey
  */
-router.post(
+router.get(
   '/:id/file-export/geopackage',
   ensureAuthenticated(),
   validateRequest([
@@ -64,7 +64,7 @@ router.post(
       res.status(200);
       res.end(geopackageBuffer);
     }
-  })
+  }),
 );
 
 /**
@@ -90,7 +90,7 @@ router.get(
     } else {
       res.status(200).json(attachments);
     }
-  })
+  }),
 );
 
 export default router;

@@ -10,6 +10,14 @@ export type SurveyPageSection =
   | SurveyDocumentSection;
 
 /**
+ * Survey page section which can have follow-up sections
+ */
+export type SurveyFollowUpSectionParent = Extract<
+  SurveyPageSection,
+  { type: 'numeric' | 'slider' | 'checkbox' | 'radio' }
+>;
+
+/**
  * Question section of a survey page
  */
 export type SurveyQuestion =
@@ -33,7 +41,7 @@ export type SurveyQuestion =
 export type SurveyMapSubQuestion = Exclude<SurveyQuestion, SurveyMapQuestion>;
 
 /**
- * Common fields for survey page sections
+ * Common fields for survey page sectionsx
  */
 interface CommonSurveyPageSection {
   /**
@@ -52,7 +60,15 @@ interface CommonSurveyPageSection {
    * Toggler whether the section info should be shown
    */
   showInfo?: boolean;
+  /**
+   * Follow-up sections
+   */
+  followUpSections?: SurveyFollowUpSection[];
 }
+
+type SurveyFollowUpSection = SurveyPageSection & {
+  conditions: Conditions;
+};
 
 /**
  * Common fields for survey page questions
@@ -266,6 +282,10 @@ export interface SurveyPageSidebar {
    */
   mapLayers: number[];
   /**
+   * Geometry for the default map view
+   */
+  defaultMapView: Geometry;
+  /**
    * Path of the sidebar image
    */
   imagePath: string[];
@@ -303,6 +323,15 @@ export interface SurveyPage {
    * Page sections
    */
   sections: SurveyPageSection[];
+  /**
+   * Conditions to display the page in the survey
+   */
+  conditions?: SurveyPageConditions;
+
+  /**
+   * Are conditional page conditions fulfilled
+   */
+  isVisible?: boolean;
 }
 
 export interface Survey {
@@ -696,3 +725,15 @@ export interface Submission {
 }
 
 export type ImageType = 'backgroundImage' | 'thanksPageImage';
+
+/**
+ * Conditions to display follow-up section
+ */
+
+export interface Conditions {
+  equals: number[];
+  lessThan: number[];
+  greaterThan: number[];
+}
+
+export type SurveyPageConditions = Record<SurveyPageSection['id'], Conditions>;

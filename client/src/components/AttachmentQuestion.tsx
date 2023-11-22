@@ -13,6 +13,8 @@ interface Props {
   question: SurveyAttachmentQuestion;
 }
 
+const MEGAS = 10;
+
 export default function AttachmentQuestion({
   value,
   setDirty,
@@ -41,7 +43,7 @@ export default function AttachmentQuestion({
 
   const dropzoneContent = value?.length ? (
     <div>
-      <Typography color='info'> {tr.AttachmentQuestion.addedFile}: </Typography>
+      <Typography color="info"> {tr.AttachmentQuestion.addedFile}: </Typography>
       {value?.map((file, index) => {
         return (
           <div
@@ -52,10 +54,7 @@ export default function AttachmentQuestion({
               alignItems: 'center',
             }}
           >
-            <Typography color='primary' >
-              {' '}
-              {file.fileName}{' '}
-            </Typography>
+            <Typography color="primary"> {file.fileName} </Typography>
             <IconButton
               aria-label={tr.AttachmentQuestion.deleteUploadedFile}
               onClick={(event) => {
@@ -76,12 +75,13 @@ export default function AttachmentQuestion({
     <div id={`${question.id}-input`}>
       <DropZone
         maxFiles={1}
+        maxFileSize={MEGAS}
         fileCallback={async (files: File[]) => {
           try {
             const filesSize = files
               .map((file) => file.size)
               .reduce((prevValue, currentValue) => prevValue + currentValue, 0);
-            if (filesSize > 10 * 1000 * 1000) {
+            if (filesSize > MEGAS * 1000 * 1000) {
               showToast({
                 severity: 'error',
                 message: tr.AttachmentQuestion.fileSizeLimitError,
@@ -89,7 +89,7 @@ export default function AttachmentQuestion({
               return;
             }
             const fileStrings = (await Promise.all(
-              files.map((file: any) => readFileAsync(file))
+              files.map((file: any) => readFileAsync(file)),
             )) as string[];
 
             const filesAreValid = !fileStrings
@@ -101,7 +101,7 @@ export default function AttachmentQuestion({
                 fileStrings.map((fileString, index) => ({
                   fileName: files[index].name,
                   fileString: fileString,
-                }))
+                })),
               );
               setDirty(true);
             } else {

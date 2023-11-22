@@ -1,4 +1,4 @@
-import { SurveyPageSection } from '@interfaces/survey';
+import { SurveyFollowUpSection, SurveyPageSection } from '@interfaces/survey';
 import { Fab, Grid, Typography } from '@mui/material';
 import {
   Article,
@@ -34,9 +34,10 @@ const useStyles = makeStyles({
 });
 
 interface Props {
+  followUpSectionId?: number;
   types?: SurveyPageSection['type'][];
   disabled?: boolean;
-  onAdd: (newSection: SurveyPageSection) => void;
+  onAdd: (newSection: SurveyPageSection | SurveyFollowUpSection) => void;
 }
 
 export default function AddSurveySectionActions(props: Props) {
@@ -186,8 +187,8 @@ export default function AddSurveySectionActions(props: Props) {
 
   function handleAdd(type: SurveyPageSection['type']) {
     return () => {
-      const id = sectionSequence;
-      setSectionSequence(sectionSequence - 1);
+      const id = props.followUpSectionId ?? sectionSequence;
+      if (!props.followUpSectionId) setSectionSequence(sectionSequence - 1);
       props.onAdd({
         ...defaultSections[type],
         id,

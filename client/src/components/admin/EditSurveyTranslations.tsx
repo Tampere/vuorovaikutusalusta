@@ -117,6 +117,7 @@ export default function EditSurveyTranslations() {
     activeSurveyLoading,
     editSurvey,
     editSection,
+    editFollowUpSection,
     editPage,
   } = useSurvey();
   const { tr, languages } = useTranslations();
@@ -367,18 +368,35 @@ export default function EditSurveyTranslations() {
                               />
                             )}
                             {page.sections.map((section, sectionIndex) => (
-                              <EditSurveySectionTranslations
-                                key={`survey-section-${sectionIndex}`}
-                                languageCode={lang}
-                                section={section}
-                                onEdit={(editedSection) =>
-                                  editSection(
-                                    page.id,
-                                    sectionIndex,
-                                    editedSection,
-                                  )
-                                }
-                              />
+                              <div key={`survey-section-${sectionIndex}`}>
+                                <EditSurveySectionTranslations
+                                  languageCode={lang}
+                                  section={section}
+                                  onEdit={(editedSection) =>
+                                    editSection(
+                                      page.id,
+                                      sectionIndex,
+                                      editedSection,
+                                    )
+                                  }
+                                />
+                                {section?.followUpSections?.map(
+                                  (followUpSection, index) => (
+                                    <EditSurveySectionTranslations
+                                      key={`survey-follow-up-section-${sectionIndex}-${index}`}
+                                      languageCode={lang}
+                                      section={followUpSection}
+                                      onEdit={(editedFollowUpSection) =>
+                                        editFollowUpSection(
+                                          page.id,
+                                          sectionIndex,
+                                          editedFollowUpSection,
+                                        )
+                                      }
+                                    />
+                                  ),
+                                )}
+                              </div>
                             ))}
                           </div>
                         </div>
