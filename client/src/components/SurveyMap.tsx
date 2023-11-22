@@ -5,7 +5,6 @@ import { useTranslations } from '@src/stores/TranslationContext';
 import { visuallyHidden } from '@mui/utils';
 import OskariRPC from 'oskari-rpc';
 import React, { useEffect, useRef, useState } from 'react';
-import { channel } from 'diagnostics_channel';
 
 interface Props {
   url: string;
