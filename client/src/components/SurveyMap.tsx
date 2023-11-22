@@ -11,12 +11,14 @@ interface Props {
   layers: number[];
   onAnswer?: () => void;
   defaultMapView?: GeoJSON.FeatureCollection;
+  pageId: number;
 }
 
 export default function SurveyMap(props: Props) {
   const [mapInitialized, setMapInitialized] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>();
   const {
+    rpcChannel,
     setRpcChannel,
     isMapReady,
     initializeMap,
@@ -72,13 +74,16 @@ export default function SurveyMap(props: Props) {
   }, [isMapReady]);
 
   useEffect(() => {
-    if (mapInitialized && props.defaultMapView) {
+    if (!mapInitialized) return;
+    if (props.defaultMapView) {
       centerToDefaultView(props.defaultMapView, {
         fill: { color: '#00000000' },
         stroke: { color: '#00000000' },
       });
+    } else {
+      rpcChannel.resetState(() => {});
     }
-  }, [props.defaultMapView, mapInitialized]);
+  }, [props.defaultMapView, mapInitialized, props.pageId]);
 
   return (
     props.url && (

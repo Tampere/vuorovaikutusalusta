@@ -312,39 +312,59 @@ export function useSurvey() {
      * @param index
      */
     movePage(pageId: number, index: number) {
-      let page = state.activeSurvey.pages.find((page) => page.id === pageId);
+      let movedPage = state.activeSurvey.pages.find(
+        (page) => page.id === pageId,
+      );
 
-      const otherPages = state.activeSurvey.pages.filter(
+      let otherPages = state.activeSurvey.pages.filter(
         (page) => page.id !== pageId,
       );
 
       if (index === 0 || index === state.activeSurvey?.pages?.length - 1) {
         // First and last pages cannot have conditions
-        page = { ...page, conditions: {} };
+        movedPage = { ...movedPage, conditions: {} };
       } else {
+        // Clear first and last page conditions
+        otherPages = otherPages.map((page, index) =>
+          index === 0 || index === otherPages.length - 1
+            ? { ...page, conditions: {} }
+            : page,
+        );
         // A page can only have conditions based on previous pages sections
         const previousSectionIds = otherPages
           .slice(0, index)
           .map((page) => page.sections)
           .flat(1)
           .map((section) => section.id);
-        page = {
-          ...page,
+        movedPage = {
+          ...movedPage,
           conditions: Object.fromEntries(
-            Object.entries(page.conditions).filter(([sectionId, _conditions]) =>
-              previousSectionIds.includes(Number(sectionId)),
+            Object.entries(movedPage.conditions).filter(
+              ([sectionId, _conditions]) =>
+                previousSectionIds.includes(Number(sectionId)),
             ),
           ),
         };
       }
 
+      const movedPageSectionIds = movedPage.sections.map(
+        (section) => section.id,
+      );
+      // Go through all pages which are before the moved page in the survey and filter out conditions based on the moved page
+      const pagesBefore = otherPages.slice(0, index).map((page) => ({
+        ...page,
+        conditions: Object.fromEntries(
+          Object.entries(page.conditions).filter(
+            ([sectionId, _conditions]) =>
+              !movedPageSectionIds.includes(Number(sectionId)),
+          ),
+        ),
+      }));
+      const pagesAfter = otherPages.slice(index);
+
       dispatch({
         type: 'SET_PAGES',
-        pages: [
-          ...otherPages.slice(0, index),
-          page,
-          ...otherPages.slice(index),
-        ],
+        pages: [...pagesBefore, movedPage, ...pagesAfter],
       });
     },
     /**
