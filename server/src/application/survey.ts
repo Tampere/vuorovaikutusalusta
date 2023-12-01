@@ -32,6 +32,7 @@ import {
   InternalServerError,
   NotFoundError,
 } from '@src/error';
+
 import { geometryToGeoJSONFeatureCollection } from '@src/utils';
 import { Geometry } from 'geojson';
 
@@ -704,19 +705,21 @@ async function upsertSectionConditions(
  */
 async function deleteSectionConditions(
   pageIds: number[],
-  sectionIds?: number[],
+  sectionIds: number[],
 ) {
   let rows: { id: number }[];
-  if (!sectionIds || sectionIds.length === 0) {
+
+  if (pageIds && pageIds.length > 0) {
     rows = await getDb().manyOrNone<{ id: number }>(
-      'DELETE FROM data.section_conditions WHERE survey_page_id = ANY ($2) RETURNING id',
-      [sectionIds, pageIds],
+      'DELETE FROM data.section_conditions WHERE survey_page_id = ANY ($1) RETURNING id',
+      [pageIds],
+    );
+  } else {
+    rows = await getDb().manyOrNone<{ id: number }>(
+      'DELETE FROM data.section_conditions WHERE section_id = ANY ($1) RETURNING id',
+      [sectionIds],
     );
   }
-  rows = await getDb().manyOrNone<{ id: number }>(
-    'DELETE FROM data.section_conditions WHERE section_id = ANY ($1) AND survey_page_id = ANY ($2) RETURNING id',
-    [sectionIds, pageIds],
-  );
 
   if (!rows) throw new Error('Error deleting conditions');
   return rows;
