@@ -219,9 +219,12 @@ export default function SurveyStepper({
 
   // Map answer geometries on the current page
   const mapAnswerGeometries = useMemo(() => {
-    const mapQuestions = currentPage.sections.filter(
-      (section): section is SurveyMapQuestion => section.type === 'map',
-    );
+    const mapQuestions = currentPage.sections
+      .filter((section) => section.type === 'map' || section?.followUpSections)
+      .map((section) => [section, ...(section?.followUpSections ?? [])])
+      .flat(1)
+      .filter((section) => section.type === 'map');
+
     // Reduce all geometries from map question answers into a feature collection
     return mapQuestions.reduce(
       (featureCollection, question) => {
