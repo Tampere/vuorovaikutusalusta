@@ -363,11 +363,20 @@ export async function getSurvey(params: { id: number } | { name: string }) {
             : 'followUpSections';
 
         // Parent section should already exist because of the ordering by parent section rule
-        const parentSection = page.sections.find(
-          (section) => section.id === row[column],
-        );
+        const parentSection =
+          page.sections.find((section) => section.id === row[column]) ??
+          page.sections
+            .find((section) =>
+              section.followUpSections.find(
+                (followUpSection) => followUpSection.id === row[column],
+              )
+                ? true
+                : false,
+            )
+            .followUpSections.find((section) => section.id === row[column]);
 
         // Initialize subquestion or follow-up section array if it doesn't yet exist
+
         if (!parentSection[key]) {
           parentSection[key] = [];
         }
@@ -961,9 +970,12 @@ export async function updateSurvey(survey: Survey) {
   );
 
   // Form a flat array of all new section rows under each page
-  const sections = survey.pages.reduce((result, page) => {
-    return [...result, ...surveySectionsToRows(page.sections, page.id)];
-  }, [] as ReturnType<typeof surveySectionsToRows>);
+  const sections = survey.pages.reduce(
+    (result, page) => {
+      return [...result, ...surveySectionsToRows(page.sections, page.id)];
+    },
+    [] as ReturnType<typeof surveySectionsToRows>,
+  );
 
   // Delete sections that were removed from the updated survey
   await deleteRemovedSections(survey.id, sections);
@@ -1012,6 +1024,35 @@ export async function updateSurvey(survey: Survey) {
 
             // Refresh conditions for a follow-up section
             if (linkedSection.predecessor_section) {
+              // Upsert follow-up section subquestions if applicable
+
+              if (linkedSection?.subQuestions) {
+                const subQuestionRows = surveySectionsToRows(
+                  linkedSection.subQuestions,
+                  linkedSection.survey_page_id,
+                  sectionRow.id,
+                );
+
+                await Promise.all(
+                  subQuestionRows.map(async (question, index) => {
+                    const sectionRow = await upsertSection(question, index);
+
+                    // Delete options that were removed
+
+                    await deleteRemovedOptions(question.id, question.options);
+
+                    // Update/insert the remaining options
+                    if (question.options?.length) {
+                      const options = optionsToRows(
+                        question.options,
+                        sectionRow.id,
+                      );
+                      await Promise.all(options.map(upsertOption));
+                    }
+                  }),
+                );
+              }
+
               // use sectionRow id that was generated when saving follow-up section to db
               await deleteSectionConditions(null, [sectionRow.id]);
               // Filter out null values from conditions caused by trying to save "-" as numeric condition
