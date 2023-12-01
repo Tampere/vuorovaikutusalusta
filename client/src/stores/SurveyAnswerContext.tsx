@@ -504,12 +504,12 @@ export function useSurveyAnswers() {
             !nonQuestionSectionTypes.includes(section.type),
         )
         .some((section) => {
+          const displayedFollowUpIds = getFollowUpSectionsToDisplay(section);
+
           if (
             isFollowUpSectionParentType(section) &&
-            section.followUpSections?.length > 0
+            displayedFollowUpIds.length > 0
           ) {
-            const displayedFollowUpIds = getFollowUpSectionsToDisplay(section);
-
             return section.followUpSections
               .filter(
                 (sect): sect is SurveyQuestion & { conditions: Conditions } =>
@@ -519,7 +519,7 @@ export function useSurveyAnswers() {
               .some((s) => getValidationErrors(s).length);
           }
 
-          return getValidationErrors(section).length;
+          return getValidationErrors(section).length > 0;
         });
     },
     /**
