@@ -104,6 +104,7 @@ interface Props {
   onEdit: (index: number, section: SurveyPageSection) => void;
   onDelete: (index: number) => void;
   provided: DraggableProvided;
+  forFollowUpSection?: boolean;
   pageId?: number;
 }
 
@@ -316,34 +317,36 @@ export default function SurveySectionAccordion(props: Props) {
               <em>{tr.EditSurveyPage.untitledSection}</em>
             )}
           </Typography>
-          <IconButton
-            onClick={async (event) => {
-              event.stopPropagation();
-              event.preventDefault();
+          {!props.forFollowUpSection && (
+            <IconButton
+              onClick={async (event) => {
+                event.stopPropagation();
+                event.preventDefault();
 
-              // Remove all IDs from the section JSON to prevent unwanted references
-              const copiedSurveySection = replaceTranslationsWithNull(
-                replaceIdsWithNull({ ...props.section }),
-              );
+                // Remove all IDs from the section JSON to prevent unwanted references
+                const copiedSurveySection = replaceTranslationsWithNull(
+                  replaceIdsWithNull({ ...props.section }),
+                );
 
-              // Store section to locale storage for other browser tabs to get access to it
-              localStorage.setItem(
-                'clipboard-content',
-                JSON.stringify({
-                  clipboardSection: copiedSurveySection,
-                  clipboardPage,
-                }),
-              );
-              // Store section to context for the currently active browser tab to get access to it
-              setSection(copiedSurveySection);
-              showToast({
-                message: tr.EditSurveyPage.sectionCopied,
-                severity: 'success',
-              });
-            }}
-          >
-            <ContentCopy />
-          </IconButton>
+                // Store section to locale storage for other browser tabs to get access to it
+                localStorage.setItem(
+                  'clipboard-content',
+                  JSON.stringify({
+                    clipboardSection: copiedSurveySection,
+                    clipboardPage,
+                  }),
+                );
+                // Store section to context for the currently active browser tab to get access to it
+                setSection(copiedSurveySection);
+                showToast({
+                  message: tr.EditSurveyPage.sectionCopied,
+                  severity: 'success',
+                });
+              }}
+            >
+              <ContentCopy />
+            </IconButton>
+          )}
           <div {...props.provided.dragHandleProps} style={{ display: 'flex' }}>
             <DragIndicator />
           </div>
