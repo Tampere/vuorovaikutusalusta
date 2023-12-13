@@ -74,14 +74,14 @@ export default function SurveyMap(props: Props) {
   }, [isMapReady]);
 
   useEffect(() => {
-    if (!mapInitialized) return;
+    if (!mapInitialized || !isMapReady) return;
     if (props.defaultMapView) {
       centerToDefaultView(props.defaultMapView, {
         fill: { color: '#00000000' },
         stroke: { color: '#00000000' },
       });
     } else {
-      rpcChannel.resetState(() => {});
+      rpcChannel?.resetState(() => {});
     }
   }, [props.defaultMapView, mapInitialized, props.pageId]);
 
