@@ -1,4 +1,4 @@
-import { Feature, FeatureCollection, Point } from 'geojson';
+import { Feature, FeatureCollection, Geometry, Point } from 'geojson';
 import OskariRPC, {
   Channel,
   DrawingEventHandler,
@@ -54,7 +54,6 @@ export function useOskari() {
   const [_defaultMapView, setDefaultMapView] =
     useState<FeatureCollection>(null);
   const [oskariVersion, setOskariVersion] = useState(null);
-
 
   // Make current features available inside callbacks
   const getCurrentFeatures = useCurrent(features);

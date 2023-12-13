@@ -199,7 +199,10 @@ export default function SurveyListItem(props: Props) {
           setLoading(true);
           try {
             const updatedSurvey = await publishSurvey(survey);
-            setSurvey(updatedSurvey);
+            setSurvey({
+              ...updatedSurvey,
+              submissionCount: survey.submissionCount,
+            });
             showToast({
               severity: 'success',
               message: tr.SurveyList.publishSuccessful,
@@ -226,7 +229,10 @@ export default function SurveyListItem(props: Props) {
           setLoading(true);
           try {
             const updatedSurvey = await unpublishSurvey(survey);
-            setSurvey(updatedSurvey);
+            setSurvey({
+              ...updatedSurvey,
+              submissionCount: survey.submissionCount,
+            });
             showToast({
               severity: 'success',
               message: tr.SurveyList.unpublishSuccessful,
