@@ -81,7 +81,7 @@ export default function SurveyMap(props: Props) {
         stroke: { color: '#00000000' },
       });
     } else {
-      rpcChannel.resetState(() => {});
+      rpcChannel?.resetState(() => {});
     }
   }, [props.defaultMapView, mapInitialized, props.pageId]);
 
