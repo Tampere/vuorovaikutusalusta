@@ -501,28 +501,40 @@ export default function SurveyStepper({
                       setVisiblePages(tempVisiblePages);
                       if (currentPage.sidebar.type === 'map')
                         await saveMapLayers();
+
                       // Skip conditional pages with unmet conditions
-                      if (!tempVisiblePages.includes(previousPage.id)) {
-                        setPageNumber(index - 2);
-                      } else {
-                        setPageNumber(index - 1);
-                      }
+                      const previousVisiblePageIndex = survey.pages.findIndex(
+                        (surveyPage) =>
+                          surveyPage.id ===
+                          tempVisiblePages[
+                            tempVisiblePages.indexOf(page.id) - 1
+                          ],
+                      );
+                      setPageNumber(previousVisiblePageIndex);
 
                       setPageUnfinished(false);
                     }}
                     onNext={async () => {
                       const tempVisiblePages = getVisiblePages();
                       setVisiblePages(tempVisiblePages);
+
                       if (validateSurveyPage(page)) {
                         if (currentPage.sidebar.type === 'map')
                           await saveMapLayers();
-                        // Skip conditional pages with unmet conditions
 
-                        if (!tempVisiblePages.includes(nextPage.id)) {
-                          setPageNumber(index + 2);
-                        } else {
-                          setPageNumber(index + 1);
-                        }
+                        // Skip conditional pages with unmet conditions
+                        const nextVisiblePageIndex = survey.pages.findIndex(
+                          (surveyPage) => {
+                            return (
+                              surveyPage.id ===
+                              tempVisiblePages[
+                                tempVisiblePages.indexOf(page.id) + 1
+                              ]
+                            );
+                          },
+                        );
+
+                        setPageNumber(nextVisiblePageIndex);
                       } else {
                         handleClick();
                       }
