@@ -35,9 +35,10 @@ export default function AnswerMap({
 
     return (
       question.type === 'map' ||
-      question.followUpSections.some(
+      (question?.followUpSections.some(
         (followUpSection) => followUpSection.type === 'map',
-      )
+      ) ??
+        false)
     );
   }
 
