@@ -8,7 +8,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
   CREATE TABLE data.section_conditions (
     id SERIAL PRIMARY KEY,
       section_id int REFERENCES data.page_section(id) ON DELETE CASCADE,
-      survey_page_id int REFERENCES DATA.survey_page(id),
+      survey_page_id int REFERENCES DATA.survey_page(id) ON DELETE CASCADE,
       "equals" int,
       less_than int,
       greater_than int

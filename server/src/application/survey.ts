@@ -250,7 +250,7 @@ const conditionColumnSet = getColumnSet<DBSectionCondition>(
 export async function getSurvey(params: { id: number } | { name: string }) {
   const rows = await getDb().manyOrNone<DBSurveyJoin>(
     `
-    SELECT
+    SELECT 
       survey_page_section.*,
       option.id as option_id,
       option.text as option_text,
@@ -334,7 +334,6 @@ export async function getSurvey(params: { id: number } | { name: string }) {
   const allConditions = await getSectionConditions(
     rows.map((row) => row.section_id).filter(Boolean),
   );
-
   return rows.reduce((survey, row) => {
     // Try to find the pre-existing page object
     let page = survey.pages.find((page) => page.id === row.page_id);
@@ -367,12 +366,11 @@ export async function getSurvey(params: { id: number } | { name: string }) {
         const parentSection =
           page.sections.find((section) => section.id === row[column]) ??
           page.sections
-            .find((section) =>
-              section.followUpSections.find(
-                (followUpSection) => followUpSection.id === row[column],
-              )
-                ? true
-                : false,
+            .find(
+              (section) =>
+                section.followUpSections?.some(
+                  (followUpSection) => followUpSection.id === row[column],
+                ) ?? false,
             )
             .followUpSections.find((section) => section.id === row[column]);
 

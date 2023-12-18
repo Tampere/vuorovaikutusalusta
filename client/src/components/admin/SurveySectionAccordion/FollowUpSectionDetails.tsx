@@ -43,7 +43,7 @@ export function FollowUpSectionDetails({
       <TextField
         autoFocus
         label={tr.EditSurveyPage.title}
-        value={section.title?.[surveyLanguage] ?? null}
+        value={section.title?.[surveyLanguage] ?? ''}
         variant="standard"
         onChange={(event) => {
           handleEdit({
