@@ -8,11 +8,12 @@ import {
   Typography,
 } from '@mui/material';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
-import { DragDropContext,
+import {
+  DragDropContext,
   Droppable,
   Draggable,
   DropResult,
-  ResponderProvided
+  ResponderProvided,
 } from 'react-beautiful-dnd';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useEffect, useState } from 'react';
@@ -23,13 +24,14 @@ interface Props {
   onChange: (value: number[]) => void;
   question: SurveySortingQuestion;
   setDirty: (dirty: boolean) => void;
+  readOnly: boolean;
 }
 
 export default function SortingQuestion(props: Props) {
   const { surveyLanguage, tr } = useTranslations();
   const [verified, setVerified] = useState(props.value ? true : false);
   const [sortedOptionIds, setSortedOptionIds] = useState(
-    props.value ?? props.question.options.map( option => option.id )
+    props.value ?? props.question.options.map((option) => option.id),
   );
 
   useEffect(() => {
@@ -40,7 +42,11 @@ export default function SortingQuestion(props: Props) {
     props.onChange(sortedOptionIds);
   }, [sortedOptionIds, verified]);
 
-  const reorder = (list: Array<number>, startIndex: number, endIndex: number) => {
+  const reorder = (
+    list: Array<number>,
+    startIndex: number,
+    endIndex: number,
+  ) => {
     const result = Array.from(list);
     const [removed] = result.splice(startIndex, 1);
     result.splice(endIndex, 0, removed);
@@ -50,95 +56,131 @@ export default function SortingQuestion(props: Props) {
   const onDragEnd = (result: DropResult, provided: ResponderProvided) => {
     const { destination, source } = result;
     if (!destination || destination.index === source.index) {
-      provided.announce(tr.SortingQuestion.announcement.droppedInPlace
-        .replace('{position}', (destination.index + 1).toString()));
+      provided.announce(
+        tr.SortingQuestion.announcement.droppedInPlace.replace(
+          '{position}',
+          (destination.index + 1).toString(),
+        ),
+      );
       return;
     }
-    provided.announce(tr.SortingQuestion.announcement.drop
-      .replace('{position}', (destination.index + 1).toString())
+    provided.announce(
+      tr.SortingQuestion.announcement.drop.replace(
+        '{position}',
+        (destination.index + 1).toString(),
+      ),
     );
     setVerified(false);
-    setSortedOptionIds(reorder(sortedOptionIds, source.index, destination.index));
+    setSortedOptionIds(
+      reorder(sortedOptionIds, source.index, destination.index),
+    );
   };
 
   return (
     <FormGroup id={`${props.question.id}-input`}>
-      <Box style={visuallyHidden} id={`drag-instruction-announcement-${props.question.id}`}>
+      <Box
+        style={visuallyHidden}
+        id={`drag-instruction-announcement-${props.question.id}`}
+      >
         {tr.SortingQuestion.announcement.focus}
       </Box>
       <DragDropContext
-        onDragStart={(start, provided) => provided.announce(
-          tr.SortingQuestion.announcement.grab
-          .replace('{position}', (start.source.index + 1).toString())
-        )}
-        onDragUpdate={(update, provided) => provided.announce(
-          tr.SortingQuestion.announcement.move
-          .replace('{position}', (update.destination.index + 1).toString())
-          .replace('{length}', props.question.options.length.toString())
-        )}
-        onDragEnd={onDragEnd}>
+        onDragStart={(start, provided) =>
+          provided.announce(
+            tr.SortingQuestion.announcement.grab.replace(
+              '{position}',
+              (start.source.index + 1).toString(),
+            ),
+          )
+        }
+        onDragUpdate={(update, provided) =>
+          provided.announce(
+            tr.SortingQuestion.announcement.move
+              .replace('{position}', (update.destination.index + 1).toString())
+              .replace('{length}', props.question.options.length.toString()),
+          )
+        }
+        onDragEnd={onDragEnd}
+      >
         <div style={{ display: 'flex', flexDirection: 'row' }}>
           <div>
-          {props.question.options.map((_option, index) => (
-            <Paper key={index}
-              variant="outlined"
-              sx={{
-                backgroundColor: "#ededed",
-                borderTopRightRadius: "0",
-                borderBottomRightRadius: "0",
-                marginBottom: "0.5em",
-                marginRight: "-0.25em",
-                padding: "0.5em",
-              }}
-            >
-              <Typography>
-                {index+1}.
-              </Typography>
-            </Paper>
-          ))}
+            {props.question.options.map((_option, index) => (
+              <Paper
+                key={index}
+                variant="outlined"
+                sx={{
+                  backgroundColor: '#ededed',
+                  borderTopRightRadius: '0',
+                  borderBottomRightRadius: '0',
+                  marginBottom: '0.5em',
+                  marginRight: '-0.25em',
+                  padding: '0.5em',
+                }}
+              >
+                <Typography>{index + 1}.</Typography>
+              </Paper>
+            ))}
           </div>
-          <Droppable droppableId={`question-dropzone-${props.question.id}`}>
+          <Droppable
+            droppableId={`question-dropzone-${props.question.id}`}
+            isDropDisabled={props.readOnly}
+          >
             {(provided) => (
-              <div {...provided.droppableProps} ref={provided.innerRef} style={{ flexGrow: 1 }}>
-              {sortedOptionIds.map((optionId, index) => (
-                <Draggable
-                  key={`option-${optionId}`}
-                  index={index}
-                  draggableId={`option-${optionId}`}>
-                  {(provided, snapshot) => (
-                    <Paper
-                      variant="outlined"
-                      sx={{
-                        backgroundColor: snapshot.isDragging ? "#c2dcf1" : "white",
-                        display: "flex",
-                        justifyContent: "space-between",
-                        marginBottom: "0.5em",
-                        padding: "0.5em",
-                        transition: "background-color 200ms",
-                        '&:focus': {
-                          outlineOffset: "2px",
-                          outline: "2px solid black",
-                        }
-                      }}
-                      {...provided.draggableProps}
-                      {...provided.dragHandleProps}
-                      ref={provided.innerRef}
-                      aria-describedby={`drag-instruction-announcement-${props.question.id}`}
-                    >
-                      <Typography color="primary">
-                        { props.question.options
-                          .find( option => option.id === optionId )
-                          .text?.[surveyLanguage] }
-                      </Typography>
-                      <Box style={visuallyHidden}>
-                        {tr.SortingQuestion.inPosition} {index + 1} / {sortedOptionIds.length}
+              <div
+                {...provided.droppableProps}
+                ref={provided.innerRef}
+                style={{ flexGrow: 1 }}
+              >
+                {sortedOptionIds.map((optionId, index) => (
+                  <Draggable
+                    isDragDisabled={props.readOnly}
+                    key={`option-${optionId}`}
+                    index={index}
+                    draggableId={`option-${optionId}`}
+                  >
+                    {(provided, snapshot) => (
+                      <Paper
+                        variant="outlined"
+                        sx={{
+                          backgroundColor: snapshot.isDragging
+                            ? '#c2dcf1'
+                            : 'white',
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          marginBottom: '0.5em',
+                          padding: '0.5em',
+                          transition: 'background-color 200ms',
+                          '&:focus': {
+                            outlineOffset: '2px',
+                            outline: '2px solid black',
+                          },
+                        }}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                        ref={provided.innerRef}
+                        aria-describedby={`drag-instruction-announcement-${props.question.id}`}
+                      >
+                        <Typography
+                          color={props.readOnly ? 'disabled' : 'primary'}
+                        >
+                          {
+                            props.question.options.find(
+                              (option) => option.id === optionId,
+                            ).text?.[surveyLanguage]
+                          }
+                        </Typography>
+                        <Box style={visuallyHidden}>
+                          {tr.SortingQuestion.inPosition} {index + 1} /{' '}
+                          {sortedOptionIds.length}
                         </Box>
-                      <DragIndicatorIcon color={snapshot.isDragging ? "info" : "action"} />
-                    </Paper>
-                  )}
-                </Draggable>
-              ))}
-              {provided.placeholder}
+                        <DragIndicatorIcon
+                          color={snapshot.isDragging ? 'info' : 'action'}
+                        />
+                      </Paper>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
               </div>
             )}
           </Droppable>
@@ -150,7 +192,7 @@ export default function SortingQuestion(props: Props) {
               name={`verify-order-question_${props.question.id}`}
               checked={verified}
               onChange={(event) => {
-                setVerified(event.target.checked); 
+                setVerified(event.target.checked);
                 props.setDirty(true);
               }}
             />

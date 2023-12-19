@@ -1,11 +1,10 @@
-import { Box, Collapse, Grow, Typography } from '@mui/material';
+import { Box, Collapse, Typography } from '@mui/material';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
-import React, { useState } from 'react';
+import React from 'react';
 import {
   AnswerEntry,
   SurveyFollowUpQuestion,
   SurveyFollowUpSection,
-  SurveyMapQuestion,
   SurveyQuestion as SurveyQuestionType,
 } from '@interfaces/survey';
 import SurveyQuestion from './SurveyQuestion';

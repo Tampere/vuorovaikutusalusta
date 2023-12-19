@@ -2,7 +2,7 @@ import { createTheme } from '@mui/material/styles';
 import { fiFI } from '@mui/material/locale';
 import { buttonOverrides } from './survey';
 
-export const theme = createTheme(
+export let theme = createTheme(
   {
     components: {
       ...buttonOverrides,
@@ -43,3 +43,13 @@ export const theme = createTheme(
   },
   fiFI,
 );
+
+theme = createTheme(theme, {
+  palette: {
+    disabled: theme.palette.augmentColor({
+      color: {
+        main: '#858585',
+      },
+    }),
+  },
+});

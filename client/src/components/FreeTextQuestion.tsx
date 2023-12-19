@@ -10,6 +10,7 @@ interface Props {
   onChange: (value: string) => void;
   setDirty: (dirty: boolean) => void;
   maxLength?: number;
+  readOnly?: boolean;
 }
 
 export default function FreeTextQuestion({
@@ -19,12 +20,14 @@ export default function FreeTextQuestion({
   onChange,
   setDirty,
   maxLength = 500,
+  readOnly = false,
 }: Props) {
   const { tr } = useTranslations();
 
   return (
     <>
       <TextField
+        disabled={readOnly}
         autoFocus={autoFocus}
         value={value}
         multiline
