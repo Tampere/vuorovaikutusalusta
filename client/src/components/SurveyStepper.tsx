@@ -326,9 +326,20 @@ export default function SurveyStepper({
     updatePageMapLayers(currentPage, mapLayers);
 
     // Get all map answer entries on the current page and set their map layers
+
     const mapQuestionIds = currentPage.sections
-      .filter((section): section is SurveyMapQuestion => section.type === 'map')
-      .map((question) => question.id);
+      .filter(
+        (section): section is SurveyMapQuestion =>
+          section.type === 'map' ||
+          (section.followUpSections?.length > 0 &&
+            section.followUpSections.some((sect) => sect.type === 'map')),
+      )
+      .map((question) => {
+        if (question.type === 'map') {
+          return question.id;
+        }
+        return question.followUpSections.find((sect) => sect.type === 'map').id;
+      });
     answers
       .filter((answer): answer is AnswerEntry & { type: 'map' } =>
         mapQuestionIds.includes(answer.sectionId),
