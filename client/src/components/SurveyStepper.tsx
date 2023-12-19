@@ -13,7 +13,6 @@ import {
   Drawer,
   FormControl,
   FormHelperText,
-  Grow,
   IconButton,
   Link,
   Paper,
@@ -219,9 +218,11 @@ export default function SurveyStepper({
 
   // Map answer geometries on the current page
   const mapAnswerGeometries = useMemo(() => {
-    const mapQuestions = currentPage.sections.filter(
-      (section): section is SurveyMapQuestion => section.type === 'map',
-    );
+    const mapQuestions = currentPage.sections
+      .map((section) => [section, ...(section?.followUpSections ?? [])])
+      .flat(1)
+      .filter((section) => section.type === 'map');
+
     // Reduce all geometries from map question answers into a feature collection
     return mapQuestions.reduce(
       (featureCollection, question) => {
@@ -324,9 +325,20 @@ export default function SurveyStepper({
     updatePageMapLayers(currentPage, mapLayers);
 
     // Get all map answer entries on the current page and set their map layers
+
     const mapQuestionIds = currentPage.sections
-      .filter((section): section is SurveyMapQuestion => section.type === 'map')
-      .map((question) => question.id);
+      .filter(
+        (section): section is SurveyMapQuestion =>
+          section.type === 'map' ||
+          (section.followUpSections?.length > 0 &&
+            section.followUpSections.some((sect) => sect.type === 'map')),
+      )
+      .map((question) => {
+        if (question.type === 'map') {
+          return question.id;
+        }
+        return question.followUpSections.find((sect) => sect.type === 'map').id;
+      });
     answers
       .filter((answer): answer is AnswerEntry & { type: 'map' } =>
         mapQuestionIds.includes(answer.sectionId),
@@ -499,28 +511,40 @@ export default function SurveyStepper({
                       setVisiblePages(tempVisiblePages);
                       if (currentPage.sidebar.type === 'map')
                         await saveMapLayers();
+
                       // Skip conditional pages with unmet conditions
-                      if (!tempVisiblePages.includes(previousPage.id)) {
-                        setPageNumber(index - 2);
-                      } else {
-                        setPageNumber(index - 1);
-                      }
+                      const previousVisiblePageIndex = survey.pages.findIndex(
+                        (surveyPage) =>
+                          surveyPage.id ===
+                          tempVisiblePages[
+                            tempVisiblePages.indexOf(page.id) - 1
+                          ],
+                      );
+                      setPageNumber(previousVisiblePageIndex);
 
                       setPageUnfinished(false);
                     }}
                     onNext={async () => {
                       const tempVisiblePages = getVisiblePages();
                       setVisiblePages(tempVisiblePages);
+
                       if (validateSurveyPage(page)) {
                         if (currentPage.sidebar.type === 'map')
                           await saveMapLayers();
-                        // Skip conditional pages with unmet conditions
 
-                        if (!tempVisiblePages.includes(nextPage.id)) {
-                          setPageNumber(index + 2);
-                        } else {
-                          setPageNumber(index + 1);
-                        }
+                        // Skip conditional pages with unmet conditions
+                        const nextVisiblePageIndex = survey.pages.findIndex(
+                          (surveyPage) => {
+                            return (
+                              surveyPage.id ===
+                              tempVisiblePages[
+                                tempVisiblePages.indexOf(page.id) + 1
+                              ]
+                            );
+                          },
+                        );
+
+                        setPageNumber(nextVisiblePageIndex);
                       } else {
                         handleClick();
                       }

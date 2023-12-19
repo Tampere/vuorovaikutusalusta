@@ -9,6 +9,7 @@ interface Props {
   value: number;
   onChange: (value: number) => void;
   setDirty: (dirty: boolean) => void;
+  readOnly?: boolean;
 }
 
 export default function NumericQuestion({
@@ -17,12 +18,14 @@ export default function NumericQuestion({
   value,
   onChange,
   setDirty,
+  readOnly = false,
 }: Props) {
   const { tr } = useTranslations();
 
   return (
     <>
       <TextField
+        disabled={readOnly}
         autoFocus={autoFocus}
         value={value ?? ''}
         required={question.isRequired}
@@ -36,7 +39,7 @@ export default function NumericQuestion({
         onChange={(event) => {
           setDirty(true);
           onChange(
-            !event.target.value.length ? null : Number(event.target.value)
+            !event.target.value.length ? null : Number(event.target.value),
           );
         }}
       />
@@ -49,11 +52,11 @@ export default function NumericQuestion({
             : question.minValue != null
             ? tr.NumericQuestion.minValue.replace(
                 '{minValue}',
-                String(question.minValue)
+                String(question.minValue),
               )
             : tr.NumericQuestion.maxValue.replace(
                 '{maxValue}',
-                String(question.maxValue)
+                String(question.maxValue),
               )}
         </FormHelperText>
       )}

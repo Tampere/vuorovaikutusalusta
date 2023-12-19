@@ -11,6 +11,7 @@ interface Props {
   onChange: (value: FileAnswer[]) => void;
   setDirty: (dirty: boolean) => void;
   question: SurveyAttachmentQuestion;
+  readOnly: boolean;
 }
 
 const MEGAS = 10;
@@ -20,6 +21,7 @@ export default function AttachmentQuestion({
   setDirty,
   onChange,
   question,
+  readOnly = false,
 }: Props) {
   const { tr } = useTranslations();
   const { showToast } = useToasts();
@@ -63,7 +65,7 @@ export default function AttachmentQuestion({
                 onChange(value);
               }}
             >
-              <DeleteIcon />
+              {!readOnly && <DeleteIcon />}
             </IconButton>
           </div>
         );
@@ -74,6 +76,7 @@ export default function AttachmentQuestion({
   return (
     <div id={`${question.id}-input`}>
       <DropZone
+        readOnly={readOnly}
         maxFiles={1}
         maxFileSize={MEGAS}
         fileCallback={async (files: File[]) => {

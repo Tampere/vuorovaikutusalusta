@@ -10,6 +10,7 @@ interface Props {
   onChange: (subQuestions: SurveyMapSubQuestion[]) => void;
   disabled?: boolean;
   onExpandedSectionChange: (expandedSectionIndex: number) => void;
+  forFollowUpSection?: boolean;
 }
 
 const useStyles = makeStyles({
@@ -31,6 +32,7 @@ export default function EditMapSubQuestions(props: Props) {
         const oldIndex = props.mapQuestion.subQuestions.findIndex(
           (subQuestion) => subQuestion.id === subQuestionId,
         );
+
         const subQuestion = props.mapQuestion.subQuestions[oldIndex];
         const newIndex = event.destination.index;
         const otherSubQuestions = props.mapQuestion.subQuestions.filter(
@@ -58,6 +60,7 @@ export default function EditMapSubQuestions(props: Props) {
               >
                 {(provided, _snapshot) => (
                   <SurveySectionAccordion
+                    forFollowUpSection={props?.forFollowUpSection ?? false}
                     index={index}
                     provided={provided}
                     key={index}

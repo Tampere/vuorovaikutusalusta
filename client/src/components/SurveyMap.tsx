@@ -74,7 +74,7 @@ export default function SurveyMap(props: Props) {
   }, [isMapReady]);
 
   useEffect(() => {
-    if (!mapInitialized) return;
+    if (!mapInitialized || !isMapReady) return;
     if (props.defaultMapView) {
       centerToDefaultView(props.defaultMapView, {
         fill: { color: '#00000000' },

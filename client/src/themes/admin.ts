@@ -2,11 +2,31 @@ import { createTheme } from '@mui/material/styles';
 import { fiFI } from '@mui/material/locale';
 import { buttonOverrides } from './survey';
 
-export const theme = createTheme(
+export let theme = createTheme(
   {
     components: {
       ...buttonOverrides,
       MuiTypography: {
+        variants: [
+          {
+            props: { variant: 'questionTitle' },
+            style: {
+              fontWeight: 700,
+              fontSize: '1.2em',
+              color: '#000000DE',
+              margin: '1em 0',
+            },
+          },
+          {
+            props: { variant: 'followUpSectionTitle' },
+            style: {
+              fontWeight: 700,
+              fontSize: '1em',
+              color: '#000000',
+              margin: '0.5em 0',
+            },
+          },
+        ],
         styleOverrides: {
           root: {
             textTransform: 'none',
@@ -23,3 +43,13 @@ export const theme = createTheme(
   },
   fiFI,
 );
+
+theme = createTheme(theme, {
+  palette: {
+    disabled: theme.palette.augmentColor({
+      color: {
+        main: '#858585',
+      },
+    }),
+  },
+});

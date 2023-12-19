@@ -18,11 +18,18 @@ import { visuallyHidden } from '@mui/utils';
 import React, { useMemo, useState } from 'react';
 import SectionInfo from './SectionInfo';
 
+declare module '@mui/material/Chip' {
+  interface ChipPropsColorOverrides {
+    disabled: true;
+  }
+}
+
 interface Props {
   value: number[];
   onChange: (value: number[]) => void;
   question: SurveyGroupedCheckboxQuestion;
   setDirty: (dirty: boolean) => void;
+  readOnly: boolean;
 }
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -72,6 +79,7 @@ export default function GroupedCheckBoxQuestion({
   onChange,
   question,
   setDirty,
+  readOnly = false,
 }: Props) {
   const [expanded, setExpanded] = useState<number>(null);
 
@@ -160,7 +168,7 @@ export default function GroupedCheckBoxQuestion({
                     style={{ marginLeft: '1rem' }}
                     label={amountsByGroup[index]}
                     size="small"
-                    color="primary"
+                    color={readOnly ? 'disabled' : 'primary'}
                     aria-hidden={true}
                   />
                   <Box style={visuallyHidden}>
@@ -199,7 +207,10 @@ export default function GroupedCheckBoxQuestion({
                             'aria-describedby': `${question.id}-indicator`,
                           }}
                           checked={value.includes(option.id)}
-                          disabled={maxReached && !value.includes(option.id)}
+                          disabled={
+                            readOnly ||
+                            (maxReached && !value.includes(option.id))
+                          }
                           onChange={(event) => {
                             setDirty(true);
                             const newValue = event.currentTarget.checked

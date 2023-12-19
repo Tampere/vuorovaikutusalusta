@@ -2,6 +2,7 @@ import {
   AnswerEntry,
   Submission,
   Survey,
+  SurveyPageSection,
   SurveyQuestion,
 } from '@interfaces/survey';
 import React, { useEffect, useMemo } from 'react';
@@ -29,10 +30,53 @@ export default function AnswerMap({
   surveyQuestions,
   questions,
 }: Props) {
+  function holdsMapQuestions(question: SurveyQuestion) {
+    if (!question) return false;
+
+    return (
+      question.type === 'map' ||
+      (question?.followUpSections?.some(
+        (followUpSection) => followUpSection.type === 'map',
+      ) ??
+        false)
+    );
+  }
+
+  function isFeatureSelected(
+    submission: Submission,
+    section: SurveyPageSection,
+    index: number,
+  ) {
+    return (
+      selectedAnswer &&
+      selectedAnswer.submissionId === submission.id &&
+      selectedAnswer.questionId === section.id &&
+      (section.type === 'map' ? selectedAnswer.index === index : true)
+    );
+  }
+
+  function getAnswerVisibility(answer: AnswerEntry) {
+    if (!answer.value) return false;
+    // Current question is not selected, filter away answers that are not map answers
+    if (selectedQuestion.id === 0) return answer.type === 'map';
+
+    if (answer.type === 'map') {
+      if (answer.sectionId === selectedQuestion.id) {
+        return true;
+      } else if (selectedQuestion.followUpSections?.length > 0) {
+        return selectedQuestion.followUpSections?.some(
+          (followUpSection) => followUpSection.id === answer.sectionId,
+        );
+      }
+    }
+
+    return false;
+  }
+
   // All answer geometries that should be shown on the map
   const features = useMemo<GeoJSON.Feature[]>(() => {
-    // If no map question was selected OR if the selected question was not "select all", show nothing on the map
-    if (!(selectedQuestion?.id === 0 || selectedQuestion?.type === 'map')) {
+    // If no question containing map question was selected OR if the selected question was not "select all", show nothing on the map
+    if (!(selectedQuestion?.id === 0 || holdsMapQuestions(selectedQuestion))) {
       return [];
     }
 
@@ -43,23 +87,21 @@ export default function AnswerMap({
           return [
             ...features,
             ...submission.answerEntries
-              // Filter answer entries that are not for the current question
-              // Current question is not selected, filter away answers that are not map answers
-              .filter(
-                (answer): answer is AnswerEntry & { type: 'map' } =>
-                  (selectedQuestion.id === 0
-                    ? answer.type === 'map'
-                    : answer.sectionId === selectedQuestion.id) &&
-                  Boolean(answer.value),
+
+              .filter((answer): answer is AnswerEntry & { type: 'map' } =>
+                getAnswerVisibility(answer),
               )
 
               // Reduce answer's values into a single array of features
               .reduce((features, answer) => {
                 const question =
                   selectedQuestion?.id === 0
-                    ? surveyQuestions.find(
-                        (question) => question.id === answer.sectionId,
-                      )
+                    ? surveyQuestions
+                        .flatMap((question) => [
+                          question,
+                          ...(question?.followUpSections ?? []),
+                        ])
+                        .find((question) => question.id === answer.sectionId)
                     : selectedQuestion;
 
                 return [
@@ -73,11 +115,11 @@ export default function AnswerMap({
                         question: question,
                         submissionId: submission.id,
                         index,
-                        selected:
-                          selectedAnswer &&
-                          selectedAnswer.submissionId === submission.id &&
-                          selectedAnswer.questionId === question.id &&
-                          selectedAnswer.index === index,
+                        selected: isFeatureSelected(
+                          submission,
+                          question,
+                          index,
+                        ),
                       },
                     } as GeoJSON.Feature;
                   }),

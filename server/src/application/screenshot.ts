@@ -8,6 +8,7 @@ import parseCSSColor from 'parse-css-color';
 import { Page } from 'puppeteer';
 import { Cluster } from 'puppeteer-cluster';
 import { getAvailableMapLayers } from './map';
+import logger from '@src/logger';
 
 /**
  * Oskari needs to be declared, because it is available as a global variable inside
@@ -52,7 +53,7 @@ const defaultFeatureStyle = {
 
 function getFeatureStyle(
   selectionType: MapQuestionSelectionType,
-  question: SurveyMapQuestion
+  question: SurveyMapQuestion,
 ) {
   // Use default style for points
   if (selectionType === 'point') {
@@ -101,7 +102,7 @@ async function generateScreenshots({
 
   // Setting a real user agent _might_ make requests flow faster
   await page.setUserAgent(
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36'
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36',
   );
 
   page.setViewport({ width: 800, height: 600, deviceScaleFactor: 1 });
@@ -127,13 +128,13 @@ async function generateScreenshots({
           .forEach((layerId) => {
             sandbox.postRequestByName(
               'MapModulePlugin.MapLayerVisibilityRequest',
-              [layerId, visibleLayerIds.includes(layerId)]
+              [layerId, visibleLayerIds.includes(layerId)],
             );
           });
         // Clear any previous features or markers
         sandbox.postRequestByName(
           'MapModulePlugin.RemoveFeaturesFromMapRequest',
-          []
+          [],
         );
         sandbox.postRequestByName('MapModulePlugin.RemoveMarkersRequest', []);
 
@@ -177,10 +178,10 @@ async function generateScreenshots({
             : answer.feature.geometry.type === 'LineString'
             ? 'line'
             : 'area',
-          answer.question
+          answer.question,
         ),
         question: answer.question as any,
-      }
+      },
     );
     try {
       await page.waitForNetworkIdle({ timeout: networkIdleTimeout });
@@ -202,7 +203,7 @@ async function generateScreenshots({
       layerNames: answer.visibleLayerIds
         .map(
           (layerId) =>
-            availableMapLayers.find((layer) => layer.id === layerId)?.name
+            availableMapLayers.find((layer) => layer.id === layerId)?.name,
         )
         .filter(Boolean),
     });

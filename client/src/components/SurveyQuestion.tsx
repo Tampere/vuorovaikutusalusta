@@ -117,6 +117,7 @@ function SurveyQuestion({
       >
         <Typography
           component="h3"
+          sx={{ margin: readOnly ? 0 : '' }}
           variant={props.isFollowUp ? 'followUpSectionTitle' : 'questionTitle'}
         >
           {question.title?.[surveyLanguage]}
@@ -171,6 +172,7 @@ function SurveyQuestion({
       {/* Free text question */}
       {question.type === 'free-text' && (
         <FreeTextQuestion
+          readOnly={readOnly}
           value={value as string}
           maxLength={question.maxLength}
           onChange={(value) => {
@@ -187,6 +189,7 @@ function SurveyQuestion({
       {/* Numeric question */}
       {question.type === 'numeric' && (
         <NumericQuestion
+          readOnly={readOnly}
           value={value as number}
           onChange={(value) => {
             updateAnswer({
@@ -217,6 +220,7 @@ function SurveyQuestion({
       {/* Sorting question */}
       {question.type === 'sorting' && (
         <SortingQuestion
+          readOnly={readOnly}
           value={value as number[]}
           onChange={(value) => {
             updateAnswer({
@@ -232,6 +236,7 @@ function SurveyQuestion({
       {/* Slider question */}
       {question.type === 'slider' && (
         <SliderQuestion
+          readOnly={readOnly}
           value={value as number}
           onChange={(value) => {
             updateAnswer({
@@ -278,6 +283,7 @@ function SurveyQuestion({
       )}
       {question.type === 'grouped-checkbox' && (
         <GroupedCheckBoxQuestion
+          readOnly={readOnly}
           value={value as number[]}
           onChange={(value) => {
             updateAnswer({
@@ -292,6 +298,7 @@ function SurveyQuestion({
       )}
       {question.type === 'attachment' && (
         <AttachmentQuestion
+          readOnly={readOnly}
           question={question}
           value={value as FileAnswer[]}
           setDirty={setDirty}

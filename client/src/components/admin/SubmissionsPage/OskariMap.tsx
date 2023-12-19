@@ -1,5 +1,5 @@
 import { useOskari } from '@src/utils/useOskari';
-import { Feature } from 'geojson';
+import { Feature, Geometry } from 'geojson';
 import { FeatureStyle, MarkerStyle } from 'oskari-rpc';
 import parseCSSColor from 'parse-css-color';
 import React, { useEffect, useMemo, useRef } from 'react';
@@ -106,6 +106,21 @@ export default function OskariMap({
     };
   }
 
+  /** Helper function to determine if feature is for follow-up section.
+   * If feature question has follow-up sections the feature is for one of these questions.
+   * This is because map questions can't have follow-up questions.
+   * */
+  function featureIsForFollowUpSection(
+    feature: Feature<
+      Geometry,
+      {
+        [name: string]: any;
+      }
+    >,
+  ) {
+    return feature.properties.question?.followUpSections?.length > 0;
+  }
+
   function getMarkerStyle(
     feature: Feature,
     isPrimaryStyle: boolean,
@@ -122,7 +137,14 @@ export default function OskariMap({
         : mapFeatureColorScheme.secondaryColor,
     };
     if (withMessage) {
-      return { ...style, msg: feature.properties.submissionId };
+      return {
+        ...style,
+        msg: `${feature.properties.submissionId}${
+          featureIsForFollowUpSection(feature)
+            ? `-${feature.properties.index + 1}`
+            : ''
+        }`,
+      };
     }
 
     return style;

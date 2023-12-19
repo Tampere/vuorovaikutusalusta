@@ -12,6 +12,7 @@ import ogr2ogr from 'ogr2ogr';
 import { getAvailableMapLayers } from './map';
 import { getSurvey } from './survey';
 import { indexToAlpha } from '@src/utils';
+import logger from '@src/logger';
 
 const tr = useTranslations('fi');
 
@@ -815,9 +816,10 @@ function createCSVHeaders(sectionMetadata: SectionHeader[]) {
       default:
         allHeaders.push({
           [getHeaderKey(sectionHead.pageIndex, sectionHead.sectionIndex)]:
-            `${getSectionDetailsForHeader(sectionHead, predecessorIndexes)}: ${
-              sectionHead.title?.['fi']
-            }` ?? '',
+            `${getSectionDetailsForHeader(
+              sectionHead,
+              predecessorIndexes,
+            )}: ${sectionHead.title?.['fi']}` ?? '',
         });
     }
   });
