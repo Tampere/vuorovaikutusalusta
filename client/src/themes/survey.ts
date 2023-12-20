@@ -74,6 +74,13 @@ export const buttonOverrides: Components<Omit<Theme, 'components'>> = {
       },
     },
   },
+  MuiFab: {
+    styleOverrides: {
+      root: {
+        textTransform: 'none',
+      },
+    },
+  },
   MuiToggleButton: {
     styleOverrides: {
       root: {
