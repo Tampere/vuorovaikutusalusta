@@ -43,7 +43,9 @@ export default function FreeTextQuestion({
         }}
       />
       <FormHelperText id={`${question.id}-helper-text`}>
-        <span aria-hidden={(value?.length ?? 0) < 0.9 * maxLength}>
+        <span
+          aria-hidden={value?.length > 0 && value?.length < 0.9 * maxLength}
+        >
           {tr.SurveyQuestion.charactersRemaining.replace(
             '{x}',
             String(maxLength - (value?.length ?? 0)),
