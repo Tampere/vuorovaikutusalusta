@@ -637,6 +637,7 @@ export default function SurveyStepper({
                     ? { margin: '0 auto', maxWidth: '100%' }
                     : null
                 }
+                aria-hidden={true}
                 alt={currentPage.sidebar?.imageAltText?.[surveyLanguage]}
                 src={`/api/file/${fullSidebarImagePath}`}
               />
