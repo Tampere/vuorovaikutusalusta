@@ -11,6 +11,7 @@ interface Props {
   setDirty: (dirty: boolean) => void;
   maxLength?: number;
   readOnly?: boolean;
+  isEmptyAndRequired: boolean;
 }
 
 export default function FreeTextQuestion({
@@ -21,6 +22,7 @@ export default function FreeTextQuestion({
   setDirty,
   maxLength = 500,
   readOnly = false,
+  isEmptyAndRequired,
 }: Props) {
   const { tr } = useTranslations();
 
@@ -35,7 +37,10 @@ export default function FreeTextQuestion({
         inputProps={{
           id: `${question.id}-input`,
           maxLength: maxLength,
-          'aria-describedby': `${question.id}-helper-text ${question.id}-required-text`,
+          'aria-describedby':
+            question.isRequired && isEmptyAndRequired
+              ? `${question.id}-helper-text ${question.id}-required-text`
+              : `${question.id}-helper-text`,
         }}
         onChange={(event) => {
           setDirty(true);

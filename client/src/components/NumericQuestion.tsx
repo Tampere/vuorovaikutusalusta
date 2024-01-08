@@ -10,6 +10,7 @@ interface Props {
   onChange: (value: number) => void;
   setDirty: (dirty: boolean) => void;
   readOnly?: boolean;
+  isEmptyAndRequired: boolean;
 }
 
 export default function NumericQuestion({
@@ -19,8 +20,11 @@ export default function NumericQuestion({
   onChange,
   setDirty,
   readOnly = false,
+  isEmptyAndRequired,
 }: Props) {
   const { tr } = useTranslations();
+
+  const valuesLimited = question.minValue != null || question.maxValue != null;
 
   return (
     <>
@@ -33,7 +37,10 @@ export default function NumericQuestion({
           min: question.minValue,
           max: question.maxValue,
           id: `${question.id}-input`,
-          'aria-describedby': `${question.id}-required-text ${question.id}-helper-text`,
+          'aria-describedby':
+            question.isRequired && isEmptyAndRequired
+              ? `${question.id}-helper-text ${question.id}-required-text`
+              : `${question.id}-helper-text`,
         }}
         type="number"
         onChange={(event) => {
@@ -43,8 +50,11 @@ export default function NumericQuestion({
           );
         }}
       />
-      {(question.minValue != null || question.maxValue != null) && (
-        <FormHelperText id={`${question.id}-helper-text`}>
+      {
+        <FormHelperText
+          sx={{ display: valuesLimited ? 'block' : 'none' }}
+          id={`${question.id}-helper-text`}
+        >
           {question.minValue != null && question.maxValue != null
             ? tr.NumericQuestion.minMaxValue
                 .replace('{minValue}', String(question.minValue))
@@ -59,7 +69,7 @@ export default function NumericQuestion({
                 String(question.maxValue),
               )}
         </FormHelperText>
-      )}
+      }
     </>
   );
 }

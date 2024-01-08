@@ -175,6 +175,7 @@ function SurveyQuestion({
           readOnly={readOnly}
           value={value as string}
           maxLength={question.maxLength}
+          isEmptyAndRequired={validationErrors.includes('required')}
           onChange={(value) => {
             updateAnswer({
               sectionId: question.id,
@@ -191,6 +192,7 @@ function SurveyQuestion({
         <NumericQuestion
           readOnly={readOnly}
           value={value as number}
+          isEmptyAndRequired={validationErrors.includes('required')}
           onChange={(value) => {
             updateAnswer({
               sectionId: question.id,
