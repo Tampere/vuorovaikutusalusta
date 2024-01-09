@@ -31,15 +31,14 @@ const useStyles = makeStyles({
   },
 });
 
-
 const DEFAULT_MAX_FILE_SIZE = '10';
-
 
 interface Props {
   maxFiles: number;
   fileCallback: (files: File[]) => void;
   children?: React.ReactNode;
   maxFileSize?: number;
+  readOnly?: boolean;
 }
 
 export default function DropZone({
@@ -47,11 +46,13 @@ export default function DropZone({
   fileCallback,
   children,
   maxFileSize,
+  readOnly = false,
 }: Props) {
   const classes = useStyles();
   const { tr } = useTranslations();
   const { acceptedFiles, getRootProps, getInputProps } = useDropzone({
     maxFiles: maxFiles,
+    disabled: readOnly,
   });
 
   useEffect(() => {
@@ -73,7 +74,6 @@ export default function DropZone({
                 '{x}',
                 maxFileSize ? String(maxFileSize) : DEFAULT_MAX_FILE_SIZE,
               )}
-
         </div>
       </div>
     </section>

@@ -6,6 +6,15 @@ import {
 } from '@mui/material/styles';
 import { fiFI } from '@mui/material/locale';
 
+declare module '@mui/material/styles' {
+  interface Palette {
+    disabled: Palette['primary'];
+  }
+  interface PaletteOptions {
+    disabled?: PaletteOptions['primary'];
+  }
+}
+
 declare module '@mui/material/Typography' {
   interface TypographyPropsVariantOverrides {
     questionTitle: true;
@@ -62,6 +71,13 @@ export const buttonOverrides: Components<Omit<Theme, 'components'>> = {
         '&.Mui-disabled': {
           color: disabledColor,
         },
+      },
+    },
+  },
+  MuiFab: {
+    styleOverrides: {
+      root: {
+        textTransform: 'none',
       },
     },
   },
@@ -176,7 +192,7 @@ export const textOverrides: Components<Omit<Theme, 'components'>> = {
 /**
  * Default theme - used only when survey doesn't have a theme at all set in DB
  */
-export const defaultSurveyTheme = createTheme(
+export let defaultSurveyTheme = createTheme(
   {
     components: {
       ...buttonOverrides,
@@ -195,3 +211,13 @@ export const defaultSurveyTheme = createTheme(
   },
   fiFI,
 );
+
+defaultSurveyTheme = createTheme(defaultSurveyTheme, {
+  palette: {
+    disabled: defaultSurveyTheme.palette.augmentColor({
+      color: {
+        main: '#858585',
+      },
+    }),
+  },
+});

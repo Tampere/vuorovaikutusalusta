@@ -4,7 +4,6 @@ import { Client } from 'pg';
 import migrate from 'node-pg-migrate';
 import logger from './logger';
 import retry from 'async-retry';
-import * as tsnode from 'ts-node';
 
 // Default schemas for all queries
 const schema = ['application', 'public', 'data'];

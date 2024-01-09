@@ -10,6 +10,7 @@ interface Props {
   question: SurveySliderQuestion;
   onChange: (value: number) => void;
   setDirty: (dirty: boolean) => void;
+  readOnly: boolean;
 }
 
 const useStyles = makeStyles({
@@ -23,6 +24,7 @@ export default function SliderQuestion({
   question,
   onChange,
   setDirty,
+  readOnly = false,
 }: Props) {
   const { surveyLanguage } = useTranslations();
   const classes = useStyles();
@@ -77,6 +79,7 @@ export default function SliderQuestion({
         </span>
       </FormLabel>
       <Slider
+        disabled={readOnly}
         aria-label={question.title?.[surveyLanguage]}
         ref={sliderRef}
         slotProps={{

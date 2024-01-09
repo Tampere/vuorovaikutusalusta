@@ -39,12 +39,23 @@ export interface AnswerItem {
   entry: AnswerEntry & { index?: number };
 }
 
-function isItemSelected(item: AnswerItem, selection: AnswerSelection) {
+function isItemSelected(
+  item: AnswerItem,
+  selection: AnswerSelection,
+  selectedQuestion: Question,
+) {
+  if (!selection) return false;
+
+  if (selectedQuestion.type === 'map') {
+    return (
+      item.submission.id === selection.submissionId &&
+      item.entry.sectionId === selection.questionId &&
+      item.entry.index === selection.index
+    );
+  }
   return (
-    selection &&
     item.submission.id === selection.submissionId &&
-    item.entry.sectionId === selection.questionId &&
-    item.entry.index === selection.index
+    item.entry.sectionId === selection.questionId
   );
 }
 
@@ -69,7 +80,7 @@ export default function AnswersList({
             }}
             elevation={0}
             key={index}
-            expanded={isItemSelected(answer, selectedAnswer)}
+            expanded={isItemSelected(answer, selectedAnswer, selectedQuestion)}
             TransitionProps={{
               onEntered: (node) =>
                 node.scrollIntoView({ behavior: 'smooth', block: 'end' }),
@@ -81,7 +92,9 @@ export default function AnswersList({
                   questionId: answer.entry.sectionId,
                   index: answer.entry.index,
                 });
-              } else if (isItemSelected(answer, selectedAnswer)) {
+              } else if (
+                isItemSelected(answer, selectedAnswer, selectedQuestion)
+              ) {
                 setSelectedAnswer(null);
               }
             }}
@@ -105,7 +118,11 @@ export default function AnswersList({
               <div style={{ flexGrow: 1 }}>
                 <Typography
                   sx={{
-                    fontWeight: isItemSelected(answer, selectedAnswer)
+                    fontWeight: isItemSelected(
+                      answer,
+                      selectedAnswer,
+                      selectedQuestion,
+                    )
                       ? 700
                       : 400,
                   }}
@@ -114,12 +131,6 @@ export default function AnswersList({
                     '{x}',
                     String(answer.submission.id),
                   )}
-                  {answer.entry.index != null
-                    ? `, ${tr.AnswersList.mapMarkingIndex.replace(
-                        '{x}',
-                        String(answer.entry.index + 1),
-                      )}`.toLowerCase()
-                    : ''}
                 </Typography>
               </div>
               {(index === 0 ||
@@ -129,7 +140,7 @@ export default function AnswersList({
                 </Typography>
               )}
             </AccordionSummary>
-            {isItemSelected(answer, selectedAnswer) && (
+            {isItemSelected(answer, selectedAnswer, selectedQuestion) && (
               <AccordionDetails sx={{ borderTop: 0, padding: '1rem 2rem' }}>
                 {answer.entry.type === 'map' ? (
                   <>

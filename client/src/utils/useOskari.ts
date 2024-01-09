@@ -55,7 +55,6 @@ export function useOskari() {
     useState<FeatureCollection>(null);
   const [oskariVersion, setOskariVersion] = useState(null);
 
-
   // Make current features available inside callbacks
   const getCurrentFeatures = useCurrent(features);
 

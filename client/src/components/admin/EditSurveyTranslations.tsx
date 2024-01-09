@@ -386,13 +386,13 @@ export default function EditSurveyTranslations() {
                                       key={`survey-follow-up-section-${sectionIndex}-${index}`}
                                       languageCode={lang}
                                       section={followUpSection}
-                                      onEdit={(editedFollowUpSection) =>
+                                      onEdit={(editedFollowUpSection) => {
                                         editFollowUpSection(
                                           page.id,
-                                          sectionIndex,
+                                          section.id,
                                           editedFollowUpSection,
-                                        )
-                                      }
+                                        );
+                                      }}
                                     />
                                   ),
                                 )}

@@ -428,7 +428,7 @@
     "answerLimitsMax": "Valitse enintään {max} vaihtoehtoa.",
     "customAnswer": "Jokin muu (täsmennä alla)",
     "customAnswerField": "Täsmennä vastaustasi tässä.",
-    "charactersRemaining": "{x} merkki(ä) jäljellä.",
+    "charactersRemaining": "{x} merkkiä jäljellä.",
     "showInfo": "Näytä lisätietoja",
     "info": "Lisätietoja"
   },

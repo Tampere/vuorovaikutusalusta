@@ -149,9 +149,13 @@ export function EditSurveyPageConditions() {
   )
     return null;
 
-  const previousPages = activeSurvey.pages.slice(0, activePageIndex);
+  const previousNonConditionalPages = activeSurvey.pages
+    .slice(0, activePageIndex)
+    .filter(
+      (page) => !page?.conditions || Object.keys(page.conditions).length === 0,
+    );
 
-  const previousQuestions = previousPages
+  const previousQuestions = previousNonConditionalPages
     .map((page, pageIndex) =>
       page.sections
         .filter((sect) => isFollowUpSectionParentType(sect))
@@ -262,9 +266,15 @@ export function EditSurveyPageConditions() {
                   key={`${question.pageId}-${question.id}`}
                   value={String(question.id)}
                 >
-                  <Typography>{`Sivu ${question.pageIndex + 1}: ${
-                    question.title[surveyLanguage]
-                  }`}</Typography>
+                  <Typography>{`${
+                    previousNonConditionalPages[question.pageIndex].title[
+                      surveyLanguage
+                    ] === ''
+                      ? tr.EditSurvey.untitledPage
+                      : previousNonConditionalPages[question.pageIndex].title[
+                          surveyLanguage
+                        ]
+                  }: ${question.title[surveyLanguage]}`}</Typography>
                 </MenuItem>
               ))}
             </Select>
@@ -273,7 +283,7 @@ export function EditSurveyPageConditions() {
             {conditionList.map(([sectionId, _conditions]) => (
               <SurveyPageCondition
                 key={sectionId}
-                pages={previousPages}
+                pages={previousNonConditionalPages}
                 activePage={activePage}
                 sectionId={sectionId}
               />

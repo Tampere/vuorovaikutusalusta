@@ -70,6 +70,10 @@ type SurveyFollowUpSection = SurveyPageSection & {
   conditions: Conditions;
 };
 
+type SurveyFollowUpQuestion = SurveyQuestion & {
+  conditions: Conditions;
+};
+
 /**
  * Common fields for survey page questions
  */

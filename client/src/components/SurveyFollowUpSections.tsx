@@ -1,7 +1,9 @@
-import { Box, Collapse, Grow, Typography } from '@mui/material';
+import { Box, Collapse, Typography } from '@mui/material';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
-import React, { useState } from 'react';
+import React from 'react';
 import {
+  AnswerEntry,
+  SurveyFollowUpQuestion,
   SurveyFollowUpSection,
   SurveyQuestion as SurveyQuestionType,
 } from '@interfaces/survey';
@@ -11,6 +13,59 @@ import ImageSection from './ImageSection';
 import TextSection from './TextSection';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { AnswerItem } from './admin/SubmissionsPage/AnswersList';
+
+function FollowUpSectionAnswers({
+  section,
+  answerEntries,
+  pageUnfinished,
+  mobileDrawerOpen,
+}: {
+  section: SurveyFollowUpQuestion;
+  answerEntries: AnswerEntry[];
+  pageUnfinished: boolean;
+  mobileDrawerOpen: boolean;
+}) {
+  const { surveyLanguage } = useTranslations();
+  const answerEntry = answerEntries.find(
+    (entry) => entry.sectionId === section.id,
+  );
+
+  return (
+    <>
+      {section.type === 'map' ? (
+        <>
+          <Typography variant="followUpSectionTitle">
+            {section.title?.[surveyLanguage]}
+          </Typography>
+          {(answerEntry as AnswerEntry & { type: 'map' }).value.map((item) =>
+            item.subQuestionAnswers.map((subquestionAnswer, index) => (
+              <SurveyQuestion
+                pageUnfinished={false}
+                mobileDrawerOpen={false}
+                key={index}
+                readOnly
+                question={section.subQuestions.find(
+                  (question) => question.id === subquestionAnswer.sectionId,
+                )}
+                value={subquestionAnswer.value}
+              />
+            )),
+          )}
+        </>
+      ) : (
+        <SurveyQuestion
+          readOnly
+          value={answerEntry.value}
+          isFollowUp
+          key={section.id}
+          question={section}
+          pageUnfinished={pageUnfinished}
+          mobileDrawerOpen={mobileDrawerOpen}
+        />
+      )}
+    </>
+  );
+}
 
 interface Props {
   section: SurveyQuestionType;
@@ -83,18 +138,12 @@ export function SurveyFollowUpSections({
           sect.type !== 'image' &&
           sect.type !== 'document' &&
           answer ? (
-            <SurveyQuestion
-              readOnly
-              value={
-                answer.submission.answerEntries.find(
-                  (entry) => entry.sectionId === sect.id,
-                ).value
-              }
-              isFollowUp
+            <FollowUpSectionAnswers
               key={sect.id}
-              question={sect}
-              pageUnfinished={pageUnfinished}
+              answerEntries={answer.submission.answerEntries}
               mobileDrawerOpen={mobileDrawerOpen}
+              pageUnfinished={pageUnfinished}
+              section={sect}
             />
           ) : sect.type === 'text' ? (
             <TextSection isFollowUp key={sect.id} section={sect} />

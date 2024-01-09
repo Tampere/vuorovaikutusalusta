@@ -77,6 +77,27 @@ async function convertPdfToBuffer(pdf: typeof PDFDocument) {
   });
 }
 
+function findFollowUpMapQuestion(
+  sections: SurveyPageSection[],
+  entryId: number,
+): SurveyMapQuestion {
+  let followUpSectionIndex: number;
+  const sectionIndex = sections.findIndex((section) =>
+    section.followUpSections.some((followUpSection, followUpIndex) => {
+      if (followUpSection.id === entryId) {
+        followUpSectionIndex = followUpIndex;
+        return true;
+      }
+      return false;
+    }),
+  );
+
+  // Entry id is already only for map questions
+  return sections[sectionIndex].followUpSections[
+    followUpSectionIndex
+  ] as SurveyMapQuestion;
+}
+
 function prepareMapAnswers(
   survey: Survey,
   answerEntries: AnswerEntry[],
@@ -88,7 +109,13 @@ function prepareMapAnswers(
     .reduce(
       (jobData, entry) => {
         const page = survey.pages.find((page) =>
-          page.sections.some((section) => section.id === entry.sectionId),
+          page.sections.some(
+            (section) =>
+              section.id === entry.sectionId ||
+              section.followUpSections.some(
+                (followUpSection) => followUpSection.id === entry.sectionId,
+              ),
+          ),
         );
         return {
           ...jobData,
@@ -99,10 +126,11 @@ function prepareMapAnswers(
               index,
               feature: answer.geometry,
               visibleLayerIds: answer.mapLayers ?? page.sidebar.mapLayers,
-              question: page.sections.find(
-                (section): section is SurveyMapQuestion =>
-                  section.id === entry.sectionId,
-              ),
+              question:
+                page.sections.find(
+                  (section): section is SurveyMapQuestion =>
+                    section.id === entry.sectionId,
+                ) ?? findFollowUpMapQuestion(page.sections, entry.sectionId),
             })),
           ],
         };
@@ -497,10 +525,10 @@ export async function generatePdf(
         fontSize: 15,
         color: '#696969',
         bold: true,
-        margin: [5, 0, 0, 10],
+        margin: [0, 0, 0, 10],
       },
       followUpSectionAnswer: {
-        margin: [5, 0, 0, 15],
+        margin: [0, 0, 0, 15],
         fontSize: 12,
       },
     },
