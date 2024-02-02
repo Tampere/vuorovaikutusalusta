@@ -144,8 +144,8 @@ export default function SurveyLandingPage({
             maxWidth: '60%',
             maxHeight: '100%',
           }}
-          src={`/api/feature-styles/icons/tre_logo`}
-          alt={tr.IconAltTexts.treLogoAltText}
+          src={`/api/feature-styles/icons/logo`}
+          alt={tr.IconAltTexts.logoAltText}
         />
       </Box>
       <Box
@@ -217,8 +217,8 @@ export default function SurveyLandingPage({
             marginLeft: '0.5rem',
             marginBottom: '0.5rem',
           }}
-          src={`/api/feature-styles/icons/tre_banner`}
-          alt={tr.IconAltTexts.treBannerAltText}
+          src={`/api/feature-styles/icons/banner`}
+          alt={tr.IconAltTexts.bannerAltText}
         />
 
         {surveyBackgroundImage?.attributions ? (

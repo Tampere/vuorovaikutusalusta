@@ -623,8 +623,8 @@
     "privacyStatement": "Data protection statement"
   },
   "IconAltTexts": {
-    "treBannerAltText": "Tampere banner",
-    "treLogoAltText": "Tampere Finland logo"
+    "bannerAltText": "Tampere banner",
+    "logoAltText": "Tampere Finland logo"
   },
   "adminInstructions": "Open user manual"
 }

@@ -118,7 +118,7 @@ export default function SurveyStepper({
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [submissionInfoDialogOpen, setSubmissionInfoDialogOpen] =
     useState(false);
-
+  const [shouldSubmit, setShouldSubmit] = useState(false);
   const {
     isPageValid,
     answers,
@@ -290,6 +290,16 @@ export default function SurveyStepper({
     return true;
   }
 
+  /**
+   * There is a race condition between updating answers to SurveyAnswerContext and submitting the answers thus the reason for this effect
+   */
+  useEffect(() => {
+    if (!shouldSubmit) return;
+
+    setShouldSubmit(false);
+    doSubmit();
+  }, [shouldSubmit]);
+
   async function doSubmit(info?: SubmissionInfo) {
     if (isTestSurvey) {
       onComplete();
@@ -325,7 +335,6 @@ export default function SurveyStepper({
     updatePageMapLayers(currentPage, mapLayers);
 
     // Get all map answer entries on the current page and set their map layers
-
     const mapQuestionIds = currentPage.sections
       .filter(
         (section): section is SurveyMapQuestion =>
@@ -339,6 +348,7 @@ export default function SurveyStepper({
         }
         return question.followUpSections.find((sect) => sect.type === 'map').id;
       });
+
     answers
       .filter((answer): answer is AnswerEntry & { type: 'map' } =>
         mapQuestionIds.includes(answer.sectionId),
@@ -556,12 +566,14 @@ export default function SurveyStepper({
                         handleClick();
                         return;
                       }
-                      if (currentPage.sidebar.type === 'map')
+                      if (currentPage.sidebar.type === 'map') {
                         await saveMapLayers();
+                      }
+
                       if (survey.email.enabled) {
                         setSubmissionInfoDialogOpen(true);
                       } else {
-                        doSubmit();
+                        setShouldSubmit(true);
                       }
                     }}
                     allowSavingUnfinished={survey.allowSavingUnfinished}

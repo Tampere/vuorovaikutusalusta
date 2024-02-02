@@ -626,8 +626,8 @@
     "privacyStatement": "Tietosuojaseloste"
   },
   "IconAltTexts": {
-    "treBannerAltText": "Tampereen vaakunalogo",
-    "treLogoAltText": "Tampere Finland -logo"
+    "bannerAltText": "Tampereen vaakunalogo",
+    "logoAltText": "Tampere Finland -logo"
   },
   "adminInstructions": "Avaa käyttöohje"
 }
