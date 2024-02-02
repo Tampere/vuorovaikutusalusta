@@ -9,7 +9,7 @@ on:
     branches: [master]
 
 env:
-  NODE_VERSION: 18
+  NODE_VERSION: 20
   IMAGE_NAME: ${{ secrets.REGISTRY_ADDRESS }}/vuorovaikutusalusta
 
 jobs:
