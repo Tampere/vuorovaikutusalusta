@@ -85,8 +85,8 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
       >
         <img
           style={{ maxWidth: '60%', maxHeight: '15vh' }}
-          src={`/api/feature-styles/icons/tre_logo`}
-          alt={tr.IconAltTexts.treLogoAltText}
+          src={`/api/feature-styles/icons/logo`}
+          alt={tr.IconAltTexts.logoAltText}
         />
       </Box>
       <Box
@@ -174,8 +174,8 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
             bottom: 0,
             margin: '0.5rem',
           }}
-          src={`/api/feature-styles/icons/tre_banner`}
-          alt={tr.IconAltTexts.treBannerAltText}
+          src={`/api/feature-styles/icons/banner`}
+          alt={tr.IconAltTexts.bannerAltText}
         />
       </Box>
     </Stack>

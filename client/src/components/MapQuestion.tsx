@@ -114,7 +114,6 @@ export default function MapQuestion({
         setSelectionType(null);
         return;
       }
-
       // Update the new answer to context at once
       onChange([
         ...value,
