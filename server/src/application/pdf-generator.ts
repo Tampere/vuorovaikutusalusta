@@ -425,9 +425,9 @@ function getContent(
         }),
       ];
     }
-    // Unlisted types are ignored in the PDf
+    // Unlisted types are ignored in the PDF
     default:
-      return null;
+      return [];
   }
 }
 
