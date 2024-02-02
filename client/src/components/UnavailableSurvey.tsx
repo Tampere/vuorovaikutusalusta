@@ -31,8 +31,8 @@ export function UnavailableSurvey() {
     >
       <img
         style={{ height: '125px', width: '351px' }}
-        src={`api/feature-styles/icons/tre_logo`}
-        alt={tr.IconAltTexts.treLogoAltText}
+        src={`api/feature-styles/icons/logo`}
+        alt={tr.IconAltTexts.logoAltText}
       />
       <br />
       <Typography variant="body1" classes={{ body1: classes.infoText }}>

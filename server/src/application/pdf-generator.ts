@@ -50,12 +50,12 @@ const fonts = {
 };
 
 async function getStaticIconSvg(name: string) {
-  const { svg } = await getDb().oneOrNone<{
+  const data = await getDb().oneOrNone<{
     svg: Buffer;
   }>('SELECT svg FROM application.static_icons WHERE name=$(name)', {
     name,
   });
-  return svg.toString();
+  return data?.svg?.toString();
 }
 
 /**
@@ -82,14 +82,15 @@ function findFollowUpMapQuestion(
   entryId: number,
 ): SurveyMapQuestion {
   let followUpSectionIndex: number;
-  const sectionIndex = sections.findIndex((section) =>
-    section.followUpSections.some((followUpSection, followUpIndex) => {
-      if (followUpSection.id === entryId) {
-        followUpSectionIndex = followUpIndex;
-        return true;
-      }
-      return false;
-    }),
+  const sectionIndex = sections.findIndex(
+    (section) =>
+      section.followUpSections?.some((followUpSection, followUpIndex) => {
+        if (followUpSection.id === entryId) {
+          followUpSectionIndex = followUpIndex;
+          return true;
+        }
+        return false;
+      }),
   );
 
   // Entry id is already only for map questions
@@ -112,7 +113,7 @@ function prepareMapAnswers(
           page.sections.some(
             (section) =>
               section.id === entry.sectionId ||
-              section.followUpSections.some(
+              section.followUpSections?.some(
                 (followUpSection) => followUpSection.id === entry.sectionId,
               ),
           ),
@@ -155,8 +156,8 @@ async function getFrontPage(
     : null;
 
   const [logo, banner] = await Promise.all([
-    getStaticIconSvg('tre_logo'),
-    getStaticIconSvg('tre_banner'),
+    getStaticIconSvg('logo'),
+    getStaticIconSvg('banner'),
   ]);
 
   const attachmentFileNames = answerEntries
@@ -167,12 +168,12 @@ async function getFrontPage(
     .map((entry) => entry.value[0]?.fileName)
     .filter(Boolean);
   return [
-    {
+    logo && {
       svg: logo,
       width: 200,
       absolutePosition: { x: 360, y: 20 },
     },
-    {
+    banner && {
       svg: banner,
       width: 100,
       absolutePosition: { x: 40, y: 780 },
