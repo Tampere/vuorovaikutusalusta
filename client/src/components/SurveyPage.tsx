@@ -15,6 +15,7 @@ import SurveyStepper from './SurveyStepper';
 import SurveyThanksPage from './SurveyThanksPage';
 import TestSurveyFrame from './TestSurveyFrame';
 import { UnavailableSurvey } from './UnavailableSurvey';
+import SurveyInfoPage from './SurveyInfoPage';
 
 interface Props {
   isTestSurvey?: boolean;
@@ -23,6 +24,7 @@ interface Props {
 export default function SurveyPage({ isTestSurvey }: Props) {
   const [loading, setLoading] = useState(true);
   const [showLandingPage, setShowLandingPage] = useState(true);
+  const [showInfoPage, setShowInfoPage] = useState(false);
   const [showThanksPage, setShowThanksPage] = useState(false);
   const [surveyBackgroundImage, setSurveyBackgroundImage] = useState<{
     attributions: string;
@@ -66,6 +68,7 @@ export default function SurveyPage({ isTestSurvey }: Props) {
         }
         setSurvey(survey);
         setThemeFromSurvey(survey);
+        setShowInfoPage(survey.infoPage?.enabled ?? false);
         setLoading(false);
       } catch (error) {
         setErrorStatusCode(error.status);
@@ -167,8 +170,15 @@ export default function SurveyPage({ isTestSurvey }: Props) {
             }}
           />
         )}
+        {!showLandingPage && showInfoPage && (
+          <SurveyInfoPage
+            infoPageContent={survey.infoPage}
+            personalInfoQuery={survey.personalInfoQuery}
+            onStart={() => setShowInfoPage(false)}
+          />
+        )}
         {/* Survey page */}
-        {!showLandingPage && !showThanksPage && (
+        {!showLandingPage && !showInfoPage && !showThanksPage && (
           <SurveyStepper
             survey={survey}
             isTestSurvey={isTestSurvey}

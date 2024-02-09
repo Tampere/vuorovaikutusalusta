@@ -20,6 +20,7 @@ import {
   Preview,
   ContentCopy,
   ContentPaste,
+  Quiz,
 } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { useSurvey } from '@src/stores/SurveyContext';
@@ -124,6 +125,12 @@ export default function EditSurveySideBar(props: Props) {
       </List>
       <Divider />
       <List>
+        <ListItemLink to={`${url}/henkilötiedot`}>
+          <ListItemIcon>
+            <Quiz />
+          </ListItemIcon>
+          <ListItemText primary={tr.EditSurvey.surveyInfoPage} />
+        </ListItemLink>
         <DragDropContext
           onDragEnd={(event) => {
             if (!event.destination) {

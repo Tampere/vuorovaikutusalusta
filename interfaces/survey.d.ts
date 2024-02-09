@@ -467,6 +467,40 @@ export interface Survey {
     info: SurveyEmailInfoItem[];
   };
   /**
+   * What personal info is asked as a part of the survey
+   */
+  personalInfoQuery: {
+    /**
+     * Name of the respondent
+     */
+    name?: boolean;
+    /**
+     * Phone number of the respondent
+     */
+    phoneNumber?: boolean;
+    /**
+     * Email of the respondent
+     */
+    email?: boolean;
+  };
+    /**
+   * Info page's localized texts
+   */
+    infoPage: {
+      /**
+       * Is the info page enabled
+       */
+      enabled: boolean;
+      /**
+       * Title of the info page
+       */
+      title: string;
+      /**
+       * Text in markdown format
+       */
+      text: string;
+    };
+  /**
    * Should the survey be able to be saved as unfinished
    */
   allowSavingUnfinished?: boolean;
@@ -695,6 +729,24 @@ export interface SubmissionInfo {
 }
 
 /**
+ * Info about the submitter
+ */
+export interface PersonalInfo {
+  /**
+   * Name
+   */
+  name?: string;
+  /**
+   * Email address
+   */
+  email: string;
+  /**
+   * Phone number
+   */
+  phoneNumber?: string;
+}
+
+/**
  * Map marker icon
  */
 export interface MapMarkerIcon {
@@ -726,6 +778,8 @@ export interface Submission {
   id: number;
   timestamp: Date;
   answerEntries?: AnswerEntry[];
+  personalInfo?: PersonalInfo;
+
 }
 
 export type ImageType = 'backgroundImage' | 'thanksPageImage';

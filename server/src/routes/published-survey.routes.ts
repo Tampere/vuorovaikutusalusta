@@ -1,9 +1,10 @@
-import { AnswerEntry, SubmissionInfo } from '@interfaces/survey';
+import { AnswerEntry, PersonalInfo, SubmissionInfo } from '@interfaces/survey';
 import { generatePdf } from '@src/application/pdf-generator';
 import {
   createSurveySubmission,
   getSurveyAnswerLanguage,
   getUnfinishedAnswerEntries,
+  handlePersonalInfo,
 } from '@src/application/submission';
 import { getSurvey } from '@src/application/survey';
 import { sendSubmissionReport } from '@src/email/submission-report';
@@ -72,6 +73,21 @@ router.post(
     // We are done with this request - start sending the emails in the background
     res.status(201).send();
 
+    // Handle sending the report to the submitter and storing personal info, if asked
+    const perfonalInfo: PersonalInfo = req.body.personalInfo;
+
+    /**
+     * If personal info was asked, store it to db
+     */
+    if (
+      [
+        survey.personalInfoQuery.email,
+        survey.personalInfoQuery.name,
+        survey.personalInfoQuery.phoneNumber,
+      ].includes(true)
+    ) {
+      handlePersonalInfo(perfonalInfo, submissionId);
+    }
     // Return if email is not enabled for this survey
     if (!survey.email.enabled) {
       return;

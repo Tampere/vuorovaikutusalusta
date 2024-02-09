@@ -3,9 +3,9 @@ import {
   Box,
   Button,
   Link,
+  Stack,
   Theme,
   Typography,
-  Stack,
   useMediaQuery,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
@@ -142,7 +142,7 @@ export default function SurveyLandingPage({
         <img
           style={{
             maxWidth: '60%',
-            maxHeight: '100%',
+            maxHeight: '15vh',
           }}
           src={`/api/feature-styles/icons/logo`}
           alt={tr.IconAltTexts.logoAltText}

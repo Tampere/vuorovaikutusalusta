@@ -1,12 +1,12 @@
 import { Survey } from '@interfaces/survey';
 import {
+  Box,
   Link,
-  Typography,
+  Stack,
   SxProps,
   Theme,
-  Box,
+  Typography,
   useMediaQuery,
-  Stack,
 } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useEffect, useState } from 'react';
@@ -168,7 +168,7 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
         <img
           style={{
             minWidth: '130px',
-            width: '10vw',
+            maxWidth: '20%',
             position: !mediumWidth ? 'absolute' : 'static',
             left: !mediumWidth ? '0' : 'auto',
             bottom: 0,

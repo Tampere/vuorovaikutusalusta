@@ -2,6 +2,7 @@ import {
   AnswerEntry,
   Conditions,
   LanguageCode,
+  PersonalInfo,
   Survey,
   SurveyPage,
   SurveyPageSection,
@@ -22,6 +23,7 @@ interface State {
   answers: AnswerEntry[];
   survey: Survey;
   unfinishedToken: string;
+  personalInfo: PersonalInfo;
 }
 
 type Action =
@@ -48,6 +50,10 @@ type Action =
   | {
       type: 'SET_UNFINISHED_TOKEN';
       token: string;
+    }
+  | {
+      type: 'SET_PERSONAL_INFO';
+      personalInfo: PersonalInfo;
     };
 
 type Context = [State, React.Dispatch<Action>];
@@ -56,6 +62,7 @@ const stateDefaults: State = {
   answers: [],
   survey: null,
   unfinishedToken: null,
+  personalInfo: null,
 };
 
 // Section types that won't have an answer (e.g. text sections)
@@ -577,6 +584,12 @@ export function useSurveyAnswers() {
         page: { ...page, sidebar: { ...page.sidebar, mapLayers } },
       });
     },
+    /**
+     * Store personal info to the context
+     */
+    setPersonalInfo(personalInfo: PersonalInfo) {
+      dispatch({ type: 'SET_PERSONAL_INFO', personalInfo });
+    },
   };
 }
 
@@ -628,6 +641,11 @@ function reducer(state: State, action: Action): State {
       return {
         ...state,
         unfinishedToken: action.token,
+      };
+    case 'SET_PERSONAL_INFO':
+      return {
+        ...state,
+        personalInfo: action.personalInfo,
       };
     default:
       throw new Error('Invalid action type');
