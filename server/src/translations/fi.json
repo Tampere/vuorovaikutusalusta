@@ -10,6 +10,9 @@
   "continueWithLink": "Voit jatkaa vastaamista kyselyn ollessa auki avaamalla seuraavan linkin:",
   "submissionId": "Vastaustunniste",
   "responseTime": "Tallennusaika",
+  "name": "Nimi",
+  "email": "Sähköposti",
+  "phone": "Puhelinnumero",
   "attachments": "Liitteet",
   "fi": "suomi",
   "en": "englanti"

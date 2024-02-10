@@ -798,6 +798,27 @@ export async function getAnswerEntries(submissionId: number) {
 }
 
 /**
+ * Gets personal info for given submission
+ * @param submissionId Submission ID
+ * @returns Personal info
+ */
+export async function getPersonalInfo(submissionId: number) {
+  const rows = await getDb().oneOrNone<PersonalInfo>(
+    `
+    SELECT
+      public.pgp_sym_decrypt(name, $2) as name,
+      public.pgp_sym_decrypt(email, $2) as email,
+      public.pgp_sym_decrypt(phone, $2) as "phoneNumber"
+    FROM data.participant_info
+    WHERE submission_id = $1
+  `,
+    [submissionId, encryptionKey],
+  );
+
+  return rows;
+}
+
+/**
  * Get timestamp of the given submission (=updated at)
  * @param submissionId Submission ID
  * @returns Timestamp

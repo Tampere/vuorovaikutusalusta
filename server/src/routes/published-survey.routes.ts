@@ -99,6 +99,7 @@ router.post(
       { id: submissionId, timestamp },
       answerEntries,
       answerLanguage,
+      perfonalInfo,
     );
 
     // Send the report to the submitter, if they provided their email address
