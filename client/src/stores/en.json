@@ -25,6 +25,7 @@
     "toFrontPage": "Back to the front page",
     "info": "Basic information",
     "email": "Email",
+    "surveyInfoPage": "Survey info page",
     "newPage": "Create page",
     "newPageFailed": "Error while creating a new page. Please try again later.",
     "thanksPage": "Thanks page",
@@ -76,6 +77,18 @@
     "emailBody": "Email content",
     "info": "Additional information",
     "infoHelperText": "Additional information will be displayed on the front page of the answer report."
+  },
+  "EditSurveyInfoPage": {
+    "title": "Info page title",
+    "text": "Info page text",
+    "askPersonalInfo": "Ask personal info as a part of the survey",
+    "askedInfo": "Personal info to be asked",
+    "helperText": "If you are about to ask personal information from the survey participants, these informations should be asked through this form so that the sensitive information is handled properly.",
+    "name": "Name",
+    "email": "Email",
+    "phoneNumber": "Phone number",
+    "enableInfoPage": "Show survey info page",
+    "infoPageTexts": "You can add title and text for the info page with which you can give participants information about the survey and about why the personal information is needed."
   },
   "KeyValueForm": {
     "key": "Key",
@@ -371,6 +384,15 @@
     "copySurvey": "Copy survey",
     "answers": "Answers"
   },
+  "SurveyInfoPage": {
+    "name": "Name",
+    "email": "Email",
+    "phoneNumber": "Phone number",
+    "startSurvey": "Start the survey",
+    "fillEntries": "Fill in the following personal information",
+    "invalidEmail": "Invalid email address. Revise the input and try again.",
+    "invalidPhoneNumber": "Invalid phone number. Revise the input and try again."
+  },
   "SurveyPage": {
     "errorSurveyNotFound": "Survey was not found, or it is not published. Please check the address and try again.",
     "errorFetchingSurvey": "Error while accessing the survey. Please try again later.",
@@ -593,7 +615,10 @@
       "tooltipWeekLabel": "Week {x}, Year",
       "tooltipTotal": "Total answers",
       "tooltipCurrent": "Answers",
-      "xAxisLabel": { "byDay": "Day", "byWeek": "Week" },
+      "xAxisLabel": {
+        "byDay": "Day",
+        "byWeek": "Week"
+      },
       "yAxisTotalLabel": "Total answers",
       "yAxisLabel": "Answers"
     }

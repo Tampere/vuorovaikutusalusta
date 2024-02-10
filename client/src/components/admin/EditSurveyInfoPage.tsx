@@ -50,7 +50,7 @@ export default function EditSurveyInfoPage() {
           }
           label={tr.EditSurveyInfoPage.enableInfoPage}
         />
-        <FormHelperText style={{ paddingTop: '1rem' }}>
+        <FormHelperText style={{ paddingTop: '1rem', paddingBottom: '2rem' }}>
           {' '}
           {tr.EditSurveyInfoPage.infoPageTexts}{' '}
         </FormHelperText>
