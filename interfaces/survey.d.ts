@@ -483,23 +483,23 @@ export interface Survey {
      */
     email?: boolean;
   };
-    /**
+  /**
    * Info page's localized texts
    */
-    infoPage: {
-      /**
-       * Is the info page enabled
-       */
-      enabled: boolean;
-      /**
-       * Title of the info page
-       */
-      title: string;
-      /**
-       * Text in markdown format
-       */
-      text: string;
-    };
+  infoPage: {
+    /**
+     * Is the info page enabled
+     */
+    enabled: boolean;
+    /**
+     * Title of the info page
+     */
+    title: LocalizedText;
+    /**
+     * Text in markdown format
+     */
+    text: LocalizedText;
+  };
   /**
    * Should the survey be able to be saved as unfinished
    */
@@ -779,7 +779,6 @@ export interface Submission {
   timestamp: Date;
   answerEntries?: AnswerEntry[];
   personalInfo?: PersonalInfo;
-
 }
 
 export type ImageType = 'backgroundImage' | 'thanksPageImage';

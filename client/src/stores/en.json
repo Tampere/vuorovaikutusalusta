@@ -601,7 +601,8 @@
     "missingTranslation": "Missing translation",
     "optionInfo": "Option info",
     "emailInfo": "Email",
-    "thanksPage": "Thank you -page"
+    "thanksPage": "Thank you -page",
+    "infoPage": "Info page"
   },
   "SurveySubmissionsPage": {
     "attachments": "Attachments",

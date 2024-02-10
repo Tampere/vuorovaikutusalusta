@@ -9,13 +9,13 @@ import { request } from '@src/utils/request';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 import { NotFoundPage } from './NotFoundPage';
+import SurveyInfoPage from './SurveyInfoPage';
 import SurveyLandingPage from './SurveyLandingPage';
 import SurveyLanguageMenu from './SurveyLanguageMenu';
 import SurveyStepper from './SurveyStepper';
 import SurveyThanksPage from './SurveyThanksPage';
 import TestSurveyFrame from './TestSurveyFrame';
 import { UnavailableSurvey } from './UnavailableSurvey';
-import SurveyInfoPage from './SurveyInfoPage';
 
 interface Props {
   isTestSurvey?: boolean;
@@ -147,17 +147,18 @@ export default function SurveyPage({ isTestSurvey }: Props) {
           maxHeight: '-webkit-fill-available',
         }}
       >
-        {(showLandingPage || showThanksPage) && survey.localisationEnabled && (
-          <SurveyLanguageMenu
-            changeUILanguage={true}
-            style={{
-              position: 'absolute',
-              top: '1rem',
-              left: '1rem',
-              zIndex: 10,
-            }}
-          />
-        )}
+        {(showLandingPage || showThanksPage || showInfoPage) &&
+          survey.localisationEnabled && (
+            <SurveyLanguageMenu
+              changeUILanguage={true}
+              style={{
+                position: 'absolute',
+                top: '1rem',
+                left: '1rem',
+                zIndex: 10,
+              }}
+            />
+          )}
         {/* Landing page */}
         {showLandingPage && (
           <SurveyLandingPage

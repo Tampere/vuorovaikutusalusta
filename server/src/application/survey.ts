@@ -23,8 +23,8 @@ import { User } from '@interfaces/user';
 import {
   getColumnSet,
   getDb,
-  getMultiInsertQuery,
   getGeoJSONColumn,
+  getMultiInsertQuery,
   getMultiUpdateQuery,
 } from '@src/database';
 import {
@@ -934,8 +934,8 @@ export async function updateSurvey(survey: Survey) {
         survey.localisationEnabled,
         survey.displayPrivacyStatement,
         survey.infoPage.enabled,
-        { fi: survey.infoPage.title },
-        { fi: survey.infoPage.text },
+        survey.infoPage.title,
+        survey.infoPage.text,
         survey.personalInfoQuery.name,
         survey.personalInfoQuery.email,
         survey.personalInfoQuery.phoneNumber,
@@ -1211,8 +1211,8 @@ function dbSurveyToSurvey(
     },
     infoPage: {
       enabled: dbSurvey.info_page_enabled,
-      title: dbSurvey.info_page_title?.fi,
-      text: dbSurvey.info_page_text?.fi,
+      title: dbSurvey.info_page_title,
+      text: dbSurvey.info_page_text,
     },
     personalInfoQuery: {
       name: dbSurvey.inquire_name,

@@ -1,4 +1,4 @@
-import { PersonalInfo } from '@interfaces/survey';
+import { LocalizedText, PersonalInfo } from '@interfaces/survey';
 import { Button, Grid, TextField, Theme, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
@@ -72,7 +72,7 @@ const useStyles = makeStyles((theme: Theme & { [customKey: string]: any }) => ({
 }));
 
 interface Props {
-  infoPageContent: { title: string; text: string };
+  infoPageContent: { title: LocalizedText; text: LocalizedText };
   personalInfoQuery?: {
     name?: boolean;
     email?: boolean;
@@ -86,7 +86,7 @@ export default function SurveyInfoPage({
   infoPageContent,
   personalInfoQuery,
 }: Props) {
-  const { tr } = useTranslations();
+  const { tr, surveyLanguage } = useTranslations();
   const classes = useStyles();
   const { setPersonalInfo } = useSurveyAnswers();
   const [personalInfoValues, setPersonalInfoValues] =
@@ -110,20 +110,20 @@ export default function SurveyInfoPage({
     >
       <Grid container spacing={4} className={classes.root}>
         <Grid item xs={12} style={{ padding: 0 }}>
-          {infoPageContent?.title && (
+          {infoPageContent?.title?.[surveyLanguage] && (
             <Typography
               className={getClassList([classes.heading, classes.title])}
               variant="h3"
             >
-              {infoPageContent.title}
+              {infoPageContent.title[surveyLanguage]}
             </Typography>
           )}
-          {infoPageContent?.text && (
+          {infoPageContent?.text?.[surveyLanguage] && (
             <Typography
               className={getClassList([classes.subtitle])}
               variant="body1"
             >
-              {infoPageContent?.text}
+              {infoPageContent?.text[surveyLanguage]}
             </Typography>
           )}
         </Grid>

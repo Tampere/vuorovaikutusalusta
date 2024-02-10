@@ -216,7 +216,13 @@ export default function EditSurveyTranslations() {
                       }}
                     />
                     {activeSurvey.email.enabled && (
-                      <>
+                      <div
+                        style={{
+                          paddingTop: '0.25rem',
+                          paddingBottom: '1rem',
+                          maxWidth: '330px',
+                        }}
+                      >
                         <br />
                         <Typography className={classes.titleText}>
                           {langIndex === 0
@@ -313,7 +319,58 @@ export default function EditSurveyTranslations() {
                             </div>
                           ),
                         )}
-                      </>
+                      </div>
+                    )}
+                    {activeSurvey?.infoPage && (
+                      <div
+                        style={{
+                          paddingTop: '0.25rem',
+                          paddingBottom: '1rem',
+                          maxWidth: '330px',
+                        }}
+                      >
+                        <br />
+                        <Typography className={classes.titleText}>
+                          {langIndex === 0
+                            ? tr.EditSurveyTranslations.infoPage
+                            : ''}
+                          &nbsp;
+                        </Typography>
+                        <TranslationField
+                          value={activeSurvey.infoPage?.title?.[lang] ?? ''}
+                          onChange={(event) =>
+                            editSurvey({
+                              ...activeSurvey,
+                              infoPage: {
+                                ...activeSurvey.infoPage,
+                                title: {
+                                  ...activeSurvey.infoPage.title,
+                                  [lang]: event.target.value,
+                                },
+                              },
+                            })
+                          }
+                        />
+                        <RichTextEditor
+                          value={activeSurvey.infoPage?.text?.[lang] ?? ''}
+                          missingValue={Boolean(
+                            !activeSurvey.infoPage?.text?.[lang],
+                          )}
+                          onChange={(value) =>
+                            editSurvey({
+                              ...activeSurvey,
+                              infoPage: {
+                                ...activeSurvey.infoPage,
+                                text: {
+                                  ...activeSurvey.infoPage.text,
+                                  [lang]: value,
+                                },
+                              },
+                            })
+                          }
+                          editorHeight={'100px'}
+                        />
+                      </div>
                     )}
                     <br />
                     <Typography className={classes.titleText}>

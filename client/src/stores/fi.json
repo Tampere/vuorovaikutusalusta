@@ -601,7 +601,8 @@
     "missingTranslation": "Käännös puuttuu",
     "optionInfo": "Vaihtoehdon lisätiedot",
     "emailInfo": "Sähköposti",
-    "thanksPage": "Kiitos-sivu"
+    "thanksPage": "Kiitos-sivu",
+    "infoPage": "Esittely-sivu"
   },
   "SurveySubmissionsPage": {
     "attachments": "Liitteet",
