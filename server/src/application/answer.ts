@@ -4,15 +4,14 @@ import {
   LocalizedText,
   MapLayer,
 } from '@interfaces/survey';
-import { getDb } from '@src/database';
+import { encryptionKey, getDb } from '@src/database';
 import useTranslations from '@src/translations/useTranslations';
+import { indexToAlpha } from '@src/utils';
 import { readFileSync, rmSync } from 'fs';
 import moment from 'moment';
 import ogr2ogr from 'ogr2ogr';
 import { getAvailableMapLayers } from './map';
 import { getSurvey } from './survey';
-import { indexToAlpha } from '@src/utils';
-import logger from '@src/logger';
 
 const tr = useTranslations('fi');
 
@@ -43,6 +42,9 @@ interface DBAnswerEntry {
   option_text: string;
   option_group_index: number;
   map_layers: number[];
+  email: string;
+  name: string;
+  phone: string;
 }
 
 /**
@@ -83,6 +85,9 @@ interface AnswerEntry {
   optionIndex: number;
   optionText?: string;
   mapLayers: number[];
+  name?: string;
+  email?: string;
+  phone?: string;
 }
 
 interface CheckboxOptions {
@@ -115,6 +120,9 @@ interface CSVJson {
     [key: number]: TextCell[];
     timeStamp: Date;
     submissionLanguage: LanguageCode;
+    name?: string;
+    email?: string;
+    phone?: string;
   }[];
 }
 
@@ -177,6 +185,9 @@ function dbAnswerEntryRowsToAnswerEntries(rows: DBAnswerEntry[]) {
     createdAt: row.created_at,
     groupIndex: row.option_group_index,
     mapLayers: row.map_layers ?? [],
+    name: row?.name,
+    email: row?.email,
+    phone: row?.phone,
   })) as AnswerEntry[];
 }
 
@@ -318,15 +329,20 @@ function dbEntriesToFeatures(
 async function answerEntriesToCSV(entries: CSVJson): Promise<string> {
   const { submissions, headers } = entries;
 
-  let csvData = `Vastaustunniste,Vastauskieli,Aikaleima,${headers.map(
+  let csvData = `Vastaustunniste,Vastauskieli,Aikaleima,Nimi,Sähköposti,Puhelinnumero,${headers.map(
     (header) => `"${Object.values(header)[0]}"`,
   )}\n`;
 
+  console.log(csvData);
+
+  console.log(submissions);
   for (let i = 0; i < submissions.length; ++i) {
     // Timestamp + submission language
-    csvData += `${Object.keys(submissions[i])[0]},${moment(
-      submissions[i].timeStamp,
-    ).format('DD-MM-YYYY HH:mm')},${submissions[i].submissionLanguage}`;
+    csvData += `${Object.keys(submissions[i])[0]},${
+      submissions[i].submissionLanguage
+    },${moment(submissions[i].timeStamp).format('DD-MM-YYYY HH:mm')},${
+      submissions[i].name
+    },${submissions[i].email},${submissions[i].phone}`;
     csvData += ',';
 
     headers.forEach((headerObj, index) => {
@@ -523,7 +539,10 @@ async function getAnswerDBEntries(surveyId: number): Promise<AnswerEntry[]> {
       ps.idx as section_index,
       og.idx as option_group_index,
       sub.created_at,
-      sub.language
+      sub.language,
+      public.pgp_sym_decrypt(pinf.name, $2) as name,
+      public.pgp_sym_decrypt(pinf.email, $2) as email,
+      public.pgp_sym_decrypt(pinf.phone, $2) as phone
         FROM data.answer_entry ae
         LEFT JOIN data.submission sub ON ae.submission_id = sub.id
         LEFT JOIN data.page_section ps ON ps.id = ae.section_id
@@ -531,6 +550,7 @@ async function getAnswerDBEntries(surveyId: number): Promise<AnswerEntry[]> {
         LEFT JOIN data.option_group og ON opt.group_id = og.id
         LEFT JOIN data.survey_page sp ON ps.survey_page_id = sp.id
         LEFT JOIN data.survey s ON sp.survey_id = s.id
+        LEFT JOIN data.participant_info pinf ON sub.id = pinf.submission_id 
       WHERE ps.type <> 'map'
         AND ps.type <> 'attachment'
         AND ps.type <> 'document'
@@ -539,7 +559,7 @@ async function getAnswerDBEntries(surveyId: number): Promise<AnswerEntry[]> {
         AND sub.unfinished_token IS NULL
         AND ps.parent_section IS NULL AND sub.survey_id = $1;
     `,
-    [surveyId],
+    [surveyId, encryptionKey],
   )) as DBAnswerEntry[];
 
   if (!rows || rows.length === 0) return null;
@@ -884,6 +904,9 @@ function createCSVSubmissions(
       ),
       timeStamp: value[0].createdAt,
       submissionLanguage: value[0].submissionLanguage,
+      name: value[0]?.name ?? '',
+      email: value[0]?.email ?? '',
+      phone: value[0]?.phone ?? '',
     });
   });
 
