@@ -333,9 +333,6 @@ async function answerEntriesToCSV(entries: CSVJson): Promise<string> {
     (header) => `"${Object.values(header)[0]}"`,
   )}\n`;
 
-  console.log(csvData);
-
-  console.log(submissions);
   for (let i = 0; i < submissions.length; ++i) {
     // Timestamp + submission language
     csvData += `${Object.keys(submissions[i])[0]},${
