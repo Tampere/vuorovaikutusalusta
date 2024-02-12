@@ -24,7 +24,7 @@ const useStyles = makeStyles({
 });
 
 export default function EditSurveyInfoPage() {
-  const { tr } = useTranslations();
+  const { tr, language } = useTranslations();
   const { activeSurvey, activeSurveyLoading, editSurvey } = useSurvey();
   const classes = useStyles();
 
@@ -59,13 +59,16 @@ export default function EditSurveyInfoPage() {
           disabled={!activeSurvey.infoPage.enabled}
           style={{ paddingBottom: '1rem' }}
           label={tr.EditSurveyInfoPage.title}
-          value={activeSurvey.infoPage.title ?? ''}
+          value={activeSurvey?.infoPage?.title?.[language] ?? ''}
           onChange={(event) => {
             editSurvey({
               ...activeSurvey,
               infoPage: {
                 ...activeSurvey.infoPage,
-                title: event.target.value,
+                title: {
+                  ...activeSurvey.infoPage.title,
+                  [language]: event.target.value,
+                },
               },
             });
           }}
@@ -73,13 +76,16 @@ export default function EditSurveyInfoPage() {
         <RichTextEditor
           disabled={!activeSurvey.infoPage.enabled}
           label={tr.EditSurveyInfoPage.text}
-          value={activeSurvey.infoPage.text ?? ''}
+          value={activeSurvey?.infoPage?.text?.[language] ?? ''}
           onChange={(value) => {
             editSurvey({
               ...activeSurvey,
               infoPage: {
                 ...activeSurvey.infoPage,
-                text: value,
+                text: {
+                  ...activeSurvey.infoPage.text,
+                  [language]: value,
+                },
               },
             });
           }}
