@@ -128,6 +128,7 @@ export default function SurveyStepper({
     updateAnswer,
     getConditionalPageVisibility,
     getAnswersForSubmission,
+    personalInfo,
   } = useSurveyAnswers();
   const { showToast } = useToasts();
   const {
@@ -314,7 +315,17 @@ export default function SurveyStepper({
         `/api/published-surveys/${survey.name}/submission${
           unfinishedToken ? `?token=${unfinishedToken}` : ''
         }`,
-        { method: 'POST', body: { entries: visibleAnswers, info, language } },
+        {
+          method: 'POST',
+          body: {
+            entries: visibleAnswers,
+            info,
+            language,
+            personalInfo: {
+              ...(personalInfo ?? {}),
+            },
+          },
+        },
       );
       setLoading(false);
       onComplete();

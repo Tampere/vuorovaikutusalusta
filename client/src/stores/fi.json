@@ -25,6 +25,7 @@
     "toFrontPage": "Etusivulle",
     "info": "Kyselyn perustiedot",
     "email": "Sähköposti",
+    "surveyInfoPage": "Kyselyn esittelysivu",
     "newPage": "Luo sivu",
     "newPageFailed": "Uuden sivun luomisessa tapahtui virhe. Yritä myöhemmin uudestaan.",
     "thanksPage": "Kiitos-sivu",
@@ -76,6 +77,18 @@
     "emailBody": "Viestin sisältö",
     "info": "Lisätiedot",
     "infoHelperText": "Lisätiedot esitetään sähköpostitse lähetettävän vastausraportin etusivulla."
+  },
+  "EditSurveyInfoPage": {
+    "title": "Info-sivun otsikko",
+    "text": "Info-sivun teksti",
+    "askPersonalInfo": "Kysy henkilötietoja kyselyn osana",
+    "askedInfo": "Kysytyt henkilötiedot",
+    "helperText": "Jos kyselyssä on tarkoitus kysyä henkilötietoja kyselyyn vastaajilta, tulee kysyttävät tiedot asettaa tämän näkymän kautta, jotta henkilötiedot pystytään käsittelemään asianmukaisella tavalla.",
+    "name": "Nimi",
+    "email": "Sähköposti",
+    "phoneNumber": "Puhelinnumero",
+    "enableInfoPage": "Näytä kyselyn esittelysivu",
+    "infoPageTexts": "Voit antaa esittelysivulle otsikon ja leipätekstin, joiden avulla kyselyyn vastaajat saavat tietoa itse kyselystä sekä siitä, mihin heidän henkilötietojaan käytetään."
   },
   "KeyValueForm": {
     "key": "Nimi",
@@ -371,6 +384,15 @@
     "copySurvey": "Kopioi",
     "answers": "Vastaukset"
   },
+  "SurveyInfoPage": {
+    "name": "Nimi",
+    "email": "Sähköposti",
+    "phoneNumber": "Puhelinnumero",
+    "startSurvey": "Aloita kysely",
+    "fillEntries": "Täytä seuraavat henkilötiedot",
+    "invalidEmail": "Virheellinen sähköpostiosoite. Tarkista syöte ja koita uudelleen.",
+    "invalidPhoneNumber": "Virheellinen puhelinnumero. Tarkista syöte ja koita uudelleen."
+  },
   "SurveyPage": {
     "errorSurveyNotFound": "Kyselyä ei löytynyt, tai se ei ole avoinna. Tarkista osoite ja yritä uudestaan.",
     "errorFetchingSurvey": "Kyselyn haussa tapahtui virhe. Yritä myöhemmin uudestaan.",
@@ -579,7 +601,8 @@
     "missingTranslation": "Käännös puuttuu",
     "optionInfo": "Vaihtoehdon lisätiedot",
     "emailInfo": "Sähköposti",
-    "thanksPage": "Kiitos-sivu"
+    "thanksPage": "Kiitos-sivu",
+    "infoPage": "Esittely-sivu"
   },
   "SurveySubmissionsPage": {
     "attachments": "Liitteet",

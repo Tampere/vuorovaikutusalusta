@@ -9,6 +9,7 @@ import { request } from '@src/utils/request';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 import { NotFoundPage } from './NotFoundPage';
+import SurveyInfoPage from './SurveyInfoPage';
 import SurveyLandingPage from './SurveyLandingPage';
 import SurveyLanguageMenu from './SurveyLanguageMenu';
 import SurveyStepper from './SurveyStepper';
@@ -23,6 +24,7 @@ interface Props {
 export default function SurveyPage({ isTestSurvey }: Props) {
   const [loading, setLoading] = useState(true);
   const [showLandingPage, setShowLandingPage] = useState(true);
+  const [showInfoPage, setShowInfoPage] = useState(false);
   const [showThanksPage, setShowThanksPage] = useState(false);
   const [surveyBackgroundImage, setSurveyBackgroundImage] = useState<{
     attributions: string;
@@ -66,6 +68,7 @@ export default function SurveyPage({ isTestSurvey }: Props) {
         }
         setSurvey(survey);
         setThemeFromSurvey(survey);
+        setShowInfoPage(survey.infoPage?.enabled ?? false);
         setLoading(false);
       } catch (error) {
         setErrorStatusCode(error.status);
@@ -144,17 +147,18 @@ export default function SurveyPage({ isTestSurvey }: Props) {
           maxHeight: '-webkit-fill-available',
         }}
       >
-        {(showLandingPage || showThanksPage) && survey.localisationEnabled && (
-          <SurveyLanguageMenu
-            changeUILanguage={true}
-            style={{
-              position: 'absolute',
-              top: '1rem',
-              left: '1rem',
-              zIndex: 10,
-            }}
-          />
-        )}
+        {(showLandingPage || showThanksPage || showInfoPage) &&
+          survey.localisationEnabled && (
+            <SurveyLanguageMenu
+              changeUILanguage={true}
+              style={{
+                position: 'absolute',
+                top: '1rem',
+                left: '1rem',
+                zIndex: 10,
+              }}
+            />
+          )}
         {/* Landing page */}
         {showLandingPage && (
           <SurveyLandingPage
@@ -167,8 +171,15 @@ export default function SurveyPage({ isTestSurvey }: Props) {
             }}
           />
         )}
+        {!showLandingPage && showInfoPage && (
+          <SurveyInfoPage
+            infoPageContent={survey.infoPage}
+            personalInfoQuery={survey.personalInfoQuery}
+            onStart={() => setShowInfoPage(false)}
+          />
+        )}
         {/* Survey page */}
-        {!showLandingPage && !showThanksPage && (
+        {!showLandingPage && !showInfoPage && !showThanksPage && (
           <SurveyStepper
             survey={survey}
             isTestSurvey={isTestSurvey}
