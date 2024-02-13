@@ -215,7 +215,6 @@ async function getFrontPage(
       ...(personalInfo?.phoneNumber
         ? [`${tr.phone}: ${personalInfo?.phoneNumber}`]
         : []),
-      ,
       attachmentFileNames.length > 0 &&
         `${tr.attachments}: ${attachmentFileNames.join(', ')}`,
     ]
