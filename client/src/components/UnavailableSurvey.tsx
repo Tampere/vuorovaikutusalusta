@@ -42,7 +42,7 @@ export function UnavailableSurvey() {
         {tr.UnavailableSurvey.treTopicalInfo}
       </Typography>
       <br />
-      <Link href="https://tampere.fi" className={classes.infoText}>
+      <Link href="https://ouka.fi" className={classes.infoText}>
         {tr.UnavailableSurvey.tre}
       </Link>
     </Box>

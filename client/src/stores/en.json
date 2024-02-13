@@ -404,8 +404,8 @@
   },
   "UnavailableSurvey": {
     "surveyNotPublished": "The survey is not available at the moment. Thank You for your interest on the survey!",
-    "treTopicalInfo": "You can access topical issues of the city of Tampere from the link below.",
-    "tre": "The city of Tampere"
+    "treTopicalInfo": "You can access topical issues of the city of Oulu from the link below.",
+    "tre": "The city of Oulu"
   },
   "NotFoundPage": {
     "pageNotFound": "Survey not found. Please check the address and try again later."
@@ -649,8 +649,8 @@
     "privacyStatement": "Data protection statement"
   },
   "IconAltTexts": {
-    "bannerAltText": "Tampere banner",
-    "logoAltText": "Tampere Finland logo"
+    "bannerAltText": "Oulu banner",
+    "logoAltText": "Oulu Finland logo"
   },
   "adminInstructions": "Open user manual"
 }

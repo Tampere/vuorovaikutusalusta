@@ -197,12 +197,7 @@ export default function SurveyLandingPage({
             {tr.FooterLinks.accessibility}
           </Link>
           {survey.displayPrivacyStatement && (
-            <Link
-              color="primary"
-              underline="hover"
-              href="https://www.tampere.fi/tietosuoja-ja-tiedonhallinta/tietosuojaselosteet"
-              target="_blank"
-            >
+            <Link color="primary" underline="hover" href="" target="_blank">
               {tr.FooterLinks.privacyStatement}
             </Link>
           )}

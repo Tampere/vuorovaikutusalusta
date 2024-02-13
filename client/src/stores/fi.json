@@ -404,8 +404,8 @@
   },
   "UnavailableSurvey": {
     "surveyNotPublished": "Kiitos mielenkiinnostasi! Kysely ei ole tällä hetkellä avoinna eikä siihen voi vastata.",
-    "treTopicalInfo": "Tampereen kaupungin ajankohtaisiin asioihin pääset tutustumaan alla olevasta linkistä.",
-    "tre": "Tampereen kaupunki"
+    "treTopicalInfo": "Oulun kaupungin ajankohtaisiin asioihin pääset tutustumaan alla olevasta linkistä.",
+    "tre": "Oulun kaupunki"
   },
   "NotFoundPage": {
     "pageNotFound": "Kyselyä ei löytynyt. Tarkista osoite ja yritä uudelleen"
@@ -649,8 +649,8 @@
     "privacyStatement": "Tietosuojaseloste"
   },
   "IconAltTexts": {
-    "bannerAltText": "Tampereen vaakunalogo",
-    "logoAltText": "Tampere Finland -logo"
+    "bannerAltText": "Oulun vaakunalogo",
+    "logoAltText": "Oulu Finland -logo"
   },
   "adminInstructions": "Avaa käyttöohje"
 }
