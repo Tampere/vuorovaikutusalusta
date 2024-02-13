@@ -210,13 +210,12 @@ async function getFrontPage(
       ),
       `${tr.submissionId}: ${submissionId}`,
       `${tr.responseTime}: ${moment(timestamp).format('DD.MM.YYYY HH:mm')}`,
-      ...[personalInfo?.name ? `${tr.name}: ${personalInfo?.name}` : null],
-      ...[personalInfo?.email ? `${tr.email}: ${personalInfo?.email}` : null],
-      ...[
-        personalInfo?.phoneNumber
-          ? `${tr.phone}: ${personalInfo?.phoneNumber}`
-          : null,
-      ],
+      ...(personalInfo?.name ? [`${tr.name}: ${personalInfo?.name}`] : []),
+      ...(personalInfo?.email ? [`${tr.email}: ${personalInfo?.email}`] : []),
+      ...(personalInfo?.phoneNumber
+        ? [`${tr.phone}: ${personalInfo?.phoneNumber}`]
+        : []),
+      ,
       attachmentFileNames.length > 0 &&
         `${tr.attachments}: ${attachmentFileNames.join(', ')}`,
     ]
