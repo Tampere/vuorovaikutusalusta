@@ -2,6 +2,7 @@ import { LanguageCode, Survey, SurveyPage } from '@interfaces/survey';
 import { generatePdf } from '@src/application/pdf-generator';
 import {
   getAnswerEntries,
+  getPersonalInfo,
   getSubmissionsForSurvey,
   getTimestamp,
 } from '@src/application/submission';
@@ -353,16 +354,18 @@ router.get(
       throw new ForbiddenError('User not author nor admin of the survey');
     }
 
-    const [survey, answerEntries, timestamp] = await Promise.all([
+    const [survey, answerEntries, timestamp, personalInfo] = await Promise.all([
       getSurvey({ id: surveyId }),
       getAnswerEntries(submissionId),
       getTimestamp(submissionId),
+      getPersonalInfo(submissionId),
     ]);
     const pdfBuffer = await generatePdf(
       survey,
       { id: submissionId, timestamp },
       answerEntries,
       language,
+      personalInfo,
     );
     res.writeHead(200, {
       'Content-Type': 'application/pdf',

@@ -23,8 +23,8 @@ import { User } from '@interfaces/user';
 import {
   getColumnSet,
   getDb,
-  getMultiInsertQuery,
   getGeoJSONColumn,
+  getMultiInsertQuery,
   getMultiUpdateQuery,
 } from '@src/database';
 import {
@@ -74,6 +74,12 @@ interface DBSurvey {
   email_body: LocalizedText;
   email_info: SurveyEmailInfoItem[];
   allow_saving_unfinished: boolean;
+  info_page_enabled: boolean;
+  info_page_title: LocalizedText;
+  info_page_text: LocalizedText;
+  inquire_name: boolean;
+  inquire_email: boolean;
+  inquire_phone_number: boolean;
   localisation_enabled: boolean;
   submission_count?: number;
 }
@@ -891,7 +897,13 @@ export async function updateSurvey(survey: Survey) {
         email_info = $24::json,
         allow_saving_unfinished = $25,
         localisation_enabled = $26,
-        display_privacy_statement = $27
+        display_privacy_statement = $27,
+        info_page_enabled = $28,
+        info_page_title = $29,
+        info_page_text = $30,
+        inquire_name = $31,
+        inquire_email = $32,
+        inquire_phone_number = $33
       WHERE id = $1 RETURNING *`,
       [
         survey.id,
@@ -921,6 +933,12 @@ export async function updateSurvey(survey: Survey) {
         survey.allowSavingUnfinished,
         survey.localisationEnabled,
         survey.displayPrivacyStatement,
+        survey.infoPage.enabled,
+        survey.infoPage.title,
+        survey.infoPage.text,
+        survey.personalInfoQuery.name,
+        survey.personalInfoQuery.email,
+        survey.personalInfoQuery.phoneNumber,
       ],
     )
     .catch((error) => {
@@ -1190,6 +1208,16 @@ function dbSurveyToSurvey(
       subject: dbSurvey.email_subject,
       body: dbSurvey.email_body,
       info: dbSurvey.email_info,
+    },
+    infoPage: {
+      enabled: dbSurvey.info_page_enabled,
+      title: dbSurvey.info_page_title,
+      text: dbSurvey.info_page_text,
+    },
+    personalInfoQuery: {
+      name: dbSurvey.inquire_name,
+      email: dbSurvey.inquire_email,
+      phoneNumber: dbSurvey.inquire_phone_number,
     },
     allowSavingUnfinished: dbSurvey.allow_saving_unfinished,
     localisationEnabled: dbSurvey.localisation_enabled,

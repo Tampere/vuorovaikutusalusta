@@ -20,6 +20,7 @@ import EditSurveyPage from './EditSurveyPage';
 import EditSurveySideBar from './EditSurveySideBar';
 import EditSurveyThanksPage from './EditSurveyThanksPage';
 import EditSurveyTranslations from './EditSurveyTranslations';
+import EditSurveyInfoPage from './EditSurveyInfoPage';
 
 const sideBarWidth = 320;
 
@@ -106,6 +107,9 @@ export default function EditSurvey() {
           </Route>
           <Route path={`${path}/sähköpostit`}>
             <EditSurveyEmail />
+          </Route>
+          <Route path={`${path}/henkilötiedot`}>
+            <EditSurveyInfoPage />
           </Route>
           <Route path={`${path}/sivut/:pageId`}>
             <EditSurveyPage />

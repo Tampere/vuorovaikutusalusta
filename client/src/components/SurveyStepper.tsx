@@ -42,11 +42,11 @@ import ImageSection from './ImageSection';
 import PageConnector from './PageConnector';
 import StepperControls from './StepperControls';
 import SubmissionInfoDialog from './SubmissionInfoDialog';
+import { SurveyFollowUpSections } from './SurveyFollowUpSections';
 import SurveyLanguageMenu from './SurveyLanguageMenu';
 import SurveyMap from './SurveyMap';
 import SurveyQuestion from './SurveyQuestion';
 import TextSection from './TextSection';
-import { SurveyFollowUpSections } from './SurveyFollowUpSections';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -128,6 +128,7 @@ export default function SurveyStepper({
     updateAnswer,
     getConditionalPageVisibility,
     getAnswersForSubmission,
+    personalInfo,
   } = useSurveyAnswers();
   const { showToast } = useToasts();
   const {
@@ -314,7 +315,17 @@ export default function SurveyStepper({
         `/api/published-surveys/${survey.name}/submission${
           unfinishedToken ? `?token=${unfinishedToken}` : ''
         }`,
-        { method: 'POST', body: { entries: visibleAnswers, info, language } },
+        {
+          method: 'POST',
+          body: {
+            entries: visibleAnswers,
+            info,
+            language,
+            personalInfo: {
+              ...(personalInfo ?? {}),
+            },
+          },
+        },
       );
       setLoading(false);
       onComplete();
@@ -604,12 +615,7 @@ export default function SurveyStepper({
           {tr.FooterLinks.accessibility}
         </Link>
         {survey.displayPrivacyStatement && (
-          <Link
-            color="primary"
-            underline="hover"
-            href="https://www.tampere.fi/tietosuoja-ja-tiedonhallinta/tietosuojaselosteet"
-            target="_blank"
-          >
+          <Link color="primary" underline="hover" href="" target="_blank">
             {tr.FooterLinks.privacyStatement}
           </Link>
         )}

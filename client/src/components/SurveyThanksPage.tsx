@@ -1,12 +1,12 @@
 import { Survey } from '@interfaces/survey';
 import {
+  Box,
   Link,
-  Typography,
+  Stack,
   SxProps,
   Theme,
-  Box,
+  Typography,
   useMediaQuery,
-  Stack,
 } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useEffect, useState } from 'react';
@@ -155,12 +155,7 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
             {tr.FooterLinks.accessibility}
           </Link>
           {survey.displayPrivacyStatement && (
-            <Link
-              color="primary"
-              underline="hover"
-              href="https://www.tampere.fi/tietosuoja-ja-tiedonhallinta/tietosuojaselosteet"
-              target="_blank"
-            >
+            <Link color="primary" underline="hover" href="" target="_blank">
               {tr.FooterLinks.privacyStatement}
             </Link>
           )}
@@ -168,7 +163,7 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
         <img
           style={{
             minWidth: '130px',
-            width: '10vw',
+            maxWidth: '20%',
             position: !mediumWidth ? 'absolute' : 'static',
             left: !mediumWidth ? '0' : 'auto',
             bottom: 0,

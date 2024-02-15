@@ -10,6 +10,9 @@
   "continueWithLink": "You can continue answering the survey while it is open via the following link: <linkki>.",
   "submissionId": "Submission identifier",
   "responseTime": "Time of the response",
+  "name": "Name",
+  "email": "Email",
+  "phone": "Phone",
   "attachments": "Attachments",
   "fi": "finnish",
   "en": "english"

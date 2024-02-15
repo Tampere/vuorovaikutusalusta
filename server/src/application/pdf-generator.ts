@@ -1,6 +1,7 @@
 import {
   AnswerEntry,
   LanguageCode,
+  PersonalInfo,
   SectionOption,
   Survey,
   SurveyFollowUpSection,
@@ -149,6 +150,7 @@ async function getFrontPage(
   timestamp: Date,
   answerEntries: AnswerEntry[],
   language: LanguageCode,
+  personalInfo?: PersonalInfo,
 ): Promise<Content> {
   const tr = useTranslations(language);
   const image = survey.backgroundImageName
@@ -208,6 +210,11 @@ async function getFrontPage(
       ),
       `${tr.submissionId}: ${submissionId}`,
       `${tr.responseTime}: ${moment(timestamp).format('DD.MM.YYYY HH:mm')}`,
+      ...(personalInfo?.name ? [`${tr.name}: ${personalInfo?.name}`] : []),
+      ...(personalInfo?.email ? [`${tr.email}: ${personalInfo?.email}`] : []),
+      ...(personalInfo?.phoneNumber
+        ? [`${tr.phone}: ${personalInfo?.phoneNumber}`]
+        : []),
       attachmentFileNames.length > 0 &&
         `${tr.attachments}: ${attachmentFileNames.join(', ')}`,
     ]
@@ -443,6 +450,7 @@ export async function generatePdf(
   submission: { id: number; timestamp: Date },
   answerEntries: AnswerEntry[],
   language: LanguageCode,
+  perfonalInfo?: PersonalInfo,
 ) {
   const start = Date.now();
   const options = await getOptionsForSurvey(survey.id);
@@ -473,6 +481,7 @@ export async function generatePdf(
       submission.timestamp,
       answerEntries,
       language,
+      perfonalInfo,
     ),
     ...sections.map((section) => [
       ...getContent(

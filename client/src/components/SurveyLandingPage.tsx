@@ -3,9 +3,9 @@ import {
   Box,
   Button,
   Link,
+  Stack,
   Theme,
   Typography,
-  Stack,
   useMediaQuery,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
@@ -142,7 +142,7 @@ export default function SurveyLandingPage({
         <img
           style={{
             maxWidth: '60%',
-            maxHeight: '100%',
+            maxHeight: '15vh',
           }}
           src={`/api/feature-styles/icons/logo`}
           alt={tr.IconAltTexts.logoAltText}
@@ -197,12 +197,7 @@ export default function SurveyLandingPage({
             {tr.FooterLinks.accessibility}
           </Link>
           {survey.displayPrivacyStatement && (
-            <Link
-              color="primary"
-              underline="hover"
-              href="https://www.tampere.fi/tietosuoja-ja-tiedonhallinta/tietosuojaselosteet"
-              target="_blank"
-            >
+            <Link color="primary" underline="hover" href="" target="_blank">
               {tr.FooterLinks.privacyStatement}
             </Link>
           )}

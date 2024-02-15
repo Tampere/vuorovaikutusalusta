@@ -2,11 +2,13 @@ import {
   AnswerEntry,
   LanguageCode,
   MapQuestionAnswer,
+  PersonalInfo,
   Submission,
   SurveyMapSubQuestionAnswer,
   SurveyPageSection,
 } from '@interfaces/survey';
 import {
+  encryptionKey,
   getColumnSet,
   getDb,
   getGeoJSONColumn,
@@ -43,6 +45,13 @@ interface DBSubmission {
   id: number;
   created_at: Date;
   updated_at: Date;
+}
+
+interface DBParticipantInfo {
+  submission_id: number;
+  name: string;
+  email: string;
+  phone: string;
 }
 
 /**
@@ -789,6 +798,27 @@ export async function getAnswerEntries(submissionId: number) {
 }
 
 /**
+ * Gets personal info for given submission
+ * @param submissionId Submission ID
+ * @returns Personal info
+ */
+export async function getPersonalInfo(submissionId: number) {
+  const rows = await getDb().oneOrNone<PersonalInfo>(
+    `
+    SELECT
+      public.pgp_sym_decrypt(name, $2) as name,
+      public.pgp_sym_decrypt(email, $2) as email,
+      public.pgp_sym_decrypt(phone, $2) as "phoneNumber"
+    FROM data.participant_info
+    WHERE submission_id = $1
+  `,
+    [submissionId, encryptionKey],
+  );
+
+  return rows;
+}
+
+/**
  * Get timestamp of the given submission (=updated at)
  * @param submissionId Submission ID
  * @returns Timestamp
@@ -802,26 +832,55 @@ export async function getTimestamp(submissionId: number) {
 }
 
 /**
+ * Store personal info into db
+ * @param info
+ * @param submissionId
+ * @returns
+ */
+export async function handlePersonalInfo(
+  info: PersonalInfo,
+  submissionId: number,
+) {
+  const { email, phoneNumber, name } = info;
+
+  return getDb().oneOrNone(
+    `
+    INSERT INTO data.participant_info (submission_id, name, email, phone) VALUES ($(submissionId), pgp_sym_encrypt($(name), $(encryptionKey)), pgp_sym_encrypt($(email), $(encryptionKey)), pgp_sym_encrypt($(phoneNumber), $(encryptionKey)));
+  `,
+    { submissionId, name, email, phoneNumber, encryptionKey },
+  );
+}
+
+/**
  * Gets all finished submissions (with all answer entries) for a given survey ID
  * @param surveyId Survey ID
  * @returns Submissions
  */
 export async function getSubmissionsForSurvey(surveyId: number) {
-  const rows = await getDb().manyOrNone<DBSubmission>(
+  const rows = await getDb().manyOrNone<DBSubmission & DBParticipantInfo>(
     `SELECT
       s.id,
-      s.updated_at
+      s.updated_at,
+      pgp_sym_decrypt(name, $(encryptionKey)) as name,
+      pgp_sym_decrypt(email, $(encryptionKey)) as email,
+      pgp_sym_decrypt(phone, $(encryptionKey)) as phone
     FROM
       data.submission s
+      LEFT JOIN data.participant_info pi ON s.id = pi.submission_id
     WHERE survey_id = $(surveyId) AND unfinished_token IS NULL
     ORDER BY updated_at ASC`,
-    { surveyId },
+    { encryptionKey, surveyId },
   );
   return Promise.all<Submission>(
     rows.map(async (row) => ({
       id: row.id,
       timestamp: row.updated_at,
       answerEntries: await getAnswerEntries(row.id),
+      personalInfo: {
+        name: row.name,
+        email: row.email,
+        phoneNumber: row.phone,
+      },
     })),
   );
 }
