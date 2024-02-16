@@ -577,7 +577,7 @@ async function getGeometryDBEntries(surveyId: number): Promise<AnswerEntry[]> {
       ae.value_text,
       ae.value_option_id,
       opt.text as option_text,
-      public.ST_AsGeoJSON(public.ST_Transform(ae.value_geometry, 3067))::json as value_geometry,
+      public.ST_AsGeoJSON(ae.value_geometry)::json as value_geometry,
       ae.value_numeric,
       ae.value_json,
       ae.parent_entry_id,
