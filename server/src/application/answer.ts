@@ -6,13 +6,12 @@ import {
 } from '@interfaces/survey';
 import { getDb } from '@src/database';
 import useTranslations from '@src/translations/useTranslations';
+import { indexToAlpha } from '@src/utils';
 import { readFileSync, rmSync } from 'fs';
 import moment from 'moment';
 import ogr2ogr from 'ogr2ogr';
 import { getAvailableMapLayers } from './map';
 import { getSurvey } from './survey';
-import { indexToAlpha } from '@src/utils';
-import logger from '@src/logger';
 
 const tr = useTranslations('fi');
 
@@ -626,7 +625,7 @@ const getSectionHeaders = async (surveyId: number) =>
       AND ps.type <> 'text'
       AND ps.type <> 'image'
       AND ps.parent_section IS NULL
-    ORDER BY "pageIndex", COALESCE(ps2.idx, ps.idx), og.idx NULLS FIRST, opt.idx NULLS FIRST;
+      ORDER BY "pageIndex", "predecessorSectionIndex" nulls first, ps.idx, og.idx NULLS FIRST, opt.idx NULLS first;
 `,
     [surveyId],
   );
@@ -695,7 +694,7 @@ function createCSVHeaders(sectionMetadata: SectionHeader[]) {
     const { pageIndex, sectionIndex, predecessorSection } = section;
     let key = `${pageIndex}-${sectionIndex}`;
     if (predecessorSection) {
-      key = `${predecessorIndexes[predecessorSection]}?${key}`;
+      key = `${predecessorIndexes[predecessorSection]}-f${sectionIndex}`;
     }
     group[key] = group[key] ?? [];
     group[key].push(section);
@@ -815,7 +814,7 @@ function createCSVHeaders(sectionMetadata: SectionHeader[]) {
       // numeric, free-text, slider
       default:
         allHeaders.push({
-          [getHeaderKey(sectionHead.pageIndex, sectionHead.sectionIndex)]:
+          [getHeaderKey(sectionHead.pageIndex, sectionHead.sectionIndex, null, null, sectionHead.predecessorSection, predecessorIndexes)]:
             `${getSectionDetailsForHeader(
               sectionHead,
               predecessorIndexes,
@@ -998,7 +997,7 @@ function getValue(answer: AnswerEntry, answerType: string) {
     case 'numeric':
       return answer.valueNumeric;
     case 'free-text':
-      return answer.valueText;
+      return answer.valueText.replace(/\r?\n/g, "").replace(/,/g, '');
   }
 }
 
