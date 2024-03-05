@@ -6,13 +6,12 @@ import {
 } from '@interfaces/survey';
 import { getDb } from '@src/database';
 import useTranslations from '@src/translations/useTranslations';
+import { indexToAlpha } from '@src/utils';
 import { readFileSync, rmSync } from 'fs';
 import moment from 'moment';
 import ogr2ogr from 'ogr2ogr';
 import { getAvailableMapLayers } from './map';
 import { getSurvey } from './survey';
-import { indexToAlpha } from '@src/utils';
-import logger from '@src/logger';
 
 const tr = useTranslations('fi');
 
@@ -998,7 +997,7 @@ function getValue(answer: AnswerEntry, answerType: string) {
     case 'numeric':
       return answer.valueNumeric;
     case 'free-text':
-      return answer.valueText;
+      return answer.valueText.replace(/\r?\n/g, "").replace(/,/g, '');
   }
 }
 
