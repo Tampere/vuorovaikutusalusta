@@ -331,11 +331,11 @@
     "color": "Color",
     "colors": {
       "black": "Black",
-      "darkGray": "Dark grey",
-      "steelBlue": "Steel blue",
-      "atmosphere": "Atmosphere",
-      "berryRed": "Berry red",
-      "warmGreen": "Warm green"
+      "darkGray": "Dark blue",
+      "steelBlue": "Pink",
+      "atmosphere": "Light blue",
+      "berryRed": "Dark red",
+      "warmGreen": "Green"
     }
   },
   "MarkerIconSelect": {

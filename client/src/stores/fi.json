@@ -331,11 +331,11 @@
     "color": "Väri",
     "colors": {
       "black": "Musta",
-      "darkGray": "Tumma harmaa",
-      "steelBlue": "Teräksensininen",
-      "atmosphere": "Tunnelma",
-      "berryRed": "Marjanpunainen",
-      "warmGreen": "Lämmin vihreä"
+      "darkGray": "Tummansininen",
+      "steelBlue": "Vaaleanpunainen",
+      "atmosphere": "Vaaleansininen",
+      "berryRed": "Tummanpunainen",
+      "warmGreen": "Vihreä"
     }
   },
   "MarkerIconSelect": {
