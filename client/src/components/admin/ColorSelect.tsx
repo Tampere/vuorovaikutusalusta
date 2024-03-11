@@ -1,7 +1,7 @@
-import React, { useMemo } from 'react';
-import { Select, FormControl, MenuItem, InputLabel } from '@mui/material';
-import { useTranslations } from '@src/stores/TranslationContext';
+import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import { useTranslations } from '@src/stores/TranslationContext';
+import React, { useMemo } from 'react';
 import ColorIndicator from './ColorIndicator';
 
 interface Props {
@@ -27,11 +27,11 @@ export default function ColorSelect({ label, value, onChange }: Props) {
   const colors = useMemo<{ name: string; value: string }[]>(
     () => [
       { name: tr.ColorSelect.colors.black, value: '#000000' },
-      { name: tr.ColorSelect.colors.darkGray, value: '#3f3e3e' },
-      { name: tr.ColorSelect.colors.steelBlue, value: '#0074a4' },
-      { name: tr.ColorSelect.colors.atmosphere, value: '#c83e36' },
-      { name: tr.ColorSelect.colors.berryRed, value: '#ad3963' },
-      { name: tr.ColorSelect.colors.warmGreen, value: '#418155' },
+      { name: tr.ColorSelect.colors.darkGray, value: '#001E96' }, 
+      { name: tr.ColorSelect.colors.steelBlue, value: '#E10069' },
+      { name: tr.ColorSelect.colors.atmosphere, value: '#00DBFF' }, 
+      { name: tr.ColorSelect.colors.berryRed, value: '#AA0000' },
+      { name: tr.ColorSelect.colors.warmGreen, value: '#006E0A' },
     ],
     [tr]
   );
