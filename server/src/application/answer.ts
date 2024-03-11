@@ -33,6 +33,7 @@ interface DBAnswerEntry {
   language: LanguageCode;
   title: LocalizedText;
   type: string;
+  geometry_srid?: number;
   value_geometry: GeoJSON.Point | GeoJSON.LineString | GeoJSON.Polygon;
   value_text: string;
   value_json: JSON[];
@@ -75,6 +76,7 @@ interface AnswerEntry {
   submissionLanguage: LanguageCode;
   title: LocalizedText;
   type: string;
+  geometrySRID: number;
   valueGeometry: GeoJSON.Point | GeoJSON.LineString | GeoJSON.Polygon;
   valueText: string;
   valueJson: JSON[];
@@ -176,6 +178,7 @@ function dbAnswerEntryRowsToAnswerEntries(rows: DBAnswerEntry[]) {
     submissionLanguage: row?.language,
     title: row.title,
     type: row.type,
+    geometrySRID: row.geometry_srid,
     valueGeometry: row.value_geometry,
     valueText: row.value_text,
     valueJson: row.value_json,
@@ -379,12 +382,14 @@ export async function getCSVFile(surveyId: number): Promise<string> {
  */
 export async function getGeoPackageFile(surveyId: number): Promise<Buffer> {
   const rows = await getGeometryDBEntries(surveyId);
+
+  const srid = rows?.find(row => row.geometrySRID)?.geometrySRID ?? '3857';
   const checkboxOptions = await getCheckboxOptionsFromDB(surveyId);
   const mapLayers = await getSurvey({ id: surveyId }).then((survey) =>
     getAvailableMapLayers(survey.mapUrl),
   );
 
-  if (!rows || !checkboxOptions) {
+  if (!rows) {
     return null;
   }
 
@@ -419,7 +424,7 @@ export async function getGeoPackageFile(surveyId: number): Promise<Buffer> {
       features: firstFeatures,
       crs: {
         type: 'name',
-        properties: { name: 'urn:ogc:def:crs:EPSG::3067' },
+        properties: { name: `urn:ogc:def:crs:EPSG::${srid}` },
       },
     },
     {
@@ -436,7 +441,7 @@ export async function getGeoPackageFile(surveyId: number): Promise<Buffer> {
         features,
         crs: {
           type: 'name',
-          properties: { name: 'urn:ogc:def:crs:EPSG::3067' },
+          properties: { name: `urn:ogc:def:crs:EPSG::${srid}` },
         },
       },
       {
@@ -578,6 +583,7 @@ async function getGeometryDBEntries(surveyId: number): Promise<AnswerEntry[]> {
       ae.value_option_id,
       opt.text as option_text,
       public.ST_AsGeoJSON(ae.value_geometry)::json as value_geometry,
+      public.ST_SRID(ae.value_geometry) AS geometry_srid,
       ae.value_numeric,
       ae.value_json,
       ae.parent_entry_id,
