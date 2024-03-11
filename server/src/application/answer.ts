@@ -384,7 +384,6 @@ export async function getGeoPackageFile(surveyId: number): Promise<Buffer> {
   const rows = await getGeometryDBEntries(surveyId);
 
   const srid = rows?.find(row => row.geometrySRID)?.geometrySRID ?? '3857';
-  console.log(srid);
   const checkboxOptions = await getCheckboxOptionsFromDB(surveyId);
   const mapLayers = await getSurvey({ id: surveyId }).then((survey) =>
     getAvailableMapLayers(survey.mapUrl),

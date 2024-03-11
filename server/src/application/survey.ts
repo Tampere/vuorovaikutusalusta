@@ -956,12 +956,9 @@ export async function updateSurvey(survey: Survey) {
     throw new NotFoundError(`Survey with ID ${survey.id} not found`);
   }
 
-  console.log(survey.pages[0].sidebar.defaultMapView)
   // Find out what coordinate system was used for the default map view
   const pageWithDefaultMapView = survey.pages.find(page => page.sidebar.defaultMapView);
   const defaultMapViewSRID = pageWithDefaultMapView ? parseInt(pageWithDefaultMapView.sidebar.defaultMapView.crs.split(':')[1]) : null;
-
-  console.log(defaultMapViewSRID)
 
   // Update the survey pages
   await getDb().none(
