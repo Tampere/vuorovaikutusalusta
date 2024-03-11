@@ -1,15 +1,13 @@
+import retry from 'async-retry';
+import migrate from 'node-pg-migrate';
+import { Client } from 'pg';
 import PgPromise from 'pg-promise';
 import { IClient } from 'pg-promise/typescript/pg-subset';
-import { Client } from 'pg';
-import migrate from 'node-pg-migrate';
 import logger from './logger';
-import retry from 'async-retry';
 
 // Default schemas for all queries
 const schema = ['application', 'public', 'data'];
 
-// Default SRID for geometries - inserted data will be transformed to this
-const defaultSrid = 3857;
 
 // How many times to retry connection, if it fails on initialization?
 const connectRetries = Number(process.env.DATABASE_CONNECT_RETRIES) || 10;
@@ -112,13 +110,13 @@ export function getGeoJSONColumn(
         : value.properties?.bufferRadius != null
         ? // If geometry provided with buffer radius, add ST_Buffer
           pgp.as.format(
-            'public.ST_Buffer(public.ST_Transform(public.ST_SetSRID(public.ST_GeomFromGeoJSON($1), $2), $3), $4)',
-            [value, inputSRID, defaultSrid, value.properties.bufferRadius],
+            'public.ST_Buffer(public.ST_SetSRID(public.ST_GeomFromGeoJSON($1), $2), $4)',
+            [value, inputSRID, value.properties.bufferRadius],
           )
         : pgp.as.format(
             // Transform provided geometry to default SRID
-            'public.ST_Transform(public.ST_SetSRID(public.ST_GeomFromGeoJSON($1), $2), $3)',
-            [value, inputSRID, defaultSrid],
+            'public.ST_SetSRID(public.ST_GeomFromGeoJSON($1), $2)',
+            [value, inputSRID],
           );
     },
   };
