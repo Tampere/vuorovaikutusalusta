@@ -1,22 +1,24 @@
+import { SurveyPageSidebarImageSize } from '@interfaces/survey';
+import { CheckSharp, ClearSharp } from '@mui/icons-material';
 import {
+  Box,
   Button,
   Checkbox,
+  FormControl,
   FormControlLabel,
   FormGroup,
   FormLabel,
+  Radio,
+  RadioGroup,
   Skeleton,
   TextField,
   ToggleButton,
   ToggleButtonGroup,
-  FormControl,
-  Radio,
-  RadioGroup,
-  Box,
   Typography,
 } from '@mui/material';
-import { ClearSharp, CheckSharp } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { useSurvey } from '@src/stores/SurveyContext';
+import { useAdminMap } from '@src/stores/SurveyMapContext';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -24,12 +26,10 @@ import { useHistory, useParams } from 'react-router-dom';
 import ConfirmDialog from '../ConfirmDialog';
 import Fieldset from '../Fieldset';
 import AddSurveySectionActions from './AddSurveySectionActions';
+import { AdminSurveyMapPreview } from './AdminSurveyMapPreview';
+import { EditSurveyPageConditions } from './EditSurveyPageConditions';
 import FileUpload from './FileUpload';
 import SurveySections from './SurveySections';
-import { SurveyPageSidebarImageSize } from '@interfaces/survey';
-import { EditSurveyPageConditions } from './EditSurveyPageConditions';
-import { AdminSurveyMapPreview } from './AdminSurveyMapPreview';
-import { useAdminMap } from '@src/stores/SurveyMapContext';
 
 
 const useStyles = makeStyles({
@@ -389,7 +389,7 @@ export default function EditSurveyPage() {
           if (result) {
             setLoading(true);
             try {
-              await deletePage(page.id);
+              await deletePage(activeSurvey.id, page.id);
             } catch (error) {
               showToast({
                 severity: 'error',
