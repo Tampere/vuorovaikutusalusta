@@ -41,9 +41,10 @@ export default function DataExport({ surveyId }: Props) {
       });
 
       const csvText = await res.text();
+      const textBlob = new Blob([csvText], { type: 'text/csv;charset=utf-8' });
 
       const link = document.createElement('a');
-      link.href = `data:text/csv;charset=utf-8,${encodeURI(csvText)}`;
+      link.href = URL.createObjectURL(textBlob);
       link.target = '_blank';
       link.download = 'data.csv';
       link.click();
