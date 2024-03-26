@@ -615,7 +615,7 @@ export default function SurveyStepper({
           {tr.FooterLinks.accessibility}
         </Link>
         {survey.displayPrivacyStatement && (
-          <Link color="primary" underline="hover" href="" target="_blank">
+          <Link color="primary" underline="hover" href="https://www.ouka.fi/tietosuoja/tietosuojaselosteet" target="_blank">
             {tr.FooterLinks.privacyStatement}
           </Link>
         )}
