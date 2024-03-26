@@ -284,6 +284,11 @@ router.post(
   ]),
   asyncHandler(async (req, res) => {
     const surveyId = Number(req.params.id);
+    const permissionsOk = await userCanEditSurvey(req.user, surveyId);
+    if (!permissionsOk) {
+      throw new ForbiddenError('User not author nor admin of the survey');
+    }
+
     const survey = await publishSurvey(surveyId);
     res.status(200).json(survey);
   }),
@@ -300,6 +305,11 @@ router.post(
   ]),
   asyncHandler(async (req, res) => {
     const surveyId = Number(req.params.id);
+    const permissionsOk = await userCanEditSurvey(req.user, surveyId);
+    if (!permissionsOk) {
+      throw new ForbiddenError('User not author nor admin of the survey');
+    }
+
     const survey = await unpublishSurvey(surveyId);
     res.status(200).json(survey);
   }),
@@ -315,9 +325,13 @@ router.post(
     param('id').isNumeric().toInt().withMessage('ID must be a number'),
   ]),
   asyncHandler(async (req, res) => {
-    const id = Number(req.params.id);
+    const surveyId = Number(req.params.id);
+    const permissionsOk = await userCanEditSurvey(req.user, surveyId);
+    if (!permissionsOk) {
+      throw new ForbiddenError('User not author nor admin of the survey');
+    }
     const partialPage = req.body as Partial<SurveyPage>;
-    const createdSurveyPage = await createSurveyPage(id, partialPage);
+    const createdSurveyPage = await createSurveyPage(surveyId, partialPage);
     res.status(201).json(createdSurveyPage);
   }),
 );
@@ -326,14 +340,23 @@ router.post(
  * Endpoint for deleting an existing survey page
  */
 router.delete(
-  '/page/:id',
+  '/:surveyId/page/:id',
   ensureAuthenticated(),
+  validateRequest([
+    param('surveyId').isNumeric().toInt().withMessage('surveyId must be a number'),
+  ]),
   validateRequest([
     param('id').isNumeric().toInt().withMessage('ID must be a number'),
   ]),
   asyncHandler(async (req, res) => {
-    const id = Number(req.params.id);
-    const deletedSurveyPage = await deleteSurveyPage(id);
+    const pageId = Number(req.params.id);
+    const surveyId = Number(req.params.surveyId);
+    const permissionsOk = await userCanEditSurvey(req.user, surveyId);
+    if (!permissionsOk) {
+      throw new ForbiddenError('User not author nor admin of the survey');
+    }
+
+    const deletedSurveyPage = await deleteSurveyPage(pageId);
     res.status(200).json(deletedSurveyPage);
   }),
 );
