@@ -4,7 +4,7 @@ export const shorthands: ColumnDefinitions | undefined = undefined;
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.sql(
-    `ALTER TABLE data.submission ADD COLUMN updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW();`
+    `ALTER TABLE data.submission ADD COLUMN updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW();`,
   );
 }
 

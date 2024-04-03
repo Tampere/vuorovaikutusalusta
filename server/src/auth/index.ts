@@ -40,7 +40,7 @@ export function configureAuth(app: Express) {
         pgPromise: getDb(),
         schemaName: 'application',
       }),
-    })
+    }),
   );
   app.use(passport.initialize());
   app.use(passport.session());
@@ -48,13 +48,18 @@ export function configureAuth(app: Express) {
   // Logout route
   app.get('/logout', (req, res) => {
     req.session.destroy((error) => {
-      req.logOut();
+      req.logOut((err) => {
+        if (err) {
+          return req.next(err);
+        }
+        res.redirect('/');
+      }); // Fix: Pass an empty function as the argument
       res.redirect(process.env.AUTH_LOGOUT_URL);
     });
   });
 
   logger.info(
-    `Configuring authentication with method "${process.env.AUTH_METHOD}"...`
+    `Configuring authentication with method "${process.env.AUTH_METHOD}"...`,
   );
 
   // Configure auth method specific authentications
@@ -69,7 +74,7 @@ export function configureAuth(app: Express) {
       throw new Error(
         !process.env.AUTH_METHOD
           ? `Environment variable AUTH_METHOD required`
-          : `Unsupported auth method "${process.env.AUTH_METHOD}"`
+          : `Unsupported auth method "${process.env.AUTH_METHOD}"`,
       );
   }
 }
@@ -118,7 +123,12 @@ export function ensureAuthenticated(options?: { redirectToLogin?: boolean }) {
       }
     };
     req.session?.destroy(() => {
-      req.logOut();
+      req.logOut((err) => {
+        if (err) {
+          return req.next(err);
+        }
+        res.redirect('/');
+      });
       fail();
     }) ?? fail();
   };

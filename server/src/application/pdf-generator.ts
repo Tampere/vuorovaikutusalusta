@@ -82,15 +82,14 @@ function findFollowUpMapQuestion(
   entryId: number,
 ): SurveyMapQuestion {
   let followUpSectionIndex: number;
-  const sectionIndex = sections.findIndex(
-    (section) =>
-      section.followUpSections?.some((followUpSection, followUpIndex) => {
-        if (followUpSection.id === entryId) {
-          followUpSectionIndex = followUpIndex;
-          return true;
-        }
-        return false;
-      }),
+  const sectionIndex = sections.findIndex((section) =>
+    section.followUpSections?.some((followUpSection, followUpIndex) => {
+      if (followUpSection.id === entryId) {
+        followUpSectionIndex = followUpIndex;
+        return true;
+      }
+      return false;
+    }),
   );
 
   // Entry id is already only for map questions
@@ -258,15 +257,15 @@ function getContent(
     style: isSubQuestion
       ? 'subQuestionTitle'
       : isFollowUpSection
-      ? 'followUpSectionTitle'
-      : 'questionTitle',
+        ? 'followUpSectionTitle'
+        : 'questionTitle',
   };
 
   const style = isSubQuestion
     ? 'subQuestionAnswer'
     : isFollowUpSection
-    ? 'followUpSectionAnswer'
-    : 'answer';
+      ? 'followUpSectionAnswer'
+      : 'answer';
 
   switch (answerEntry.type) {
     case 'free-text':
@@ -324,10 +323,10 @@ function getContent(
               answerEntry.value[index] === '-1'
                 ? tr.dontKnow
                 : answerEntry.value[index] == null
-                ? '-'
-                : question.classes[Number(answerEntry.value[index])]?.[
-                    language
-                  ] ?? '-'
+                  ? '-'
+                  : question.classes[Number(answerEntry.value[index])]?.[
+                      language
+                    ] ?? '-'
             }`,
             style,
           })),

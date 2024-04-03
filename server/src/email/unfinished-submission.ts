@@ -32,7 +32,7 @@ export async function sendUnfinishedSubmissionLink({
         noReply: tr.noReply,
         unfinishedSurveyInfo: tr.unfinishedSurveyInfo.replace(
           '{surveyTitle}',
-          survey.title[language]
+          survey.title[language],
         ),
         continueWithLink: tr.continueWithLink,
       },

@@ -96,8 +96,8 @@ export default function SurveyImageList({ imageType }: Props) {
           imageType === 'backgroundImage'
             ? 'background-images'
             : imageType === 'thanksPageImage'
-            ? 'thanks-page-images'
-            : ''
+              ? 'thanks-page-images'
+              : ''
         }`,
       );
 
@@ -202,8 +202,8 @@ export default function SurveyImageList({ imageType }: Props) {
           imageType === 'backgroundImage'
             ? 'background-images'
             : imageType === 'thanksPageImage'
-            ? 'thanks-page-images'
-            : ''
+              ? 'thanks-page-images'
+              : ''
         }`,
         { method: 'POST', body: formData },
       );
@@ -298,8 +298,8 @@ export default function SurveyImageList({ imageType }: Props) {
           {imageType === 'backgroundImage'
             ? tr.SurveyImageList.surveyImage
             : imageType === 'thanksPageImage'
-            ? tr.SurveyImageList.thanksPageImage
-            : tr.SurveyImageList.image}
+              ? tr.SurveyImageList.thanksPageImage
+              : tr.SurveyImageList.image}
           {': '}
           {activeImage
             ? ` ${activeImage?.fileName}`
@@ -344,12 +344,12 @@ export default function SurveyImageList({ imageType }: Props) {
                       }
                     : null
                   : imageType === 'thanksPageImage'
-                  ? !activeSurvey?.thanksPage.imageName
-                    ? {
-                        border: '4px solid #1976d2',
-                      }
+                    ? !activeSurvey?.thanksPage.imageName
+                      ? {
+                          border: '4px solid #1976d2',
+                        }
+                      : null
                     : null
-                  : null
               }
               onClick={() => handleEmptyImage()}
             >
@@ -371,8 +371,8 @@ export default function SurveyImageList({ imageType }: Props) {
                   {imageType === 'backgroundImage'
                     ? tr.SurveyImageList.noBackgroundImage
                     : imageType === 'thanksPageImage'
-                    ? tr.SurveyImageList.noThanksPageImage
-                    : tr.SurveyImageList.noImage}
+                      ? tr.SurveyImageList.noThanksPageImage
+                      : tr.SurveyImageList.noImage}
                 </Typography>
               </Container>
             </ImageListItem>

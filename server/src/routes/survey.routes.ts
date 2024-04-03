@@ -221,7 +221,8 @@ router.post(
     // Get data of the survey that were copied
     const copiedSurveyData = await getSurvey({ id });
     if (!copiedSurveyData || !createdSurvey) {
-      return res.status(500).json('Error while copying survey');
+      res.status(500).json('Error while copying survey');
+      return;
     }
 
     // Just in case: change every 'id' -field found on the copied survey into null to prevent overwriting anything
@@ -266,9 +267,11 @@ router.post(
     // Just to make sure that we are not overwriting the previous survey
     if (newSurvey.name === null && newSurvey.id !== id) {
       await updateSurvey(newSurvey);
-      return res.status(200).json(newSurvey.id);
+      res.status(200).json(newSurvey.id);
+      return;
     } else {
-      return res.status(500).json('Error while copying survey');
+      res.status(500).json('Error while copying survey');
+      return;
     }
   }),
 );
@@ -343,7 +346,10 @@ router.delete(
   '/:surveyId/page/:id',
   ensureAuthenticated(),
   validateRequest([
-    param('surveyId').isNumeric().toInt().withMessage('surveyId must be a number'),
+    param('surveyId')
+      .isNumeric()
+      .toInt()
+      .withMessage('surveyId must be a number'),
   ]),
   validateRequest([
     param('id').isNumeric().toInt().withMessage('ID must be a number'),

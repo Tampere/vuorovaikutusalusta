@@ -49,7 +49,7 @@ export async function upsertUser(user: Express.User) {
       id: user.id,
       fullName: user.fullName,
       email: user.email,
-    }
+    },
   );
   return dbUserToUser(newUser);
 }
@@ -61,7 +61,7 @@ export async function upsertUser(user: Express.User) {
 export async function getUser(id: string) {
   const user = await getDb().oneOrNone<DbUser>(
     `SELECT * FROM "user" WHERE id = $1`,
-    [id]
+    [id],
   );
   return dbUserToUser(user);
 }
@@ -74,7 +74,7 @@ export async function getUser(id: string) {
 export async function getUsers(excludeIds = []) {
   const dbUsers = await getDb().manyOrNone<DbUser>(
     `SELECT * FROM "user" WHERE NOT (id = ANY ($1))`,
-    [excludeIds]
+    [excludeIds],
   );
   return dbUsers.map(dbUserToUser);
 }

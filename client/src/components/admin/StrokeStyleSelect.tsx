@@ -25,7 +25,7 @@ export default function StrokeStyleSelect({ value, onChange }: Props) {
           onChange(
             event.target.value == null
               ? null
-              : (event.target.value as FeatureStrokeStyle)
+              : (event.target.value as FeatureStrokeStyle),
           );
         }}
       >

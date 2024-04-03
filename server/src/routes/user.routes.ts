@@ -14,7 +14,7 @@ router.get(
   asyncHandler(async (req, res) => {
     const users = await getUsers();
     res.json(users);
-  })
+  }),
 );
 
 /**
@@ -34,7 +34,7 @@ router.get(
     // Exclude logged in user from response
     const users = await getUsers([req.user.id]);
     res.json(users);
-  })
+  }),
 );
 
 export default router;

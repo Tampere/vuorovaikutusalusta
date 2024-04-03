@@ -39,7 +39,7 @@ export default function ThemeSelect({ value, onChange }: Props) {
     async function fetchThemes() {
       try {
         const themes = await fetch('/api/themes').then(
-          (response) => response.json() as Promise<SurveyTheme[]>
+          (response) => response.json() as Promise<SurveyTheme[]>,
         );
         setThemes(themes);
       } catch (error) {
@@ -68,7 +68,7 @@ export default function ThemeSelect({ value, onChange }: Props) {
         value={loading || value == null ? '' : value}
         onChange={(event) => {
           onChange(
-            themes.find((theme) => theme.id === event.target.value) ?? null
+            themes.find((theme) => theme.id === event.target.value) ?? null,
           );
         }}
       >

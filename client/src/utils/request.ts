@@ -38,7 +38,7 @@ function serializeBody(body: unknown): {
  */
 export async function request<Response = unknown>(
   url: string,
-  options?: RequestOptions
+  options?: RequestOptions,
 ) {
   const body = options?.body ? serializeBody(options.body) : undefined;
   const response = await fetch(url, {

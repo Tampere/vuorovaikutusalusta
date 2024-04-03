@@ -37,8 +37,8 @@ export function configureAzureAuth(app: Express) {
           });
           return done(null, user);
         });
-      }
-    )
+      },
+    ),
   );
 
   // Login route
@@ -61,6 +61,6 @@ export function configureAzureAuth(app: Express) {
       // Redirect to original request URL
       const redirectUrl = decrypt(req.body.state) ?? '/admin';
       res.redirect(redirectUrl);
-    }
+    },
   );
 }

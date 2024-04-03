@@ -46,7 +46,7 @@ export default function FileUpload({
       if (value) {
         try {
           await Promise.all(
-            (value ?? []).map(({ path, name }) => deleteFile(path, name))
+            (value ?? []).map(({ path, name }) => deleteFile(path, name)),
           );
         } catch (error) {
           showToast({

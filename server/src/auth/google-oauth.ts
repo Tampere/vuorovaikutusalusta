@@ -49,8 +49,8 @@ export function configureGoogleOAuth(app: Express) {
           email: profile._json.email,
         });
         return done(null, user);
-      }
-    )
+      },
+    ),
   );
 
   // Login endpoint
@@ -61,7 +61,7 @@ export function configureGoogleOAuth(app: Express) {
       req.session.redirectUrl = decrypt(String(req.query.redirect)) ?? '/admin';
       next();
     },
-    passport.authenticate('google', { scope: ['profile', 'email'] })
+    passport.authenticate('google', { scope: ['profile', 'email'] }),
   );
 
   // OAuth callback endpoint
@@ -75,6 +75,6 @@ export function configureGoogleOAuth(app: Express) {
       // Get original request URL from session
       const redirectUrl = req.session.redirectUrl ?? '/admin';
       res.redirect(redirectUrl);
-    }
+    },
   );
 }

@@ -11,7 +11,7 @@ export type HttpResponseError = InstanceType<
  */
 function getHttpErrorClass<StatusCode extends number>(
   statusCode: StatusCode,
-  defaultMessage?: string
+  defaultMessage?: string,
 ) {
   return class HttpResponseError<InfoType = never> extends Error {
     /**
@@ -48,7 +48,7 @@ function getHttpErrorClass<StatusCode extends number>(
 export const BadRequestError = getHttpErrorClass(400 as const);
 export const UnauthorizedError = getHttpErrorClass(
   401 as const,
-  'Unauthorized'
+  'Unauthorized',
 );
 export const ForbiddenError = getHttpErrorClass(403 as const, 'Forbidden');
 export const NotFoundError = getHttpErrorClass(404 as const);

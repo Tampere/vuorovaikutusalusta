@@ -3,7 +3,7 @@ import fetch, { Response } from 'node-fetch';
 import { NotFoundError } from '../error';
 
 export async function getAvailableMapLayers(
-  mapUrl: string
+  mapUrl: string,
 ): Promise<MapLayer[]> {
   if (!mapUrl) {
     return [];
@@ -12,7 +12,7 @@ export async function getAvailableMapLayers(
   const [baseUrl, queryParams] = mapUrl.split(/\/?\?/);
   try {
     const response: Response = await fetch(
-      `${baseUrl}/action?action_route=GetAppSetup&${queryParams}`
+      `${baseUrl}/action?action_route=GetAppSetup&${queryParams}`,
     );
     const responseJson = (await response.json()) as {
       configuration: {
@@ -30,11 +30,11 @@ export async function getAvailableMapLayers(
           typeof name === 'string'
             ? name
             : // For user-created datasets, the name might be a localized object instead of a string.
-            // In this case, just pick the first one available
-            Object.keys(name).length > 0
-            ? name[Object.keys(name)[0]]
-            : '<untitled layer>',
-      })
+              // In this case, just pick the first one available
+              Object.keys(name).length > 0
+              ? name[Object.keys(name)[0]]
+              : '<untitled layer>',
+      }),
     );
     // For non-existent UUIDs the full layer path won't exist in the response object
     if (!layers) {

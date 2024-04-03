@@ -646,8 +646,8 @@ export default function SurveyStepper({
                   currentPage.sidebar.imageSize === 'original'
                     ? { margin: '0 auto' }
                     : currentPage.sidebar.imageSize === 'fitted'
-                    ? { margin: '0 auto', maxWidth: '100%' }
-                    : null
+                      ? { margin: '0 auto', maxWidth: '100%' }
+                      : null
                 }
                 aria-hidden={true}
                 alt={currentPage.sidebar?.imageAltText?.[surveyLanguage]}
@@ -814,8 +814,8 @@ export default function SurveyStepper({
                   currentPage.sidebar.type === 'image'
                     ? tr.SurveyStepper.closeImage
                     : currentPage.sidebar.type === 'map'
-                    ? tr.SurveyStepper.closeMap
-                    : ''
+                      ? tr.SurveyStepper.closeMap
+                      : ''
                 }
               >
                 <Close />

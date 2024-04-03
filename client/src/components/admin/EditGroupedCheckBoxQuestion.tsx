@@ -129,12 +129,12 @@ export default function EditGroupedCheckBoxQuestion({
           }
           const groupId = Number(event.draggableId);
           const oldIndex = section.groups.findIndex(
-            (group) => group.id === groupId
+            (group) => group.id === groupId,
           );
           const group = section.groups[oldIndex];
           const newIndex = event.destination.index;
           const otherGroups = section.groups.filter(
-            (group) => group.id !== groupId
+            (group) => group.id !== groupId,
           );
           onChange({
             ...section,
@@ -222,7 +222,7 @@ export default function EditGroupedCheckBoxQuestion({
                               onChange({
                                 ...section,
                                 groups: section.groups.filter(
-                                  (_, i) => i !== index
+                                  (_, i) => i !== index,
                                 ),
                               });
                             }}

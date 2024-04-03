@@ -118,19 +118,19 @@ export default function GroupedCheckBoxQuestion({
               .replace('{min}', question.answerLimits.min.toString())
               .replace('{max}', question.answerLimits.max.toString())
           : question.answerLimits?.min
-          ? // Only min limit is set
-            tr.GroupedCheckBoxQuestion.helperTextMin.replace(
-              '{min}',
-              question.answerLimits.min.toString(),
-            )
-          : question.answerLimits?.max
-          ? // Only max limit is set
-            tr.GroupedCheckBoxQuestion.helperTextMax.replace(
-              '{max}',
-              question.answerLimits.max.toString(),
-            )
-          : // No limits are set
-            tr.GroupedCheckBoxQuestion.helperText}
+            ? // Only min limit is set
+              tr.GroupedCheckBoxQuestion.helperTextMin.replace(
+                '{min}',
+                question.answerLimits.min.toString(),
+              )
+            : question.answerLimits?.max
+              ? // Only max limit is set
+                tr.GroupedCheckBoxQuestion.helperTextMax.replace(
+                  '{max}',
+                  question.answerLimits.max.toString(),
+                )
+              : // No limits are set
+                tr.GroupedCheckBoxQuestion.helperText}
       </Typography>
       <Typography style={{ marginTop: '1rem' }} id={`${question.id}-indicator`}>
         {indicatorTextStart}
@@ -183,9 +183,9 @@ export default function GroupedCheckBoxQuestion({
             <AccordionDetails className={classes.accordionDetails}>
               <FormGroup
                 // Indicate the amount of selections inside the group for screen readers
-                aria-label={`${group.name?.[
-                  surveyLanguage
-                ]}: ${tr.GroupedCheckBoxQuestion.optionsSelectedInGroup.replace(
+                aria-label={`${
+                  group.name?.[surveyLanguage]
+                }: ${tr.GroupedCheckBoxQuestion.optionsSelectedInGroup.replace(
                   '{number}',
                   String(amountsByGroup[index]),
                 )}`}
