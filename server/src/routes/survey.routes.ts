@@ -136,6 +136,9 @@ router.put(
       .isArray()
       .optional({ nullable: true })
       .withMessage('Thanks page image path must be an array'),
+    body('marginImages')
+      .isObject()
+      .withMessage('Margin images must be an object'),
     body('startDate')
       .isString()
       .optional({ nullable: true })

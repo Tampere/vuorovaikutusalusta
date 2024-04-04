@@ -482,6 +482,13 @@ export interface Survey {
    * Number of submissions for the survey
    */
   submissionCount: number;
+  /**
+   * Margin images displayed on the landing and thanks pages
+   */
+  marginImages: {
+    top: { imagePath: string[]; imageName: string; altText?: string };
+    bottom: { imagePath: string[]; imageName: string; altText?: string };
+  };
 }
 
 /**
@@ -728,7 +735,11 @@ export interface Submission {
   answerEntries?: AnswerEntry[];
 }
 
-export type ImageType = 'backgroundImage' | 'thanksPageImage';
+export type ImageType =
+  | 'backgroundImage'
+  | 'thanksPageImage'
+  | 'topMarginImage'
+  | 'bottomMarginImage';
 
 /**
  * Conditions to display follow-up section

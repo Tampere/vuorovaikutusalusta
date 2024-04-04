@@ -2,7 +2,6 @@ import { Survey } from '@interfaces/survey';
 import {
   Box,
   Button,
-  Link,
   Theme,
   Typography,
   Stack,
@@ -12,7 +11,8 @@ import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { getClassList } from '@src/utils/classes';
 import React from 'react';
-import Footer from './Footer';
+
+import { useImageHeaderQuery } from '@src/hooks/UseImageHeaderQuery';
 
 const useStyles = makeStyles((theme: Theme & { [customKey: string]: any }) => ({
   heading: {
@@ -102,6 +102,16 @@ export default function SurveyLandingPage({
   const classes = useStyles({ imageName: survey?.backgroundImageName ?? '' });
   const { tr, surveyLanguage } = useTranslations();
   const mediumWidth = useMediaQuery('(max-width: 640px)');
+
+  const topImageHeaderQuery = useImageHeaderQuery(
+    `/api/file/${survey.marginImages.top.imagePath}/${survey.marginImages.top.imageName}`,
+    !survey.marginImages.top.imageName,
+  );
+  const bottomImageHeaderQuery = useImageHeaderQuery(
+    `/api/file/${survey.marginImages.bottom.imagePath}/${survey.marginImages.bottom.imageName}`,
+    !survey.marginImages.bottom.imageName,
+  );
+
   return (
     <Stack
       direction="column"
@@ -139,14 +149,16 @@ export default function SurveyLandingPage({
           alignItems: 'flex-start',
         }}
       >
-        <img
-          style={{
-            maxWidth: '60%',
-            maxHeight: '100%',
-          }}
-          src={`/api/feature-styles/icons/logo`}
-          alt={tr.IconAltTexts.logoAltText}
-        />
+        {topImageHeaderQuery.imageHeaders && (
+          <img
+            style={{
+              maxWidth: '60%',
+              maxHeight: '100%',
+            }}
+            src={`/api/file/${survey.marginImages.top.imagePath}/${survey.marginImages.top.imageName}`}
+            alt={topImageHeaderQuery.imageHeaders?.imageAltText ?? ''}
+          />
+        )}
       </Box>
       <Box
         className="middle-content"
@@ -187,40 +199,21 @@ export default function SurveyLandingPage({
           whiteSpace: 'nowrap',
         }}
       >
-        <Footer>
-          <Link
-            color="primary"
-            underline="hover"
-            href="https://www.tampere.fi/asioi-kaupungin-kanssa/oskari-karttakyselypalvelun-saavutettavuusseloste"
-            target="_blank"
-          >
-            {tr.FooterLinks.accessibility}
-          </Link>
-          {survey.displayPrivacyStatement && (
-            <Link
-              color="primary"
-              underline="hover"
-              href="https://www.tampere.fi/tietosuoja-ja-tiedonhallinta/tietosuojaselosteet"
-              target="_blank"
-            >
-              {tr.FooterLinks.privacyStatement}
-            </Link>
-          )}
-        </Footer>
-        <img
-          style={{
-            minWidth: '130px',
-            maxWidth: '20%',
-            position: !mediumWidth ? 'absolute' : 'static',
-            left: !mediumWidth ? '0' : 'auto',
-            bottom: 0,
-            marginLeft: '0.5rem',
-            marginBottom: '0.5rem',
-          }}
-          src={`/api/feature-styles/icons/banner`}
-          alt={tr.IconAltTexts.bannerAltText}
-        />
-
+        {bottomImageHeaderQuery.imageHeaders && (
+          <img
+            style={{
+              minWidth: '130px',
+              maxWidth: '20%',
+              position: !mediumWidth ? 'absolute' : 'static',
+              left: !mediumWidth ? '0' : 'auto',
+              bottom: 0,
+              marginLeft: '0.5rem',
+              marginBottom: '0.5rem',
+            }}
+            src={`/api/file/${survey.marginImages.bottom.imagePath}/${survey.marginImages.bottom.imageName}`}
+            alt={bottomImageHeaderQuery.imageHeaders?.imageAltText ?? ''}
+          />
+        )}
         {surveyBackgroundImage?.attributions ? (
           <Typography className={classes.imageCopyright} variant="body2">
             {surveyBackgroundImage.attributions}

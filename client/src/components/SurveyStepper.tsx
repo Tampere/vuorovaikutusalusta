@@ -14,7 +14,6 @@ import {
   FormControl,
   FormHelperText,
   IconButton,
-  Link,
   Paper,
   Step,
   StepContent,
@@ -37,7 +36,6 @@ import { request } from '@src/utils/request';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import SplitPane from 'react-split-pane';
 import DocumentSection from './DocumentSection';
-import Footer from './Footer';
 import ImageSection from './ImageSection';
 import PageConnector from './PageConnector';
 import StepperControls from './StepperControls';
@@ -594,26 +592,6 @@ export default function SurveyStepper({
           ))}
         </Stepper>
       </main>
-      <Footer>
-        <Link
-          color="primary"
-          underline="hover"
-          href="https://www.tampere.fi/asioi-kaupungin-kanssa/oskari-karttakyselypalvelun-saavutettavuusseloste"
-          target="_blank"
-        >
-          {tr.FooterLinks.accessibility}
-        </Link>
-        {survey.displayPrivacyStatement && (
-          <Link
-            color="primary"
-            underline="hover"
-            href="https://www.tampere.fi/tietosuoja-ja-tiedonhallinta/tietosuojaselosteet"
-            target="_blank"
-          >
-            {tr.FooterLinks.privacyStatement}
-          </Link>
-        )}
-      </Footer>
     </>
   );
 
