@@ -530,7 +530,7 @@ export interface SectionOptionGroup {
 /**
  * Supported language codes
  */
-type LanguageCode = 'fi' | 'en';
+type LanguageCode = 'fi' | 'en' | 'se';
 
 /**
  * Type for localization typing

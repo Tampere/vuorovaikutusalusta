@@ -1,0 +1,634 @@
+{
+  "DataExport": {
+    "exportAnswers": "Ladda ner svar",
+    "surveyAnswerExport": "Nedladdning av enkätsvar",
+    "chooseFileFormat": "Välj önskat filformat",
+    "download": "Ladda ner",
+    "errorDownloadingCSV": "Misslyckades att ladda ner CSV-filen",
+    "errorDownloadingGPKG": "Misslyckades att ladda ner GeoPackage-filen",
+    "attachments": "Bilagor"
+  },
+  "EditSurvey": {
+    "errorFetchingSurvey": "Fel vid hämtning av enkät. Kontrollera adressen eller försök igen senare.",
+    "untitledPage": "Namnlös sida",
+    "fetchFailed": "Fel vid hämtning av enkät. Försök igen senare.",
+    "saveSuccessful": "Enkäten sparades framgångsrikt!",
+    "saveFailed": "Det gick inte att spara enkäten. Försök igen senare.",
+    "saveFailedDuplicateName": "En enkät med samma namn finns redan. Välj ett annat namn och försök igen.",
+    "invalidFields": "Följande fält har ogiltiga värden:",
+    "validationError": {
+      "survey.title": "Undersökningens titel",
+      "survey.name": "Undersökningens namn",
+      "survey.author": "Undersökningens författare/kontaktperson",
+      "survey.mapUrl": "Oskari-kartpubliceringens adress"
+    },
+    "toFrontPage": "Framsidan",
+    "info": "Undersökningsinformation",
+    "email": "E-post",
+    "newPage": "Skapa sida",
+    "newPageFailed": "Det uppstod ett fel när en ny sida skulle skapas. Försök igen senare.",
+    "thanksPage": "Tack-sida",
+    "translations": "Översättningar",
+    "preview": "Förhandsgranska",
+    "toSurveyPage": "Till undersökningssidan",
+    "preventUnloadConfirm": "Det finns osparade ändringar på sidan. Vill du verkligen lämna sidan?",
+    "deleteSurvey": "Ta bort undersökningen",
+    "deleteSurveyConfirm": "Vill du verkligen ta bort hela undersökningen? Åtgärden kan inte ångras.",
+    "deleteSurveyFailed": "Det uppstod ett fel när undersökningen skulle tas bort. Försök igen senare.",
+    "deleteSurveySuccessful": "Undersökningen togs bort framgångsrikt!",
+    "allowSavingUnfinished": "Tillåt att spara undersökningen som ofärdig",
+    "displayPrivacyStatement": "Visa länk till integritetspolicy och dataskydd i sidfoten",
+    "copyPage": "Kopiera sida",
+    "attachNewPage": "Bifoga sida",
+    "pageAttached": "Observera att kartlagval inte kopieras. Kontrollera kartlagvalen och korrigera kartpubliceringsadressen vid behov.",
+    "pageCopied": "Sidkopiering lyckades. Du kan nu klistra in den kopierade sidan i din undersökning."
+  },
+  "EditSurveyInfo": {
+    "title": "Undersökningens titel",
+    "subtitle": "Undersökningens undertitel",
+    "name": "Undersökningens namn",
+    "nameHelperText": "Namnet som syns i undersökningens URL-adress. Kan innehålla endast bokstäver (a-z), siffror (0-9) och bindestreck (- och _).",
+    "author": "Undersökningens författare/kontaktperson",
+    "authorUnit": "Författarens enhet",
+    "admins": "Undersökningens administratörer",
+    "userFetchFailed": "Misslyckades att hämta användare. Försök igen senare.",
+    "adminsHelperText": "Användare som definieras förutom den ursprungliga skaparen av undersökningen, som kan se undersökningssvar och redigera undersökningen.",
+    "mapUrl": "Oskari-kartpubliceringens adress",
+    "mapUrlError": "Misslyckades att hämta kartlager för den angivna adressen. Kontrollera adressen och försök igen.",
+    "availableMapLayers": "Tillgängliga kartlager:",
+    "startDate": "Startdatum",
+    "endDate": "Slutdatum",
+    "selectDateAndTime": "Välj datum och tid",
+    "theme": "Tema",
+    "selectTheme": "Välj tema",
+    "themeFetchFailed": "Misslyckades att hämta teman. Försök igen senare.",
+    "titleColor": "Färg på avsnittstitlar",
+    "allowTestSurvey": "Publicera testundersökning",
+    "allowTestSurveyHelperText": "En testversion av undersökningen publiceras på din egen adress. Testundersökningen sparar inte svar.",
+    "testSurveyUrl": "Testundersökningens adress"
+  },
+  "EditSurveyEmail": {
+    "enable": "Tillåt rapportering av svar via e-post",
+    "enableHelperText": "Om du tillåter rapportering av svar via e-post, skickas individuella svar som pdf-rapporter till de angivna adresserna nedan. Dessutom ombeds respondenten att ange sin e-postadress i slutet av undersökningen för att få pdf-rapporten skickad till sig.",
+    "autoSendTo": "Mottagarens e-postadresser",
+    "autoSendToHelperText": "Pdf-rapport om varje svar skickas som bilaga till dessa adresser (förutom respondenten själv).",
+    "emailSubject": "Ämne för meddelandet",
+    "emailBody": "Meddelandets innehåll",
+    "info": "Ytterligare information",
+    "infoHelperText": "Ytterligare information visas på framsidan av e-postmeddelandet som skickas med svarrapporten."
+  },
+  "KeyValueForm": {
+    "key": "Namn",
+    "value": "Värde",
+    "addEntry": "Lägg till post",
+    "deleteEntry": "Ta bort post"
+  },
+  "EditSurveyPage": {
+    "name": "Sidans namn",
+    "conditions": {
+      "noSelections": "Inga val",
+      "selections": "{x} val",
+      "label": "Visa sida",
+      "pageVisible": "alltid",
+      "pageHasConditions": "om följande villkor uppfylls",
+      "questionSelectorLabel": "Frågan",
+      "equals": "svaret är exakt",
+      "contains": "Svaret innehåller alternativet",
+      "somethingElse": "Något annat, vad?",
+      "numeric": {
+        "lessThan": "svaret är högst",
+        "greaterThan": "svaret är minst"
+      }
+    },
+    "deletePage": "Ta bort sida",
+    "confirmDeletePage": "Vill du verkligen ta bort den här sidan? Åtgärden kan inte ångras.",
+    "deletePageFailed": "Det uppstod ett fel när sidan skulle tas bort. Försök igen senare.",
+    "selectSidebarType": "Välj innehåll i sidopanelen till höger",
+    "sidebarType": {
+      "none": "Inget",
+      "map": "Karta",
+      "image": "Bild"
+    },
+    "sidebarLabel": "Navigeringsmeny",
+    "warningNoMapUrl": "Ingen Oskari-kartpublicering har angetts för undersökningen.",
+    "warningNoAvailableMapLayers": "Inga kartlager hittades från Oskari-kartpubliceringen.",
+    "mapLayers": "Kartlager som visas på sidan",
+    "defaultMapView": "Standardvy för kartan på den här sidan",
+    "defaultMapViewStatus": { "set": "Inställd", "notSet": "Inte inställd" },
+    "defaultMapViewInfo": "Markera ett område på kartan med en klickning med musen för att visa det på frågesidan.",
+    "mapViewButtons": {
+      "set": "Ange",
+      "showMap": "Visa",
+      "modifyDefaultView": "Redigera",
+      "deleteDefaultView": "Ta bort",
+      "close": "Stäng",
+      "clear": "Rensa",
+      "cancel": "Avbryt"
+    },
+    "untitledSection": "Namnlös avsnitt",
+    "title": "Titel",
+    "deleteSection": "Ta bort avsnitt",
+    "addFollowUpQuestion": "Lägg till uppföljningsfråga",
+    "addFollowUpButtonTile": "Spara frågan för att lägga till en uppföljningsfråga",
+    "confirmDeleteSection": "Vill du verkligen ta bort det här avsnittet?",
+    "imageAltText": "Alternativ text för bild",
+    "imageScaling": "Bildskalning",
+    "imageScalingLabel": {
+      "original": "Originalstorlek",
+      "fitted": "Anpassad till vy"
+    },
+    "sectionCopied": "Avsnitt kopierat till urklipp. Du kan nu klistra in det kopierade avsnittet i din undersökning.",
+    "sectionAttached": "Observera att kartlagval inte kopieras. Kontrollera kartlagvalen och korrigera kartpubliceringsadressen vid behov.",
+    "attachSection": "Ny avsnitt från urklipp"
+  },
+  "FollowUpSection": {
+    "title": "Uppföljningsfråga för fråga",
+    "conditions": {
+      "title": "Villkor",
+      "labelForSingle": "Visa uppföljningsfrågan om följande villkor uppfylls:",
+      "labelForMultiple": "Visa uppföljningsfrågan om något av följande villkor uppfylls:",
+      "chooseCondition": "välj villkor",
+      "insertValue": "ange jämförelsevärde",
+      "customAnswer": "Något annat, vad?",
+      "types": {
+        "equals": "Svaret är exakt",
+        "contains": "Svaret innehåller alternativet",
+        "lessThan": "högst",
+        "greaterThan": "minst",
+        "or": "eller"
+      },
+      "validationError": "Jämförelsevärdet måste vara ett nummer."
+    },
+    "question": "Fråga",
+    "changeType": "Byt frågetyp",
+    "cancel": "Avbryt"
+  },
+  "FileUpload": {
+    "deleteFile": "Ta bort fil",
+    "addedFile": "Vald fil",
+    "errorUploadingFile": "Det uppstod ett fel när filen skulle laddas upp. Försök igen senare.",
+    "errorDeletingFile": "Det uppstod ett fel när filen skulle tas bort. Försök igen senare."
+  },
+  "EditGroupedCheckBoxQuestion": {
+    "addGroup": "Lägg till grupp",
+    "groupName": "Gruppens namn",
+    "untitledGroup": "Namnlös grupp",
+    "deleteGroup": "Ta bort grupp"
+  },
+  "AddSurveySectionActions": {
+    "radioQuestion": "Lägg till alternativfråga",
+    "checkBoxQuestion": "Lägg till flervalsfråga",
+    "numericQuestion": "Lägg till numerisk fråga",
+    "mapQuestion": "Lägg till kartfråga",
+    "textSection": "Lägg till textavsnitt",
+    "freeTextQuestion": "Lägg till fritextfråga",
+    "sortingQuestion": "Lägg till sorteringsfråga",
+    "sliderQuestion": "Lägg till skjutreglagefråga",
+    "matrixQuestion": "Lägg till likert-fråga",
+    "multiMatrixQuestion": "Lägg till flervalslikert-fråga",
+    "groupedCheckboxQuestion": "Lägg till grupperad flervalsfråga",
+    "imageSection": "Lägg till bildavsnitt",
+    "documentSection": "Lägg till bilageavsnitt",
+    "attachmentSection": "Lägg till svarsbilage"
+  },
+  "SliderQuestion": {
+    "defaultMinLabel": "Helt oenig",
+    "defaultMaxLabel": "Helt enig",
+    "scale": "Skala"
+  },
+  "SurveySection": {
+    "radioQuestion": "Alternativfråga",
+    "checkBoxQuestion": "Flervalsfråga",
+    "numericQuestion": "Numerisk fråga",
+    "mapQuestion": "Kartfråga",
+    "textSection": "Textavsnitt",
+    "freeTextQuestion": "Fritextfråga",
+    "sortingQuestion": "Sorteringsfråga",
+    "sliderQuestion": "Skjutreglagefråga",
+    "matrixQuestion": "Likert-fråga",
+    "multiMatrixQuestion": "Flervalslikert-fråga",
+    "groupedCheckboxQuestion": "Grupperad flervalsfråga",
+    "imageSection": "Bildavsnitt",
+    "documentSection": "Bilageavsnitt",
+    "attachmentSection": "Svarsbilage",
+    "question": "Fråga"
+  },
+  "SurveySections": {
+    "limitAnswers": "Begränsa svarsantal",
+    "minAnswers": "Minst svar",
+    "maxAnswers": "Högst svar",
+    "classes": "Svarsklasser",
+    "options": "Svarsalternativ",
+    "subjects": "Svarsteman",
+    "allowCustomAnswer": "Tillåt 'Något annat, vad?' alternativ",
+    "isRequired": "Obligatoriskt svar",
+    "answerMaxLength": "Max antal tecken",
+    "sectionInfo": "Ange ytterligare information om frågan",
+    "allowEmptyAnswer": "Tillåt 'Jag vet inte' alternativ",
+    "optionInfo": "Ytterligare information om frågealternativet",
+    "removeOption": "Ta bort svarsalternativ",
+    "selectAnswer": "Välj svar"
+  },
+  "NumericQuestion": {
+    "minValue": "Värdet måste vara minst {minValue}",
+    "maxValue": "Värdet måste vara högst {maxValue}",
+    "minMaxValue": "Värdet måste vara mellan {minValue} och {maxValue}"
+  },
+  "AttachmentQuestion": {
+    "addedFile": "Tillagd fil",
+    "fileUploadError": "Ett fel uppstod vid uppladdning av filen",
+    "fileSizeLimitError": "Filstorleken får inte vara över 10MB",
+    "unsupportedFileFormat": "Filformatet stöds inte",
+    "attachmentFileFormats": "Tillåtna filformat: jpg, jpeg, png, pdf, docx, xlsx.",
+    "deleteUploadedFile": "Ta bort uppladdad fil",
+    "replace": "Ersätt vald bilaga genom att klicka."
+  },
+  "SurveyImageList": {
+    "attributions": "Tillägg",
+    "noBackgroundImage": "Ingen bakgrundsbild",
+    "noThanksPageImage": "Ingen bild på Tack-sidan",
+    "noTopMarginImage": "Ingen övre marginalbild",
+    "noBottomMarginImage": "Ingen nedre marginalbild",
+    "noImage": "Ingen bild",
+    "surveyImage": "Bakgrundsbild för undersökningen",
+    "thanksPageImage": "Bild på Tack-sidan",
+    "topMarginImage": "Bild för övre marginalen",
+    "bottomMarginImage": "Bild för nedre marginalen",
+    "image": "Bild",
+    "selectImage": "Välj bakgrundsbild",
+    "addNewImage": "Lägg till ny bild",
+    "files": "Filer",
+    "imageSizeExceeded": "Maximal bildstorlek är {x} Mb",
+    "imageTypeError": "Bilden måste vara av typen .svg",
+    "imageUploadError": "Ett fel uppstod vid sparande av bilden",
+    "imageDownloadError": "Ett fel uppstod vid hämtning av bilden",
+    "multipleImagesDownloadError": "Hämtning av bilder misslyckades",
+    "imageDeleteError": "Ett fel uppstod vid borttagning av bilden"
+  },
+  "DropZone": {
+    "dropFiles": "Välj en fil genom att klicka eller släppa den här (max {x} Mb).",
+    "dropFilesSvg": "Välj en .svg-fil genom att klicka eller släppa den här (max {x} Mb)."
+  },
+  "EditTextSection": {
+    "text": "Text",
+    "bodyColor": "Textfärg"
+  },
+  "EditImageSection": {
+    "altText": "Alternativ text för bild"
+  },
+  "EditMapQuestion": {
+    "selectionTypes": "Tillåtna kartvalstyper",
+    "point": "Punkt",
+    "line": "Linje",
+    "area": "Område",
+    "subQuestions": "Underfrågor"
+  },
+  "EditSliderQuestion": {
+    "presentationType": "Presentationstyp",
+    "literal": "Ordetligt",
+    "numeric": "Numerisk",
+    "minValue": "Minimivärde",
+    "maxValue": "Maximivärde",
+    "defaultMinLabel": "Helt oenig",
+    "defaultMaxLabel": "Helt enig",
+    "defaultTranslatedMinLabel": {
+      "en": "Strongly disagree",
+      "fi": "Täysin eri mieltä"
+    },
+    "defaultTranslatedMaxLabel": {
+      "en": "Strongly agree",
+      "fi": "Täysin samaa mieltä"
+    },
+    "literalHelperText": "Svaret på den ordagranna skjutreglagefrågan sparas i databasen med ett värde mellan 0 och 10."
+  },
+  "EditSurveyThanksPage": {
+    "title": "Tack-sidans titel",
+    "text": "Tack-sidans text"
+  },
+  "RichTextEditor": {
+    "generic.add": "Lägg till",
+    "generic.cancel": "Avbryt",
+    "components.controls.inline.bold": "Fetstil",
+    "components.controls.inline.italic": "Kursiv",
+    "components.controls.link.linkTitle": "Länktext",
+    "components.controls.link.linkTarget": "Adress",
+    "components.controls.link.linkTargetOption": "Öppna i nytt fönster",
+    "components.controls.link.link": "Lägg till länk",
+    "components.controls.link.unlink": "Ta bort länk",
+    "components.controls.list.list": "Lista",
+    "components.controls.list.unordered": "Oordnad lista",
+    "components.controls.list.ordered": "Ordnad lista"
+  },
+  "ColorSelect": {
+    "color": "Färg",
+    "colors": {
+      "black": "Svart",
+      "darkGray": "Mörkgrå",
+      "steelBlue": "Stålblå",
+      "atmosphere": "Atmosfär",
+      "berryRed": "Bärrotsröd",
+      "warmGreen": "Varmgrön"
+    }
+  },
+  "MarkerIconSelect": {
+    "icon": "Ikon",
+    "selectIcon": "Välj ikon",
+    "errorFetchingIcons": "Det uppstod ett fel vid hämtning av ikoner. Försök igen senare."
+  },
+  "StrokeStyleSelect": {
+    "strokeStyle": "Linjestil",
+    "selectStrokeStyle": "Välj linjestil",
+    "solid": "Solid",
+    "dashed": "Streckad",
+    "dotted": "Prickad"
+  },
+  "StrokeColorSelect": {
+    "strokeColor": "Linjefärg",
+    "selectStrokeColor": "Välj linjefärg",
+    "errorFetchingColors": "Det uppstod ett fel vid hämtning av färger. Försök igen senare."
+  },
+  "SurveyList": {
+    "title": {
+      "main": "Interaktionsplattform",
+      "frontPage": "Enkäter"
+    },
+    "errorFetchingSurveys": "Ett fel uppstod vid hämtning av enkäter. Försök igen senare.",
+    "editSurvey": "Redigera enkät",
+    "publishNow": "Publicera nu",
+    "confirmPublish": "Vill du verkligen publicera enkäten?",
+    "publishSuccessful": "Enkäten har publicerats!",
+    "publishFailed": "Det uppstod ett fel vid publiceringen av enkäten. Försök igen senare.",
+    "unpublish": "Avsluta enkät",
+    "confirmUnpublish": "Vill du verkligen avsluta enkäten?",
+    "unpublishSuccessful": "Enkäten har avslutats!",
+    "unpublishFailed": "Det uppstod ett fel vid avslutningen av enkäten. Försök igen senare.",
+    "createNewSurvey": "Ny enkät",
+    "errorCreatingNewSurvey": "Det uppstod ett fel vid skapandet av en ny enkät. Försök igen senare.",
+    "untitledSurvey": "Namnlös enkät",
+    "author": "Författare/kontaktperson",
+    "url": "Enkätens adress",
+    "open": "Öppen",
+    "openFrom": "Öppen från",
+    "published": "Publicerad",
+    "notPublished": "Ej publicerad",
+    "showAuthoredOnly": "Visa bara mina enkäter",
+    "showPublishedOnly": "Visa bara öppna enkäter",
+    "copySurvey": "Kopiera",
+    "answers": "Svar"
+  },
+  "SurveyPage": {
+    "errorSurveyNotFound": "Enkäten kunde inte hittas eller är inte öppen för tillfället. Kontrollera adressen och försök igen.",
+    "errorFetchingSurvey": "Det uppstod ett fel vid hämtning av enkäten. Försök igen senare.",
+    "startSurveyLink": "Börja enkäten här",
+    "continueSurveyLink": "Fortsätt enkäten här",
+    "loadUnfinishedSuccessful": "Sparade svar har laddats framgångsrikt! Du kan fortsätta fylla i enkäten.",
+    "errorTokenNotFound": "Inga sparade svar hittades för den angivna adressen. Kontrollera adressen eller börja fylla i enkäten på nytt.",
+    "errorLoadingUnfinished": "Det uppstod ett fel vid inläsningen av sparade svar. Försök igen senare."
+  },
+  "UnavailableSurvey": {
+    "surveyNotPublished": "Tack för ditt intresse! Enkäten är för närvarande inte öppen för svar."
+  },
+  "NotFoundPage": {
+    "pageNotFound": "Enkäten kunde inte hittas. Kontrollera adressen och försök igen."
+  },
+  "CopyToClipboard": {
+    "tooltip": "Kopiera till urklipp",
+    "successful": "Texten har kopierats till urklipp!",
+    "fail": "Det uppstod ett fel vid kopieringen till urklipp. Försök igen senare."
+  },
+  "SurveyStepper": {
+    "followUpSections": "Uppföljningsfrågor:",
+    "next": "Nästa",
+    "previous": "Föregående",
+    "submit": "Skicka",
+    "conditionalPage": "Villkorlig sida",
+    "conditionalPageNotActivated": "gäller inte för dig",
+    "errorSubmittingSurvey": "Det uppstod ett fel vid insändningen av enkäten. Försök igen senare.",
+    "openMap": "Öppna karta",
+    "closeMap": "Stäng karta",
+    "openImage": "Öppna bild",
+    "closeImage": "Stäng bild",
+    "unfinishedAnswers": "Besvara alla obligatoriska frågor.",
+    "unfinishedAnswersInfo": "Följande frågor är obesvarade:",
+    "saveAsUnfinished": "Spara som obesvarad",
+    "step": "Steg",
+    "outOf": "/",
+    "completedStep": "Slutfört steg",
+    "futureStep": "Kommande steg"
+  },
+  "SaveAsUnfinishedDialog": {
+    "description": "Du kan spara enkäten som obesvarad genom att ange din e-postadress. En länk för att återuppta enkäten kommer att skickas till din e-postadress när enkäten är öppen.",
+    "disclaimer": "Din e-postadress kommer inte att sparas eller användas för andra ändamål. Dina svar kommer att räknas först när du har svarat på alla frågor och skickat in dina slutliga svar.",
+    "email": "E-postadress",
+    "saveSuccessful": "Dina svar har sparats! En länk för att återuppta enkäten kommer snart att skickas till din e-postadress. Du kan nu stänga webbläsaren. Om du använder en offentlig dator, se till att rensa webbläsarens cache.",
+    "errorSaving": "Det uppstod ett fel vid sparandet av dina svar. Försök igen senare."
+  },
+  "SurveyQuestion": {
+    "errorFieldIsRequired": "Svaret är obligatoriskt.",
+    "accessibilityTooltip": "Vänligen svara på frågan:",
+    "answerLimitsMinMax": "Välj minst {min} och högst {max} alternativ.",
+    "answerLimitsMin": "Välj minst {min} alternativ.",
+    "answerLimitsMax": "Välj högst {max} alternativ.",
+    "customAnswer": "Annan (specifiera nedan)",
+    "customAnswerField": "Specificera ditt svar här.",
+    "charactersRemaining": "{x} tecken kvar.",
+    "showInfo": "Visa mer information",
+    "info": "Information"
+  },
+  "MapQuestion": {
+    "mapSelectionButtons": "Kartvalknappar",
+    "selectionTypes": {
+      "point": "Punktmarkering",
+      "line": "Linjemarkering",
+      "area": "Områdesmarkering"
+    },
+    "markingsMade": "markeringar gjorda.",
+    "subQuestionDialog": "Underfrågevy",
+    "selectionHelperText": {
+      "point": "Placera en punkt på rätt plats genom att klicka på kartan där du vill ha punkten.",
+      "line": "Börja rita genom att klicka på startpunkten. Fortsätt att rita genom att klicka på kartan igen, avsluta ritningen genom att klicka på den sista punkten igen.",
+      "area": "Börja rita genom att klicka på startpunkten. Fortsätt att rita genom att klicka på kartan igen, avsluta ritningen genom att klicka på den sista punkten igen."
+    },
+    "clearAnswers": "Rensa alla kartssvar",
+    "confirmClearAnswers": "Vill du verkligen rensa alla dina svar för den här frågan?",
+    "removeAnswer": "Ta bort svar",
+    "confirmRemoveAnswer": "Vill du verkligen ta bort detta kartssvar?"
+  },
+  "SurveyMap": {
+    "browsingInstructions": "Navigera i kartvyn med piltangenterna. Zooma in och ut med plustecknet och minustecknet.",
+    "editGeometries": "Redigera dina kartmarkeringar",
+    "finishEditingGeometries": "Avsluta redigeringen av kartmarkeringar",
+    "iFrameTitle": "Kartvy"
+  },
+  "MatrixQuestion": {
+    "emptyAnswer": "Jag vet inte",
+    "subject": "Ämne",
+    "response": "Svar"
+  },
+  "MultiMatrixQuestion": {
+    "answerClass": "Svarsalternativ",
+    "unansweredRow": "För få valda svar på rad {x}.",
+    "unansweredRows": "För få valda svar på raderna {x}.",
+    "and": "och",
+    "answerLimitsMinMax": "Välj minst {min} och högst {max} alternativ på varje rad.",
+    "answerLimitsMin": "Välj minst {min} alternativ på varje rad.",
+    "answerLimitsMax": "Välj högst {max} alternativ på varje rad",
+    "selected": "valda",
+    "SR": {
+      "isRequired": "Välj minst ett alternativ från varje rad.",
+      "mustSelectMore": "Välj ytterligare {x} alternativ från den här raden.",
+      "maySelectMore": "Du kan välja ytterligare {x} alternativ från den här raden.",
+      "maxSelected": "Du har valt det maximala antalet alternativ från den här raden",
+      "IDK": "Valet av detta alternativ ersätter alla andra val på raden.",
+      "replacingIDK": "Valet ersätter det nuvarande \"Jag vet inte\"-alternativet."
+    }
+  },
+  "ImageSection": {
+    "openInNewTab": "Öppna bilden i en ny flik"
+  },
+  "SortingQuestion": {
+    "empty": "Tom",
+    "rankForOption": "Rangordningsnummer för alternativet: {option}",
+    "sortedOptions": "Alternativen är nu sorterade",
+    "orderComplete": "Alternativen är nu i rätt ordning.",
+    "confirmationGuide": "Välj bekräftelsemarkeringen för att avsluta.",
+    "inPosition": "På position ",
+    "announcement": {
+      "focus": "Flytta detta alternativ genom att trycka på mellanslagstangenten. Aktivera kanske fokusläget först.",
+      "grab": "Du har greppat alternativet på position {position}. Flytta uppåt eller nedåt med piltangenterna.",
+      "move": "Nu på position {position} av {length}. Placera här genom att trycka på mellanslagstangenten.",
+      "drop": "Placerad på position {position}.",
+      "droppedInPlace": "Placerad på ursprunglig position {position}"
+    }
+  },
+  "DocumentSection": {
+    "attachment": "Bilaga"
+  },
+  "DeleteSurveyDialog": {
+    "dialogTitle": "Ta bort enkät",
+    "surveyName": "enkätens namn",
+    "surveyAuthor": "enkätens författare/kontaktperson",
+    "warningMessage": "OBS! När enkäten tas bort, tas även alla svar på enkäten bort. Svaren tas bort permanent och kan inte återställas efter enkätens borttagning.",
+    "activateDeleting": "För att aktivera borttagningen av enkäten, skriv enkätens namn nedan",
+    "surveyToBeDeleted": "enkätens namn som ska tas bort"
+  },
+  "GroupedCheckBoxQuestion": {
+    "helperText": "Välj objekt från de följande grupperna.",
+    "helperTextMin": "Välj sammanlagt minst {min} alternativ.",
+    "helperTextMax": "Välj sammanlagt högst {max} alternativ.",
+    "helperTextMinMax": "Välj sammanlagt minst {min} och högst {max} alternativ.",
+    "indicatorText": "Du har valt {numbers} alternativ.",
+    "indicatorTextMaxReached": "Du har valt alla {numbers} alternativ.",
+    "optionsSelectedInGroup": "{number} alternativ valda."
+  },
+  "SubmissionInfoDialog": {
+    "title": "Skicka svar",
+    "text": "Om du vill ha en kopia av ditt svar, ange din e-postadress nedan.",
+    "email": "E-post (valfritt)"
+  },
+  "AnswersList": {
+    "answers": "Svar",
+    "selectQuestion": "Välj först en fråga",
+    "noAnswers": "Det finns inga svar på den valda frågan.",
+    "respondent": "Respondent {x}",
+    "mapMarkingIndex": "Kartmarkering {x}",
+    "hideOldResponses": "Dölj äldre kommentarer...",
+    "showOldResponses": "Visa {x} äldre kommentarer..."
+  },
+  "AppBarUserMenu": {
+    "label": "Användarmeny",
+    "logout": "Logga ut",
+    "updateInstructions": "Uppdatera instruktioner"
+  },
+  "InstructionsDialog": {
+    "fetchingError": "Fel vid hämtning av aktuella instruktioner",
+    "currentInstructions": "Aktuella instruktioner",
+    "uploadNewInstructions": "Ladda upp nya instruktioner",
+    "wrongFileFormat": "Filen ska vara i pdf-format",
+    "fileUploadError": "Fel vid uppladdning av filen",
+    "fileSizeLimitError": "Filstorleken får inte vara över {x} MB",
+    "submit": "Skicka",
+    "cancel": "Avbryt"
+  },
+  "MapInfoBox": {
+    "answer": "Svar"
+  },
+  "TestSurveyFrame": {
+    "text": "Det här är ett testenkät. Svaren sparas inte och inget e-postmeddelande skickas."
+  },
+  "LanguageMenu": {
+    "languageControl": "Language / Språk",
+    "changeLanguage": "Byt språk för tjänsten",
+    "fi": "Suomi",
+    "en": "English",
+    "se": "Svenska"
+  },
+  "SurveyLanguageMenu": {
+    "languageControl": "Language / Språk",
+    "changeSurveyLanguage": "Byt språk för enkäten",
+    "surveyLanguage": "Enkätens språk"
+  },
+  "EditSurveyTranslations": {
+    "enableLocalisation": "Tillåt att enkäten publiceras på flera språk",
+    "provideTranslations": "Om enkäten publiceras på flera språk, måste all text i enkäten översättas till dessa språk. Ange översättningar för varje saknad post i listan nedan.",
+    "surveyInformation": "Information om enkäten",
+    "copyTextFields": "Kopiera översättningsbara fält till Urklipp",
+    "supportedLanguages": "Språk som stöds i enkäten",
+    "surveyPages": "Enkätens sidor",
+    "surveyTitle": "Enkätens rubrik",
+    "surveySubtitle": "Enkätens underrubrik",
+    "fi": "Finska",
+    "en": "Engelska",
+    "se": "Svenska",
+    "page": "sida",
+    "missingTranslation": "Översättning saknas",
+    "optionInfo": "Ytterligare information om alternativet",
+    "emailInfo": "E-post",
+    "thanksPage": "Tack-sida"
+  },
+  "SurveySubmissionsPage": {
+    "attachments": "Bilagor",
+    "noAttachments": "Inga bilagor",
+    "summary": "Sammanfattning",
+    "toHomePage": "Till startsidan",
+    "answerCount": "Totalt antal svar: {x} st",
+    "respondentCount": "Totalt antal respondenter {x} st",
+    "pageNumber": "Sida {x}:",
+    "dataChart": {
+      "tooltipWeekLabel": "Vecka {x}, År",
+      "tooltipTotal": "Totalt antal svar",
+      "tooltipCurrent": "Antal svar",
+      "xAxisLabel": {
+        "byDay": "Dag",
+        "byWeek": "Vecka"
+      },
+      "yAxisTotalLabel": "Svarssammanställning",
+      "yAxisLabel": "Svar"
+    }
+  },
+  "navigation": {
+    "next": "Nästa",
+    "back": "Tillbaka"
+  },
+  "commands": {
+    "finish": "Klart",
+    "cancel": "Avbryt",
+    "select": "Välj",
+    "remove": "Ta bort",
+    "save": "Spara",
+    "discard": "Släng ändringar",
+    "edit": "Redigera",
+    "copy": "Kopiera",
+    "close": "Stäng"
+  },
+  "options": {
+    "yes": "Ja",
+    "no": "Nej",
+    "ok": "OK"
+  },
+  "FooterLinks": {
+    "accessibility": "Tillgänglighet",
+    "privacyStatement": "Integritetspolicy"
+  },
+  "adminInstructions": "Öppna användarmanual"
+}

@@ -25,7 +25,7 @@ const useStyles = makeStyles({
   langContainer: {
     display: 'flex',
     flexDirection: 'column',
-    flexGrow: 1,
+    flex: 1,
     marginLeft: '0.2rem',
   },
   pageContainer: {
@@ -49,7 +49,7 @@ const useStyles = makeStyles({
 });
 
 function surveyToTranslationString(survey: Survey) {
-  const columnHeaders = 'Label \t fi \t en \n';
+  const columnHeaders = 'Label \t fi \t en \t se \n';
   const surveyStrings: string[] = [];
 
   function isPartialLocalizedText(
@@ -58,7 +58,7 @@ function surveyToTranslationString(survey: Survey) {
     return (
       typeof value === 'object' &&
       value !== null &&
-      ('fi' in value || 'en' in value)
+      ('fi' in value || 'en' in value || 'se' in value)
     );
   }
 
@@ -70,8 +70,9 @@ function surveyToTranslationString(survey: Survey) {
     label: string,
     valueFi: string,
     valueEn: string,
+    valueSe: string,
   ): string {
-    return `${label} \t ${valueFi ?? ''} \t ${valueEn ?? ''} \n`;
+    return `${label} \t ${valueFi ?? ''} \t ${valueEn ?? ''} \t ${valueSe ?? ''}\n`;
   }
 
   // Uses recursion to loop through the entire Survey object and to add all values of objects of type LocalizedText to the clipboard
@@ -86,7 +87,7 @@ function surveyToTranslationString(survey: Survey) {
 
     if (isPartialLocalizedText(obj)) {
       surveyStrings.push(
-        getRowString(`${label}`, obj?.fi ?? '', obj?.en ?? ''),
+        getRowString(`${label}`, obj?.fi ?? '', obj?.en ?? '', obj?.se ?? ''),
       );
       return;
     }
@@ -102,7 +103,9 @@ function surveyToTranslationString(survey: Survey) {
       } else if (typeof value === 'object' && !isPartialLocalizedText(value)) {
         addRowString(value, `${label}.${key}[${index}]`, index);
       } else if (isPartialLocalizedText(value)) {
-        surveyStrings.push(getRowString(`${label}.${key}`, value.fi, value.en));
+        surveyStrings.push(
+          getRowString(`${label}.${key}`, value.fi, value.en, value.se),
+        );
       }
     });
   }

@@ -20,6 +20,7 @@ import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import fiLocale from 'date-fns/locale/fi';
 import enLocale from 'date-fns/locale/en-GB';
+import svLocale from 'date-fns/locale/sv';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import CopyToClipboard from '../CopyToClipboard';
@@ -94,6 +95,8 @@ export default function EditSurveyInfo() {
         return fiLocale;
       case 'en':
         return enLocale;
+      case 'se':
+        return svLocale;
       default:
         return assertNever(language);
     }

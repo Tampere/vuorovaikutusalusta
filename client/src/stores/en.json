@@ -561,7 +561,8 @@
     "languageControl": "Language / Kieli",
     "changeLanguage": "Change service language",
     "fi": "Suomi",
-    "en": "English"
+    "en": "English",
+    "se": "Svenska"
   },
   "SurveyLanguageMenu": {
     "languageControl": "Language / Kieli",
@@ -577,8 +578,9 @@
     "surveyPages": "Survey pages",
     "surveyTitle": "Survey title",
     "surveySubtitle": "Survey subtitle",
-    "fi": "finnish",
-    "en": "english",
+    "fi": "Finnish",
+    "en": "English",
+    "se": "Swedish",
     "page": "page",
     "missingTranslation": "Missing translation",
     "optionInfo": "Option info",
