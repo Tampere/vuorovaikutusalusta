@@ -21,7 +21,7 @@ function dbSurveyThemeToSurveyTheme(dbSurveyTheme: DbSurveyTheme): SurveyTheme {
  */
 export async function getAllSurveyThemes() {
   const rows = await getDb().manyOrNone<DbSurveyTheme>(
-    `SELECT * FROM application.theme ORDER BY idx ASC`
+    `SELECT * FROM application.theme ORDER BY idx ASC`,
   );
   return rows.map(dbSurveyThemeToSurveyTheme);
 }

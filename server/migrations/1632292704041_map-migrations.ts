@@ -6,7 +6,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.sql(`ALTER TABLE data.survey ADD COLUMN map_url varchar(255)`);
   pgm.sql(`ALTER TABLE data.survey_page ADD COLUMN map_layers JSON`);
   pgm.sql(
-    `ALTER TABLE data.answer_entry ADD COLUMN value_geometry public.geometry`
+    `ALTER TABLE data.answer_entry ADD COLUMN value_geometry public.geometry`,
   );
   pgm.sql(`ALTER TABLE data.page_section ADD COLUMN parent_section INT`);
 }

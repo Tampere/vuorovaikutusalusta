@@ -6,7 +6,8 @@ describe('ApplicationLogic', function () {
   it('should render without crashing', function () {
     const component = mount(
       <TranslationProvider>
-      </TranslationProvider>
+        <p>children</p>
+      </TranslationProvider>,
     );
     component.unmount();
   });

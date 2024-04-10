@@ -39,7 +39,6 @@ interface State {
 
   defaultView: GeoJSON.FeatureCollection;
   oskariVersion: number;
-
 }
 
 type Action =
@@ -83,14 +82,12 @@ type Action =
       value: boolean;
     }
   | {
-
       type: 'SET_DEFAULT_VIEW';
       value: GeoJSON.FeatureCollection;
     }
   | {
       type: 'SET_OSKARI_VERSION';
       value: number;
-
     };
 
 type Context = [State, React.Dispatch<Action>];
@@ -117,7 +114,6 @@ const stateDefaults: State = {
 
   defaultView: null,
   oskariVersion: null,
-
 };
 
 /**
@@ -172,8 +168,8 @@ function getFeatureStyle(
         style.strokeStyle === 'dashed'
           ? [30, 10]
           : style.strokeStyle === 'dotted'
-          ? [0, 14]
-          : null,
+            ? [0, 14]
+            : null,
       lineCap: style.strokeStyle === 'dashed' ? 'butt' : 'round',
     },
     fill: {
@@ -504,10 +500,10 @@ export function useSurveyMap() {
         type === 'point'
           ? 'Point'
           : type === 'line'
-          ? 'LineString'
-          : type === 'area'
-          ? 'Polygon'
-          : null,
+            ? 'LineString'
+            : type === 'area'
+              ? 'Polygon'
+              : null,
         {
           allowMultipleDrawing: false,
           style: {
@@ -798,7 +794,7 @@ function reducer(state: State, action: Action): State {
       return {
         ...state,
         defaultView: action.value,
-      }
+      };
     case 'SET_OSKARI_VERSION':
       return {
         ...state,

@@ -331,14 +331,14 @@ export function useSurveyAnswers() {
           )
             ? true
             : conditionForSection.greaterThan.some(
-                (conditionValue) => answerEntry.value >= conditionValue,
-              )
-            ? true
-            : conditionForSection.lessThan.some(
-                (conditionValue) => answerEntry.value <= conditionValue,
-              )
-            ? true
-            : false;
+                  (conditionValue) => answerEntry.value >= conditionValue,
+                )
+              ? true
+              : conditionForSection.lessThan.some(
+                    (conditionValue) => answerEntry.value <= conditionValue,
+                  )
+                ? true
+                : false;
 
         default:
           return false;
@@ -401,14 +401,14 @@ export function useSurveyAnswers() {
             )
               ? true
               : section.conditions.greaterThan.some(
-                  (conditionValue) => value >= conditionValue,
-                )
-              ? true
-              : section.conditions.lessThan.some(
-                  (conditionValue) => value <= conditionValue,
-                )
-              ? true
-              : false;
+                    (conditionValue) => value >= conditionValue,
+                  )
+                ? true
+                : section.conditions.lessThan.some(
+                      (conditionValue) => value <= conditionValue,
+                    )
+                  ? true
+                  : false;
           })
           .map((s) => s.id);
       default:

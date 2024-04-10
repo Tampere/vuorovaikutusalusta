@@ -49,6 +49,6 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 
 export async function down(pgm: MigrationBuilder): Promise<void> {
   pgm.sql(
-    `DELETE FROM application.theme WHERE name IN ('Teema 1', 'Teema 2', 'Teema 3');`
+    `DELETE FROM application.theme WHERE name IN ('Teema 1', 'Teema 2', 'Teema 3');`,
   );
 }

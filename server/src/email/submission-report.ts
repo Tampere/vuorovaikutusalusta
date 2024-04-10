@@ -38,7 +38,7 @@ function getAttachments(answerEntries: AnswerEntry[]) {
             ({
               filename: file.fileName,
               content: fileStringToBuffer(file.fileString),
-            } as Attachment),
+            }) as Attachment,
         ),
       ];
     }, [] as Attachment[]);

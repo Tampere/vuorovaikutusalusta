@@ -61,7 +61,7 @@ export default function SaveAsUnfinishedDialog({
             entries: answers,
             language,
           },
-        }
+        },
       );
       showToast({
         message: tr.SaveAsUnfinishedDialog.saveSuccessful,
@@ -86,11 +86,11 @@ export default function SaveAsUnfinishedDialog({
         setEmailDirty(false);
         onCancel();
       }}
-      aria-describedby='save-dialog-content'
+      aria-describedby="save-dialog-content"
     >
       <DialogTitle>{tr.SurveyStepper.saveAsUnfinished}</DialogTitle>
       <DialogContent>
-        <div id='save-dialog-content'>
+        <div id="save-dialog-content">
           <Typography variant="body1" className={classes.paragraph}>
             {tr.SaveAsUnfinishedDialog.description}
           </Typography>
@@ -103,7 +103,7 @@ export default function SaveAsUnfinishedDialog({
           aria-label={tr.SaveAsUnfinishedDialog.email}
           label={tr.SaveAsUnfinishedDialog.email}
           required
-          name='email'
+          name="email"
           error={emailDirty && !email.length}
           value={email}
           inputProps={{ type: 'email' }}
@@ -117,7 +117,7 @@ export default function SaveAsUnfinishedDialog({
           sx={{
             '& .MuiOutlinedInput-root.Mui-focused': {
               outlineOffset: '.5em', // Outline obstructs label otherwise
-            }
+            },
           }}
         />
       </DialogContent>
@@ -132,7 +132,7 @@ export default function SaveAsUnfinishedDialog({
           {tr.commands.cancel}
         </Button>
         <Button
-          variant='contained'
+          variant="contained"
           onClick={handleSave}
           disabled={loading || !email.length}
         >

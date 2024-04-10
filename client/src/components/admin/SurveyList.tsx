@@ -62,7 +62,7 @@ export default function SurveyList() {
       abortController?.abort();
     };
   }, [showAuthoredOnly, showPublishedOnly]);
-  
+
   return (
     <div className={classes.root}>
       <div className={classes.actions}>

@@ -17,7 +17,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
       ALTER TABLE data.files ADD CONSTRAINT pk_files PRIMARY KEY (file_path, file_name);
       ALTER TABLE data.files ADD CONSTRAINT fk_file_survey FOREIGN KEY (survey_id) REFERENCES data.survey(id) ON DELETE CASCADE;
       ALTER TABLE data.files ADD CONSTRAINT fk_file_section FOREIGN KEY (section_id) REFERENCES data.page_section(id) ON DELETE CASCADE;
-    `
+    `,
   );
 }
 
@@ -38,6 +38,6 @@ export async function down(pgm: MigrationBuilder): Promise<void> {
       ALTER TABLE data.files RENAME COLUMN file TO image;
       ALTER TABLE data.files DROP COLUMN details;
       ALTER TABLE data.files RENAME TO images;
-  `
+  `,
   );
 }

@@ -103,16 +103,16 @@ export function getGeoJSONColumn(
       return !value
         ? 'NULL'
         : value.properties?.bufferRadius != null
-        ? // If geometry provided with buffer radius, add ST_Buffer
-          pgp.as.format(
-            'public.ST_Buffer(public.ST_Transform(public.ST_SetSRID(public.ST_GeomFromGeoJSON($1), $2), $3), $4)',
-            [value, inputSRID, defaultSrid, value.properties.bufferRadius],
-          )
-        : pgp.as.format(
-            // Transform provided geometry to default SRID
-            'public.ST_Transform(public.ST_SetSRID(public.ST_GeomFromGeoJSON($1), $2), $3)',
-            [value, inputSRID, defaultSrid],
-          );
+          ? // If geometry provided with buffer radius, add ST_Buffer
+            pgp.as.format(
+              'public.ST_Buffer(public.ST_Transform(public.ST_SetSRID(public.ST_GeomFromGeoJSON($1), $2), $3), $4)',
+              [value, inputSRID, defaultSrid, value.properties.bufferRadius],
+            )
+          : pgp.as.format(
+              // Transform provided geometry to default SRID
+              'public.ST_Transform(public.ST_SetSRID(public.ST_GeomFromGeoJSON($1), $2), $3)',
+              [value, inputSRID, defaultSrid],
+            );
     },
   };
 }
