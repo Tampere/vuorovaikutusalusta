@@ -15,16 +15,17 @@ router.get(
       connection.done();
     } catch (error) {
       logger.error(`Could not connect to database: ${error}`);
-      return res.status(500).json({
+      res.status(500).json({
         status: 'error',
       });
+      return;
     }
 
     // Everything fine
     res.status(200).json({
       status: 'OK',
     });
-  })
+  }),
 );
 
 export default router;

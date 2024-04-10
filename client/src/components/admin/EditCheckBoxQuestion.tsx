@@ -128,7 +128,7 @@ export default function EditCheckBoxQuestion({
             value={section.answerLimits?.min ?? ''}
             onChange={(event) => {
               handleAnswerLimitsMinChange(
-                !event.target.value.length ? null : Number(event.target.value)
+                !event.target.value.length ? null : Number(event.target.value),
               );
             }}
           />
@@ -142,7 +142,7 @@ export default function EditCheckBoxQuestion({
             value={section.answerLimits?.max ?? ''}
             onChange={(event) => {
               handleAnswerLimitsMaxChange(
-                !event.target.value.length ? null : Number(event.target.value)
+                !event.target.value.length ? null : Number(event.target.value),
               );
             }}
           />

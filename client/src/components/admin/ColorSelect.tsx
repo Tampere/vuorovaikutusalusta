@@ -33,7 +33,7 @@ export default function ColorSelect({ label, value, onChange }: Props) {
       { name: tr.ColorSelect.colors.berryRed, value: '#ad3963' },
       { name: tr.ColorSelect.colors.warmGreen, value: '#418155' },
     ],
-    [tr]
+    [tr],
   );
 
   return (

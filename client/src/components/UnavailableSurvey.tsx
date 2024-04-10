@@ -1,4 +1,4 @@
-import { Box, Link, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React from 'react';
@@ -29,22 +29,9 @@ export function UnavailableSurvey() {
         justifyContent: 'center',
       }}
     >
-      <img
-        style={{ height: '125px', width: '351px' }}
-        src={`api/feature-styles/icons/logo`}
-        alt={tr.IconAltTexts.logoAltText}
-      />
-      <br />
       <Typography variant="body1" classes={{ body1: classes.infoText }}>
         {tr.UnavailableSurvey.surveyNotPublished}
       </Typography>
-      <Typography variant="body1" classes={{ body1: classes.infoText }}>
-        {tr.UnavailableSurvey.treTopicalInfo}
-      </Typography>
-      <br />
-      <Link href="https://tampere.fi" className={classes.infoText}>
-        {tr.UnavailableSurvey.tre}
-      </Link>
     </Box>
   );
 }

@@ -19,7 +19,7 @@ function dbAdminFileToAdminFile(dbFile: DbAdminFile): AdminFile {
 
 export async function getAdminInstructions() {
   const row = await getDb().oneOrNone<DbAdminFile>(
-    `SELECT name, mime_type, data FROM application.files WHERE description='admin_instructions'`
+    `SELECT name, mime_type, data FROM application.files WHERE description='admin_instructions'`,
   );
   if (!row) {
     throw new NotFoundError(`Admin instructions not found`);
@@ -30,7 +30,7 @@ export async function getAdminInstructions() {
 export async function storeAdminInstructions(
   name: string,
   mimeType: MimeType,
-  data: Buffer
+  data: Buffer,
 ) {
   const row = await getDb().oneOrNone(
     `INSERT INTO application.files AS af (name, mime_type, description, data) 
@@ -40,7 +40,7 @@ export async function storeAdminInstructions(
           SET name = $(name), mime_type = $(mimeType), data = $(data) 
           WHERE af.description = 'admin_instructions' 
           RETURNING name`,
-    { name, mimeType, data }
+    { name, mimeType, data },
   );
 
   if (!row) {

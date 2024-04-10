@@ -248,21 +248,27 @@
     "attributions": "Tekijänoikeustiedot",
     "noBackgroundImage": "Ei taustakuvaa",
     "noThanksPageImage": "Ei Kiitos-sivun kuvaa",
+    "noTopMarginImage": "Ei ylämarginaalin kuvaa",
+    "noBottomMarginImage": "Ei alamarginaalin kuvaa",
     "noImage": "Ei kuvaa",
     "surveyImage": "Kyselyn taustakuva",
     "thanksPageImage": "Kiitos-sivun kuva",
+    "topMarginImage": "Ylämarginaalin kuva",
+    "bottomMarginImage": "Alamarginaalin kuva",
     "image": "Kuva",
     "selectImage": "Valitse taustakuva",
     "addNewImage": "Lisää uusi kuva",
     "files": "Tiedosto",
     "imageSizeExceeded": "Kuvan maksimikoko on {x} Mt",
+    "imageTypeError": "Kuvan tulee olla .svg -muodossa",
     "imageUploadError": "Virhe tallennettaessa kuvaa",
     "imageDownloadError": "Virhe ladattaessa kuvaa",
     "multipleImagesDownloadError": "Kuvien lataaminen epäonnistui",
     "imageDeleteError": "Virhe poistettaessa kuvaa"
   },
   "DropZone": {
-    "dropFiles": "Valitse tiedosto klikkaamalla tai pudottamalla se tähän (enint. {x} Mt)."
+    "dropFiles": "Valitse tiedosto klikkaamalla tai pudottamalla se tähän (enint. {x} Mt).",
+    "dropFilesSvg": "Valitse .svg -tiedosto klikkaamalla tai pudottamalla se tähän (enint. {x} Mt)."
   },
   "EditTextSection": {
     "text": "Teksti",
@@ -381,9 +387,7 @@
     "errorLoadingUnfinished": "Tallennettujen vastausten lataamisessa tapahtui virhe. Yritä myöhemmin uudestaan."
   },
   "UnavailableSurvey": {
-    "surveyNotPublished": "Kiitos mielenkiinnostasi! Kysely ei ole tällä hetkellä avoinna eikä siihen voi vastata.",
-    "treTopicalInfo": "Tampereen kaupungin ajankohtaisiin asioihin pääset tutustumaan alla olevasta linkistä.",
-    "tre": "Tampereen kaupunki"
+    "surveyNotPublished": "Kiitos mielenkiinnostasi! Kysely ei ole tällä hetkellä avoinna eikä siihen voi vastata."
   },
   "NotFoundPage": {
     "pageNotFound": "Kyselyä ei löytynyt. Tarkista osoite ja yritä uudelleen"
@@ -625,9 +629,6 @@
     "accessibility": "Saavutettavuusseloste",
     "privacyStatement": "Tietosuojaseloste"
   },
-  "IconAltTexts": {
-    "bannerAltText": "Tampereen vaakunalogo",
-    "logoAltText": "Tampere Finland -logo"
-  },
+
   "adminInstructions": "Avaa käyttöohje"
 }

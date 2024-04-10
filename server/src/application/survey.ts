@@ -67,6 +67,10 @@ interface DBSurvey {
   thanks_page_image_path: string[];
   background_image_name: string;
   background_image_path: string[];
+  top_margin_image_name: string;
+  top_margin_image_path: string[];
+  bottom_margin_image_name: string;
+  bottom_margin_image_path: string[];
   section_title_color: string;
   email_enabled: boolean;
   email_auto_send_to: string[];
@@ -891,7 +895,11 @@ export async function updateSurvey(survey: Survey) {
         email_info = $24::json,
         allow_saving_unfinished = $25,
         localisation_enabled = $26,
-        display_privacy_statement = $27
+        display_privacy_statement = $27,
+        top_margin_image_name = $28,
+        top_margin_image_path = $29,
+        bottom_margin_image_name = $30,
+        bottom_margin_image_path = $31
       WHERE id = $1 RETURNING *`,
       [
         survey.id,
@@ -921,6 +929,10 @@ export async function updateSurvey(survey: Survey) {
         survey.allowSavingUnfinished,
         survey.localisationEnabled,
         survey.displayPrivacyStatement,
+        survey.marginImages.top.imageName ?? null,
+        survey.marginImages.top.imagePath ?? null,
+        survey.marginImages.bottom.imageName ?? null,
+        survey.marginImages.bottom.imagePath ?? null,
       ],
     )
     .catch((error) => {
@@ -1195,6 +1207,16 @@ function dbSurveyToSurvey(
     localisationEnabled: dbSurvey.localisation_enabled,
     // Single survey row won't contain pages - they get aggregated from a join query
     pages: [],
+    marginImages: {
+      top: {
+        imagePath: dbSurvey.top_margin_image_path,
+        imageName: dbSurvey.top_margin_image_name,
+      },
+      bottom: {
+        imagePath: dbSurvey.bottom_margin_image_path,
+        imageName: dbSurvey.bottom_margin_image_name,
+      },
+    },
   };
   return {
     ...survey,

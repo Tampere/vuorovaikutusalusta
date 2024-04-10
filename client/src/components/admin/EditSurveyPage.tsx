@@ -31,7 +31,6 @@ import { EditSurveyPageConditions } from './EditSurveyPageConditions';
 import FileUpload from './FileUpload';
 import SurveySections from './SurveySections';
 
-
 const useStyles = makeStyles({
   button: {
     width: 'fit-content',

@@ -30,6 +30,7 @@ import ColorSelect from './ColorSelect';
 import SurveyImageList from './SurveyImageList';
 import ThemeSelect from './ThemeSelect';
 import { assertNever } from '@src/utils/typeCheck';
+import { SurveyMarginImageList } from './SurveyImageListWrapper';
 
 const useStyles = makeStyles({
   dateTimePicker: {
@@ -218,6 +219,8 @@ export default function EditSurveyInfo() {
           </div>
         )}
         <SurveyImageList imageType={'backgroundImage'} />
+        <SurveyMarginImageList />
+
         <Box
           sx={{
             width: '206px',

@@ -43,8 +43,8 @@ export async function sendMail(emailOptions: EmailOptions) {
   if (!config.enabled) {
     logger.debug(
       `Email send disabled: tried to send email with options: ${JSON.stringify(
-        emailOptions
-      )}`
+        emailOptions,
+      )}`,
     );
     return;
   }

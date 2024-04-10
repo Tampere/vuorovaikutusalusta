@@ -610,8 +610,8 @@ function dbAnswerEntriesToAnswerEntries(
               row.value_geometry.type === 'Point'
                 ? 'point'
                 : row.value_geometry.type === 'LineString'
-                ? 'line'
-                : 'area',
+                  ? 'line'
+                  : 'area',
             geometry: {
               type: 'Feature',
               geometry: row.value_geometry,

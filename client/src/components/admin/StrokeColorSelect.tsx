@@ -35,7 +35,7 @@ export default function StrokeColorSelect({ value, onChange }: Props) {
       setLoading(true);
       try {
         const colors = await request<MapStrokeColor[]>(
-          '/api/feature-styles/stroke-colors'
+          '/api/feature-styles/stroke-colors',
         );
         setColors(colors);
       } catch (error) {

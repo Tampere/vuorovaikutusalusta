@@ -55,21 +55,29 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 interface Props {
   imageType: ImageType;
+  images?: File[];
+  setImages?: (images: File[]) => void;
 }
 
 const MEGAS = 10;
 const MAX_FILE_SIZE = MEGAS * 1000 * 1000; // ten megabytes
 
-export default function SurveyImageList({ imageType }: Props) {
+export default function SurveyImageList({ imageType, ...props }: Props) {
   const classes = useStyles();
   const { tr } = useTranslations();
   const { editSurvey, activeSurvey } = useSurvey();
   const { showToast } = useToasts();
-  const [images, setImages] = useState<File[]>([]);
+  const [images, setImages] = useState<File[]>(props.images ?? []);
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
   const [imageAttributions, setImageAttributions] = useState<string>('');
   const [imageAltText, setImageAltText] = useState<string | null>(null);
   const [activeImage, setActiveImage] = useState<File | null>(null);
+  const limitToSvg = ['topMarginImage', 'bottomMarginImage'].includes(
+    imageType,
+  );
+  const activeImageSrc = activeImage
+    ? `data:image/${limitToSvg ? 'svg+xml' : ''};base64,${activeImage.data}`
+    : '';
 
   /** Fetch all images from db during component mount */
   useEffect(() => {
@@ -77,10 +85,20 @@ export default function SurveyImageList({ imageType }: Props) {
   }, []);
 
   useEffect(() => {
+    if (props.images) setImages(props.images);
+  }, [props.images]);
+
+  useEffect(() => {
     setActiveImage(getActiveImage());
   });
 
-  function fileSizeValidator(file) {
+  function fileValidator(file) {
+    if (limitToSvg && file.type !== 'image/svg+xml') {
+      return {
+        code: 'file-type-error',
+        message: tr.SurveyImageList.imageTypeError,
+      };
+    }
     if (file.size > MAX_FILE_SIZE) {
       return {
         code: 'file-size-exceeded',
@@ -89,19 +107,25 @@ export default function SurveyImageList({ imageType }: Props) {
     }
   }
 
+  function getApiFilePath(imageType: ImageType) {
+    switch (imageType) {
+      case 'backgroundImage':
+        return '/api/file/background-images';
+      case 'thanksPageImage':
+        return '/api/file/thanks-page-images';
+      case 'topMarginImage':
+      case 'bottomMarginImage':
+        return '/api/file/margin-images';
+      default:
+        return '/api/file';
+    }
+  }
+
   async function getImages() {
     try {
-      const res = await request<File[]>(
-        `/api/file/${
-          imageType === 'backgroundImage'
-            ? 'background-images'
-            : imageType === 'thanksPageImage'
-            ? 'thanks-page-images'
-            : ''
-        }`,
-      );
+      const res = await request<File[]>(getApiFilePath(imageType));
 
-      setImages(res);
+      props.setImages?.(res) ?? setImages(res);
     } catch (error) {
       showToast({
         severity: 'error',
@@ -133,6 +157,30 @@ export default function SurveyImageList({ imageType }: Props) {
             imagePath: filePath,
           },
         });
+        break;
+      case 'topMarginImage':
+        editSurvey({
+          ...activeSurvey,
+          marginImages: {
+            ...activeSurvey.marginImages,
+            top: {
+              imageName: fileName,
+              imagePath: filePath,
+            },
+          },
+        });
+        break;
+      case 'bottomMarginImage':
+        editSurvey({
+          ...activeSurvey,
+          marginImages: {
+            ...activeSurvey.marginImages,
+            bottom: {
+              imageName: fileName,
+              imagePath: filePath,
+            },
+          },
+        });
     }
   }
 
@@ -142,6 +190,7 @@ export default function SurveyImageList({ imageType }: Props) {
     filePath: string[],
   ) {
     event.stopPropagation();
+
     try {
       await fetch(
         `/api/file${filePath.length > 0 ? '/' : ''}${filePath.join(
@@ -149,6 +198,25 @@ export default function SurveyImageList({ imageType }: Props) {
         )}/${fileName}`,
         { method: 'DELETE' },
       );
+
+      editSurvey({
+        ...activeSurvey,
+        ...(fileName === activeSurvey.backgroundImageName && {
+          backgroundImageName: null,
+        }),
+        ...(fileName === activeSurvey.thanksPage.imageName && {
+          thanksPage: { imageName: null, imagePath: [] },
+        }),
+        marginImages: {
+          ...activeSurvey.marginImages,
+          ...(fileName === activeSurvey.marginImages.top.imageName && {
+            top: { imageName: null, imagePath: [] },
+          }),
+          ...(fileName === activeSurvey.marginImages.bottom.imageName && {
+            bottom: { imageName: null, imagePath: [] },
+          }),
+        },
+      });
     } catch (error) {
       showToast({
         severity: 'error',
@@ -162,7 +230,7 @@ export default function SurveyImageList({ imageType }: Props) {
   const { acceptedFiles, fileRejections, getRootProps, getInputProps } =
     useDropzone({
       maxFiles: 1,
-      validator: fileSizeValidator,
+      validator: fileValidator,
     });
 
   useEffect(() => {
@@ -197,16 +265,10 @@ export default function SurveyImageList({ imageType }: Props) {
     imageAltText && formData.append('imageAltText', imageAltText);
 
     try {
-      await fetch(
-        `/api/file/${
-          imageType === 'backgroundImage'
-            ? 'background-images'
-            : imageType === 'thanksPageImage'
-            ? 'thanks-page-images'
-            : ''
-        }`,
-        { method: 'POST', body: formData },
-      );
+      await fetch(getApiFilePath(imageType), {
+        method: 'POST',
+        body: formData,
+      });
       acceptedFiles.shift();
       getImages();
       setImageAltText('');
@@ -238,6 +300,30 @@ export default function SurveyImageList({ imageType }: Props) {
             imagePath: [],
           },
         });
+        break;
+      case 'topMarginImage':
+        editSurvey({
+          ...activeSurvey,
+          marginImages: {
+            ...activeSurvey.marginImages,
+            top: {
+              imageName: null,
+              imagePath: [],
+            },
+          },
+        });
+        break;
+      case 'bottomMarginImage':
+        editSurvey({
+          ...activeSurvey,
+          marginImages: {
+            ...activeSurvey.marginImages,
+            bottom: {
+              imageName: null,
+              imagePath: [],
+            },
+          },
+        });
     }
   }
 
@@ -260,6 +346,24 @@ export default function SurveyImageList({ imageType }: Props) {
                 activeSurvey.thanksPage.imagePath.join(),
           ) ?? null
         );
+      case 'topMarginImage':
+        return (
+          images?.find(
+            (image) =>
+              image.fileName === activeSurvey.marginImages.top?.imageName &&
+              image.filePath.join() ===
+                activeSurvey.marginImages.top.imagePath.join(),
+          ) ?? null
+        );
+      case 'bottomMarginImage':
+        return (
+          images?.find(
+            (image) =>
+              image.fileName === activeSurvey.marginImages.bottom?.imageName &&
+              image.filePath.join() ===
+                activeSurvey.marginImages.bottom.imagePath.join(),
+          ) ?? null
+        );
     }
   }
 
@@ -270,12 +374,82 @@ export default function SurveyImageList({ imageType }: Props) {
         image?.fileName === activeSurvey?.backgroundImageName &&
           (style = { border: '4px solid #1976d2' });
         break;
-
       case 'thanksPageImage':
         image?.fileName === activeSurvey?.thanksPage.imageName &&
           (style = { border: '4px solid #1976d2' });
+        break;
+      case 'topMarginImage':
+        image?.fileName === activeSurvey?.marginImages?.top?.imageName &&
+          (style = { border: '4px solid #1976d2' });
+        break;
+      case 'bottomMarginImage':
+        image?.fileName === activeSurvey?.marginImages?.bottom?.imageName &&
+          (style = { border: '4px solid #1976d2' });
     }
+
     return style;
+  }
+
+  function getEmptyImageBorderStyle() {
+    switch (imageType) {
+      case 'backgroundImage':
+        return !activeSurvey?.backgroundImageName
+          ? { border: '4px solid #1976d2' }
+          : null;
+      case 'thanksPageImage':
+        return !activeSurvey?.thanksPage.imageName
+          ? { border: '4px solid #1976d2' }
+          : null;
+      case 'topMarginImage':
+        return !activeSurvey?.marginImages?.top?.imageName
+          ? { border: '4px solid #1976d2' }
+          : null;
+      case 'bottomMarginImage':
+        return !activeSurvey?.marginImages?.bottom?.imageName
+          ? { border: '4px solid #1976d2' }
+          : null;
+      default:
+        return null;
+    }
+  }
+
+  function getSelectorHeader() {
+    let header;
+    switch (imageType) {
+      case 'backgroundImage':
+        header = tr.SurveyImageList.surveyImage;
+        break;
+      case 'thanksPageImage':
+        header = tr.SurveyImageList.thanksPageImage;
+        break;
+      case 'topMarginImage':
+        header = tr.SurveyImageList.topMarginImage;
+        break;
+      case 'bottomMarginImage':
+        header = tr.SurveyImageList.bottomMarginImage;
+        break;
+      default:
+        header = tr.SurveyImageList.image;
+    }
+
+    return activeImage
+      ? `${header}: ${activeImage.fileName}`
+      : `${header}: ${tr.SurveyImageList.noImage.toLowerCase()}`;
+  }
+
+  function getEmptyImageSelectionPlaceholder() {
+    switch (imageType) {
+      case 'backgroundImage':
+        return tr.SurveyImageList.noBackgroundImage;
+      case 'thanksPageImage':
+        return tr.SurveyImageList.noThanksPageImage;
+      case 'topMarginImage':
+        return tr.SurveyImageList.noTopMarginImage;
+      case 'bottomMarginImage':
+        return tr.SurveyImageList.noBottomMarginImage;
+      default:
+        return tr.SurveyImageList.noImage;
+    }
   }
 
   return (
@@ -295,20 +469,12 @@ export default function SurveyImageList({ imageType }: Props) {
             paddingRight: '0.5rem',
           }}
         >
-          {imageType === 'backgroundImage'
-            ? tr.SurveyImageList.surveyImage
-            : imageType === 'thanksPageImage'
-            ? tr.SurveyImageList.thanksPageImage
-            : tr.SurveyImageList.image}
-          {': '}
-          {activeImage
-            ? ` ${activeImage?.fileName}`
-            : ` ${tr.SurveyImageList.noImage.toLowerCase()}`}
+          {getSelectorHeader()}
         </Typography>
         {activeImage && (
           <img
-            src={`data:image/;base64,${activeImage.data}`}
-            srcSet={`data:image/;base64,${activeImage.data}`}
+            src={activeImageSrc}
+            srcSet={activeImageSrc}
             alt={`survey-image-${activeImage.fileName}`}
             loading="lazy"
             style={{
@@ -336,21 +502,7 @@ export default function SurveyImageList({ imageType }: Props) {
           >
             <ImageListItem
               className={classes.noImageBackground}
-              style={
-                imageType === 'backgroundImage'
-                  ? !activeSurvey?.backgroundImageName
-                    ? {
-                        border: '4px solid #1976d2',
-                      }
-                    : null
-                  : imageType === 'thanksPageImage'
-                  ? !activeSurvey?.thanksPage.imageName
-                    ? {
-                        border: '4px solid #1976d2',
-                      }
-                    : null
-                  : null
-              }
+              style={getEmptyImageBorderStyle()}
               onClick={() => handleEmptyImage()}
             >
               <Container
@@ -368,49 +520,61 @@ export default function SurveyImageList({ imageType }: Props) {
                     textAlign: 'center',
                   }}
                 >
-                  {imageType === 'backgroundImage'
-                    ? tr.SurveyImageList.noBackgroundImage
-                    : imageType === 'thanksPageImage'
-                    ? tr.SurveyImageList.noThanksPageImage
-                    : tr.SurveyImageList.noImage}
+                  {getEmptyImageSelectionPlaceholder()}
                 </Typography>
               </Container>
             </ImageListItem>
-            {images.map((image) => (
-              <ImageListItem
-                style={getImageBorderStyle(image)}
-                key={image.fileName}
-                onClick={() =>
-                  handleListItemClick(image.fileName, image.filePath)
-                }
-              >
-                <Cancel
-                  color="error"
-                  className={classes.deleteImageIcon}
-                  onClick={(event) =>
-                    handleDeletingImage(event, image.fileName, image.filePath)
+            {images.map((image) => {
+              const imageSrc = `data:image/${limitToSvg ? 'svg+xml' : ''};base64,${image.data}`;
+              return (
+                <ImageListItem
+                  style={getImageBorderStyle(image)}
+                  key={image.fileName}
+                  onClick={() =>
+                    handleListItemClick(image.fileName, image.filePath)
                   }
-                />
-                <img
-                  src={`data:image/;base64,${image.data}`}
-                  srcSet={`data:image/;base64,${image.data}`}
-                  alt={
-                    imageAltText
-                      ? imageAltText
-                      : `survey-image-${image.fileName}`
-                  }
-                  loading="lazy"
-                  style={{ height: '100%' }}
-                />
-              </ImageListItem>
-            ))}
+                >
+                  <Cancel
+                    color="error"
+                    className={classes.deleteImageIcon}
+                    onClick={async (event) =>
+                      await handleDeletingImage(
+                        event,
+                        image.fileName,
+                        image.filePath,
+                      )
+                    }
+                  />
+                  <img
+                    src={imageSrc}
+                    srcSet={imageSrc}
+                    alt={
+                      imageAltText
+                        ? imageAltText
+                        : `survey-image-${image.fileName}`
+                    }
+                    loading="lazy"
+                    style={{ height: '100%', objectFit: 'contain' }}
+                  />
+                </ImageListItem>
+              );
+            })}
           </ImageList>
         </DialogContent>
         <section className={classes.container}>
           <div {...getRootProps({ className: 'dropzone' })}>
             <input {...getInputProps()} />
-            <p style={{ color: 'purple', cursor: 'pointer' }}>
-              {tr.DropZone.dropFiles.replace('{x}', MEGAS)}
+            <p
+              style={{
+                color: 'purple',
+                cursor: 'pointer',
+                textAlign: 'center',
+              }}
+            >
+              {(limitToSvg
+                ? tr.DropZone.dropFilesSvg
+                : tr.DropZone.dropFiles
+              ).replace('{x}', MEGAS)}
             </p>
           </div>
           {acceptedFiles?.length ? (

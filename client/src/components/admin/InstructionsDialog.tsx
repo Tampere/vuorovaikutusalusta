@@ -80,20 +80,20 @@ export function InstructionsDialog({ isOpen, setIsOpen, setMenuOpen }: Props) {
                 .map((file) => file.size)
                 .reduce(
                   (prevValue, currentValue) => prevValue + currentValue,
-                  0
+                  0,
                 );
               if (filesSize > MAX_FILE_SIZE) {
                 showToast({
                   severity: 'error',
                   message: tr.InstructionsDialog.fileSizeLimitError.replace(
                     '{x}',
-                    String(MEGAS)
+                    String(MEGAS),
                   ),
                 });
                 return;
               }
               const fileStrings = (await Promise.all(
-                files.map((file: any) => readFileAsync(file))
+                files.map((file: any) => readFileAsync(file)),
               )) as string[];
 
               const filesAreValid = !fileStrings

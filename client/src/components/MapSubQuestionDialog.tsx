@@ -189,6 +189,9 @@ export default function MapSubQuestionDialog({
             ) : question.type === 'free-text' ? (
               <FreeTextQuestion
                 autoFocus={index === 0}
+                isEmptyAndRequired={validationErrors?.[index].includes(
+                  'required',
+                )}
                 value={answers[index]?.value as string}
                 onChange={(value) => {
                   answers[index].value = value;
@@ -204,6 +207,9 @@ export default function MapSubQuestionDialog({
             ) : question.type === 'numeric' ? (
               <NumericQuestion
                 autoFocus={index === 0}
+                isEmptyAndRequired={validationErrors?.[index].includes(
+                  'required',
+                )}
                 value={answers[index]?.value as number}
                 onChange={(value) => {
                   answers[index].value = value;

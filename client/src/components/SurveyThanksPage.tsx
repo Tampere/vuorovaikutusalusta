@@ -1,15 +1,16 @@
 import { Survey } from '@interfaces/survey';
 import {
-  Link,
   Typography,
   SxProps,
   Theme,
   Box,
   useMediaQuery,
   Stack,
+  Link,
 } from '@mui/material';
+import { useImageHeaderQuery } from '@src/hooks/UseImageHeaderQuery';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import rehypeExternalLinks from 'rehype-external-links';
 import Footer from './Footer';
@@ -33,23 +34,18 @@ interface Props {
 }
 
 export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
-  const [imageAltText, setImageAltText] = useState<string | null>(null);
-
-  useEffect(() => {
-    async function getImageHeaders() {
-      const res = await fetch(
-        `api/file/${survey.thanksPage.imagePath[0]}/${survey.thanksPage.imageName}`,
-        { method: 'HEAD' },
-      );
-
-      const details = JSON.parse(res.headers.get('File-details'));
-
-      setImageAltText(details?.imageAltText);
-    }
-    survey.thanksPage.imagePath.length > 0 &&
-      survey.thanksPage.imageName &&
-      getImageHeaders();
-  }, []);
+  const thanksPageImageHeaderQuery = useImageHeaderQuery(
+    `api/file/${survey.thanksPage.imagePath[0]}/${survey.thanksPage.imageName}`,
+    !(survey.thanksPage.imagePath.length > 0 && survey.thanksPage.imageName),
+  );
+  const topImageHeaderQuery = useImageHeaderQuery(
+    `/api/file/${survey.marginImages.top.imagePath}/${survey.marginImages.top.imageName}`,
+    !survey.marginImages.top.imageName,
+  );
+  const bottomImageHeaderQuery = useImageHeaderQuery(
+    `/api/file/${survey.marginImages.bottom.imagePath}/${survey.marginImages.bottom.imageName}`,
+    !survey.marginImages.bottom.imageName,
+  );
 
   const { tr, surveyLanguage } = useTranslations();
   const hasImage = survey.thanksPage.imageName !== null;
@@ -83,11 +79,13 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
           alignItems: 'flex-start',
         }}
       >
-        <img
-          style={{ maxWidth: '60%', maxHeight: '15vh' }}
-          src={`/api/feature-styles/icons/logo`}
-          alt={tr.IconAltTexts.logoAltText}
-        />
+        {topImageHeaderQuery.imageHeaders && (
+          <img
+            style={{ maxWidth: '60%', maxHeight: '15vh' }}
+            src={`/api/file/${survey.marginImages.top.imagePath}/${survey.marginImages.top.imageName}`}
+            alt={topImageHeaderQuery.imageHeaders?.imageAltText ?? ''}
+          />
+        )}
       </Box>
       <Box
         className="middle-content"
@@ -119,7 +117,7 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
             {survey.thanksPage.text?.[surveyLanguage]}
           </ReactMarkdown>
         </div>
-        {survey.thanksPage.imageName && (
+        {thanksPageImageHeaderQuery.imageHeaders && (
           <div className="spacer" style={{ minHeight: '40vh', width: '100%' }}>
             <img
               style={{
@@ -127,7 +125,7 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
                 maxWidth: '100%',
               }}
               src={`/api/file/${survey.thanksPage.imagePath[0]}/${survey.thanksPage.imageName}`}
-              alt={imageAltText ?? ''}
+              alt={thanksPageImageHeaderQuery.imageHeaders?.imageAltText ?? ''}
             />
           </div>
         )}
@@ -146,37 +144,34 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
         }}
       >
         <Footer>
-          <Link
-            color="primary"
-            underline="hover"
-            href="https://www.tampere.fi/asioi-kaupungin-kanssa/oskari-karttakyselypalvelun-saavutettavuusseloste"
-            target="_blank"
-          >
+          <Link color="primary" underline="hover" href="_blank" target="_blank">
             {tr.FooterLinks.accessibility}
           </Link>
           {survey.displayPrivacyStatement && (
             <Link
               color="primary"
               underline="hover"
-              href="https://www.tampere.fi/tietosuoja-ja-tiedonhallinta/tietosuojaselosteet"
+              href="_blank"
               target="_blank"
             >
               {tr.FooterLinks.privacyStatement}
             </Link>
           )}
         </Footer>
-        <img
-          style={{
-            minWidth: '130px',
-            width: '10vw',
-            position: !mediumWidth ? 'absolute' : 'static',
-            left: !mediumWidth ? '0' : 'auto',
-            bottom: 0,
-            margin: '0.5rem',
-          }}
-          src={`/api/feature-styles/icons/banner`}
-          alt={tr.IconAltTexts.bannerAltText}
-        />
+        {bottomImageHeaderQuery.imageHeaders && (
+          <img
+            style={{
+              minWidth: '130px',
+              width: '10vw',
+              position: !mediumWidth ? 'absolute' : 'static',
+              left: !mediumWidth ? '0' : 'auto',
+              bottom: 0,
+              margin: '0.5rem',
+            }}
+            src={`/api/file/${survey.marginImages.bottom.imagePath}/${survey.marginImages.bottom.imageName}`}
+            alt={bottomImageHeaderQuery.imageHeaders?.imageAltText ?? ''}
+          />
+        )}
       </Box>
     </Stack>
   );

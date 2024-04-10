@@ -22,7 +22,7 @@ export default function MarkerIconSelect({ value, onChange }: Props) {
       setLoading(true);
       try {
         const icons = await request<MapMarkerIcon[]>(
-          '/api/feature-styles/marker-icons'
+          '/api/feature-styles/marker-icons',
         );
         setIcons(icons);
       } catch (error) {

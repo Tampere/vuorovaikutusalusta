@@ -37,7 +37,6 @@ import { request } from '@src/utils/request';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import SplitPane from 'react-split-pane';
 import DocumentSection from './DocumentSection';
-import Footer from './Footer';
 import ImageSection from './ImageSection';
 import PageConnector from './PageConnector';
 import StepperControls from './StepperControls';
@@ -47,6 +46,7 @@ import SurveyMap from './SurveyMap';
 import SurveyQuestion from './SurveyQuestion';
 import TextSection from './TextSection';
 import { SurveyFollowUpSections } from './SurveyFollowUpSections';
+import Footer from './Footer';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -595,21 +595,11 @@ export default function SurveyStepper({
         </Stepper>
       </main>
       <Footer>
-        <Link
-          color="primary"
-          underline="hover"
-          href="https://www.tampere.fi/asioi-kaupungin-kanssa/oskari-karttakyselypalvelun-saavutettavuusseloste"
-          target="_blank"
-        >
+        <Link color="primary" underline="hover" href="_blank" target="_blank">
           {tr.FooterLinks.accessibility}
         </Link>
         {survey.displayPrivacyStatement && (
-          <Link
-            color="primary"
-            underline="hover"
-            href="https://www.tampere.fi/tietosuoja-ja-tiedonhallinta/tietosuojaselosteet"
-            target="_blank"
-          >
+          <Link color="primary" underline="hover" href="_blank" target="_blank">
             {tr.FooterLinks.privacyStatement}
           </Link>
         )}
@@ -646,8 +636,8 @@ export default function SurveyStepper({
                   currentPage.sidebar.imageSize === 'original'
                     ? { margin: '0 auto' }
                     : currentPage.sidebar.imageSize === 'fitted'
-                    ? { margin: '0 auto', maxWidth: '100%' }
-                    : null
+                      ? { margin: '0 auto', maxWidth: '100%' }
+                      : null
                 }
                 aria-hidden={true}
                 alt={currentPage.sidebar?.imageAltText?.[surveyLanguage]}
@@ -814,8 +804,8 @@ export default function SurveyStepper({
                   currentPage.sidebar.type === 'image'
                     ? tr.SurveyStepper.closeImage
                     : currentPage.sidebar.type === 'map'
-                    ? tr.SurveyStepper.closeMap
-                    : ''
+                      ? tr.SurveyStepper.closeMap
+                      : ''
                 }
               >
                 <Close />

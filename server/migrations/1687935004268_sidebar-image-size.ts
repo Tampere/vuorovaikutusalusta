@@ -4,7 +4,7 @@ export const shorthands: ColumnDefinitions | undefined = undefined;
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.sql(
-    `ALTER TABLE data.survey_page ADD COLUMN sidebar_image_size VARCHAR(20);`
+    `ALTER TABLE data.survey_page ADD COLUMN sidebar_image_size VARCHAR(20);`,
   );
 }
 

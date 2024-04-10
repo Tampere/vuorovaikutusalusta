@@ -14,7 +14,7 @@ router.get(
   asyncHandler(async (req, res) => {
     const themes = await getAllSurveyThemes();
     res.json(themes);
-  })
+  }),
 );
 
 export default router;

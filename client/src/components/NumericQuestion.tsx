@@ -60,14 +60,14 @@ export default function NumericQuestion({
                 .replace('{minValue}', String(question.minValue))
                 .replace('{maxValue}', String(question.maxValue))
             : question.minValue != null
-            ? tr.NumericQuestion.minValue.replace(
-                '{minValue}',
-                String(question.minValue),
-              )
-            : tr.NumericQuestion.maxValue.replace(
-                '{maxValue}',
-                String(question.maxValue),
-              )}
+              ? tr.NumericQuestion.minValue.replace(
+                  '{minValue}',
+                  String(question.minValue),
+                )
+              : tr.NumericQuestion.maxValue.replace(
+                  '{maxValue}',
+                  String(question.maxValue),
+                )}
         </FormHelperText>
       }
     </>

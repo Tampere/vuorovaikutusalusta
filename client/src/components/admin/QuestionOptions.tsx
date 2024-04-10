@@ -53,7 +53,7 @@ export default function QuestionOptions({
       Array(options.length)
         .fill(null)
         .map(() => createRef<HTMLInputElement>()),
-    [options.length]
+    [options.length],
   );
 
   // Whenever input element count changes, focus on the last one
@@ -65,7 +65,7 @@ export default function QuestionOptions({
   function handleClipboardInput(
     optionValue: string,
     optionIndex: number,
-    optionToChange: SectionOption
+    optionToChange: SectionOption,
   ) {
     const clipboardRows = optionValue.split(/(?!\B"[^"]*)\n(?![^"]*"\B)/);
     const optionFields = clipboardRows
@@ -105,7 +105,7 @@ export default function QuestionOptions({
     if (!optionFields || !optionFields.length) return;
     // First add option for the empty option field where focus is currently
     const updatedOptions = options.map((option, i) =>
-      optionIndex === i ? optionFields[0] : option
+      optionIndex === i ? optionFields[0] : option,
     );
     // Add other fields
     const newOptions = optionFields.slice(1, optionFields.length);
@@ -159,13 +159,13 @@ export default function QuestionOptions({
                                 [surveyLanguage]: event.target.value,
                               },
                             }
-                          : option
-                      )
+                          : option,
+                      ),
                     );
                   }
                 }}
                 onKeyDown={(event) => {
-                  if (['Enter', 'NumpadEnter'].includes(event.code)) {
+                  if (['Enter', 'NumpadEnter'].includes(event.key)) {
                     event.preventDefault();
                     if (index === options.length - 1) {
                       // Last item on list - add new option
@@ -195,8 +195,8 @@ export default function QuestionOptions({
                               [surveyLanguage]: newInfoText,
                             },
                           }
-                        : option
-                    )
+                        : option,
+                    ),
                   );
                 }}
               />

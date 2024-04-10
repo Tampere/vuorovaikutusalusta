@@ -4,7 +4,7 @@ export const shorthands: ColumnDefinitions | undefined = undefined;
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.sql(
-    `ALTER TABLE data.survey_page RENAME COLUMN map_layers TO sidebar_map_layers`
+    `ALTER TABLE data.survey_page RENAME COLUMN map_layers TO sidebar_map_layers`,
   );
   pgm.sql(`ALTER TABLE data.survey_page
     ADD COLUMN sidebar_type VARCHAR(20) DEFAULT 'map' NOT NULL,
@@ -18,6 +18,6 @@ export async function down(pgm: MigrationBuilder): Promise<void> {
     DROP COLUMN sidebar_image_url
   `);
   pgm.sql(
-    `ALTER TABLE data.survey_page RENAME COLUMN sidebar_map_layers TO map_layers`
+    `ALTER TABLE data.survey_page RENAME COLUMN sidebar_map_layers TO map_layers`,
   );
 }

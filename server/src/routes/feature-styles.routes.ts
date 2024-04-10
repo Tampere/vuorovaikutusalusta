@@ -19,10 +19,10 @@ router.get(
   ensureAuthenticated(),
   asyncHandler(async (req, res) => {
     const icons = await getDb().manyOrNone<MapMarkerIcon>(
-      `SELECT id, name, svg FROM application.map_marker_icon ORDER BY idx ASC`
+      `SELECT id, name, svg FROM application.map_marker_icon ORDER BY idx ASC`,
     );
     res.json(icons);
-  })
+  }),
 );
 
 router.get(
@@ -30,10 +30,10 @@ router.get(
   ensureAuthenticated(),
   asyncHandler(async (req, res) => {
     const colors = await getDb().manyOrNone<MapStrokeColor>(
-      `SELECT name, value FROM application.map_stroke_color ORDER BY idx ASC`
+      `SELECT name, value FROM application.map_stroke_color ORDER BY idx ASC`,
     );
     res.json(colors);
-  })
+  }),
 );
 
 router.get(
@@ -54,7 +54,7 @@ router.get(
 
     res.type('image/svg+xml');
     res.status(200).send(icon.svg);
-  })
+  }),
 );
 
 export default router;

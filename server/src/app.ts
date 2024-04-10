@@ -47,7 +47,7 @@ async function start() {
           logger.info(message.split('\n')[0]);
         },
       },
-    })
+    }),
   );
 
   if (process.env.AUTH_ENABLED === 'true') {
@@ -64,7 +64,7 @@ async function start() {
     ensureAuthenticated({
       redirectToLogin: true,
     }),
-    express.static('static/admin')
+    express.static('static/admin'),
   );
   app.use('/', express.static('static'));
 
@@ -79,7 +79,7 @@ async function start() {
     }),
     (req, res) => {
       res.sendFile(path.join(__dirname, '../static/admin/index.html'));
-    }
+    },
   );
 
   // Serve frontend files from remaining URLs

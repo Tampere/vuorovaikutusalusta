@@ -248,21 +248,27 @@
     "attributions": "Copyright & attributions",
     "noBackgroundImage": "No background image",
     "noThanksPageImage": "No thank you page image",
+    "noTopMarginImage": "No top margin image",
+    "noBottomMarginImage": "No bottom margin image",
     "noImage": "No image",
     "surveyImage": "Survey background image",
     "thanksPageImage": "Image for thank you page",
+    "topMarginImage": "Top margin image",
+    "bottomMarginImage": "Bottom margin image",
     "image": "Image",
     "selectImage": "Choose background image",
     "addNewImage": "Add a new image",
     "files": "File",
     "imageSizeExceeded": "Image maximum size is {x} MB",
+    "imageTypeError": "Image type must be .svg",
     "imageUploadError": "Image uploading failed",
     "imageDownloadError": "Image downloading failed",
     "multipleImagesDownloadError": "Error while downloading images",
     "imageDeleteError": "Error while deleting image"
   },
   "DropZone": {
-    "dropFiles": "Click to select a file or drop it here (max {x} MB)."
+    "dropFiles": "Click to select a file or drop it here (max {x} MB).",
+    "dropFilesSvg": "Click to select a file or drop it here (max {x} MB). Only .svg files are allowed."
   },
   "EditTextSection": {
     "text": "Text",
@@ -381,9 +387,7 @@
     "errorLoadingUnfinished": "Failed to load previously stored answers. Please try again later."
   },
   "UnavailableSurvey": {
-    "surveyNotPublished": "The survey is not available at the moment. Thank You for your interest on the survey!",
-    "treTopicalInfo": "You can access topical issues of the city of Tampere from the link below.",
-    "tre": "The city of Tampere"
+    "surveyNotPublished": "The survey is not available at the moment. Thank You for your interest on the survey!"
   },
   "NotFoundPage": {
     "pageNotFound": "Survey not found. Please check the address and try again later."
@@ -621,10 +625,6 @@
   "FooterLinks": {
     "accessibility": "Accessibility report",
     "privacyStatement": "Data protection statement"
-  },
-  "IconAltTexts": {
-    "bannerAltText": "Tampere banner",
-    "logoAltText": "Tampere Finland logo"
   },
   "adminInstructions": "Open user manual"
 }
