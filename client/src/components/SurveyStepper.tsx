@@ -609,7 +609,7 @@ export default function SurveyStepper({
         <Link
           color="primary"
           underline="hover"
-          href="https://www.tampere.fi/asioi-kaupungin-kanssa/oskari-karttakyselypalvelun-saavutettavuusseloste"
+          href="https://www.ouka.fi/yhteystiedot-ja-palaute/oulun-kaupungin-karttakyselypalvelun-saavutettavuusseloste"
           target="_blank"
         >
           {tr.FooterLinks.accessibility}

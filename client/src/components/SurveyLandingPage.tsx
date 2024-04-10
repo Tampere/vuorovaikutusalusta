@@ -187,11 +187,11 @@ export default function SurveyLandingPage({
           whiteSpace: 'nowrap',
         }}
       >
-        <Footer>
+        <Footer style={{ backgroundColor: '#f2f2f2', paddingRight: '2rem'}}>
           <Link
             color="primary"
             underline="hover"
-            href="https://www.tampere.fi/asioi-kaupungin-kanssa/oskari-karttakyselypalvelun-saavutettavuusseloste"
+            href="https://www.ouka.fi/yhteystiedot-ja-palaute/oulun-kaupungin-karttakyselypalvelun-saavutettavuusseloste"
             target="_blank"
           >
             {tr.FooterLinks.accessibility}
