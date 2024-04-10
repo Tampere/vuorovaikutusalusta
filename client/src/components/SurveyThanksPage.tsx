@@ -6,12 +6,14 @@ import {
   Box,
   useMediaQuery,
   Stack,
+  Link,
 } from '@mui/material';
 import { useImageHeaderQuery } from '@src/hooks/UseImageHeaderQuery';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import rehypeExternalLinks from 'rehype-external-links';
+import Footer from './Footer';
 
 type StyleKeys = 'testSurveyHeader';
 
@@ -141,6 +143,21 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
           whiteSpace: 'nowrap',
         }}
       >
+        <Footer>
+          <Link color="primary" underline="hover" href="_blank" target="_blank">
+            {tr.FooterLinks.accessibility}
+          </Link>
+          {survey.displayPrivacyStatement && (
+            <Link
+              color="primary"
+              underline="hover"
+              href="_blank"
+              target="_blank"
+            >
+              {tr.FooterLinks.privacyStatement}
+            </Link>
+          )}
+        </Footer>
         {bottomImageHeaderQuery.imageHeaders && (
           <img
             style={{

@@ -6,6 +6,7 @@ import {
   Typography,
   Stack,
   useMediaQuery,
+  Link,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
@@ -13,6 +14,7 @@ import { getClassList } from '@src/utils/classes';
 import React from 'react';
 
 import { useImageHeaderQuery } from '@src/hooks/UseImageHeaderQuery';
+import Footer from './Footer';
 
 const useStyles = makeStyles((theme: Theme & { [customKey: string]: any }) => ({
   heading: {
@@ -199,6 +201,21 @@ export default function SurveyLandingPage({
           whiteSpace: 'nowrap',
         }}
       >
+        <Footer>
+          <Link color="primary" underline="hover" href="_blank" target="_blank">
+            {tr.FooterLinks.accessibility}
+          </Link>
+          {survey.displayPrivacyStatement && (
+            <Link
+              color="primary"
+              underline="hover"
+              href="_blank"
+              target="_blank"
+            >
+              {tr.FooterLinks.privacyStatement}
+            </Link>
+          )}
+        </Footer>
         {bottomImageHeaderQuery.imageHeaders && (
           <img
             style={{

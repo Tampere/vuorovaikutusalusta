@@ -14,6 +14,7 @@ import {
   FormControl,
   FormHelperText,
   IconButton,
+  Link,
   Paper,
   Step,
   StepContent,
@@ -45,6 +46,7 @@ import SurveyMap from './SurveyMap';
 import SurveyQuestion from './SurveyQuestion';
 import TextSection from './TextSection';
 import { SurveyFollowUpSections } from './SurveyFollowUpSections';
+import Footer from './Footer';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -592,6 +594,16 @@ export default function SurveyStepper({
           ))}
         </Stepper>
       </main>
+      <Footer>
+        <Link color="primary" underline="hover" href="_blank" target="_blank">
+          {tr.FooterLinks.accessibility}
+        </Link>
+        {survey.displayPrivacyStatement && (
+          <Link color="primary" underline="hover" href="_blank" target="_blank">
+            {tr.FooterLinks.privacyStatement}
+          </Link>
+        )}
+      </Footer>
     </>
   );
 
