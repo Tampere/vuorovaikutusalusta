@@ -561,7 +561,8 @@
     "languageControl": "Language / Kieli",
     "changeLanguage": "Vaihda palvelun kieltä",
     "fi": "Suomi",
-    "en": "English"
+    "en": "English",
+    "se": "Svenska"
   },
   "SurveyLanguageMenu": {
     "languageControl": "Language / Kieli",
@@ -579,6 +580,7 @@
     "surveySubtitle": "Kyselyn aliotsikko",
     "fi": "suomi",
     "en": "englanti",
+    "se": "ruotsi",
     "page": "sivu",
     "missingTranslation": "Käännös puuttuu",
     "optionInfo": "Vaihtoehdon lisätiedot",
