@@ -17,15 +17,12 @@ import TranslationField from './TranslationField';
 
 const useStyles = makeStyles({
   rowContainer: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
   },
   langContainer: {
     display: 'flex',
     flexDirection: 'column',
-    flex: 1,
     marginLeft: '0.2rem',
   },
   pageContainer: {
