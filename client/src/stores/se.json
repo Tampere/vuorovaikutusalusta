@@ -322,12 +322,14 @@
   "ColorSelect": {
     "color": "Färg",
     "colors": {
-      "black": "Svart",
-      "darkGray": "Mörkgrå",
-      "steelBlue": "Stålblå",
-      "atmosphere": "Atmosfär",
-      "berryRed": "Bärrotsröd",
-      "warmGreen": "Varmgrön"
+      "teal": "Tavi",
+      "sea": "Hav",
+      "sprig": "Grönskott",
+      "grey": "Grå",
+      "night": "Natt",
+      "blue": "Blå",
+      "earthRed": "Rödmylla",
+      "tar": "Tjära"
     }
   },
   "MarkerIconSelect": {
