@@ -10,7 +10,7 @@ env:
 
 jobs:
   deploy:
-    name: Deploy to production
+    name: Deploy to test
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
