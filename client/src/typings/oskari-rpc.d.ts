@@ -168,6 +168,15 @@ declare module 'oskari-rpc' {
   }
 
   /**
+   *  Move map to given position
+   */
+
+  export type MapMoveRequest = (
+    name: 'MapMoveRequest',
+    params: [x: number, y: number, zoom?: number, options?: object],
+  ) => void;
+
+  /**
    * Drawing event handler
    */
   export type DrawingEventHandler = (payload: {
@@ -296,7 +305,7 @@ declare module 'oskari-rpc' {
     getSupportedRequests: (callback: (requests: unknown[]) => void) => void;
     getSupportedFunctions: (callback: (functions: unknown[]) => void) => void;
     getInfo: (callback: (info: any) => void) => void;
-    resetState: (callback: (data: any) => void) => void;
+    getMapPosition: (callback: (position: any) => void) => void;
     /**
      * Post an Oskari request
      */
@@ -309,7 +318,8 @@ declare module 'oskari-rpc' {
       MapModulePlugin.AddMarkerRequest &
       MapModulePlugin.RemoveMarkersRequest &
       InfoBox.ShowInfoBoxRequest &
-      InfoBox.HideInfoBoxRequest;
+      InfoBox.HideInfoBoxRequest &
+      MapMoveRequest;
     /**
      * Handle an Oskari event
      */
