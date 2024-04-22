@@ -32,6 +32,7 @@ import {
   InternalServerError,
   NotFoundError,
 } from '@src/error';
+import logger from '@src/logger';
 
 import { geometryToGeoJSONFeatureCollection } from '@src/utils';
 import { Geometry } from 'geojson';
@@ -80,6 +81,7 @@ interface DBSurvey {
   allow_saving_unfinished: boolean;
   localisation_enabled: boolean;
   submission_count?: number;
+  groups: string[];
 }
 
 /**
@@ -251,7 +253,9 @@ const conditionColumnSet = getColumnSet<DBSectionCondition>(
  * @param params Query parameter (search by ID or name)
  * @returns Requested survey
  */
-export async function getSurvey(params: { id: number } | { name: string }) {
+export async function getSurvey(
+  params: ({ id: number } | { name: string }) & { groups?: string[] },
+) {
   const rows = await getDb().manyOrNone<DBSurveyJoin>(
     `
     SELECT 
@@ -297,6 +301,7 @@ export async function getSurvey(params: { id: number } | { name: string }) {
               theme.data as theme_data
             FROM data.survey survey
             LEFT JOIN application.theme theme ON survey.theme_id = theme.id
+            ${params?.groups?.length > 0 ? `WHERE $2 && survey.groups ` : ''} 
           ) survey
           LEFT JOIN data.survey_page page ON survey.id = page.survey_id
         WHERE ${'id' in params ? `survey.id = $1` : `survey.name = $1`}
@@ -311,7 +316,7 @@ export async function getSurvey(params: { id: number } | { name: string }) {
       section_idx ASC,
       option_idx ASC;
   `,
-    ['id' in params ? params.id : params.name],
+    ['id' in params ? params.id : params.name, params.groups],
   );
 
   if (!rows.length) {
@@ -486,6 +491,7 @@ export async function getSurvey(params: { id: number } | { name: string }) {
 export async function getSurveys(
   authorId?: string,
   filterByPublished?: boolean,
+  groups?: string[],
 ) {
   const rows = await getDb().manyOrNone<DBSurvey>(
     `SELECT
@@ -496,13 +502,22 @@ export async function getSurveys(
     LEFT JOIN data.submission sub ON sub.survey_id = survey.id
   WHERE
     ($1 IS NULL OR author_id = $1)
+    ${groups?.length > 0 ? `AND $3 && survey.groups` : ''}
   GROUP BY survey.id
   ORDER BY updated_at DESC`,
-    [authorId, filterByPublished],
+    [authorId, filterByPublished, groups],
   );
   return rows
     .map((row) => dbSurveyToSurvey(row))
     .filter((survey) => (filterByPublished ? isPublished(survey) : survey));
+}
+
+export async function getSurveyGroups(id: number) {
+  const rows = await getDb().one<{ groups: string[] }>(
+    `SELECT groups FROM data.survey WHERE id = $1`,
+    [id],
+  );
+  return rows.groups;
 }
 
 /**
@@ -511,8 +526,12 @@ export async function getSurveys(
  */
 export async function createSurvey(user: User) {
   const surveyRow = await getDb().one<DBSurvey>(
-    `INSERT INTO data.survey (author_id) VALUES ($1) RETURNING *`,
-    [user.id],
+    `INSERT INTO data.survey ${
+      user.groups?.length > 0
+        ? '(author_id, groups) VALUES ($1, $2)'
+        : '(author_id) VALUES ($1)'
+    } RETURNING *`,
+    [user.id, [user.groups[0]]],
   );
 
   if (!surveyRow) {
@@ -899,7 +918,8 @@ export async function updateSurvey(survey: Survey) {
         top_margin_image_name = $28,
         top_margin_image_path = $29,
         bottom_margin_image_name = $30,
-        bottom_margin_image_path = $31
+        bottom_margin_image_path = $31,
+        groups = $32
       WHERE id = $1 RETURNING *`,
       [
         survey.id,
@@ -933,6 +953,7 @@ export async function updateSurvey(survey: Survey) {
         survey.marginImages.top.imagePath ?? null,
         survey.marginImages.bottom.imageName ?? null,
         survey.marginImages.bottom.imagePath ?? null,
+        survey.groups,
       ],
     )
     .catch((error) => {
@@ -1217,6 +1238,7 @@ function dbSurveyToSurvey(
         imageName: dbSurvey.bottom_margin_image_name,
       },
     },
+    groups: dbSurvey.groups,
   };
   return {
     ...survey,
@@ -1664,6 +1686,7 @@ export async function storeFile({
   mimetype,
   details,
   surveyId,
+  groups,
 }: {
   buffer: Buffer;
   path: string[];
@@ -1671,19 +1694,22 @@ export async function storeFile({
   mimetype: string;
   details: { [key: string]: any };
   surveyId: number;
+  groups: string[];
 }) {
   const fileString = `\\x${buffer.toString('hex')}`;
+
   const row = await getDb().oneOrNone<{ path: string[]; name: string }>(
     `
-    INSERT INTO data.files (file, details, file_path, file_name, mime_type, survey_id)
-    VALUES ($(fileString), $(details), $(path), $(name), $(mimetype), $(surveyId))
+    INSERT INTO data.files (file, details, file_path, file_name, mime_type, survey_id, groups)
+    VALUES ($(fileString), $(details), $(path), $(name), $(mimetype), $(surveyId), $(groups))
     ON CONFLICT ON CONSTRAINT pk_files DO UPDATE SET
       file = $(fileString),
       details = $(details),
       file_path = $(path),
       file_name = $(name),
       mime_type = $(mimetype),
-      survey_id = $(surveyId)
+      survey_id = $(surveyId),
+      groups = $(groups)
     RETURNING file_path AS path, file_name AS name;
     `,
     {
@@ -1693,6 +1719,7 @@ export async function storeFile({
       name,
       mimetype,
       surveyId,
+      groups,
     },
   );
 
@@ -1738,12 +1765,19 @@ export async function getFile(fileName: string, filePath: string[]) {
  * Get all survey images from the database
  * @returns SurveyImage[]
  */
-export async function getImages(imagePath: string[]) {
+export async function getImages(imagePath: string[], groups?: string[]) {
   const rows = await getDb().manyOrNone(
     `
-    SELECT id, details, file, file_name, file_path FROM data.files WHERE file_path = $1;
+    SELECT 
+      id, 
+      details, 
+      file, 
+      file_name, 
+      file_path 
+    FROM data.files 
+    WHERE file_path = $1 ${groups ? 'AND groups && $2' : ''};
   `,
-    [imagePath],
+    [imagePath, groups],
   );
 
   return rows.map((row) => ({
@@ -1762,12 +1796,17 @@ export async function getImages(imagePath: string[]) {
  * @param filePath path of the file
  * @returns
  */
-export async function removeFile(fileName: string, filePath: string[]) {
+export async function removeFile(
+  fileName: string,
+  filePath: string[],
+  groups?: string[],
+) {
   return await getDb().none(
     `
-    DELETE FROM data.files WHERE file_name = $1 AND file_path = $2;
+    DELETE FROM data.files 
+    WHERE file_name = $1 AND file_path = $2 ${groups ? 'AND groups && $3' : ''};
   `,
-    [fileName, filePath],
+    [fileName, filePath, groups],
   );
 }
 

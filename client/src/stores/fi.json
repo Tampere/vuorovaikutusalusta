@@ -50,6 +50,8 @@
     "nameHelperText": "Kyselyn URL-osoitteessa näkyvä nimi. Voi sisältää vain kirjaimia (a-z), numeroita (0-9) ja viivoja (- ja _).",
     "author": "Kyselyn laatija/yhteyshenkilö",
     "authorUnit": "Kyselyn laatijan yksikkö",
+    "authorizedGroups": "Luvitetut käyttäjäryhmät",
+    "authorizedGroupsHelperText": "Kyselyn näkevät vain valitut käyttäjäryhmät.",
     "admins": "Kyselyn ylläpitäjät",
     "userFetchFailed": "Käyttäjien haku epäonnistui. Yritä myöhemmin uudestaan.",
     "adminsHelperText": "Kyselyn alkuperäisen luojan lisäksi määriteltävät käyttäjät, jotka voivat katsella kyselyn vastauksia sekä muokata kyselyä.",

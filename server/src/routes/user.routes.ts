@@ -12,7 +12,7 @@ router.get(
   '/',
   ensureAuthenticated(),
   asyncHandler(async (req, res) => {
-    const users = await getUsers();
+    const users = await getUsers(req.user.groups);
     res.json(users);
   }),
 );
@@ -32,7 +32,7 @@ router.get(
   ensureAuthenticated(),
   asyncHandler(async (req, res) => {
     // Exclude logged in user from response
-    const users = await getUsers([req.user.id]);
+    const users = await getUsers(req.user.groups, [req.user.id]);
     res.json(users);
   }),
 );

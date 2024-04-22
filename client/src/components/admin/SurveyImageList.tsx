@@ -268,6 +268,7 @@ export default function SurveyImageList({ imageType, ...props }: Props) {
       await fetch(getApiFilePath(imageType), {
         method: 'POST',
         body: formData,
+        headers: { groups: JSON.stringify(activeSurvey.groups) },
       });
       acceptedFiles.shift();
       getImages();

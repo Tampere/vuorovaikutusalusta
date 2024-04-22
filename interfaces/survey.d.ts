@@ -489,6 +489,10 @@ export interface Survey {
     top: { imagePath: string[]; imageName: string; altText?: string };
     bottom: { imagePath: string[]; imageName: string; altText?: string };
   };
+  /**
+   * User groups that can access the survey
+   */
+  groups: string[];
 }
 
 /**
