@@ -325,12 +325,14 @@
   "ColorSelect": {
     "color": "Color",
     "colors": {
-      "black": "Black",
-      "darkGray": "Dark grey",
-      "steelBlue": "Steel blue",
-      "atmosphere": "Atmosphere",
-      "berryRed": "Berry red",
-      "warmGreen": "Warm green"
+      "teal": "Teal",
+      "sea": "Sea",
+      "sprig": "Sprig",
+      "grey": "Grey",
+      "night": "Night",
+      "blue": "Blue",
+      "earthRed": "Earth red",
+      "tar": "Tar"
     }
   },
   "MarkerIconSelect": {

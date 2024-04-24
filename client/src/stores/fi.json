@@ -325,12 +325,14 @@
   "ColorSelect": {
     "color": "Väri",
     "colors": {
-      "black": "Musta",
-      "darkGray": "Tumma harmaa",
-      "steelBlue": "Teräksensininen",
-      "atmosphere": "Tunnelma",
-      "berryRed": "Marjanpunainen",
-      "warmGreen": "Lämmin vihreä"
+      "teal": "Tavi",
+      "sea": "Meri",
+      "sprig": "Havu",
+      "grey": "Harmaa",
+      "night": "Yö",
+      "blue": "Sininen",
+      "earthRed": "Punamulta",
+      "tar": "Terva"
     }
   },
   "MarkerIconSelect": {
