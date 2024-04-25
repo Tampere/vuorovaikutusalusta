@@ -23,8 +23,8 @@ import { User } from '@interfaces/user';
 import {
   getColumnSet,
   getDb,
-  getMultiInsertQuery,
   getGeoJSONColumn,
+  getMultiInsertQuery,
   getMultiUpdateQuery,
 } from '@src/database';
 import {
@@ -32,7 +32,6 @@ import {
   InternalServerError,
   NotFoundError,
 } from '@src/error';
-import logger from '@src/logger';
 
 import { geometryToGeoJSONFeatureCollection } from '@src/utils';
 import { Geometry } from 'geojson';
@@ -196,12 +195,13 @@ type DBSurveyJoin = DBSurvey & {
   theme_name: string;
   theme_data: SurveyTheme;
   default_map_view: Geometry;
+  mapViewSRID: number;
 };
 
 /**
  * Helper function for creating survey page column set for database queries
  */
-const surveyPageColumnSet = getColumnSet<DBSurveyPage>('survey_page', [
+const surveyPageColumnSet = (inputSRID: number) => getColumnSet<DBSurveyPage>('survey_page', [
   'id',
   'survey_id',
   'idx',
@@ -224,7 +224,7 @@ const surveyPageColumnSet = getColumnSet<DBSurveyPage>('survey_page', [
     cast: 'json',
   },
   'sidebar_image_size',
-  getGeoJSONColumn('default_map_view', 3067),
+  getGeoJSONColumn('default_map_view', inputSRID),
 ]);
 
 /**
@@ -291,7 +291,8 @@ export async function getSurvey(
           page.sidebar_image_name as page_sidebar_image_name,
           page.sidebar_image_alt_text as page_sidebar_image_alt_text,
           page.sidebar_image_size as page_sidebar_image_size,
-          public.ST_AsGeoJSON(public.ST_Transform(page.default_map_view, 3067))::json as default_map_view
+          public.ST_AsGeoJSON(page.default_map_view)::json as default_map_view,
+          public.ST_SRID(page.default_map_view) AS "mapViewSRID"
         FROM
           (
             SELECT
@@ -969,11 +970,16 @@ export async function updateSurvey(survey: Survey) {
     throw new NotFoundError(`Survey with ID ${survey.id} not found`);
   }
 
+  // Find out what coordinate system was used for the default map view
+  const pageWithDefaultMapView = survey.pages.find(page => page.sidebar.defaultMapView);
+  const defaultMapViewSRID = pageWithDefaultMapView ? parseInt(pageWithDefaultMapView.sidebar.defaultMapView.crs.split(':')[1]) : null;
+  
+
   // Update the survey pages
   await getDb().none(
     getMultiUpdateQuery(
       surveyPagesToRows(survey.pages, survey.id),
-      surveyPageColumnSet,
+      surveyPageColumnSet(defaultMapViewSRID),
     ) + ' WHERE t.id = v.id',
   );
 
@@ -1286,6 +1292,7 @@ function dbSurveyJoinToPage(dbSurveyJoin: DBSurveyJoin): SurveyPage {
             ? geometryToGeoJSONFeatureCollection(
                 dbSurveyJoin.default_map_view,
                 {},
+                dbSurveyJoin.mapViewSRID
               )
             : null,
         },
