@@ -220,7 +220,7 @@ export default function SurveyLandingPage({
           <img
             style={{
               minWidth: '130px',
-              maxWidth: '20%',
+              width: '10vw',
               position: !mediumWidth ? 'absolute' : 'static',
               left: !mediumWidth ? '0' : 'auto',
               bottom: 0,

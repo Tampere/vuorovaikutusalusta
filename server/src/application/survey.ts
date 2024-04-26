@@ -23,8 +23,8 @@ import { User } from '@interfaces/user';
 import {
   getColumnSet,
   getDb,
-  getMultiInsertQuery,
   getGeoJSONColumn,
+  getMultiInsertQuery,
   getMultiUpdateQuery,
 } from '@src/database';
 import {
@@ -80,6 +80,7 @@ interface DBSurvey {
   allow_saving_unfinished: boolean;
   localisation_enabled: boolean;
   submission_count?: number;
+  groups: string[];
 }
 
 /**
@@ -194,12 +195,13 @@ type DBSurveyJoin = DBSurvey & {
   theme_name: string;
   theme_data: SurveyTheme;
   default_map_view: Geometry;
+  mapViewSRID: number;
 };
 
 /**
  * Helper function for creating survey page column set for database queries
  */
-const surveyPageColumnSet = getColumnSet<DBSurveyPage>('survey_page', [
+const surveyPageColumnSet = (inputSRID: number) => getColumnSet<DBSurveyPage>('survey_page', [
   'id',
   'survey_id',
   'idx',
@@ -222,7 +224,7 @@ const surveyPageColumnSet = getColumnSet<DBSurveyPage>('survey_page', [
     cast: 'json',
   },
   'sidebar_image_size',
-  getGeoJSONColumn('default_map_view', 3067),
+  getGeoJSONColumn('default_map_view', inputSRID),
 ]);
 
 /**
@@ -251,7 +253,9 @@ const conditionColumnSet = getColumnSet<DBSectionCondition>(
  * @param params Query parameter (search by ID or name)
  * @returns Requested survey
  */
-export async function getSurvey(params: { id: number } | { name: string }) {
+export async function getSurvey(
+  params: ({ id: number } | { name: string }) & { groups?: string[] },
+) {
   const rows = await getDb().manyOrNone<DBSurveyJoin>(
     `
     SELECT 
@@ -287,7 +291,8 @@ export async function getSurvey(params: { id: number } | { name: string }) {
           page.sidebar_image_name as page_sidebar_image_name,
           page.sidebar_image_alt_text as page_sidebar_image_alt_text,
           page.sidebar_image_size as page_sidebar_image_size,
-          public.ST_AsGeoJSON(public.ST_Transform(page.default_map_view, 3067))::json as default_map_view
+          public.ST_AsGeoJSON(page.default_map_view)::json as default_map_view,
+          public.ST_SRID(page.default_map_view) AS "mapViewSRID"
         FROM
           (
             SELECT
@@ -297,6 +302,7 @@ export async function getSurvey(params: { id: number } | { name: string }) {
               theme.data as theme_data
             FROM data.survey survey
             LEFT JOIN application.theme theme ON survey.theme_id = theme.id
+            ${params?.groups?.length > 0 ? `WHERE $2 && survey.groups ` : ''} 
           ) survey
           LEFT JOIN data.survey_page page ON survey.id = page.survey_id
         WHERE ${'id' in params ? `survey.id = $1` : `survey.name = $1`}
@@ -311,7 +317,7 @@ export async function getSurvey(params: { id: number } | { name: string }) {
       section_idx ASC,
       option_idx ASC;
   `,
-    ['id' in params ? params.id : params.name],
+    ['id' in params ? params.id : params.name, params.groups],
   );
 
   if (!rows.length) {
@@ -486,6 +492,7 @@ export async function getSurvey(params: { id: number } | { name: string }) {
 export async function getSurveys(
   authorId?: string,
   filterByPublished?: boolean,
+  groups?: string[],
 ) {
   const rows = await getDb().manyOrNone<DBSurvey>(
     `SELECT
@@ -496,13 +503,22 @@ export async function getSurveys(
     LEFT JOIN data.submission sub ON sub.survey_id = survey.id
   WHERE
     ($1 IS NULL OR author_id = $1)
+    ${groups?.length > 0 ? `AND $3 && survey.groups` : ''}
   GROUP BY survey.id
   ORDER BY updated_at DESC`,
-    [authorId, filterByPublished],
+    [authorId, filterByPublished, groups],
   );
   return rows
     .map((row) => dbSurveyToSurvey(row))
     .filter((survey) => (filterByPublished ? isPublished(survey) : survey));
+}
+
+export async function getSurveyGroups(id: number) {
+  const rows = await getDb().one<{ groups: string[] }>(
+    `SELECT groups FROM data.survey WHERE id = $1`,
+    [id],
+  );
+  return rows.groups;
 }
 
 /**
@@ -511,8 +527,12 @@ export async function getSurveys(
  */
 export async function createSurvey(user: User) {
   const surveyRow = await getDb().one<DBSurvey>(
-    `INSERT INTO data.survey (author_id) VALUES ($1) RETURNING *`,
-    [user.id],
+    `INSERT INTO data.survey ${
+      user.groups?.length > 0
+        ? '(author_id, groups) VALUES ($1, $2)'
+        : '(author_id) VALUES ($1)'
+    } RETURNING *`,
+    [user.id, [user.groups[0]]],
   );
 
   if (!surveyRow) {
@@ -899,7 +919,8 @@ export async function updateSurvey(survey: Survey) {
         top_margin_image_name = $28,
         top_margin_image_path = $29,
         bottom_margin_image_name = $30,
-        bottom_margin_image_path = $31
+        bottom_margin_image_path = $31,
+        groups = $32
       WHERE id = $1 RETURNING *`,
       [
         survey.id,
@@ -933,6 +954,7 @@ export async function updateSurvey(survey: Survey) {
         survey.marginImages.top.imagePath ?? null,
         survey.marginImages.bottom.imageName ?? null,
         survey.marginImages.bottom.imagePath ?? null,
+        survey.groups,
       ],
     )
     .catch((error) => {
@@ -948,11 +970,16 @@ export async function updateSurvey(survey: Survey) {
     throw new NotFoundError(`Survey with ID ${survey.id} not found`);
   }
 
+  // Find out what coordinate system was used for the default map view
+  const pageWithDefaultMapView = survey.pages.find(page => page.sidebar.defaultMapView);
+  const defaultMapViewSRID = pageWithDefaultMapView ? parseInt(pageWithDefaultMapView.sidebar.defaultMapView.crs.split(':')[1]) : null;
+  
+
   // Update the survey pages
   await getDb().none(
     getMultiUpdateQuery(
       surveyPagesToRows(survey.pages, survey.id),
-      surveyPageColumnSet,
+      surveyPageColumnSet(defaultMapViewSRID),
     ) + ' WHERE t.id = v.id',
   );
 
@@ -1217,6 +1244,7 @@ function dbSurveyToSurvey(
         imageName: dbSurvey.bottom_margin_image_name,
       },
     },
+    groups: dbSurvey.groups,
   };
   return {
     ...survey,
@@ -1264,6 +1292,7 @@ function dbSurveyJoinToPage(dbSurveyJoin: DBSurveyJoin): SurveyPage {
             ? geometryToGeoJSONFeatureCollection(
                 dbSurveyJoin.default_map_view,
                 {},
+                dbSurveyJoin.mapViewSRID
               )
             : null,
         },
@@ -1664,6 +1693,7 @@ export async function storeFile({
   mimetype,
   details,
   surveyId,
+  groups,
 }: {
   buffer: Buffer;
   path: string[];
@@ -1671,19 +1701,22 @@ export async function storeFile({
   mimetype: string;
   details: { [key: string]: any };
   surveyId: number;
+  groups: string[];
 }) {
   const fileString = `\\x${buffer.toString('hex')}`;
+
   const row = await getDb().oneOrNone<{ path: string[]; name: string }>(
     `
-    INSERT INTO data.files (file, details, file_path, file_name, mime_type, survey_id)
-    VALUES ($(fileString), $(details), $(path), $(name), $(mimetype), $(surveyId))
+    INSERT INTO data.files (file, details, file_path, file_name, mime_type, survey_id, groups)
+    VALUES ($(fileString), $(details), $(path), $(name), $(mimetype), $(surveyId), $(groups))
     ON CONFLICT ON CONSTRAINT pk_files DO UPDATE SET
       file = $(fileString),
       details = $(details),
       file_path = $(path),
       file_name = $(name),
       mime_type = $(mimetype),
-      survey_id = $(surveyId)
+      survey_id = $(surveyId),
+      groups = $(groups)
     RETURNING file_path AS path, file_name AS name;
     `,
     {
@@ -1693,6 +1726,7 @@ export async function storeFile({
       name,
       mimetype,
       surveyId,
+      groups,
     },
   );
 
@@ -1738,12 +1772,19 @@ export async function getFile(fileName: string, filePath: string[]) {
  * Get all survey images from the database
  * @returns SurveyImage[]
  */
-export async function getImages(imagePath: string[]) {
+export async function getImages(imagePath: string[], groups?: string[]) {
   const rows = await getDb().manyOrNone(
     `
-    SELECT id, details, file, file_name, file_path FROM data.files WHERE file_path = $1;
+    SELECT 
+      id, 
+      details, 
+      file, 
+      file_name, 
+      file_path 
+    FROM data.files 
+    WHERE file_path = $1 ${groups ? 'AND groups && $2' : ''};
   `,
-    [imagePath],
+    [imagePath, groups],
   );
 
   return rows.map((row) => ({
@@ -1762,12 +1803,17 @@ export async function getImages(imagePath: string[]) {
  * @param filePath path of the file
  * @returns
  */
-export async function removeFile(fileName: string, filePath: string[]) {
+export async function removeFile(
+  fileName: string,
+  filePath: string[],
+  groups?: string[],
+) {
   return await getDb().none(
     `
-    DELETE FROM data.files WHERE file_name = $1 AND file_path = $2;
+    DELETE FROM data.files 
+    WHERE file_name = $1 AND file_path = $2 ${groups ? 'AND groups && $3' : ''};
   `,
-    [fileName, filePath],
+    [fileName, filePath, groups],
   );
 }
 

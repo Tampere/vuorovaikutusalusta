@@ -19,6 +19,7 @@ export default function EditImageSection({ section, onChange }: Props) {
       <FileUpload
         surveyId={activeSurvey.id}
         targetPath={[String(activeSurvey.id)]}
+        surveyGroups={activeSurvey.groups}
         value={
           !section.fileName
             ? null

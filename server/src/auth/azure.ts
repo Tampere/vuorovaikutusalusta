@@ -3,6 +3,7 @@ import passport from 'passport';
 import { OIDCStrategy } from 'passport-azure-ad';
 import { decrypt } from '../crypto';
 import { upsertUser } from '../user';
+import logger from '@src/logger';
 
 /**
  * Configures authentication for given Express application.
@@ -26,14 +27,19 @@ export function configureAzureAuth(app: Express) {
         passReqToCallback: false,
       },
       (profile, done) => {
+        logger.info(JSON.stringify(profile));
         if (!profile.oid) {
           return done(new Error('No oid found'), null);
+        } else if (!profile._json.groups || profile._json.groups.length === 0) {
+          return done(new Error('No groups found'), null);
         }
+
         process.nextTick(async function () {
           const user = await upsertUser({
             id: profile.oid,
             fullName: profile.displayName,
             email: profile._json.email,
+            groups: profile._json.groups,
           });
           return done(null, user);
         });

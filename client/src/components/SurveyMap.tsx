@@ -14,8 +14,16 @@ interface Props {
   pageId: number;
 }
 
+interface MapPosition {
+  centerX: number;
+  centerY: number;
+  zoom?: number;
+  options?: object;
+}
+
 export default function SurveyMap(props: Props) {
   const [mapInitialized, setMapInitialized] = useState(false);
+  const [mapInitialPos, setMapiInitialPos] = useState<MapPosition | null>(null);
   const iframeRef = useRef<HTMLIFrameElement>();
   const {
     rpcChannel,
@@ -75,13 +83,23 @@ export default function SurveyMap(props: Props) {
 
   useEffect(() => {
     if (!mapInitialized || !isMapReady) return;
+    if (!mapInitialPos) {
+      rpcChannel.getMapPosition((pos) => {
+        setMapiInitialPos(pos);
+      });
+    }
+
     if (props.defaultMapView) {
       centerToDefaultView(props.defaultMapView, {
         fill: { color: '#00000000' },
         stroke: { color: '#00000000' },
       });
-    } else {
-      rpcChannel?.resetState(() => {});
+    } else if (mapInitialPos) {
+      rpcChannel.postRequest('MapMoveRequest', [
+        mapInitialPos.centerX,
+        mapInitialPos.centerY,
+        mapInitialPos.zoom,
+      ]);
     }
   }, [props.defaultMapView, mapInitialized, props.pageId]);
 

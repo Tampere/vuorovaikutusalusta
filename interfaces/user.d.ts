@@ -14,4 +14,8 @@ export interface User {
    * User's email address
    */
   email: string;
+  /**
+   * User's group ids
+   */
+  groups: string[];
 }

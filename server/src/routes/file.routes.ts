@@ -8,7 +8,8 @@ import {
   removeFile,
   storeFile,
 } from '@src/application/survey';
-import { ensureAuthenticated } from '@src/auth';
+import { ensureAuthenticated, ensureFileGroupAccess } from '@src/auth';
+
 import { parseMimeType, validateRequest } from '@src/utils';
 import { Router } from 'express';
 import asyncHandler from 'express-async-handler';
@@ -66,12 +67,22 @@ router.post(
   ]),
   upload.single('file'),
   ensureAuthenticated(),
+  ensureFileGroupAccess(),
   asyncHandler(async (req, res) => {
     const { buffer, originalname, mimetype } = req.file;
     const path = req.params.filePath?.split('/') ?? [];
 
     // Pick the survey ID from the request - the rest will be the remaining details/metadata
     const { surveyId, ...details } = req.body;
+    const groups = res.locals.fileGroups;
+    if (
+      process.env.USER_GROUPING_ENABLED === 'true' &&
+      surveyId == null &&
+      groups == null
+    ) {
+      res.status(400).json({ message: 'Survey ID or groups must be provided' });
+      return;
+    }
 
     const id = await storeFile({
       buffer,
@@ -80,6 +91,7 @@ router.post(
       mimetype,
       details,
       surveyId: surveyId == null ? null : Number(surveyId),
+      groups: groups ?? [],
     });
     res.status(200).json({ id });
   }),
@@ -91,10 +103,11 @@ router.post(
 router.get(
   '/:filePath?',
   ensureAuthenticated(),
+  ensureFileGroupAccess(),
   asyncHandler(async (req, res) => {
     const { filePath } = req.params;
     const filePathArray = filePath?.split('/') ?? [];
-    const row = await getImages(filePathArray);
+    const row = await getImages(filePathArray, res.locals.fileGroups);
 
     res.status(200).json(row);
   }),
@@ -135,11 +148,12 @@ router.delete(
       .withMessage('filePath must be a string'),
   ]),
   ensureAuthenticated(),
+  ensureFileGroupAccess(),
   asyncHandler(async (req, res) => {
     const { fileName, filePath } = req.params;
     const filePathArray = filePath?.split('/') ?? [];
 
-    await removeFile(fileName, filePathArray);
+    await removeFile(fileName, filePathArray, res.locals.fileGroups);
     res.status(200).send();
   }),
 );

@@ -50,6 +50,8 @@
     "nameHelperText": "Namnet som syns i undersökningens URL-adress. Kan innehålla endast bokstäver (a-z), siffror (0-9) och bindestreck (- och _).",
     "author": "Undersökningens författare/kontaktperson",
     "authorUnit": "Författarens enhet",
+    "authorizedGroups": "Auktoriserade grupper",
+    "authorizedGroupsHelperText": "Endast utvalda användargrupper kan se enkäten.",
     "admins": "Undersökningens administratörer",
     "userFetchFailed": "Misslyckades att hämta användare. Försök igen senare.",
     "adminsHelperText": "Användare som definieras förutom den ursprungliga skaparen av undersökningen, som kan se undersökningssvar och redigera undersökningen.",
@@ -322,12 +324,14 @@
   "ColorSelect": {
     "color": "Färg",
     "colors": {
-      "black": "Svart",
-      "darkGray": "Mörkgrå",
-      "steelBlue": "Stålblå",
-      "atmosphere": "Atmosfär",
-      "berryRed": "Bärrotsröd",
-      "warmGreen": "Varmgrön"
+      "teal": "Tavi",
+      "sea": "Hav",
+      "sprig": "Grönskott",
+      "grey": "Grå",
+      "night": "Natt",
+      "blue": "Blå",
+      "earthRed": "Rödmylla",
+      "tar": "Tjära"
     }
   },
   "MarkerIconSelect": {

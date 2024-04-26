@@ -50,6 +50,8 @@
     "nameHelperText": "The name displayed on the survey URL-address. This can only include characters (a-z), numbers (0-9), hyphen (-) and underline (_).",
     "author": "Survey author / contact person",
     "authorUnit": "Survey author's / contact person's unit",
+    "authorizedGroups": "Authorized user groups",
+    "authorizedGroupsHelperText": "Users in these groups will have access to the survey.",
     "admins": "Survey admins",
     "userFetchFailed": "Failed to fetch users. Try again later.",
     "adminsHelperText": "Users besides the original author of the survey, who will have access to the survey answers and who can modify the survey.",
@@ -323,12 +325,14 @@
   "ColorSelect": {
     "color": "Color",
     "colors": {
-      "black": "Black",
-      "darkGray": "Dark grey",
-      "steelBlue": "Steel blue",
-      "atmosphere": "Atmosphere",
-      "berryRed": "Berry red",
-      "warmGreen": "Warm green"
+      "teal": "Teal",
+      "sea": "Sea",
+      "sprig": "Sprig",
+      "grey": "Grey",
+      "night": "Night",
+      "blue": "Blue",
+      "earthRed": "Earth red",
+      "tar": "Tar"
     }
   },
   "MarkerIconSelect": {

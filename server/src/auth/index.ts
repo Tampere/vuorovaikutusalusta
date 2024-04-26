@@ -8,6 +8,7 @@ import { encrypt } from '../crypto';
 import { getDb } from '../database';
 import { configureAzureAuth } from './azure';
 import { configureGoogleOAuth } from './google-oauth';
+import { getSurveyGroups } from '@src/application/survey';
 
 /**
  * Configures authentication for given Express application.
@@ -85,9 +86,10 @@ export function configureAuth(app: Express) {
 export function configureMockAuth(app: Express) {
   // Create a mock user & persist it in the database
   const mockUser: Express.User = {
-    id: '12345-67890-abcde-fghij',
-    fullName: 'Teemu Testaaja',
-    email: 'teemu.testaaja@testi.com',
+    id: '12345-67890-abcde-fghij1',
+    fullName: 'toinen Testaaja',
+    email: 'toinen.testaaja@testi.com',
+    groups: ['test-group-id-1'],
   };
   upsertUser(mockUser);
 
@@ -131,5 +133,51 @@ export function ensureAuthenticated(options?: { redirectToLogin?: boolean }) {
       });
       fail();
     }) ?? fail();
+  };
+}
+
+export function ensureSurveyGroupAccess(id: string = 'id') {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    if (process.env.USER_GROUPING_ENABLED !== 'true') {
+      return next();
+    }
+    const surveyGroups = req.params[id]
+      ? await getSurveyGroups(Number(req.params[id]))
+      : [];
+    if (
+      surveyGroups.length > 0 &&
+      surveyGroups.every((group) => !req.user.groups.includes(group))
+    ) {
+      res.status(403).send('Forbidden');
+    } else {
+      return next();
+    }
+  };
+}
+
+export function ensureFileGroupAccess() {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    if (process.env.USER_GROUPING_ENABLED !== 'true') {
+      return next();
+    }
+
+    const surveyGroups = req.headers['groups']
+      ? JSON.parse(req.headers['groups'] as string)
+      : req.user.groups;
+
+    if (!Array.isArray(surveyGroups)) {
+      res.status(400).send('Bad Request');
+    }
+
+    const fileGroups = req.user.groups.filter((group) =>
+      (surveyGroups as string[]).includes(group),
+    );
+
+    if (fileGroups.length === 0) {
+      res.status(403).send('Forbidden');
+    } else {
+      res.locals.fileGroups = fileGroups;
+      return next();
+    }
   };
 }
