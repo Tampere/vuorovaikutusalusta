@@ -31,7 +31,6 @@ import { EditSurveyPageConditions } from './EditSurveyPageConditions';
 import FileUpload from './FileUpload';
 import SurveySections from './SurveySections';
 
-
 const useStyles = makeStyles({
   button: {
     width: 'fit-content',
@@ -170,6 +169,7 @@ export default function EditSurveyPage() {
                 {!availableMapLayersLoading &&
                   availableMapLayers.map((layer) => (
                     <FormControlLabel
+                      sx={{ maxWidth: '500px' }}
                       key={layer.id}
                       label={layer.name}
                       control={

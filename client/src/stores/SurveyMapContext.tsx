@@ -39,7 +39,6 @@ interface State {
 
   defaultView: GeoJSON.FeatureCollection;
   oskariVersion: number;
-
 }
 
 type Action =
@@ -83,14 +82,12 @@ type Action =
       value: boolean;
     }
   | {
-
       type: 'SET_DEFAULT_VIEW';
       value: GeoJSON.FeatureCollection;
     }
   | {
       type: 'SET_OSKARI_VERSION';
       value: number;
-
     };
 
 type Context = [State, React.Dispatch<Action>];
@@ -117,7 +114,6 @@ const stateDefaults: State = {
 
   defaultView: null,
   oskariVersion: null,
-
 };
 
 /**
@@ -798,7 +794,7 @@ function reducer(state: State, action: Action): State {
       return {
         ...state,
         defaultView: action.value,
-      }
+      };
     case 'SET_OSKARI_VERSION':
       return {
         ...state,
