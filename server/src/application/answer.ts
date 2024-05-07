@@ -255,7 +255,7 @@ function dbEntriesToFeatures(
               ) {
                 submissionGroup[submissionId][answer.parentEntryId].properties[
                   questionKey
-                ] = null;
+                ] = false;
               }
             });
           // initialize subquestion custom answer header if it exists
@@ -814,7 +814,14 @@ function createCSVHeaders(sectionMetadata: SectionHeader[]) {
       // numeric, free-text, slider
       default:
         allHeaders.push({
-          [getHeaderKey(sectionHead.pageIndex, sectionHead.sectionIndex, null, null, sectionHead.predecessorSection, predecessorIndexes)]:
+          [getHeaderKey(
+            sectionHead.pageIndex,
+            sectionHead.sectionIndex,
+            null,
+            null,
+            sectionHead.predecessorSection,
+            predecessorIndexes,
+          )]:
             `${getSectionDetailsForHeader(
               sectionHead,
               predecessorIndexes,
@@ -997,7 +1004,7 @@ function getValue(answer: AnswerEntry, answerType: string) {
     case 'numeric':
       return answer.valueNumeric;
     case 'free-text':
-      return answer.valueText.replace(/\r?\n/g, "").replace(/,/g, '');
+      return answer.valueText.replace(/\r?\n/g, '').replace(/,/g, '');
   }
 }
 
