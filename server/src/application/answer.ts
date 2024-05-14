@@ -255,7 +255,7 @@ function dbEntriesToFeatures(
               ) {
                 submissionGroup[submissionId][answer.parentEntryId].properties[
                   questionKey
-                ] = false;
+                ] = "false";
               }
             });
           // initialize subquestion custom answer header if it exists
@@ -279,7 +279,7 @@ function dbEntriesToFeatures(
             key = `${key} - ${answer?.optionText?.['fi']}`;
             submissionGroup[submissionId][answer.parentEntryId].properties[
               key
-            ] = true;
+            ] = "true";
           }
 
           break;
@@ -370,7 +370,7 @@ export async function getGeoPackageFile(surveyId: number): Promise<Buffer> {
     getAvailableMapLayers(survey.mapUrl),
   );
 
-  if (!rows || !checkboxOptions) {
+  if (!rows) {
     return null;
   }
 
