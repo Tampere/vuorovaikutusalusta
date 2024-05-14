@@ -1,9 +1,9 @@
+import { LocalizedText } from '@interfaces/survey';
 import React, { ReactNode, useContext, useMemo, useReducer } from 'react';
 import { useHistory } from 'react-router-dom';
 import en from './en.json';
 import fi from './fi.json';
 import se from './se.json';
-import { LocalizedText } from '@interfaces/survey';
 
 // Object containing all translations
 const translations = {
@@ -50,7 +50,7 @@ interface Props {
 const stateDefaults: State = {
   language: 'fi',
   surveyLanguage: 'fi',
-  languages: ['fi', 'en', 'se'],
+  languages: ['fi', 'se'],
 };
 
 export const TranslationContext = React.createContext<Context>(null);
