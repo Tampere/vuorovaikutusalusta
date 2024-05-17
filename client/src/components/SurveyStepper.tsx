@@ -37,16 +37,16 @@ import { request } from '@src/utils/request';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import SplitPane from 'react-split-pane';
 import DocumentSection from './DocumentSection';
+import Footer from './Footer';
 import ImageSection from './ImageSection';
 import PageConnector from './PageConnector';
 import StepperControls from './StepperControls';
 import SubmissionInfoDialog from './SubmissionInfoDialog';
+import { SurveyFollowUpSections } from './SurveyFollowUpSections';
 import SurveyLanguageMenu from './SurveyLanguageMenu';
 import SurveyMap from './SurveyMap';
 import SurveyQuestion from './SurveyQuestion';
 import TextSection from './TextSection';
-import { SurveyFollowUpSections } from './SurveyFollowUpSections';
-import Footer from './Footer';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -595,11 +595,11 @@ export default function SurveyStepper({
         </Stepper>
       </main>
       <Footer>
-        <Link color="primary" underline="hover" href="_blank" target="_blank">
+        <Link color="primary" underline="hover" href="/saavutettavuusseloste" target="_blank">
           {tr.FooterLinks.accessibility}
         </Link>
         {survey.displayPrivacyStatement && (
-          <Link color="primary" underline="hover" href="_blank" target="_blank">
+          <Link color="primary" underline="hover" href="/tietosuojaseloste" target="_blank">
             {tr.FooterLinks.privacyStatement}
           </Link>
         )}

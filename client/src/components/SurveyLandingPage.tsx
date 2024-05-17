@@ -2,11 +2,11 @@ import { Survey } from '@interfaces/survey';
 import {
   Box,
   Button,
+  Link,
+  Stack,
   Theme,
   Typography,
-  Stack,
   useMediaQuery,
-  Link,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
@@ -202,14 +202,14 @@ export default function SurveyLandingPage({
         }}
       >
         <Footer>
-          <Link color="primary" underline="hover" href="_blank" target="_blank">
+          <Link color="primary" underline="hover" href="/saavutettavuusseloste" target="_blank">
             {tr.FooterLinks.accessibility}
           </Link>
           {survey.displayPrivacyStatement && (
             <Link
               color="primary"
               underline="hover"
-              href="_blank"
+              href="/tietosuojaseloste"
               target="_blank"
             >
               {tr.FooterLinks.privacyStatement}
