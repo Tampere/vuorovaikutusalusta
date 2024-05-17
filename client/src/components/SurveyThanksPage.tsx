@@ -1,12 +1,12 @@
 import { Survey } from '@interfaces/survey';
 import {
-  Typography,
+  Box,
+  Link,
+  Stack,
   SxProps,
   Theme,
-  Box,
+  Typography,
   useMediaQuery,
-  Stack,
-  Link,
 } from '@mui/material';
 import { useImageHeaderQuery } from '@src/hooks/UseImageHeaderQuery';
 import { useTranslations } from '@src/stores/TranslationContext';
@@ -144,14 +144,14 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
         }}
       >
         <Footer>
-          <Link color="primary" underline="hover" href="_blank" target="_blank">
+          <Link color="primary" underline="hover" href="/saavutettavuusseloste" target="_blank">
             {tr.FooterLinks.accessibility}
           </Link>
           {survey.displayPrivacyStatement && (
             <Link
               color="primary"
               underline="hover"
-              href="_blank"
+              href="/tietosuojaseloste"
               target="_blank"
             >
               {tr.FooterLinks.privacyStatement}
