@@ -4,7 +4,7 @@ import {
   MapQuestionAnswer,
   Submission,
   SurveyMapSubQuestionAnswer,
-  SurveyPageSection,
+  SurveyPageSection
 } from '@interfaces/survey';
 import {
   getColumnSet,
@@ -807,21 +807,44 @@ export async function getTimestamp(submissionId: number) {
  * @returns Submissions
  */
 export async function getSubmissionsForSurvey(surveyId: number) {
-  const rows = await getDb().manyOrNone<DBSubmission>(
+  const rows = await getDb().manyOrNone<DBSubmission & DBAnswerEntry>(
     `SELECT
-      s.id,
-      s.updated_at
+      s.updated_at,
+      ae.id,
+      ae.submission_id,
+      ae.section_id,
+      ae.parent_entry_id,
+      ae.value_text,
+      ae.value_option_id,
+      public.ST_AsGeoJSON(public.ST_Transform(ae.value_geometry, 3067))::json as value_geometry,
+      ae.value_numeric,
+      ae.value_json,
+      ae.value_file,
+      ae.value_file_name,
+      ae.map_layers,
+      ps.type AS section_type,
+      ps.parent_section AS parent_section
     FROM
       data.submission s
-    WHERE survey_id = $(surveyId) AND unfinished_token IS NULL
-    ORDER BY updated_at ASC`,
+      INNER JOIN data.answer_entry ae ON ae.submission_id = s.id
+      INNER JOIN data.page_section ps ON ps.id = ae.section_id
+      INNER JOIN data.survey_page sp ON sp.id = ps.survey_page_id
+    WHERE s.survey_id = $(surveyId) AND s.unfinished_token IS NULL
+    ORDER BY updated_at, sp.idx, ps.idx;`,
     { surveyId },
   );
-  return Promise.all<Submission>(
-    rows.map(async (row) => ({
-      id: row.id,
-      timestamp: row.updated_at,
-      answerEntries: await getAnswerEntries(row.id),
-    })),
-  );
+  const result = [];
+  let currentSubmission: {id: number, timestamp: Date, entries: DBAnswerEntry[]} | null = null;
+  for (const row of rows) {
+    if (currentSubmission?.id !== row.submission_id) {
+      currentSubmission = {
+        id: row.submission_id,
+        timestamp: row.updated_at,
+        entries: []
+      }
+      result.push(currentSubmission);
+    }
+    currentSubmission.entries.push(row);
+  }
+  return result.map(x => ({id: x.id, timestamp: x.timestamp, answerEntries: dbAnswerEntriesToAnswerEntries(x.entries)} as Submission));
 }
