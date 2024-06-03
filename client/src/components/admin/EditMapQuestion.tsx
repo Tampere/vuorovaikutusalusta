@@ -21,14 +21,12 @@ interface Props {
   section: SurveyMapQuestion;
   disabled?: boolean;
   onChange: (section: SurveyMapQuestion) => void;
-  forFollowUpSection?: boolean;
 }
 
 export default function EditMapQuestion({
   section,
   disabled,
   onChange,
-  forFollowUpSection,
 }: Props) {
   const [expandedSection, setExpandedSection] = useState<number>(null);
 
@@ -198,7 +196,6 @@ export default function EditMapQuestion({
       </FormGroup>
       <FormLabel>{tr.EditMapQuestion.subQuestions}</FormLabel>
       <EditMapSubQuestions
-        forFollowUpSection={forFollowUpSection ?? false}
         mapQuestion={section}
         expandedSection={expandedSection}
         onExpandedSectionChange={(section) => {

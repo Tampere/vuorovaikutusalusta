@@ -171,7 +171,7 @@ export function FollowUpSectionAccordion(props: Props) {
       tooltip: tr.SurveySection.mapQuestion,
       form: (
         <EditMapQuestion
-          forFollowUpSection
+          disableSectionCopying
           disabled={props.disabled}
           section={props.section as SurveyMapQuestion}
           onChange={handleEdit}

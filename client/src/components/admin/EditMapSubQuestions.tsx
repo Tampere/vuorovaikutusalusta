@@ -10,7 +10,6 @@ interface Props {
   onChange: (subQuestions: SurveyMapSubQuestion[]) => void;
   disabled?: boolean;
   onExpandedSectionChange: (expandedSectionIndex: number) => void;
-  forFollowUpSection?: boolean;
 }
 
 const useStyles = makeStyles({
@@ -60,7 +59,7 @@ export default function EditMapSubQuestions(props: Props) {
               >
                 {(provided, _snapshot) => (
                   <SurveySectionAccordion
-                    forFollowUpSection={props?.forFollowUpSection ?? false}
+                    disableSectionCopying
                     index={index}
                     provided={provided}
                     key={index}
