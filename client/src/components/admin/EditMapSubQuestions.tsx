@@ -58,37 +58,39 @@ export default function EditMapSubQuestions(props: Props) {
                 index={index}
               >
                 {(provided, _snapshot) => (
-                  <SurveySectionAccordion
-                    disableSectionCopying
-                    index={index}
-                    provided={provided}
-                    key={index}
-                    className={classes.accordion}
-                    disabled={props.disabled}
-                    section={section}
-                    name={`section-${index}`}
-                    expanded={props.expandedSection === index}
-                    onExpandedChange={(isExpanded) => {
-                      props.onExpandedSectionChange(isExpanded ? index : null);
-                    }}
-                    onEdit={(index, editedSection: SurveyMapSubQuestion) => {
-                      // Replace the edited subquestion in the array
-                      const subQuestions = props.mapQuestion.subQuestions.map(
-                        (section, i) => (i === index ? editedSection : section),
-                      );
-                      props.onChange(subQuestions);
-                    }}
-                    onDelete={(index) => {
-                      // Filter out the subquestion from the array
-                      const subQuestions =
-                        props.mapQuestion.subQuestions.filter(
-                          (_, i) => i !== index,
+                  <div ref={provided.innerRef} {...provided.draggableProps}>
+                    <SurveySectionAccordion
+                      disableSectionCopying
+                      index={index}
+                      provided={provided}
+                      key={index}
+                      className={classes.accordion}
+                      disabled={props.disabled}
+                      section={section}
+                      name={`section-${index}`}
+                      expanded={props.expandedSection === index}
+                      onExpandedChange={(isExpanded) => {
+                        props.onExpandedSectionChange(isExpanded ? index : null);
+                      }}
+                      onEdit={(index, editedSection: SurveyMapSubQuestion) => {
+                        // Replace the edited subquestion in the array
+                        const subQuestions = props.mapQuestion.subQuestions.map(
+                          (section, i) => (i === index ? editedSection : section),
                         );
-                      props.onChange(subQuestions);
-                      // Reset expanded section to null
-                      props.onExpandedSectionChange(null);
-                    }}
+                        props.onChange(subQuestions);
+                      }}
+                      onDelete={(index) => {
+                        // Filter out the subquestion from the array
+                        const subQuestions =
+                          props.mapQuestion.subQuestions.filter(
+                            (_, i) => i !== index,
+                          );
+                        props.onChange(subQuestions);
+                        // Reset expanded section to null
+                        props.onExpandedSectionChange(null);
+                      }}
                   />
+                  </div>
                 )}
               </Draggable>
             ))}
