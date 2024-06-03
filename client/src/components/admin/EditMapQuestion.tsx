@@ -215,6 +215,7 @@ export default function EditMapQuestion({
           // Open last section after adding a new one
           setExpandedSection((section.subQuestions ?? []).length);
         }}
+        disableSectionPaste
       />
     </>
   );
