@@ -1,5 +1,4 @@
 import { SurveyFollowUpSection, SurveyPageSection } from '@interfaces/survey';
-import { Fab, Grid, Typography } from '@mui/material';
 import {
   Article,
   AttachFile,
@@ -17,13 +16,14 @@ import {
   ViewComfy,
   ViewComfyAlt,
 } from '@mui/icons-material';
+import { Fab, Grid, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { useTranslations } from '@src/stores/TranslationContext';
-import React, { ReactNode, useState } from 'react';
-import { useParams } from 'react-router-dom';
 import { useClipboard } from '@src/stores/ClipboardContext';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useToasts } from '@src/stores/ToastContext';
+import { useTranslations } from '@src/stores/TranslationContext';
+import React, { ReactNode, useState } from 'react';
+import { useParams } from 'react-router-dom';
 
 const useStyles = makeStyles({
   actionItem: {
@@ -38,6 +38,7 @@ interface Props {
   types?: SurveyPageSection['type'][];
   disabled?: boolean;
   onAdd: (newSection: SurveyPageSection | SurveyFollowUpSection) => void;
+  disableSectionPaste?: boolean;
 }
 
 export default function AddSurveySectionActions(props: Props) {
@@ -343,38 +344,39 @@ export default function AddSurveySectionActions(props: Props) {
                 </div>
               </Grid>
             ))}
-          <Grid item style={{ padding: '0.5rem' }}>
-            <div className={classes.actionItem}>
-              <Fab
-                disabled={!clipboardSection}
-                color="secondary"
-                aria-label={'attach-section-from-clipboard'}
-                size="small"
-                onClick={() => {
-                  // Copy content from Clipboard context to active survey
-                  if (clipboardSection) {
-                    addSection(Number(pageId), {
-                      ...clipboardSection,
-                      id: sectionSequence,
-                    });
-                    setSectionSequence((prev) => prev - 1);
-
-                    if (clipboardSection.type === 'map') {
-                      showToast({
-                        severity: 'warning',
-                        autoHideDuration: 30000,
-                        message: tr.EditSurveyPage.sectionAttached,
+          {!props.disableSectionPaste && 
+            <Grid item style={{ padding: '0.5rem' }}>
+              <div className={classes.actionItem}>
+                <Fab
+                  disabled={!clipboardSection}
+                  color="secondary"
+                  aria-label={'attach-section-from-clipboard'}
+                  size="small"
+                  onClick={() => {
+                    // Copy content from Clipboard context to active survey
+                    if (clipboardSection) {
+                      addSection(Number(pageId), {
+                        ...clipboardSection,
+                        id: sectionSequence,
                       });
-                    }
-                  }
-                }}
-              >
-                <ContentPaste />
-              </Fab>
-              <Typography>{tr.EditSurveyPage.attachSection}</Typography>
-            </div>
-          </Grid>
+                      setSectionSequence((prev) => prev - 1);
 
+                      if (clipboardSection.type === 'map') {
+                        showToast({
+                          severity: 'warning',
+                          autoHideDuration: 30000,
+                          message: tr.EditSurveyPage.sectionAttached,
+                        });
+                      }
+                    }
+                  }}
+                >
+                  <ContentPaste />
+                </Fab>
+                <Typography>{tr.EditSurveyPage.attachSection}</Typography>
+              </div>
+            </Grid>
+          }
           <Grid
             item
             style={{

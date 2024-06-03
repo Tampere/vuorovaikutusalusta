@@ -1,10 +1,10 @@
 import { SurveyPage } from '@interfaces/survey';
 import { useSurvey } from '@src/stores/SurveyContext';
+import { isFollowUpSectionParentType } from '@src/utils/typeCheck';
 import React from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
-import SurveySectionAccordion from './SurveySectionAccordion/SurveySectionAccordion';
 import { FollowUpSections } from './SurveySectionAccordion/FollowUpSections';
-import { isFollowUpSectionParentType } from '@src/utils/typeCheck';
+import SurveySectionAccordion from './SurveySectionAccordion/SurveySectionAccordion';
 
 interface Props {
   page: SurveyPage;
@@ -28,7 +28,7 @@ export default function SurveySections(props: Props) {
 
         if (event.type.includes('followUpSection')) {
           const parentSection = props.page.sections.find((sect) =>
-            sect.followUpSections.find((s) => s.id === id),
+            sect.followUpSections?.find((s) => s.id === id),
           );
 
           const oldIndex = parentSection.followUpSections.findIndex(
