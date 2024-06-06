@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "lib": ["ES2021", "DOM"],
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "esModuleInterop": true,
