@@ -318,7 +318,7 @@ async function answerEntriesToCSV(entries: CSVJson): Promise<string> {
   const { submissions, headers } = entries;
 
   let csvData = `Vastaustunniste,Vastauskieli,Aikaleima,${headers.map(
-    (header) => `"${Object.values(header)[0]}"`,
+    (header) => `"${Object.values(header)[0].replace(/"/g, '""')}"`,
   )}\n`;
 
   for (let i = 0; i < submissions.length; ++i) {
