@@ -182,7 +182,12 @@ export function EditSurveyPageConditions() {
 
   return (
     <Box
-      sx={{ dipslay: 'flex', flexDirection: 'column', marginBottom: '10px' }}
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        marginBottom: '10px',
+        maxWidth: '45rem',
+      }}
     >
       <FormControl
         fullWidth
@@ -206,7 +211,9 @@ export function EditSurveyPageConditions() {
           sx={{
             flex: 2,
             backgroundColor: 'white',
-            '& .MuiSelect-select': { paddingY: '0.75rem' },
+            '& .MuiSelect-select': {
+              paddingY: '0.75rem',
+            },
           }}
           onChange={(event) => {
             editPage({
@@ -252,7 +259,16 @@ export function EditSurveyPageConditions() {
               sx={{
                 flex: 2,
                 backgroundColor: 'white',
-                '& .MuiSelect-select': { paddingY: '0.75rem' },
+                overflow: 'hidden',
+                '& .MuiSelect-select': {
+                  paddingY: '0.75rem',
+                  minWidth: 0,
+                  '& .MuiTypography-root': {
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  },
+                },
               }}
               value={
                 conditionList.length > 0

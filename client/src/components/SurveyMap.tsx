@@ -79,6 +79,9 @@ export default function SurveyMap(props: Props) {
       initializeMap();
       setMapInitialized(true);
     }
+    return () => {
+      setMapInitialized(false);
+    };
   }, [isMapReady]);
 
   useEffect(() => {

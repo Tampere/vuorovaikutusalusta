@@ -17,18 +17,11 @@ import {
   SurveyTextSection,
 } from '@interfaces/survey';
 import {
-  Accordion,
-  AccordionSummary,
-  IconButton,
-  Tooltip,
-  Typography,
-} from '@mui/material';
-import {
-  DragIndicator,
-  ExpandMore,
   Article,
   AttachFile,
   CheckBox,
+  DragIndicator,
+  ExpandMore,
   FormatListNumbered,
   Image,
   LibraryAddCheck,
@@ -41,33 +34,35 @@ import {
   ViewComfy,
   ViewComfyAlt,
 } from '@mui/icons-material';
+import {
+  Accordion,
+  AccordionSummary,
+  Tooltip,
+  Typography
+} from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import { FollowUpListItemIcon } from '@src/components/icons/FollowUpListItemIcon';
+import { useClipboard } from '@src/stores/ClipboardContext';
+import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { ReactNode, useMemo, useRef, useState } from 'react';
 import { DraggableProvided } from 'react-beautiful-dnd';
 import ConfirmDialog from '../../ConfirmDialog';
-import {
-  replaceIdsWithNull,
-  replaceTranslationsWithNull,
-} from '@src/utils/schemaValidation';
-import { useClipboard } from '@src/stores/ClipboardContext';
-import { useToasts } from '@src/stores/ToastContext';
 import EditAttachmentSection from '../EditAttachmentSection';
 import EditCheckBoxQuestion from '../EditCheckBoxQuestion';
-import EditRadioQuestion from '../EditRadioQuestion';
-import EditNumericQuestion from '../EditNumericQuestion';
-import EditMapQuestion from '../EditMapQuestion';
-import EditFreeTextQuestion from '../EditFreeTextQuestion';
-import EditTextSection from '../EditTextSection';
-import EditSortingQuestion from '../EditSortingQuestion';
-import EditSliderQuestion from '../EditSliderQuestion';
-import EditMatrixQuestion from '../EditMatrixQuestion';
 import EditDocumentSection from '../EditDocumentSection';
-import EditImageSection from '../EditImageSection';
+import EditFreeTextQuestion from '../EditFreeTextQuestion';
 import EditGroupedCheckBoxQuestion from '../EditGroupedCheckBoxQuestion';
+import EditImageSection from '../EditImageSection';
+import EditMapQuestion from '../EditMapQuestion';
+import EditMatrixQuestion from '../EditMatrixQuestion';
 import { EditMultiMatrixQuestion } from '../EditMultiMatrixQuestion';
+import EditNumericQuestion from '../EditNumericQuestion';
+import EditRadioQuestion from '../EditRadioQuestion';
+import EditSliderQuestion from '../EditSliderQuestion';
+import EditSortingQuestion from '../EditSortingQuestion';
+import EditTextSection from '../EditTextSection';
 import { FollowUpSectionMenu } from './FollowUpSectionMenu';
-import { FollowUpListItemIcon } from '@src/components/icons/FollowUpListItemIcon';
 
 const useStyles = makeStyles({
   accordion: {
@@ -176,7 +171,7 @@ export function FollowUpSectionAccordion(props: Props) {
       tooltip: tr.SurveySection.mapQuestion,
       form: (
         <EditMapQuestion
-          forFollowUpSection
+          disableSectionCopying
           disabled={props.disabled}
           section={props.section as SurveyMapQuestion}
           onChange={handleEdit}
@@ -335,32 +330,6 @@ export function FollowUpSectionAccordion(props: Props) {
               <em>{tr.EditSurveyPage.untitledSection}</em>
             )}
           </Typography>
-          <IconButton
-            onClick={async (event) => {
-              event.stopPropagation();
-              event.preventDefault();
-
-              // Remove all IDs from the section JSON to prevent unwanted references
-              const copiedSurveySection = replaceTranslationsWithNull(
-                replaceIdsWithNull({ ...props.section }),
-              );
-
-              // Store section to locale storage for other browser tabs to get access to it
-              localStorage.setItem(
-                'clipboard-content',
-                JSON.stringify({
-                  clipboardSection: copiedSurveySection,
-                  clipboardPage,
-                }),
-              );
-              // Store section to context for the currently active browser tab to get access to it
-              setSection(copiedSurveySection);
-              showToast({
-                message: tr.EditSurveyPage.sectionCopied,
-                severity: 'success',
-              });
-            }}
-          ></IconButton>
           <div {...props.provided.dragHandleProps} style={{ display: 'flex' }}>
             <DragIndicator />
           </div>

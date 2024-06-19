@@ -169,6 +169,7 @@ export default function EditSurveyPage() {
                 {!availableMapLayersLoading &&
                   availableMapLayers.map((layer) => (
                     <FormControlLabel
+                      sx={{ maxWidth: '500px' }}
                       key={layer.id}
                       label={layer.name}
                       control={

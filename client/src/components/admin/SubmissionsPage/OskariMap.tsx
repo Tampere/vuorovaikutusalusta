@@ -1,10 +1,10 @@
+import { useSurveyMap } from '@src/stores/SurveyMapContext';
 import { useOskari } from '@src/utils/useOskari';
 import { Feature, Geometry } from 'geojson';
 import { FeatureStyle, MarkerStyle } from 'oskari-rpc';
 import parseCSSColor from 'parse-css-color';
 import React, { useEffect, useMemo, useRef } from 'react';
 import { AnswerSelection } from './AnswersList';
-import { useSurveyMap } from '@src/stores/SurveyMapContext';
 
 interface Props {
   url: string;
