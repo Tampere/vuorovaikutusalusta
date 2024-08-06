@@ -31,4 +31,4 @@ Lokaalissa kehityksessä React käyttöliittymä ohjaa rajapintapyynnöt automaa
 
 Sovelluskehitys noudattaa perinteistä [Gitflow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow#:~:text=The%20overall%20flow%20of%20Gitflow,branch%20is%20created%20from%20main&text=When%20a%20feature%20is%20complete%20it%20is%20merged%20into%20the,branch%20is%20created%20from%20main) -mallia, jossa uudet toiminnallisuudet toteutetaan omaan Git -haaraansa, esim. `feature/new-feature-name`. Valmistuessaan tämä haara yhdistetään `develop` -haaraan. Kun `develop` -haaraan kohdistuu muutoksia Githubissa, automaattinen integraatio käynnistyy, joka julkistaa haaraan viedyn uuden lähdekoodin Azureen testiympäristöön. Kun tulee aika tehdä tuotantopäivitys, yhdistetään `develop` -haaran muutokset `master` -haaraan. Githubissa `master` -haaran muutokset käynnistävät automaattisen integraation, joka julkistaa lähdekoodin Azuren DevOps -palveluun. Täältä lähdekoodi taas julkistetaan automaattisesti Azureen tuotantoympäristöön.
 
-## TODO
+## TODO.
