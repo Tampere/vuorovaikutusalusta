@@ -201,31 +201,32 @@ type DBSurveyJoin = DBSurvey & {
 /**
  * Helper function for creating survey page column set for database queries
  */
-const surveyPageColumnSet = (inputSRID: number) => getColumnSet<DBSurveyPage>('survey_page', [
-  'id',
-  'survey_id',
-  'idx',
-  {
-    name: 'title',
-    cast: 'json',
-  },
-  'sidebar_type',
-  {
-    name: 'sidebar_map_layers',
-    cast: 'json',
-  },
-  {
-    name: 'sidebar_image_path',
-    cast: 'text[]',
-  },
-  'sidebar_image_name',
-  {
-    name: 'sidebar_image_alt_text',
-    cast: 'json',
-  },
-  'sidebar_image_size',
-  getGeoJSONColumn('default_map_view', inputSRID),
-]);
+const surveyPageColumnSet = (inputSRID: number) =>
+  getColumnSet<DBSurveyPage>('survey_page', [
+    'id',
+    'survey_id',
+    'idx',
+    {
+      name: 'title',
+      cast: 'json',
+    },
+    'sidebar_type',
+    {
+      name: 'sidebar_map_layers',
+      cast: 'json',
+    },
+    {
+      name: 'sidebar_image_path',
+      cast: 'text[]',
+    },
+    'sidebar_image_name',
+    {
+      name: 'sidebar_image_alt_text',
+      cast: 'json',
+    },
+    'sidebar_image_size',
+    getGeoJSONColumn('default_map_view', inputSRID),
+  ]);
 
 /**
  * Helper function for creating section option column set for database queries
@@ -971,9 +972,12 @@ export async function updateSurvey(survey: Survey) {
   }
 
   // Find out what coordinate system was used for the default map view
-  const pageWithDefaultMapView = survey.pages.find(page => page.sidebar.defaultMapView);
-  const defaultMapViewSRID = pageWithDefaultMapView ? parseInt(pageWithDefaultMapView.sidebar.defaultMapView.crs.split(':')[1]) : null;
-  
+  const pageWithDefaultMapView = survey.pages.find(
+    (page) => page.sidebar.defaultMapView,
+  );
+  const defaultMapViewSRID = pageWithDefaultMapView
+    ? parseInt(pageWithDefaultMapView.sidebar.defaultMapView.crs.split(':')[1])
+    : null;
 
   // Update the survey pages
   await getDb().none(
@@ -1292,7 +1296,7 @@ function dbSurveyJoinToPage(dbSurveyJoin: DBSurveyJoin): SurveyPage {
             ? geometryToGeoJSONFeatureCollection(
                 dbSurveyJoin.default_map_view,
                 {},
-                dbSurveyJoin.mapViewSRID
+                dbSurveyJoin.mapViewSRID,
               )
             : null,
         },
@@ -1782,7 +1786,7 @@ export async function getImages(imagePath: string[], groups?: string[]) {
       file_name, 
       file_path 
     FROM data.files 
-    WHERE file_path = $1 ${groups ? 'AND groups && $2' : ''};
+    WHERE file_path = $1 AND ${groups ? 'groups && $2' : 'array_length(groups, 1) IS NULL'};
   `,
     [imagePath, groups],
   );
