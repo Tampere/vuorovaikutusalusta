@@ -75,11 +75,7 @@ router.post(
     // Pick the survey ID from the request - the rest will be the remaining details/metadata
     const { surveyId, ...details } = req.body;
     const groups = res.locals.fileGroups;
-    if (
-      process.env.USER_GROUPING_ENABLED === 'true' &&
-      surveyId == null &&
-      groups == null
-    ) {
+    if (surveyId == null && groups == null) {
       res.status(400).json({ message: 'Survey ID or groups must be provided' });
       return;
     }

@@ -138,9 +138,6 @@ export function ensureAuthenticated(options?: { redirectToLogin?: boolean }) {
 
 export function ensureSurveyGroupAccess(id: string = 'id') {
   return async (req: Request, res: Response, next: NextFunction) => {
-    if (process.env.USER_GROUPING_ENABLED !== 'true') {
-      return next();
-    }
     const surveyGroups = req.params[id]
       ? await getSurveyGroups(Number(req.params[id]))
       : [];
@@ -157,10 +154,6 @@ export function ensureSurveyGroupAccess(id: string = 'id') {
 
 export function ensureFileGroupAccess() {
   return async (req: Request, res: Response, next: NextFunction) => {
-    if (process.env.USER_GROUPING_ENABLED !== 'true') {
-      return next();
-    }
-
     const surveyGroups = req.headers['groups']
       ? JSON.parse(req.headers['groups'] as string)
       : req.user.groups;
