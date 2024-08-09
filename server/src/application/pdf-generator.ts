@@ -151,7 +151,11 @@ async function getFrontPage(
 ): Promise<Content> {
   const tr = useTranslations(language);
   const image = survey.backgroundImageName
-    ? await getFile(survey.backgroundImageName, survey.backgroundImagePath)
+    ? await getFile(
+        survey.backgroundImageName,
+        survey.backgroundImagePath,
+        survey.backgroundImageOrganization,
+      )
     : null;
 
   const [logo, banner] = await Promise.all([

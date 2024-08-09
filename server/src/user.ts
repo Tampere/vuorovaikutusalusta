@@ -14,7 +14,7 @@ interface DbUser {
   id: string;
   full_name: string;
   email: string;
-  groups: string[];
+  organizations: string[];
 }
 
 /**
@@ -29,7 +29,7 @@ function dbUserToUser(dbUser: DbUser): Express.User {
         id: dbUser.id,
         fullName: dbUser.full_name,
         email: dbUser.email,
-        groups: dbUser.groups,
+        organizations: dbUser.organizations,
       };
 }
 
@@ -41,17 +41,17 @@ function dbUserToUser(dbUser: DbUser): Express.User {
 export async function upsertUser(user: Express.User) {
   const newUser = await getDb().one<DbUser>(
     `
-    INSERT INTO "user" (id, full_name, email, groups)
-    VALUES ($(id), $(fullName), $(email), $(groups))
+    INSERT INTO "user" (id, full_name, email, organizations)
+    VALUES ($(id), $(fullName), $(email), $(organizations))
     ON CONFLICT (id) DO UPDATE
-      SET full_name = $(fullName), email = $(email), groups = $(groups)
+      SET full_name = $(fullName), email = $(email), organizations = $(organizations)
     RETURNING *
   `,
     {
       id: user.id,
       fullName: user.fullName,
       email: user.email,
-      groups: user.groups,
+      organizations: user.organizations,
     },
   );
   return dbUserToUser(newUser);
@@ -74,10 +74,10 @@ export async function getUser(id: string) {
  * @param excludeIds User IDs to exclude
  * @returns Users
  */
-export async function getUsers(userGroups: string[], excludeIds = []) {
+export async function getUsers(userOrganizations: string[], excludeIds = []) {
   const dbUsers = await getDb().manyOrNone<DbUser>(
-    `SELECT * FROM "user" WHERE NOT (id = ANY ($2)) ${userGroups.length > 0 ? 'AND groups && $1' : ''}`,
-    [userGroups, excludeIds],
+    `SELECT * FROM "user" WHERE NOT (id = ANY ($2)) ${userOrganizations.length > 0 ? 'AND organizations && $1' : ''}`,
+    [userOrganizations, excludeIds],
   );
   return dbUsers.map(dbUserToUser);
 }

@@ -74,8 +74,8 @@ router.post(
 
     // Pick the survey ID from the request - the rest will be the remaining details/metadata
     const { surveyId, ...details } = req.body;
-    const groups = res.locals.fileGroups;
-    if (surveyId == null && groups == null) {
+    const organizations = res.locals.fileGroups;
+    if (surveyId == null && organizations == null) {
       res.status(400).json({ message: 'Survey ID or groups must be provided' });
       return;
     }
@@ -87,7 +87,7 @@ router.post(
       mimetype,
       details,
       surveyId: surveyId == null ? null : Number(surveyId),
-      groups: groups ?? [],
+      organization: organizations[0], // For now, use the first organization
     });
     res.status(200).json({ id });
   }),
@@ -122,9 +122,9 @@ router.get(
       .withMessage('filePath must be a string'),
   ]),
   asyncHandler(async (req, res) => {
-    const { fileName, filePath } = req.params;
+    const { fileName, filePath, fileOrganization } = req.params;
     const filePathArray = filePath?.split('/') ?? [];
-    const row = await getFile(fileName, filePathArray);
+    const row = await getFile(fileName, filePathArray, fileOrganization);
     res.set('Content-type', row.mimeType);
     res.set('File-details', JSON.stringify(row.details));
     res.status(200).send(row.data);

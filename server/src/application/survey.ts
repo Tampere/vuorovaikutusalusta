@@ -80,7 +80,7 @@ interface DBSurvey {
   allow_saving_unfinished: boolean;
   localisation_enabled: boolean;
   submission_count?: number;
-  groups: string[];
+  organization: string;
 }
 
 /**
@@ -99,6 +99,7 @@ interface DBSurveyPage {
   sidebar_map_layers: string;
   sidebar_image_path: string[];
   sidebar_image_name: string;
+  sidebar_image_organization: string;
   sidebar_image_alt_text: LocalizedText;
   sidebar_image_size: SurveyPageSidebarImageSize;
 }
@@ -118,6 +119,7 @@ interface DBSurveyPageSection {
   info: LocalizedText;
   file_name: string;
   file_path: string[];
+  file_organization: string;
   predecessor_section: number;
 }
 
@@ -174,6 +176,7 @@ type DBSurveyJoin = DBSurvey & {
   page_sidebar_map_layers: number[];
   page_sidebar_image_path: string[];
   page_sidebar_image_name: string;
+  page_sidebar_image_organization: string;
   page_sidebar_image_alt_text: LocalizedText;
   page_sidebar_image_size: SurveyPageSidebarImageSize;
   section_id: number;
@@ -187,6 +190,7 @@ type DBSurveyJoin = DBSurvey & {
   section_info: LocalizedText;
   section_file_name: string;
   section_file_path: string[];
+  section_file_organization: string;
   option_id: number;
   option_text: LocalizedText;
   option_group_id: number;
@@ -201,31 +205,33 @@ type DBSurveyJoin = DBSurvey & {
 /**
  * Helper function for creating survey page column set for database queries
  */
-const surveyPageColumnSet = (inputSRID: number) => getColumnSet<DBSurveyPage>('survey_page', [
-  'id',
-  'survey_id',
-  'idx',
-  {
-    name: 'title',
-    cast: 'json',
-  },
-  'sidebar_type',
-  {
-    name: 'sidebar_map_layers',
-    cast: 'json',
-  },
-  {
-    name: 'sidebar_image_path',
-    cast: 'text[]',
-  },
-  'sidebar_image_name',
-  {
-    name: 'sidebar_image_alt_text',
-    cast: 'json',
-  },
-  'sidebar_image_size',
-  getGeoJSONColumn('default_map_view', inputSRID),
-]);
+const surveyPageColumnSet = (inputSRID: number) =>
+  getColumnSet<DBSurveyPage>('survey_page', [
+    'id',
+    'survey_id',
+    'idx',
+    {
+      name: 'title',
+      cast: 'json',
+    },
+    'sidebar_type',
+    {
+      name: 'sidebar_map_layers',
+      cast: 'json',
+    },
+    {
+      name: 'sidebar_image_path',
+      cast: 'text[]',
+    },
+    'sidebar_image_name',
+    'sidebar_image_organization',
+    {
+      name: 'sidebar_image_alt_text',
+      cast: 'json',
+    },
+    'sidebar_image_size',
+    getGeoJSONColumn('default_map_view', inputSRID),
+  ]);
 
 /**
  * Helper function for creating section option column set for database queries
@@ -254,7 +260,7 @@ const conditionColumnSet = getColumnSet<DBSectionCondition>(
  * @returns Requested survey
  */
 export async function getSurvey(
-  params: ({ id: number } | { name: string }) & { groups?: string[] },
+  params: ({ id: number } | { name: string }) & { organization?: string },
 ) {
   const rows = await getDb().manyOrNone<DBSurveyJoin>(
     `
@@ -278,6 +284,7 @@ export async function getSurvey(
         section.info as section_info,
         section.file_name as section_file_name,
         section.file_path as section_file_path,
+        section.file_organization as section_file_organization,
         section.predecessor_section as section_predecessor_section
       FROM (
         SELECT
@@ -289,6 +296,7 @@ export async function getSurvey(
           page.sidebar_map_layers as page_sidebar_map_layers,
           page.sidebar_image_path as page_sidebar_image_path,
           page.sidebar_image_name as page_sidebar_image_name,
+          page.sidebar_image_organization as page_sidebar_image_organization,
           page.sidebar_image_alt_text as page_sidebar_image_alt_text,
           page.sidebar_image_size as page_sidebar_image_size,
           public.ST_AsGeoJSON(page.default_map_view)::json as default_map_view,
@@ -302,7 +310,7 @@ export async function getSurvey(
               theme.data as theme_data
             FROM data.survey survey
             LEFT JOIN application.theme theme ON survey.theme_id = theme.id
-            ${params?.groups?.length > 0 ? `WHERE $2 && survey.groups ` : ''} 
+            ${typeof params.organization === 'string' ? `WHERE survey.organization = $2` : ''}
           ) survey
           LEFT JOIN data.survey_page page ON survey.id = page.survey_id
         WHERE ${'id' in params ? `survey.id = $1` : `survey.name = $1`}
@@ -317,7 +325,7 @@ export async function getSurvey(
       section_idx ASC,
       option_idx ASC;
   `,
-    ['id' in params ? params.id : params.name, params.groups],
+    ['id' in params ? params.id : params.name, params.organization],
   );
 
   if (!rows.length) {
@@ -492,7 +500,7 @@ export async function getSurvey(
 export async function getSurveys(
   authorId?: string,
   filterByPublished?: boolean,
-  groups?: string[],
+  organization?: string,
 ) {
   const rows = await getDb().manyOrNone<DBSurvey>(
     `SELECT
@@ -503,22 +511,22 @@ export async function getSurveys(
     LEFT JOIN data.submission sub ON sub.survey_id = survey.id
   WHERE
     ($1 IS NULL OR author_id = $1)
-    ${groups?.length > 0 ? `AND $3 && survey.groups` : ''}
+    ${typeof organization === 'string' ? `AND survey.organization = $3` : ''}
   GROUP BY survey.id
   ORDER BY updated_at DESC`,
-    [authorId, filterByPublished, groups],
+    [authorId, filterByPublished, organization],
   );
   return rows
     .map((row) => dbSurveyToSurvey(row))
     .filter((survey) => (filterByPublished ? isPublished(survey) : survey));
 }
 
-export async function getSurveyGroups(id: number) {
-  const rows = await getDb().one<{ groups: string[] }>(
-    `SELECT groups FROM data.survey WHERE id = $1`,
+export async function getSurveyOrganization(id: number) {
+  const rows = await getDb().one<{ organization: string }>(
+    `SELECT organization FROM data.survey WHERE id = $1`,
     [id],
   );
-  return rows.groups;
+  return rows.organization;
 }
 
 /**
@@ -527,12 +535,10 @@ export async function getSurveyGroups(id: number) {
  */
 export async function createSurvey(user: User) {
   const surveyRow = await getDb().one<DBSurvey>(
-    `INSERT INTO data.survey ${
-      user.groups?.length > 0
-        ? '(author_id, groups) VALUES ($1, $2)'
-        : '(author_id) VALUES ($1)'
-    } RETURNING *`,
-    [user.id, [user.groups[0]]],
+    `INSERT INTO data.survey (author_id, organization)
+    VALUES ($1, $2)
+    RETURNING *`,
+    [user.id, user.organizations[0]], // For now, use the first organization
   );
 
   if (!surveyRow) {
@@ -555,7 +561,7 @@ async function upsertSection(section: DBSurveyPageSection, index: number) {
   // Negative IDs can be assigned as temporary IDs for e.g. drag and drop - change them to null
   return await getDb().one<DBSurveyPageSection>(
     `
-    INSERT INTO data.page_section (id, survey_page_id, idx, title, type, body, details, parent_section, info, file_name, file_path, predecessor_section)
+    INSERT INTO data.page_section (id, survey_page_id, idx, title, type, body, details, parent_section, info, file_name, file_path, file_organization, predecessor_section)
     VALUES (
       COALESCE(
         CASE
@@ -574,6 +580,7 @@ async function upsertSection(section: DBSurveyPageSection, index: number) {
       $(info),
       $(fileName),
       $(filePath),
+      $(fileOrganization),
       $(predecessorSection)
     )
     ON CONFLICT (id) DO
@@ -587,6 +594,7 @@ async function upsertSection(section: DBSurveyPageSection, index: number) {
         info = $(info),
         file_name = $(fileName),
         file_path = $(filePath),
+        file_organization = $(fileOrganization),
         predecessor_section = $(predecessorSection)
     RETURNING *
   `,
@@ -602,6 +610,7 @@ async function upsertSection(section: DBSurveyPageSection, index: number) {
       info: section.info,
       fileName: section.file_name,
       filePath: section.file_path,
+      fileOrganization: section.file_organization,
       predecessorSection: section.predecessor_section,
     },
   );
@@ -920,7 +929,7 @@ export async function updateSurvey(survey: Survey) {
         top_margin_image_path = $29,
         bottom_margin_image_name = $30,
         bottom_margin_image_path = $31,
-        groups = $32
+        organization = $32
       WHERE id = $1 RETURNING *`,
       [
         survey.id,
@@ -954,7 +963,7 @@ export async function updateSurvey(survey: Survey) {
         survey.marginImages.top.imagePath ?? null,
         survey.marginImages.bottom.imageName ?? null,
         survey.marginImages.bottom.imagePath ?? null,
-        survey.groups,
+        survey.organization,
       ],
     )
     .catch((error) => {
@@ -971,9 +980,12 @@ export async function updateSurvey(survey: Survey) {
   }
 
   // Find out what coordinate system was used for the default map view
-  const pageWithDefaultMapView = survey.pages.find(page => page.sidebar.defaultMapView);
-  const defaultMapViewSRID = pageWithDefaultMapView ? parseInt(pageWithDefaultMapView.sidebar.defaultMapView.crs.split(':')[1]) : null;
-
+  const pageWithDefaultMapView = survey.pages.find(
+    (page) => page.sidebar.defaultMapView,
+  );
+  const defaultMapViewSRID = pageWithDefaultMapView
+    ? parseInt(pageWithDefaultMapView.sidebar.defaultMapView.crs.split(':')[1])
+    : null;
 
   // Update the survey pages
   await getDb().none(
@@ -1157,7 +1169,7 @@ export async function updateSurvey(survey: Survey) {
     }),
   );
 
-  return await getSurvey({ id: survey.id });
+  return await getSurvey({ id: survey.id, organization: survey.organization });
 }
 
 /**
@@ -1238,13 +1250,15 @@ function dbSurveyToSurvey(
       top: {
         imagePath: dbSurvey.top_margin_image_path,
         imageName: dbSurvey.top_margin_image_name,
+        imageOrganization: dbSurvey.organization,
       },
       bottom: {
         imagePath: dbSurvey.bottom_margin_image_path,
         imageName: dbSurvey.bottom_margin_image_name,
+        imageOrganization: dbSurvey.organization,
       },
     },
-    groups: dbSurvey.groups,
+    organization: dbSurvey.organization,
   };
   return {
     ...survey,
@@ -1286,13 +1300,14 @@ function dbSurveyJoinToPage(dbSurveyJoin: DBSurveyJoin): SurveyPage {
           mapLayers: dbSurveyJoin.page_sidebar_map_layers ?? [],
           imagePath: dbSurveyJoin.page_sidebar_image_path,
           imageName: dbSurveyJoin.page_sidebar_image_name,
+          imageOrganization: dbSurveyJoin.page_sidebar_image_organization,
           imageAltText: dbSurveyJoin.page_sidebar_image_alt_text,
           imageSize: dbSurveyJoin.page_sidebar_image_size,
           defaultMapView: dbSurveyJoin.default_map_view
             ? geometryToGeoJSONFeatureCollection(
                 dbSurveyJoin.default_map_view,
                 {},
-                dbSurveyJoin.mapViewSRID
+                dbSurveyJoin.mapViewSRID,
               )
             : null,
         },
@@ -1317,6 +1332,7 @@ function dbSurveyJoinToSection(dbSurveyJoin: DBSurveyJoin): SurveyPageSection {
         info: dbSurveyJoin.section_info,
         fileName: dbSurveyJoin.section_file_name,
         filePath: dbSurveyJoin.section_file_path,
+        fileOrganization: dbSurveyJoin.section_file_organization,
         // Trust that the JSON in the DB fits the rest of the detail fields
         ...(dbSurveyJoin.section_details as any),
         // Add an initial empty option array if the type allows options
@@ -1495,6 +1511,7 @@ function surveyPagesToRows(
       sidebar_map_layers: JSON.stringify(surveyPage.sidebar.mapLayers),
       sidebar_image_path: surveyPage.sidebar.imagePath,
       sidebar_image_name: surveyPage.sidebar.imageName,
+      sidebar_image_organization: surveyPage.sidebar.imageOrganization,
       sidebar_image_alt_text: surveyPage.sidebar.imageAltText,
       sidebar_image_size: surveyPage.sidebar.imageSize,
       default_map_view:
@@ -1530,6 +1547,7 @@ function surveySectionsToRows(
       groups = undefined,
       fileName = undefined,
       filePath = undefined,
+      fileOrganization = undefined,
       conditions = undefined,
       ...details
     } = { ...surveySection };
@@ -1550,6 +1568,7 @@ function surveySectionsToRows(
       info: info,
       file_name: fileName,
       file_path: filePath,
+      file_organization: fileOrganization,
       conditions,
     } as DBSurveyPageSection & {
       options: SectionOption[];
@@ -1678,6 +1697,8 @@ export async function unpublishSurvey(surveyId: number) {
  * @param fileName
  * @param mimeType
  * @param details
+ * @param surveyId
+ * @param fileOrganization
  * @returns Database row id of the uploaded image
  */
 
@@ -1693,7 +1714,7 @@ export async function storeFile({
   mimetype,
   details,
   surveyId,
-  groups,
+  organization,
 }: {
   buffer: Buffer;
   path: string[];
@@ -1701,14 +1722,14 @@ export async function storeFile({
   mimetype: string;
   details: { [key: string]: any };
   surveyId: number;
-  groups: string[];
+  organization: string;
 }) {
   const fileString = `\\x${buffer.toString('hex')}`;
 
   const row = await getDb().oneOrNone<{ path: string[]; name: string }>(
     `
-    INSERT INTO data.files (file, details, file_path, file_name, mime_type, survey_id, groups)
-    VALUES ($(fileString), $(details), $(path), $(name), $(mimetype), $(surveyId), $(groups))
+    INSERT INTO data.files (file, details, file_path, file_name, mime_type, survey_id, organization)
+    VALUES ($(fileString), $(details), $(path), $(name), $(mimetype), $(surveyId), $(organization))
     ON CONFLICT ON CONSTRAINT pk_files DO UPDATE SET
       file = $(fileString),
       details = $(details),
@@ -1716,7 +1737,7 @@ export async function storeFile({
       file_name = $(name),
       mime_type = $(mimetype),
       survey_id = $(surveyId),
-      groups = $(groups)
+      organization = $(organization)
     RETURNING file_path AS path, file_name AS name;
     `,
     {
@@ -1726,7 +1747,7 @@ export async function storeFile({
       name,
       mimetype,
       surveyId,
-      groups,
+      organization,
     },
   );
 
@@ -1741,23 +1762,28 @@ export async function storeFile({
  * Get a single file with id from the database
  * @param fileName
  * @param filePath
+ * @param fileOrganization
  * @returns File
  */
-export async function getFile(fileName: string, filePath: string[]) {
+export async function getFile(
+  fileName: string,
+  filePath: string[],
+  organization: string,
+) {
   const row = await getDb().oneOrNone<{
     file: Buffer;
     mime_type: string;
     details: { [key: string]: any };
   }>(
     `
-    SELECT file, mime_type, details FROM data.files WHERE file_name = $1 AND file_path = $2;
+    SELECT file, mime_type, details FROM data.files WHERE file_name = $1 AND file_path = $2 AND organization = $3;
   `,
-    [fileName, filePath],
+    [fileName, filePath, organization],
   );
 
   if (!row) {
     throw new NotFoundError(
-      `File with fileName ${fileName} filePath ${filePath} not found`,
+      `File with fileName ${fileName} filePath ${filePath} organization ${organization} not found`,
     );
   }
 
@@ -1772,7 +1798,7 @@ export async function getFile(fileName: string, filePath: string[]) {
  * Get all survey images from the database
  * @returns SurveyImage[]
  */
-export async function getImages(imagePath: string[], groups?: string[]) {
+export async function getImages(imagePath: string[], organization: string) {
   const rows = await getDb().manyOrNone(
     `
     SELECT 
@@ -1782,9 +1808,9 @@ export async function getImages(imagePath: string[], groups?: string[]) {
       file_name, 
       file_path 
     FROM data.files 
-    WHERE file_path = $1 AND ${groups ? 'groups && $2' : 'array_length(groups, 1) IS NULL'};
+    WHERE file_path = $1 AND organization = $2;
   `,
-    [imagePath, groups],
+    [imagePath, organization],
   );
 
   return rows.map((row) => ({
@@ -1794,6 +1820,7 @@ export async function getImages(imagePath: string[], groups?: string[]) {
     altText: row.details?.imageAltText,
     fileName: row.file_name,
     filePath: row.file_path,
+    fileOrganization: row.organization,
   })) as SurveyImage[];
 }
 
@@ -1801,19 +1828,20 @@ export async function getImages(imagePath: string[], groups?: string[]) {
  * Delete a single file from the db
  * @param fileName name of the file
  * @param filePath path of the file
+ * @param fileOrganization organization
  * @returns
  */
 export async function removeFile(
   fileName: string,
   filePath: string[],
-  groups?: string[],
+  organization: string,
 ) {
   return await getDb().none(
     `
     DELETE FROM data.files 
-    WHERE file_name = $1 AND file_path = $2 ${groups ? 'AND groups && $3' : ''};
+    WHERE file_name = $1 AND file_path = $2 AND organization = $3;
   `,
-    [fileName, filePath, groups],
+    [fileName, filePath, organization],
   );
 }
 

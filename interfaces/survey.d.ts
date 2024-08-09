@@ -298,6 +298,10 @@ export interface SurveyPageSidebar {
    */
   imageName: string;
   /**
+   * The organization of the file uploader
+   */
+  imageOrganization: string;
+  /**
    * Alternative text for the sidebar image
    */
   imageAltText: LocalizedText;
@@ -413,6 +417,10 @@ export interface Survey {
    */
   backgroundImagePath?: string[];
   /**
+   * The organization of the background image uploader
+   */
+  backgroundImageOrganization?: string;
+  /**
    * Thanks page
    */
   thanksPage: {
@@ -432,6 +440,10 @@ export interface Survey {
      * Path of the thanks page image
      */
     imagePath?: string[];
+    /**
+     * The organization of the thanks page image uploader
+     */
+    imageOrganization?: string
   };
   /**
    * Theme of the survey
@@ -486,13 +498,23 @@ export interface Survey {
    * Margin images displayed on the landing and thanks pages
    */
   marginImages: {
-    top: { imagePath: string[]; imageName: string; altText?: string };
-    bottom: { imagePath: string[]; imageName: string; altText?: string };
+    top: {
+      imagePath: string[];
+      imageName: string;
+      imageOrganization: string;
+      altText?: string
+    };
+    bottom: {
+      imagePath: string[];
+      imageName: string;
+      imageOrganization: string;
+      altText?: string
+    };
   };
   /**
-   * User groups that can access the survey
+   * User organization that can access the survey
    */
-  groups: string[];
+  organization: string;
 }
 
 /**
@@ -657,6 +679,10 @@ export interface File {
    * Path of the file in the file hierarchy
    */
   filePath: string;
+  /**
+   * The organization of the file uploader
+   */
+  fileOrganization: string;
   /**
    * File mime type
    */

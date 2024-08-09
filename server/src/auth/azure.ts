@@ -39,7 +39,7 @@ export function configureAzureAuth(app: Express) {
             id: profile.oid,
             fullName: profile.displayName,
             email: profile._json.email,
-            groups: profile._json.groups,
+            organizations: profile._json.groups,
           });
           return done(null, user);
         });
