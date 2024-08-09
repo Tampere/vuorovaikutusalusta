@@ -116,19 +116,21 @@ router.get(
  * Endpoint for fetching a single local file
  */
 router.get(
-  '/:filePath?/:fileName',
+  '/:organization/:filePath?/:fileName',
   validateRequest([
     param('fileName').isString().withMessage('fileName must be a string'),
     param('filePath')
       .optional()
       .isString()
       .withMessage('filePath must be a string'),
+    param('organization')
+      .isString()
+      .withMessage('organization id must be a string'),
   ]),
   asyncHandler(async (req, res) => {
-    const { fileName, filePath, fileOrganizations } = req.params;
+    const { fileName, filePath, organization } = req.params;
     const filePathArray = filePath?.split('/') ?? [];
-    // For now, use the first organization
-    const row = await getFile(fileName, filePathArray, fileOrganizations[0]);
+    const row = await getFile(fileName, filePathArray, organization);
     res.set('Content-type', row.mimeType);
     res.set('File-details', JSON.stringify(row.details));
     res.status(200).send(row.data);
