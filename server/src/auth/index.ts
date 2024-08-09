@@ -154,8 +154,8 @@ export function ensureSurveyGroupAccess(id: string = 'id') {
 
 export function ensureFileGroupAccess() {
   return async (req: Request, res: Response, next: NextFunction) => {
-    const surveyOrganizations = req.headers['organizations']
-      ? JSON.parse(req.headers['organizations'] as string)
+    const surveyOrganizations = req.headers['organization']
+      ? [JSON.parse(req.headers['organization'] as string)]
       : req.user.organizations;
 
     if (!Array.isArray(surveyOrganizations)) {

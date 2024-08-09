@@ -74,9 +74,11 @@ router.post(
 
     // Pick the survey ID from the request - the rest will be the remaining details/metadata
     const { surveyId, ...details } = req.body;
-    const organizations = res.locals.fileGroups;
+    const organizations = res.locals.fileOrganizations;
     if (surveyId == null && organizations == null) {
-      res.status(400).json({ message: 'Survey ID or groups must be provided' });
+      res
+        .status(400)
+        .json({ message: 'Survey ID and organizations must be provided' });
       return;
     }
 
@@ -103,7 +105,8 @@ router.get(
   asyncHandler(async (req, res) => {
     const { filePath } = req.params;
     const filePathArray = filePath?.split('/') ?? [];
-    const row = await getImages(filePathArray, res.locals.fileGroups);
+    // For now, use the first organization
+    const row = await getImages(filePathArray, res.locals.fileOrganizations[0]);
 
     res.status(200).json(row);
   }),
@@ -122,9 +125,10 @@ router.get(
       .withMessage('filePath must be a string'),
   ]),
   asyncHandler(async (req, res) => {
-    const { fileName, filePath, fileOrganization } = req.params;
+    const { fileName, filePath, fileOrganizations } = req.params;
     const filePathArray = filePath?.split('/') ?? [];
-    const row = await getFile(fileName, filePathArray, fileOrganization);
+    // For now, use the first organization
+    const row = await getFile(fileName, filePathArray, fileOrganizations[0]);
     res.set('Content-type', row.mimeType);
     res.set('File-details', JSON.stringify(row.details));
     res.status(200).send(row.data);
@@ -148,8 +152,8 @@ router.delete(
   asyncHandler(async (req, res) => {
     const { fileName, filePath } = req.params;
     const filePathArray = filePath?.split('/') ?? [];
-
-    await removeFile(fileName, filePathArray, res.locals.fileGroups);
+    // For now, use the first organization
+    await removeFile(fileName, filePathArray, res.locals.fileOrganizations[0]);
     res.status(200).send();
   }),
 );
