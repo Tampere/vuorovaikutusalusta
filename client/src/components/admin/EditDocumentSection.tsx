@@ -16,7 +16,7 @@ export default function EditDocumentSection({ section, onChange }: Props) {
       <FileUpload
         surveyId={activeSurvey.id}
         targetPath={[String(activeSurvey.id)]}
-        surveyGroups={activeSurvey.groups}
+        surveyOrganization={activeSurvey.organization}
         value={
           !section.fileName
             ? null

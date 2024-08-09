@@ -283,7 +283,7 @@ export default function EditSurveyPage() {
           <FileUpload
             surveyId={activeSurvey.id}
             targetPath={[String(activeSurvey.id)]}
-            surveyGroups={activeSurvey.groups}
+            surveyOrganization={activeSurvey.organization}
             value={
               !page.sidebar.imageName
                 ? null
