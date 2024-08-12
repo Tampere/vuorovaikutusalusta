@@ -20,6 +20,9 @@ const useStyles = makeStyles({
     display: 'flex',
     justifyContent: 'space-between',
   },
+  item: {
+    boxShadow: '0px 2px 4px rgba(63, 111, 127, 0.9)',
+  },
 });
 
 export default function SurveyList() {

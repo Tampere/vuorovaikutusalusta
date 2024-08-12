@@ -5,6 +5,7 @@ import {
   CSSInterpolation,
 } from '@mui/material/styles';
 import { fiFI } from '@mui/material/locale';
+import { ubiColors } from './common';
 
 declare module '@mui/material/styles' {
   interface Palette {
@@ -67,13 +68,24 @@ export const buttonOverrides: Components<Omit<Theme, 'components'>> = {
   MuiButton: {
     styleOverrides: {
       root: {
+        boxShadow: 'none',
         textTransform: 'none',
         '&.Mui-disabled': {
           color: disabledColor,
         },
+        '&:hover': {
+          boxShadow: 'none',
+        },
+        '&.Mui-focusVisible': {
+          boxShadow: 'none',
+        },
+        '&:active': {
+          boxShadow: 'none',
+        },
       },
     },
   },
+
   MuiFab: {
     styleOverrides: {
       root: {
@@ -195,11 +207,12 @@ export const textOverrides: Components<Omit<Theme, 'components'>> = {
 export let defaultSurveyTheme = createTheme(
   {
     components: {
+      ...ubiColors,
       ...buttonOverrides,
       ...inputOverrides,
       ...stepperOverrides,
       ...textOverrides,
-    },
+    } /*
     palette: {
       primary: {
         main: '#135b9a',
@@ -207,7 +220,7 @@ export let defaultSurveyTheme = createTheme(
       secondary: {
         main: '#abc872',
       },
-    },
+    },*/,
   },
   fiFI,
 );

@@ -16,6 +16,7 @@ import { useToasts } from '@src/stores/ToastContext';
 import { makeStyles } from '@mui/styles';
 import LoadingButton from '../LoadingButton';
 import { NavLink, useRouteMatch } from 'react-router-dom';
+import { theme } from '@src/themes/admin';
 
 const useStyles = makeStyles((theme: Theme) => ({
   '@keyframes pulse': {
@@ -65,20 +66,21 @@ export default function SurveyListItem(props: Props) {
     }/${survey.name}`;
   }, [survey.name]);
 
+  const cardStyle = survey.isPublished
+    ? {
+        borderLeft: 'solid 5px',
+        borderLeftColor: theme.palette.primary.main,
+      }
+    : {};
   return (
     <>
-      <Card
-        className={loading ? classes.loading : ''}
-        style={
-          survey.isPublished ? { filter: 'drop-shadow(0 0 0.15rem green)' } : {}
-        }
-      >
+      <Card className={loading ? classes.loading : ''} style={cardStyle}>
         <CardContent classes={{ root: classes.cardRoot }}>
           <Typography variant="h6" component="h3">
             {!survey.title?.[surveyLanguage] ? (
               <em>{tr.SurveyList.untitledSurvey}</em>
             ) : (
-              survey?.title?.[surveyLanguage] ?? ''
+              (survey?.title?.[surveyLanguage] ?? '')
             )}
           </Typography>
           <Typography color="textSecondary" component="h4" gutterBottom>
@@ -111,23 +113,31 @@ export default function SurveyListItem(props: Props) {
           <div style={{ display: 'flex', flexDirection: 'row' }}>
             {/* Scheduling info (start/end dates) */}
             {survey.startDate && survey.endDate ? (
-              <Typography variant="body1" color="textSecondary" gutterBottom>
+              <Typography variant="body1" color="primary" gutterBottom>
                 {tr.SurveyList.open} {format(survey.startDate, 'd.M.yyyy')} -{' '}
                 {format(survey.endDate, 'd.M.yyyy')}
               </Typography>
             ) : survey.startDate ? (
-              <Typography variant="body1" color="textSecondary" gutterBottom>
+              <Typography variant="body1" color="primary" gutterBottom>
                 {tr.SurveyList.openFrom} {format(survey.startDate, 'd.M.yyyy')}
               </Typography>
             ) : null}
             {/* Current publish status */}
             {survey.isPublished ? (
-              <Typography style={{ paddingLeft: '0.5rem', color: 'green' }}>
+              <Typography
+                variant="published"
+                color="primary"
+                style={{ paddingLeft: '0.5rem' }}
+              >
                 {' '}
                 - {tr.SurveyList.published}
               </Typography>
             ) : (
-              <Typography style={{ paddingLeft: '0.5rem' }}>
+              <Typography
+                variant="published"
+                color="primary"
+                style={{ paddingLeft: '0.5rem' }}
+              >
                 {' '}
                 - {tr.SurveyList.notPublished}
               </Typography>
