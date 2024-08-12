@@ -299,6 +299,7 @@ export default function EditSurveyPage() {
                 ...page,
                 sidebar: {
                   ...page.sidebar,
+                  imageOrganization: activeSurvey.organization,
                   imagePath: path,
                   imageName: name,
                   imageSize: 'fitted',
@@ -310,6 +311,7 @@ export default function EditSurveyPage() {
                 ...page,
                 sidebar: {
                   ...page.sidebar,
+                  imageOrganization: null,
                   imagePath: [],
                   imageName: null,
                   imageSize: null,

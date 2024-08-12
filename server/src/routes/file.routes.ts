@@ -141,21 +141,23 @@ router.get(
  * Endpoint for deleting a single file
  */
 router.delete(
-  '/:filePath?/:fileName',
+  '/:organization/:filePath?/:fileName',
   validateRequest([
     param('fileName').isString().withMessage('fileName must be a string'),
     param('filePath')
       .optional()
       .isString()
       .withMessage('filePath must be a string'),
+    param('organization')
+      .isString()
+      .withMessage('organization id must be a string'),
   ]),
   ensureAuthenticated(),
   ensureFileGroupAccess(),
   asyncHandler(async (req, res) => {
-    const { fileName, filePath } = req.params;
+    const { fileName, filePath, organization } = req.params;
     const filePathArray = filePath?.split('/') ?? [];
-    // For now, use the first organization
-    await removeFile(fileName, filePathArray, res.locals.fileOrganizations[0]);
+    await removeFile(fileName, filePathArray, organization);
     res.status(200).send();
   }),
 );

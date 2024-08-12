@@ -33,7 +33,7 @@ export default function FileUpload({
   const imageFileFormats = ['jpg', 'jpeg', 'png', 'tiff', 'bmp'];
 
   async function deleteFile(path: string[], name: string) {
-    const fullFilePath = getFullFilePath(path, name);
+    const fullFilePath = getFullFilePath(surveyOrganization, path, name);
     await fetch(`/api/file/${fullFilePath}`, {
       method: 'DELETE',
       headers: { organization: JSON.stringify(surveyOrganization) },
@@ -89,7 +89,7 @@ export default function FileUpload({
       const fileFormat = name
         .substring(name.lastIndexOf('.') + 1, name.length)
         .toLowerCase();
-      const fullFilePath = getFullFilePath(path, name);
+      const fullFilePath = getFullFilePath(surveyOrganization, path, name);
       return (
         <div key={name}>
           {imageFileFormats.includes(fileFormat) && (

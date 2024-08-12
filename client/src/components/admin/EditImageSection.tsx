@@ -33,6 +33,7 @@ export default function EditImageSection({ section, onChange }: Props) {
         onUpload={({ name, path }) => {
           onChange({
             ...section,
+            fileOrganization: activeSurvey.organization,
             fileName: name,
             filePath: path,
           });
@@ -40,6 +41,7 @@ export default function EditImageSection({ section, onChange }: Props) {
         onDelete={() => {
           onChange({
             ...section,
+            fileOrganization: null,
             fileName: null,
             filePath: [],
           });

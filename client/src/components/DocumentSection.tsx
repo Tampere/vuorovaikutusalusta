@@ -19,8 +19,13 @@ export default function DocumentSection({
   const { tr, surveyLanguage } = useTranslations();
 
   const fullFilePath = useMemo(
-    () => getFullFilePath(section.filePath, section.fileName),
-    [section.filePath, section.fileName],
+    () =>
+      getFullFilePath(
+        section.fileOrganization,
+        section.filePath,
+        section.fileName,
+      ),
+    [section.fileOrganization, section.filePath, section.fileName],
   );
 
   return (

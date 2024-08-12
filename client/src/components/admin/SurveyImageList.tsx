@@ -22,6 +22,7 @@ import { useTranslations } from '@src/stores/TranslationContext';
 import { request } from '@src/utils/request';
 import React, { useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
+import { getFullFilePath } from '@src/utils/path';
 
 const useStyles = makeStyles((theme: Theme) => ({
   noImageBackground: {
@@ -124,7 +125,6 @@ export default function SurveyImageList({ imageType, ...props }: Props) {
   async function getImages() {
     try {
       const res = await request<File[]>(getApiFilePath(imageType));
-
       props.setImages?.(res) ?? setImages(res);
     } catch (error) {
       showToast({
@@ -134,9 +134,12 @@ export default function SurveyImageList({ imageType, ...props }: Props) {
     }
   }
 
-  function handleListItemClick(fileName?: string, filePath?: string[]) {
+  function handleListItemClick(
+    fileOrganization?: string,
+    fileName?: string,
+    filePath?: string[],
+  ) {
     setImageDialogOpen((prev) => !prev);
-
     if (!fileName) {
       return;
     }
@@ -144,6 +147,7 @@ export default function SurveyImageList({ imageType, ...props }: Props) {
       case 'backgroundImage':
         editSurvey({
           ...activeSurvey,
+          backgroundImageOrganization: fileOrganization,
           backgroundImageName: fileName,
           backgroundImagePath: filePath,
         });
@@ -153,6 +157,7 @@ export default function SurveyImageList({ imageType, ...props }: Props) {
           ...activeSurvey,
           thanksPage: {
             ...activeSurvey.thanksPage,
+            imageOrganization: fileOrganization,
             imageName: fileName,
             imagePath: filePath,
           },
@@ -164,6 +169,7 @@ export default function SurveyImageList({ imageType, ...props }: Props) {
           marginImages: {
             ...activeSurvey.marginImages,
             top: {
+              imageOrganization: fileOrganization,
               imageName: fileName,
               imagePath: filePath,
             },
@@ -176,6 +182,7 @@ export default function SurveyImageList({ imageType, ...props }: Props) {
           marginImages: {
             ...activeSurvey.marginImages,
             bottom: {
+              imageOrganization: fileOrganization,
               imageName: fileName,
               imagePath: filePath,
             },
@@ -193,9 +200,11 @@ export default function SurveyImageList({ imageType, ...props }: Props) {
 
     try {
       await fetch(
-        `/api/file${filePath.length > 0 ? '/' : ''}${filePath.join(
-          '/',
-        )}/${fileName}`,
+        `/api/file/${getFullFilePath(
+          activeSurvey.organization,
+          filePath,
+          fileName,
+        )}`,
         { method: 'DELETE' },
       );
 
@@ -534,7 +543,11 @@ export default function SurveyImageList({ imageType, ...props }: Props) {
                   style={getImageBorderStyle(image)}
                   key={image.fileName}
                   onClick={() =>
-                    handleListItemClick(image.fileName, image.filePath)
+                    handleListItemClick(
+                      image.fileOrganization,
+                      image.fileName,
+                      image.filePath,
+                    )
                   }
                 >
                   <Cancel

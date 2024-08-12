@@ -65,12 +65,16 @@ interface DBSurvey {
   thanks_page_text: LocalizedText;
   thanks_page_image_name: string;
   thanks_page_image_path: string[];
+  thanks_page_image_organization: string;
   background_image_name: string;
   background_image_path: string[];
+  background_image_organization: string;
   top_margin_image_name: string;
   top_margin_image_path: string[];
+  top_margin_image_organization: string;
   bottom_margin_image_name: string;
   bottom_margin_image_path: string[];
+  bottom_margin_image_organization: string;
   section_title_color: string;
   email_enabled: boolean;
   email_auto_send_to: string[];
@@ -912,24 +916,28 @@ export async function updateSurvey(survey: Survey) {
         thanks_page_text = $12,
         background_image_name = $13,
         background_image_path = $14,
-        thanks_page_image_name = $15,
-        thanks_page_image_path = $16,
-        admins = $17,
-        theme_id = $18,
-        section_title_color = $19,
-        email_enabled = $20,
-        email_auto_send_to = $21,
-        email_subject = $22,
-        email_body = $23,
-        email_info = $24::json,
-        allow_saving_unfinished = $25,
-        localisation_enabled = $26,
-        display_privacy_statement = $27,
-        top_margin_image_name = $28,
-        top_margin_image_path = $29,
-        bottom_margin_image_name = $30,
-        bottom_margin_image_path = $31,
-        organization = $32
+        background_image_organization = $15,
+        thanks_page_image_name = $16,
+        thanks_page_image_path = $17,
+        thanks_page_image_organization = $18,
+        admins = $19,
+        theme_id = $20,
+        section_title_color = $21,
+        email_enabled = $22,
+        email_auto_send_to = $23,
+        email_subject = $24,
+        email_body = $25,
+        email_info = $26::json,
+        allow_saving_unfinished = $27,
+        localisation_enabled = $28,
+        display_privacy_statement = $29,
+        top_margin_image_name = $30,
+        top_margin_image_path = $31,
+        top_margin_image_organization = $32,
+        bottom_margin_image_name = $33,
+        bottom_margin_image_path = $34,
+        bottom_margin_image_organization = $35,
+        organization = $36
       WHERE id = $1 RETURNING *`,
       [
         survey.id,
@@ -946,8 +954,10 @@ export async function updateSurvey(survey: Survey) {
         survey.thanksPage.text,
         survey.backgroundImageName ?? null,
         survey.backgroundImagePath ?? null,
+        survey.backgroundImageOrganization ?? null,
         survey.thanksPage.imageName ?? null,
         survey.thanksPage.imagePath ?? null,
+        survey.thanksPage.imageOrganization ?? null,
         survey.admins,
         survey.theme?.id ?? null,
         survey.sectionTitleColor,
@@ -961,8 +971,10 @@ export async function updateSurvey(survey: Survey) {
         survey.displayPrivacyStatement,
         survey.marginImages.top.imageName ?? null,
         survey.marginImages.top.imagePath ?? null,
+        survey.marginImages.top.imageOrganization ?? null,
         survey.marginImages.bottom.imageName ?? null,
         survey.marginImages.bottom.imagePath ?? null,
+        survey.marginImages.bottom.imageOrganization ?? null,
         survey.organization,
       ],
     )
@@ -1231,9 +1243,11 @@ function dbSurveyToSurvey(
       text: dbSurvey.thanks_page_text,
       imageName: dbSurvey.thanks_page_image_name,
       imagePath: dbSurvey.thanks_page_image_path,
+      imageOrganization: dbSurvey.thanks_page_image_organization,
     },
     backgroundImageName: dbSurvey.background_image_name,
     backgroundImagePath: dbSurvey.background_image_path,
+    backgroundImageOrganization: dbSurvey.background_image_organization,
     sectionTitleColor: dbSurvey.section_title_color,
     email: {
       enabled: dbSurvey.email_enabled,
@@ -1806,7 +1820,8 @@ export async function getImages(imagePath: string[], organization: string) {
       details, 
       file, 
       file_name, 
-      file_path 
+      file_path,
+      organization
     FROM data.files 
     WHERE file_path = $1 AND organization = $2;
   `,

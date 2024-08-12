@@ -50,11 +50,14 @@ export default function SurveyPage({ isTestSurvey }: Props) {
           `/api/published-surveys/${name}${isTestSurvey ? '?test=true' : ''}`,
         );
         if (
+          survey.backgroundImageOrganization &&
+          survey.backgroundImageOrganization !== '' &&
           survey.backgroundImagePath &&
           survey.backgroundImageName &&
           survey.backgroundImageName !== ''
         ) {
           const fullFilePath = getFullFilePath(
+            survey.backgroundImageOrganization,
             survey.backgroundImagePath,
             survey.backgroundImageName,
           );

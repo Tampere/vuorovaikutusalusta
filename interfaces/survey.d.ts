@@ -90,6 +90,7 @@ interface CommonSurveyPageQuestion extends CommonSurveyPageSection {
 interface SectionFile {
   fileName: string;
   filePath: string[];
+  fileOrganization: string;
 }
 
 /**

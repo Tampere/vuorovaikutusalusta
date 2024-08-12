@@ -16,8 +16,13 @@ export default function ImageSection({ section, isFollowUp = false }: Props) {
   const { tr, surveyLanguage, language } = useTranslations();
 
   const fullFilePath = useMemo(
-    () => getFullFilePath(section.filePath, section.fileName),
-    [section.filePath, section.fileName],
+    () =>
+      getFullFilePath(
+        section.fileOrganization,
+        section.filePath,
+        section.fileName,
+      ),
+    [section.fileOrganization, section.filePath, section.fileName],
   );
 
   return (

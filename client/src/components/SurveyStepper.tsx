@@ -167,6 +167,7 @@ export default function SurveyStepper({
   const fullSidebarImagePath = useMemo(
     () =>
       getFullFilePath(
+        survey.organization,
         currentPage.sidebar.imagePath,
         currentPage.sidebar.imageName,
       ),
@@ -595,11 +596,21 @@ export default function SurveyStepper({
         </Stepper>
       </main>
       <Footer>
-        <Link color="primary" underline="hover" href="/saavutettavuusseloste" target="_blank">
+        <Link
+          color="primary"
+          underline="hover"
+          href="/saavutettavuusseloste"
+          target="_blank"
+        >
           {tr.FooterLinks.accessibility}
         </Link>
         {survey.displayPrivacyStatement && (
-          <Link color="primary" underline="hover" href="/tietosuojaseloste" target="_blank">
+          <Link
+            color="primary"
+            underline="hover"
+            href="/tietosuojaseloste"
+            target="_blank"
+          >
             {tr.FooterLinks.privacyStatement}
           </Link>
         )}

@@ -15,6 +15,7 @@ import React from 'react';
 
 import { useImageHeaderQuery } from '@src/hooks/UseImageHeaderQuery';
 import Footer from './Footer';
+import { getFullFilePath } from '@src/utils/path';
 
 const useStyles = makeStyles((theme: Theme & { [customKey: string]: any }) => ({
   heading: {
@@ -105,12 +106,23 @@ export default function SurveyLandingPage({
   const { tr, surveyLanguage } = useTranslations();
   const mediumWidth = useMediaQuery('(max-width: 640px)');
 
+  const topImagePath = getFullFilePath(
+    survey.marginImages.top.imageOrganization,
+    survey.marginImages.top.imagePath,
+    survey.marginImages.top.imageName,
+  );
+  const bottomImagePath = getFullFilePath(
+    survey.marginImages.bottom.imageOrganization,
+    survey.marginImages.bottom.imagePath,
+    survey.marginImages.bottom.imageName,
+  );
+
   const topImageHeaderQuery = useImageHeaderQuery(
-    `/api/file/${survey.marginImages.top.imagePath}/${survey.marginImages.top.imageName}`,
+    `/api/file/${topImagePath}`,
     !survey.marginImages.top.imageName,
   );
   const bottomImageHeaderQuery = useImageHeaderQuery(
-    `/api/file/${survey.marginImages.bottom.imagePath}/${survey.marginImages.bottom.imageName}`,
+    `/api/file/${bottomImagePath}`,
     !survey.marginImages.bottom.imageName,
   );
 
@@ -124,7 +136,11 @@ export default function SurveyLandingPage({
         width: '100%',
         minHeight: '100vh', // as a fallback if svh not supported
         ...(survey?.backgroundImageName && {
-          backgroundImage: `url("/api/file/background-images/${survey?.backgroundImageName}")`,
+          backgroundImage: `url("/api/file/${getFullFilePath(
+            survey?.organization,
+            ['background-images'],
+            survey?.backgroundImageName,
+          )}")`,
         }),
         backgroundSize: 'cover',
         backgroundPosition: 'center',
@@ -157,7 +173,7 @@ export default function SurveyLandingPage({
               maxWidth: '60%',
               maxHeight: '100%',
             }}
-            src={`/api/file/${survey.marginImages.top.imagePath}/${survey.marginImages.top.imageName}`}
+            src={`/api/file/${topImagePath}`}
             alt={topImageHeaderQuery.imageHeaders?.imageAltText ?? ''}
           />
         )}
@@ -202,7 +218,12 @@ export default function SurveyLandingPage({
         }}
       >
         <Footer>
-          <Link color="primary" underline="hover" href="/saavutettavuusseloste" target="_blank">
+          <Link
+            color="primary"
+            underline="hover"
+            href="/saavutettavuusseloste"
+            target="_blank"
+          >
             {tr.FooterLinks.accessibility}
           </Link>
           {survey.displayPrivacyStatement && (
@@ -227,7 +248,7 @@ export default function SurveyLandingPage({
               marginLeft: '0.5rem',
               marginBottom: '0.5rem',
             }}
-            src={`/api/file/${survey.marginImages.bottom.imagePath}/${survey.marginImages.bottom.imageName}`}
+            src={`/api/file/${bottomImagePath}`}
             alt={bottomImageHeaderQuery.imageHeaders?.imageAltText ?? ''}
           />
         )}

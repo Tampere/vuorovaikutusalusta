@@ -14,6 +14,7 @@ import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import rehypeExternalLinks from 'rehype-external-links';
 import Footer from './Footer';
+import { getFullFilePath } from '@src/utils/path';
 
 type StyleKeys = 'testSurveyHeader';
 
@@ -34,16 +35,32 @@ interface Props {
 }
 
 export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
+  const thanksPageImagePath = getFullFilePath(
+    survey.thanksPage.imageOrganization,
+    survey.thanksPage.imagePath,
+    survey.thanksPage.imageName,
+  );
+  const topImagePath = getFullFilePath(
+    survey.marginImages.top.imageOrganization,
+    survey.marginImages.top.imagePath,
+    survey.marginImages.top.imageName,
+  );
+  const bottomImagePath = getFullFilePath(
+    survey.marginImages.bottom.imageOrganization,
+    survey.marginImages.bottom.imagePath,
+    survey.marginImages.bottom.imageName,
+  );
+
   const thanksPageImageHeaderQuery = useImageHeaderQuery(
-    `api/file/${survey.thanksPage.imagePath[0]}/${survey.thanksPage.imageName}`,
+    `api/file/${thanksPageImagePath}`,
     !(survey.thanksPage.imagePath.length > 0 && survey.thanksPage.imageName),
   );
   const topImageHeaderQuery = useImageHeaderQuery(
-    `/api/file/${survey.marginImages.top.imagePath}/${survey.marginImages.top.imageName}`,
+    `/api/file/${topImagePath}`,
     !survey.marginImages.top.imageName,
   );
   const bottomImageHeaderQuery = useImageHeaderQuery(
-    `/api/file/${survey.marginImages.bottom.imagePath}/${survey.marginImages.bottom.imageName}`,
+    `/api/file/${bottomImagePath}`,
     !survey.marginImages.bottom.imageName,
   );
 
@@ -82,7 +99,7 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
         {topImageHeaderQuery.imageHeaders && (
           <img
             style={{ maxWidth: '60%', maxHeight: '15vh' }}
-            src={`/api/file/${survey.marginImages.top.imagePath}/${survey.marginImages.top.imageName}`}
+            src={`/api/file/${topImagePath}`}
             alt={topImageHeaderQuery.imageHeaders?.imageAltText ?? ''}
           />
         )}
@@ -124,7 +141,7 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
                 maxHeight: !mobileLandscape ? '40vh' : '100vh',
                 maxWidth: '100%',
               }}
-              src={`/api/file/${survey.thanksPage.imagePath[0]}/${survey.thanksPage.imageName}`}
+              src={`/api/file/${thanksPageImagePath}`}
               alt={thanksPageImageHeaderQuery.imageHeaders?.imageAltText ?? ''}
             />
           </div>
@@ -144,7 +161,12 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
         }}
       >
         <Footer>
-          <Link color="primary" underline="hover" href="/saavutettavuusseloste" target="_blank">
+          <Link
+            color="primary"
+            underline="hover"
+            href="/saavutettavuusseloste"
+            target="_blank"
+          >
             {tr.FooterLinks.accessibility}
           </Link>
           {survey.displayPrivacyStatement && (
@@ -168,7 +190,7 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
               bottom: 0,
               margin: '0.5rem',
             }}
-            src={`/api/file/${survey.marginImages.bottom.imagePath}/${survey.marginImages.bottom.imageName}`}
+            src={`/api/file/${bottomImagePath}`}
             alt={bottomImageHeaderQuery.imageHeaders?.imageAltText ?? ''}
           />
         )}
