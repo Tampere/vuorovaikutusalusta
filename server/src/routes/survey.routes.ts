@@ -175,7 +175,9 @@ router.put(
       .optional({ checkFalsy: true })
       .isString()
       .withMessage('Section type must be a string'),
-    body('groups').isArray().withMessage('Groups must be an array'),
+    body('organization')
+      .isString()
+      .withMessage('Organization must be a string'),
   ]),
   asyncHandler(async (req, res) => {
     const surveyId = Number(req.params.id);
