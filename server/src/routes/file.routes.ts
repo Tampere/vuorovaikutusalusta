@@ -116,21 +116,10 @@ router.get(
  * Endpoint for fetching a single local file
  */
 router.get(
-  '/:organization/:filePath?/:fileName',
-  validateRequest([
-    param('fileName').isString().withMessage('fileName must be a string'),
-    param('filePath')
-      .optional()
-      .isString()
-      .withMessage('filePath must be a string'),
-    param('organization')
-      .isString()
-      .withMessage('organization id must be a string'),
-  ]),
+  '/*',
   asyncHandler(async (req, res) => {
-    const { fileName, filePath, organization } = req.params;
-    const filePathArray = filePath?.split('/') ?? [];
-    const row = await getFile(fileName, filePathArray, organization);
+    const fileUrl = req.params[0];
+    const row = await getFile(fileUrl);
     res.set('Content-type', row.mimeType);
     res.set('File-details', JSON.stringify(row.details));
     res.status(200).send(row.data);
@@ -141,23 +130,12 @@ router.get(
  * Endpoint for deleting a single file
  */
 router.delete(
-  '/:organization/:filePath?/:fileName',
-  validateRequest([
-    param('fileName').isString().withMessage('fileName must be a string'),
-    param('filePath')
-      .optional()
-      .isString()
-      .withMessage('filePath must be a string'),
-    param('organization')
-      .isString()
-      .withMessage('organization id must be a string'),
-  ]),
+  '/*',
   ensureAuthenticated(),
   ensureFileGroupAccess(),
   asyncHandler(async (req, res) => {
-    const { fileName, filePath, organization } = req.params;
-    const filePathArray = filePath?.split('/') ?? [];
-    await removeFile(fileName, filePathArray, organization);
+    const fileUrl = req.params[0];
+    await removeFile(fileUrl);
     res.status(200).send();
   }),
 );

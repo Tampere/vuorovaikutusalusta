@@ -285,23 +285,20 @@ export default function EditSurveyPage() {
             targetPath={[String(activeSurvey.id)]}
             surveyOrganization={activeSurvey.organization}
             value={
-              !page.sidebar.imageName
+              !page.sidebar.imageUrl
                 ? null
                 : [
                     {
-                      name: page.sidebar.imageName,
-                      path: page.sidebar.imagePath,
+                      url: page.sidebar.imageUrl,
                     },
                   ]
             }
-            onUpload={({ name, path }) => {
+            onUpload={({ url }) => {
               editPage({
                 ...page,
                 sidebar: {
                   ...page.sidebar,
-                  imageOrganization: activeSurvey.organization,
-                  imagePath: path,
-                  imageName: name,
+                  imageUrl: url,
                   imageSize: 'fitted',
                 },
               });
@@ -311,9 +308,7 @@ export default function EditSurveyPage() {
                 ...page,
                 sidebar: {
                   ...page.sidebar,
-                  imageOrganization: null,
-                  imagePath: [],
-                  imageName: null,
+                  imageUrl: null,
                   imageSize: null,
                 },
               });

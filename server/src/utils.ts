@@ -90,7 +90,7 @@ export function indexToAlpha(num = 1) {
 export function geometryToGeoJSONFeatureCollection(
   geometry: Geometry,
   properties: Record<string, string>,
-  srid: number
+  srid: number,
 ): GeoJSON.FeatureCollection & { crs: string } {
   return {
     type: 'FeatureCollection',

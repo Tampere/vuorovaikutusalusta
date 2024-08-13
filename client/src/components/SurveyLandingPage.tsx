@@ -15,7 +15,6 @@ import React from 'react';
 
 import { useImageHeaderQuery } from '@src/hooks/UseImageHeaderQuery';
 import Footer from './Footer';
-import { getFullFilePath } from '@src/utils/path';
 
 const useStyles = makeStyles((theme: Theme & { [customKey: string]: any }) => ({
   heading: {
@@ -102,28 +101,19 @@ export default function SurveyLandingPage({
   onStart,
   surveyBackgroundImage,
 }: Props) {
-  const classes = useStyles({ imageName: survey?.backgroundImageName ?? '' });
+  const classes = useStyles({ imageUrl: survey?.backgroundImageUrl ?? '' });
   const { tr, surveyLanguage } = useTranslations();
   const mediumWidth = useMediaQuery('(max-width: 640px)');
 
-  const topImagePath = getFullFilePath(
-    survey.marginImages.top.imageOrganization,
-    survey.marginImages.top.imagePath,
-    survey.marginImages.top.imageName,
-  );
-  const bottomImagePath = getFullFilePath(
-    survey.marginImages.bottom.imageOrganization,
-    survey.marginImages.bottom.imagePath,
-    survey.marginImages.bottom.imageName,
-  );
-
+  const topImagePath = `/api/file/${survey.marginImages.top.imageUrl}`;
+  const bottomImagePath = `/api/file/${survey.marginImages.bottom.imageUrl}`;
   const topImageHeaderQuery = useImageHeaderQuery(
-    `/api/file/${topImagePath}`,
-    !survey.marginImages.top.imageName,
+    topImagePath,
+    !survey.marginImages.top.imageUrl,
   );
   const bottomImageHeaderQuery = useImageHeaderQuery(
-    `/api/file/${bottomImagePath}`,
-    !survey.marginImages.bottom.imageName,
+    bottomImagePath,
+    !survey.marginImages.bottom.imageUrl,
   );
 
   return (
@@ -135,12 +125,8 @@ export default function SurveyLandingPage({
       sx={{
         width: '100%',
         minHeight: '100vh', // as a fallback if svh not supported
-        ...(survey?.backgroundImageName && {
-          backgroundImage: `url("/api/file/${getFullFilePath(
-            survey?.organization,
-            ['background-images'],
-            survey?.backgroundImageName,
-          )}")`,
+        ...(survey?.backgroundImageUrl && {
+          backgroundImage: `url("/api/file/${survey.backgroundImageUrl}")`,
         }),
         backgroundSize: 'cover',
         backgroundPosition: 'center',
@@ -173,7 +159,7 @@ export default function SurveyLandingPage({
               maxWidth: '60%',
               maxHeight: '100%',
             }}
-            src={`/api/file/${topImagePath}`}
+            src={topImagePath}
             alt={topImageHeaderQuery.imageHeaders?.imageAltText ?? ''}
           />
         )}
@@ -248,7 +234,7 @@ export default function SurveyLandingPage({
               marginLeft: '0.5rem',
               marginBottom: '0.5rem',
             }}
-            src={`/api/file/${bottomImagePath}`}
+            src={bottomImagePath}
             alt={bottomImageHeaderQuery.imageHeaders?.imageAltText ?? ''}
           />
         )}

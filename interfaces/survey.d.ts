@@ -88,9 +88,7 @@ interface CommonSurveyPageQuestion extends CommonSurveyPageSection {
  * Section file
  */
 interface SectionFile {
-  fileName: string;
-  filePath: string[];
-  fileOrganization: string;
+  fileUrl: string;
 }
 
 /**
@@ -291,17 +289,9 @@ export interface SurveyPageSidebar {
    */
   defaultMapView: Geometry;
   /**
-   * Path of the sidebar image
+   * Url of the sidebar image
    */
-  imagePath: string[];
-  /**
-   * Name of the sidebar image
-   */
-  imageName: string;
-  /**
-   * The organization of the file uploader
-   */
-  imageOrganization: string;
+  imageUrl: string;
   /**
    * Alternative text for the sidebar image
    */
@@ -410,17 +400,9 @@ export interface Survey {
    */
   pages?: SurveyPage[];
   /**
-   * Name of the survey background image
+   * Url of the survey background image
    */
-  backgroundImageName?: string;
-  /**
-   * Path of the survey background image
-   */
-  backgroundImagePath?: string[];
-  /**
-   * The organization of the background image uploader
-   */
-  backgroundImageOrganization?: string;
+  backgroundImageUrl?: string;
   /**
    * Thanks page
    */
@@ -434,17 +416,9 @@ export interface Survey {
      */
     text: LocalizedText;
     /**
-     * Name of the thanks page image
+     * Url of the thanks page image
      */
-    imageName?: string;
-    /**
-     * Path of the thanks page image
-     */
-    imagePath?: string[];
-    /**
-     * The organization of the thanks page image uploader
-     */
-    imageOrganization?: string
+    imageUrl?: string;
   };
   /**
    * Theme of the survey
@@ -500,15 +474,11 @@ export interface Survey {
    */
   marginImages: {
     top: {
-      imagePath: string[];
-      imageName: string;
-      imageOrganization: string;
+      imageUrl: string;
       altText?: string
     };
     bottom: {
-      imagePath: string[];
-      imageName: string;
-      imageOrganization: string;
+      imageUrl: string;
       altText?: string
     };
   };
@@ -673,17 +643,9 @@ export interface File {
    */
   details?: { [key: string]: any };
   /**
-   * Image file name
+   * Image url
    */
-  fileName: string;
-  /**
-   * Path of the file in the file hierarchy
-   */
-  filePath: string;
-  /**
-   * The organization of the file uploader
-   */
-  fileOrganization: string;
+  fileUrl: string;
   /**
    * File mime type
    */

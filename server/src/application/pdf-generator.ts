@@ -150,12 +150,8 @@ async function getFrontPage(
   language: LanguageCode,
 ): Promise<Content> {
   const tr = useTranslations(language);
-  const image = survey.backgroundImageName
-    ? await getFile(
-        survey.backgroundImageName,
-        survey.backgroundImagePath,
-        survey.backgroundImageOrganization,
-      )
+  const image = survey.backgroundImageUrl
+    ? await getFile(survey.backgroundImageUrl)
     : null;
 
   const [logo, banner] = await Promise.all([

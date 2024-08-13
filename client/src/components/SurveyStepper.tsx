@@ -32,7 +32,6 @@ import { useSurveyMap } from '@src/stores/SurveyMapContext';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { getClassList } from '@src/utils/classes';
-import { getFullFilePath } from '@src/utils/path';
 import { request } from '@src/utils/request';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import SplitPane from 'react-split-pane';
@@ -163,16 +162,6 @@ export default function SurveyStepper({
   }, [survey, pageNumber]);
 
   const currentPageErrorRef = useRef(null);
-
-  const fullSidebarImagePath = useMemo(
-    () =>
-      getFullFilePath(
-        survey.organization,
-        currentPage.sidebar.imagePath,
-        currentPage.sidebar.imageName,
-      ),
-    [currentPage.sidebar],
-  );
 
   /**
    * Show/hide mobile map when the drawing status of the map changes
@@ -479,10 +468,10 @@ export default function SurveyStepper({
                   </Box>
                 )}
                 <FormControl style={{ width: '100%' }} component="fieldset">
-                  {currentPage.sidebar.imageName && (
+                  {currentPage.sidebar?.imageUrl && (
                     <img
                       alt={currentPage.sidebar?.imageAltText?.[surveyLanguage]}
-                      src={`/api/file/${fullSidebarImagePath}`}
+                      src={`/api/file/${currentPage.sidebar?.imageUrl}`}
                       style={visuallyHidden}
                     />
                   )}
@@ -641,7 +630,7 @@ export default function SurveyStepper({
               width: '100%',
             }}
           >
-            {currentPage.sidebar.imageName && (
+            {currentPage.sidebar?.imageUrl && (
               <img
                 style={
                   currentPage.sidebar.imageSize === 'original'
@@ -652,7 +641,7 @@ export default function SurveyStepper({
                 }
                 aria-hidden={true}
                 alt={currentPage.sidebar?.imageAltText?.[surveyLanguage]}
-                src={`/api/file/${fullSidebarImagePath}`}
+                src={`/api/file/${currentPage.sidebar?.imageUrl}`}
               />
             )}
           </div>

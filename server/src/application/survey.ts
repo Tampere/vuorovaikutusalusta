@@ -63,18 +63,10 @@ interface DBSurvey {
   updated_at: Date;
   thanks_page_title: LocalizedText;
   thanks_page_text: LocalizedText;
-  thanks_page_image_name: string;
-  thanks_page_image_path: string[];
-  thanks_page_image_organization: string;
-  background_image_name: string;
-  background_image_path: string[];
-  background_image_organization: string;
-  top_margin_image_name: string;
-  top_margin_image_path: string[];
-  top_margin_image_organization: string;
-  bottom_margin_image_name: string;
-  bottom_margin_image_path: string[];
-  bottom_margin_image_organization: string;
+  thanks_page_image_url: string;
+  background_image_url: string;
+  top_margin_image_url: string;
+  bottom_margin_image_url: string;
   section_title_color: string;
   email_enabled: boolean;
   email_auto_send_to: string[];
@@ -101,9 +93,7 @@ interface DBSurveyPage {
    * For some reason, pg won't be able to cast number[] to json - the array should be JSON.stringified
    */
   sidebar_map_layers: string;
-  sidebar_image_path: string[];
-  sidebar_image_name: string;
-  sidebar_image_organization: string;
+  sidebar_image_url: string;
   sidebar_image_alt_text: LocalizedText;
   sidebar_image_size: SurveyPageSidebarImageSize;
 }
@@ -121,9 +111,7 @@ interface DBSurveyPageSection {
   details: object;
   parent_section: number;
   info: LocalizedText;
-  file_name: string;
-  file_path: string[];
-  file_organization: string;
+  file_url: string;
   predecessor_section: number;
 }
 
@@ -178,9 +166,7 @@ type DBSurveyJoin = DBSurvey & {
   page_title: LocalizedText;
   page_sidebar_type: SurveyPageSidebarType;
   page_sidebar_map_layers: number[];
-  page_sidebar_image_path: string[];
-  page_sidebar_image_name: string;
-  page_sidebar_image_organization: string;
+  page_sidebar_image_url: string;
   page_sidebar_image_alt_text: LocalizedText;
   page_sidebar_image_size: SurveyPageSidebarImageSize;
   section_id: number;
@@ -192,9 +178,7 @@ type DBSurveyJoin = DBSurvey & {
   section_parent_section: number;
   section_predecessor_section: number;
   section_info: LocalizedText;
-  section_file_name: string;
-  section_file_path: string[];
-  section_file_organization: string;
+  section_file_url: string;
   option_id: number;
   option_text: LocalizedText;
   option_group_id: number;
@@ -223,12 +207,7 @@ const surveyPageColumnSet = (inputSRID: number) =>
       name: 'sidebar_map_layers',
       cast: 'json',
     },
-    {
-      name: 'sidebar_image_path',
-      cast: 'text[]',
-    },
-    'sidebar_image_name',
-    'sidebar_image_organization',
+    'sidebar_image_url',
     {
       name: 'sidebar_image_alt_text',
       cast: 'json',
@@ -286,9 +265,7 @@ export async function getSurvey(
         section.idx as section_idx,
         section.parent_section as section_parent_section,
         section.info as section_info,
-        section.file_name as section_file_name,
-        section.file_path as section_file_path,
-        section.file_organization as section_file_organization,
+        section.file_url as section_file_url,
         section.predecessor_section as section_predecessor_section
       FROM (
         SELECT
@@ -298,9 +275,7 @@ export async function getSurvey(
           page.idx as page_idx,
           page.sidebar_type as page_sidebar_type,
           page.sidebar_map_layers as page_sidebar_map_layers,
-          page.sidebar_image_path as page_sidebar_image_path,
-          page.sidebar_image_name as page_sidebar_image_name,
-          page.sidebar_image_organization as page_sidebar_image_organization,
+          page.sidebar_image_url as page_sidebar_image_url,
           page.sidebar_image_alt_text as page_sidebar_image_alt_text,
           page.sidebar_image_size as page_sidebar_image_size,
           public.ST_AsGeoJSON(page.default_map_view)::json as default_map_view,
@@ -565,7 +540,7 @@ async function upsertSection(section: DBSurveyPageSection, index: number) {
   // Negative IDs can be assigned as temporary IDs for e.g. drag and drop - change them to null
   return await getDb().one<DBSurveyPageSection>(
     `
-    INSERT INTO data.page_section (id, survey_page_id, idx, title, type, body, details, parent_section, info, file_name, file_path, file_organization, predecessor_section)
+    INSERT INTO data.page_section (id, survey_page_id, idx, title, type, body, details, parent_section, info, file_url, predecessor_section)
     VALUES (
       COALESCE(
         CASE
@@ -582,9 +557,7 @@ async function upsertSection(section: DBSurveyPageSection, index: number) {
       $(details)::json,
       $(parentSection),
       $(info),
-      $(fileName),
-      $(filePath),
-      $(fileOrganization),
+      $(fileUrl),
       $(predecessorSection)
     )
     ON CONFLICT (id) DO
@@ -596,9 +569,7 @@ async function upsertSection(section: DBSurveyPageSection, index: number) {
         details = $(details)::json,
         parent_section = $(parentSection),
         info = $(info),
-        file_name = $(fileName),
-        file_path = $(filePath),
-        file_organization = $(fileOrganization),
+        file_url = $(fileUrl),
         predecessor_section = $(predecessorSection)
     RETURNING *
   `,
@@ -612,9 +583,7 @@ async function upsertSection(section: DBSurveyPageSection, index: number) {
       details: section.details,
       parentSection: section.parent_section,
       info: section.info,
-      fileName: section.file_name,
-      filePath: section.file_path,
-      fileOrganization: section.file_organization,
+      fileUrl: section.file_url,
       predecessorSection: section.predecessor_section,
     },
   );
@@ -914,30 +883,22 @@ export async function updateSurvey(survey: Survey) {
         allow_test_survey = $10,
         thanks_page_title = $11,
         thanks_page_text = $12,
-        background_image_name = $13,
-        background_image_path = $14,
-        background_image_organization = $15,
-        thanks_page_image_name = $16,
-        thanks_page_image_path = $17,
-        thanks_page_image_organization = $18,
-        admins = $19,
-        theme_id = $20,
-        section_title_color = $21,
-        email_enabled = $22,
-        email_auto_send_to = $23,
-        email_subject = $24,
-        email_body = $25,
-        email_info = $26::json,
-        allow_saving_unfinished = $27,
-        localisation_enabled = $28,
-        display_privacy_statement = $29,
-        top_margin_image_name = $30,
-        top_margin_image_path = $31,
-        top_margin_image_organization = $32,
-        bottom_margin_image_name = $33,
-        bottom_margin_image_path = $34,
-        bottom_margin_image_organization = $35,
-        organization = $36
+        background_image_url = $13,
+        thanks_page_image_url = $14,
+        admins = $15,
+        theme_id = $16,
+        section_title_color = $17,
+        email_enabled = $18,
+        email_auto_send_to = $19,
+        email_subject = $20,
+        email_body = $21,
+        email_info = $22::json,
+        allow_saving_unfinished = $23,
+        localisation_enabled = $24,
+        display_privacy_statement = $25,
+        top_margin_image_url = $26,
+        bottom_margin_image_url = $27,
+        organization = $28
       WHERE id = $1 RETURNING *`,
       [
         survey.id,
@@ -952,12 +913,8 @@ export async function updateSurvey(survey: Survey) {
         survey.allowTestSurvey,
         survey.thanksPage.title,
         survey.thanksPage.text,
-        survey.backgroundImageName ?? null,
-        survey.backgroundImagePath ?? null,
-        survey.backgroundImageOrganization ?? null,
-        survey.thanksPage.imageName ?? null,
-        survey.thanksPage.imagePath ?? null,
-        survey.thanksPage.imageOrganization ?? null,
+        survey.backgroundImageUrl ?? null,
+        survey.thanksPage.imageUrl ?? null,
         survey.admins,
         survey.theme?.id ?? null,
         survey.sectionTitleColor,
@@ -969,12 +926,8 @@ export async function updateSurvey(survey: Survey) {
         survey.allowSavingUnfinished,
         survey.localisationEnabled,
         survey.displayPrivacyStatement,
-        survey.marginImages.top.imageName ?? null,
-        survey.marginImages.top.imagePath ?? null,
-        survey.marginImages.top.imageOrganization ?? null,
-        survey.marginImages.bottom.imageName ?? null,
-        survey.marginImages.bottom.imagePath ?? null,
-        survey.marginImages.bottom.imageOrganization ?? null,
+        survey.marginImages.top.imageUrl ?? null,
+        survey.marginImages.bottom.imageUrl ?? null,
         survey.organization,
       ],
     )
@@ -1241,13 +1194,9 @@ function dbSurveyToSurvey(
     thanksPage: {
       title: dbSurvey.thanks_page_title,
       text: dbSurvey.thanks_page_text,
-      imageName: dbSurvey.thanks_page_image_name,
-      imagePath: dbSurvey.thanks_page_image_path,
-      imageOrganization: dbSurvey.thanks_page_image_organization,
+      imageUrl: dbSurvey.thanks_page_image_url,
     },
-    backgroundImageName: dbSurvey.background_image_name,
-    backgroundImagePath: dbSurvey.background_image_path,
-    backgroundImageOrganization: dbSurvey.background_image_organization,
+    backgroundImageUrl: dbSurvey.background_image_url,
     sectionTitleColor: dbSurvey.section_title_color,
     email: {
       enabled: dbSurvey.email_enabled,
@@ -1262,14 +1211,10 @@ function dbSurveyToSurvey(
     pages: [],
     marginImages: {
       top: {
-        imagePath: dbSurvey.top_margin_image_path,
-        imageName: dbSurvey.top_margin_image_name,
-        imageOrganization: dbSurvey.organization,
+        imageUrl: dbSurvey.top_margin_image_url,
       },
       bottom: {
-        imagePath: dbSurvey.bottom_margin_image_path,
-        imageName: dbSurvey.bottom_margin_image_name,
-        imageOrganization: dbSurvey.organization,
+        imageUrl: dbSurvey.bottom_margin_image_url,
       },
     },
     organization: dbSurvey.organization,
@@ -1312,9 +1257,7 @@ function dbSurveyJoinToPage(dbSurveyJoin: DBSurveyJoin): SurveyPage {
         sidebar: {
           type: dbSurveyJoin.page_sidebar_type,
           mapLayers: dbSurveyJoin.page_sidebar_map_layers ?? [],
-          imagePath: dbSurveyJoin.page_sidebar_image_path,
-          imageName: dbSurveyJoin.page_sidebar_image_name,
-          imageOrganization: dbSurveyJoin.page_sidebar_image_organization,
+          imageUrl: dbSurveyJoin.page_sidebar_image_url,
           imageAltText: dbSurveyJoin.page_sidebar_image_alt_text,
           imageSize: dbSurveyJoin.page_sidebar_image_size,
           defaultMapView: dbSurveyJoin.default_map_view
@@ -1344,9 +1287,7 @@ function dbSurveyJoinToSection(dbSurveyJoin: DBSurveyJoin): SurveyPageSection {
         type: dbSurveyJoin.section_type as SurveyPageSection['type'],
         body: dbSurveyJoin.section_body,
         info: dbSurveyJoin.section_info,
-        fileName: dbSurveyJoin.section_file_name,
-        filePath: dbSurveyJoin.section_file_path,
-        fileOrganization: dbSurveyJoin.section_file_organization,
+        fileUrl: dbSurveyJoin.section_file_url,
         // Trust that the JSON in the DB fits the rest of the detail fields
         ...(dbSurveyJoin.section_details as any),
         // Add an initial empty option array if the type allows options
@@ -1477,8 +1418,7 @@ export async function createSurveyPage(
     sidebar: {
       type: row.sidebar_type,
       mapLayers: partialPage?.sidebar?.mapLayers ?? [],
-      imagePath: [],
-      imageName: null,
+      imageUrl: null,
       defaultMapView: null,
     },
     conditions: {},
@@ -1523,9 +1463,7 @@ function surveyPagesToRows(
       title: surveyPage.title,
       sidebar_type: surveyPage.sidebar.type,
       sidebar_map_layers: JSON.stringify(surveyPage.sidebar.mapLayers),
-      sidebar_image_path: surveyPage.sidebar.imagePath,
-      sidebar_image_name: surveyPage.sidebar.imageName,
-      sidebar_image_organization: surveyPage.sidebar.imageOrganization,
+      sidebar_image_url: surveyPage.sidebar.imageUrl,
       sidebar_image_alt_text: surveyPage.sidebar.imageAltText,
       sidebar_image_size: surveyPage.sidebar.imageSize,
       default_map_view:
@@ -1559,9 +1497,7 @@ function surveySectionsToRows(
       followUpSections = undefined,
       info = undefined,
       groups = undefined,
-      fileName = undefined,
-      filePath = undefined,
-      fileOrganization = undefined,
+      fileUrl = undefined,
       conditions = undefined,
       ...details
     } = { ...surveySection };
@@ -1580,9 +1516,7 @@ function surveySectionsToRows(
       parent_section: parentSectionId ?? null,
       predecessor_section: predecessorSectionId ?? null,
       info: info,
-      file_name: fileName,
-      file_path: filePath,
-      file_organization: fileOrganization,
+      file_url: fileUrl,
       conditions,
     } as DBSurveyPageSection & {
       options: SectionOption[];
@@ -1739,29 +1673,25 @@ export async function storeFile({
   organization: string;
 }) {
   const fileString = `\\x${buffer.toString('hex')}`;
-
+  const fileUrl = `${organization}/${path.join('/')}/${name}`;
   const row = await getDb().oneOrNone<{ path: string[]; name: string }>(
     `
-    INSERT INTO data.files (file, details, file_path, file_name, mime_type, survey_id, organization)
-    VALUES ($(fileString), $(details), $(path), $(name), $(mimetype), $(surveyId), $(organization))
+    INSERT INTO data.files (file, details, mime_type, survey_id, url)
+    VALUES ($(fileString), $(details), $(mimetype), $(surveyId), $(fileUrl))
     ON CONFLICT ON CONSTRAINT pk_files DO UPDATE SET
       file = $(fileString),
       details = $(details),
-      file_path = $(path),
-      file_name = $(name),
       mime_type = $(mimetype),
       survey_id = $(surveyId),
-      organization = $(organization)
-    RETURNING file_path AS path, file_name AS name;
+      url = $(fileUrl)
+    RETURNING url as url;
     `,
     {
       fileString,
       details,
-      path,
-      name,
       mimetype,
       surveyId,
-      organization,
+      fileUrl,
     },
   );
 
@@ -1774,31 +1704,23 @@ export async function storeFile({
 
 /**
  * Get a single file with id from the database
- * @param fileName
- * @param filePath
- * @param fileOrganization
+ * @param fileUrl
  * @returns File
  */
-export async function getFile(
-  fileName: string,
-  filePath: string[],
-  organization: string,
-) {
+export async function getFile(fileUrl: string) {
   const row = await getDb().oneOrNone<{
     file: Buffer;
     mime_type: string;
     details: { [key: string]: any };
   }>(
     `
-    SELECT file, mime_type, details FROM data.files WHERE file_name = $1 AND file_path = $2 AND organization = $3;
+    SELECT file, mime_type, details FROM data.files WHERE url = $1;
   `,
-    [fileName, filePath, organization],
+    [fileUrl],
   );
 
   if (!row) {
-    throw new NotFoundError(
-      `File with fileName ${fileName} filePath ${filePath} organization ${organization} not found`,
-    );
+    throw new NotFoundError(`File with URL ${fileUrl} not found`);
   }
 
   return {
@@ -1813,19 +1735,18 @@ export async function getFile(
  * @returns SurveyImage[]
  */
 export async function getImages(imagePath: string[], organization: string) {
+  const filePattern = `${organization}/${imagePath.join('/')}%`;
   const rows = await getDb().manyOrNone(
     `
     SELECT 
       id, 
       details, 
       file, 
-      file_name, 
-      file_path,
-      organization
+      url
     FROM data.files 
-    WHERE file_path = $1 AND organization = $2;
+    WHERE url LIKE $1;
   `,
-    [imagePath, organization],
+    [filePattern],
   );
 
   return rows.map((row) => ({
@@ -1833,30 +1754,22 @@ export async function getImages(imagePath: string[], organization: string) {
     data: row.file.toString('base64'),
     attributions: row.details?.attributions,
     altText: row.details?.imageAltText,
-    fileName: row.file_name,
-    filePath: row.file_path,
-    fileOrganization: row.organization,
+    fileUrl: row.url,
   })) as SurveyImage[];
 }
 
 /**
  * Delete a single file from the db
- * @param fileName name of the file
- * @param filePath path of the file
- * @param fileOrganization organization
+ * @param fileUrl url of the file
  * @returns
  */
-export async function removeFile(
-  fileName: string,
-  filePath: string[],
-  organization: string,
-) {
+export async function removeFile(fileUrl: string) {
   return await getDb().none(
     `
     DELETE FROM data.files 
-    WHERE file_name = $1 AND file_path = $2 AND organization = $3;
+    WHERE url = $1;
   `,
-    [fileName, filePath, organization],
+    [fileUrl],
   );
 }
 

@@ -18,29 +18,24 @@ export default function EditDocumentSection({ section, onChange }: Props) {
         targetPath={[String(activeSurvey.id)]}
         surveyOrganization={activeSurvey.organization}
         value={
-          !section.fileName
+          !section.fileUrl
             ? null
             : [
                 {
-                  name: section.fileName,
-                  path: section.filePath,
+                  url: section.fileUrl,
                 },
               ]
         }
-        onUpload={({ name, path }) => {
+        onUpload={({ url }) => {
           onChange({
             ...section,
-            fileOrganization: activeSurvey.organization,
-            fileName: name,
-            filePath: path,
+            fileUrl: url,
           });
         }}
         onDelete={() => {
           onChange({
             ...section,
-            fileOrganization: null,
-            fileName: null,
-            filePath: [],
+            fileUrl: null,
           });
         }}
       />

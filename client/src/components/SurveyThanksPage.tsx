@@ -14,7 +14,6 @@ import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import rehypeExternalLinks from 'rehype-external-links';
 import Footer from './Footer';
-import { getFullFilePath } from '@src/utils/path';
 
 type StyleKeys = 'testSurveyHeader';
 
@@ -35,37 +34,25 @@ interface Props {
 }
 
 export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
-  const thanksPageImagePath = getFullFilePath(
-    survey.thanksPage.imageOrganization,
-    survey.thanksPage.imagePath,
-    survey.thanksPage.imageName,
-  );
-  const topImagePath = getFullFilePath(
-    survey.marginImages.top.imageOrganization,
-    survey.marginImages.top.imagePath,
-    survey.marginImages.top.imageName,
-  );
-  const bottomImagePath = getFullFilePath(
-    survey.marginImages.bottom.imageOrganization,
-    survey.marginImages.bottom.imagePath,
-    survey.marginImages.bottom.imageName,
-  );
+  const thanksPageImagePath = `/api/file/${survey.thanksPage.imageUrl}`;
+  const topImagePath = `/api/file/${survey.marginImages.top.imageUrl}`;
+  const bottomImagePath = `/api/file/${survey.marginImages.bottom.imageUrl}`;
 
   const thanksPageImageHeaderQuery = useImageHeaderQuery(
-    `api/file/${thanksPageImagePath}`,
-    !(survey.thanksPage.imagePath.length > 0 && survey.thanksPage.imageName),
+    thanksPageImagePath,
+    !survey.thanksPage.imageUrl,
   );
   const topImageHeaderQuery = useImageHeaderQuery(
-    `/api/file/${topImagePath}`,
-    !survey.marginImages.top.imageName,
+    topImagePath,
+    !survey.marginImages.top.imageUrl,
   );
   const bottomImageHeaderQuery = useImageHeaderQuery(
-    `/api/file/${bottomImagePath}`,
-    !survey.marginImages.bottom.imageName,
+    bottomImagePath,
+    !survey.marginImages.bottom.imageUrl,
   );
 
   const { tr, surveyLanguage } = useTranslations();
-  const hasImage = survey.thanksPage.imageName !== null;
+  const hasImage = typeof survey.thanksPage.imageUrl === 'string';
   const lowWidth = useMediaQuery('(max-width: 400px)');
   const mediumWidth = useMediaQuery('(max-width: 640px)');
   const lowHeight = useMediaQuery('(max-height: 400px');
@@ -99,7 +86,7 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
         {topImageHeaderQuery.imageHeaders && (
           <img
             style={{ maxWidth: '60%', maxHeight: '15vh' }}
-            src={`/api/file/${topImagePath}`}
+            src={topImagePath}
             alt={topImageHeaderQuery.imageHeaders?.imageAltText ?? ''}
           />
         )}
@@ -141,7 +128,7 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
                 maxHeight: !mobileLandscape ? '40vh' : '100vh',
                 maxWidth: '100%',
               }}
-              src={`/api/file/${thanksPageImagePath}`}
+              src={thanksPageImagePath}
               alt={thanksPageImageHeaderQuery.imageHeaders?.imageAltText ?? ''}
             />
           </div>
@@ -190,7 +177,7 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
               bottom: 0,
               margin: '0.5rem',
             }}
-            src={`/api/file/${bottomImagePath}`}
+            src={bottomImagePath}
             alt={bottomImageHeaderQuery.imageHeaders?.imageAltText ?? ''}
           />
         )}
