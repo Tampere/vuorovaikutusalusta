@@ -1676,14 +1676,15 @@ export async function storeFile({
   const fileUrl = `${organization}/${path.join('/')}/${name}`;
   const row = await getDb().oneOrNone<{ path: string[]; name: string }>(
     `
-    INSERT INTO data.files (file, details, mime_type, survey_id, url)
-    VALUES ($(fileString), $(details), $(mimetype), $(surveyId), $(fileUrl))
+    INSERT INTO data.files (file, details, mime_type, survey_id, url, organization)
+    VALUES ($(fileString), $(details), $(mimetype), $(surveyId), $(fileUrl), $(organization))
     ON CONFLICT ON CONSTRAINT pk_files DO UPDATE SET
       file = $(fileString),
       details = $(details),
       mime_type = $(mimetype),
       survey_id = $(surveyId),
-      url = $(fileUrl)
+      url = $(fileUrl),
+      organization = $(organization)
     RETURNING url as url;
     `,
     {
@@ -1692,6 +1693,7 @@ export async function storeFile({
       mimetype,
       surveyId,
       fileUrl,
+      organization,
     },
   );
 

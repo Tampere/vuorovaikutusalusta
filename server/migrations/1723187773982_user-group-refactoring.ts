@@ -6,11 +6,12 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.sql(
     `
       ALTER TABLE APPLICATION.user RENAME groups TO organizations;
+      ALTER TABLE DATA.files ALTER COLUMN groups TYPE TEXT;
+      ALTER TABLE DATA.files RENAME groups TO organization;
       ALTER TABLE DATA.files DROP CONSTRAINT pk_files CASCADE;
       ALTER TABLE DATA.files
         DROP COLUMN file_name,
-        DROP COLUMN file_path,
-        DROP COLUMN groups;
+        DROP COLUMN file_path;
       ALTER TABLE DATA.files ADD url TEXT;
       ALTER TABLE DATA.files ADD CONSTRAINT pk_files PRIMARY KEY (url);
       ALTER TABLE DATA.survey ALTER COLUMN groups TYPE TEXT;
