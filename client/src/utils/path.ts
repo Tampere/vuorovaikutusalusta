@@ -12,3 +12,13 @@ export function getFullFilePath(
 ) {
   return `${organization}/${filePath.join('/')}/${fileName}`;
 }
+
+/**
+ * Returns the name of the file that is expected to be found after the
+ * last slash in the URL path
+ * @param fileUrl Url of the file
+ * @returns Filename
+ */
+export function getFileName(fileUrl: string) {
+  return typeof fileUrl === 'string' ? fileUrl.split('/').pop() ?? null : null;
+}

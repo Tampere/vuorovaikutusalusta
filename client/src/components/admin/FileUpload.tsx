@@ -4,7 +4,7 @@ import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useEffect, useMemo, useState } from 'react';
 import DropZone from '../DropZone';
-import { getFullFilePath } from '@src/utils/path';
+import { getFileName, getFullFilePath } from '@src/utils/path';
 
 interface Props {
   targetPath?: string[];
@@ -87,7 +87,7 @@ export default function FileUpload({
       const fileFormat = url
         .substring(url.lastIndexOf('.') + 1, url.length)
         .toLowerCase();
-      const name = url.split('/').pop();
+      const name = getFileName(url);
       return (
         <div key={url}>
           {imageFileFormats.includes(fileFormat) && (

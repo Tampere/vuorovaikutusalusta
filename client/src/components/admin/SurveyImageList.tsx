@@ -22,6 +22,7 @@ import { useTranslations } from '@src/stores/TranslationContext';
 import { request } from '@src/utils/request';
 import React, { useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
+import { getFileName } from '@src/utils/path';
 
 const useStyles = makeStyles((theme: Theme) => ({
   noImageBackground: {
@@ -105,10 +106,6 @@ export default function SurveyImageList({ imageType, ...props }: Props) {
         message: tr.SurveyImageList.imageSizeExceeded.replace('{x}', MEGAS),
       };
     }
-  }
-
-  function getFileName(url: string) {
-    return url.split('/').pop();
   }
 
   function getApiFilePath(imageType: ImageType) {

@@ -4,6 +4,7 @@ import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import React, { useMemo } from 'react';
 import SectionInfo from './SectionInfo';
 import { useTranslations } from '@src/stores/TranslationContext';
+import { getFileName } from '@src/utils/path';
 
 interface Props {
   section: SurveyDocumentSection;
@@ -18,7 +19,7 @@ export default function DocumentSection({
   const { tr, surveyLanguage } = useTranslations();
 
   const fileName = useMemo(
-    () => section.fileUrl.split('/').pop(),
+    () => getFileName(section.fileUrl),
     [section.fileUrl],
   );
 
