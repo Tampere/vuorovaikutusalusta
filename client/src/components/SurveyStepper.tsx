@@ -468,7 +468,7 @@ export default function SurveyStepper({
                   </Box>
                 )}
                 <FormControl style={{ width: '100%' }} component="fieldset">
-                  {currentPage.sidebar?.imageUrl && (
+                  {currentPage.sidebar.imageUrl && (
                     <img
                       alt={currentPage.sidebar?.imageAltText?.[surveyLanguage]}
                       src={`/api/file/${currentPage.sidebar?.imageUrl}`}

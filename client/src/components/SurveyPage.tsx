@@ -48,7 +48,7 @@ export default function SurveyPage({ isTestSurvey }: Props) {
         const survey = await request<Survey>(
           `/api/published-surveys/${name}${isTestSurvey ? '?test=true' : ''}`,
         );
-        if (survey.backgroundImageUrl && survey.backgroundImageUrl !== '') {
+        if (survey.backgroundImageUrl) {
           const response = await fetch(
             `/api/file/${survey.backgroundImageUrl}`,
           );
