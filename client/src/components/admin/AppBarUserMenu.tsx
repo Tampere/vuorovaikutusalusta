@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { IconButton, Menu, MenuItem, Tooltip } from '@mui/material';
-import SettingsIcon from '@mui/icons-material/Settings';
+import SettingsIcon from '@src/components/icons/SettingsIcon';
 import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { InstructionsDialog } from './InstructionsDialog';

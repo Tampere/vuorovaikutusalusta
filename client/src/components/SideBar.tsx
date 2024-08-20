@@ -8,10 +8,8 @@ const useStyles = makeStyles({
     // TODO: use theme colors?
     background: '#333',
     color: '#fafafa',
-    fill: '#fafafa',
     '& *': {
       color: '#fafafa',
-      fill: '#fafafa',
     },
     '& hr': {
       borderColor: '#555',

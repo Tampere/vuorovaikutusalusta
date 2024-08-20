@@ -14,7 +14,8 @@ import {
   Theme,
   Typography,
 } from '@mui/material';
-import { Cancel, PhotoLibrary } from '@mui/icons-material';
+import ImageIcon from '@src/components/icons/ImageIcon';
+import CancelIcon from '@src/components/icons/CancelIcon';
 import { makeStyles } from '@mui/styles';
 import { useToasts } from '@src/stores/ToastContext';
 import { useSurvey } from '@src/stores/SurveyContext';
@@ -22,6 +23,7 @@ import { useTranslations } from '@src/stores/TranslationContext';
 import { request } from '@src/utils/request';
 import React, { useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
+
 
 const useStyles = makeStyles((theme: Theme) => ({
   noImageBackground: {
@@ -456,10 +458,11 @@ export default function SurveyImageList({ imageType, ...props }: Props) {
   return (
     <div>
       <Button
+        startIcon={<ImageIcon/>}
         variant="outlined"
         onClick={() => setImageDialogOpen((prev) => !prev)}
       >
-        <PhotoLibrary />
+        
         <Typography
           style={{
             textTransform: 'none',
@@ -535,7 +538,7 @@ export default function SurveyImageList({ imageType, ...props }: Props) {
                     handleListItemClick(image.fileName, image.filePath)
                   }
                 >
-                  <Cancel
+                  <CancelIcon
                     color="error"
                     className={classes.deleteImageIcon}
                     onClick={async (event) =>

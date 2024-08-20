@@ -8,9 +8,10 @@ import {
   Tooltip,
 } from '@mui/material';
 import React, { useState } from 'react';
-import { Help as HelpIcon } from '@mui/icons-material';
+import QuestionmarkSmallIcon from '@src/components/icons/QuestionmarkSmallIcon';
 import { useTranslations } from '@src/stores/TranslationContext';
 import RichTextEditor from '../RichTextEditor';
+
 
 interface Props {
   infoText: string;
@@ -32,7 +33,7 @@ export default function OptionInfoDialog({
           onClick={() => setDialogOpen((prev) => !prev)}
           color={infoText ? 'secondary' : 'default'}
         >
-          <HelpIcon />
+          <QuestionmarkSmallIcon />
         </IconButton>
       </Tooltip>
       <Dialog

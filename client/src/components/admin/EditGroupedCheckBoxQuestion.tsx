@@ -11,12 +11,15 @@ import {
   FormControlLabel,
   Checkbox,
 } from '@mui/material';
-import { Add, DragIndicator, ExpandMore } from '@mui/icons-material';
+import ChevronDownSmallIcon from '@src/components/icons/ChevronDownSmallIcon';
+import DraggableIcon from '@src/components/icons/DraggableIcon';
+import AddIcon from '../icons/AddIcon';
 import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useState } from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import QuestionOptions from './QuestionOptions';
+
 
 interface Props {
   section: SurveyGroupedCheckboxQuestion;
@@ -171,7 +174,7 @@ export default function EditGroupedCheckBoxQuestion({
                       }}
                     >
                       <AccordionSummary
-                        expandIcon={<ExpandMore />}
+                        expandIcon={<ChevronDownSmallIcon />}
                         aria-controls={`group-${index}-content`}
                         id={`group-${index}-header`}
                       >
@@ -186,7 +189,7 @@ export default function EditGroupedCheckBoxQuestion({
                           {...provided.dragHandleProps}
                           style={{ display: 'flex' }}
                         >
-                          <DragIndicator />
+                          <DraggableIcon />
                         </div>
                       </AccordionSummary>
                       <AccordionDetails className={classes.group}>
@@ -264,7 +267,7 @@ export default function EditGroupedCheckBoxQuestion({
             setOpenedGroupId(id);
           }}
         >
-          <Add />
+          <AddIcon />
         </Fab>
         <Typography style={{ paddingLeft: '1rem' }}>
           {tr.EditGroupedCheckBoxQuestion.addGroup}

@@ -5,6 +5,16 @@ const textlink = '#219acd';
 const borderPrimary = '#939ca6';
 const baseTheme = createTheme({});
 
+declare module '@mui/material/styles' {
+  interface Palette {
+    borderPrimary: Palette['primary'];
+  }
+
+  interface PaletteOptions {
+    borderPrimary?: PaletteOptions['primary'];
+  }
+}
+
 export const ubiColors = createTheme({
   palette: {
     primary: {
@@ -27,10 +37,16 @@ export const surveyCardOverrides: Components<Omit<Theme, 'components'>> = {
       root: {
         boxShadow: ubiShadow,
         border: `0.5px solid ${borderPrimary};`,
-        // border: '0.5px solid color(display-p3 0.914 0.925 0.937);', TODO: support for P3 color space seems poor/non existant
       },
     },
   },
+  MuiLink: {
+    styleOverrides: {
+      root: {
+        color: textlink,
+      }
+    }
+  }
 };
 
 //

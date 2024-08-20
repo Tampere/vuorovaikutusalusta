@@ -10,7 +10,7 @@ import {
   AccordionSummary,
   Typography,
 } from '@mui/material';
-import { KeyboardArrowDownSharp } from '@mui/icons-material';
+import ChevronDownSmallIcon from '@src/components/icons/ChevronDownSmallIcon';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React from 'react';
 import SurveyQuestion from '@src/components/SurveyQuestion';
@@ -113,7 +113,7 @@ export default function AnswersList({
                   margin: 0,
                 },
               }}
-              expandIcon={<KeyboardArrowDownSharp />}
+              expandIcon={<ChevronDownSmallIcon/>}
             >
               <div style={{ flexGrow: 1 }}>
                 <Typography

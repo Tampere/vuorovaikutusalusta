@@ -1,6 +1,6 @@
 import React from 'react';
 import { IconButton, Tooltip } from '@mui/material';
-import InfoIcon from '@mui/icons-material/Info';
+import InfoIcon from "@src/components/icons/InfoIcon";
 import { useTranslations } from '@src/stores/TranslationContext';
 
 export function AdminInstructionButton() {
@@ -9,7 +9,7 @@ export function AdminInstructionButton() {
   return (
     <Tooltip arrow title={tr.adminInstructions}>
       <IconButton href="/api/file/instructions" target="_blank">
-        <InfoIcon sx={{ color: 'white' }} />
+        <InfoIcon />
       </IconButton>
     </Tooltip>
   );

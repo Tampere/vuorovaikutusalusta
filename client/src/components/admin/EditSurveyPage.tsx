@@ -1,5 +1,6 @@
 import { SurveyPageSidebarImageSize } from '@interfaces/survey';
-import { CheckSharp, ClearSharp } from '@mui/icons-material';
+import ClearIcon from '@src/components/icons/ClearIcon';
+import CheckIcon from '@src/components/icons/CheckIcon';
 import {
   Box,
   Button,
@@ -215,14 +216,14 @@ export default function EditSurveyPage() {
               >
                 {page.sidebar.defaultMapView ? (
                   <>
-                    <CheckSharp color="success" />
+                    <CheckIcon color="success" />
                     <Typography>
                       {tr.EditSurveyPage.defaultMapViewStatus.set}
                     </Typography>
                   </>
                 ) : (
                   <>
-                    <ClearSharp sx={{ color: '#0000008A' }} />
+                    <ClearIcon sx={{ color: '#0000008A' }} />
                     <Typography>
                       {tr.EditSurveyPage.defaultMapViewStatus.notSet}
                     </Typography>
