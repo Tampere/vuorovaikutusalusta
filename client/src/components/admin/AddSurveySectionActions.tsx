@@ -169,15 +169,13 @@ export default function AddSurveySectionActions(props: Props) {
     image: {
       type: 'image',
       title: initializeLocalizedObject(''),
-      fileName: null,
-      filePath: [],
+      fileUrl: null,
       altText: initializeLocalizedObject(''),
     },
     document: {
       type: 'document',
       title: initializeLocalizedObject(''),
-      fileName: null,
-      filePath: [],
+      fileUrl: null,
     },
     attachment: {
       type: 'attachment',
@@ -344,7 +342,7 @@ export default function AddSurveySectionActions(props: Props) {
                 </div>
               </Grid>
             ))}
-          {!props.disableSectionPaste && 
+          {!props.disableSectionPaste && (
             <Grid item style={{ padding: '0.5rem' }}>
               <div className={classes.actionItem}>
                 <Fab
@@ -376,7 +374,7 @@ export default function AddSurveySectionActions(props: Props) {
                 <Typography>{tr.EditSurveyPage.attachSection}</Typography>
               </div>
             </Grid>
-          }
+          )}
           <Grid
             item
             style={{

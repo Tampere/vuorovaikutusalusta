@@ -202,13 +202,13 @@ export default function EditSurveyInfo() {
             tr.EditSurveyInfo.mapUrlError
           }
         />
-        {!usersLoading && currentUser?.groups.length !== 1 && (
+        {!usersLoading && currentUser?.organizations.length !== 1 && (
           <Autocomplete
             multiple
-            defaultValue={activeSurvey.groups}
-            disabled={usersLoading || currentUser.groups?.length === 1}
-            options={currentUser?.groups ?? []}
-            getOptionLabel={(group) => group}
+            defaultValue={activeSurvey.organization}
+            disabled={usersLoading || currentUser.organizations?.length === 1}
+            options={currentUser?.organizations ?? []}
+            getOptionLabel={(organization: string) => organization}
             value={activeSurvey.groups}
             onChange={(_, value: string[]) => {
               editSurvey({

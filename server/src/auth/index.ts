@@ -8,7 +8,7 @@ import { encrypt } from '../crypto';
 import { getDb } from '../database';
 import { configureAzureAuth } from './azure';
 import { configureGoogleOAuth } from './google-oauth';
-import { getSurveyGroups } from '@src/application/survey';
+import { getSurveyOrganization } from '@src/application/survey';
 
 /**
  * Configures authentication for given Express application.
@@ -89,7 +89,7 @@ export function configureMockAuth(app: Express) {
     id: '12345-67890-abcde-fghij1',
     fullName: 'toinen Testaaja',
     email: 'toinen.testaaja@testi.com',
-    groups: ['test-group-id-1'],
+    organizations: ['test-group-id-1'],
   };
   upsertUser(mockUser);
 
@@ -138,15 +138,12 @@ export function ensureAuthenticated(options?: { redirectToLogin?: boolean }) {
 
 export function ensureSurveyGroupAccess(id: string = 'id') {
   return async (req: Request, res: Response, next: NextFunction) => {
-    if (process.env.USER_GROUPING_ENABLED !== 'true') {
-      return next();
-    }
-    const surveyGroups = req.params[id]
-      ? await getSurveyGroups(Number(req.params[id]))
-      : [];
+    const surveyOrganization = req.params[id]
+      ? await getSurveyOrganization(Number(req.params[id]))
+      : null;
     if (
-      surveyGroups.length > 0 &&
-      surveyGroups.every((group) => !req.user.groups.includes(group))
+      typeof surveyOrganization === 'string' &&
+      !req.user.organizations.includes(surveyOrganization)
     ) {
       res.status(403).send('Forbidden');
     } else {
@@ -157,26 +154,22 @@ export function ensureSurveyGroupAccess(id: string = 'id') {
 
 export function ensureFileGroupAccess() {
   return async (req: Request, res: Response, next: NextFunction) => {
-    if (process.env.USER_GROUPING_ENABLED !== 'true') {
-      return next();
-    }
+    const surveyOrganizations = req.headers['organization']
+      ? [JSON.parse(req.headers['organization'] as string)]
+      : req.user.organizations;
 
-    const surveyGroups = req.headers['groups']
-      ? JSON.parse(req.headers['groups'] as string)
-      : req.user.groups;
-
-    if (!Array.isArray(surveyGroups)) {
+    if (!Array.isArray(surveyOrganizations)) {
       res.status(400).send('Bad Request');
     }
 
-    const fileGroups = req.user.groups.filter((group) =>
-      (surveyGroups as string[]).includes(group),
+    const fileOrganizations = req.user.organizations.filter((organization) =>
+      (surveyOrganizations as string[]).includes(organization),
     );
 
-    if (fileGroups.length === 0) {
+    if (fileOrganizations.length === 0) {
       res.status(403).send('Forbidden');
     } else {
-      res.locals.fileGroups = fileGroups;
+      res.locals.fileOrganizations = fileOrganizations;
       return next();
     }
   };

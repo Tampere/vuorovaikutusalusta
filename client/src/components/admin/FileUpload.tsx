@@ -2,20 +2,19 @@ import { IconButton, Tooltip } from '@mui/material';
 import { Cancel } from '@mui/icons-material';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
-import { getFullFilePath } from '@src/utils/path';
 import React, { useEffect, useMemo, useState } from 'react';
 import DropZone from '../DropZone';
+import { getFileName, getFullFilePath } from '@src/utils/path';
 
 interface Props {
   targetPath?: string[];
   surveyId?: number;
   value: {
-    path: string[];
-    name: string;
+    url: string;
   }[];
-  onUpload: (file: { name: string; path: string[] }) => void;
-  onDelete: (file: { name: string; path: string[] }) => void;
-  surveyGroups: string[];
+  onUpload: (file: { url: string }) => void;
+  onDelete: (file: { url: string }) => void;
+  surveyOrganization: string;
 }
 
 export default function FileUpload({
@@ -24,7 +23,7 @@ export default function FileUpload({
   value,
   onDelete,
   surveyId,
-  surveyGroups,
+  surveyOrganization,
 }: Props) {
   const { tr } = useTranslations();
   const { showToast } = useToasts();
@@ -32,11 +31,10 @@ export default function FileUpload({
 
   const imageFileFormats = ['jpg', 'jpeg', 'png', 'tiff', 'bmp'];
 
-  async function deleteFile(path: string[], name: string) {
-    const fullFilePath = getFullFilePath(path, name);
-    await fetch(`/api/file/${fullFilePath}`, {
+  async function deleteFile(url: string) {
+    await fetch(`/api/file/${url}`, {
       method: 'DELETE',
-      headers: { groups: JSON.stringify(surveyGroups) },
+      headers: { organization: JSON.stringify(surveyOrganization) },
     });
   }
 
@@ -48,9 +46,7 @@ export default function FileUpload({
       // Delete previous file(s)
       if (value) {
         try {
-          await Promise.all(
-            (value ?? []).map(({ path, name }) => deleteFile(path, name)),
-          );
+          await Promise.all((value ?? []).map(({ url }) => deleteFile(url)));
         } catch (error) {
           showToast({
             severity: 'error',
@@ -73,7 +69,9 @@ export default function FileUpload({
           body: formData,
         });
         // Upload complete - notify via callback
-        onUpload({ name: file.name, path: targetPath });
+        onUpload({
+          url: getFullFilePath(surveyOrganization, targetPath, file.name),
+        });
       } catch (error) {
         showToast({
           severity: 'error',
@@ -85,16 +83,16 @@ export default function FileUpload({
   }, [acceptedFiles]);
 
   const filesList = useMemo(() => {
-    return value?.map(({ path, name }) => {
-      const fileFormat = name
-        .substring(name.lastIndexOf('.') + 1, name.length)
+    return value?.map(({ url }) => {
+      const fileFormat = url
+        .substring(url.lastIndexOf('.') + 1, url.length)
         .toLowerCase();
-      const fullFilePath = getFullFilePath(path, name);
+      const name = getFileName(url);
       return (
-        <div key={name}>
+        <div key={url}>
           {imageFileFormats.includes(fileFormat) && (
             <img
-              src={`/api/file/${fullFilePath}`}
+              src={`/api/file/${url}`}
               style={{ width: 50, maxHeight: 50, marginRight: '1rem' }}
             />
           )}
@@ -107,8 +105,8 @@ export default function FileUpload({
               onClick={async (event) => {
                 event.stopPropagation();
                 try {
-                  await deleteFile(path, name);
-                  onDelete({ name, path });
+                  await deleteFile(url);
+                  onDelete({ url });
                 } catch (error) {
                   showToast({
                     severity: 'error',

@@ -4,7 +4,6 @@ import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import { useSurveyTheme } from '@src/stores/SurveyThemeProvider';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
-import { getFullFilePath } from '@src/utils/path';
 import { request } from '@src/utils/request';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
@@ -49,16 +48,10 @@ export default function SurveyPage({ isTestSurvey }: Props) {
         const survey = await request<Survey>(
           `/api/published-surveys/${name}${isTestSurvey ? '?test=true' : ''}`,
         );
-        if (
-          survey.backgroundImagePath &&
-          survey.backgroundImageName &&
-          survey.backgroundImageName !== ''
-        ) {
-          const fullFilePath = getFullFilePath(
-            survey.backgroundImagePath,
-            survey.backgroundImageName,
+        if (survey.backgroundImageUrl) {
+          const response = await fetch(
+            `/api/file/${survey.backgroundImageUrl}`,
           );
-          const response = await fetch(`/api/file/${fullFilePath}`);
           const details = JSON.parse(
             response.headers.get('File-details') ?? '{}',
           );
