@@ -1,6 +1,6 @@
 import React from 'react';
 import { IconButton, Tooltip } from '@mui/material';
-import InfoIcon from "@src/components/icons/InfoIcon";
+import InfoIcon from '@src/components/icons/InfoIcon';
 import { useTranslations } from '@src/stores/TranslationContext';
 
 export function AdminInstructionButton() {

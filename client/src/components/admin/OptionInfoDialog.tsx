@@ -12,7 +12,6 @@ import QuestionmarkSmallIcon from '@src/components/icons/QuestionmarkSmallIcon';
 import { useTranslations } from '@src/stores/TranslationContext';
 import RichTextEditor from '../RichTextEditor';
 
-
 interface Props {
   infoText: string;
   onChangeOptionInfo: (newInfoText: string) => void;

@@ -82,7 +82,7 @@ export function PageQuestionList({ questions, handleClick }: Props) {
                   <Typography>{question.title[surveyLanguage]}</Typography>
                 </Box>
 
-                <ChevronRightIcon sx= {{ color: '#41BBFF' }} />
+                <ChevronRightIcon sx={{ color: '#41BBFF' }} />
               </Box>
             </CardActionArea>
           </ListItem>

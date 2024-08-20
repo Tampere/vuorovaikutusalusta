@@ -144,7 +144,12 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
         }}
       >
         <Footer>
-          <Link color="primary" underline="hover" href="/saavutettavuusseloste" target="_blank">
+          <Link
+            color="primary"
+            underline="hover"
+            href="/saavutettavuusseloste"
+            target="_blank"
+          >
             {tr.FooterLinks.accessibility}
           </Link>
           {survey.displayPrivacyStatement && (

@@ -113,7 +113,7 @@ export default function AnswersList({
                   margin: 0,
                 },
               }}
-              expandIcon={<ChevronDownSmallIcon/>}
+              expandIcon={<ChevronDownSmallIcon />}
             >
               <div style={{ flexGrow: 1 }}>
                 <Typography

@@ -70,12 +70,15 @@ export default function EditMapSubQuestions(props: Props) {
                       name={`section-${index}`}
                       expanded={props.expandedSection === index}
                       onExpandedChange={(isExpanded) => {
-                        props.onExpandedSectionChange(isExpanded ? index : null);
+                        props.onExpandedSectionChange(
+                          isExpanded ? index : null,
+                        );
                       }}
                       onEdit={(index, editedSection: SurveyMapSubQuestion) => {
                         // Replace the edited subquestion in the array
                         const subQuestions = props.mapQuestion.subQuestions.map(
-                          (section, i) => (i === index ? editedSection : section),
+                          (section, i) =>
+                            i === index ? editedSection : section,
                         );
                         props.onChange(subQuestions);
                       }}
@@ -89,7 +92,7 @@ export default function EditMapSubQuestions(props: Props) {
                         // Reset expanded section to null
                         props.onExpandedSectionChange(null);
                       }}
-                  />
+                    />
                   </div>
                 )}
               </Draggable>

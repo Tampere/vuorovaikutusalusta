@@ -154,7 +154,11 @@ export function EditMultiMatrixQuestion({
                       : null,
                   });
                 }}
-                style={{ position: 'absolute', top: '-1rem', right: '-0.75rem' }}
+                style={{
+                  position: 'absolute',
+                  top: '-1rem',
+                  right: '-0.75rem',
+                }}
               >
                 <CancelIcon />
               </IconButton>

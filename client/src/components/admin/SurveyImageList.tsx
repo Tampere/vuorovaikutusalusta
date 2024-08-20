@@ -24,7 +24,6 @@ import { request } from '@src/utils/request';
 import React, { useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 
-
 const useStyles = makeStyles((theme: Theme) => ({
   noImageBackground: {
     backgroundColor: '#D3D3D3',
@@ -458,11 +457,10 @@ export default function SurveyImageList({ imageType, ...props }: Props) {
   return (
     <div>
       <Button
-        startIcon={<ImageIcon/>}
+        startIcon={<ImageIcon />}
         variant="outlined"
         onClick={() => setImageDialogOpen((prev) => !prev)}
       >
-        
         <Typography
           style={{
             textTransform: 'none',

@@ -10,7 +10,6 @@ import { useTranslations } from '@src/stores/TranslationContext';
 import React, { createRef, useEffect, useMemo } from 'react';
 import OptionInfoDialog from './OptionInfoDialog';
 
-
 const useStyles = makeStyles({
   wrapper: {
     display: 'flex',
@@ -136,7 +135,7 @@ export default function QuestionOptions({
       <div>
         {options.map((option, index) => (
           <div className={`${classes.row} ${classes.option}`} key={index}>
-            <DraggableIcon style={{ fontSize: "14"}}/>
+            <DraggableIcon style={{ fontSize: '14' }} />
             <div className={classes.textInput}>
               <TextField
                 multiline

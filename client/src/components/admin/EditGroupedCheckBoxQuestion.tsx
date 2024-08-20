@@ -20,7 +20,6 @@ import React, { useState } from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import QuestionOptions from './QuestionOptions';
 
-
 interface Props {
   section: SurveyGroupedCheckboxQuestion;
   disabled?: boolean;

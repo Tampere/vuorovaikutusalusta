@@ -90,11 +90,3 @@ export default function MatrixIcon(props: SvgIconProps) {
     </SvgIcon>
   );
 }
-
-
-
-
-
-
-
-

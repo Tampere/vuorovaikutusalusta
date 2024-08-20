@@ -342,7 +342,7 @@ export default function AddSurveySectionActions(props: Props) {
                 </div>
               </Grid>
             ))}
-          {!props.disableSectionPaste && 
+          {!props.disableSectionPaste && (
             <Grid item style={{ padding: '0.5rem' }}>
               <div className={classes.actionItem}>
                 <Fab
@@ -374,7 +374,7 @@ export default function AddSurveySectionActions(props: Props) {
                 <Typography>{tr.EditSurveyPage.attachSection}</Typography>
               </div>
             </Grid>
-          }
+          )}
           <Grid
             item
             style={{

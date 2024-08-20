@@ -18,7 +18,6 @@ import {
 } from '@src/controllers/AdminFileController';
 import UploadIcon from '@src/components/icons/UploadIcon';
 
-
 interface Props {
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;

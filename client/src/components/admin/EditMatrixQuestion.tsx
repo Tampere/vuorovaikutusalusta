@@ -96,7 +96,7 @@ export default function EditMatrixQuestion({ section, onChange }: Props) {
                 }}
                 style={{ position: 'absolute', top: '-1rem', right: '0.1rem' }}
               >
-              <CancelIcon />
+                <CancelIcon />
               </IconButton>
             </div>
           );

@@ -96,9 +96,9 @@ export default function EditSurveySideBar(props: Props) {
       mobileOpen={props.mobileOpen}
       onDrawerToggle={props.onDrawerToggle}
     >
-      <List >
+      <List>
         <ListItemLink external to={`/admin?lang=${language}`}>
-          <ListItemIcon >
+          <ListItemIcon>
             <ChevronLeftIcon />
           </ListItemIcon>
           <ListItemText primary={tr.EditSurvey.toFrontPage} />
@@ -110,14 +110,14 @@ export default function EditSurveySideBar(props: Props) {
           <ListItemText primary={tr.EditSurvey.info} />
         </ListItemLink>
         <ListItemLink to={`${url}/käännökset?lang=${language}`}>
-          <ListItemIcon >
+          <ListItemIcon>
             <LanguageIcon />
           </ListItemIcon>
           <ListItemText primary={tr.EditSurvey.translations}></ListItemText>
         </ListItemLink>
         <ListItemLink to={`${url}/sähköpostit?lang=${language}`}>
           <ListItemIcon>
-          <MailIcon />
+            <MailIcon />
           </ListItemIcon>
           <ListItemText primary={tr.EditSurvey.email} />
         </ListItemLink>
@@ -150,7 +150,7 @@ export default function EditSurveySideBar(props: Props) {
                             {Object.keys(page?.conditions)?.length > 0 && (
                               <BranchIcon />
                             )}
-                            <QuestionmarkSmallIcon/>
+                            <QuestionmarkSmallIcon />
                           </ListItemIcon>
                           <ListItemText
                             primary={

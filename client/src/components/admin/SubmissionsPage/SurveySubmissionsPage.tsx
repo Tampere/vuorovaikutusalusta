@@ -13,7 +13,7 @@ import {
   Select,
   Typography,
 } from '@mui/material';
-import MapIcon from "@src/components/icons/MapIcon";
+import MapIcon from '@src/components/icons/MapIcon';
 import {
   isAnswerEmpty,
   nonQuestionSectionTypes,
