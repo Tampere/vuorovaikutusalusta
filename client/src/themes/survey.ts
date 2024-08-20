@@ -212,15 +212,7 @@ export let defaultSurveyTheme = createTheme(
       ...inputOverrides,
       ...stepperOverrides,
       ...textOverrides,
-    } /*
-    palette: {
-      primary: {
-        main: '#135b9a',
-      },
-      secondary: {
-        main: '#abc872',
-      },
-    },*/,
+    },
   },
   fiFI,
 );

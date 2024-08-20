@@ -22,7 +22,6 @@ export let theme = createTheme(
   {
     components: {
       ...surveyCardOverrides,
-      //...textOverrides,
       ...buttonOverrides,
       ...ubiColors,
       MuiTypography: {
@@ -49,7 +48,6 @@ export let theme = createTheme(
             props: { variant: 'published' },
             style: {
               fontStyle: 'italic',
-              //color: 'primary',
             },
           },
         ],

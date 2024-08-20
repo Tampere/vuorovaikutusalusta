@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import clsx from 'clsx';
 import { Survey } from '@interfaces/survey';
 import { Button, Card, Link, Theme, Typography } from '@mui/material';
 import { CardContent } from '@mui/material';
@@ -16,7 +17,6 @@ import { useToasts } from '@src/stores/ToastContext';
 import { makeStyles } from '@mui/styles';
 import LoadingButton from '../LoadingButton';
 import { NavLink, useRouteMatch } from 'react-router-dom';
-import { theme } from '@src/themes/admin';
 
 const useStyles = makeStyles((theme: Theme) => ({
   '@keyframes pulse': {
@@ -37,6 +37,10 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   cardRoot: {
     paddingBottom: '8px',
+  },
+  publishedCard: {
+    borderLeft: 'solid 5px',
+    borderLeftColor: theme.palette.primary.main,
   },
 }));
 
@@ -66,15 +70,14 @@ export default function SurveyListItem(props: Props) {
     }/${survey.name}`;
   }, [survey.name]);
 
-  const cardStyle = survey.isPublished
-    ? {
-        borderLeft: 'solid 5px',
-        borderLeftColor: theme.palette.primary.main,
-      }
-    : {};
   return (
     <>
-      <Card className={loading ? classes.loading : ''} style={cardStyle}>
+      <Card
+        className={clsx(
+          loading && classes.loading,
+          survey.isPublished && classes.publishedCard,
+        )}
+      >
         <CardContent classes={{ root: classes.cardRoot }}>
           <Typography variant="h6" component="h3">
             {!survey.title?.[surveyLanguage] ? (
