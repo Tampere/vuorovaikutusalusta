@@ -1,5 +1,6 @@
 import { LocalizedText, SurveyMultiMatrixQuestion } from '@interfaces/survey';
-import { Add, Cancel } from '@mui/icons-material';
+import AddIcon from '@src/components/icons/AddIcon';
+import CancelIcon from '@src/components/icons/CancelIcon';
 import {
   Checkbox,
   Fab,
@@ -105,7 +106,7 @@ export function EditMultiMatrixQuestion({
               });
             }}
           >
-            <Add />
+            <AddIcon />
           </Fab>
           <Typography style={{ paddingLeft: '1rem' }}>
             {tr.SurveySections.classes}{' '}
@@ -153,9 +154,13 @@ export function EditMultiMatrixQuestion({
                       : null,
                   });
                 }}
-                style={{ position: 'absolute', top: '-1rem', right: '0.1rem' }}
+                style={{
+                  position: 'absolute',
+                  top: '-1rem',
+                  right: '-0.75rem',
+                }}
               >
-                <Cancel />
+                <CancelIcon />
               </IconButton>
             </div>
           );

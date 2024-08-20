@@ -42,10 +42,10 @@ const Application = () => {
           <SurveyLanguageRouter />
           <Switch>
             <Route path="/saavutettavuusseloste" exact>
-              <A11yStatement/>
+              <A11yStatement />
             </Route>
             <Route path="/tietosuojaseloste" exact>
-              <DataProtectionStatement/>
+              <DataProtectionStatement />
             </Route>
             <Route path="/:name" exact>
               <SurveyPage />

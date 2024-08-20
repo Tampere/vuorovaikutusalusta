@@ -2,7 +2,7 @@ import { MenuItem, Select, Tooltip } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { LanguageCode } from '@interfaces/survey';
 import { makeStyles } from '@mui/styles';
-import LanguageIcon from '@mui/icons-material/Language';
+import LanguageIcon from './icons/LanguageIcon';
 import React from 'react';
 
 interface Props {
@@ -48,10 +48,14 @@ export default function LanguageMenu({ style }: Props) {
               borderWidth: 0,
               '&>legend': { display: 'none' },
             },
-            '& svg': {
+            '&>.MuiSvgIcon-root': {
               // The component is used in admin panel and survey, must adapt
               color: 'inherit',
               fill: 'currentColor',
+              position: 'absolute',
+              right: '0px',
+              pointerEvents: 'none',
+              marginRight: '2px',
             },
           }}
         >

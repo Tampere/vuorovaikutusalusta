@@ -12,7 +12,8 @@ import {
   TextField,
   Tooltip,
 } from '@mui/material';
-import { Add, Delete } from '@mui/icons-material';
+import AddIcon from '@src/components/icons/AddIcon';
+import DeleteBinIcon from '@src/components/icons/DeleteBinIcon';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React from 'react';
 
@@ -74,7 +75,7 @@ export default function KeyValueForm({ label, value, onChange }: Props) {
                         onChange(value.filter((_, i) => i !== index));
                       }}
                     >
-                      <Delete />
+                      <DeleteBinIcon />
                     </IconButton>
                   </Tooltip>
                 </TableCell>
@@ -99,7 +100,7 @@ export default function KeyValueForm({ label, value, onChange }: Props) {
             ]);
           }}
         >
-          <Add />
+          <AddIcon />
         </Fab>
       </Tooltip>
     </div>

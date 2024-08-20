@@ -16,29 +16,27 @@ import {
   SurveySortingQuestion,
   SurveyTextSection,
 } from '@interfaces/survey';
-import {
-  Article,
-  AttachFile,
-  CheckBox,
-  DragIndicator,
-  ExpandMore,
-  FormatListNumbered,
-  Image,
-  LibraryAddCheck,
-  LinearScale,
-  Looks4,
-  Map,
-  RadioButtonChecked,
-  Subject,
-  TextFields,
-  ViewComfy,
-  ViewComfyAlt,
-} from '@mui/icons-material';
+import CheckboxCheckedIcon from '@src/components/icons/CheckboxCheckedIcon';
+import RadioButtonCheckedIcon from '@src/components/icons/RadioButtonCheckedIcon';
+import NumericFieldIcon from '@src/components/icons/NumericFieldIcon';
+import MapIcon from '@src/components/icons/MapIcon';
+import TextFieldIcon from '@src/components/icons/TextFieldIcon';
+import TextSectionIcon from '@src/components/icons/TextSectionIcon';
+import OrderedIcon from '@src/components/icons/OrderedIcon';
+import SliderIcon from '@src/components/icons/SliderIcon';
+import MatrixIcon from '@src/components/icons/MatrixIcon';
+import LikertGroupIcon from '@src/components/icons/LikertGroupIcon';
+import MultiCheckmarkIcon from '@src/components/icons/MultiCheckmarkIcon';
+import ImageSmallIcon from '@src/components/icons/ImageSmallIcon';
+import TextFileIcon from '@src/components/icons/TextFileIcon';
+import PaperclipIcon from '@src/components/icons/PaperclipIcon';
+import ChevronDownIcon from '@src/components/icons/ChevronDownIcon';
+import DraggableIcon from '@src/components/icons/DraggableIcon';
 import {
   Accordion,
   AccordionSummary,
   Tooltip,
-  Typography
+  Typography,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { FollowUpListItemIcon } from '@src/components/icons/FollowUpListItemIcon';
@@ -134,7 +132,7 @@ export function FollowUpSectionAccordion(props: Props) {
     };
   } = {
     checkbox: {
-      icon: <CheckBox />,
+      icon: <CheckboxCheckedIcon />,
       tooltip: tr.SurveySection.checkBoxQuestion,
       form: (
         <EditCheckBoxQuestion
@@ -145,7 +143,7 @@ export function FollowUpSectionAccordion(props: Props) {
       ),
     },
     radio: {
-      icon: <RadioButtonChecked />,
+      icon: <RadioButtonCheckedIcon />,
       tooltip: tr.SurveySection.radioQuestion,
       form: (
         <EditRadioQuestion
@@ -156,7 +154,7 @@ export function FollowUpSectionAccordion(props: Props) {
       ),
     },
     numeric: {
-      icon: <Looks4 />,
+      icon: <NumericFieldIcon />,
       tooltip: tr.SurveySection.numericQuestion,
       form: (
         <EditNumericQuestion
@@ -167,7 +165,7 @@ export function FollowUpSectionAccordion(props: Props) {
       ),
     },
     map: {
-      icon: <Map />,
+      icon: <MapIcon />,
       tooltip: tr.SurveySection.mapQuestion,
       form: (
         <EditMapQuestion
@@ -179,7 +177,7 @@ export function FollowUpSectionAccordion(props: Props) {
       ),
     },
     'free-text': {
-      icon: <TextFields />,
+      icon: <TextFieldIcon />,
       tooltip: tr.SurveySection.freeTextQuestion,
       form: (
         <EditFreeTextQuestion
@@ -190,7 +188,7 @@ export function FollowUpSectionAccordion(props: Props) {
       ),
     },
     text: {
-      icon: <Subject />,
+      icon: <TextSectionIcon />,
       tooltip: tr.SurveySection.textSection,
       form: (
         <EditTextSection
@@ -201,7 +199,7 @@ export function FollowUpSectionAccordion(props: Props) {
       ),
     },
     sorting: {
-      icon: <FormatListNumbered />,
+      icon: <OrderedIcon />,
       tooltip: tr.SurveySection.sortingQuestion,
       form: (
         <EditSortingQuestion
@@ -212,7 +210,7 @@ export function FollowUpSectionAccordion(props: Props) {
       ),
     },
     slider: {
-      icon: <LinearScale />,
+      icon: <SliderIcon />,
       tooltip: tr.SurveySection.sliderQuestion,
       form: (
         <EditSliderQuestion
@@ -223,7 +221,7 @@ export function FollowUpSectionAccordion(props: Props) {
       ),
     },
     matrix: {
-      icon: <ViewComfy />,
+      icon: <MatrixIcon />,
       tooltip: tr.SurveySection.matrixQuestion,
       form: (
         <EditMatrixQuestion
@@ -233,7 +231,7 @@ export function FollowUpSectionAccordion(props: Props) {
       ),
     },
     'multi-matrix': {
-      icon: <ViewComfyAlt />,
+      icon: <LikertGroupIcon />,
       tooltip: tr.SurveySection.multiMatrixQuestion,
       form: (
         <EditMultiMatrixQuestion
@@ -244,7 +242,7 @@ export function FollowUpSectionAccordion(props: Props) {
       ),
     },
     'grouped-checkbox': {
-      icon: <LibraryAddCheck />,
+      icon: <MultiCheckmarkIcon />,
       tooltip: tr.SurveySection.groupedCheckboxQuestion,
       form: (
         <EditGroupedCheckBoxQuestion
@@ -255,7 +253,7 @@ export function FollowUpSectionAccordion(props: Props) {
       ),
     },
     image: {
-      icon: <Image />,
+      icon: <ImageSmallIcon />,
       tooltip: tr.SurveySection.imageSection,
       form: (
         <EditImageSection
@@ -265,7 +263,7 @@ export function FollowUpSectionAccordion(props: Props) {
       ),
     },
     document: {
-      icon: <Article />,
+      icon: <TextFileIcon />,
       tooltip: tr.SurveySection.documentSection,
       form: (
         <EditDocumentSection
@@ -275,7 +273,7 @@ export function FollowUpSectionAccordion(props: Props) {
       ),
     },
     attachment: {
-      icon: <AttachFile />,
+      icon: <PaperclipIcon />,
       tooltip: tr.SurveySection.attachmentSection,
       form: <EditAttachmentSection />,
     },
@@ -297,7 +295,7 @@ export function FollowUpSectionAccordion(props: Props) {
         style={{ backgroundColor: '#FDE1FF' }}
       >
         <AccordionSummary
-          expandIcon={<ExpandMore />}
+          expandIcon={<ChevronDownIcon />}
           aria-controls={`${props.name}-content`}
           id={`${props.name}-header`}
           className={classes.customAccordionSummary}
@@ -331,7 +329,7 @@ export function FollowUpSectionAccordion(props: Props) {
             )}
           </Typography>
           <div {...props.provided.dragHandleProps} style={{ display: 'flex' }}>
-            <DragIndicator />
+            <DraggableIcon />
           </div>
         </AccordionSummary>
 

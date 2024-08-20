@@ -14,7 +14,8 @@ import {
   Theme,
   Typography,
 } from '@mui/material';
-import { Cancel, PhotoLibrary } from '@mui/icons-material';
+import ImageIcon from '@src/components/icons/ImageIcon';
+import CancelIcon from '@src/components/icons/CancelIcon';
 import { makeStyles } from '@mui/styles';
 import { useToasts } from '@src/stores/ToastContext';
 import { useSurvey } from '@src/stores/SurveyContext';
@@ -430,10 +431,10 @@ export default function SurveyImageList({ imageType, ...props }: Props) {
   return (
     <div>
       <Button
+        startIcon={<ImageIcon />}
         variant="outlined"
         onClick={() => setImageDialogOpen((prev) => !prev)}
       >
-        <PhotoLibrary />
         <Typography
           style={{
             textTransform: 'none',
@@ -507,7 +508,7 @@ export default function SurveyImageList({ imageType, ...props }: Props) {
                   key={image.fileUrl}
                   onClick={() => handleListItemClick(image.fileUrl)}
                 >
-                  <Cancel
+                  <CancelIcon
                     color="error"
                     className={classes.deleteImageIcon}
                     onClick={async (event) =>

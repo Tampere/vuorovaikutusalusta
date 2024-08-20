@@ -1,11 +1,29 @@
-import { createTheme } from '@mui/material/styles';
+import { Components, createTheme, Theme } from '@mui/material/styles';
 import { fiFI } from '@mui/material/locale';
 import { buttonOverrides } from './survey';
+import { surveyCardOverrides, ubiColors } from './common';
+
+declare module '@mui/material/styles' {
+  interface TypographyVariants {
+    published: React.CSSProperties;
+  }
+
+  interface TypographyVariantsOptions {
+    published?: React.CSSProperties;
+  }
+}
+declare module '@mui/material/Typography' {
+  interface TypographyPropsVariantOverrides {
+    published: true;
+  }
+}
 
 export let theme = createTheme(
   {
     components: {
+      ...surveyCardOverrides,
       ...buttonOverrides,
+      ...ubiColors,
       MuiTypography: {
         variants: [
           {
@@ -24,6 +42,12 @@ export let theme = createTheme(
               fontSize: '1em',
               color: '#000000',
               margin: '0.5em 0',
+            },
+          },
+          {
+            props: { variant: 'published' },
+            style: {
+              fontStyle: 'italic',
             },
           },
         ],
@@ -46,6 +70,7 @@ export let theme = createTheme(
 
 theme = createTheme(theme, {
   palette: {
+    ...ubiColors.palette,
     disabled: theme.palette.augmentColor({
       color: {
         main: '#858585',

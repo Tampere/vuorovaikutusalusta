@@ -1,5 +1,5 @@
 import { IconButton, Tooltip } from '@mui/material';
-import { Cancel } from '@mui/icons-material';
+import CancelIcon from '@src/components/icons/CancelIcon';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -115,7 +115,7 @@ export default function FileUpload({
                 }
               }}
             >
-              <Cancel />
+              <CancelIcon />
             </IconButton>
           </Tooltip>
         </div>
