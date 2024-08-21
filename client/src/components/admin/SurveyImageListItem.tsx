@@ -7,8 +7,8 @@ import { getFileName } from '@src/utils/path';
 
 interface Props {
   image: File;
+  src: string;
   altText: string;
-  limitToSvg?: boolean;
   onClick: Function;
   onDelete: Function;
 }
@@ -16,7 +16,6 @@ interface Props {
 export default function SurveyImageListItem(props: Props) {
   const [isLoading, setIsLoading] = useState(true);
   const image = props.image;
-  const imageSrc = `data:image/${props.limitToSvg ? 'svg+xml' : ''};base64,${image.data}`;
 
   return (
     <ImageListItem>
@@ -27,14 +26,15 @@ export default function SurveyImageListItem(props: Props) {
           top: '5px',
           left: '5px',
           fontSize: '26px',
+          cursor: 'pointer',
         }}
         onClick={async (event: MouseEvent) =>
           await props.onDelete(event, image.fileUrl)
         }
       />
       <img
-        src={imageSrc}
-        srcSet={imageSrc}
+        src={props.src}
+        srcSet={props.src}
         alt={props.altText || `survey-image-${getFileName(image.fileUrl)}`}
         loading="lazy"
         style={{
@@ -46,20 +46,25 @@ export default function SurveyImageListItem(props: Props) {
         onLoad={() => {
           setIsLoading(false);
         }}
+        onError={() => {
+          setIsLoading(false);
+        }}
         onClick={() => props.onClick(image.fileUrl)}
       />
-      <span
-        style={{
-          position: 'absolute',
-          height: '100%',
-          width: '100%',
-          display: isLoading ? 'flex' : 'none',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <CircularProgress style={{ color: '#00a393' }} />
-      </span>
+      {isLoading && (
+        <span
+          style={{
+            position: 'absolute',
+            height: '100%',
+            width: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <CircularProgress style={{ color: '#00a393' }} />
+        </span>
+      )}
     </ImageListItem>
   );
 }

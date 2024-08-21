@@ -500,8 +500,8 @@ export default function SurveyImageList({ imageType, ...props }: Props) {
                 <SurveyImageListItem
                   key={image.fileUrl}
                   image={image}
+                  src={imageSrc}
                   altText={imageAltText}
-                  limitToSvg={limitToSvg}
                   setImageDialogOpen={() => {
                     setImageDialogOpen((prev) => !prev);
                   }}
