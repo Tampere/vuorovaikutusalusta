@@ -1,6 +1,7 @@
 import React from 'react';
+import { useState } from 'react';
 import { File } from '@interfaces/survey';
-import { ImageListItem } from '@mui/material';
+import { ImageListItem, CircularProgress } from '@mui/material';
 import CancelIcon from '@src/components/icons/CancelIcon';
 import { getFileName } from '@src/utils/path';
 
@@ -13,6 +14,7 @@ interface Props {
 }
 
 export default function SurveyImageListItem(props: Props) {
+  const [isLoading, setIsLoading] = useState(true);
   const image = props.image;
   const imageSrc = `data:image/${props.limitToSvg ? 'svg+xml' : ''};base64,${image.data}`;
 
@@ -38,10 +40,26 @@ export default function SurveyImageListItem(props: Props) {
         style={{
           height: '100%',
           objectFit: 'contain',
+          visibility: isLoading ? 'hidden' : 'visible',
           cursor: 'pointer',
+        }}
+        onLoad={() => {
+          setIsLoading(false);
         }}
         onClick={() => props.onClick(image.fileUrl)}
       />
+      <span
+        style={{
+          position: 'absolute',
+          height: '100%',
+          width: '100%',
+          display: isLoading ? 'flex' : 'none',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <CircularProgress style={{ color: '#00a393' }} />
+      </span>
     </ImageListItem>
   );
 }
