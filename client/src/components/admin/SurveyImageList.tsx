@@ -502,9 +502,6 @@ export default function SurveyImageList({ imageType, ...props }: Props) {
                   image={image}
                   src={imageSrc}
                   altText={imageAltText}
-                  setImageDialogOpen={() => {
-                    setImageDialogOpen((prev) => !prev);
-                  }}
                   onClick={handleListItemClick}
                   onDelete={handleDeletingImage}
                 />
