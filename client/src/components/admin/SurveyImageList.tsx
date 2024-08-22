@@ -15,7 +15,6 @@ import {
   Typography,
 } from '@mui/material';
 import ImageIcon from '@src/components/icons/ImageIcon';
-import CancelIcon from '@src/components/icons/CancelIcon';
 import { makeStyles } from '@mui/styles';
 import { useToasts } from '@src/stores/ToastContext';
 import { useSurvey } from '@src/stores/SurveyContext';
@@ -24,6 +23,7 @@ import { request } from '@src/utils/request';
 import React, { useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { getFileName } from '@src/utils/path';
+import SurveyImageListItem from './SurveyImageListItem';
 
 const useStyles = makeStyles((theme: Theme) => ({
   noImageBackground: {
@@ -46,12 +46,6 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   addImageIcon: {
     color: theme.palette.primary.main,
-  },
-  deleteImageIcon: {
-    position: 'absolute',
-    top: '5px',
-    left: '5px',
-    fontSize: '26px',
   },
 }));
 
@@ -503,30 +497,14 @@ export default function SurveyImageList({ imageType, ...props }: Props) {
             {images.map((image) => {
               const imageSrc = `data:image/${limitToSvg ? 'svg+xml' : ''};base64,${image.data}`;
               return (
-                <ImageListItem
-                  style={getImageBorderStyle(image)}
+                <SurveyImageListItem
                   key={image.fileUrl}
-                  onClick={() => handleListItemClick(image.fileUrl)}
-                >
-                  <CancelIcon
-                    color="error"
-                    className={classes.deleteImageIcon}
-                    onClick={async (event) =>
-                      await handleDeletingImage(event, image.fileUrl)
-                    }
-                  />
-                  <img
-                    src={imageSrc}
-                    srcSet={imageSrc}
-                    alt={
-                      imageAltText
-                        ? imageAltText
-                        : `survey-image-${getFileName(image.fileUrl)}`
-                    }
-                    loading="lazy"
-                    style={{ height: '100%', objectFit: 'contain' }}
-                  />
-                </ImageListItem>
+                  image={image}
+                  src={imageSrc}
+                  altText={imageAltText}
+                  onClick={handleListItemClick}
+                  onDelete={handleDeletingImage}
+                />
               );
             })}
           </ImageList>
