@@ -152,6 +152,7 @@ export default function SurveyPage({ isTestSurvey }: Props) {
               top: '1rem',
               left: '1rem',
               zIndex: 10,
+              backgroundColor: 'rgba(256, 256, 256, 0.8)'
             }}
           />
         )}
