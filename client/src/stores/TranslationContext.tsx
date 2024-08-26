@@ -50,7 +50,7 @@ interface Props {
 const stateDefaults: State = {
   language: 'fi',
   surveyLanguage: 'fi',
-  languages: ['fi', 'se'],
+  languages: ['fi', 'en', 'se'],
 };
 
 export const TranslationContext = React.createContext<Context>(null);
