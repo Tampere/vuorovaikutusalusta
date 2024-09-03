@@ -7,7 +7,6 @@ import {
   Button,
   Typography,
 } from '@mui/material';
-import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import PaperclipIcon from '@src/components/icons/PaperclipIcon';
 import { useToasts } from '@src/stores/ToastContext';
 import DropZone from '../DropZone';
