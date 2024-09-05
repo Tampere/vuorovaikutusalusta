@@ -16,10 +16,10 @@ import ChevronLeftIcon from '@src/components/icons/ChevronLeftIcon';
 import AddIcon from '@src/components/icons/AddIcon';
 import DraggableIcon from '@src/components/icons/DraggableIcon';
 import FavoriteIcon from '@src/components/icons/FavoriteIcon';
-import QuestionmarkSmallIcon from '@src/components/icons/QuestionmarkSmallIcon';
+import SurveyPageIcon from '@src/components/icons/SurveyPageIcon';
 import VisibleIcon from '@src/components/icons/VisibleIcon';
 import ClipboardIcon from '@src/components/icons/ClipboardIcon';
-import ClipboardPasteIcon from '@src/components/icons/ClipboardPasteIcon';
+import DocumentCopyIcon from '@src/components/icons/DocumentCopyIcon';
 import BranchIcon from '@src/components/icons/BranchIcon';
 
 import { makeStyles } from '@mui/styles';
@@ -150,7 +150,7 @@ export default function EditSurveySideBar(props: Props) {
                             {Object.keys(page?.conditions)?.length > 0 && (
                               <BranchIcon />
                             )}
-                            <QuestionmarkSmallIcon />
+                            <SurveyPageIcon /> 
                           </ListItemIcon>
                           <ListItemText
                             primary={
@@ -194,10 +194,12 @@ export default function EditSurveySideBar(props: Props) {
                               });
                             }}
                           >
-                            <ClipboardIcon />
+                            <DocumentCopyIcon />
                           </IconButton>
                           <div {...provided.dragHandleProps}>
+                          <IconButton>
                             <DraggableIcon />
+                          </IconButton>
                           </div>
                         </ListItemLink>
                       </div>
@@ -280,7 +282,7 @@ export default function EditSurveySideBar(props: Props) {
               }
             }}
           >
-            <ClipboardPasteIcon />
+            <ClipboardIcon />
             {tr.EditSurvey.attachNewPage}
           </ListItemButton>
         </div>
