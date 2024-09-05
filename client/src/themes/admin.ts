@@ -1,4 +1,4 @@
-import { Components, createTheme, Theme } from '@mui/material/styles';
+import { createTheme } from '@mui/material/styles';
 import { fiFI } from '@mui/material/locale';
 import { buttonOverrides } from './survey';
 import { surveyCardOverrides, ubiColors } from './common';
@@ -54,6 +54,7 @@ export let theme = createTheme(
         styleOverrides: {
           root: {
             textTransform: 'none',
+            fontFamily: 'Nunito',
           },
           h1: { color: '#000000DE' },
           h2: { color: '#000000DE' },
