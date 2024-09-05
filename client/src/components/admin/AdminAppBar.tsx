@@ -14,6 +14,7 @@ import { AdminInstructionButton } from './AdminInstructionButton';
 import AppBarUserMenu from './AppBarUserMenu';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { NavLink } from 'react-router-dom';
+import KartallaLogo from '@src/components/icons/KartallaLogo';
 
 interface Props {
   labels?: string[];
@@ -63,7 +64,7 @@ export function AdminAppBar({
                     },
                   }}
                 >
-                  {tr.SurveyList.title.main}
+                  <KartallaLogo/>
                 </Typography>
               </ListItem>
             )}
