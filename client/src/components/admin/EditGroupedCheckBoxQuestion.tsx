@@ -259,7 +259,7 @@ export default function EditGroupedCheckBoxQuestion({
                 ...section.groups,
                 {
                   id,
-                  name: { fi: '', en: '' },
+                  name: { fi: '', se: '', en: '' },
                   options: [],
                 },
               ],
