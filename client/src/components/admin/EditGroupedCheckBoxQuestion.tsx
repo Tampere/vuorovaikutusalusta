@@ -248,6 +248,7 @@ export default function EditGroupedCheckBoxQuestion({
           disabled={disabled}
           aria-label="add-checkbox-group"
           size="small"
+          sx={{boxShadow: 'none'}}
           onClick={() => {
             // Add a temporary new ID for the group
             const id =

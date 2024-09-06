@@ -48,6 +48,7 @@ export default function EditMatrixQuestion({ section, onChange }: Props) {
             color="primary"
             aria-label="add-matrix-class"
             size="small"
+            sx={{boxShadow: 'none'}}
             onClick={() => {
               onChange({
                 ...section,

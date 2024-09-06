@@ -90,6 +90,7 @@ export default function KeyValueForm({ label, value, onChange }: Props) {
           aria-label="add-key-value-pair"
           size="small"
           style={{ margin: '1rem 0' }}
+          sx={{boxShadow: 'none'}}
           onClick={() => {
             onChange([
               ...value,
