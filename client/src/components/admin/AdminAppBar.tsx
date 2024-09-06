@@ -42,7 +42,7 @@ export function AdminAppBar({
                 padding: '0',
               },
               'li+li::before': {
-                content: '" - "',
+                content: '" • "',
                 padding: '0px 10px',
                 lineHeight: 1.6,
                 fontSize: '1.25rem',
