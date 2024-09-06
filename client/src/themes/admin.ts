@@ -20,6 +20,9 @@ declare module '@mui/material/Typography' {
 
 export let theme = createTheme(
   {
+    typography: {
+      fontFamily: 'Nunito'
+    },
     components: {
       ...surveyCardOverrides,
       ...buttonOverrides,
@@ -54,7 +57,6 @@ export let theme = createTheme(
         styleOverrides: {
           root: {
             textTransform: 'none',
-            fontFamily: 'Nunito',
           },
           h1: { color: '#000000DE' },
           h2: { color: '#000000DE' },

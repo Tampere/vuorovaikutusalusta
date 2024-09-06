@@ -191,7 +191,6 @@ export const textOverrides: Components<Omit<Theme, 'components'>> = {
     styleOverrides: {
       root: {
         textTransform: 'none',
-        fontFamily: 'Nunito',
       },
       h1: { color: '#000000DE' },
       h2: { color: '#000000DE' },
@@ -207,6 +206,9 @@ export const textOverrides: Components<Omit<Theme, 'components'>> = {
  */
 export let defaultSurveyTheme = createTheme(
   {
+    typography: {
+      fontFamily: 'Nunito'
+    },
     components: {
       ...ubiColors,
       ...buttonOverrides,
