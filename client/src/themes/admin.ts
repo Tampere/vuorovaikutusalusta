@@ -1,7 +1,7 @@
 import { createTheme } from '@mui/material/styles';
 import { fiFI } from '@mui/material/locale';
 import { buttonOverrides } from './survey';
-import { surveyCardOverrides, ubiColors } from './common';
+import { surveyCardOverrides, ubiColors, ubiElevated } from './common';
 
 declare module '@mui/material/styles' {
   interface TypographyVariants {
@@ -27,6 +27,13 @@ export let theme = createTheme(
       ...surveyCardOverrides,
       ...buttonOverrides,
       ...ubiColors,
+      MuiAppBar:{
+        styleOverrides:{
+          root: {
+            boxShadow: ubiElevated,
+          }
+        }
+      },
       MuiTypography: {
         variants: [
           {
