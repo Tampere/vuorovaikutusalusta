@@ -1,5 +1,5 @@
 import { Link, ListItem } from '@mui/material';
-import { OpenInNew } from '@mui/icons-material';
+import OpenInNewIcon from '@src/components/icons/OpenInNewIcon';
 import { makeStyles } from '@mui/styles';
 import React, { ReactNode } from 'react';
 import { NavLink } from 'react-router-dom';
@@ -39,7 +39,7 @@ export default function ListItemLink(props: Props) {
         : {})}
     >
       {props.children}
-      {props.newTab && <OpenInNew />}
+      {props.newTab && <OpenInNewIcon />}
     </ListItem>
   );
 }

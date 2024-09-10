@@ -99,6 +99,7 @@ export function EditMultiMatrixQuestion({
             color="primary"
             aria-label="add-matrix-class"
             size="small"
+            sx={{boxShadow: 'none'}}
             onClick={() => {
               onChange({
                 ...section,

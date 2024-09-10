@@ -124,6 +124,7 @@ export default function QuestionOptions({
           disabled={disabled}
           aria-label="add-question-option"
           size="small"
+          sx={{boxShadow: 'none'}}
           onClick={() => {
             onChange([...options, { text: initializeLocalizedObject('') }]);
           }}

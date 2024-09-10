@@ -29,7 +29,7 @@ import PaperclipIcon from '@src/components/icons/PaperclipIcon';
 import SliderIcon from '@src/components/icons/SliderIcon';
 import TextSectionIcon from '@src/components/icons/TextSectionIcon';
 import DraggableIcon from '@src/components/icons/DraggableIcon';
-import ClipboardIcon from '@src/components/icons/ClipboardIcon';
+import DocumentCopyIcon from '@src/components/icons/DocumentCopyIcon';
 import ChevronDownIcon from '@src/components/icons/ChevronDownIcon';
 import {
   Accordion,
@@ -342,11 +342,11 @@ export default function SurveySectionAccordion(props: Props) {
                 });
               }}
             >
-              <ClipboardIcon />
+              <DocumentCopyIcon htmlColor='#000000DD' />
             </IconButton>
           )}
           <div {...props.provided.dragHandleProps} style={{ display: 'flex' }}>
-            <DraggableIcon />
+            <DraggableIcon color='disabled'/>
           </div>
         </AccordionSummary>
         <SectionDetails
