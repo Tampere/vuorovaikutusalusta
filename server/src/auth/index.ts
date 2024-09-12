@@ -47,14 +47,14 @@ export function configureAuth(app: Express) {
 
   // Logout route
   app.get('/logout', (req, res) => {
-    req.session.destroy((error) => {
-      req.logOut((err) => {
-        if (err) {
-          return req.next(err);
-        }
-        res.redirect('/');
+    res.clearCookie('connect.sid');
+    req.logout((err) => {
+      if (err) {
+        return req.next(err);
+      }
+      req.session.destroy((err) => {
+        res.redirect(process.env.AUTH_LOGOUT_URL);
       });
-      res.redirect(process.env.AUTH_LOGOUT_URL);
     });
   });
 
@@ -112,6 +112,7 @@ export function ensureAuthenticated(options?: { redirectToLogin?: boolean }) {
     ) {
       return next();
     }
+
     const fail = () => {
       if (options?.redirectToLogin) {
         // Provide original request URL for redirection after authentication.
@@ -122,14 +123,19 @@ export function ensureAuthenticated(options?: { redirectToLogin?: boolean }) {
         res.status(401).send('Unauthorized');
       }
     };
-    req.session?.destroy(() => {
-      req.logOut((err) => {
+
+    if (req.session) {
+      res.clearCookie('connect.sid');
+      req.logout((err) => {
         if (err) {
           return req.next(err);
         }
-        res.redirect('/');
+        req.session.destroy((err) => {
+          fail();
+        });
       });
+    } else {
       fail();
-    }) ?? fail();
+    }
   };
 }
