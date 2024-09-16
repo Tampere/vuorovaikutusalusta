@@ -2,7 +2,6 @@
 
 import { File, ImageType } from '@interfaces/survey';
 import {
-  Box,
   Button,
   Container,
   Dialog,
@@ -12,17 +11,17 @@ import {
   ImageListItem,
   TextField,
   Theme,
-  Typography,
+  Typography
 } from '@mui/material';
-import ImageIcon from '@src/components/icons/ImageIcon';
 import { makeStyles } from '@mui/styles';
-import { useToasts } from '@src/stores/ToastContext';
+import ImageIcon from '@src/components/icons/ImageIcon';
 import { useSurvey } from '@src/stores/SurveyContext';
+import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
+import { getFileName } from '@src/utils/path';
 import { request } from '@src/utils/request';
 import React, { useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { getFileName } from '@src/utils/path';
 import SurveyImageListItem from './SurveyImageListItem';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -249,7 +248,7 @@ export default function SurveyImageList({ imageType, ...props }: Props) {
         method: 'POST',
         body: formData,
         headers: {
-          organization: JSON.stringify(activeSurvey.organization),
+          organization: activeSurvey.organization,
         },
       });
       acceptedFiles.shift();
