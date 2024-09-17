@@ -18,8 +18,9 @@ import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
-import fiLocale from 'date-fns/locale/fi';
+import { assertNever } from '@src/utils/typeCheck';
 import enLocale from 'date-fns/locale/en-GB';
+import fiLocale from 'date-fns/locale/fi';
 import svLocale from 'date-fns/locale/sv';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useHistory } from 'react-router-dom';
@@ -29,9 +30,8 @@ import Fieldset from '../Fieldset';
 import LoadingButton from '../LoadingButton';
 import ColorSelect from './ColorSelect';
 import SurveyImageList from './SurveyImageList';
-import ThemeSelect from './ThemeSelect';
-import { assertNever } from '@src/utils/typeCheck';
 import { SurveyMarginImageList } from './SurveyImageListWrapper';
+import ThemeSelect from './ThemeSelect';
 
 const useStyles = makeStyles({
   dateTimePicker: {
@@ -202,30 +202,6 @@ export default function EditSurveyInfo() {
             tr.EditSurveyInfo.mapUrlError
           }
         />
-        {!usersLoading && currentUser?.organizations.length !== 1 && (
-          <Autocomplete
-            multiple
-            defaultValue={activeSurvey.organization}
-            disabled={usersLoading || currentUser.organizations?.length === 1}
-            options={currentUser?.organizations ?? []}
-            getOptionLabel={(organization: string) => organization}
-            value={activeSurvey.groups}
-            onChange={(_, value: string[]) => {
-              editSurvey({
-                ...activeSurvey,
-                groups: value,
-              });
-            }}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                variant="standard"
-                label={tr.EditSurveyInfo.authorizedGroups}
-                helperText={tr.EditSurveyInfo.authorizedGroupsHelperText}
-              />
-            )}
-          />
-        )}
 
         <Autocomplete
           multiple
