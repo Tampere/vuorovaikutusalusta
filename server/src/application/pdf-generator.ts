@@ -49,19 +49,6 @@ const fonts = {
   },
 };
 
-/*
-async function getStaticIconSvg(name: string, orgid: string) {
-  const data = await getDb().oneOrNone<{
-    svg: Buffer;
-  }>( `SELECT file FROM data.files WHERE url=$1 || '/margin-images/' || $2;`,
-    [
-      orgid,
-      name,
-    ]);
-  console.log(data);
-  
-  return data?.svg?.toString();
-}*/
 
 /**
  * Converts a PDFDocument to a Buffer
