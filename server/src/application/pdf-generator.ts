@@ -49,14 +49,19 @@ const fonts = {
   },
 };
 
-async function getStaticIconSvg(name: string) {
+/*
+async function getStaticIconSvg(name: string, orgid: string) {
   const data = await getDb().oneOrNone<{
     svg: Buffer;
-  }>('SELECT svg FROM application.static_icons WHERE name=$(name)', {
-    name,
-  });
+  }>( `SELECT file FROM data.files WHERE url=$1 || '/margin-images/' || $2;`,
+    [
+      orgid,
+      name,
+    ]);
+  console.log(data);
+  
   return data?.svg?.toString();
-}
+}*/
 
 /**
  * Converts a PDFDocument to a Buffer
@@ -155,8 +160,12 @@ async function getFrontPage(
     : null;
 
   const [logo, banner] = await Promise.all([
-    getStaticIconSvg('logo'),
-    getStaticIconSvg('banner'),
+    survey.marginImages.top.imageUrl
+      ? (await getFile(survey.marginImages.top.imageUrl )).data.toString()
+      : null,
+    survey.marginImages.bottom.imageUrl
+      ? (await getFile(survey.marginImages.bottom.imageUrl)).data.toString()
+      : null,
   ]);
 
   const attachmentFileNames = answerEntries
