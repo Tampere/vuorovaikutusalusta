@@ -77,6 +77,7 @@ interface DBSurvey {
   localisation_enabled: boolean;
   submission_count?: number;
   organization: string;
+  tags: string[];
 }
 
 /**
@@ -495,6 +496,7 @@ export async function getSurveys(
   ORDER BY updated_at DESC`,
     [authorId, filterByPublished, organization],
   );
+  console.log(rows);
   return rows
     .map((row) => dbSurveyToSurvey(row))
     .filter((survey) => (filterByPublished ? isPublished(survey) : survey));
@@ -1218,6 +1220,7 @@ function dbSurveyToSurvey(
       },
     },
     organization: dbSurvey.organization,
+    tags: dbSurvey.tags,
   };
   return {
     ...survey,
@@ -1824,4 +1827,24 @@ export async function getDistinctAutoSendToEmails() {
     SELECT DISTINCT UNNEST(email_auto_send_to) AS email FROM data.survey
   `);
   return rows.map((row) => row.email);
+}
+
+/**
+ * get all distinct tags used by the organisation
+ * @param organizations array of organizations. Likely to be of length 1 for now
+ * @returns array of distinct tags
+ */
+export async function getTagsByOrganizations(organizations: string[]) {
+  const rows = await getDb().manyOrNone<{ tag: string }>(
+    `
+    SELECT
+      DISTINCT UNNEST(tags) AS tag
+    FROM
+      data.survey AS s
+    WHERE
+      s.organization = ANY($1)
+  `,
+    [organizations],
+  );
+  return rows.map((row) => row.tag);
 }
