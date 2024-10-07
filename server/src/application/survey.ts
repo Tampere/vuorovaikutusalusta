@@ -294,6 +294,9 @@ export async function getPublishedSurvey(
           survey.thanks_page_image_name,
           survey.thanks_page_image_path,
           survey.display_privacy_statement,
+          survey.theme_id,
+          theme_name,
+          theme_data,
           page.id as page_id,
           page.title as page_title,
           page.idx as page_idx,
@@ -308,7 +311,7 @@ export async function getPublishedSurvey(
           (
             SELECT
               survey.*,
-              theme.id as theme_id,
+              theme.id as theme_identifier,
               theme.name as theme_name,
               theme.data as theme_data
             FROM data.survey survey
