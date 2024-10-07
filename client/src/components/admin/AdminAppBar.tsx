@@ -12,8 +12,8 @@ import SurveyLanguageMenu from '../SurveyLanguageMenu';
 import LanguageMenu from '../LanguageMenu';
 import { AdminInstructionButton } from './AdminInstructionButton';
 import AppBarUserMenu from './AppBarUserMenu';
-import { useTranslations } from '@src/stores/TranslationContext';
 import { NavLink } from 'react-router-dom';
+import KartallaLogo from '@src/components/icons/KartallaLogo';
 
 interface Props {
   labels?: string[];
@@ -26,8 +26,6 @@ export function AdminAppBar({
   withHomeLink = true,
   style = {},
 }: Props) {
-  const { tr } = useTranslations();
-
   return (
     <>
       <AppBar position="fixed">
@@ -41,7 +39,7 @@ export function AdminAppBar({
                 padding: '0',
               },
               'li+li::before': {
-                content: '" - "',
+                content: '" • "',
                 padding: '0px 10px',
                 lineHeight: 1.6,
                 fontSize: '1.25rem',
@@ -63,7 +61,7 @@ export function AdminAppBar({
                     },
                   }}
                 >
-                  {tr.SurveyList.title.main}
+                  <KartallaLogo/>
                 </Typography>
               </ListItem>
             )}

@@ -28,17 +28,21 @@ export function configureAzureAuth(app: Express) {
       (profile, done) => {
         if (!profile.oid) {
           return done(new Error('No oid found'), null);
+        } else if (!profile._json.groups || profile._json.groups.length === 0) {
+          return done(new Error('No groups found'), null);
         }
+
         process.nextTick(async function () {
           const user = await upsertUser({
             id: profile.oid,
             fullName: profile.displayName,
             email: profile._json.email,
+            organizations: JSON.parse(profile._json.groups), // Parse groups to trim extra characters
           });
           return done(null, user);
         });
-      }
-    )
+      },
+    ),
   );
 
   // Login route
@@ -61,6 +65,6 @@ export function configureAzureAuth(app: Express) {
       // Redirect to original request URL
       const redirectUrl = decrypt(req.body.state) ?? '/admin';
       res.redirect(redirectUrl);
-    }
+    },
   );
 }

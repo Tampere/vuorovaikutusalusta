@@ -5,6 +5,6 @@
  * 'preset-react' provides plugins to transform JSX syntax etc.
  */
 
- module.exports = {
-  "presets": [ "@babel/preset-env", "@babel/preset-react" ]
+module.exports = {
+  presets: ['@babel/preset-env', '@babel/preset-react'],
 };

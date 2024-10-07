@@ -7,8 +7,7 @@ import {
   Button,
   Typography,
 } from '@mui/material';
-import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
-import AttachFileIcon from '@mui/icons-material/AttachFile';
+import PaperclipIcon from '@src/components/icons/PaperclipIcon';
 import { useToasts } from '@src/stores/ToastContext';
 import DropZone from '../DropZone';
 import { useTranslations } from '@src/stores/TranslationContext';
@@ -16,6 +15,7 @@ import {
   getInstructionFilename,
   storeAdminInstructions,
 } from '@src/controllers/AdminFileController';
+import UploadIcon from '@src/components/icons/UploadIcon';
 
 interface Props {
   isOpen: boolean;
@@ -80,20 +80,20 @@ export function InstructionsDialog({ isOpen, setIsOpen, setMenuOpen }: Props) {
                 .map((file) => file.size)
                 .reduce(
                   (prevValue, currentValue) => prevValue + currentValue,
-                  0
+                  0,
                 );
               if (filesSize > MAX_FILE_SIZE) {
                 showToast({
                   severity: 'error',
                   message: tr.InstructionsDialog.fileSizeLimitError.replace(
                     '{x}',
-                    String(MEGAS)
+                    String(MEGAS),
                   ),
                 });
                 return;
               }
               const fileStrings = (await Promise.all(
-                files.map((file: any) => readFileAsync(file))
+                files.map((file: any) => readFileAsync(file)),
               )) as string[];
 
               const filesAreValid = !fileStrings
@@ -118,7 +118,7 @@ export function InstructionsDialog({ isOpen, setIsOpen, setMenuOpen }: Props) {
         >
           {stagedFile && (
             <div style={{ display: 'flex', alignItems: 'center' }}>
-              <AttachFileIcon />
+              <PaperclipIcon />
               <p>{stagedFile.name}</p>
             </div>
           )}
@@ -139,7 +139,7 @@ export function InstructionsDialog({ isOpen, setIsOpen, setMenuOpen }: Props) {
             </Typography>
             <Button
               variant="outlined"
-              startIcon={<PictureAsPdfIcon sx={{ color: 'inherit' }} />}
+              startIcon={<UploadIcon sx={{ color: 'currentColor' }} />}
               href="/api/file/instructions"
               download={instructionFileName}
             >

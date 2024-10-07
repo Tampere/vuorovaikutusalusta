@@ -200,10 +200,10 @@ export default function MultiMatrixQuestion({
       question.answerLimits.min && question.answerLimits.max
         ? tr.MultiMatrixQuestion.answerLimitsMinMax
         : question.answerLimits.min
-        ? tr.MultiMatrixQuestion.answerLimitsMin
-        : question.answerLimits.max
-        ? tr.MultiMatrixQuestion.answerLimitsMax
-        : ''
+          ? tr.MultiMatrixQuestion.answerLimitsMin
+          : question.answerLimits.max
+            ? tr.MultiMatrixQuestion.answerLimitsMax
+            : ''
     )
       .replace('{min}', `${question.answerLimits.min}`)
       .replace('{max}', `${question.answerLimits.max}`);

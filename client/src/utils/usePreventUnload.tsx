@@ -9,7 +9,7 @@ import { useCurrent } from './useCurrent';
  */
 export function usePreventUnload(
   prevent: boolean,
-  confirmationMessage: string
+  confirmationMessage: string,
 ) {
   // Access current "prevent" value via ref - otherwise it won't get updated inside the callback
   const getCurrentPrevent = useCurrent(prevent);

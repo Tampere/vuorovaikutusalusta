@@ -20,6 +20,9 @@ const useStyles = makeStyles({
     display: 'flex',
     justifyContent: 'space-between',
   },
+  item: {
+    boxShadow: '0px 2px 4px rgba(63, 111, 127, 0.9)',
+  },
 });
 
 export default function SurveyList() {
@@ -62,7 +65,7 @@ export default function SurveyList() {
       abortController?.abort();
     };
   }, [showAuthoredOnly, showPublishedOnly]);
-  
+
   return (
     <div className={classes.root}>
       <div className={classes.actions}>
@@ -95,6 +98,7 @@ export default function SurveyList() {
             setNewSurveyLoading(true);
             try {
               const newSurvey = await createNewSurvey();
+              setNewSurveyLoading(false);
               history.push(`/kyselyt/${newSurvey.id}`);
             } catch (error) {
               showToast({
@@ -102,7 +106,7 @@ export default function SurveyList() {
                 message: tr.SurveyList.errorCreatingNewSurvey,
               });
             } finally {
-              setNewSurveyLoading(false);
+              if (newSurveyLoading) setNewSurveyLoading(false);
             }
           }}
         >

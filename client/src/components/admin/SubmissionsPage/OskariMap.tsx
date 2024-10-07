@@ -64,8 +64,8 @@ export default function OskariMap({
       feature.geometry.type === 'Polygon'
         ? 'area'
         : feature.geometry.type === 'LineString'
-        ? 'line'
-        : 'point';
+          ? 'line'
+          : 'point';
     const question = feature.properties.question;
 
     // Use default style for points
@@ -83,8 +83,8 @@ export default function OskariMap({
     const fillColor = parsedStrokeColor
       ? `rgba(${parsedStrokeColor.values.join(',')}, 0.3)`
       : isPrimaryStyle
-      ? defaultFeatureStyles[0].fill.color
-      : defaultFeatureStyles[1].fill.color;
+        ? defaultFeatureStyles[0].fill.color
+        : defaultFeatureStyles[1].fill.color;
     return {
       stroke: {
         color:
@@ -96,8 +96,8 @@ export default function OskariMap({
           style.strokeStyle === 'dashed'
             ? [30, 10]
             : style.strokeStyle === 'dotted'
-            ? [0, 14]
-            : null,
+              ? [0, 14]
+              : null,
         lineCap: style.strokeStyle === 'dashed' ? 'butt' : 'round',
       },
       fill: {

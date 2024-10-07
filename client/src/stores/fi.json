@@ -50,6 +50,8 @@
     "nameHelperText": "Kyselyn URL-osoitteessa näkyvä nimi. Voi sisältää vain kirjaimia (a-z), numeroita (0-9) ja viivoja (- ja _).",
     "author": "Kyselyn laatija/yhteyshenkilö",
     "authorUnit": "Kyselyn laatijan yksikkö",
+    "authorizedGroups": "Luvitetut käyttäjäryhmät",
+    "authorizedGroupsHelperText": "Kyselyn näkevät vain valitut käyttäjäryhmät.",
     "admins": "Kyselyn ylläpitäjät",
     "userFetchFailed": "Käyttäjien haku epäonnistui. Yritä myöhemmin uudestaan.",
     "adminsHelperText": "Kyselyn alkuperäisen luojan lisäksi määriteltävät käyttäjät, jotka voivat katsella kyselyn vastauksia sekä muokata kyselyä.",
@@ -248,21 +250,27 @@
     "attributions": "Tekijänoikeustiedot",
     "noBackgroundImage": "Ei taustakuvaa",
     "noThanksPageImage": "Ei Kiitos-sivun kuvaa",
+    "noTopMarginImage": "Ei ylämarginaalin kuvaa",
+    "noBottomMarginImage": "Ei alamarginaalin kuvaa",
     "noImage": "Ei kuvaa",
     "surveyImage": "Kyselyn taustakuva",
     "thanksPageImage": "Kiitos-sivun kuva",
+    "topMarginImage": "Ylämarginaalin kuva",
+    "bottomMarginImage": "Alamarginaalin kuva",
     "image": "Kuva",
     "selectImage": "Valitse taustakuva",
     "addNewImage": "Lisää uusi kuva",
     "files": "Tiedosto",
     "imageSizeExceeded": "Kuvan maksimikoko on {x} Mt",
+    "imageTypeError": "Kuvan tulee olla .svg -muodossa",
     "imageUploadError": "Virhe tallennettaessa kuvaa",
     "imageDownloadError": "Virhe ladattaessa kuvaa",
     "multipleImagesDownloadError": "Kuvien lataaminen epäonnistui",
     "imageDeleteError": "Virhe poistettaessa kuvaa"
   },
   "DropZone": {
-    "dropFiles": "Valitse tiedosto klikkaamalla tai pudottamalla se tähän (enint. {x} Mt)."
+    "dropFiles": "Valitse tiedosto klikkaamalla tai pudottamalla se tähän (enint. {x} Mt).",
+    "dropFilesSvg": "Valitse .svg -tiedosto klikkaamalla tai pudottamalla se tähän (enint. {x} Mt)."
   },
   "EditTextSection": {
     "text": "Teksti",
@@ -317,12 +325,14 @@
   "ColorSelect": {
     "color": "Väri",
     "colors": {
-      "black": "Musta",
-      "darkGray": "Tumma harmaa",
-      "steelBlue": "Teräksensininen",
-      "atmosphere": "Tunnelma",
-      "berryRed": "Marjanpunainen",
-      "warmGreen": "Lämmin vihreä"
+      "teal": "Tavi",
+      "sea": "Meri",
+      "sprig": "Havu",
+      "grey": "Harmaa",
+      "night": "Yö",
+      "blue": "Sininen",
+      "earthRed": "Punamulta",
+      "tar": "Terva"
     }
   },
   "MarkerIconSelect": {
@@ -381,9 +391,7 @@
     "errorLoadingUnfinished": "Tallennettujen vastausten lataamisessa tapahtui virhe. Yritä myöhemmin uudestaan."
   },
   "UnavailableSurvey": {
-    "surveyNotPublished": "Kiitos mielenkiinnostasi! Kysely ei ole tällä hetkellä avoinna eikä siihen voi vastata.",
-    "treTopicalInfo": "Tampereen kaupungin ajankohtaisiin asioihin pääset tutustumaan alla olevasta linkistä.",
-    "tre": "Tampereen kaupunki"
+    "surveyNotPublished": "Kiitos mielenkiinnostasi! Kysely ei ole tällä hetkellä avoinna eikä siihen voi vastata."
   },
   "NotFoundPage": {
     "pageNotFound": "Kyselyä ei löytynyt. Tarkista osoite ja yritä uudelleen"
@@ -557,7 +565,8 @@
     "languageControl": "Language / Kieli",
     "changeLanguage": "Vaihda palvelun kieltä",
     "fi": "Suomi",
-    "en": "English"
+    "en": "English",
+    "se": "Svenska"
   },
   "SurveyLanguageMenu": {
     "languageControl": "Language / Kieli",
@@ -575,6 +584,7 @@
     "surveySubtitle": "Kyselyn aliotsikko",
     "fi": "suomi",
     "en": "englanti",
+    "se": "ruotsi",
     "page": "sivu",
     "missingTranslation": "Käännös puuttuu",
     "optionInfo": "Vaihtoehdon lisätiedot",
@@ -625,9 +635,6 @@
     "accessibility": "Saavutettavuusseloste",
     "privacyStatement": "Tietosuojaseloste"
   },
-  "IconAltTexts": {
-    "bannerAltText": "Tampereen vaakunalogo",
-    "logoAltText": "Tampere Finland -logo"
-  },
+
   "adminInstructions": "Avaa käyttöohje"
 }

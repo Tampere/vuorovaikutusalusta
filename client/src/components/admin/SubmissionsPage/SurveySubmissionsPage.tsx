@@ -13,7 +13,7 @@ import {
   Select,
   Typography,
 } from '@mui/material';
-import { Map } from '@mui/icons-material';
+import MapIcon from '@src/components/icons/MapIcon';
 import {
   isAnswerEmpty,
   nonQuestionSectionTypes,
@@ -333,7 +333,7 @@ export default function SurveySubmissionsPage() {
           },
           chipProps: {
             color: 'secondary',
-            icon: <Map />,
+            icon: <MapIcon />,
             label: tr.SurveyStepper.openMap,
           },
           helperText: null,

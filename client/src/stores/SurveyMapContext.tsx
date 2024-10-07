@@ -168,8 +168,8 @@ function getFeatureStyle(
         style.strokeStyle === 'dashed'
           ? [30, 10]
           : style.strokeStyle === 'dotted'
-          ? [0, 14]
-          : null,
+            ? [0, 14]
+            : null,
       lineCap: style.strokeStyle === 'dashed' ? 'butt' : 'round',
     },
     fill: {
@@ -500,10 +500,10 @@ export function useSurveyMap() {
         type === 'point'
           ? 'Point'
           : type === 'line'
-          ? 'LineString'
-          : type === 'area'
-          ? 'Polygon'
-          : null,
+            ? 'LineString'
+            : type === 'area'
+              ? 'Polygon'
+              : null,
         {
           allowMultipleDrawing: false,
           style: {

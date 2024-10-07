@@ -1,5 +1,6 @@
 import { SurveyPageSidebarImageSize } from '@interfaces/survey';
-import { CheckSharp, ClearSharp } from '@mui/icons-material';
+import ClearIcon from '@src/components/icons/ClearIcon';
+import CheckIcon from '@src/components/icons/CheckIcon';
 import {
   Box,
   Button,
@@ -215,14 +216,14 @@ export default function EditSurveyPage() {
               >
                 {page.sidebar.defaultMapView ? (
                   <>
-                    <CheckSharp color="success" />
+                    <CheckIcon color="success" />
                     <Typography>
                       {tr.EditSurveyPage.defaultMapViewStatus.set}
                     </Typography>
                   </>
                 ) : (
                   <>
-                    <ClearSharp sx={{ color: '#0000008A' }} />
+                    <ClearIcon sx={{ color: '#0000008A' }} />
                     <Typography>
                       {tr.EditSurveyPage.defaultMapViewStatus.notSet}
                     </Typography>
@@ -283,23 +284,22 @@ export default function EditSurveyPage() {
           <FileUpload
             surveyId={activeSurvey.id}
             targetPath={[String(activeSurvey.id)]}
+            surveyOrganization={activeSurvey.organization}
             value={
-              !page.sidebar.imageName
+              !page.sidebar.imageUrl
                 ? null
                 : [
                     {
-                      name: page.sidebar.imageName,
-                      path: page.sidebar.imagePath,
+                      url: page.sidebar.imageUrl,
                     },
                   ]
             }
-            onUpload={({ name, path }) => {
+            onUpload={({ url }) => {
               editPage({
                 ...page,
                 sidebar: {
                   ...page.sidebar,
-                  imagePath: path,
-                  imageName: name,
+                  imageUrl: url,
                   imageSize: 'fitted',
                 },
               });
@@ -309,8 +309,7 @@ export default function EditSurveyPage() {
                 ...page,
                 sidebar: {
                   ...page.sidebar,
-                  imagePath: [],
-                  imageName: null,
+                  imageUrl: null,
                   imageSize: null,
                 },
               });

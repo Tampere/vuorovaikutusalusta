@@ -26,14 +26,16 @@ export default function ColorSelect({ label, value, onChange }: Props) {
 
   const colors = useMemo<{ name: string; value: string }[]>(
     () => [
-      { name: tr.ColorSelect.colors.black, value: '#000000' },
-      { name: tr.ColorSelect.colors.darkGray, value: '#3f3e3e' },
-      { name: tr.ColorSelect.colors.steelBlue, value: '#0074a4' },
-      { name: tr.ColorSelect.colors.atmosphere, value: '#c83e36' },
-      { name: tr.ColorSelect.colors.berryRed, value: '#ad3963' },
-      { name: tr.ColorSelect.colors.warmGreen, value: '#418155' },
+      { name: tr.ColorSelect.colors.teal, value: '#00a393' },
+      { name: tr.ColorSelect.colors.sea, value: '#17607f' },
+      { name: tr.ColorSelect.colors.sprig, value: '#1a776d' },
+      { name: tr.ColorSelect.colors.grey, value: '#515b68' },
+      { name: tr.ColorSelect.colors.night, value: '#001e39' },
+      { name: tr.ColorSelect.colors.blue, value: '#0065BD' },
+      { name: tr.ColorSelect.colors.earthRed, value: '#C84436' },
+      { name: tr.ColorSelect.colors.tar, value: '#312322' },
     ],
-    [tr]
+    [tr],
   );
 
   return (

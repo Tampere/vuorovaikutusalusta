@@ -1,21 +1,19 @@
 import { SurveyFollowUpSection, SurveyPageSection } from '@interfaces/survey';
-import {
-  Article,
-  AttachFile,
-  CheckBox,
-  ContentPaste,
-  FormatListNumbered,
-  Image,
-  LibraryAddCheck,
-  LinearScale,
-  Looks4,
-  Map,
-  RadioButtonChecked,
-  Subject,
-  TextFields,
-  ViewComfy,
-  ViewComfyAlt,
-} from '@mui/icons-material';
+import ImageSmallIcon from '../icons/ImageSmallIcon';
+import RadioButtonCheckedIcon from '../icons/RadioButtonCheckedIcon';
+import CheckboxCheckedIcon from '../icons/CheckboxCheckedIcon';
+import TextFieldIcon from '../icons/TextFieldIcon';
+import NumericFieldIcon from '../icons/NumericFieldIcon';
+import MapIcon from '../icons/MapIcon';
+import OrderedIcon from '../icons/OrderedIcon';
+import SliderIcon from '../icons/SliderIcon';
+import PaperclipIcon from '../icons/PaperclipIcon';
+import MultiCheckmarkIcon from '../icons/MultiCheckmarkIcon';
+import MatrixIcon from '../icons/MatrixIcon';
+import LikertGroupIcon from '../icons/LikertGroupIcon';
+import TextFileIcon from '../icons/TextFileIcon';
+import TextSectionIcon from '../icons/TextSectionIcon';
+import ClipboardSmallIcon from '../icons/ClipboardSmallIcon';
 import { Fab, Grid, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useClipboard } from '@src/stores/ClipboardContext';
@@ -169,15 +167,13 @@ export default function AddSurveySectionActions(props: Props) {
     image: {
       type: 'image',
       title: initializeLocalizedObject(''),
-      fileName: null,
-      filePath: [],
+      fileUrl: null,
       altText: initializeLocalizedObject(''),
     },
     document: {
       type: 'document',
       title: initializeLocalizedObject(''),
-      fileName: null,
-      filePath: [],
+      fileUrl: null,
     },
     attachment: {
       type: 'attachment',
@@ -207,67 +203,67 @@ export default function AddSurveySectionActions(props: Props) {
       type: 'radio',
       label: tr.AddSurveySectionActions.radioQuestion,
       ariaLabel: 'add-radio-question',
-      icon: <RadioButtonChecked />,
+      icon: <RadioButtonCheckedIcon />,
     },
     {
       type: 'checkbox',
       label: tr.AddSurveySectionActions.checkBoxQuestion,
       ariaLabel: 'add-checkbox-question',
-      icon: <CheckBox />,
+      icon: <CheckboxCheckedIcon />,
     },
     {
       type: 'free-text',
       label: tr.AddSurveySectionActions.freeTextQuestion,
       ariaLabel: 'add-free-text-question',
-      icon: <TextFields />,
+      icon: <TextFieldIcon />,
     },
     {
       type: 'numeric',
       label: tr.AddSurveySectionActions.numericQuestion,
       ariaLabel: 'add-numeric-question',
-      icon: <Looks4 />,
+      icon: <NumericFieldIcon />,
     },
     {
       type: 'map',
       label: tr.AddSurveySectionActions.mapQuestion,
       ariaLabel: 'add-map-question',
-      icon: <Map />,
+      icon: <MapIcon />,
     },
     {
       type: 'sorting',
       label: tr.AddSurveySectionActions.sortingQuestion,
       ariaLabel: 'add-sorting-question',
-      icon: <FormatListNumbered />,
+      icon: <OrderedIcon />,
     },
     {
       type: 'slider',
       label: tr.AddSurveySectionActions.sliderQuestion,
       ariaLabel: 'add-slider-question',
-      icon: <LinearScale />,
+      icon: <SliderIcon />,
     },
     {
       type: 'matrix',
       label: tr.AddSurveySectionActions.matrixQuestion,
       ariaLabel: 'add-matrix-question',
-      icon: <ViewComfy />,
+      icon: <MatrixIcon />,
     },
     {
       type: 'multi-matrix',
       label: tr.AddSurveySectionActions.multiMatrixQuestion,
       ariaLabel: 'add-multiple-choice-matrix-question',
-      icon: <ViewComfyAlt />,
+      icon: <LikertGroupIcon />,
     },
     {
       type: 'grouped-checkbox',
       label: tr.AddSurveySectionActions.groupedCheckboxQuestion,
       ariaLabel: 'add-grouped-checkbox-question',
-      icon: <LibraryAddCheck />,
+      icon: <MultiCheckmarkIcon />,
     },
     {
       type: 'attachment',
       label: tr.AddSurveySectionActions.attachmentSection,
       ariaLabel: 'add-attachment-section',
-      icon: <AttachFile />,
+      icon: <PaperclipIcon />,
     },
   ];
 
@@ -281,19 +277,19 @@ export default function AddSurveySectionActions(props: Props) {
       type: 'text',
       label: tr.AddSurveySectionActions.textSection,
       ariaLabel: 'add-text-section',
-      icon: <Subject />,
+      icon: <TextSectionIcon />,
     },
     {
       type: 'image',
       label: tr.AddSurveySectionActions.imageSection,
       ariaLabel: 'add-image-section',
-      icon: <Image />,
+      icon: <ImageSmallIcon />,
     },
     {
       type: 'document',
       label: tr.AddSurveySectionActions.documentSection,
       ariaLabel: 'add-document-section',
-      icon: <Article />,
+      icon: <TextFileIcon />,
     },
   ];
 
@@ -315,6 +311,7 @@ export default function AddSurveySectionActions(props: Props) {
                     onClick={handleAdd(button.type)}
                     disabled={props.disabled}
                     style={{ minWidth: '40px' }}
+                    sx={{boxShadow: 'none'}}
                   >
                     {button.icon}
                   </Fab>
@@ -337,6 +334,7 @@ export default function AddSurveySectionActions(props: Props) {
                     size="small"
                     onClick={handleAdd(button.type)}
                     disabled={props.disabled}
+                    sx={{boxShadow: 'none'}}
                   >
                     {button.icon}
                   </Fab>
@@ -344,7 +342,7 @@ export default function AddSurveySectionActions(props: Props) {
                 </div>
               </Grid>
             ))}
-          {!props.disableSectionPaste && 
+          {!props.disableSectionPaste && (
             <Grid item style={{ padding: '0.5rem' }}>
               <div className={classes.actionItem}>
                 <Fab
@@ -352,6 +350,7 @@ export default function AddSurveySectionActions(props: Props) {
                   color="secondary"
                   aria-label={'attach-section-from-clipboard'}
                   size="small"
+                  sx={{boxShadow: 'none'}}
                   onClick={() => {
                     // Copy content from Clipboard context to active survey
                     if (clipboardSection) {
@@ -371,12 +370,12 @@ export default function AddSurveySectionActions(props: Props) {
                     }
                   }}
                 >
-                  <ContentPaste />
+                  <ClipboardSmallIcon />
                 </Fab>
                 <Typography>{tr.EditSurveyPage.attachSection}</Typography>
               </div>
             </Grid>
-          }
+          )}
           <Grid
             item
             style={{

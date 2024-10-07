@@ -14,6 +14,7 @@ interface DbUser {
   id: string;
   full_name: string;
   email: string;
+  organizations: string[];
 }
 
 /**
@@ -28,6 +29,7 @@ function dbUserToUser(dbUser: DbUser): Express.User {
         id: dbUser.id,
         fullName: dbUser.full_name,
         email: dbUser.email,
+        organizations: dbUser.organizations,
       };
 }
 
@@ -39,17 +41,18 @@ function dbUserToUser(dbUser: DbUser): Express.User {
 export async function upsertUser(user: Express.User) {
   const newUser = await getDb().one<DbUser>(
     `
-    INSERT INTO "user" (id, full_name, email)
-    VALUES ($(id), $(fullName), $(email))
+    INSERT INTO "user" (id, full_name, email, organizations)
+    VALUES ($(id), $(fullName), $(email), $(organizations))
     ON CONFLICT (id) DO UPDATE
-      SET full_name = $(fullName), email = $(email)
+      SET full_name = $(fullName), email = $(email), organizations = $(organizations)
     RETURNING *
   `,
     {
       id: user.id,
       fullName: user.fullName,
       email: user.email,
-    }
+      organizations: user.organizations,
+    },
   );
   return dbUserToUser(newUser);
 }
@@ -61,7 +64,7 @@ export async function upsertUser(user: Express.User) {
 export async function getUser(id: string) {
   const user = await getDb().oneOrNone<DbUser>(
     `SELECT * FROM "user" WHERE id = $1`,
-    [id]
+    [id],
   );
   return dbUserToUser(user);
 }
@@ -71,10 +74,10 @@ export async function getUser(id: string) {
  * @param excludeIds User IDs to exclude
  * @returns Users
  */
-export async function getUsers(excludeIds = []) {
+export async function getUsers(userOrganizations: string[], excludeIds = []) {
   const dbUsers = await getDb().manyOrNone<DbUser>(
-    `SELECT * FROM "user" WHERE NOT (id = ANY ($1))`,
-    [excludeIds]
+    `SELECT * FROM "user" WHERE NOT (id = ANY ($2)) ${userOrganizations.length > 0 ? 'AND organizations && $1' : ''}`,
+    [userOrganizations, excludeIds],
   );
   return dbUsers.map(dbUserToUser);
 }

@@ -1,3 +1,4 @@
+import { getSurveyOrganization } from '@src/application/survey';
 import logger from '@src/logger';
 import { getUser, upsertUser } from '@src/user';
 import ConnectPgSimple from 'connect-pg-simple';
@@ -85,9 +86,10 @@ export function configureAuth(app: Express) {
 export function configureMockAuth(app: Express) {
   // Create a mock user & persist it in the database
   const mockUser: Express.User = {
-    id: '12345-67890-abcde-fghij',
-    fullName: 'Teemu Testaaja',
-    email: 'teemu.testaaja@testi.com',
+    id: '12345-67890-abcde-fghij1',
+    fullName: 'toinen Testaaja',
+    email: 'toinen.testaaja@testi.com',
+    organizations: ['test-group-id-1'],
   };
   upsertUser(mockUser);
 
@@ -136,6 +138,41 @@ export function ensureAuthenticated(options?: { redirectToLogin?: boolean }) {
       });
     } else {
       fail();
+    }
+  };
+}
+
+export function ensureSurveyGroupAccess(id: string = 'id') {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    const surveyOrganization = req.params[id]
+      ? await getSurveyOrganization(Number(req.params[id]))
+      : null;
+    if (
+      typeof surveyOrganization === 'string' &&
+      !req.user.organizations.includes(surveyOrganization)
+    ) {
+      res.status(403).send('Forbidden');
+    } else {
+      return next();
+    }
+  };
+}
+
+export function ensureFileGroupAccess() {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    const surveyOrganizations = req.headers['organization']
+      ? (req.headers['organization'] as string)
+      : req.user.organizations;
+
+    const fileOrganization = req.user.organizations.filter((organization) =>
+      (surveyOrganizations as string[]).includes(organization),
+    );
+
+    if (fileOrganization.length === 0) {
+      res.status(403).send('Forbidden');
+    } else {
+      res.locals.fileOrganizations = fileOrganization;
+      return next();
     }
   };
 }

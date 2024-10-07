@@ -55,10 +55,10 @@ export default function CheckBoxQuestion({
       question.answerLimits.min && question.answerLimits.max
         ? tr.SurveyQuestion.answerLimitsMinMax
         : question.answerLimits.min
-        ? tr.SurveyQuestion.answerLimitsMin
-        : question.answerLimits.max
-        ? tr.SurveyQuestion.answerLimitsMax
-        : ''
+          ? tr.SurveyQuestion.answerLimitsMin
+          : question.answerLimits.max
+            ? tr.SurveyQuestion.answerLimitsMax
+            : ''
     )
       .replace('{min}', `${question.answerLimits.min}`)
       .replace('{max}', `${question.answerLimits.max}`);

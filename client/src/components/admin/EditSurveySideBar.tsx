@@ -8,19 +8,20 @@ import {
   ListItemText,
   Theme,
 } from '@mui/material';
-import {
-  Add,
-  ArrowBack,
-  DragIndicator,
-  FavoriteBorder,
-  InfoOutlined,
-  InsertDriveFileOutlined,
-  Language,
-  Mail,
-  Preview,
-  ContentCopy,
-  ContentPaste,
-} from '@mui/icons-material';
+
+import MailIcon from '@src/components/icons/MailIcon';
+import LanguageIcon from '@src/components/icons/LanguageIcon';
+import InfoIcon from '@src/components/icons/InfoIcon';
+import ChevronLeftIcon from '@src/components/icons/ChevronLeftIcon';
+import AddIcon from '@src/components/icons/AddIcon';
+import DraggableIcon from '@src/components/icons/DraggableIcon';
+import FavoriteIcon from '@src/components/icons/FavoriteIcon';
+import SurveyPageIcon from '@src/components/icons/SurveyPageIcon';
+import VisibleIcon from '@src/components/icons/VisibleIcon';
+import ClipboardIcon from '@src/components/icons/ClipboardIcon';
+import DocumentCopyIcon from '@src/components/icons/DocumentCopyIcon';
+import BranchIcon from '@src/components/icons/BranchIcon';
+
 import { makeStyles } from '@mui/styles';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useToasts } from '@src/stores/ToastContext';
@@ -37,7 +38,6 @@ import {
 } from '@src/utils/schemaValidation';
 import { useClipboard } from '@src/stores/ClipboardContext';
 import { SurveyPage } from '@interfaces/survey';
-import { BranchIcon } from '../icons/BranchIcon';
 
 const useStyles = makeStyles((theme: Theme) => ({
   '@keyframes pulse': {
@@ -99,25 +99,25 @@ export default function EditSurveySideBar(props: Props) {
       <List>
         <ListItemLink external to={`/admin?lang=${language}`}>
           <ListItemIcon>
-            <ArrowBack />
+            <ChevronLeftIcon />
           </ListItemIcon>
           <ListItemText primary={tr.EditSurvey.toFrontPage} />
         </ListItemLink>
         <ListItemLink to={`${url}/perustiedot?lang=${language}`}>
           <ListItemIcon>
-            <InfoOutlined />
+            <InfoIcon />
           </ListItemIcon>
           <ListItemText primary={tr.EditSurvey.info} />
         </ListItemLink>
         <ListItemLink to={`${url}/käännökset?lang=${language}`}>
           <ListItemIcon>
-            <Language />
+            <LanguageIcon />
           </ListItemIcon>
           <ListItemText primary={tr.EditSurvey.translations}></ListItemText>
         </ListItemLink>
         <ListItemLink to={`${url}/sähköpostit?lang=${language}`}>
           <ListItemIcon>
-            <Mail />
+            <MailIcon />
           </ListItemIcon>
           <ListItemText primary={tr.EditSurvey.email} />
         </ListItemLink>
@@ -150,7 +150,7 @@ export default function EditSurveySideBar(props: Props) {
                             {Object.keys(page?.conditions)?.length > 0 && (
                               <BranchIcon />
                             )}
-                            <InsertDriveFileOutlined />
+                            <SurveyPageIcon /> 
                           </ListItemIcon>
                           <ListItemText
                             primary={
@@ -194,10 +194,12 @@ export default function EditSurveySideBar(props: Props) {
                               });
                             }}
                           >
-                            <ContentCopy />
+                            <DocumentCopyIcon />
                           </IconButton>
                           <div {...provided.dragHandleProps}>
-                            <DragIndicator />
+                          <IconButton>
+                            <DraggableIcon />
+                          </IconButton>
                           </div>
                         </ListItemLink>
                       </div>
@@ -236,7 +238,7 @@ export default function EditSurveySideBar(props: Props) {
             }}
           >
             <ListItemIcon>
-              <Add />
+              <AddIcon />
             </ListItemIcon>
             <ListItemText primary={tr.EditSurvey.newPage} />
           </ListItem>
@@ -280,7 +282,7 @@ export default function EditSurveySideBar(props: Props) {
               }
             }}
           >
-            <ContentPaste />
+            <ClipboardIcon />
             {tr.EditSurvey.attachNewPage}
           </ListItemButton>
         </div>
@@ -289,7 +291,7 @@ export default function EditSurveySideBar(props: Props) {
       <List>
         <ListItemLink to={`${url}/kiitos-sivu?lang=${language}`}>
           <ListItemIcon>
-            <FavoriteBorder />
+            <FavoriteIcon />
           </ListItemIcon>
           <ListItemText primary={tr.EditSurvey.thanksPage} />
         </ListItemLink>
@@ -303,7 +305,7 @@ export default function EditSurveySideBar(props: Props) {
           }`}
         >
           <ListItemIcon>
-            <Preview />
+            <VisibleIcon />
           </ListItemIcon>
           <ListItemText primary={tr.EditSurvey.toSurveyPage} />
         </ListItemLink>

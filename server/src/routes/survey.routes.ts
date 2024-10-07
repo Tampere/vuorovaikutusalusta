@@ -18,7 +18,7 @@ import {
   updateSurvey,
   userCanEditSurvey,
 } from '@src/application/survey';
-import { ensureAuthenticated } from '@src/auth';
+import { ensureAuthenticated, ensureSurveyGroupAccess } from '@src/auth';
 import { ForbiddenError } from '@src/error';
 import { Router } from 'express';
 import asyncHandler from 'express-async-handler';
@@ -60,6 +60,7 @@ router.get(
     const surveys = await getSurveys(
       filterByAuthored ? userId : null,
       Boolean(filterByPublished),
+      req.user.organizations[0], // For now, use the first organization
     );
     res.status(200).json(surveys);
   }),
@@ -75,7 +76,11 @@ router.get(
   ]),
   asyncHandler(async (req, res) => {
     const id = Number(req.params.id);
-    const survey = await getSurvey({ id });
+    // For now, use the first organization
+    const survey = await getSurvey({
+      id,
+      organization: req.user.organizations[0],
+    });
     res.status(200).json(survey);
   }),
 );
@@ -98,6 +103,7 @@ router.post(
 router.put(
   '/:id',
   ensureAuthenticated(),
+  ensureSurveyGroupAccess(),
   validateRequest([
     param('id').isNumeric().toInt().withMessage('ID must be a number'),
     body('name')
@@ -136,6 +142,9 @@ router.put(
       .isArray()
       .optional({ nullable: true })
       .withMessage('Thanks page image path must be an array'),
+    body('marginImages')
+      .isObject()
+      .withMessage('Margin images must be an object'),
     body('startDate')
       .isString()
       .optional({ nullable: true })
@@ -166,6 +175,9 @@ router.put(
       .optional({ checkFalsy: true })
       .isString()
       .withMessage('Section type must be a string'),
+    body('organization')
+      .isString()
+      .withMessage('Organization must be a string'),
   ]),
   asyncHandler(async (req, res) => {
     const surveyId = Number(req.params.id);
@@ -191,6 +203,7 @@ router.put(
 router.delete(
   '/:id',
   ensureAuthenticated(),
+  ensureSurveyGroupAccess(),
   validateRequest([
     param('id').isNumeric().toInt().withMessage('ID must be a number'),
   ]),
@@ -211,6 +224,7 @@ router.delete(
 router.post(
   '/:id/copy',
   ensureAuthenticated(),
+  ensureSurveyGroupAccess(),
   validateRequest([
     param('id').isNumeric().toInt().withMessage('ID must be a number'),
   ]),
@@ -282,6 +296,7 @@ router.post(
 router.post(
   '/:id/publish',
   ensureAuthenticated(),
+  ensureSurveyGroupAccess(),
   validateRequest([
     param('id').isNumeric().toInt().withMessage('ID must be a number'),
   ]),
@@ -303,6 +318,7 @@ router.post(
 router.post(
   '/:id/unpublish',
   ensureAuthenticated(),
+  ensureSurveyGroupAccess(),
   validateRequest([
     param('id').isNumeric().toInt().withMessage('ID must be a number'),
   ]),
@@ -324,6 +340,7 @@ router.post(
 router.post(
   '/:id/page',
   ensureAuthenticated(),
+  ensureSurveyGroupAccess(),
   validateRequest([
     param('id').isNumeric().toInt().withMessage('ID must be a number'),
   ]),
@@ -345,6 +362,7 @@ router.post(
 router.delete(
   '/:surveyId/page/:id',
   ensureAuthenticated(),
+  ensureSurveyGroupAccess('surveyId'),
   validateRequest([
     param('surveyId')
       .isNumeric()
@@ -373,6 +391,7 @@ router.delete(
 router.get(
   '/:surveyId/report/:submissionId/:lang',
   ensureAuthenticated(),
+  ensureSurveyGroupAccess('surveyId'),
   asyncHandler(async (req, res) => {
     const surveyId = Number(req.params.surveyId);
     const submissionId = Number(req.params.submissionId);
@@ -407,6 +426,7 @@ router.get(
 router.get(
   '/:id/submissions',
   ensureAuthenticated(),
+  ensureSurveyGroupAccess(),
   validateRequest([
     param('id').isNumeric().toInt().withMessage('ID must be a number'),
   ]),

@@ -3,15 +3,17 @@ import {
   Box,
   Button,
   Link,
+  Stack,
   Theme,
   Typography,
-  Stack,
   useMediaQuery,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { getClassList } from '@src/utils/classes';
 import React from 'react';
+
+import { useImageHeaderQuery } from '@src/hooks/UseImageHeaderQuery';
 import Footer from './Footer';
 
 const useStyles = makeStyles((theme: Theme & { [customKey: string]: any }) => ({
@@ -99,9 +101,21 @@ export default function SurveyLandingPage({
   onStart,
   surveyBackgroundImage,
 }: Props) {
-  const classes = useStyles({ imageName: survey?.backgroundImageName ?? '' });
+  const classes = useStyles({ imageUrl: survey?.backgroundImageUrl ?? '' });
   const { tr, surveyLanguage } = useTranslations();
   const mediumWidth = useMediaQuery('(max-width: 640px)');
+
+  const topImagePath = `/api/file/${survey.marginImages.top.imageUrl}`;
+  const bottomImagePath = `/api/file/${survey.marginImages.bottom.imageUrl}`;
+  const topImageHeaderQuery = useImageHeaderQuery(
+    topImagePath,
+    !survey.marginImages.top.imageUrl,
+  );
+  const bottomImageHeaderQuery = useImageHeaderQuery(
+    bottomImagePath,
+    !survey.marginImages.bottom.imageUrl,
+  );
+
   return (
     <Stack
       direction="column"
@@ -111,8 +125,8 @@ export default function SurveyLandingPage({
       sx={{
         width: '100%',
         minHeight: '100vh', // as a fallback if svh not supported
-        ...(survey?.backgroundImageName && {
-          backgroundImage: `url("/api/file/background-images/${survey?.backgroundImageName}")`,
+        ...(survey?.backgroundImageUrl && {
+          backgroundImage: `url("/api/file/${survey.backgroundImageUrl}")`,
         }),
         backgroundSize: 'cover',
         backgroundPosition: 'center',
@@ -139,14 +153,16 @@ export default function SurveyLandingPage({
           alignItems: 'flex-start',
         }}
       >
-        <img
-          style={{
-            maxWidth: '60%',
-            maxHeight: '100%',
-          }}
-          src={`/api/feature-styles/icons/logo`}
-          alt={tr.IconAltTexts.logoAltText}
-        />
+        {topImageHeaderQuery.imageHeaders && (
+          <img
+            style={{
+              maxWidth: '60%',
+              maxHeight: '100%',
+            }}
+            src={topImagePath}
+            alt={topImageHeaderQuery.imageHeaders?.imageAltText ?? ''}
+          />
+        )}
       </Box>
       <Box
         className="middle-content"
@@ -191,7 +207,7 @@ export default function SurveyLandingPage({
           <Link
             color="primary"
             underline="hover"
-            href="https://www.tampere.fi/asioi-kaupungin-kanssa/oskari-karttakyselypalvelun-saavutettavuusseloste"
+            href="/saavutettavuusseloste"
             target="_blank"
           >
             {tr.FooterLinks.accessibility}
@@ -200,27 +216,28 @@ export default function SurveyLandingPage({
             <Link
               color="primary"
               underline="hover"
-              href="https://www.tampere.fi/tietosuoja-ja-tiedonhallinta/tietosuojaselosteet"
+              href="/tietosuojaseloste"
               target="_blank"
             >
               {tr.FooterLinks.privacyStatement}
             </Link>
           )}
         </Footer>
-        <img
-          style={{
-            minWidth: '130px',
-            maxWidth: '20%',
-            position: !mediumWidth ? 'absolute' : 'static',
-            left: !mediumWidth ? '0' : 'auto',
-            bottom: 0,
-            marginLeft: '0.5rem',
-            marginBottom: '0.5rem',
-          }}
-          src={`/api/feature-styles/icons/banner`}
-          alt={tr.IconAltTexts.bannerAltText}
-        />
-
+        {bottomImageHeaderQuery.imageHeaders && (
+          <img
+            style={{
+              minWidth: '130px',
+              width: '10vw',
+              position: !mediumWidth ? 'absolute' : 'static',
+              left: !mediumWidth ? '0' : 'auto',
+              bottom: 0,
+              marginLeft: '0.5rem',
+              marginBottom: '0.5rem',
+            }}
+            src={bottomImagePath}
+            alt={bottomImageHeaderQuery.imageHeaders?.imageAltText ?? ''}
+          />
+        )}
         {surveyBackgroundImage?.attributions ? (
           <Typography className={classes.imageCopyright} variant="body2">
             {surveyBackgroundImage.attributions}

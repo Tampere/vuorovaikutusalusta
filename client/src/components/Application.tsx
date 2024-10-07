@@ -12,11 +12,13 @@ import TranslationProvider from '@src/stores/TranslationContext';
 import fiLocale from 'date-fns/locale/fi';
 import React from 'react';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import { A11yStatement } from './A11yStatement';
 import Compose from './Compose';
+import { DataProtectionStatement } from './DataProtectionStatement';
 import { NotFoundPage } from './NotFoundPage';
-import './react-split-pane.css';
-import SurveyPage from './SurveyPage';
 import SurveyLanguageRouter from './SurveyLanguageRouter';
+import SurveyPage from './SurveyPage';
+import './react-split-pane.css';
 
 /** Application entry point wrapper component */
 const Application = () => {
@@ -39,6 +41,12 @@ const Application = () => {
         <BrowserRouter basename="/">
           <SurveyLanguageRouter />
           <Switch>
+            <Route path="/saavutettavuusseloste" exact>
+              <A11yStatement />
+            </Route>
+            <Route path="/tietosuojaseloste" exact>
+              <DataProtectionStatement />
+            </Route>
             <Route path="/:name" exact>
               <SurveyPage />
             </Route>

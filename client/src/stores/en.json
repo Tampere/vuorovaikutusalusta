@@ -50,6 +50,8 @@
     "nameHelperText": "The name displayed on the survey URL-address. This can only include characters (a-z), numbers (0-9), hyphen (-) and underline (_).",
     "author": "Survey author / contact person",
     "authorUnit": "Survey author's / contact person's unit",
+    "authorizedGroups": "Authorized user groups",
+    "authorizedGroupsHelperText": "Users in these groups will have access to the survey.",
     "admins": "Survey admins",
     "userFetchFailed": "Failed to fetch users. Try again later.",
     "adminsHelperText": "Users besides the original author of the survey, who will have access to the survey answers and who can modify the survey.",
@@ -248,21 +250,27 @@
     "attributions": "Copyright & attributions",
     "noBackgroundImage": "No background image",
     "noThanksPageImage": "No thank you page image",
+    "noTopMarginImage": "No top margin image",
+    "noBottomMarginImage": "No bottom margin image",
     "noImage": "No image",
     "surveyImage": "Survey background image",
     "thanksPageImage": "Image for thank you page",
+    "topMarginImage": "Top margin image",
+    "bottomMarginImage": "Bottom margin image",
     "image": "Image",
     "selectImage": "Choose background image",
     "addNewImage": "Add a new image",
     "files": "File",
     "imageSizeExceeded": "Image maximum size is {x} MB",
+    "imageTypeError": "Image type must be .svg",
     "imageUploadError": "Image uploading failed",
     "imageDownloadError": "Image downloading failed",
     "multipleImagesDownloadError": "Error while downloading images",
     "imageDeleteError": "Error while deleting image"
   },
   "DropZone": {
-    "dropFiles": "Click to select a file or drop it here (max {x} MB)."
+    "dropFiles": "Click to select a file or drop it here (max {x} MB).",
+    "dropFilesSvg": "Click to select a file or drop it here (max {x} MB). Only .svg files are allowed."
   },
   "EditTextSection": {
     "text": "Text",
@@ -317,12 +325,14 @@
   "ColorSelect": {
     "color": "Color",
     "colors": {
-      "black": "Black",
-      "darkGray": "Dark grey",
-      "steelBlue": "Steel blue",
-      "atmosphere": "Atmosphere",
-      "berryRed": "Berry red",
-      "warmGreen": "Warm green"
+      "teal": "Teal",
+      "sea": "Sea",
+      "sprig": "Sprig",
+      "grey": "Grey",
+      "night": "Night",
+      "blue": "Blue",
+      "earthRed": "Earth red",
+      "tar": "Tar"
     }
   },
   "MarkerIconSelect": {
@@ -381,9 +391,7 @@
     "errorLoadingUnfinished": "Failed to load previously stored answers. Please try again later."
   },
   "UnavailableSurvey": {
-    "surveyNotPublished": "The survey is not available at the moment. Thank You for your interest on the survey!",
-    "treTopicalInfo": "You can access topical issues of the city of Tampere from the link below.",
-    "tre": "The city of Tampere"
+    "surveyNotPublished": "The survey is not available at the moment. Thank You for your interest on the survey!"
   },
   "NotFoundPage": {
     "pageNotFound": "Survey not found. Please check the address and try again later."
@@ -557,7 +565,8 @@
     "languageControl": "Language / Kieli",
     "changeLanguage": "Change service language",
     "fi": "Suomi",
-    "en": "English"
+    "en": "English",
+    "se": "Svenska"
   },
   "SurveyLanguageMenu": {
     "languageControl": "Language / Kieli",
@@ -573,8 +582,9 @@
     "surveyPages": "Survey pages",
     "surveyTitle": "Survey title",
     "surveySubtitle": "Survey subtitle",
-    "fi": "finnish",
-    "en": "english",
+    "fi": "Finnish",
+    "en": "English",
+    "se": "Swedish",
     "page": "page",
     "missingTranslation": "Missing translation",
     "optionInfo": "Option info",
@@ -621,10 +631,6 @@
   "FooterLinks": {
     "accessibility": "Accessibility report",
     "privacyStatement": "Data protection statement"
-  },
-  "IconAltTexts": {
-    "bannerAltText": "Tampere banner",
-    "logoAltText": "Tampere Finland logo"
   },
   "adminInstructions": "Open user manual"
 }

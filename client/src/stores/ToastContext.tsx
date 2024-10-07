@@ -9,7 +9,7 @@ import React, {
 import { Alert, AlertProps } from '@mui/material';
 import { Snackbar } from '@mui/material';
 import { IconButton } from '@mui/material';
-import { Close } from '@mui/icons-material';
+import CloseIcon from '@src/components/icons/CloseIcon';
 
 export interface Toast {
   severity: AlertProps['severity'];
@@ -168,7 +168,7 @@ export default function ToastProvider({ children }: { children: ReactNode }) {
           sx={{ width: '100%' }}
           action={
             <IconButton size="small" onClick={closeCurrentToast}>
-              <Close />
+              <CloseIcon />
             </IconButton>
           }
         >

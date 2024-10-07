@@ -15,7 +15,7 @@ router.get(
     const mapUrl = decodeURIComponent(req.query.url.toString());
     const layers = await getAvailableMapLayers(mapUrl);
     res.json(layers);
-  })
+  }),
 );
 
 export default router;

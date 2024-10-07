@@ -10,7 +10,7 @@ import {
   useMediaQuery,
   useTheme,
 } from '@mui/material';
-import { Close } from '@mui/icons-material';
+import CloseIcon from '@src/components/icons/CloseIcon';
 import React, { ReactNode, useState } from 'react';
 import SplitPane from 'react-split-pane';
 
@@ -147,7 +147,7 @@ export default function SplitPaneLayout({
                   mobileDrawer.setOpen(false);
                 }}
               >
-                <Close />
+                <CloseIcon />
               </IconButton>
               {mobileDrawer.title && (
                 <>

@@ -1,7 +1,7 @@
 {
   "name": "server",
   "version": "1.0.0",
-  "description": "Tampere Vuorovaikutusalusta API Server",
+  "description": "Ubigu Vuorovaikutusalusta API Server",
   "main": "src/app.js",
   "scripts": {
     "dev": "concurrently npm:dev:* --color",
@@ -22,7 +22,7 @@
     "url": "git+https://github.com/ubigu/vuorovaikutusalusta.git"
   },
   "keywords": [
-    "Tampere",
+    "Ubigu",
     "vuorovaikutusalusta",
     "REST",
     "API",

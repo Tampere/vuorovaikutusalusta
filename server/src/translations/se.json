@@ -1,0 +1,17 @@
+{
+  "timestamp": "Tidsstämpel",
+  "noReply": "Detta är ett automatiskt genererat meddelande. Svara inte på detta meddelande.",
+  "somethingElse": "Något annat, vad",
+  "question": "Fråga",
+  "subquestion": "Underfråga",
+  "dontKnow": "Jag vet inte",
+  "unfinishedSubmission": "Ofullständigt svar",
+  "unfinishedSurveyInfo": "Ditt svar på enkäten {surveyTitle} har sparats som ofullständigt. Ditt svar kommer att beaktas först när du har besvarat hela enkäten och skickat in ditt slutgiltiga svar.",
+  "continueWithLink": "Du kan fortsätta att svara på enkäten genom att öppna följande länk:",
+  "submissionId": "Svarsid",
+  "responseTime": "Svarstid",
+  "attachments": "Bilagor",
+  "fi": "Finska",
+  "en": "Engelska",
+  "se": "Svenska"
+}

@@ -14,7 +14,7 @@ import moment from 'moment';
 import PDFDocument from 'pdfkit';
 import PdfPrinter from 'pdfmake';
 import { Content } from 'pdfmake/interfaces';
-import { getDb } from '../database';
+
 import {
   ScreenshotJobData,
   ScreenshotJobReturnData,
@@ -49,15 +49,6 @@ const fonts = {
   },
 };
 
-async function getStaticIconSvg(name: string) {
-  const data = await getDb().oneOrNone<{
-    svg: Buffer;
-  }>('SELECT svg FROM application.static_icons WHERE name=$(name)', {
-    name,
-  });
-  return data?.svg?.toString();
-}
-
 /**
  * Converts a PDFDocument to a Buffer
  * @param pdf The PDFDocument to convert
@@ -82,15 +73,14 @@ function findFollowUpMapQuestion(
   entryId: number,
 ): SurveyMapQuestion {
   let followUpSectionIndex: number;
-  const sectionIndex = sections.findIndex(
-    (section) =>
-      section.followUpSections?.some((followUpSection, followUpIndex) => {
-        if (followUpSection.id === entryId) {
-          followUpSectionIndex = followUpIndex;
-          return true;
-        }
-        return false;
-      }),
+  const sectionIndex = sections.findIndex((section) =>
+    section.followUpSections?.some((followUpSection, followUpIndex) => {
+      if (followUpSection.id === entryId) {
+        followUpSectionIndex = followUpIndex;
+        return true;
+      }
+      return false;
+    }),
   );
 
   // Entry id is already only for map questions
@@ -151,13 +141,17 @@ async function getFrontPage(
   language: LanguageCode,
 ): Promise<Content> {
   const tr = useTranslations(language);
-  const image = survey.backgroundImageName
-    ? await getFile(survey.backgroundImageName, survey.backgroundImagePath)
+  const image = survey.backgroundImageUrl
+    ? await getFile(survey.backgroundImageUrl)
     : null;
 
   const [logo, banner] = await Promise.all([
-    getStaticIconSvg('logo'),
-    getStaticIconSvg('banner'),
+    survey.marginImages.top.imageUrl
+      ? (await getFile(survey.marginImages.top.imageUrl)).data.toString()
+      : null,
+    survey.marginImages.bottom.imageUrl
+      ? (await getFile(survey.marginImages.bottom.imageUrl)).data.toString()
+      : null,
   ]);
 
   const attachmentFileNames = answerEntries
@@ -258,15 +252,15 @@ function getContent(
     style: isSubQuestion
       ? 'subQuestionTitle'
       : isFollowUpSection
-      ? 'followUpSectionTitle'
-      : 'questionTitle',
+        ? 'followUpSectionTitle'
+        : 'questionTitle',
   };
 
   const style = isSubQuestion
     ? 'subQuestionAnswer'
     : isFollowUpSection
-    ? 'followUpSectionAnswer'
-    : 'answer';
+      ? 'followUpSectionAnswer'
+      : 'answer';
 
   switch (answerEntry.type) {
     case 'free-text':
@@ -324,10 +318,10 @@ function getContent(
               answerEntry.value[index] === '-1'
                 ? tr.dontKnow
                 : answerEntry.value[index] == null
-                ? '-'
-                : question.classes[Number(answerEntry.value[index])]?.[
-                    language
-                  ] ?? '-'
+                  ? '-'
+                  : question.classes[Number(answerEntry.value[index])]?.[
+                      language
+                    ] ?? '-'
             }`,
             style,
           })),

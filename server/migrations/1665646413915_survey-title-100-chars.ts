@@ -8,6 +8,6 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 
 export async function down(pgm: MigrationBuilder): Promise<void> {
   pgm.sql(
-    `ALTER TABLE data.survey ALTER COLUMN name TYPE varchar(40) USING name::varchar(40)`
+    `ALTER TABLE data.survey ALTER COLUMN name TYPE varchar(40) USING name::varchar(40)`,
   );
 }
