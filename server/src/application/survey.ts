@@ -243,7 +243,7 @@ const conditionColumnSet = getColumnSet<DBSectionCondition>(
  * @returns Requested survey
  */
 export async function getPublishedSurvey(
-  params: { id: number } | { name: string },
+  params: ({ id: number } | { name: string }) & { organization?: string },
 ) {
   const rows = await getDb().manyOrNone<DBSurveyJoin>(
     `
@@ -265,8 +265,7 @@ export async function getPublishedSurvey(
         section.idx as section_idx,
         section.parent_section as section_parent_section,
         section.info as section_info,
-        section.file_name as section_file_name,
-        section.file_path as section_file_path,
+        section.file_url as section_file_url,
         section.predecessor_section as section_predecessor_section
       FROM (
         SELECT
@@ -280,34 +279,38 @@ export async function getPublishedSurvey(
           survey.thanks_page_text,
           survey.map_url,
           survey.section_title_color,
-          survey.background_image_name,
-          survey.background_image_path,
+          survey.background_image_url,
+          survey.thanks_page_image_url,
+          survey.top_margin_image_url,
+          survey.bottom_margin_image_url,
           survey.email_enabled,
           survey.allow_saving_unfinished,
           survey.allow_test_survey,
           survey.localisation_enabled,
-          survey.thanks_page_image_name,
-          survey.thanks_page_image_path,
           survey.display_privacy_statement,
+          survey.theme_id as theme_id,
+          theme_name,
+          theme_data,
           page.id as page_id,
           page.title as page_title,
           page.idx as page_idx,
           page.sidebar_type as page_sidebar_type,
           page.sidebar_map_layers as page_sidebar_map_layers,
-          page.sidebar_image_path as page_sidebar_image_path,
-          page.sidebar_image_name as page_sidebar_image_name,
+          page.sidebar_image_url as page_sidebar_image_url,
           page.sidebar_image_alt_text as page_sidebar_image_alt_text,
           page.sidebar_image_size as page_sidebar_image_size,
-          public.ST_AsGeoJSON(public.ST_Transform(page.default_map_view, 3067))::json as default_map_view
+          public.ST_AsGeoJSON(page.default_map_view)::json as default_map_view,
+          public.ST_SRID(page.default_map_view) AS "mapViewSRID"
         FROM
           (
             SELECT
               survey.*,
-              theme.id as theme_id,
+              theme.id as theme_identifier,
               theme.name as theme_name,
               theme.data as theme_data
             FROM data.survey survey
             LEFT JOIN application.theme theme ON survey.theme_id = theme.id
+            ${typeof params.organization === 'string' ? `WHERE survey.organization = $2` : ''}
           ) survey
           LEFT JOIN data.survey_page page ON survey.id = page.survey_id
         WHERE ${'id' in params ? `survey.id = $1` : `survey.name = $1`}
@@ -322,7 +325,7 @@ export async function getPublishedSurvey(
       section_idx ASC,
       option_idx ASC;
   `,
-    ['id' in params ? params.id : params.name],
+    ['id' in params ? params.id : params.name, params.organization],
   );
 
   if (!rows.length) {
