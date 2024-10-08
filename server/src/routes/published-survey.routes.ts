@@ -5,7 +5,7 @@ import {
   getSurveyAnswerLanguage,
   getUnfinishedAnswerEntries,
 } from '@src/application/submission';
-import { getSurvey } from '@src/application/survey';
+import { getPublishedSurvey, getSurvey } from '@src/application/survey';
 import { sendSubmissionReport } from '@src/email/submission-report';
 import { sendUnfinishedSubmissionLink } from '@src/email/unfinished-submission';
 import { ForbiddenError, NotFoundError } from '@src/error';
@@ -16,12 +16,15 @@ import { body, query } from 'express-validator';
 
 const router = Router();
 
+/**
+ * Endpoint for getting a published survey
+ */
 router.get(
   '/:name',
   validateRequest([query('test').optional().isString()]),
   asyncHandler(async (req, res) => {
     const test = req.query.test === 'true';
-    const survey = await getSurvey({ name: req.params.name });
+    const survey = await getPublishedSurvey({ name: req.params.name });
     if ((!test && !survey.isPublished) || (test && !survey.allowTestSurvey)) {
       // In case the survey shouldn't be published (or test survey not allowed if requested), throw the same not found error
       throw new ForbiddenError(`Survey with name ${req.params.name} not found`);

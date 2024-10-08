@@ -23,8 +23,8 @@ import { User } from '@interfaces/user';
 import {
   getColumnSet,
   getDb,
-  getMultiInsertQuery,
   getGeoJSONColumn,
+  getMultiInsertQuery,
   getMultiUpdateQuery,
 } from '@src/database';
 import {
@@ -241,6 +241,262 @@ const conditionColumnSet = getColumnSet<DBSectionCondition>(
     { name: 'greater_than', cast: 'int' },
   ],
 );
+
+/**
+ * Gets the survey with given ID or name from the database.
+ * @param params Query parameter (search by ID or name)
+ * @returns Requested survey
+ */
+export async function getPublishedSurvey(
+  params: { id: number } | { name: string },
+) {
+  const rows = await getDb().manyOrNone<DBSurveyJoin>(
+    `
+    SELECT 
+      survey_page_section.*,
+      option.id as option_id,
+      option.text as option_text,
+      option.idx as option_idx,
+      option.group_id as option_group_id,
+      option.info as option_info
+    FROM (
+      SELECT
+        survey_page.*,
+        section.id as section_id,
+        section.title as section_title,
+        section.body as section_body,
+        section.type as section_type,
+        section.details as section_details,
+        section.idx as section_idx,
+        section.parent_section as section_parent_section,
+        section.info as section_info,
+        section.file_name as section_file_name,
+        section.file_path as section_file_path,
+        section.predecessor_section as section_predecessor_section
+      FROM (
+        SELECT
+          survey.id,
+          survey.name,
+          survey.title,
+          survey.subtitle,
+          survey.start_date,
+          survey.end_date,
+          survey.thanks_page_title,
+          survey.thanks_page_text,
+          survey.map_url,
+          survey.section_title_color,
+          survey.background_image_name,
+          survey.background_image_path,
+          survey.email_enabled,
+          survey.allow_saving_unfinished,
+          survey.allow_test_survey,
+          survey.localisation_enabled,
+          survey.thanks_page_image_name,
+          survey.thanks_page_image_path,
+          survey.display_privacy_statement,
+          survey.theme_id,
+          theme_name,
+          theme_data,
+          page.id as page_id,
+          page.title as page_title,
+          page.idx as page_idx,
+          page.sidebar_type as page_sidebar_type,
+          page.sidebar_map_layers as page_sidebar_map_layers,
+          page.sidebar_image_path as page_sidebar_image_path,
+          page.sidebar_image_name as page_sidebar_image_name,
+          page.sidebar_image_alt_text as page_sidebar_image_alt_text,
+          page.sidebar_image_size as page_sidebar_image_size,
+          public.ST_AsGeoJSON(public.ST_Transform(page.default_map_view, 3067))::json as default_map_view
+        FROM
+          (
+            SELECT
+              survey.*,
+              theme.id as theme_identifier,
+              theme.name as theme_name,
+              theme.data as theme_data
+            FROM data.survey survey
+            LEFT JOIN application.theme theme ON survey.theme_id = theme.id
+          ) survey
+          LEFT JOIN data.survey_page page ON survey.id = page.survey_id
+        WHERE ${'id' in params ? `survey.id = $1` : `survey.name = $1`}
+      ) AS survey_page
+      LEFT JOIN data.page_section section ON survey_page.page_id = section.survey_page_id
+    ) AS survey_page_section
+    LEFT JOIN data.option option ON survey_page_section.section_id = option.section_id
+    ORDER BY
+      section_parent_section ASC NULLS FIRST,
+      section_predecessor_section ASC NULLS FIRST,
+      page_idx ASC,
+      section_idx ASC,
+      option_idx ASC;
+  `,
+    ['id' in params ? params.id : params.name],
+  );
+
+  if (!rows.length) {
+    throw new NotFoundError(
+      'id' in params
+        ? `Survey with ID ${params.id} not found`
+        : `Survey with name ${params.name} not found`,
+    );
+  }
+
+  // Get all option groups in its own query if needed
+  const optionGroupIds = Array.from(
+    new Set(rows.map((row) => row.option_group_id).filter(Boolean)),
+  );
+
+  const optionGroups = !optionGroupIds.length
+    ? []
+    : await getDb().manyOrNone<DBOptionGroup>(
+        `SELECT * FROM data.option_group WHERE id = ANY ($1) ORDER BY idx ASC`,
+        [optionGroupIds],
+      );
+
+  // Get all follow-up section and survey page conditions from the database
+  const allConditions = await getSectionConditions(
+    rows.map((row) => row.section_id).filter(Boolean),
+  );
+  return rows.reduce((survey, row) => {
+    // Try to find the pre-existing page object
+    let page = survey.pages.find((page) => page.id === row.page_id);
+    if (!page && (page = dbSurveyJoinToPage(row))) {
+      // Page not yet added - add converted row to survey
+      survey.pages.push(getPageWithConditions(page, allConditions));
+    }
+
+    // Try to find the pre-existing page section object
+    let section = page.sections.find(
+      (section) => section.id === row.section_id,
+    );
+    if (!section && (section = dbSurveyJoinToSection(row))) {
+      // Section not yet added - add converted row to survey page
+
+      if (
+        row.section_parent_section != null ||
+        row.section_predecessor_section != null
+      ) {
+        const column =
+          row.section_parent_section != null
+            ? 'section_parent_section'
+            : 'section_predecessor_section';
+        const key =
+          row.section_parent_section != null
+            ? 'subQuestions'
+            : 'followUpSections';
+
+        // Parent section should already exist because of the ordering by parent section rule
+        const parentSection =
+          page.sections.find((section) => section.id === row[column]) ??
+          page.sections
+            .find(
+              (section) =>
+                section.followUpSections?.some(
+                  (followUpSection) => followUpSection.id === row[column],
+                ) ?? false,
+            )
+            .followUpSections.find((section) => section.id === row[column]);
+
+        // Initialize subquestion or follow-up section array if it doesn't yet exist
+
+        if (!parentSection[key]) {
+          parentSection[key] = [];
+        }
+
+        // Try to find the pre-existing subquestion or follow-up section - if none is found, create it from the row
+        let linkedSection =
+          key === 'subQuestions'
+            ? (parentSection as SurveyMapQuestion)[key].find(
+                (linkedSection) => linkedSection.id === section.id,
+              )
+            : parentSection[key].find(
+                (linkedSection) => linkedSection.id === section.id,
+              );
+        if (!linkedSection) {
+          if (
+            key === 'subQuestions' &&
+            (linkedSection = dbSurveyJoinToSection(row) as SurveyMapSubQuestion)
+          ) {
+            // Subquestion didn't yet exist - add it to the parent section
+            parentSection[key].push(linkedSection);
+          } else if (
+            key === 'followUpSections' &&
+            (linkedSection = dbSurveyJoinToSection(
+              row,
+            ) as SurveyFollowUpSection)
+          ) {
+            linkedSection = {
+              ...linkedSection,
+              conditions: dbSectionConditionsToConditions(
+                allConditions.filter(
+                  (cond) => cond.section_id === linkedSection.id,
+                ),
+              ),
+            } as SurveyFollowUpSection;
+            // Follow-up question didn't yet exist - add it to the parent section
+            parentSection[key].push(linkedSection as SurveyFollowUpSection);
+          }
+        }
+
+        // If question contains options, add the option in the current row there
+        if ('options' in linkedSection) {
+          const option = dbSurveyJoinToOption(row);
+          if (option) {
+            linkedSection.options.push(option);
+          }
+        }
+      } else {
+        page.sections.push(section);
+      }
+    }
+
+    // Only look for options if the section type allows options
+    if (sectionTypesWithOptions.includes(section?.type)) {
+      // For some reason TS cannot infer the section here correctly from the if above - assume the type in the new variable
+      const question = section as SurveyRadioQuestion | SurveyCheckboxQuestion;
+      // Try to find the pre-existing question option object
+      let option = question.options.find(
+        (option) => option.id === row.option_id,
+      );
+      if (!option && (option = dbSurveyJoinToOption(row))) {
+        // Option not yet added - add converted row to section
+        question.options.push(option);
+      }
+    }
+
+    // Gather grouped options only for grouped checkbox questions
+    if (section?.type === 'grouped-checkbox') {
+      let group = section.groups.find(
+        (group) => group?.id === row.option_group_id,
+      );
+
+      // If the group wasn't added yet, add it from the different query result
+      if (!group) {
+        const dbGroup = optionGroups.find(
+          (group) => group.id === row.option_group_id,
+        );
+        // Add option group if it was found (otherwise ignore)
+        if (dbGroup) {
+          group = {
+            id: dbGroup?.id,
+            name: dbGroup?.name,
+            options: [],
+          };
+          // Groups may be out of order, so use the index from the other query
+          section.groups[dbGroup.idx] = group;
+        }
+      }
+
+      // Only add options if the group exists - otherwise there are no options saved for this group
+      if (group) {
+        // Add the single option to the group
+        group.options.push(dbSurveyJoinToOption(row));
+      }
+    }
+
+    return survey;
+  }, dbSurveyToSurvey(rows[0])) as Survey;
+}
 
 /**
  * Gets the survey with given ID or name from the database.
