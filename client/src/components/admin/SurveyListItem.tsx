@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import clsx from 'clsx';
 import { Survey } from '@interfaces/survey';
-import { Button, Card, Link, Theme, Typography } from '@mui/material';
+import { Button, Card, Chip, Link, Theme, Typography } from '@mui/material';
 import { CardContent } from '@mui/material';
 import { CardActions } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
@@ -83,12 +83,17 @@ export default function SurveyListItem(props: Props) {
             {!survey.title?.[surveyLanguage] ? (
               <em>{tr.SurveyList.untitledSurvey}</em>
             ) : (
-              (survey?.title?.[surveyLanguage] ?? '')
+              survey?.title?.[surveyLanguage] ?? ''
             )}
           </Typography>
           <Typography color="textSecondary" component="h4" gutterBottom>
             {survey.subtitle?.[surveyLanguage]}
           </Typography>
+          <div>
+            {survey.tags.map((tag, i) => (
+              <Chip label={tag} key={i} />
+            ))}
+          </div>
           <Typography variant="body1" color="textSecondary" gutterBottom>
             {survey.author}
             {survey.authorUnit && `, ${survey.authorUnit}`}

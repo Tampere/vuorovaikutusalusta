@@ -97,3 +97,8 @@ export async function unpublishSurvey(survey: Survey) {
   );
   return deserializeSurvey(response);
 }
+
+export async function getOrgTags() {
+  const response = await request<any>(`${apiURL}/org-tags`, { method: 'GET' });
+  return response;
+}

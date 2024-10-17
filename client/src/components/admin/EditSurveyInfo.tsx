@@ -32,6 +32,7 @@ import SurveyImageList from './SurveyImageList';
 import ThemeSelect from './ThemeSelect';
 import { assertNever } from '@src/utils/typeCheck';
 import { SurveyMarginImageList } from './SurveyImageListWrapper';
+import { TagPicker } from '@src/components/admin/TagPicker';
 
 const useStyles = makeStyles({
   dateTimePicker: {
@@ -235,8 +236,8 @@ export default function EditSurveyInfo() {
           }
           getOptionLabel={(user) => user.fullName}
           value={
-            getAllUsers()?.filter((user) =>
-              activeSurvey.admins?.includes(user.id),
+            getAllUsers()?.filter(
+              (user) => activeSurvey.admins?.includes(user.id),
             ) ?? []
           }
           onChange={(_, value: User[]) => {
@@ -254,7 +255,16 @@ export default function EditSurveyInfo() {
             />
           )}
         />
-
+        <TagPicker
+          selectedTags={activeSurvey.tags}
+          freeSolo={true}
+          onSelectedTagsChange={(t) =>
+            editSurvey({
+              ...activeSurvey,
+              tags: t.map((t) => t),
+            })
+          }
+        />
         {availableMapLayersLoading && (
           <Skeleton variant="rectangular" height={200} width="100%" />
         )}
