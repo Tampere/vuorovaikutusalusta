@@ -166,6 +166,16 @@ export default function EditSurveyInfo() {
           }}
           helperText={tr.EditSurveyInfo.nameHelperText}
         />
+        <TagPicker
+          selectedTags={activeSurvey.tags}
+          freeSolo={true}
+          onSelectedTagsChange={(t) =>
+            editSurvey({
+              ...activeSurvey,
+              tags: t.map((t) => t),
+            })
+          }
+        />
         <TextField
           required
           error={validationErrors.includes('survey.author')}
@@ -254,16 +264,6 @@ export default function EditSurveyInfo() {
               helperText={tr.EditSurveyInfo.adminsHelperText}
             />
           )}
-        />
-        <TagPicker
-          selectedTags={activeSurvey.tags}
-          freeSolo={true}
-          onSelectedTagsChange={(t) =>
-            editSurvey({
-              ...activeSurvey,
-              tags: t.map((t) => t),
-            })
-          }
         />
         {availableMapLayersLoading && (
           <Skeleton variant="rectangular" height={200} width="100%" />

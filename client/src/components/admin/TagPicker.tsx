@@ -33,7 +33,7 @@ export function TagPicker({
 
   const handleTagChange = (_event: any, newValue: string[]) => {
     setSelected(newValue);
-    onSelectedTagsChange(newValue); // Notify the parent component of the new selected tags
+    onSelectedTagsChange(newValue);
   };
 
   return (
@@ -47,7 +47,7 @@ export function TagPicker({
       onChange={handleTagChange}
       defaultValue={[]}
       filterSelectedOptions
-      sx={{ width: 500 }}
+      sx={{ width: 1 }}
       renderInput={(params) => <TextField {...params} label="filterTags" />}
     />
   );
