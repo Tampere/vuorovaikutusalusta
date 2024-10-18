@@ -12,12 +12,7 @@ export function TagPicker({
   freeSolo,
   onSelectedTagsChange,
 }: Props) {
-  const [selected, setSelected] = useState([]);
   const [tags, setTags] = useState([]);
-
-  useEffect(() => {
-    setSelected(selectedTags);
-  }, [selectedTags]);
 
   useEffect(() => {
     async function updateOrgTags() {
@@ -32,7 +27,6 @@ export function TagPicker({
   }, []);
 
   const handleTagChange = (_event: any, newValue: string[]) => {
-    setSelected(newValue);
     onSelectedTagsChange(newValue);
   };
 
@@ -41,7 +35,7 @@ export function TagPicker({
       multiple
       id="tags-outlined"
       freeSolo={freeSolo}
-      value={selected}
+      value={selectedTags}
       options={tags}
       getOptionLabel={(option) => option}
       onChange={handleTagChange}
