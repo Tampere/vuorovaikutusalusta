@@ -1,18 +1,21 @@
 import { Autocomplete, TextField } from '@mui/material';
 import { getOrgTags } from '@src/controllers/SurveyController';
+import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useEffect, useState } from 'react';
 interface Props {
   selectedTags: string[];
-  freeSolo: boolean;
+  addEnabled: boolean;
   onSelectedTagsChange: (tags: string[]) => void;
 }
 
 export function TagPicker({
   selectedTags,
-  freeSolo,
+  addEnabled,
   onSelectedTagsChange,
 }: Props) {
   const [tags, setTags] = useState([]);
+
+  const { tr } = useTranslations();
 
   useEffect(() => {
     async function updateOrgTags() {
@@ -34,15 +37,22 @@ export function TagPicker({
     <Autocomplete
       multiple
       id="tags-outlined"
-      freeSolo={freeSolo}
+      freeSolo={addEnabled}
       value={selectedTags}
       options={tags}
       getOptionLabel={(option) => option}
       onChange={handleTagChange}
       defaultValue={[]}
       filterSelectedOptions
-      sx={{ width: 1 }}
-      renderInput={(params) => <TextField {...params} label="filterTags" />}
+      sx={{ width: '100%' }}
+      renderInput={(params) => (
+        <TextField
+          {...params}
+          label={
+            addEnabled ? tr.TagPicker.addTags : tr.TagPicker.filterWithTags
+          }
+        />
+      )}
     />
   );
 }

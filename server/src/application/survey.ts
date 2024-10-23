@@ -496,7 +496,7 @@ export async function getSurveys(
   ORDER BY updated_at DESC`,
     [authorId, filterByPublished, organization],
   );
-  console.log(rows);
+
   return rows
     .map((row) => dbSurveyToSurvey(row))
     .filter((survey) => (filterByPublished ? isPublished(survey) : survey));
@@ -900,7 +900,8 @@ export async function updateSurvey(survey: Survey) {
         display_privacy_statement = $25,
         top_margin_image_url = $26,
         bottom_margin_image_url = $27,
-        organization = $28
+        organization = $28,
+        tags = $29
       WHERE id = $1 RETURNING *`,
       [
         survey.id,
@@ -931,6 +932,7 @@ export async function updateSurvey(survey: Survey) {
         survey.marginImages.top.imageUrl ?? null,
         survey.marginImages.bottom.imageUrl ?? null,
         survey.organization,
+        survey.tags,
       ],
     )
     .catch((error) => {

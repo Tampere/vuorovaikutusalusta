@@ -635,6 +635,10 @@
     "accessibility": "Saavutettavuusseloste",
     "privacyStatement": "Tietosuojaseloste"
   },
+  "TagPicker": {
+    "addTags": "Lisää tunnisteita",
+    "filterWithTags": "Suodata tunnisteilla"
+  },
 
   "adminInstructions": "Avaa käyttöohje"
 }
