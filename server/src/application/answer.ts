@@ -258,7 +258,7 @@ function dbEntriesToFeatures(
               ) {
                 submissionGroup[submissionId][answer.parentEntryId].properties[
                   questionKey
-                ] = "false";
+                ] = 'false';
               }
             });
           // initialize subquestion custom answer header if it exists
@@ -282,7 +282,7 @@ function dbEntriesToFeatures(
             key = `${key} - ${answer?.optionText?.['fi']}`;
             submissionGroup[submissionId][answer.parentEntryId].properties[
               key
-            ] = "true";
+            ] = 'true';
           }
 
           break;
@@ -320,7 +320,7 @@ function dbEntriesToFeatures(
 async function answerEntriesToCSV(entries: CSVJson): Promise<string> {
   const { submissions, headers } = entries;
 
-  let csvData = `Vastaustunniste,Vastauskieli,Aikaleima,${headers.map(
+  let csvData = `Vastaustunniste,Aikaleima,Vastauskieli,${headers.map(
     (header) => `"${Object.values(header)[0].replace(/"/g, '""')}"`,
   )}\n`;
 

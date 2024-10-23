@@ -14,7 +14,7 @@ import moment from 'moment';
 import PDFDocument from 'pdfkit';
 import PdfPrinter from 'pdfmake';
 import { Content } from 'pdfmake/interfaces';
-import { getDb } from '../database';
+
 import {
   ScreenshotJobData,
   ScreenshotJobReturnData,
@@ -48,15 +48,6 @@ const fonts = {
     normal: 'ZapfDingbats',
   },
 };
-
-async function getStaticIconSvg(name: string) {
-  const data = await getDb().oneOrNone<{
-    svg: Buffer;
-  }>('SELECT svg FROM application.static_icons WHERE name=$(name)', {
-    name,
-  });
-  return data?.svg?.toString();
-}
 
 /**
  * Converts a PDFDocument to a Buffer
@@ -155,8 +146,12 @@ async function getFrontPage(
     : null;
 
   const [logo, banner] = await Promise.all([
-    getStaticIconSvg('logo'),
-    getStaticIconSvg('banner'),
+    survey.marginImages.top.imageUrl
+      ? (await getFile(survey.marginImages.top.imageUrl)).data.toString()
+      : null,
+    survey.marginImages.bottom.imageUrl
+      ? (await getFile(survey.marginImages.bottom.imageUrl)).data.toString()
+      : null,
   ]);
 
   const attachmentFileNames = answerEntries

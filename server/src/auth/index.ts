@@ -1,3 +1,4 @@
+import { getSurveyOrganization } from '@src/application/survey';
 import logger from '@src/logger';
 import { getUser, upsertUser } from '@src/user';
 import ConnectPgSimple from 'connect-pg-simple';
@@ -8,7 +9,6 @@ import { encrypt } from '../crypto';
 import { getDb } from '../database';
 import { configureAzureAuth } from './azure';
 import { configureGoogleOAuth } from './google-oauth';
-import { getSurveyOrganization } from '@src/application/survey';
 
 /**
  * Configures authentication for given Express application.
@@ -48,14 +48,14 @@ export function configureAuth(app: Express) {
 
   // Logout route
   app.get('/logout', (req, res) => {
-    req.session.destroy((error) => {
-      req.logOut((err) => {
-        if (err) {
-          return req.next(err);
-        }
-        res.redirect('/');
-      }); // Fix: Pass an empty function as the argument
-      res.redirect(process.env.AUTH_LOGOUT_URL);
+    res.clearCookie('connect.sid');
+    req.logout((err) => {
+      if (err) {
+        return req.next(err);
+      }
+      req.session.destroy((err) => {
+        res.redirect(process.env.AUTH_LOGOUT_URL);
+      });
     });
   });
 
@@ -114,6 +114,7 @@ export function ensureAuthenticated(options?: { redirectToLogin?: boolean }) {
     ) {
       return next();
     }
+
     const fail = () => {
       if (options?.redirectToLogin) {
         // Provide original request URL for redirection after authentication.
@@ -124,15 +125,20 @@ export function ensureAuthenticated(options?: { redirectToLogin?: boolean }) {
         res.status(401).send('Unauthorized');
       }
     };
-    req.session?.destroy(() => {
-      req.logOut((err) => {
+
+    if (req.session) {
+      res.clearCookie('connect.sid');
+      req.logout((err) => {
         if (err) {
           return req.next(err);
         }
-        res.redirect('/');
+        req.session.destroy((err) => {
+          fail();
+        });
       });
+    } else {
       fail();
-    }) ?? fail();
+    }
   };
 }
 
@@ -155,21 +161,17 @@ export function ensureSurveyGroupAccess(id: string = 'id') {
 export function ensureFileGroupAccess() {
   return async (req: Request, res: Response, next: NextFunction) => {
     const surveyOrganizations = req.headers['organization']
-      ? [JSON.parse(req.headers['organization'] as string)]
+      ? (req.headers['organization'] as string)
       : req.user.organizations;
 
-    if (!Array.isArray(surveyOrganizations)) {
-      res.status(400).send('Bad Request');
-    }
-
-    const fileOrganizations = req.user.organizations.filter((organization) =>
+    const fileOrganization = req.user.organizations.filter((organization) =>
       (surveyOrganizations as string[]).includes(organization),
     );
 
-    if (fileOrganizations.length === 0) {
+    if (fileOrganization.length === 0) {
       res.status(403).send('Forbidden');
     } else {
-      res.locals.fileOrganizations = fileOrganizations;
+      res.locals.fileOrganizations = fileOrganization;
       return next();
     }
   };

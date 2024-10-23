@@ -21,12 +21,12 @@ import FreeTextQuestion from './FreeTextQuestion';
 import GroupedCheckBoxQuestion from './GroupedCheckBoxQuestion';
 import MapQuestion from './MapQuestion';
 import MatrixQuestion from './MatrixQuestion';
+import MultiMatrixQuestion from './MultiMatrixQuestion';
 import NumericQuestion from './NumericQuestion';
 import RadioQuestion from './RadioQuestion';
 import SectionInfo from './SectionInfo';
 import SliderQuestion from './SliderQuestion';
 import SortingQuestion from './SortingQuestion';
-import MultiMatrixQuestion from './MultiMatrixQuestion';
 
 interface Props {
   question: SurveyQuestionType;
