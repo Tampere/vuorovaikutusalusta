@@ -118,7 +118,7 @@ export default function SurveyList() {
       <div className={classes.actions}>
         <TagPicker
           selectedTags={filterTags}
-          freeSolo={false}
+          addEnabled={false}
           onSelectedTagsChange={(t) => setFilterTags(t)}
         />
       </div>

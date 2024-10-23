@@ -168,7 +168,7 @@ export default function EditSurveyInfo() {
         />
         <TagPicker
           selectedTags={activeSurvey.tags}
-          freeSolo={true}
+          addEnabled={true}
           onSelectedTagsChange={(t) =>
             editSurvey({
               ...activeSurvey,
