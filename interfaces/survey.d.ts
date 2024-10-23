@@ -475,17 +475,21 @@ export interface Survey {
   marginImages: {
     top: {
       imageUrl: string;
-      altText?: string
+      altText?: string;
     };
     bottom: {
       imageUrl: string;
-      altText?: string
+      altText?: string;
     };
   };
   /**
    * User organization that can access the survey
    */
   organization: string;
+  /**
+   * Survey tags
+   */
+  tags: string[];
 }
 
 /**

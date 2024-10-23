@@ -632,5 +632,9 @@
     "accessibility": "Accessibility report",
     "privacyStatement": "Data protection statement"
   },
+  "TagPicker": {
+    "addTags": "Add tags",
+    "filterWithTags": "Filter with tags"
+  },
   "adminInstructions": "Open user manual"
 }

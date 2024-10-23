@@ -634,5 +634,9 @@
     "accessibility": "Tillgänglighet",
     "privacyStatement": "Integritetspolicy"
   },
+  "TagPicker": {
+    "addTags": "Lägg till taggar",
+    "filterWithTags": "Filtrera med taggar"
+  },
   "adminInstructions": "Öppna användarmanual"
 }

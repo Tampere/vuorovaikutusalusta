@@ -31,6 +31,7 @@ import LoadingButton from '../LoadingButton';
 import ColorSelect from './ColorSelect';
 import SurveyImageList from './SurveyImageList';
 import { SurveyMarginImageList } from './SurveyImageListWrapper';
+import { TagPicker } from '@src/components/admin/TagPicker';
 import ThemeSelect from './ThemeSelect';
 
 const useStyles = makeStyles({
@@ -165,6 +166,16 @@ export default function EditSurveyInfo() {
           }}
           helperText={tr.EditSurveyInfo.nameHelperText}
         />
+        <TagPicker
+          selectedTags={activeSurvey.tags}
+          addEnabled={true}
+          onSelectedTagsChange={(t) =>
+            editSurvey({
+              ...activeSurvey,
+              tags: t.map((t) => t),
+            })
+          }
+        />
         <TextField
           required
           error={validationErrors.includes('survey.author')}
@@ -211,8 +222,8 @@ export default function EditSurveyInfo() {
           }
           getOptionLabel={(user) => user.fullName}
           value={
-            getAllUsers()?.filter((user) =>
-              activeSurvey.admins?.includes(user.id),
+            getAllUsers()?.filter(
+              (user) => activeSurvey.admins?.includes(user.id),
             ) ?? []
           }
           onChange={(_, value: User[]) => {
@@ -230,7 +241,6 @@ export default function EditSurveyInfo() {
             />
           )}
         />
-
         {availableMapLayersLoading && (
           <Skeleton variant="rectangular" height={200} width="100%" />
         )}

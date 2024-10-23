@@ -1,7 +1,15 @@
 import React, { useState, useMemo } from 'react';
 import clsx from 'clsx';
 import { Survey } from '@interfaces/survey';
-import { Button, Card, Link, Theme, Typography } from '@mui/material';
+import {
+  Button,
+  Card,
+  Chip,
+  Link,
+  Stack,
+  Theme,
+  Typography,
+} from '@mui/material';
 import { CardContent } from '@mui/material';
 import { CardActions } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
@@ -17,6 +25,9 @@ import { useToasts } from '@src/stores/ToastContext';
 import { makeStyles } from '@mui/styles';
 import LoadingButton from '../LoadingButton';
 import { NavLink, useRouteMatch } from 'react-router-dom';
+import UserSmallIcon from '@src/components/icons/UserSmallIcon';
+import LinkSmallIcon from '@src/components/icons/LinkSmallIcon';
+import CalendarSmallIcon from '@src/components/icons/CalendarSmallIcon';
 
 const useStyles = makeStyles((theme: Theme) => ({
   '@keyframes pulse': {
@@ -83,38 +94,72 @@ export default function SurveyListItem(props: Props) {
             {!survey.title?.[surveyLanguage] ? (
               <em>{tr.SurveyList.untitledSurvey}</em>
             ) : (
-              (survey?.title?.[surveyLanguage] ?? '')
+              survey?.title?.[surveyLanguage] ?? ''
             )}
           </Typography>
           <Typography color="textSecondary" component="h4" gutterBottom>
             {survey.subtitle?.[surveyLanguage]}
           </Typography>
-          <Typography variant="body1" color="textSecondary" gutterBottom>
-            {survey.author}
-            {survey.authorUnit && `, ${survey.authorUnit}`}
-          </Typography>
-          {surveyUrl && (
-            <Typography variant="body1" color="textSecondary" gutterBottom>
-              <Link
-                href={`${surveyUrl}${
-                  survey.localisationEnabled ? '?lang=' + surveyLanguage : ''
-                }`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {`${surveyUrl}${
-                  survey.localisationEnabled ? '?lang=' + surveyLanguage : ''
-                }`}
-              </Link>
-              <CopyToClipboard
-                data={`${surveyUrl}${
-                  survey.localisationEnabled ? '?lang=' + surveyLanguage : ''
-                }`}
+          <Stack direction="row" spacing={1}>
+            {survey.tags.map((tag, i) => (
+              <Chip label={tag} key={i} />
+            ))}
+          </Stack>
+          <Stack direction="row">
+            <div>
+              <LinkSmallIcon
+                color="primary"
+                fontSize="small"
+                sx={{ marginTop: 1, marginRight: 1 }}
               />
+            </div>
+            {surveyUrl && (
+              <Typography variant="body1" color="textSecondary" gutterBottom>
+                <Link
+                  href={`${surveyUrl}${
+                    survey.localisationEnabled ? '?lang=' + surveyLanguage : ''
+                  }`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {`${surveyUrl}${
+                    survey.localisationEnabled ? '?lang=' + surveyLanguage : ''
+                  }`}
+                </Link>
+                <CopyToClipboard
+                  data={`${surveyUrl}${
+                    survey.localisationEnabled ? '?lang=' + surveyLanguage : ''
+                  }`}
+                />
+              </Typography>
+            )}
+          </Stack>
+          <Stack direction="row">
+            <div>
+              <UserSmallIcon
+                color="primary"
+                fontSize="small"
+                sx={{ marginTop: 0, marginRight: 1 }}
+              />
+            </div>
+            <Typography
+              variant="body1"
+              fontSize="bigger"
+              color="textSecondary"
+              gutterBottom
+            >
+              {survey.author}
+              {survey.authorUnit && `, ${survey.authorUnit}`}
             </Typography>
-          )}
+          </Stack>
+
           <div style={{ display: 'flex', flexDirection: 'row' }}>
             {/* Scheduling info (start/end dates) */}
+            <CalendarSmallIcon
+              fontSize="small"
+              color="primary"
+              sx={{ marginRight: 1 }}
+            />
             {survey.startDate && survey.endDate ? (
               <Typography variant="body1" color="primary" gutterBottom>
                 {tr.SurveyList.open} {format(survey.startDate, 'd.M.yyyy')} -{' '}

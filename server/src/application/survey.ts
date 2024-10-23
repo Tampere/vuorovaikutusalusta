@@ -77,6 +77,7 @@ interface DBSurvey {
   localisation_enabled: boolean;
   submission_count?: number;
   organization: string;
+  tags: string[];
 }
 
 /**
@@ -751,6 +752,7 @@ export async function getSurveys(
   ORDER BY updated_at DESC`,
     [authorId, filterByPublished, organization],
   );
+
   return rows
     .map((row) => dbSurveyToSurvey(row))
     .filter((survey) => (filterByPublished ? isPublished(survey) : survey));
@@ -1154,7 +1156,8 @@ export async function updateSurvey(survey: Survey) {
         display_privacy_statement = $25,
         top_margin_image_url = $26,
         bottom_margin_image_url = $27,
-        organization = $28
+        organization = $28,
+        tags = $29
       WHERE id = $1 RETURNING *`,
       [
         survey.id,
@@ -1185,6 +1188,7 @@ export async function updateSurvey(survey: Survey) {
         survey.marginImages.top.imageUrl ?? null,
         survey.marginImages.bottom.imageUrl ?? null,
         survey.organization,
+        survey.tags,
       ],
     )
     .catch((error) => {
@@ -1474,6 +1478,7 @@ function dbSurveyToSurvey(
       },
     },
     organization: dbSurvey.organization,
+    tags: dbSurvey.tags,
   };
   return {
     ...survey,
@@ -2080,4 +2085,24 @@ export async function getDistinctAutoSendToEmails() {
     SELECT DISTINCT UNNEST(email_auto_send_to) AS email FROM data.survey
   `);
   return rows.map((row) => row.email);
+}
+
+/**
+ * get all distinct tags used by the organisation
+ * @param organizations array of organizations. Likely to be of length 1 for now
+ * @returns array of distinct tags
+ */
+export async function getTagsByOrganizations(organizations: string[]) {
+  const rows = await getDb().manyOrNone<{ tag: string }>(
+    `
+    SELECT
+      DISTINCT UNNEST(tags) AS tag
+    FROM
+      data.survey AS s
+    WHERE
+      s.organization = ANY($1)
+  `,
+    [organizations],
+  );
+  return rows.map((row) => row.tag);
 }

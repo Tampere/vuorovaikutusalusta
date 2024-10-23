@@ -13,6 +13,7 @@ import {
   getDistinctAutoSendToEmails,
   getSurvey,
   getSurveys,
+  getTagsByOrganizations,
   publishSurvey,
   unpublishSurvey,
   updateSurvey,
@@ -35,6 +36,18 @@ router.get(
   asyncHandler(async (req, res) => {
     const emails = await getDistinctAutoSendToEmails();
     res.json(emails);
+  }),
+);
+
+/**
+ * Endpoint for getting orgs all available tags
+ */
+router.get(
+  '/org-tags',
+  ensureAuthenticated(),
+  asyncHandler(async (req, res) => {
+    const orgTags = await getTagsByOrganizations(req.user.organizations);
+    res.json(orgTags);
   }),
 );
 
@@ -178,6 +191,7 @@ router.put(
     body('organization')
       .isString()
       .withMessage('Organization must be a string'),
+    body('tags').optional().isArray().withMessage('Tags must be an array.'),
   ]),
   asyncHandler(async (req, res) => {
     const surveyId = Number(req.params.id);
