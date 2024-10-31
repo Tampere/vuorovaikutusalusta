@@ -174,7 +174,7 @@ export default function SurveyStepper({
    * Stop the drawing interaction when the mobile map gets closed
    */
   useEffect(() => {
-    if (!mobileDrawerOpen && isMapReady) {
+    if (!mdUp && !mobileDrawerOpen && isMapReady) {
       stopDrawing();
     }
   }, [mobileDrawerOpen]);
@@ -187,6 +187,7 @@ export default function SurveyStepper({
     // If modifying, stop it when changing page
     if (isMapReady) {
       stopModifying();
+      stopDrawing();
     }
     // TODO scroll to beginning of the step? or only when "next" is clicked, and not on "previous"?
   }, [currentPage]);
@@ -320,7 +321,8 @@ export default function SurveyStepper({
   async function saveMapLayers() {
     // Get all currently visible map layer iDs and update to the survey page
     const mapLayers = (await getAllLayers())
-      .filter((layer) => layer.visible)
+      // Old Oskari might return drawing or feature layers as a string of format "userlayer_<number>", filter these out (as well as invisible layers)
+      .filter((layer) => layer.visible && typeof layer.id === 'number')
       .map((layer) => layer.id);
     updatePageMapLayers(currentPage, mapLayers);
 
@@ -636,8 +638,8 @@ export default function SurveyStepper({
                   currentPage.sidebar.imageSize === 'original'
                     ? { margin: '0 auto' }
                     : currentPage.sidebar.imageSize === 'fitted'
-                      ? { margin: '0 auto', maxWidth: '100%' }
-                      : null
+                    ? { margin: '0 auto', maxWidth: '100%' }
+                    : null
                 }
                 aria-hidden={true}
                 alt={currentPage.sidebar?.imageAltText?.[surveyLanguage]}
@@ -804,8 +806,8 @@ export default function SurveyStepper({
                   currentPage.sidebar.type === 'image'
                     ? tr.SurveyStepper.closeImage
                     : currentPage.sidebar.type === 'map'
-                      ? tr.SurveyStepper.closeMap
-                      : ''
+                    ? tr.SurveyStepper.closeMap
+                    : ''
                 }
               >
                 <Close />
