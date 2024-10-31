@@ -473,14 +473,10 @@ export function useSurveyMap() {
      * @returns Drawn geometry
      */
     async draw(type: MapQuestionSelectionType, question: SurveyMapQuestion) {
-      // Stop the previous drawing if the map is in a draw state
+      // Stop any previous drawing if the map is in a draw state
       if (state.questionId) {
-        const previousEventId = getDrawingEventId(
-          state.questionId,
-          state.selectionType,
-        );
         state.rpcChannel.postRequest('DrawTools.StopDrawingRequest', [
-          previousEventId,
+          null,
           true,
         ]);
       }
@@ -556,15 +552,21 @@ export function useSurveyMap() {
         false,
       ]);
 
+      dispatch({ type: 'SET_SELECTION_TYPE', value: null });
+      dispatch({ type: 'SET_HELPER_TEXT', text: null });
+      dispatch({ type: 'SET_QUESTION_ID', value: null });
+
       return geometry;
     },
     /**
      * Stops the drawing interaction on the map for given question ID (or the currently active question)
      * @param questionId Question ID (default: current question ID)
      */
-    stopDrawing(questionId = state.questionId) {
+    stopDrawing(questionId: number | null = state.questionId) {
       state.rpcChannel.postRequest('DrawTools.StopDrawingRequest', [
-        getDrawingEventId(questionId, state.selectionType),
+        questionId == null
+          ? null
+          : getDrawingEventId(questionId, state.selectionType),
         true,
       ]);
       // If stopping the current drawing (or there was none), clear the internal state
@@ -591,7 +593,7 @@ export function useSurveyMap() {
       state.rpcChannel.postRequest('DrawTools.StartDrawingRequest', [
         modifyEventId,
         // This must have some valid value, but shouldnt matter a lot because we aren't drawing new shapes here
-        'Box',
+        'LineString',
         {
           drawControl: false,
           modifyControl: true,
