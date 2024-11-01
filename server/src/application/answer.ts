@@ -147,6 +147,7 @@ interface SectionHeader {
   groupIndex: number;
   pageIndex: number;
   sectionIndex: number;
+  questionIndex: number;
 }
 
 /**
@@ -368,7 +369,7 @@ export async function getCSVFile(surveyId: number): Promise<string> {
  */
 export async function getGeoPackageFile(surveyId: number): Promise<Buffer> {
   const rows = await getGeometryDBEntries(surveyId);
-  const srid = rows?.find(row => row.geometrySRID)?.geometrySRID ?? '3857';
+  const srid = rows?.find((row) => row.geometrySRID)?.geometrySRID ?? '3857';
   const checkboxOptions = await getCheckboxOptionsFromDB(surveyId);
   const mapLayers = await getSurvey({ id: surveyId }).then((survey) =>
     getAvailableMapLayers(survey.mapUrl),
@@ -599,8 +600,10 @@ async function getGeometryDBEntries(surveyId: number): Promise<AnswerEntry[]> {
  * @param surveyId
  * @returns
  */
-const getSectionHeaders = async (surveyId: number) =>
-  getDb().manyOrNone<SectionHeader>(
+async function getSectionHeaders(surveyId: number) {
+  const res = await getDb().manyOrNone<
+    SectionHeader & { questionOrderIndex: number }
+  >(
     `
   SELECT
     opt.id as "optionId",
@@ -616,7 +619,8 @@ const getSectionHeaders = async (surveyId: number) =>
     ps.predecessor_section as "predecessorSection",
     og.name as "groupName",
     og.idx as "groupIndex",
-    sp.idx as "pageIndex"
+    sp.idx as "pageIndex",
+    coalesce(ps2.idx, ps.idx) as "questionOrderIndex"
   FROM data.page_section ps
     LEFT JOIN data.option opt ON ps.id = opt.section_id
     LEFT JOIN data.option_group og ON opt.group_id = og.id
@@ -624,16 +628,41 @@ const getSectionHeaders = async (surveyId: number) =>
     LEFT JOIN data.survey s ON sp.survey_id = s.id
     LEFT JOIN data.page_section ps2 ON ps.predecessor_section = ps2.id
     WHERE s.id = $1
-      AND ps.type <> 'map'
       AND ps.type <> 'attachment'
       AND ps.type <> 'document'
       AND ps.type <> 'text'
       AND ps.type <> 'image'
       AND ps.parent_section IS NULL
-      ORDER BY "pageIndex", "predecessorSectionIndex" nulls first, ps.idx, og.idx NULLS FIRST, opt.idx NULLS first;
+      ORDER BY "pageIndex", "questionOrderIndex", "predecessorSectionIndex" nulls first, ps.idx, og.idx NULLS FIRST, opt.idx NULLS first;
 `,
     [surveyId],
   );
+
+  let questionIndex = 0;
+  let lastSectionIndex = -1;
+  let lastHandledPage = -1;
+  return (
+    res
+      .map<SectionHeader>((section) => {
+        if (lastHandledPage !== section.pageIndex) {
+          questionIndex = 0;
+          lastHandledPage = section.pageIndex;
+          lastSectionIndex = section.sectionIndex;
+        } else if (
+          section.predecessorSection === null &&
+          lastSectionIndex !== section.questionOrderIndex
+        ) {
+          questionIndex++;
+          lastSectionIndex = section.sectionIndex;
+        }
+
+        return { ...section, questionIndex };
+      })
+      // Map elements should be taken into account when numbering,
+      // but shouldn't be printed to CSV-report
+      .filter((e) => e && e.type !== 'map')
+  );
+}
 
 /**
  * Create key for CSV headers and submissions
@@ -667,12 +696,12 @@ function getSectionDetailsForHeader(section, predecessorIndexes) {
   if (section.predecessorSection) {
     const [pageIndex, sectionIndex] =
       predecessorIndexes[section.predecessorSection].split('-');
-    return `s${Number(pageIndex) + 1}k${Number(sectionIndex) + 1}${indexToAlpha(
-      section.sectionIndex,
-    )}`;
+    return `s${Number(pageIndex) + 1}k${
+      Number(section.questionIndex) + 1
+    }${indexToAlpha(section.sectionIndex)}`;
   }
 
-  return `s${section.pageIndex + 1}k${section.sectionIndex + 1}`;
+  return `s${section.pageIndex + 1}k${section.questionIndex + 1}`;
 }
 
 /**
@@ -826,11 +855,10 @@ function createCSVHeaders(sectionMetadata: SectionHeader[]) {
             null,
             sectionHead.predecessorSection,
             predecessorIndexes,
-          )]:
-            `${getSectionDetailsForHeader(
-              sectionHead,
-              predecessorIndexes,
-            )}: ${sectionHead.title?.['fi']}` ?? '',
+          )]: `${getSectionDetailsForHeader(
+            sectionHead,
+            predecessorIndexes,
+          )}: ${sectionHead.title?.['fi']}`,
         });
     }
   });
