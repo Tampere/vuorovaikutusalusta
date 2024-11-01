@@ -47,6 +47,7 @@ export default function MapQuestion({
     isMapReady,
     drawing,
     stopDrawing,
+    stopModifying,
     questionId: drawingQuestionId,
     editingMapAnswer,
     stopEditingMapAnswer,
@@ -89,10 +90,10 @@ export default function MapQuestion({
       return;
     }
     if (!selectionType) {
-      stopDrawing(question.id);
       return;
     }
 
+    stopModifying();
     setDrawingCancelled(false);
     async function handleMapDraw() {
       const geometry = await draw(selectionType, question);
@@ -108,6 +109,8 @@ export default function MapQuestion({
       }
 
       const subQuestionAnswers = await getSubQuestionAnswers();
+
+      stopDrawing();
 
       if (!subQuestionAnswers) {
         // Subquestion dialog was cancelled - do not add an answer
@@ -144,7 +147,6 @@ export default function MapQuestion({
     }
     if (drawingQuestionId !== question.id) {
       setSelectionType(null);
-      stopDrawing(question.id);
     }
   }, [drawingQuestionId]);
 
