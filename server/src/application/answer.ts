@@ -369,7 +369,7 @@ export async function getCSVFile(surveyId: number): Promise<string> {
  */
 export async function getGeoPackageFile(surveyId: number): Promise<Buffer> {
   const rows = await getGeometryDBEntries(surveyId);
-  const srid = rows?.find(row => row.geometrySRID)?.geometrySRID ?? '3857';
+  const srid = rows?.find((row) => row.geometrySRID)?.geometrySRID ?? '3857';
   const checkboxOptions = await getCheckboxOptionsFromDB(surveyId);
   const mapLayers = await getSurvey({ id: surveyId }).then((survey) =>
     getAvailableMapLayers(survey.mapUrl),
@@ -855,11 +855,10 @@ function createCSVHeaders(sectionMetadata: SectionHeader[]) {
             null,
             sectionHead.predecessorSection,
             predecessorIndexes,
-          )]:
-            `${getSectionDetailsForHeader(
-              sectionHead,
-              predecessorIndexes,
-            )}: ${sectionHead.title?.['fi']}` ?? '',
+          )]: `${getSectionDetailsForHeader(
+            sectionHead,
+            predecessorIndexes,
+          )}: ${sectionHead.title?.['fi']}`,
         });
     }
   });
