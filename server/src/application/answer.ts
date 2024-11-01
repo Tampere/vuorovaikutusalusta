@@ -623,7 +623,6 @@ async function getSectionHeaders(surveyId: number) {
     LEFT JOIN data.survey s ON sp.survey_id = s.id
     LEFT JOIN data.page_section ps2 ON ps.predecessor_section = ps2.id
     WHERE s.id = $1
-      AND ps.type <> 'map'
       AND ps.type <> 'attachment'
       AND ps.type <> 'document'
       AND ps.type <> 'text'
@@ -637,21 +636,27 @@ async function getSectionHeaders(surveyId: number) {
   let questionIndex = 0;
   let lastSectionIndex = -1;
   let lastHandledPage = -1;
-  return res.map<SectionHeader>((section) => {
-    if (lastHandledPage !== section.pageIndex) {
-      questionIndex = 0;
-      lastHandledPage = section.pageIndex;
-      lastSectionIndex = section.sectionIndex;
-    } else if (
-      section.predecessorSection === null &&
-      lastSectionIndex !== section.questionOrderIndex
-    ) {
-      questionIndex++;
-      lastSectionIndex = section.sectionIndex;
-    }
+  return (
+    res
+      .map<SectionHeader>((section) => {
+        if (lastHandledPage !== section.pageIndex) {
+          questionIndex = 0;
+          lastHandledPage = section.pageIndex;
+          lastSectionIndex = section.sectionIndex;
+        } else if (
+          section.predecessorSection === null &&
+          lastSectionIndex !== section.questionOrderIndex
+        ) {
+          questionIndex++;
+          lastSectionIndex = section.sectionIndex;
+        }
 
-    return { ...section, questionIndex };
-  });
+        return { ...section, questionIndex };
+      })
+      // Map elements should be taken into account when numbering,
+      // but shouldn't be printed to CSV-report
+      .filter((e) => e && e.type !== 'map')
+  );
 }
 
 /**
