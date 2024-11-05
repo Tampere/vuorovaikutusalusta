@@ -69,7 +69,9 @@ function surveyToTranslationString(survey: Survey) {
     valueEn: string,
     valueSe: string,
   ): string {
-    return `${label} \t ${valueFi ?? ''} \t ${valueEn ?? ''} \t ${valueSe ?? ''}\n`;
+    return `${label} \t ${valueFi ?? ''} \t ${valueEn ?? ''} \t ${
+      valueSe ?? ''
+    }\n`;
   }
 
   // Uses recursion to loop through the entire Survey object and to add all values of objects of type LocalizedText to the clipboard
@@ -173,6 +175,9 @@ export default function EditSurveyTranslations() {
                       style={{ justifyContent: 'flex-start' }}
                     >
                       <Typography variant="h6" style={{ fontWeight: 'bold' }}>
+                        <Checkbox
+                          value={activeSurvey.enabledLanguages?.[lang]}
+                        ></Checkbox>
                         {tr.EditSurveyTranslations[lang].toLocaleUpperCase()}
                       </Typography>
                     </div>

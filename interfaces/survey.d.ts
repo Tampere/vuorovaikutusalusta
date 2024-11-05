@@ -490,7 +490,13 @@ export interface Survey {
    * Survey tags
    */
   tags: string[];
+  /**
+   * Survey languages
+   */
+  enabledLanguages: Record<EnabledLanguages, boolean>;
 }
+
+export type EnabledLanguages = Record<LanguageCode, boolean>;
 
 /**
  * A single option of a multichoise question
