@@ -81,7 +81,7 @@ interface DBSurvey {
   submission_count?: number;
   organization: string;
   tags: string[];
-  enabledLanguages: ('fi' | 'se' | 'en')[];
+  survey_languages: LanguageCode[];
 }
 
 /**
@@ -1483,10 +1483,11 @@ function dbSurveyToSurvey(
     },
     organization: dbSurvey.organization,
     tags: dbSurvey.tags,
-    enabledLanguages: dbSurvey.enabledLanguages,
+    enabledLanguages: dbSurvey.survey_languages,
   };
+
   const enabledLanguages: Record<'fi' | 'en' | 'se', boolean> =
-    dbSurvey.enabledLanguages.reduce(
+    dbSurvey.survey_languages.reduce(
       (acc, lang) => {
         acc[lang as LanguageCode] = true;
         return acc;
