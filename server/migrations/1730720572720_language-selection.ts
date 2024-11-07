@@ -4,12 +4,12 @@ export const shorthands: ColumnDefinitions | undefined = undefined;
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.sql(
-    `ALTER TABLE DATA.survey ADD COLUMN survey_languages text[] NOT NULL DEFAULT '{}'::TEXT[];`,
+    `ALTER TABLE DATA.survey ADD COLUMN languages text[] NOT NULL DEFAULT '{}'::TEXT[];`,
   );
   pgm.sql(
     `
     UPDATE DATA.survey
-    SET survey_languages =
+    SET languages =
       CASE
         WHEN localisation_enabled = true THEN ARRAY['fi', 'en', 'se']
         ELSE ARRAY['fi']
@@ -19,5 +19,5 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 }
 
 export async function down(pgm: MigrationBuilder): Promise<void> {
-  pgm.sql(`ALTER TABLE data.survey DROP COLUMN survey_languages;`);
+  pgm.sql(`ALTER TABLE data.survey DROP COLUMN languages;`);
 }

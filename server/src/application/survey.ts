@@ -37,7 +37,6 @@ import {
 
 import { geometryToGeoJSONFeatureCollection } from '@src/utils';
 import { Geometry } from 'geojson';
-import db from 'node-pg-migrate/dist/db';
 
 const sectionTypesWithOptions: SurveyPageSection['type'][] = [
   'radio',
@@ -81,7 +80,7 @@ interface DBSurvey {
   submission_count?: number;
   organization: string;
   tags: string[];
-  survey_languages: LanguageCode[];
+  languages: LanguageCode[];
 }
 
 /**
@@ -294,7 +293,7 @@ export async function getPublishedSurvey(
           survey.localisation_enabled,
           survey.display_privacy_statement,
           survey.theme_id as theme_id,
-          survey.survey_languages,
+          survey.languages,
           theme_name,
           theme_data,
           page.id as page_id,
@@ -1163,7 +1162,7 @@ export async function updateSurvey(survey: Survey) {
         bottom_margin_image_url = $27,
         organization = $28,
         tags = $29,
-        survey_languages = $30
+        languages = $30
       WHERE id = $1 RETURNING *`,
       [
         survey.id,
@@ -1488,13 +1487,13 @@ function dbSurveyToSurvey(
     },
     organization: dbSurvey.organization,
     tags: dbSurvey.tags,
-    enabledLanguages: dbSurvey.survey_languages,
+    enabledLanguages: dbSurvey.languages,
   };
 
-  const enabledLanguages = dbSurvey.survey_languages.reduce(
-    (acc, lang) => {
-      acc[lang] = true;
-      return acc;
+  const enabledLanguages = dbSurvey.languages.reduce(
+    (languages, lang) => {
+      languages[lang] = true;
+      return languages;
     },
     { fi: false, en: false, se: false } as EnabledLanguages,
   );
