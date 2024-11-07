@@ -1,6 +1,8 @@
 import {
   Conditions,
+  EnabledLanguages,
   File,
+  LanguageCode,
   LocalizedText,
   SectionOption,
   SectionOptionGroup,
@@ -78,6 +80,7 @@ interface DBSurvey {
   submission_count?: number;
   organization: string;
   tags: string[];
+  languages: LanguageCode[];
 }
 
 /**
@@ -290,6 +293,7 @@ export async function getPublishedSurvey(
           survey.localisation_enabled,
           survey.display_privacy_statement,
           survey.theme_id as theme_id,
+          survey.languages,
           theme_name,
           theme_data,
           page.id as page_id,
@@ -1157,7 +1161,8 @@ export async function updateSurvey(survey: Survey) {
         top_margin_image_url = $26,
         bottom_margin_image_url = $27,
         organization = $28,
-        tags = $29
+        tags = $29,
+        languages = $30
       WHERE id = $1 RETURNING *`,
       [
         survey.id,
@@ -1189,6 +1194,9 @@ export async function updateSurvey(survey: Survey) {
         survey.marginImages.bottom.imageUrl ?? null,
         survey.organization,
         survey.tags,
+        Object.entries(survey.enabledLanguages)
+          .filter(([, isEnabled]) => isEnabled)
+          .map(([lang]) => lang),
       ],
     )
     .catch((error) => {
@@ -1479,7 +1487,16 @@ function dbSurveyToSurvey(
     },
     organization: dbSurvey.organization,
     tags: dbSurvey.tags,
+    enabledLanguages: dbSurvey.languages,
   };
+
+  const enabledLanguages = dbSurvey.languages.reduce(
+    (languages, lang) => {
+      languages[lang] = true;
+      return languages;
+    },
+    { fi: false, en: false, se: false } as EnabledLanguages,
+  );
   return {
     ...survey,
     submissionCount: Number(dbSurvey.submission_count),
@@ -1487,6 +1504,7 @@ function dbSurveyToSurvey(
     ...('theme_id' in dbSurvey && {
       theme: dbSurveyJoinToTheme(dbSurvey),
     }),
+    enabledLanguages,
   };
 }
 
