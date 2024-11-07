@@ -20,15 +20,15 @@ export function A11yStatement() {
       <h2>Palvelun saavutettavuuden nykytila</h2>
       <p>
         Palvelu täyttää kansainvälisen WCAG 2.1 saavutettavuussäädöksen tason
-        AA-vaatimukset osittain. Palvelussa on pieniä puuttaita
-        saavutettavuuteen liittyne, jotka on kuvattu alla.{' '}
+        AA-vaatimukset osittain. Palvelussa on pieniä puutteita
+        saavutettavuuteen liittyen, jotka on kuvattu alla.{' '}
       </p>
       <h3> Puutteet saavutettavuudessa</h3>
       <ul>
         <li>
           <p>
             Responsiivisuusongelmia: Palvelun käyttöliittymät ja
-            toiminnallisuudet eivät toimi eri päätelaitteilla ja tuetlilla
+            toiminnallisuudet eivät toimi eri päätelaitteilla ja tuetuilla
             selaimilla kriteeristön asettamissa rajoissa. Erityisesti
             karttapohjaisissa kysymyksissä on runsaasti responsiivisuuteen
             liittyviä ongelmia. (WCAG 1.4.10 Responsiivisuus)
