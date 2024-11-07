@@ -158,7 +158,11 @@ export default function EditSurveyTranslations() {
               <Typography>
                 {tr.EditSurveyTranslations.copyTextFields}
               </Typography>
-              <CopyToClipboard data={surveyToTranslationString(activeSurvey)} />
+              <div style={{ display: 'inline-block' }}>
+                <CopyToClipboard
+                  data={surveyToTranslationString(activeSurvey)}
+                />
+              </div>
             </div>
             <Typography variant="h5">
               {tr.EditSurveyTranslations.supportedLanguages}:{' '}
