@@ -294,6 +294,7 @@ export async function getPublishedSurvey(
           survey.localisation_enabled,
           survey.display_privacy_statement,
           survey.theme_id as theme_id,
+          survey.survey_languages,
           theme_name,
           theme_data,
           page.id as page_id,
@@ -1161,7 +1162,8 @@ export async function updateSurvey(survey: Survey) {
         top_margin_image_url = $26,
         bottom_margin_image_url = $27,
         organization = $28,
-        tags = $29
+        tags = $29,
+        survey_languages = $30
       WHERE id = $1 RETURNING *`,
       [
         survey.id,
@@ -1193,6 +1195,9 @@ export async function updateSurvey(survey: Survey) {
         survey.marginImages.bottom.imageUrl ?? null,
         survey.organization,
         survey.tags,
+        Object.entries(survey.enabledLanguages)
+          .filter(([, isEnabled]) => isEnabled)
+          .map(([lang]) => lang),
       ],
     )
     .catch((error) => {
@@ -1486,14 +1491,13 @@ function dbSurveyToSurvey(
     enabledLanguages: dbSurvey.survey_languages,
   };
 
-  const enabledLanguages: Record<'fi' | 'en' | 'se', boolean> =
-    dbSurvey.survey_languages.reduce(
-      (acc, lang) => {
-        acc[lang as LanguageCode] = true;
-        return acc;
-      },
-      { fi: false, en: false, se: false } as EnabledLanguages,
-    );
+  const enabledLanguages = dbSurvey.survey_languages.reduce(
+    (acc, lang) => {
+      acc[lang] = true;
+      return acc;
+    },
+    { fi: false, en: false, se: false } as EnabledLanguages,
+  );
   return {
     ...survey,
     submissionCount: Number(dbSurvey.submission_count),

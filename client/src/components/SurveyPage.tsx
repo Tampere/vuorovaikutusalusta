@@ -33,7 +33,7 @@ export default function SurveyPage({ isTestSurvey }: Props) {
   const { setSurvey, survey, loadUnfinishedEntries } = useSurveyAnswers();
   const { setThemeFromSurvey } = useSurveyTheme();
   const { search } = useLocation();
-  const { tr, language } = useTranslations();
+  const { tr, language, setAvailableLanguages } = useTranslations();
   const { showToast } = useToasts();
 
   const unfinishedToken = useMemo(
@@ -60,6 +60,7 @@ export default function SurveyPage({ isTestSurvey }: Props) {
         setSurvey(survey);
         setThemeFromSurvey(survey);
         setLoading(false);
+        setAvailableLanguages(survey.enabledLanguages);
       } catch (error) {
         setErrorStatusCode(error.status);
         setLoading(false);

@@ -493,7 +493,7 @@ export interface Survey {
   /**
    * Survey languages
    */
-  enabledLanguages: Record<EnabledLanguages, boolean>;
+  enabledLanguages: EnabledLanguages;
 }
 
 export type EnabledLanguages = Record<LanguageCode, boolean>;

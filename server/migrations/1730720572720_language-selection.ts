@@ -9,7 +9,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.sql(
     `
     UPDATE DATA.survey
-    SET enabled_languages =
+    SET survey_languages =
       CASE
         WHEN localisation_enabled = true THEN ARRAY['fi', 'en', 'se']
         ELSE ARRAY['fi']

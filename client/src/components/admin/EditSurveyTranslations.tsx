@@ -174,12 +174,33 @@ export default function EditSurveyTranslations() {
                       className={classes.rowContainer}
                       style={{ justifyContent: 'flex-start' }}
                     >
-                      <Typography variant="h6" style={{ fontWeight: 'bold' }}>
-                        <Checkbox
-                          value={activeSurvey.enabledLanguages?.[lang]}
-                        ></Checkbox>
-                        {tr.EditSurveyTranslations[lang].toLocaleUpperCase()}
-                      </Typography>
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={activeSurvey.enabledLanguages[lang]}
+                            onChange={(event) => {
+                              editSurvey({
+                                ...activeSurvey,
+                                enabledLanguages: {
+                                  ...activeSurvey.enabledLanguages,
+                                  [lang]: event.target.checked,
+                                },
+                              });
+                            }}
+                            sx={{ '& .MuiSvgIcon-root': { fontSize: 28 } }}
+                          ></Checkbox>
+                        }
+                        label={
+                          <Typography
+                            variant="h6"
+                            style={{ fontWeight: 'bold' }}
+                          >
+                            {tr.EditSurveyTranslations[
+                              lang
+                            ].toLocaleUpperCase()}
+                          </Typography>
+                        }
+                      />
                     </div>
                     <br />
                     <Typography className={classes.titleText}>
