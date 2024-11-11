@@ -100,7 +100,7 @@ export default function SurveyListItem(props: Props) {
           <Typography color="textSecondary" component="h4" gutterBottom>
             {survey.subtitle?.[surveyLanguage]}
           </Typography>
-          <Stack direction="row" spacing={1}>
+          <Stack direction="row" rowGap={1} spacing={1} flexWrap="wrap">
             {survey.tags.map((tag, i) => (
               <Chip label={tag} key={i} />
             ))}
