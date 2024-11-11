@@ -1,4 +1,4 @@
-import { Survey } from '@interfaces/survey';
+import { LanguageCode, Survey } from '@interfaces/survey';
 import { Box, CircularProgress } from '@mui/material';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import { useSurveyTheme } from '@src/stores/SurveyThemeProvider';
@@ -33,7 +33,8 @@ export default function SurveyPage({ isTestSurvey }: Props) {
   const { setSurvey, survey, loadUnfinishedEntries } = useSurveyAnswers();
   const { setThemeFromSurvey } = useSurveyTheme();
   const { search } = useLocation();
-  const { tr, language, setAvailableLanguages } = useTranslations();
+  const { tr, language, setAvailableLanguages, setSurveyLanguage } =
+    useTranslations();
   const { showToast } = useToasts();
 
   const unfinishedToken = useMemo(
@@ -61,6 +62,11 @@ export default function SurveyPage({ isTestSurvey }: Props) {
         setThemeFromSurvey(survey);
         setLoading(false);
         setAvailableLanguages(survey.enabledLanguages);
+        setSurveyLanguage(
+          Object.entries(survey.enabledLanguages).find(
+            ([, isEnabled]) => isEnabled,
+          )[0] as LanguageCode,
+        );
       } catch (error) {
         setErrorStatusCode(error.status);
         setLoading(false);
