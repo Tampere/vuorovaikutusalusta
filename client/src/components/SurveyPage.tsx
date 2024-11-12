@@ -148,6 +148,9 @@ export default function SurveyPage({ isTestSurvey }: Props) {
           <SurveyLanguageMenu
             changeUILanguage={true}
             style={{
+              backgroundColor: 'rgba(255, 255, 255, 0.4)',
+              backdropFilter: 'blur(7px)',
+              padding: '0.2rem',
               position: 'absolute',
               top: '1rem',
               left: '1rem',
