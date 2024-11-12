@@ -25,6 +25,7 @@ export default function SurveyLanguageRouter(): null {
       setSurveyLanguage(languages[0] as LanguageCode);
       setLanguage(languages[0] as LanguageCode);
     }
+
     if (!languages.includes(lang) || lang === language) return;
 
     setLanguage(lang);

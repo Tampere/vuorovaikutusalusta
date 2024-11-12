@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import clsx from 'clsx';
 import { Survey } from '@interfaces/survey';
 import {
+  Box,
   Button,
   Card,
   Chip,
@@ -100,11 +101,11 @@ export default function SurveyListItem(props: Props) {
           <Typography color="textSecondary" component="h4" gutterBottom>
             {survey.subtitle?.[surveyLanguage]}
           </Typography>
-          <Stack direction="row" spacing={1}>
+          <Box display="flex" rowGap={1} columnGap={1} flexWrap="wrap">
             {survey.tags.map((tag, i) => (
               <Chip label={tag} key={i} />
             ))}
-          </Stack>
+          </Box>
           <Stack direction="row">
             <div>
               <LinkSmallIcon
