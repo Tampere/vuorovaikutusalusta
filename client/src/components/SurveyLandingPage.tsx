@@ -203,7 +203,14 @@ export default function SurveyLandingPage({
           whiteSpace: 'nowrap',
         }}
       >
-        <Footer>
+        <Footer
+          style={{
+            backgroundColor: 'rgba(255, 255, 255, 0.4)',
+            backdropFilter: 'blur(7px)',
+            padding: '0 0.5rem 0.125rem 0.125rem',
+            borderRadius: '7px 7px 0px 0px',
+          }}
+        >
           <Link
             color="primary"
             underline="hover"
