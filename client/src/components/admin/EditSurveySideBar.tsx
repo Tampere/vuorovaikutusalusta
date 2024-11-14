@@ -163,12 +163,16 @@ export default function EditSurveySideBar(props: Props) {
                             onClick={(event) => {
                               event.stopPropagation();
                               event.preventDefault();
+                              // Deep copy page to avoid changes to current context
                               const copiedSurveyPage =
                                 replaceTranslationsWithNull(
                                   replaceIdsWithNull({
-                                    ...page,
+                                    ...structuredClone(page),
                                     id: -1,
-                                    sidebar: { ...page.sidebar, mapLayers: [] },
+                                    sidebar: {
+                                      ...structuredClone(page.sidebar),
+                                      mapLayers: [],
+                                    },
                                   }),
                                 ) as SurveyPage;
 
