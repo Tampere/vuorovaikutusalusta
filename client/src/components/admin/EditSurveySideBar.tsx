@@ -167,12 +167,10 @@ export default function EditSurveySideBar(props: Props) {
                               const copiedSurveyPage =
                                 replaceTranslationsWithNull(
                                   replaceIdsWithNull({
-                                    ...JSON.parse(JSON.stringify(page)),
+                                    ...structuredClone(page),
                                     id: -1,
                                     sidebar: {
-                                      ...JSON.parse(
-                                        JSON.stringify(page.sidebar),
-                                      ),
+                                      ...structuredClone(page.sidebar),
                                       mapLayers: [],
                                     },
                                   }),

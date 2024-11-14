@@ -325,7 +325,7 @@ export default function SurveySectionAccordion(props: Props) {
                 // Create deep copy to avoid unwanted side effects on original
                 const copiedSurveySection = replaceTranslationsWithNull(
                   replaceIdsWithNull({
-                    ...JSON.parse(JSON.stringify(props)).section,
+                    ...structuredClone(props.section),
                   }),
                 );
 
