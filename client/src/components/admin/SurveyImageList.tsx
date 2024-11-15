@@ -2,7 +2,6 @@
 
 import { File, ImageType } from '@interfaces/survey';
 import {
-  Box,
   Button,
   Container,
   Dialog,
@@ -12,16 +11,18 @@ import {
   ImageListItem,
   TextField,
   Theme,
-  Typography,
+  Typography
 } from '@mui/material';
-import { Cancel, PhotoLibrary } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
-import { useToasts } from '@src/stores/ToastContext';
+import ImageIcon from '@src/components/icons/ImageIcon';
 import { useSurvey } from '@src/stores/SurveyContext';
+import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
+import { getFileName } from '@src/utils/path';
 import { request } from '@src/utils/request';
 import React, { useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
+import SurveyImageListItem from './SurveyImageListItem';
 
 const useStyles = makeStyles((theme: Theme) => ({
   noImageBackground: {
@@ -44,12 +45,6 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   addImageIcon: {
     color: theme.palette.primary.main,
-  },
-  deleteImageIcon: {
-    position: 'absolute',
-    top: '5px',
-    left: '5px',
-    fontSize: '26px',
   },
 }));
 
@@ -124,7 +119,6 @@ export default function SurveyImageList({ imageType, ...props }: Props) {
   async function getImages() {
     try {
       const res = await request<File[]>(getApiFilePath(imageType));
-
       props.setImages?.(res) ?? setImages(res);
     } catch (error) {
       showToast({
@@ -134,18 +128,16 @@ export default function SurveyImageList({ imageType, ...props }: Props) {
     }
   }
 
-  function handleListItemClick(fileName?: string, filePath?: string[]) {
+  function handleListItemClick(fileUrl: string) {
     setImageDialogOpen((prev) => !prev);
-
-    if (!fileName) {
+    if (!fileUrl) {
       return;
     }
     switch (imageType) {
       case 'backgroundImage':
         editSurvey({
           ...activeSurvey,
-          backgroundImageName: fileName,
-          backgroundImagePath: filePath,
+          backgroundImageUrl: fileUrl,
         });
         break;
       case 'thanksPageImage':
@@ -153,8 +145,7 @@ export default function SurveyImageList({ imageType, ...props }: Props) {
           ...activeSurvey,
           thanksPage: {
             ...activeSurvey.thanksPage,
-            imageName: fileName,
-            imagePath: filePath,
+            imageUrl: fileUrl,
           },
         });
         break;
@@ -164,8 +155,7 @@ export default function SurveyImageList({ imageType, ...props }: Props) {
           marginImages: {
             ...activeSurvey.marginImages,
             top: {
-              imageName: fileName,
-              imagePath: filePath,
+              imageUrl: fileUrl,
             },
           },
         });
@@ -176,44 +166,33 @@ export default function SurveyImageList({ imageType, ...props }: Props) {
           marginImages: {
             ...activeSurvey.marginImages,
             bottom: {
-              imageName: fileName,
-              imagePath: filePath,
+              imageUrl: fileUrl,
             },
           },
         });
     }
   }
 
-  async function handleDeletingImage(
-    event: React.MouseEvent,
-    fileName: string,
-    filePath: string[],
-  ) {
+  async function handleDeletingImage(event: React.MouseEvent, fileUrl: string) {
     event.stopPropagation();
-
     try {
-      await fetch(
-        `/api/file${filePath.length > 0 ? '/' : ''}${filePath.join(
-          '/',
-        )}/${fileName}`,
-        { method: 'DELETE' },
-      );
+      await fetch(`/api/file/${fileUrl}`, { method: 'DELETE' });
 
       editSurvey({
         ...activeSurvey,
-        ...(fileName === activeSurvey.backgroundImageName && {
-          backgroundImageName: null,
+        ...(fileUrl === activeSurvey.backgroundImageUrl && {
+          backgroundImageUrl: null,
         }),
-        ...(fileName === activeSurvey.thanksPage.imageName && {
-          thanksPage: { imageName: null, imagePath: [] },
+        ...(fileUrl === activeSurvey.thanksPage.imageUrl && {
+          thanksPage: { imageUrl: null },
         }),
         marginImages: {
           ...activeSurvey.marginImages,
-          ...(fileName === activeSurvey.marginImages.top.imageName && {
-            top: { imageName: null, imagePath: [] },
+          ...(fileUrl === activeSurvey.marginImages.top.imageUrl && {
+            top: { imageUrl: null },
           }),
-          ...(fileName === activeSurvey.marginImages.bottom.imageName && {
-            bottom: { imageName: null, imagePath: [] },
+          ...(fileUrl === activeSurvey.marginImages.bottom.imageUrl && {
+            bottom: { imageUrl: null },
           }),
         },
       });
@@ -268,7 +247,9 @@ export default function SurveyImageList({ imageType, ...props }: Props) {
       await fetch(getApiFilePath(imageType), {
         method: 'POST',
         body: formData,
-        headers: { groups: JSON.stringify(activeSurvey.groups) },
+        headers: {
+          organization: activeSurvey.organization,
+        },
       });
       acceptedFiles.shift();
       getImages();
@@ -288,8 +269,7 @@ export default function SurveyImageList({ imageType, ...props }: Props) {
       case 'backgroundImage':
         editSurvey({
           ...activeSurvey,
-          backgroundImageName: null,
-          backgroundImagePath: [],
+          backgroundImageUrl: null,
         });
         break;
       case 'thanksPageImage':
@@ -297,8 +277,7 @@ export default function SurveyImageList({ imageType, ...props }: Props) {
           ...activeSurvey,
           thanksPage: {
             ...activeSurvey.thanksPage,
-            imageName: null,
-            imagePath: [],
+            imageUrl: null,
           },
         });
         break;
@@ -308,8 +287,7 @@ export default function SurveyImageList({ imageType, ...props }: Props) {
           marginImages: {
             ...activeSurvey.marginImages,
             top: {
-              imageName: null,
-              imagePath: [],
+              imageUrl: null,
             },
           },
         });
@@ -320,8 +298,7 @@ export default function SurveyImageList({ imageType, ...props }: Props) {
           marginImages: {
             ...activeSurvey.marginImages,
             bottom: {
-              imageName: null,
-              imagePath: [],
+              imageUrl: null,
             },
           },
         });
@@ -333,36 +310,27 @@ export default function SurveyImageList({ imageType, ...props }: Props) {
       case 'backgroundImage':
         return (
           images?.find(
-            (image) =>
-              image.fileName === activeSurvey.backgroundImageName &&
-              image.filePath.join() === activeSurvey.backgroundImagePath.join(),
+            (image) => image.fileUrl === activeSurvey.backgroundImageUrl,
           ) ?? null
         );
       case 'thanksPageImage':
         return (
           images?.find(
-            (image) =>
-              image.fileName === activeSurvey.thanksPage.imageName &&
-              image.filePath.join() ===
-                activeSurvey.thanksPage.imagePath.join(),
+            (image) => image.fileUrl === activeSurvey.thanksPage.imageUrl,
           ) ?? null
         );
       case 'topMarginImage':
         return (
           images?.find(
             (image) =>
-              image.fileName === activeSurvey.marginImages.top?.imageName &&
-              image.filePath.join() ===
-                activeSurvey.marginImages.top.imagePath.join(),
+              image.fileUrl === activeSurvey.marginImages.top?.imageUrl,
           ) ?? null
         );
       case 'bottomMarginImage':
         return (
           images?.find(
             (image) =>
-              image.fileName === activeSurvey.marginImages.bottom?.imageName &&
-              image.filePath.join() ===
-                activeSurvey.marginImages.bottom.imagePath.join(),
+              image.fileUrl === activeSurvey.marginImages.bottom?.imageUrl,
           ) ?? null
         );
     }
@@ -372,19 +340,19 @@ export default function SurveyImageList({ imageType, ...props }: Props) {
     let style: { border: string } | {} = {};
     switch (imageType) {
       case 'backgroundImage':
-        image?.fileName === activeSurvey?.backgroundImageName &&
+        image?.fileUrl === activeSurvey?.backgroundImageUrl &&
           (style = { border: '4px solid #1976d2' });
         break;
       case 'thanksPageImage':
-        image?.fileName === activeSurvey?.thanksPage.imageName &&
+        image?.fileUrl === activeSurvey?.thanksPage.imageUrl &&
           (style = { border: '4px solid #1976d2' });
         break;
       case 'topMarginImage':
-        image?.fileName === activeSurvey?.marginImages?.top?.imageName &&
+        image?.fileUrl === activeSurvey?.marginImages?.top?.imageUrl &&
           (style = { border: '4px solid #1976d2' });
         break;
       case 'bottomMarginImage':
-        image?.fileName === activeSurvey?.marginImages?.bottom?.imageName &&
+        image?.fileUrl === activeSurvey?.marginImages?.bottom?.imageUrl &&
           (style = { border: '4px solid #1976d2' });
     }
 
@@ -394,19 +362,19 @@ export default function SurveyImageList({ imageType, ...props }: Props) {
   function getEmptyImageBorderStyle() {
     switch (imageType) {
       case 'backgroundImage':
-        return !activeSurvey?.backgroundImageName
+        return !activeSurvey?.backgroundImageUrl
           ? { border: '4px solid #1976d2' }
           : null;
       case 'thanksPageImage':
-        return !activeSurvey?.thanksPage.imageName
+        return !activeSurvey?.thanksPage.imageUrl
           ? { border: '4px solid #1976d2' }
           : null;
       case 'topMarginImage':
-        return !activeSurvey?.marginImages?.top?.imageName
+        return !activeSurvey?.marginImages?.top?.imageUrl
           ? { border: '4px solid #1976d2' }
           : null;
       case 'bottomMarginImage':
-        return !activeSurvey?.marginImages?.bottom?.imageName
+        return !activeSurvey?.marginImages?.bottom?.imageUrl
           ? { border: '4px solid #1976d2' }
           : null;
       default:
@@ -434,7 +402,7 @@ export default function SurveyImageList({ imageType, ...props }: Props) {
     }
 
     return activeImage
-      ? `${header}: ${activeImage.fileName}`
+      ? `${header}: ${getFileName(activeImage.fileUrl)}`
       : `${header}: ${tr.SurveyImageList.noImage.toLowerCase()}`;
   }
 
@@ -456,10 +424,10 @@ export default function SurveyImageList({ imageType, ...props }: Props) {
   return (
     <div>
       <Button
+        startIcon={<ImageIcon />}
         variant="outlined"
         onClick={() => setImageDialogOpen((prev) => !prev)}
       >
-        <PhotoLibrary />
         <Typography
           style={{
             textTransform: 'none',
@@ -476,7 +444,7 @@ export default function SurveyImageList({ imageType, ...props }: Props) {
           <img
             src={activeImageSrc}
             srcSet={activeImageSrc}
-            alt={`survey-image-${activeImage.fileName}`}
+            alt={`survey-image-${getFileName(activeImage.fileUrl)}`}
             loading="lazy"
             style={{
               height: '60px',
@@ -528,36 +496,14 @@ export default function SurveyImageList({ imageType, ...props }: Props) {
             {images.map((image) => {
               const imageSrc = `data:image/${limitToSvg ? 'svg+xml' : ''};base64,${image.data}`;
               return (
-                <ImageListItem
-                  style={getImageBorderStyle(image)}
-                  key={image.fileName}
-                  onClick={() =>
-                    handleListItemClick(image.fileName, image.filePath)
-                  }
-                >
-                  <Cancel
-                    color="error"
-                    className={classes.deleteImageIcon}
-                    onClick={async (event) =>
-                      await handleDeletingImage(
-                        event,
-                        image.fileName,
-                        image.filePath,
-                      )
-                    }
-                  />
-                  <img
-                    src={imageSrc}
-                    srcSet={imageSrc}
-                    alt={
-                      imageAltText
-                        ? imageAltText
-                        : `survey-image-${image.fileName}`
-                    }
-                    loading="lazy"
-                    style={{ height: '100%', objectFit: 'contain' }}
-                  />
-                </ImageListItem>
+                <SurveyImageListItem
+                  key={image.fileUrl}
+                  image={image}
+                  src={imageSrc}
+                  altText={imageAltText}
+                  onClick={handleListItemClick}
+                  onDelete={handleDeletingImage}
+                />
               );
             })}
           </ImageList>

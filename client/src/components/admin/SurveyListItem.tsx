@@ -1,21 +1,35 @@
-import React, { useState, useMemo } from 'react';
 import { Survey } from '@interfaces/survey';
-import { Button, Card, Link, Theme, Typography } from '@mui/material';
-import { CardContent } from '@mui/material';
-import { CardActions } from '@mui/material';
-import { useTranslations } from '@src/stores/TranslationContext';
-import { format } from 'date-fns';
-import CopyToClipboard from '../CopyToClipboard';
-import ConfirmDialog from '../ConfirmDialog';
+import {
+  Box,
+  Button,
+  Card,
+  CardActions,
+  CardContent,
+  Chip,
+  Link,
+  Stack,
+  Theme,
+  Typography,
+} from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import CalendarSmallIcon from '@src/components/icons/CalendarSmallIcon';
+import LinkSmallIcon from '@src/components/icons/LinkSmallIcon';
+import UserSmallIcon from '@src/components/icons/UserSmallIcon';
 import {
   creteSurveyFromPrevious,
   publishSurvey,
   unpublishSurvey,
 } from '@src/controllers/SurveyController';
 import { useToasts } from '@src/stores/ToastContext';
-import { makeStyles } from '@mui/styles';
-import LoadingButton from '../LoadingButton';
+import { useTranslations } from '@src/stores/TranslationContext';
+import { useUser } from '@src/stores/UserContext';
+import clsx from 'clsx';
+import { format } from 'date-fns';
+import React, { useMemo, useState } from 'react';
 import { NavLink, useRouteMatch } from 'react-router-dom';
+import ConfirmDialog from '../ConfirmDialog';
+import CopyToClipboard from '../CopyToClipboard';
+import LoadingButton from '../LoadingButton';
 
 const useStyles = makeStyles((theme: Theme) => ({
   '@keyframes pulse': {
@@ -37,6 +51,10 @@ const useStyles = makeStyles((theme: Theme) => ({
   cardRoot: {
     paddingBottom: '8px',
   },
+  publishedCard: {
+    borderLeft: 'solid 5px',
+    borderLeftColor: theme.palette.primary.main,
+  },
 }));
 
 interface Props {
@@ -55,6 +73,9 @@ export default function SurveyListItem(props: Props) {
   const { tr, surveyLanguage } = useTranslations();
   const { showToast } = useToasts();
   const { url } = useRouteMatch();
+  const { activeUser } = useUser();
+
+  const disableUsersAccessToSurvey = useMemo(() => activeUser?.id !== survey.authorId || survey.admins.includes(activeUser?.id), [activeUser, survey]);
 
   const surveyUrl = useMemo(() => {
     if (!survey.name) {
@@ -68,10 +89,10 @@ export default function SurveyListItem(props: Props) {
   return (
     <>
       <Card
-        className={loading ? classes.loading : ''}
-        style={
-          survey.isPublished ? { filter: 'drop-shadow(0 0 0.15rem green)' } : {}
-        }
+        className={clsx(
+          loading && classes.loading,
+          survey.isPublished && classes.publishedCard,
+        )}
       >
         <CardContent classes={{ root: classes.cardRoot }}>
           <Typography variant="h6" component="h3">
@@ -84,50 +105,92 @@ export default function SurveyListItem(props: Props) {
           <Typography color="textSecondary" component="h4" gutterBottom>
             {survey.subtitle?.[surveyLanguage]}
           </Typography>
-          <Typography variant="body1" color="textSecondary" gutterBottom>
-            {survey.author}
-            {survey.authorUnit && `, ${survey.authorUnit}`}
-          </Typography>
-          {surveyUrl && (
-            <Typography variant="body1" color="textSecondary" gutterBottom>
-              <Link
-                href={`${surveyUrl}${
-                  survey.localisationEnabled ? '?lang=' + surveyLanguage : ''
-                }`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {`${surveyUrl}${
-                  survey.localisationEnabled ? '?lang=' + surveyLanguage : ''
-                }`}
-              </Link>
-              <CopyToClipboard
-                data={`${surveyUrl}${
-                  survey.localisationEnabled ? '?lang=' + surveyLanguage : ''
-                }`}
+          <Box display="flex" rowGap={1} columnGap={1} flexWrap="wrap">
+            {survey.tags.map((tag, i) => (
+              <Chip label={tag} key={i} />
+            ))}
+          </Box>
+          <Stack direction="row">
+            <div>
+              <LinkSmallIcon
+                color="primary"
+                fontSize="small"
+                sx={{ marginTop: 1, marginRight: 1 }}
               />
+            </div>
+            {surveyUrl && (
+              <Typography variant="body1" color="textSecondary" gutterBottom>
+                <Link
+                  href={`${surveyUrl}${
+                    survey.localisationEnabled ? '?lang=' + surveyLanguage : ''
+                  }`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {`${surveyUrl}${
+                    survey.localisationEnabled ? '?lang=' + surveyLanguage : ''
+                  }`}
+                </Link>
+                <CopyToClipboard
+                  data={`${surveyUrl}${
+                    survey.localisationEnabled ? '?lang=' + surveyLanguage : ''
+                  }`}
+                />
+              </Typography>
+            )}
+          </Stack>
+          <Stack direction="row">
+            <div>
+              <UserSmallIcon
+                color="primary"
+                fontSize="small"
+                sx={{ marginTop: 0, marginRight: 1 }}
+              />
+            </div>
+            <Typography
+              variant="body1"
+              fontSize="bigger"
+              color="textSecondary"
+              gutterBottom
+            >
+              {survey.author}
+              {survey.authorUnit && `, ${survey.authorUnit}`}
             </Typography>
-          )}
+          </Stack>
+
           <div style={{ display: 'flex', flexDirection: 'row' }}>
             {/* Scheduling info (start/end dates) */}
+            <CalendarSmallIcon
+              fontSize="small"
+              color="primary"
+              sx={{ marginRight: 1 }}
+            />
             {survey.startDate && survey.endDate ? (
-              <Typography variant="body1" color="textSecondary" gutterBottom>
+              <Typography variant="body1" color="primary" gutterBottom>
                 {tr.SurveyList.open} {format(survey.startDate, 'd.M.yyyy')} -{' '}
                 {format(survey.endDate, 'd.M.yyyy')}
               </Typography>
             ) : survey.startDate ? (
-              <Typography variant="body1" color="textSecondary" gutterBottom>
+              <Typography variant="body1" color="primary" gutterBottom>
                 {tr.SurveyList.openFrom} {format(survey.startDate, 'd.M.yyyy')}
               </Typography>
             ) : null}
             {/* Current publish status */}
             {survey.isPublished ? (
-              <Typography style={{ paddingLeft: '0.5rem', color: 'green' }}>
+              <Typography
+                variant="published"
+                color="primary"
+                style={{ paddingLeft: '0.5rem' }}
+              >
                 {' '}
                 - {tr.SurveyList.published}
               </Typography>
             ) : (
-              <Typography style={{ paddingLeft: '0.5rem' }}>
+              <Typography
+                variant="published"
+                color="primary"
+                style={{ paddingLeft: '0.5rem' }}
+              >
                 {' '}
                 - {tr.SurveyList.notPublished}
               </Typography>
@@ -143,12 +206,13 @@ export default function SurveyListItem(props: Props) {
             justifyContent: 'flex-start',
           }}
         >
-          <Button component={NavLink} to={`${url}kyselyt/${survey.id}`}>
+          <Button component={NavLink} to={`${url}kyselyt/${survey.id}`} disabled={disableUsersAccessToSurvey}>
             {tr.SurveyList.editSurvey}
           </Button>
           {/* Allow publish only if it isn't yet published and has a name */}
           {!survey.isPublished && survey.name && (
             <Button
+              disabled={disableUsersAccessToSurvey}
               onClick={() => {
                 setPublishConfirmDialogOpen(true);
               }}
@@ -159,6 +223,7 @@ export default function SurveyListItem(props: Props) {
           {/* Allow unpublish when survey is published */}
           {survey.isPublished && (
             <Button
+              disabled={disableUsersAccessToSurvey}
               onClick={() => {
                 setUnpublishConfirmDialogOpen(true);
               }}
@@ -167,6 +232,7 @@ export default function SurveyListItem(props: Props) {
             </Button>
           )}
           <LoadingButton
+            disabled={disableUsersAccessToSurvey}
             onClick={async () => {
               const newSurveyId = await creteSurveyFromPrevious(survey.id);
               if (!newSurveyId) return;
@@ -177,6 +243,7 @@ export default function SurveyListItem(props: Props) {
             {tr.SurveyList.copySurvey}{' '}
           </LoadingButton>
           <Button
+            disabled={disableUsersAccessToSurvey}
             component={NavLink}
             style={{ marginLeft: 'auto' }}
             variant="contained"

@@ -9,7 +9,8 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import { Add, Cancel } from '@mui/icons-material';
+import AddIcon from '@src/components/icons/AddIcon';
+import CancelIcon from '@src/components/icons/CancelIcon';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React from 'react';
 import QuestionOptions from './QuestionOptions';
@@ -47,6 +48,7 @@ export default function EditMatrixQuestion({ section, onChange }: Props) {
             color="primary"
             aria-label="add-matrix-class"
             size="small"
+            sx={{boxShadow: 'none'}}
             onClick={() => {
               onChange({
                 ...section,
@@ -54,7 +56,7 @@ export default function EditMatrixQuestion({ section, onChange }: Props) {
               });
             }}
           >
-            <Add />
+            <AddIcon />
           </Fab>
           <Typography style={{ paddingLeft: '1rem' }}>
             {tr.SurveySections.classes}{' '}
@@ -95,7 +97,7 @@ export default function EditMatrixQuestion({ section, onChange }: Props) {
                 }}
                 style={{ position: 'absolute', top: '-1rem', right: '0.1rem' }}
               >
-                <Cancel />
+                <CancelIcon />
               </IconButton>
             </div>
           );

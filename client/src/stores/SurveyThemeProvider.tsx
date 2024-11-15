@@ -2,6 +2,8 @@ import { Survey } from '@interfaces/survey';
 import { createTheme, Theme } from '@mui/material';
 import { fiFI } from '@mui/material/locale';
 import { ThemeProvider } from '@mui/material/styles';
+import { surveyCardOverrides } from '@src/themes/common';
+
 import {
   buttonOverrides,
   defaultSurveyTheme,

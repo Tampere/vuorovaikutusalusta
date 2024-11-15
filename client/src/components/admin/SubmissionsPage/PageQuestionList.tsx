@@ -1,19 +1,19 @@
 import React from 'react';
 import { CardActionArea, ListItem, List, Typography, Box } from '@mui/material';
-import {
-  AttachFile,
-  CheckBox,
-  FormatListNumbered,
-  LibraryAddCheck,
-  LinearScale,
-  Looks4,
-  Map,
-  RadioButtonChecked,
-  TextFields,
-  ViewComfy,
-  ViewComfyAlt,
-  ArrowForwardIosSharp,
-} from '@mui/icons-material';
+
+import CheckboxCheckedIcon from '@src/components/icons/CheckboxCheckedIcon';
+import RadioButtonCheckedIcon from '@src/components/icons/RadioButtonCheckedIcon';
+import NumericFieldIcon from '@src/components/icons/NumericFieldIcon';
+import MapIcon from '@src/components/icons/MapIcon';
+import OrderedIcon from '@src/components/icons/OrderedIcon';
+import SliderIcon from '@src/components/icons/SliderIcon';
+import MatrixIcon from '@src/components/icons/MatrixIcon';
+import LikertGroupIcon from '@src/components/icons/LikertGroupIcon';
+import MultiCheckmarkIcon from '@src/components/icons/MultiCheckmarkIcon';
+import PaperclipIcon from '@src/components/icons/PaperclipIcon';
+import TextSectionIcon from '@src/components/icons/TextSectionIcon';
+import ChevronRightIcon from '@src/components/icons/ChevronRightIcon';
+
 import { SurveyQuestion } from '@interfaces/survey';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { assertNever } from '@src/utils/typeCheck';
@@ -28,27 +28,27 @@ function getQuestionIcon(
 ) {
   switch (questionType) {
     case 'checkbox':
-      return <CheckBox color="primary" />;
+      return <CheckboxCheckedIcon color="primary" />;
     case 'radio':
-      return <RadioButtonChecked color="primary" />;
+      return <RadioButtonCheckedIcon color="primary" />;
     case 'numeric':
-      return <Looks4 color="primary" />;
+      return <NumericFieldIcon color="primary" />;
     case 'map':
-      return <Map color="primary" />;
+      return <MapIcon color="primary" />;
     case 'sorting':
-      return <FormatListNumbered color="primary" />;
+      return <OrderedIcon color="primary" />;
     case 'slider':
-      return <LinearScale color="primary" />;
+      return <SliderIcon color="primary" />;
     case 'matrix':
-      return <ViewComfy color="primary" />;
+      return <MatrixIcon color="primary" />;
     case 'multi-matrix':
-      return <ViewComfyAlt color="primary" />;
+      return <LikertGroupIcon color="primary" />;
     case 'grouped-checkbox':
-      return <LibraryAddCheck color="primary" />;
+      return <MultiCheckmarkIcon color="primary" />;
     case 'attachment':
-      return <AttachFile color="primary" />;
+      return <PaperclipIcon color="primary" />;
     case 'free-text':
-      return <TextFields color="primary" />;
+      return <TextSectionIcon color="primary" />;
     default:
       assertNever(questionType);
   }
@@ -82,7 +82,7 @@ export function PageQuestionList({ questions, handleClick }: Props) {
                   <Typography>{question.title[surveyLanguage]}</Typography>
                 </Box>
 
-                <ArrowForwardIosSharp sx={{ color: '#41BBFF' }} />
+                <ChevronRightIcon sx={{ color: '#41BBFF' }} />
               </Box>
             </CardActionArea>
           </ListItem>

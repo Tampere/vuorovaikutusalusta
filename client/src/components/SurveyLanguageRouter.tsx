@@ -19,11 +19,17 @@ export default function SurveyLanguageRouter(): null {
   const lang = query.get('lang') as LanguageCode;
 
   useEffect(() => {
+    if (!survey) return;
     if (survey?.localisationEnabled && lang) setSurveyLanguage(lang);
+    if (survey?.localisationEnabled && !languages.includes(lang)) {
+      setSurveyLanguage(languages[0] as LanguageCode);
+      setLanguage(languages[0] as LanguageCode);
+    }
+
     if (!languages.includes(lang) || lang === language) return;
 
     setLanguage(lang);
-  }, [lang, survey]);
+  }, [lang, survey, languages]);
 
   return null;
 }

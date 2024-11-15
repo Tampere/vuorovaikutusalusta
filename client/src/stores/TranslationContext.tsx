@@ -1,4 +1,8 @@
-import { LocalizedText } from '@interfaces/survey';
+import {
+  EnabledLanguages,
+  LanguageCode,
+  LocalizedText,
+} from '@interfaces/survey';
 import React, { ReactNode, useContext, useMemo, useReducer } from 'react';
 import { useHistory } from 'react-router-dom';
 import en from './en.json';
@@ -29,10 +33,15 @@ type State = {
 /**
  * Reducer action type
  */
-type Action = {
-  type: 'SET_LANGUAGE' | 'SET_SURVEY_LANGUAGE';
-  language: Language;
-};
+type Action =
+  | {
+      type: 'SET_LANGUAGE' | 'SET_SURVEY_LANGUAGE';
+      language: Language;
+    }
+  | {
+      type: 'SET_AVAILABLE_LANGUAGES';
+      languages: EnabledLanguages;
+    };
 
 /**
  * Type of stored context (state & reducer returned from useReducer)
@@ -79,9 +88,14 @@ export function useTranslations() {
     dispatch({ type: 'SET_SURVEY_LANGUAGE', language });
   };
 
+  const setAvailableLanguages = (languages: EnabledLanguages) => {
+    dispatch({ type: 'SET_AVAILABLE_LANGUAGES', languages });
+  };
+
   return {
     setLanguage,
     setSurveyLanguage,
+    setAvailableLanguages,
     language: state.language,
     surveyLanguage: state.surveyLanguage,
     tr: translations[state.language],
@@ -109,6 +123,13 @@ function reducer(state: State, action: Action): State {
       return {
         ...state,
         surveyLanguage: action.language,
+      };
+    case 'SET_AVAILABLE_LANGUAGES':
+      return {
+        ...state,
+        languages: Object.entries(action.languages)
+          .filter(([, isEnabled]) => isEnabled)
+          .map(([lang]) => lang as LanguageCode),
       };
     default:
       throw new Error('Invalid action type');

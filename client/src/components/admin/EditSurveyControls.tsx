@@ -2,7 +2,8 @@ import React, { useMemo } from 'react';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { makeStyles } from '@mui/styles';
 import { Fab, Tooltip } from '@mui/material';
-import { Save, Undo } from '@mui/icons-material';
+import SaveIcon from '@src/components/icons/SaveIcon';
+import UndoIcon from '@src/components/icons/UndoIcon';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 
@@ -77,7 +78,7 @@ export default function EditSurveyControls() {
               }
             }}
           >
-            <Save />
+            <SaveIcon />
           </Fab>
         </span>
       </Tooltip>
@@ -91,7 +92,7 @@ export default function EditSurveyControls() {
               discardChanges();
             }}
           >
-            <Undo />
+            <UndoIcon />
           </Fab>
         </span>
       </Tooltip>

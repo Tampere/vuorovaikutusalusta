@@ -116,7 +116,10 @@
     "warningNoAvailableMapLayers": "No available map layers found from the Oskari map publication.",
     "mapLayers": "Map layers shown on the survey page",
     "defaultMapView": "Default map view for this page",
-    "defaultMapViewStatus": { "set": "Set", "notSet": "Not set" },
+    "defaultMapViewStatus": {
+      "set": "Set",
+      "notSet": "Not set"
+    },
     "defaultMapViewInfo": "Select the area from the map with mouse clicks.",
     "mapViewButtons": {
       "set": "Set",
@@ -165,7 +168,6 @@
     "changeType": "Change question type",
     "cancel": "Cancel"
   },
-
   "FileUpload": {
     "deleteFile": "Delete file",
     "addedFile": "Uploaded file",
@@ -589,7 +591,8 @@
     "missingTranslation": "Missing translation",
     "optionInfo": "Option info",
     "emailInfo": "Email",
-    "thanksPage": "Thank you -page"
+    "thanksPage": "Thank you -page",
+    "errorAtleastOnelanguage": "Atleast one language must be selected."
   },
   "SurveySubmissionsPage": {
     "attachments": "Attachments",
@@ -603,7 +606,10 @@
       "tooltipWeekLabel": "Week {x}, Year",
       "tooltipTotal": "Total answers",
       "tooltipCurrent": "Answers",
-      "xAxisLabel": { "byDay": "Day", "byWeek": "Week" },
+      "xAxisLabel": {
+        "byDay": "Day",
+        "byWeek": "Week"
+      },
       "yAxisTotalLabel": "Total answers",
       "yAxisLabel": "Answers"
     }
@@ -631,6 +637,10 @@
   "FooterLinks": {
     "accessibility": "Accessibility report",
     "privacyStatement": "Data protection statement"
+  },
+  "TagPicker": {
+    "addTags": "Add tags",
+    "filterWithTags": "Filter with tags"
   },
   "adminInstructions": "Open user manual"
 }

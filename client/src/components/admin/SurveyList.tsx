@@ -9,6 +9,7 @@ import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import LoadingButton from '../LoadingButton';
 import { useHistory } from 'react-router-dom';
+import { TagPicker } from '@src/components/admin/TagPicker';
 
 const useStyles = makeStyles({
   root: {
@@ -20,6 +21,9 @@ const useStyles = makeStyles({
     display: 'flex',
     justifyContent: 'space-between',
   },
+  item: {
+    boxShadow: '0px 2px 4px rgba(63, 111, 127, 0.9)',
+  },
 });
 
 export default function SurveyList() {
@@ -28,7 +32,7 @@ export default function SurveyList() {
   const [newSurveyLoading, setNewSurveyLoading] = useState(false);
   const [showAuthoredOnly, setShowAuthoredOnly] = useState<boolean>(false);
   const [showPublishedOnly, setShowPublishedOnly] = useState<boolean>(false);
-
+  const [filterTags, setFilterTags] = useState<string[]>([]);
   const classes = useStyles();
   const { showToast } = useToasts();
   const { tr } = useTranslations();
@@ -110,13 +114,29 @@ export default function SurveyList() {
           {tr.SurveyList.createNewSurvey}
         </LoadingButton>
       </div>
+
+      <div className={classes.actions}>
+        <TagPicker
+          selectedTags={filterTags}
+          addEnabled={false}
+          onSelectedTagsChange={(t) => setFilterTags(t)}
+        />
+      </div>
       {surveysLoading ? (
         <Skeleton variant="rectangular" width="100%" height={300} />
       ) : (
         <>
-          {surveys.map((survey) => (
-            <SurveyListItem key={survey.id} survey={survey} />
-          ))}
+          {surveys
+            .filter((s) =>
+              filterTags.length
+                ? filterTags.some((t) =>
+                    s.tags.length ? s.tags.includes(t) : false,
+                  )
+                : true,
+            )
+            .map((survey) => (
+              <SurveyListItem key={survey.id} survey={survey} />
+            ))}
         </>
       )}
     </div>

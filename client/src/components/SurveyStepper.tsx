@@ -32,7 +32,6 @@ import { useSurveyMap } from '@src/stores/SurveyMapContext';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { getClassList } from '@src/utils/classes';
-import { getFullFilePath } from '@src/utils/path';
 import { request } from '@src/utils/request';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import SplitPane from 'react-split-pane';
@@ -164,15 +163,6 @@ export default function SurveyStepper({
 
   const currentPageErrorRef = useRef(null);
 
-  const fullSidebarImagePath = useMemo(
-    () =>
-      getFullFilePath(
-        currentPage.sidebar.imagePath,
-        currentPage.sidebar.imageName,
-      ),
-    [currentPage.sidebar],
-  );
-
   /**
    * Show/hide mobile map when the drawing status of the map changes
    */
@@ -184,7 +174,7 @@ export default function SurveyStepper({
    * Stop the drawing interaction when the mobile map gets closed
    */
   useEffect(() => {
-    if (!mobileDrawerOpen && isMapReady) {
+    if (!mdUp && !mobileDrawerOpen && isMapReady) {
       stopDrawing();
     }
   }, [mobileDrawerOpen]);
@@ -197,6 +187,7 @@ export default function SurveyStepper({
     // If modifying, stop it when changing page
     if (isMapReady) {
       stopModifying();
+      stopDrawing();
     }
     // TODO scroll to beginning of the step? or only when "next" is clicked, and not on "previous"?
   }, [currentPage]);
@@ -330,7 +321,8 @@ export default function SurveyStepper({
   async function saveMapLayers() {
     // Get all currently visible map layer iDs and update to the survey page
     const mapLayers = (await getAllLayers())
-      .filter((layer) => layer.visible)
+      // Old Oskari might return drawing or feature layers as a string of format "userlayer_<number>", filter these out (as well as invisible layers)
+      .filter((layer) => layer.visible && typeof layer.id === 'number')
       .map((layer) => layer.id);
     updatePageMapLayers(currentPage, mapLayers);
 
@@ -387,17 +379,20 @@ export default function SurveyStepper({
 
   const stepperPane = (
     <>
-      {survey.localisationEnabled && (
-        <SurveyLanguageMenu
-          changeUILanguage={true}
-          style={{
-            position: 'absolute',
-            top: '1rem',
-            right: '1rem',
-            zIndex: 10,
-          }}
-        />
-      )}
+      {survey.localisationEnabled &&
+        Object.values(survey.enabledLanguages).filter(
+          (langEnabled) => langEnabled,
+        ).length > 1 && (
+          <SurveyLanguageMenu
+            changeUILanguage={true}
+            style={{
+              position: 'absolute',
+              top: '1rem',
+              right: '1rem',
+              zIndex: 10,
+            }}
+          />
+        )}
       <main>
         <h1 style={{ marginLeft: '1rem' }}>{survey.title[surveyLanguage]}</h1>
 
@@ -478,10 +473,10 @@ export default function SurveyStepper({
                   </Box>
                 )}
                 <FormControl style={{ width: '100%' }} component="fieldset">
-                  {currentPage.sidebar.imageName && (
+                  {currentPage.sidebar.imageUrl && (
                     <img
                       alt={currentPage.sidebar?.imageAltText?.[surveyLanguage]}
-                      src={`/api/file/${fullSidebarImagePath}`}
+                      src={`/api/file/${currentPage.sidebar?.imageUrl}`}
                       style={visuallyHidden}
                     />
                   )}
@@ -595,11 +590,21 @@ export default function SurveyStepper({
         </Stepper>
       </main>
       <Footer>
-        <Link color="primary" underline="hover" href="/saavutettavuusseloste" target="_blank">
+        <Link
+          color="primary"
+          underline="hover"
+          href="/saavutettavuusseloste"
+          target="_blank"
+        >
           {tr.FooterLinks.accessibility}
         </Link>
         {survey.displayPrivacyStatement && (
-          <Link color="primary" underline="hover" href="/tietosuojaseloste" target="_blank">
+          <Link
+            color="primary"
+            underline="hover"
+            href="/tietosuojaseloste"
+            target="_blank"
+          >
             {tr.FooterLinks.privacyStatement}
           </Link>
         )}
@@ -630,18 +635,18 @@ export default function SurveyStepper({
               width: '100%',
             }}
           >
-            {currentPage.sidebar.imageName && (
+            {currentPage.sidebar?.imageUrl && (
               <img
                 style={
                   currentPage.sidebar.imageSize === 'original'
                     ? { margin: '0 auto' }
                     : currentPage.sidebar.imageSize === 'fitted'
-                      ? { margin: '0 auto', maxWidth: '100%' }
-                      : null
+                    ? { margin: '0 auto', maxWidth: '100%' }
+                    : null
                 }
                 aria-hidden={true}
                 alt={currentPage.sidebar?.imageAltText?.[surveyLanguage]}
-                src={`/api/file/${fullSidebarImagePath}`}
+                src={`/api/file/${currentPage.sidebar?.imageUrl}`}
               />
             )}
           </div>
@@ -804,8 +809,8 @@ export default function SurveyStepper({
                   currentPage.sidebar.type === 'image'
                     ? tr.SurveyStepper.closeImage
                     : currentPage.sidebar.type === 'map'
-                      ? tr.SurveyStepper.closeMap
-                      : ''
+                    ? tr.SurveyStepper.closeMap
+                    : ''
                 }
               >
                 <Close />

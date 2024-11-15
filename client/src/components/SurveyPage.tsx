@@ -4,7 +4,6 @@ import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import { useSurveyTheme } from '@src/stores/SurveyThemeProvider';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
-import { getFullFilePath } from '@src/utils/path';
 import { request } from '@src/utils/request';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
@@ -34,7 +33,7 @@ export default function SurveyPage({ isTestSurvey }: Props) {
   const { setSurvey, survey, loadUnfinishedEntries } = useSurveyAnswers();
   const { setThemeFromSurvey } = useSurveyTheme();
   const { search } = useLocation();
-  const { tr, language } = useTranslations();
+  const { tr, language, setAvailableLanguages } = useTranslations();
   const { showToast } = useToasts();
 
   const unfinishedToken = useMemo(
@@ -49,16 +48,10 @@ export default function SurveyPage({ isTestSurvey }: Props) {
         const survey = await request<Survey>(
           `/api/published-surveys/${name}${isTestSurvey ? '?test=true' : ''}`,
         );
-        if (
-          survey.backgroundImagePath &&
-          survey.backgroundImageName &&
-          survey.backgroundImageName !== ''
-        ) {
-          const fullFilePath = getFullFilePath(
-            survey.backgroundImagePath,
-            survey.backgroundImageName,
+        if (survey.backgroundImageUrl) {
+          const response = await fetch(
+            `/api/file/${survey.backgroundImageUrl}`,
           );
-          const response = await fetch(`/api/file/${fullFilePath}`);
           const details = JSON.parse(
             response.headers.get('File-details') ?? '{}',
           );
@@ -67,6 +60,7 @@ export default function SurveyPage({ isTestSurvey }: Props) {
         setSurvey(survey);
         setThemeFromSurvey(survey);
         setLoading(false);
+        setAvailableLanguages(survey.enabledLanguages);
       } catch (error) {
         setErrorStatusCode(error.status);
         setLoading(false);
@@ -144,18 +138,25 @@ export default function SurveyPage({ isTestSurvey }: Props) {
           maxHeight: '-webkit-fill-available',
         }}
       >
-        {(showLandingPage || showThanksPage) && survey.localisationEnabled && (
-          <SurveyLanguageMenu
-            changeUILanguage={true}
-            style={{
-              position: 'absolute',
-              top: '1rem',
-              left: '1rem',
-              zIndex: 10,
-              backgroundColor: 'rgba(256, 256, 256, 0.8)'
-            }}
-          />
-        )}
+        {(showLandingPage || showThanksPage) &&
+          survey.localisationEnabled &&
+          Object.values(survey.enabledLanguages).filter(
+            (langEnabled) => langEnabled,
+          ).length > 1 && (
+            <SurveyLanguageMenu
+              changeUILanguage={true}
+              style={{
+                backgroundColor: 'rgba(255, 255, 255, 0.4)',
+                backdropFilter: 'blur(7px)',
+                padding: '0.2rem 1rem 0.2rem 0.2rem',
+                position: 'absolute',
+                top: '1rem',
+                left: '1rem',
+                zIndex: 10,
+                borderRadius: '7px',
+              }}
+            />
+          )}
         {/* Landing page */}
         {showLandingPage && (
           <SurveyLandingPage

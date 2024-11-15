@@ -14,6 +14,7 @@ import Fieldset from '../Fieldset';
 import RichTextEditor from '../RichTextEditor';
 import EditSurveySectionTranslations from './EditSurveySectionTranslations';
 import TranslationField from './TranslationField';
+import { useToasts } from '@src/stores/ToastContext';
 
 const useStyles = makeStyles({
   rowContainer: {
@@ -69,7 +70,9 @@ function surveyToTranslationString(survey: Survey) {
     valueEn: string,
     valueSe: string,
   ): string {
-    return `${label} \t ${valueFi ?? ''} \t ${valueEn ?? ''} \t ${valueSe ?? ''}\n`;
+    return `${label} \t ${valueFi ?? ''} \t ${valueEn ?? ''} \t ${
+      valueSe ?? ''
+    }\n`;
   }
 
   // Uses recursion to loop through the entire Survey object and to add all values of objects of type LocalizedText to the clipboard
@@ -122,6 +125,7 @@ export default function EditSurveyTranslations() {
   } = useSurvey();
   const { tr, languages } = useTranslations();
   const classes = useStyles();
+  const { showToast } = useToasts();
 
   return (
     <>
@@ -156,7 +160,11 @@ export default function EditSurveyTranslations() {
               <Typography>
                 {tr.EditSurveyTranslations.copyTextFields}
               </Typography>
-              <CopyToClipboard data={surveyToTranslationString(activeSurvey)} />
+              <div style={{ display: 'inline-block' }}>
+                <CopyToClipboard
+                  data={surveyToTranslationString(activeSurvey)}
+                />
+              </div>
             </div>
             <Typography variant="h5">
               {tr.EditSurveyTranslations.supportedLanguages}:{' '}
@@ -172,9 +180,47 @@ export default function EditSurveyTranslations() {
                       className={classes.rowContainer}
                       style={{ justifyContent: 'flex-start' }}
                     >
-                      <Typography variant="h6" style={{ fontWeight: 'bold' }}>
-                        {tr.EditSurveyTranslations[lang].toLocaleUpperCase()}
-                      </Typography>
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={activeSurvey.enabledLanguages[lang]}
+                            onChange={(event) => {
+                              if (
+                                !Object.values({
+                                  ...activeSurvey.enabledLanguages,
+                                  [lang]: event.target.checked,
+                                }).some((languageEnabled) => languageEnabled)
+                              ) {
+                                showToast({
+                                  severity: 'error',
+                                  message:
+                                    tr.EditSurveyTranslations
+                                      .errorAtleastOnelanguage,
+                                });
+                                return;
+                              }
+                              editSurvey({
+                                ...activeSurvey,
+                                enabledLanguages: {
+                                  ...activeSurvey.enabledLanguages,
+                                  [lang]: event.target.checked,
+                                },
+                              });
+                            }}
+                            sx={{ '& .MuiSvgIcon-root': { fontSize: 28 } }}
+                          ></Checkbox>
+                        }
+                        label={
+                          <Typography
+                            variant="h6"
+                            style={{ fontWeight: 'bold' }}
+                          >
+                            {tr.EditSurveyTranslations[
+                              lang
+                            ].toLocaleUpperCase()}
+                          </Typography>
+                        }
+                      />
                     </div>
                     <br />
                     <Typography className={classes.titleText}>

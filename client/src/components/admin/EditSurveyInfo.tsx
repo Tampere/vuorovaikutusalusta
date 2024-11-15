@@ -15,13 +15,15 @@ import { makeStyles } from '@mui/styles';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { TagPicker } from '@src/components/admin/TagPicker';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
-import fiLocale from 'date-fns/locale/fi';
+import { assertNever } from '@src/utils/typeCheck';
 import enLocale from 'date-fns/locale/en-GB';
+import fiLocale from 'date-fns/locale/fi';
 import svLocale from 'date-fns/locale/sv';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import CopyToClipboard from '../CopyToClipboard';
 import DeleteSurveyDialog from '../DeleteSurveyDialog';
@@ -29,9 +31,8 @@ import Fieldset from '../Fieldset';
 import LoadingButton from '../LoadingButton';
 import ColorSelect from './ColorSelect';
 import SurveyImageList from './SurveyImageList';
-import ThemeSelect from './ThemeSelect';
-import { assertNever } from '@src/utils/typeCheck';
 import { SurveyMarginImageList } from './SurveyImageListWrapper';
+import ThemeSelect from './ThemeSelect';
 
 const useStyles = makeStyles({
   dateTimePicker: {
@@ -63,36 +64,11 @@ export default function EditSurveyInfo() {
   const { tr, surveyLanguage, language } = useTranslations();
   const { showToast } = useToasts();
   const history = useHistory();
-
   const classes = useStyles();
 
   const testSurveyUrl = useMemo(() => {
     return `${window.location.origin}/${originalActiveSurvey.name}/testi`;
   }, [originalActiveSurvey.name]);
-
-  useEffect(() => {
-    async function fetchOtherUsers() {
-      setUsersLoading(true);
-      try {
-        const currentUser = await fetch('/api/users/me').then(
-          (response) => response.json() as Promise<User>,
-        );
-        const users = await fetch('/api/users/others').then(
-          (response) => response.json() as Promise<User[]>,
-        );
-        setUsers(users);
-        setCurrentUser(currentUser);
-      } catch (error) {
-        showToast({
-          severity: 'error',
-          message: tr.EditSurveyInfo.userFetchFailed,
-        });
-      }
-      setUsersLoading(false);
-    }
-
-    fetchOtherUsers();
-  }, []);
 
   function getAllUsers() {
     if (!currentUser || !activeSurvey || !users) {
@@ -165,6 +141,16 @@ export default function EditSurveyInfo() {
           }}
           helperText={tr.EditSurveyInfo.nameHelperText}
         />
+        <TagPicker
+          selectedTags={activeSurvey.tags}
+          addEnabled={true}
+          onSelectedTagsChange={(t) =>
+            editSurvey({
+              ...activeSurvey,
+              tags: t.map((t) => t),
+            })
+          }
+        />
         <TextField
           required
           error={validationErrors.includes('survey.author')}
@@ -202,30 +188,6 @@ export default function EditSurveyInfo() {
             tr.EditSurveyInfo.mapUrlError
           }
         />
-        {!usersLoading && currentUser?.groups.length !== 1 && (
-          <Autocomplete
-            multiple
-            defaultValue={activeSurvey.groups}
-            disabled={usersLoading || currentUser.groups?.length === 1}
-            options={currentUser?.groups ?? []}
-            getOptionLabel={(group) => group}
-            value={activeSurvey.groups}
-            onChange={(_, value: string[]) => {
-              editSurvey({
-                ...activeSurvey,
-                groups: value,
-              });
-            }}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                variant="standard"
-                label={tr.EditSurveyInfo.authorizedGroups}
-                helperText={tr.EditSurveyInfo.authorizedGroupsHelperText}
-              />
-            )}
-          />
-        )}
 
         <Autocomplete
           multiple
@@ -235,8 +197,8 @@ export default function EditSurveyInfo() {
           }
           getOptionLabel={(user) => user.fullName}
           value={
-            getAllUsers()?.filter((user) =>
-              activeSurvey.admins?.includes(user.id),
+            getAllUsers()?.filter(
+              (user) => activeSurvey.admins?.includes(user.id),
             ) ?? []
           }
           onChange={(_, value: User[]) => {
@@ -254,7 +216,6 @@ export default function EditSurveyInfo() {
             />
           )}
         />
-
         {availableMapLayersLoading && (
           <Skeleton variant="rectangular" height={200} width="100%" />
         )}

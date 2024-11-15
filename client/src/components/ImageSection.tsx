@@ -2,7 +2,6 @@ import { SurveyImageSection } from '@interfaces/survey';
 import { FormLabel, Link, Typography } from '@mui/material';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import { useTranslations } from '@src/stores/TranslationContext';
-import { getFullFilePath } from '@src/utils/path';
 import React, { useMemo } from 'react';
 import SectionInfo from './SectionInfo';
 
@@ -14,11 +13,6 @@ interface Props {
 export default function ImageSection({ section, isFollowUp = false }: Props) {
   const { survey } = useSurveyAnswers();
   const { tr, surveyLanguage, language } = useTranslations();
-
-  const fullFilePath = useMemo(
-    () => getFullFilePath(section.filePath, section.fileName),
-    [section.filePath, section.fileName],
-  );
 
   return (
     <>
@@ -46,11 +40,11 @@ export default function ImageSection({ section, isFollowUp = false }: Props) {
       </div>
       <img
         style={{ maxWidth: '100%' }}
-        src={`/api/file/${fullFilePath}`}
+        src={`/api/file/${section.fileUrl}`}
         alt={section.altText[language]}
       />
       <div style={{ display: 'flex', flexDirection: 'row' }}>
-        <Link href={`/api/file/${fullFilePath}`} target={'__blank'}>
+        <Link href={`/api/file/${section.fileUrl}`} target={'__blank'}>
           {tr.ImageSection.openInNewTab}
         </Link>
       </div>

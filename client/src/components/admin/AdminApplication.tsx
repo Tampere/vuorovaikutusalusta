@@ -1,22 +1,23 @@
-import React from 'react';
-import fiLocale from 'date-fns/locale/fi';
 import { CssBaseline, ThemeProvider } from '@mui/material';
-import { theme } from '@src/themes/admin';
-import Compose from '../Compose';
-import EditSurvey from './EditSurvey';
-import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
-import SurveyProvider from '@src/stores/SurveyContext';
-import TranslationProvider from '@src/stores/TranslationContext';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import SurveyAnswerProvider from '@src/stores/SurveyAnswerContext';
-import ToastProvider from '@src/stores/ToastContext';
-import AdminFrontPage from './AdminFrontPage';
-import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
-import LanguageRouter from '../LanguageRouter';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import ClipboardProvider from '@src/stores/ClipboardContext';
-import SurveySubmissionsPage from './SubmissionsPage/SurveySubmissionsPage';
+import SurveyAnswerProvider from '@src/stores/SurveyAnswerContext';
+import SurveyProvider from '@src/stores/SurveyContext';
 import SurveyMapProvider from '@src/stores/SurveyMapContext';
+import ToastProvider from '@src/stores/ToastContext';
+import TranslationProvider from '@src/stores/TranslationContext';
+import UserProvider from '@src/stores/UserContext';
+import { theme } from '@src/themes/admin';
+import fiLocale from 'date-fns/locale/fi';
+import React from 'react';
+import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
+import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
+import Compose from '../Compose';
+import LanguageRouter from '../LanguageRouter';
+import AdminFrontPage from './AdminFrontPage';
+import EditSurvey from './EditSurvey';
+import SurveySubmissionsPage from './SubmissionsPage/SurveySubmissionsPage';
 
 export default function AdminApplication() {
   return (
@@ -33,6 +34,7 @@ export default function AdminApplication() {
         ClipboardProvider,
         SurveyAnswerProvider,
         SurveyMapProvider,
+        UserProvider
       ]}
     >
       <CssBaseline />

@@ -248,7 +248,6 @@ export default function EditSurveySectionTranslations({
             overflow: 'hidden',
             whiteSpace: 'nowrap',
             position: 'relative',
-            minWidth: '250px',
           }}
         >
           <RichTextEditor

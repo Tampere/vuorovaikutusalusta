@@ -13,6 +13,7 @@ import {
   getDistinctAutoSendToEmails,
   getSurvey,
   getSurveys,
+  getTagsByOrganizations,
   publishSurvey,
   unpublishSurvey,
   updateSurvey,
@@ -39,6 +40,18 @@ router.get(
 );
 
 /**
+ * Endpoint for getting orgs all available tags
+ */
+router.get(
+  '/org-tags',
+  ensureAuthenticated(),
+  asyncHandler(async (req, res) => {
+    const orgTags = await getTagsByOrganizations(req.user.organizations);
+    res.json(orgTags);
+  }),
+);
+
+/**
  * Endpoint for getting all surveys.
  */
 router.get(
@@ -60,7 +73,7 @@ router.get(
     const surveys = await getSurveys(
       filterByAuthored ? userId : null,
       Boolean(filterByPublished),
-      req.user.groups,
+      req.user.organizations[0], // For now, use the first organization
     );
     res.status(200).json(surveys);
   }),
@@ -74,9 +87,20 @@ router.get(
   validateRequest([
     param('id').isNumeric().toInt().withMessage('ID must be a number'),
   ]),
+  ensureAuthenticated(),
   asyncHandler(async (req, res) => {
-    const id = Number(req.params.id);
-    const survey = await getSurvey({ id, groups: req.user.groups });
+    const surveyId = Number(req.params.id);
+
+    const permissionsOk = await userCanEditSurvey(req.user, surveyId);
+    if (!permissionsOk) {
+      throw new ForbiddenError('User not author nor admin of the survey');
+    }
+
+    // For now, use the first organization
+    const survey = await getSurvey({
+      id: surveyId,
+      organization: req.user.organizations[0],
+    });
     res.status(200).json(survey);
   }),
 );
@@ -171,7 +195,10 @@ router.put(
       .optional({ checkFalsy: true })
       .isString()
       .withMessage('Section type must be a string'),
-    body('groups').isArray().withMessage('Groups must be an array'),
+    body('organization')
+      .isString()
+      .withMessage('Organization must be a string'),
+    body('tags').optional().isArray().withMessage('Tags must be an array.'),
   ]),
   asyncHandler(async (req, res) => {
     const surveyId = Number(req.params.id);

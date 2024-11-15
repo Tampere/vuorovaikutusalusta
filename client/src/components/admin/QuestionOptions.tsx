@@ -1,6 +1,10 @@
 import { LocalizedText, SectionOption } from '@interfaces/survey';
 import { Fab, IconButton, TextField, Tooltip, Typography } from '@mui/material';
-import { Add, Delete, DragIndicator } from '@mui/icons-material';
+
+import DraggableIcon from '@src/components/icons/DraggableIcon';
+import DeleteBinIcon from '@src/components/icons/DeleteBinIcon';
+import AddIcon from '@src/components/icons/AddIcon';
+
 import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { createRef, useEffect, useMemo } from 'react';
@@ -120,18 +124,19 @@ export default function QuestionOptions({
           disabled={disabled}
           aria-label="add-question-option"
           size="small"
+          sx={{boxShadow: 'none'}}
           onClick={() => {
             onChange([...options, { text: initializeLocalizedObject('') }]);
           }}
         >
-          <Add />
+          <AddIcon />
         </Fab>
         <Typography style={{ paddingLeft: '1rem' }}>{title}</Typography>
       </div>
       <div>
         {options.map((option, index) => (
           <div className={`${classes.row} ${classes.option}`} key={index}>
-            <DragIndicator />
+            <DraggableIcon style={{ fontSize: '14' }} />
             <div className={classes.textInput}>
               <TextField
                 multiline
@@ -211,7 +216,7 @@ export default function QuestionOptions({
                     onChange(options.filter((_, i) => index !== i));
                   }}
                 >
-                  <Delete />
+                  <DeleteBinIcon />
                 </IconButton>
               </span>
             </Tooltip>

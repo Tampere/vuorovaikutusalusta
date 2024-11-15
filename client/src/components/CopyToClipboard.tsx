@@ -1,5 +1,5 @@
 import { IconButton, Tooltip } from '@mui/material';
-import FileCopyIcon from '@mui/icons-material/FileCopy';
+import FileCopyIcon from './icons/FileCopyIcon';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React from 'react';
