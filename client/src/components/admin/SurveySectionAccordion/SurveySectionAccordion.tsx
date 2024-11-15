@@ -303,7 +303,7 @@ export default function SurveySectionAccordion(props: Props) {
           <div style={{ display: 'flex', paddingLeft: '1rem' }}>
             {accordion.tooltip ? (
               <Tooltip title={accordion.tooltip}>
-                {accordion.icon as any}
+                <span>{accordion.icon as any}</span>
               </Tooltip>
             ) : (
               accordion.icon
@@ -345,11 +345,11 @@ export default function SurveySectionAccordion(props: Props) {
                 });
               }}
             >
-              <DocumentCopyIcon htmlColor='#000000DD' />
+              <DocumentCopyIcon htmlColor="#000000DD" />
             </IconButton>
           )}
           <div {...props.provided.dragHandleProps} style={{ display: 'flex' }}>
-            <DraggableIcon color='disabled'/>
+            <DraggableIcon color="disabled" />
           </div>
         </AccordionSummary>
         <SectionDetails
