@@ -19,19 +19,25 @@ export default function DocumentSection({
   const { tr, surveyLanguage } = useTranslations();
   const [isVideo, setIsVideo] = useState(false);
 
-  const checkHeader = async () => {
-    try {
-      const res = await fetch(`/api/file/${section.fileUrl}`, {
-        method: 'HEAD',
-      });
-      const contentType = res.headers.get('Content-Type');
-      setIsVideo(contentType && contentType.startsWith('video/'));
-    } catch (error) {
-      // TODO
-    }
-  };
   useEffect(() => {
+    const controller = new AbortController();
+    const cancelSignal = controller.signal;
+    const checkHeader = async () => {
+      try {
+        const res = await fetch(`/api/file/${section.fileUrl}`, {
+          method: 'HEAD',
+          signal: cancelSignal,
+        });
+        const contentType = res.headers.get('Content-Type');
+        setIsVideo(contentType && contentType.startsWith('video/'));
+      } catch (error) {
+        // TODO
+      }
+    };
     checkHeader();
+    return () => {
+      controller.abort();
+    };
   }, []);
 
   const fileName = useMemo(
