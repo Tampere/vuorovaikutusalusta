@@ -380,7 +380,6 @@ export default function SurveyStepper({
   const stepperPane = (
     <>
       {survey.localisationEnabled &&
-        survey.localisationEnabled &&
         Object.values(survey.enabledLanguages).filter(
           (langEnabled) => langEnabled,
         ).length > 1 && (
