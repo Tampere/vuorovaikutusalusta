@@ -1,7 +1,7 @@
 import { SurveyDocumentSection } from '@interfaces/survey';
-import { FormLabel, Link, Typography } from '@mui/material';
+import { Card, CardMedia, FormLabel, Link, Typography } from '@mui/material';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import SectionInfo from './SectionInfo';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { getFileName } from '@src/utils/path';
@@ -17,6 +17,22 @@ export default function DocumentSection({
 }: Props) {
   const { survey } = useSurveyAnswers();
   const { tr, surveyLanguage } = useTranslations();
+  const [isVideo, setIsVideo] = useState(false);
+
+  const checkHeader = async () => {
+    try {
+      const res = await fetch(`/api/file/${section.fileUrl}`, {
+        method: 'HEAD',
+      });
+      const contentType = res.headers.get('Content-Type');
+      setIsVideo(contentType && contentType.startsWith('video/'));
+    } catch (error) {
+      // TODO
+    }
+  };
+  useEffect(() => {
+    checkHeader();
+  });
 
   const fileName = useMemo(
     () => getFileName(section.fileUrl),
