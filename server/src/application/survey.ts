@@ -997,7 +997,7 @@ async function deleteRemovedSections(
 ) {
   // Get all existing sections
   const rows = await getDb().manyOrNone<{ id: number }>(
-    `SELECT id FROM data.page_section WHERE parent_section IS NULL AND survey_page_id IN (
+    `SELECT id FROM data.page_section WHERE parent_section IS NULL AND predecessor_section IS NULL AND survey_page_id IN (
        SELECT id FROM data.survey_page WHERE survey_id = $1
     )`,
     [surveyId],
