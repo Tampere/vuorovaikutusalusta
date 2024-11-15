@@ -1,34 +1,35 @@
-import React, { useState, useMemo } from 'react';
-import clsx from 'clsx';
 import { Survey } from '@interfaces/survey';
 import {
   Box,
   Button,
   Card,
+  CardActions,
+  CardContent,
   Chip,
   Link,
   Stack,
   Theme,
   Typography,
 } from '@mui/material';
-import { CardContent } from '@mui/material';
-import { CardActions } from '@mui/material';
-import { useTranslations } from '@src/stores/TranslationContext';
-import { format } from 'date-fns';
-import CopyToClipboard from '../CopyToClipboard';
-import ConfirmDialog from '../ConfirmDialog';
+import { makeStyles } from '@mui/styles';
+import CalendarSmallIcon from '@src/components/icons/CalendarSmallIcon';
+import LinkSmallIcon from '@src/components/icons/LinkSmallIcon';
+import UserSmallIcon from '@src/components/icons/UserSmallIcon';
 import {
   creteSurveyFromPrevious,
   publishSurvey,
   unpublishSurvey,
 } from '@src/controllers/SurveyController';
 import { useToasts } from '@src/stores/ToastContext';
-import { makeStyles } from '@mui/styles';
-import LoadingButton from '../LoadingButton';
+import { useTranslations } from '@src/stores/TranslationContext';
+import { useUser } from '@src/stores/UserContext';
+import clsx from 'clsx';
+import { format } from 'date-fns';
+import React, { useMemo, useState } from 'react';
 import { NavLink, useRouteMatch } from 'react-router-dom';
-import UserSmallIcon from '@src/components/icons/UserSmallIcon';
-import LinkSmallIcon from '@src/components/icons/LinkSmallIcon';
-import CalendarSmallIcon from '@src/components/icons/CalendarSmallIcon';
+import ConfirmDialog from '../ConfirmDialog';
+import CopyToClipboard from '../CopyToClipboard';
+import LoadingButton from '../LoadingButton';
 
 const useStyles = makeStyles((theme: Theme) => ({
   '@keyframes pulse': {
@@ -72,6 +73,9 @@ export default function SurveyListItem(props: Props) {
   const { tr, surveyLanguage } = useTranslations();
   const { showToast } = useToasts();
   const { url } = useRouteMatch();
+  const { activeUser } = useUser();
+
+  const disableUsersAccessToSurvey = useMemo(() => activeUser?.id !== survey.authorId || survey.admins.includes(activeUser?.id), [activeUser, survey]);
 
   const surveyUrl = useMemo(() => {
     if (!survey.name) {
@@ -202,12 +206,13 @@ export default function SurveyListItem(props: Props) {
             justifyContent: 'flex-start',
           }}
         >
-          <Button component={NavLink} to={`${url}kyselyt/${survey.id}`}>
+          <Button component={NavLink} to={`${url}kyselyt/${survey.id}`} disabled={disableUsersAccessToSurvey}>
             {tr.SurveyList.editSurvey}
           </Button>
           {/* Allow publish only if it isn't yet published and has a name */}
           {!survey.isPublished && survey.name && (
             <Button
+              disabled={disableUsersAccessToSurvey}
               onClick={() => {
                 setPublishConfirmDialogOpen(true);
               }}
@@ -218,6 +223,7 @@ export default function SurveyListItem(props: Props) {
           {/* Allow unpublish when survey is published */}
           {survey.isPublished && (
             <Button
+              disabled={disableUsersAccessToSurvey}
               onClick={() => {
                 setUnpublishConfirmDialogOpen(true);
               }}
@@ -226,6 +232,7 @@ export default function SurveyListItem(props: Props) {
             </Button>
           )}
           <LoadingButton
+            disabled={disableUsersAccessToSurvey}
             onClick={async () => {
               const newSurveyId = await creteSurveyFromPrevious(survey.id);
               if (!newSurveyId) return;
@@ -236,6 +243,7 @@ export default function SurveyListItem(props: Props) {
             {tr.SurveyList.copySurvey}{' '}
           </LoadingButton>
           <Button
+            disabled={disableUsersAccessToSurvey}
             component={NavLink}
             style={{ marginLeft: 'auto' }}
             variant="contained"

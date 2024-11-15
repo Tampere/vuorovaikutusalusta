@@ -87,11 +87,18 @@ router.get(
   validateRequest([
     param('id').isNumeric().toInt().withMessage('ID must be a number'),
   ]),
+  ensureAuthenticated(),
   asyncHandler(async (req, res) => {
-    const id = Number(req.params.id);
+    const surveyId = Number(req.params.id);
+
+    const permissionsOk = await userCanEditSurvey(req.user, surveyId);
+    if (!permissionsOk) {
+      throw new ForbiddenError('User not author nor admin of the survey');
+    }
+
     // For now, use the first organization
     const survey = await getSurvey({
-      id,
+      id: surveyId,
       organization: req.user.organizations[0],
     });
     res.status(200).json(survey);
