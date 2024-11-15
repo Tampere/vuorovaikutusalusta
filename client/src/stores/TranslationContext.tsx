@@ -1,16 +1,13 @@
-import { LocalizedText } from '@interfaces/survey';
-import React, { ReactNode, useContext, useMemo, useReducer } from 'react';
-import { useHistory } from 'react-router-dom';
-import en from './en.json';
-import fi from './fi.json';
-import se from './se.json';
 import {
   EnabledLanguages,
   LanguageCode,
   LocalizedText,
 } from '@interfaces/survey';
-
-
+import React, { ReactNode, useContext, useMemo, useReducer } from 'react';
+import { useHistory } from 'react-router-dom';
+import en from './en.json';
+import fi from './fi.json';
+import se from './se.json';
 
 // Object containing all translations
 const translations = {
