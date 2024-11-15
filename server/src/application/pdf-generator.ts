@@ -141,9 +141,6 @@ async function getFrontPage(
   language: LanguageCode,
 ): Promise<Content> {
   const tr = useTranslations(language);
-  const image = survey.backgroundImageUrl
-    ? await getFile(survey.backgroundImageUrl)
-    : null;
 
   const [logo, banner] = await Promise.all([
     survey.marginImages.top.imageUrl
@@ -174,12 +171,7 @@ async function getFrontPage(
     },
     {
       text: '',
-      margin: [0, image ? 120 : 300, 0, 0],
-    },
-    image && {
-      image: `data:image/png;base64,${image.data.toString('base64')}`,
-      width: 498.9,
-      margin: [0, 0, 0, 10],
+      margin: [0, 300, 0, 0],
     },
     {
       headlineLevel: 1,
