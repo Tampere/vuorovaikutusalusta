@@ -32,7 +32,7 @@ export default function DocumentSection({
   };
   useEffect(() => {
     checkHeader();
-  });
+  }, []);
 
   const fileName = useMemo(
     () => getFileName(section.fileUrl),
@@ -63,13 +63,23 @@ export default function DocumentSection({
           />
         )}
       </div>
-      <Link
-        href={`/api/file/${section.fileUrl}`}
-        target="_blank"
-        rel="noreferrer"
-      >
-        {tr.DocumentSection.attachment}: {fileName}
-      </Link>
+      {isVideo ? (
+        <Card>
+          <CardMedia
+            controls
+            component="video"
+            src={`/api/file/${section.fileUrl}`}
+          />
+        </Card>
+      ) : (
+        <Link
+          href={`/api/file/${section.fileUrl}`}
+          target="_blank"
+          rel="noreferrer"
+        >
+          {tr.DocumentSection.attachment}: {fileName}
+        </Link>
+      )}
     </>
   );
 }
