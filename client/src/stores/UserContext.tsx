@@ -34,7 +34,7 @@ interface Props {
   children: ReactNode;
 }
 
-/** Translation context initial values */
+/** User context initial values */
 const stateDefaults: State = {
   activeUser: null,
   organizationsUsers: null
