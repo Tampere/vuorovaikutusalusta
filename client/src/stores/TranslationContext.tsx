@@ -1,3 +1,4 @@
+import { LocalizedText } from '@interfaces/survey';
 import React, { ReactNode, useContext, useMemo, useReducer } from 'react';
 import { useHistory } from 'react-router-dom';
 import en from './en.json';
@@ -8,6 +9,8 @@ import {
   LanguageCode,
   LocalizedText,
 } from '@interfaces/survey';
+
+
 
 // Object containing all translations
 const translations = {
