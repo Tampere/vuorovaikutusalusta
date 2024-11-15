@@ -244,7 +244,7 @@
     "fileUploadError": "Error while uploading file",
     "fileSizeLimitError": "File size cannot exceed 10MB",
     "unsupportedFileFormat": "Unsupported file format",
-    "attachmentFileFormats": "Supported file formats: jpg, jpeg, png, pdf, docx, xlsx.",
+    "attachmentFileFormats": "Supported file formats: jpg, jpeg, png, pdf, docx, xlsx and most video formats.",
     "deleteUploadedFile": "Delete uploaded file",
     "replace": "Replace the selected file by clicking here."
   },

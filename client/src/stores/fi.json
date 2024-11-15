@@ -244,7 +244,7 @@
     "fileUploadError": "Virhe ladattaessa tiedostoa",
     "fileSizeLimitError": "Ladattavan tiedoston koko ei saa olla yli 10MB",
     "unsupportedFileFormat": "Tiedostoformaattia ei tueta",
-    "attachmentFileFormats": "Sallitut tiedostoformaatit: jpg, jpeg, png, pdf, docx, xlsx.",
+    "attachmentFileFormats": "Sallitut tiedostoformaatit: jpg, jpeg, png, pdf, docx, xlsx sekä yleisimmät video formaatit.",
     "deleteUploadedFile": "Poista ladattu tiedosto",
     "replace": "Korvaa valittu liite napsauttamalla."
   },
