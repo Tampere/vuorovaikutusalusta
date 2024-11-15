@@ -73,6 +73,7 @@ router.get(
   validateRequest([
     param('id').isNumeric().toInt().withMessage('ID must be a number'),
   ]),
+  ensureAuthenticated(),
   asyncHandler(async (req, res) => {
     const id = Number(req.params.id);
     const survey = await getSurvey({ id });
