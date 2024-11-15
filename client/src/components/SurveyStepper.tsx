@@ -379,17 +379,20 @@ export default function SurveyStepper({
 
   const stepperPane = (
     <>
-      {survey.localisationEnabled && (
-        <SurveyLanguageMenu
-          changeUILanguage={true}
-          style={{
-            position: 'absolute',
-            top: '1rem',
-            right: '1rem',
-            zIndex: 10,
-          }}
-        />
-      )}
+      {survey.localisationEnabled &&
+        Object.values(survey.enabledLanguages).filter(
+          (langEnabled) => langEnabled,
+        ).length > 1 && (
+          <SurveyLanguageMenu
+            changeUILanguage={true}
+            style={{
+              position: 'absolute',
+              top: '1rem',
+              right: '1rem',
+              zIndex: 10,
+            }}
+          />
+        )}
       <main>
         <h1 style={{ marginLeft: '1rem' }}>{survey.title[surveyLanguage]}</h1>
 

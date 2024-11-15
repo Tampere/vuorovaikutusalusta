@@ -14,6 +14,7 @@ import Fieldset from '../Fieldset';
 import RichTextEditor from '../RichTextEditor';
 import EditSurveySectionTranslations from './EditSurveySectionTranslations';
 import TranslationField from './TranslationField';
+import { useToasts } from '@src/stores/ToastContext';
 
 const useStyles = makeStyles({
   rowContainer: {
@@ -124,6 +125,7 @@ export default function EditSurveyTranslations() {
   } = useSurvey();
   const { tr, languages } = useTranslations();
   const classes = useStyles();
+  const { showToast } = useToasts();
 
   return (
     <>
@@ -183,6 +185,20 @@ export default function EditSurveyTranslations() {
                           <Checkbox
                             checked={activeSurvey.enabledLanguages[lang]}
                             onChange={(event) => {
+                              if (
+                                !Object.values({
+                                  ...activeSurvey.enabledLanguages,
+                                  [lang]: event.target.checked,
+                                }).some((languageEnabled) => languageEnabled)
+                              ) {
+                                showToast({
+                                  severity: 'error',
+                                  message:
+                                    tr.EditSurveyTranslations
+                                      .errorAtleastOnelanguage,
+                                });
+                                return;
+                              }
                               editSurvey({
                                 ...activeSurvey,
                                 enabledLanguages: {

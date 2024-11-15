@@ -116,7 +116,10 @@
     "warningNoAvailableMapLayers": "Inga kartlager hittades från Oskari-kartpubliceringen.",
     "mapLayers": "Kartlager som visas på sidan",
     "defaultMapView": "Standardvy för kartan på den här sidan",
-    "defaultMapViewStatus": { "set": "Inställd", "notSet": "Inte inställd" },
+    "defaultMapViewStatus": {
+      "set": "Inställd",
+      "notSet": "Inte inställd"
+    },
     "defaultMapViewInfo": "Markera ett område på kartan med en klickning med musen för att visa det på frågesidan.",
     "mapViewButtons": {
       "set": "Ange",
@@ -588,7 +591,8 @@
     "missingTranslation": "Översättning saknas",
     "optionInfo": "Ytterligare information om alternativet",
     "emailInfo": "E-post",
-    "thanksPage": "Tack-sida"
+    "thanksPage": "Tack-sida",
+    "errorAtleastOnelanguage": "Minst ett språk måste väljas."
   },
   "SurveySubmissionsPage": {
     "attachments": "Bilagor",
