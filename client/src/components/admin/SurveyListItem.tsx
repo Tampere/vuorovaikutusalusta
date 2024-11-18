@@ -75,7 +75,12 @@ export default function SurveyListItem(props: Props) {
   const { url } = useRouteMatch();
   const { activeUser } = useUser();
 
-  const disableUsersAccessToSurvey = useMemo(() => activeUser?.id !== survey.authorId || survey.admins.includes(activeUser?.id), [activeUser, survey]);
+  const disableUsersAccessToSurvey = useMemo(
+    () =>
+      activeUser?.id !== survey.authorId &&
+      !survey.admins.includes(activeUser?.id),
+    [activeUser, survey],
+  );
 
   const surveyUrl = useMemo(() => {
     if (!survey.name) {
@@ -206,7 +211,11 @@ export default function SurveyListItem(props: Props) {
             justifyContent: 'flex-start',
           }}
         >
-          <Button component={NavLink} to={`${url}kyselyt/${survey.id}`} disabled={disableUsersAccessToSurvey}>
+          <Button
+            component={NavLink}
+            to={`${url}kyselyt/${survey.id}`}
+            disabled={disableUsersAccessToSurvey}
+          >
             {tr.SurveyList.editSurvey}
           </Button>
           {/* Allow publish only if it isn't yet published and has a name */}

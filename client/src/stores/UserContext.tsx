@@ -1,5 +1,11 @@
 import { User } from '@interfaces/user';
-import React, { ReactNode, useContext, useEffect, useMemo, useReducer } from 'react';
+import React, {
+  ReactNode,
+  useContext,
+  useEffect,
+  useMemo,
+  useReducer,
+} from 'react';
 import { useToasts } from './ToastContext';
 import { useTranslations } from './TranslationContext';
 
@@ -8,19 +14,26 @@ import { useTranslations } from './TranslationContext';
  */
 type State = {
   activeUser: User;
-  organizationsUsers: User[];
+  otherUsers: User[];
+  allUsers: User[];
 };
 
 /**
  * Reducer action type
  */
-type Action = {
-  type: 'SET_ACTIVE_USER';
-  user: User;
-} | {
-  type: 'SET_ALL_USERS';
-  users: User[];
-};
+type Action =
+  | {
+      type: 'SET_ACTIVE_USER';
+      user: User;
+    }
+  | {
+      type: 'SET_OTHER_USERS';
+      users: User[];
+    }
+  | {
+      type: 'SET_ALL_USERS';
+      users: User[];
+    };
 
 /**
  * Type of stored context (state & reducer returned from useReducer)
@@ -37,7 +50,8 @@ interface Props {
 /** User context initial values */
 const stateDefaults: State = {
   activeUser: null,
-  organizationsUsers: null
+  otherUsers: null,
+  allUsers: null,
 };
 
 export const UserContext = React.createContext<Context>(null);
@@ -47,9 +61,7 @@ export function useUser() {
   const context = useContext(UserContext);
 
   if (!context) {
-    throw new Error(
-      'useUser must be used within the UserProvider',
-    );
+    throw new Error('useUser must be used within the UserProvider');
   }
   const [state, dispatch] = context;
 
@@ -59,7 +71,7 @@ export function useUser() {
 
   return {
     setActiveUser,
-    activeUser: state.activeUser
+    ...state,
   };
 }
 
@@ -69,13 +81,18 @@ function reducer(state: State, action: Action): State {
     case 'SET_ACTIVE_USER':
       return {
         ...state,
-        activeUser: action.user
+        activeUser: action.user,
+      };
+    case 'SET_OTHER_USERS':
+      return {
+        ...state,
+        otherUsers: action.users,
       };
     case 'SET_ALL_USERS':
       return {
         ...state,
-        organizationsUsers: action.users
-      }
+        allUsers: action.users,
+      };
     default:
       throw new Error('Invalid action type');
   }
@@ -99,14 +116,18 @@ export default function UserProvider({ children }: Props) {
           (response) => response.json() as Promise<User>,
         );
 
-        const users = await fetch('/api/users/others').then(
+        const otherUsers = await fetch('/api/users/others').then(
           (response) => response.json() as Promise<User[]>,
         );
 
-        dispatch({type: 'SET_ACTIVE_USER', user: currentUser});
-        dispatch({type: 'SET_ALL_USERS', users: users});
+        dispatch({ type: 'SET_ACTIVE_USER', user: currentUser });
+        dispatch({ type: 'SET_OTHER_USERS', users: otherUsers });
+        dispatch({
+          type: 'SET_ALL_USERS',
+          users: [currentUser, ...otherUsers],
+        });
       } catch (error) {
-        showToast ({
+        showToast({
           severity: 'error',
           message: tr.EditSurveyInfo.userFetchFailed,
         });
@@ -116,9 +137,5 @@ export default function UserProvider({ children }: Props) {
     fetchOtherUsers();
   }, []);
 
-  return (
-    <UserContext.Provider value={value}>
-      {children}
-    </UserContext.Provider>
-  );
+  return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 }
