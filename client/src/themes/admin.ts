@@ -1,7 +1,7 @@
-import { createTheme } from '@mui/material/styles';
 import { fiFI } from '@mui/material/locale';
-import { buttonOverrides } from './survey';
+import { createTheme } from '@mui/material/styles';
 import { surveyCardOverrides, ubiColors, ubiElevated } from './common';
+import { buttonOverrides } from './survey';
 
 declare module '@mui/material/styles' {
   interface TypographyVariants {
@@ -21,18 +21,18 @@ declare module '@mui/material/Typography' {
 export let theme = createTheme(
   {
     typography: {
-      fontFamily: 'Nunito'
+      fontFamily: 'Nunito',
     },
     components: {
       ...surveyCardOverrides,
       ...buttonOverrides,
       ...ubiColors,
-      MuiAppBar:{
-        styleOverrides:{
+      MuiAppBar: {
+        styleOverrides: {
           root: {
             boxShadow: ubiElevated,
-          }
-        }
+          },
+        },
       },
       MuiTypography: {
         variants: [
@@ -71,6 +71,15 @@ export let theme = createTheme(
           h4: { color: '#000000DE' },
           h5: { color: '#000000DE' },
           h6: { color: '#000000DE' },
+        },
+      },
+      MuiChip: {
+        styleOverrides: {
+          root: {
+            '&.Mui-disabled': {
+              opacity: 0.8,
+            },
+          },
         },
       },
     },
