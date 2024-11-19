@@ -3,6 +3,7 @@ import {
   Autocomplete,
   Box,
   Checkbox,
+  Chip,
   FormControlLabel,
   FormHelperText,
   FormLabel,
@@ -25,6 +26,7 @@ import fiLocale from 'date-fns/locale/fi';
 import svLocale from 'date-fns/locale/sv';
 import React, { useMemo, useState } from 'react';
 import { useHistory } from 'react-router-dom';
+import { useUser } from '../../stores/UserContext';
 import CopyToClipboard from '../CopyToClipboard';
 import DeleteSurveyDialog from '../DeleteSurveyDialog';
 import Fieldset from '../Fieldset';
@@ -47,9 +49,6 @@ const useStyles = makeStyles({
 export default function EditSurveyInfo() {
   const [deleteConfirmDialogOpen, setDeleteConfirmDialogOpen] = useState(false);
   const [deleteSurveyLoading, setDeleteSurveyLoading] = useState(false);
-  const [users, setUsers] = useState<User[]>(null);
-  const [currentUser, setCurrentUser] = useState<User>(null);
-  const [usersLoading, setUsersLoading] = useState(true);
 
   const {
     activeSurvey,
@@ -65,23 +64,11 @@ export default function EditSurveyInfo() {
   const { showToast } = useToasts();
   const history = useHistory();
   const classes = useStyles();
+  const { allUsers, activeUser } = useUser();
 
   const testSurveyUrl = useMemo(() => {
     return `${window.location.origin}/${originalActiveSurvey.name}/testi`;
   }, [originalActiveSurvey.name]);
-
-  function getAllUsers() {
-    if (!currentUser || !activeSurvey || !users) {
-      return [];
-    }
-    const usersWithoutAuthor = users.filter(
-      (user) => user.id !== activeSurvey.authorId,
-    );
-    if (currentUser.id !== activeSurvey.authorId) {
-      return [...usersWithoutAuthor, currentUser];
-    }
-    return usersWithoutAuthor;
-  }
 
   const localLanguage = useMemo(() => {
     switch (language) {
@@ -191,13 +178,18 @@ export default function EditSurveyInfo() {
 
         <Autocomplete
           multiple
-          disabled={usersLoading}
+          filterSelectedOptions
+          disabled={allUsers == null}
           options={
-            users?.filter((user) => user.id !== activeSurvey.authorId) ?? []
+            // Options: all users except the survey author and the current user
+            allUsers?.filter(
+              (user) =>
+                user.id !== activeSurvey.authorId && user.id !== activeUser.id,
+            ) ?? []
           }
           getOptionLabel={(user) => user.fullName}
           value={
-            getAllUsers()?.filter(
+            allUsers?.filter(
               (user) => activeSurvey.admins?.includes(user.id),
             ) ?? []
           }
@@ -215,6 +207,21 @@ export default function EditSurveyInfo() {
               helperText={tr.EditSurveyInfo.adminsHelperText}
             />
           )}
+          // If active user is among the selected admin tags, disable the chip
+          renderTags={(value: User[], getTagProps) => {
+            return value.map((option, index) => {
+              const { key, ...tagProps } = getTagProps({ index });
+              return (
+                <Chip
+                  key={key}
+                  label={option.fullName}
+                  {...tagProps}
+                  // Disable selection of current user
+                  disabled={option.id === activeUser.id}
+                />
+              );
+            });
+          }}
         />
         {availableMapLayersLoading && (
           <Skeleton variant="rectangular" height={200} width="100%" />
