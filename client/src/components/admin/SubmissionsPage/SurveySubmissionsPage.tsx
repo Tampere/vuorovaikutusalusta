@@ -13,6 +13,7 @@ import {
   Select,
   Typography,
 } from '@mui/material';
+import Chart from '@src/components/admin/SubmissionsPage/SurveySubmissionsChart';
 import MapIcon from '@src/components/icons/MapIcon';
 import {
   isAnswerEmpty,
@@ -23,13 +24,13 @@ import { useTranslations } from '@src/stores/TranslationContext';
 import { request } from '@src/utils/request';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { AdminAppBar } from '../AdminAppBar';
+import DataExport from '../DataExport';
 import AnswerMap from './AnswerMap';
 import AnswersList, { AnswerItem, AnswerSelection } from './AnswersList';
-import SplitPaneLayout from './SplitPaneLayout';
-import DataExport from '../DataExport';
-import { AdminAppBar } from '../AdminAppBar';
-import { SurveyQuestionSummary } from './SurveyQuestionSummary';
 import { DataChart } from './DataChart';
+import SplitPaneLayout from './SplitPaneLayout';
+import { SurveyQuestionSummary } from './SurveyQuestionSummary';
 
 function isMapEntry(
   entry: AnswerEntry,
@@ -313,18 +314,33 @@ export default function SurveySubmissionsPage() {
           </Box>
         }
         sidePane={
-          <AnswerMap
-            survey={survey}
-            submissions={submissions}
-            selectedQuestion={selectedQuestion}
-            onAnswerClick={(answer) => {
-              setSelectedAnswer(answer);
-            }}
-            onSelectQuestion={(question) => setSelectedQuestion(question)}
-            selectedAnswer={selectedAnswer}
-            surveyQuestions={surveyQuestions}
-            questions={questions}
-          />
+          <>
+            <Chart
+              survey={survey}
+              submissions={submissions}
+              selectedQuestion={selectedQuestion}
+              onAnswerClick={(answer) => {
+                setSelectedAnswer(answer);
+              }}
+              onSelectQuestion={(question) => setSelectedQuestion(question)}
+              selectedAnswer={selectedAnswer}
+              surveyQuestions={surveyQuestions}
+              questions={questions}
+            />
+
+            <AnswerMap
+              survey={survey}
+              submissions={submissions}
+              selectedQuestion={selectedQuestion}
+              onAnswerClick={(answer) => {
+                setSelectedAnswer(answer);
+              }}
+              onSelectQuestion={(question) => setSelectedQuestion(question)}
+              selectedAnswer={selectedAnswer}
+              surveyQuestions={surveyQuestions}
+              questions={questions}
+            />
+          </>
         }
         mobileDrawer={{
           open: mobileDrawerOpen,
