@@ -316,16 +316,8 @@ export default function SurveySubmissionsPage() {
         sidePane={
           <>
             <Chart
-              survey={survey}
               submissions={submissions}
               selectedQuestion={selectedQuestion}
-              onAnswerClick={(answer) => {
-                setSelectedAnswer(answer);
-              }}
-              onSelectQuestion={(question) => setSelectedQuestion(question)}
-              selectedAnswer={selectedAnswer}
-              surveyQuestions={surveyQuestions}
-              questions={questions}
             />
 
             <AnswerMap

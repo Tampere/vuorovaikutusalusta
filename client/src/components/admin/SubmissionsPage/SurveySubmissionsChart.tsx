@@ -1,10 +1,4 @@
-import {
-  AnswerEntry,
-  Submission,
-  Survey,
-  SurveyQuestion,
-} from '@interfaces/survey';
-import { AnswerSelection } from '@src/components/admin/SubmissionsPage/AnswersList';
+import { AnswerEntry, Submission, SurveyQuestion } from '@interfaces/survey';
 import React, { FunctionComponent, useMemo, useState } from 'react';
 import {
   Bar,
@@ -17,14 +11,8 @@ import {
 } from 'recharts';
 
 interface Props {
-  survey: Survey;
   submissions: Submission[];
   selectedQuestion: SurveyQuestion;
-  onSelectQuestion: (question: SurveyQuestion) => void;
-  onAnswerClick: (answer: AnswerSelection) => void;
-  selectedAnswer: AnswerSelection;
-  surveyQuestions: SurveyQuestion[];
-  questions: SurveyQuestion[];
 }
 
 type Data = {
