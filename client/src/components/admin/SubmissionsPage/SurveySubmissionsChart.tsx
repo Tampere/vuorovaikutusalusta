@@ -180,31 +180,32 @@ export default function Chart({ submissions, selectedQuestion }: Props) {
   }, [selectedQuestion]);
 
   return answerData ? (
-    <div
+    <ResponsiveContainer
+      minWidth={250}
+      height={340}
       style={{
         position: 'absolute',
         backgroundColor: '#ffffffdd',
         borderBottomRightRadius: '7px',
+        maxWidth: `${chartWidth}px`,
       }}
     >
-      <ResponsiveContainer width={chartWidth} height={340}>
-        <BarChart
-          data={answerData.options}
-          margin={{
-            top: 25,
-            right: 30,
-            left: 20,
-            bottom: 60,
-          }}
-        >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="text" tick={<CustomizedAxisTick />} interval={0} />
-          <YAxis />
-          <Tooltip />
-          <Bar dataKey="count" fill="#00A393" />
-        </BarChart>
-      </ResponsiveContainer>
-    </div>
+      <BarChart
+        data={answerData.options}
+        margin={{
+          top: 25,
+          right: 30,
+          left: 20,
+          bottom: 60,
+        }}
+      >
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey="text" tick={<CustomizedAxisTick />} interval={0} />
+        <YAxis />
+        <Tooltip />
+        <Bar dataKey="count" fill="#00A393" />
+      </BarChart>
+    </ResponsiveContainer>
   ) : (
     <></>
   );
