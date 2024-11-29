@@ -1,4 +1,6 @@
 import { AnswerEntry, Submission, SurveyQuestion } from '@interfaces/survey';
+import { useTheme } from '@mui/material';
+import { useTranslations } from '@src/stores/TranslationContext';
 import React, { FunctionComponent, useMemo, useState } from 'react';
 import {
   Bar,
@@ -34,8 +36,10 @@ function buildNumericRange(range: Range, answersList: AnswerEntry[]): number[] {
   const minBuckets = 5;
 
   if (answersList[0].type === 'slider') {
-    Array.from({ length: 11 }, (_, i) => i);
+    return Array.from({ length: 11 }, (_, i) => i);
   }
+
+  // If range min/max are provided, use those. Otherwise find min/max values
   const min = Math.floor(
     range.min ??
       (answersList.reduce(
@@ -51,10 +55,12 @@ function buildNumericRange(range: Range, answersList: AnswerEntry[]): number[] {
       ) as number),
   );
 
+  // For short ranges, use step of 1
   if (max - min <= maxBuckets && max - min > minBuckets) {
     return Array.from({ length: max - min + 1 }, (_, i) => min + i);
   }
 
+  // increases / decreases bucket count until all items fit in bucketCount * allowedBuckets
   const calcBucketSize = (r: number, bucketSize: number) => {
     let bucketCount = Math.ceil(r / bucketSize);
     while (bucketCount < minBuckets) {
@@ -70,10 +76,10 @@ function buildNumericRange(range: Range, answersList: AnswerEntry[]): number[] {
 
   const [numOfBuckets, step] = calcBucketSize(
     max - min,
+    // Starting position is first power of 10 to fit full range
     Math.pow(10, Math.floor(Math.log10((max - min) / maxBuckets))),
   );
-  const b = Array.from({ length: numOfBuckets }, (_, i) => min + step * i);
-  return b;
+  return Array.from({ length: numOfBuckets }, (_, i) => min + step * i);
 }
 
 const CustomizedAxisTick: FunctionComponent<any> = (props: any) => {
@@ -100,8 +106,12 @@ const CustomizedAxisTick: FunctionComponent<any> = (props: any) => {
 
 export default function Chart({ submissions, selectedQuestion }: Props) {
   const [chartWidth, setChartWidth] = useState(240);
+  const { surveyLanguage } = useTranslations();
+  const theme = useTheme();
+
   const answerData = useMemo(() => {
     if (!selectedQuestion) return;
+
     const questionAnswers = submissions
       .reduce(
         (answers, submission) => [...answers, ...submission.answerEntries],
@@ -119,7 +129,7 @@ export default function Chart({ submissions, selectedQuestion }: Props) {
           options: selectedQuestion.options.map((option) => {
             return {
               id: option.id,
-              text: option.text['fi'],
+              text: option.text[surveyLanguage],
               count: questionAnswers.reduce(
                 (count, qa: AnswerEntry & { type: 'checkbox' | 'radio' }) => {
                   return qa.value === option.id ||
@@ -153,6 +163,7 @@ export default function Chart({ submissions, selectedQuestion }: Props) {
                   if (qa.value == null || qa.value < bucket) {
                     return count;
                   }
+                  // Last bucket must include the upper limit
                   if (bucketIndex === buckets.length - 1) {
                     return qa.value <= bucket + buckets[1] - buckets[0]
                       ? count + 1
@@ -170,6 +181,7 @@ export default function Chart({ submissions, selectedQuestion }: Props) {
         break;
       default:
     }
+
     const optionCount = base?.options.length;
     setChartWidth(
       optionCount <= 3
@@ -177,7 +189,7 @@ export default function Chart({ submissions, selectedQuestion }: Props) {
         : 220 + Math.min(760, Math.log2(optionCount - 2) * 180),
     );
     return base;
-  }, [selectedQuestion]);
+  }, [selectedQuestion, surveyLanguage]);
 
   return answerData ? (
     <ResponsiveContainer
@@ -203,7 +215,7 @@ export default function Chart({ submissions, selectedQuestion }: Props) {
         <XAxis dataKey="text" tick={<CustomizedAxisTick />} interval={0} />
         <YAxis />
         <Tooltip />
-        <Bar dataKey="count" fill="#00A393" />
+        <Bar dataKey="count" fill={theme.palette.primary.main} />
       </BarChart>
     </ResponsiveContainer>
   ) : (
