@@ -1,5 +1,5 @@
 ##
-# Runs builds on GitHub pull requests to test that they should be working fine.
+# Runs builds and e2e tests
 ##
 name: Test builds
 on:
@@ -43,7 +43,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
           cache: 'npm'
           cache-dependency-path: ./e2e/package-lock.json
       - run: npm i

@@ -43,7 +43,9 @@ export class SurveyEditPage {
     } else {
       await this._page.goto('http://localhost:8080/admin');
       await this._page.getByRole('button', { name: 'Uusi kysely' }).click();
-      await this._page.waitForURL('http://localhost:8080/admin/kyselyt/**');
+      await this._page.waitForURL(
+        'http://localhost:8080/admin/kyselyt/*/perustiedot',
+      );
       const urlParts = this._page.url().split('/');
       const lastElement = urlParts[urlParts.length - 1];
       this._surveyId = lastElement;

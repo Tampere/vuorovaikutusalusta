@@ -56,14 +56,21 @@ RUN apk update && apk add \
   ca-certificates \
   ttf-freefont
 
+# Add non-root user with explicit UID and GID 
+RUN addgroup --system --gid 1001 appUser && \
+  adduser --system --uid 1001 appGroup
+
 WORKDIR ${APPDIR}
 
-COPY --from=server-build ${APPDIR}/server ./
-COPY --from=client-build ${APPDIR}/client/dist ./static/
+COPY --chown=appUser:appGroup --from=server-build ${APPDIR}/server ./
+COPY --chown=appUser:appGroup --from=client-build ${APPDIR}/client/dist ./static/
 
 ENV TZ=Europe/Helsinki
 
 # Define Chromium path, as it was not installed in the previous phase
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+
+# Don't run the app as root
+USER appUser
 
 CMD npm start
