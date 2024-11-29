@@ -1,3 +1,4 @@
+import { FileAnswer } from '@interfaces/survey';
 import {
   Button,
   Checkbox,
@@ -8,14 +9,13 @@ import {
   FormControlLabel,
   Typography,
 } from '@mui/material';
+import DownloadIcon from '@src/components/icons/DownloadIcon';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { request } from '@src/utils/request';
-import React, { useState } from 'react';
-import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
-import { FileAnswer } from '@interfaces/survey';
-import DownloadIcon from '@src/components/icons/DownloadIcon';
+import JSZip from 'jszip';
+import React, { useState } from 'react';
 
 interface Props {
   surveyId: number;
@@ -32,7 +32,7 @@ export default function DataExport({ surveyId }: Props) {
   const { showToast } = useToasts();
 
   const allowedFilesRegex =
-    /^data:(image|application)\/(png|jpg|jpeg|pdf|vnd.openxmlformats-officedocument.spreadsheetml.sheet|xlsx|vnd.openxmlformats-officedocument.wordprocessingml.document|docx);base64,/;
+    /^data:(image|application|video)\/(png|jpg|jpeg|pdf|vnd.openxmlformats-officedocument.spreadsheetml.sheet|xlsx|vnd.openxmlformats-officedocument.wordprocessingml.document|docx|mp4|mkv|webm|avi|wmv|m4p|m4v|mpg|mpeg|m4v|mov);base64,/;
 
   async function exportCSV() {
     try {
