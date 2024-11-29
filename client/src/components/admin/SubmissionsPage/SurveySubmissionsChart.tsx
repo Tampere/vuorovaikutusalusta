@@ -110,7 +110,7 @@ export default function Chart({ submissions, selectedQuestion }: Props) {
       .filter((answer) => answer.sectionId === selectedQuestion.id);
     if (!questionAnswers) return;
 
-    let base;
+    let base: Data;
     switch (selectedQuestion?.type) {
       case 'radio':
       case 'checkbox':
@@ -140,7 +140,7 @@ export default function Chart({ submissions, selectedQuestion }: Props) {
           options: buildNumericRange(
             { min: selectedQuestion.minValue, max: selectedQuestion.maxValue },
             questionAnswers,
-          ).map((bucket, _, buckets) => {
+          ).map((bucket, bucketIndex, buckets) => {
             return {
               id: bucket,
               text: `${bucket} ${
@@ -148,12 +148,22 @@ export default function Chart({ submissions, selectedQuestion }: Props) {
                   ? ''
                   : '\u2013 ' + (bucket + (buckets[1] - buckets[0]))
               }`,
-              count: questionAnswers.reduce((count, qa) => {
-                return (qa.value as number) >= bucket &&
-                  (qa.value as number) < bucket + buckets[1] - buckets[0]
-                  ? count + 1
-                  : count;
-              }, 0),
+              count: questionAnswers.reduce(
+                (count, qa: AnswerEntry & { type: 'slider' | 'numeric' }) => {
+                  if (qa.value == null || qa.value < bucket) {
+                    return count;
+                  }
+                  if (bucketIndex === buckets.length - 1) {
+                    return qa.value <= bucket + buckets[1] - buckets[0]
+                      ? count + 1
+                      : count;
+                  }
+                  return qa.value < bucket + buckets[1] - buckets[0]
+                    ? count + 1
+                    : count;
+                },
+                0,
+              ),
             };
           }),
         };
@@ -166,10 +176,6 @@ export default function Chart({ submissions, selectedQuestion }: Props) {
         ? 220
         : 220 + Math.min(760, Math.log2(optionCount - 2) * 180),
     );
-    console.log(base);
-    for (let index = 0; index < questionAnswers.length; index++) {
-      console.log(questionAnswers[index]);
-    }
     return base;
   }, [selectedQuestion]);
 
