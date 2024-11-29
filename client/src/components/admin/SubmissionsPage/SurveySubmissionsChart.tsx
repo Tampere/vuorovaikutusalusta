@@ -5,7 +5,7 @@ import {
   SurveyQuestion,
 } from '@interfaces/survey';
 import { AnswerSelection } from '@src/components/admin/SubmissionsPage/AnswersList';
-import React, { useMemo } from 'react';
+import React, { FunctionComponent, useMemo, useState } from 'react';
 import {
   Bar,
   BarChart,
@@ -42,9 +42,12 @@ type Range = {
 };
 
 function buildNumericRange(range: Range, answersList: AnswerEntry[]): number[] {
-  const maxBuckets = 12;
+  const maxBuckets = 10;
   const minBuckets = 5;
 
+  if (answersList[0].type === 'slider') {
+    Array.from({ length: 11 }, (_, i) => i);
+  }
   const min = Math.floor(
     range.min ??
       (answersList.reduce(
@@ -61,8 +64,7 @@ function buildNumericRange(range: Range, answersList: AnswerEntry[]): number[] {
   );
 
   if (max - min <= maxBuckets && max - min > minBuckets) {
-    const b = Array.from({ length: max - min + 1 }, (_, i) => min + i);
-    return b;
+    return Array.from({ length: max - min + 1 }, (_, i) => min + i);
   }
 
   const calcBucketSize = (r: number, bucketSize: number) => {
@@ -86,7 +88,30 @@ function buildNumericRange(range: Range, answersList: AnswerEntry[]): number[] {
   return b;
 }
 
+const CustomizedAxisTick: FunctionComponent<any> = (props: any) => {
+  const { x, y, payload } = props;
+  const tickValue =
+    payload.value.length > 12
+      ? payload.value.slice(0, 11) + '...'
+      : payload.value;
+  return (
+    <g transform={`translate(${x},${y})`}>
+      <text
+        x={0}
+        y={0}
+        dy={16}
+        textAnchor="end"
+        fill="#666"
+        transform="rotate(-35)"
+      >
+        {tickValue}
+      </text>
+    </g>
+  );
+};
+
 export default function Chart({ submissions, selectedQuestion }: Props) {
+  const [chartWidth, setChartWidth] = useState(240);
   const answerData = useMemo(() => {
     if (!selectedQuestion) return;
     const questionAnswers = submissions
@@ -147,6 +172,16 @@ export default function Chart({ submissions, selectedQuestion }: Props) {
         break;
       default:
     }
+    const optionCount = base?.options.length;
+    setChartWidth(
+      optionCount <= 3
+        ? 220
+        : 220 + Math.min(760, Math.log2(optionCount - 2) * 180),
+    );
+    console.log(base);
+    for (let index = 0; index < questionAnswers.length; index++) {
+      console.log(questionAnswers[index]);
+    }
     return base;
   }, [selectedQuestion]);
 
@@ -158,18 +193,18 @@ export default function Chart({ submissions, selectedQuestion }: Props) {
         borderBottomRightRadius: '7px',
       }}
     >
-      <ResponsiveContainer width={600} height={320}>
+      <ResponsiveContainer width={chartWidth} height={340}>
         <BarChart
           data={answerData.options}
           margin={{
             top: 25,
             right: 30,
             left: 20,
-            bottom: 5,
+            bottom: 60,
           }}
         >
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="text" />
+          <XAxis dataKey="text" tick={<CustomizedAxisTick />} interval={0} />
           <YAxis />
           <Tooltip />
           <Bar dataKey="count" fill="#00A393" />
