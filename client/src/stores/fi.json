@@ -192,7 +192,7 @@
     "matrixQuestion": "Lisää likert-kysymys",
     "multiMatrixQuestion": "Lisää monivalinta-likert-kysymys",
     "groupedCheckboxQuestion": "Lisää ryhmitetty monivalintakysymys",
-    "imageSection": "Lisää kuvaosio",
+    "imageSection": "Lisää mediaosio",
     "documentSection": "Lisää liiteosio",
     "attachmentSection": "Lisää vastausliite"
   },

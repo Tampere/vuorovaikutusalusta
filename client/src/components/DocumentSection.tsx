@@ -1,10 +1,10 @@
 import { SurveyDocumentSection } from '@interfaces/survey';
-import { Card, CardMedia, FormLabel, Link, Typography } from '@mui/material';
+import { FormLabel, Link, Typography } from '@mui/material';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
-import React, { useEffect, useMemo, useState } from 'react';
-import SectionInfo from './SectionInfo';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { getFileName } from '@src/utils/path';
+import React, { useMemo } from 'react';
+import SectionInfo from './SectionInfo';
 
 interface Props {
   section: SurveyDocumentSection;
@@ -17,28 +17,6 @@ export default function DocumentSection({
 }: Props) {
   const { survey } = useSurveyAnswers();
   const { tr, surveyLanguage } = useTranslations();
-  const [isVideo, setIsVideo] = useState(false);
-
-  useEffect(() => {
-    const controller = new AbortController();
-    const cancelSignal = controller.signal;
-    const checkHeader = async () => {
-      try {
-        const res = await fetch(`/api/file/${section.fileUrl}`, {
-          method: 'HEAD',
-          signal: cancelSignal,
-        });
-        const contentType = res.headers.get('Content-Type');
-        setIsVideo(contentType && contentType.startsWith('video/'));
-      } catch (error) {
-        // TODO
-      }
-    };
-    checkHeader();
-    return () => {
-      controller.abort();
-    };
-  }, []);
 
   const fileName = useMemo(
     () => getFileName(section.fileUrl),
@@ -69,23 +47,13 @@ export default function DocumentSection({
           />
         )}
       </div>
-      {isVideo ? (
-        <Card>
-          <CardMedia
-            controls
-            component="video"
-            src={`/api/file/${section.fileUrl}`}
-          />
-        </Card>
-      ) : (
-        <Link
-          href={`/api/file/${section.fileUrl}`}
-          target="_blank"
-          rel="noreferrer"
-        >
-          {tr.DocumentSection.attachment}: {fileName}
-        </Link>
-      )}
+      <Link
+        href={`/api/file/${section.fileUrl}`}
+        target="_blank"
+        rel="noreferrer"
+      >
+        {tr.DocumentSection.attachment}: {fileName}
+      </Link>
     </>
   );
 }

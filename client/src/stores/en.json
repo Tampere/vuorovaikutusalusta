@@ -192,7 +192,7 @@
     "matrixQuestion": "Add likert scale question",
     "multiMatrixQuestion": "Add multiple choice likert scale question",
     "groupedCheckboxQuestion": "Add grouped checkbox question",
-    "imageSection": "Add image section",
+    "imageSection": "Add media section",
     "documentSection": "Add document section",
     "attachmentSection": "Add attachment section"
   },

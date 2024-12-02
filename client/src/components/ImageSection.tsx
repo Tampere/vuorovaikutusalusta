@@ -1,8 +1,8 @@
 import { SurveyImageSection } from '@interfaces/survey';
-import { FormLabel, Link, Typography } from '@mui/material';
+import { Card, CardMedia, FormLabel, Link, Typography } from '@mui/material';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import SectionInfo from './SectionInfo';
 
 interface Props {
@@ -13,6 +13,26 @@ interface Props {
 export default function ImageSection({ section, isFollowUp = false }: Props) {
   const { survey } = useSurveyAnswers();
   const { tr, surveyLanguage, language } = useTranslations();
+  const [isVideo, setIsVideo] = useState(false);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const cancelSignal = controller.signal;
+    const checkHeader = async () => {
+      try {
+        const res = await fetch(`/api/file/${section.fileUrl}`, {
+          method: 'HEAD',
+          signal: cancelSignal,
+        });
+        const contentType = res.headers.get('Content-Type');
+        setIsVideo(contentType && contentType.startsWith('video/'));
+      } catch (error) {}
+    };
+    checkHeader();
+    return () => {
+      controller.abort();
+    };
+  }, []);
 
   return (
     <>
@@ -38,11 +58,21 @@ export default function ImageSection({ section, isFollowUp = false }: Props) {
           />
         )}
       </div>
-      <img
-        style={{ maxWidth: '100%' }}
-        src={`/api/file/${section.fileUrl}`}
-        alt={section.altText[language]}
-      />
+      {isVideo ? (
+        <Card>
+          <CardMedia
+            controls
+            component="video"
+            src={`/api/file/${section.fileUrl}`}
+          />
+        </Card>
+      ) : (
+        <img
+          style={{ maxWidth: '100%' }}
+          src={`/api/file/${section.fileUrl}`}
+          alt={section.altText[language]}
+        />
+      )}
       <div style={{ display: 'flex', flexDirection: 'row' }}>
         <Link href={`/api/file/${section.fileUrl}`} target={'__blank'}>
           {tr.ImageSection.openInNewTab}

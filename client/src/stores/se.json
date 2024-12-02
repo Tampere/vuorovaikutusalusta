@@ -192,7 +192,7 @@
     "matrixQuestion": "Lägg till likert-fråga",
     "multiMatrixQuestion": "Lägg till flervalslikert-fråga",
     "groupedCheckboxQuestion": "Lägg till grupperad flervalsfråga",
-    "imageSection": "Lägg till bildavsnitt",
+    "imageSection": "Lägg till mediaavsnitt",
     "documentSection": "Lägg till bilageavsnitt",
     "attachmentSection": "Lägg till svarsbilage"
   },
