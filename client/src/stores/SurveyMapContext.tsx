@@ -830,15 +830,26 @@ export default function SurveyMapProvider({
       return;
     }
 
-    state.rpcChannel.getAllLayers((allLayers) => {
-      const layers = allLayers.map((layer) => layer.id);
-      dispatch({ type: 'SET_ALL_LAYERS', layers });
-      // Set all layers to be visible by default, unless there already are visible layers declared
-      dispatch({
-        type: 'SET_VISIBLE_LAYERS',
-        layers: state.visibleLayers ?? layers,
+    // getAllLayers does work here, but we need to wait until Oskari assigns the layers all the way to the internal map state, thus the polling...
+    // This issue should resolve the problem in some better way: https://github.com/oskariorg/oskari-documentation/issues/58
+    const interval = setInterval(() => {
+      state.rpcChannel.getCurrentState(({ mapfull }) => {
+        const layers = mapfull.state.selectedLayers.map((layer) => layer.id);
+        if (!layers.length) {
+          return;
+        }
+        clearInterval(interval);
+        dispatch({ type: 'SET_ALL_LAYERS', layers });
+        dispatch({
+          type: 'SET_VISIBLE_LAYERS',
+          layers: state.visibleLayers ?? layers,
+        });
       });
-    });
+    }, 100);
+
+    return () => {
+      clearInterval(interval);
+    };
   }, [state.rpcChannel]);
 
   /**
