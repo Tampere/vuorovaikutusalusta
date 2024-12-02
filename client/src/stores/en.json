@@ -192,7 +192,7 @@
     "matrixQuestion": "Add likert scale question",
     "multiMatrixQuestion": "Add multiple choice likert scale question",
     "groupedCheckboxQuestion": "Add grouped checkbox question",
-    "imageSection": "Add image section",
+    "imageSection": "Add media section",
     "documentSection": "Add document section",
     "attachmentSection": "Add attachment section"
   },
@@ -244,7 +244,7 @@
     "fileUploadError": "Error while uploading file",
     "fileSizeLimitError": "File size cannot exceed 10MB",
     "unsupportedFileFormat": "Unsupported file format",
-    "attachmentFileFormats": "Supported file formats: jpg, jpeg, png, pdf, docx, xlsx.",
+    "attachmentFileFormats": "Supported file formats: jpg, jpeg, png, pdf, docx, xlsx and most video formats.",
     "deleteUploadedFile": "Delete uploaded file",
     "replace": "Replace the selected file by clicking here."
   },

@@ -27,7 +27,7 @@ export default function AttachmentQuestion({
   const { showToast } = useToasts();
 
   const allowedFilesRegex =
-    /^data:(image|application)\/(png|jpg|jpeg|pdf|vnd.openxmlformats-officedocument.spreadsheetml.sheet|xlsx|vnd.openxmlformats-officedocument.wordprocessingml.document|docx);base64,/;
+    /^data:(image|application|video)\/(png|jpg|jpeg|pdf|vnd.openxmlformats-officedocument.spreadsheetml.sheet|xlsx|vnd.openxmlformats-officedocument.wordprocessingml.document|docx|mp4|mkv|webm|avi|wmv|m4p|m4v|mpg|mpeg|m4v|mov);base64,/;
 
   function readFileAsync(file: any) {
     return new Promise<string | ArrayBuffer>((resolve, reject) => {
