@@ -19,14 +19,12 @@ export default function ImageSection({ section, isFollowUp = false }: Props) {
     const controller = new AbortController();
     const cancelSignal = controller.signal;
     const checkHeader = async () => {
-      try {
-        const res = await fetch(`/api/file/${section.fileUrl}`, {
-          method: 'HEAD',
-          signal: cancelSignal,
-        });
-        const contentType = res.headers.get('Content-Type');
-        setIsVideo(contentType && contentType.startsWith('video/'));
-      } catch (error) {}
+      const res = await fetch(`/api/file/${section.fileUrl}`, {
+        method: 'HEAD',
+        signal: cancelSignal,
+      });
+      const contentType = res.headers.get('Content-Type');
+      setIsVideo(contentType && contentType.startsWith('video/'));
     };
     checkHeader();
     return () => {
