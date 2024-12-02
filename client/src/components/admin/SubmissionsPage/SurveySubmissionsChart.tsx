@@ -121,7 +121,7 @@ export default function Chart({ submissions, selectedQuestion }: Props) {
     if (!questionAnswers) return;
 
     let base: Data;
-    switch (selectedQuestion?.type) {
+    switch (selectedQuestion.type) {
       case 'radio':
       case 'checkbox':
         base = {
