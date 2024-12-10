@@ -57,8 +57,8 @@ RUN apk update && apk add \
   ttf-freefont
 
 # Add non-root user with explicit UID and GID 
-RUN addgroup --system --gid 1001 appUser && \
-  adduser --system --uid 1001 appGroup
+RUN addgroup --system --gid 1001 appGroup && \
+  adduser --system --uid 1001 appUser
 
 WORKDIR ${APPDIR}
 
