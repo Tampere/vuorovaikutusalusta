@@ -192,7 +192,7 @@
     "matrixQuestion": "Lägg till likert-fråga",
     "multiMatrixQuestion": "Lägg till flervalslikert-fråga",
     "groupedCheckboxQuestion": "Lägg till grupperad flervalsfråga",
-    "imageSection": "Lägg till bildavsnitt",
+    "imageSection": "Lägg till mediaavsnitt",
     "documentSection": "Lägg till bilageavsnitt",
     "attachmentSection": "Lägg till svarsbilage"
   },
@@ -244,7 +244,7 @@
     "fileUploadError": "Ett fel uppstod vid uppladdning av filen",
     "fileSizeLimitError": "Filstorleken får inte vara över 10MB",
     "unsupportedFileFormat": "Filformatet stöds inte",
-    "attachmentFileFormats": "Tillåtna filformat: jpg, jpeg, png, pdf, docx, xlsx.",
+    "attachmentFileFormats": "Tillåtna filformat: jpg, jpeg, png, pdf, docx, xlsx samt de vanligaste videoformaten.",
     "deleteUploadedFile": "Ta bort uppladdad fil",
     "replace": "Ersätt vald bilaga genom att klicka."
   },
