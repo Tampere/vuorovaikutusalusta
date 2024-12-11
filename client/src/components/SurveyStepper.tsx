@@ -42,11 +42,11 @@ import ImageSection from './ImageSection';
 import PageConnector from './PageConnector';
 import StepperControls from './StepperControls';
 import SubmissionInfoDialog from './SubmissionInfoDialog';
+import { SurveyFollowUpSections } from './SurveyFollowUpSections';
 import SurveyLanguageMenu from './SurveyLanguageMenu';
 import SurveyMap from './SurveyMap';
 import SurveyQuestion from './SurveyQuestion';
 import TextSection from './TextSection';
-import { SurveyFollowUpSections } from './SurveyFollowUpSections';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -193,6 +193,9 @@ export default function SurveyStepper({
    * Update map's visible layers when page changes
    */
   useEffect(() => {
+    if (currentPage.sidebar.type !== 'map') {
+      return;
+    }
     setVisibleLayers(currentPage.sidebar.mapLayers);
     // If modifying, stop it when changing page
     if (isMapReady) {
