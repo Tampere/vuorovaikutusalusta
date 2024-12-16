@@ -987,7 +987,7 @@ async function getSectionConditions(sectionIds: number[]) {
 }
 
 /**
- * When updating a survey, deletes all sections that should be removed from DB.
+ * When updating a survey, deletes all sections (and subsections linked to them) that should be removed from DB.
  * @param surveyId Survey ID
  * @param newSections New sections
  */
