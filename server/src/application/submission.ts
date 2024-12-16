@@ -4,7 +4,7 @@ import {
   MapQuestionAnswer,
   Submission,
   SurveyMapSubQuestionAnswer,
-  SurveyPageSection
+  SurveyPageSection,
 } from '@interfaces/survey';
 import {
   getColumnSet,
@@ -91,7 +91,8 @@ async function validateEntriesByAnswerLimits(answerEntries: AnswerEntry[]) {
     FROM data.page_section
     WHERE
       id = ANY ($1) AND
-      details->'answerLimits' IS NOT NULL`,
+      details->'answerLimits' IS NOT NULL AND
+      predecessor_section = NULL`,
     [answerEntries.map((entry) => entry.sectionId)],
   );
   // Validate each entry against the question answer limits
@@ -834,17 +835,28 @@ export async function getSubmissionsForSurvey(surveyId: number) {
     { surveyId },
   );
   const result = [];
-  let currentSubmission: {id: number, timestamp: Date, entries: DBAnswerEntry[]} | null = null;
+  let currentSubmission: {
+    id: number;
+    timestamp: Date;
+    entries: DBAnswerEntry[];
+  } | null = null;
   for (const row of rows) {
     if (currentSubmission?.id !== row.submission_id) {
       currentSubmission = {
         id: row.submission_id,
         timestamp: row.updated_at,
-        entries: []
-      }
+        entries: [],
+      };
       result.push(currentSubmission);
     }
     currentSubmission.entries.push(row);
   }
-  return result.map(x => ({id: x.id, timestamp: x.timestamp, answerEntries: dbAnswerEntriesToAnswerEntries(x.entries)} as Submission));
+  return result.map(
+    (x) =>
+      ({
+        id: x.id,
+        timestamp: x.timestamp,
+        answerEntries: dbAnswerEntriesToAnswerEntries(x.entries),
+      }) as Submission,
+  );
 }
