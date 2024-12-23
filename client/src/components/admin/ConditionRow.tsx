@@ -128,6 +128,7 @@ export function ConditionRow({
         />
       ) : (
         <Select
+          disabled={!options.some((option) => option?.id > 0)}
           multiple
           sx={{
             flex: 1,

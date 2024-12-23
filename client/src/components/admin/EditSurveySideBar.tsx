@@ -1,4 +1,17 @@
 import {
+  Add,
+  ArrowBack,
+  ContentCopy,
+  ContentPaste,
+  DragIndicator,
+  FavoriteBorder,
+  InfoOutlined,
+  InsertDriveFileOutlined,
+  Language,
+  Mail,
+  Preview,
+} from '@mui/icons-material';
+import {
   Divider,
   IconButton,
   List,
@@ -8,19 +21,6 @@ import {
   ListItemText,
   Theme,
 } from '@mui/material';
-import {
-  Add,
-  ArrowBack,
-  DragIndicator,
-  FavoriteBorder,
-  InfoOutlined,
-  InsertDriveFileOutlined,
-  Language,
-  Mail,
-  Preview,
-  ContentCopy,
-  ContentPaste,
-} from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useToasts } from '@src/stores/ToastContext';
@@ -31,12 +31,12 @@ import { useHistory, useRouteMatch } from 'react-router-dom';
 import ListItemLink from '../ListItemLink';
 import SideBar from '../SideBar';
 
+import { Conditions, SurveyPage } from '@interfaces/survey';
+import { useClipboard } from '@src/stores/ClipboardContext';
 import {
   replaceIdsWithNull,
   replaceTranslationsWithNull,
 } from '@src/utils/schemaValidation';
-import { useClipboard } from '@src/stores/ClipboardContext';
-import { SurveyPage } from '@interfaces/survey';
 import { BranchIcon } from '../icons/BranchIcon';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -164,18 +164,36 @@ export default function EditSurveySideBar(props: Props) {
                               event.stopPropagation();
                               event.preventDefault();
                               // Deep copy page to avoid changes to current context
-                              const copiedSurveyPage =
-                                replaceTranslationsWithNull(
-                                  replaceIdsWithNull({
-                                    ...structuredClone(page),
-                                    id: -1,
-                                    sidebar: {
-                                      ...structuredClone(page.sidebar),
-                                      mapLayers: [],
-                                    },
-                                  }),
-                                ) as SurveyPage;
-
+                              const deepCopy = replaceTranslationsWithNull(
+                                replaceIdsWithNull({
+                                  ...structuredClone(page),
+                                  id: -1,
+                                  sidebar: {
+                                    ...structuredClone(page.sidebar),
+                                    mapLayers: [],
+                                  },
+                                }),
+                              ) as SurveyPage;
+                              // Remove conditions from Follow up question
+                              const copiedSurveyPage: SurveyPage = {
+                                ...deepCopy,
+                                sections: deepCopy.sections.map((section) => {
+                                  return {
+                                    ...section,
+                                    followUpSections:
+                                      section.followUpSections.map((fus) => {
+                                        return {
+                                          ...fus,
+                                          conditions: {
+                                            equals: [],
+                                            lessThan: [],
+                                            greaterThan: [],
+                                          } as Conditions,
+                                        };
+                                      }),
+                                  };
+                                }),
+                              };
                               // Store section to locale storage for other browser tabs to get access to it
                               localStorage.setItem(
                                 'clipboard-content',
