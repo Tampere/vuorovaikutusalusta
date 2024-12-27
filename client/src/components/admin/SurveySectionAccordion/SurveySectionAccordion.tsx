@@ -1,6 +1,8 @@
 import {
+  Conditions,
   SurveyCheckboxQuestion,
   SurveyDocumentSection,
+  SurveyFollowUpSection,
   SurveyFreeTextQuestion,
   SurveyGroupedCheckboxQuestion,
   SurveyImageSection,
@@ -325,12 +327,27 @@ export default function SurveySectionAccordion(props: Props) {
 
                 // Remove all IDs from the section JSON to prevent unwanted references
                 // Create deep copy to avoid unwanted side effects on original
-                const copiedSurveySection = replaceTranslationsWithNull(
+
+                const deepCopy = replaceTranslationsWithNull(
                   replaceIdsWithNull({
                     ...structuredClone(props.section),
                   }),
                 );
-
+                const copiedSurveySection: SurveyPageSection = {
+                  ...deepCopy,
+                  followUpSections: deepCopy.followUpSections?.map(
+                    (fus: SurveyFollowUpSection) => {
+                      return {
+                        ...fus,
+                        conditions: {
+                          equals: [],
+                          lessThan: [],
+                          greaterThan: [],
+                        } as Conditions,
+                      };
+                    },
+                  ),
+                };
                 // Store section to locale storage for other browser tabs to get access to it
                 localStorage.setItem(
                   'clipboard-content',
