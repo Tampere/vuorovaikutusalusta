@@ -1005,7 +1005,7 @@ async function getSectionConditions(sectionIds: number[]) {
 }
 
 /**
- * When updating a survey, deletes all sections that should be removed from DB.
+ * When updating a survey, deletes all sections (and subsections linked to them) that should be removed from DB.
  * @param surveyId Survey ID
  * @param newSections New sections
  */
@@ -1028,7 +1028,7 @@ async function deleteRemovedSections(
   );
   if (removedSectionIds.length) {
     await getDb().none(
-      `DELETE FROM data.page_section WHERE id = ANY ($1) OR parent_section = ANY ($1)`,
+      `DELETE FROM data.page_section WHERE id = ANY ($1) OR parent_section = ANY ($1) OR predecessor_section = ANY($1)`,
       [removedSectionIds],
     );
   }
@@ -1247,9 +1247,9 @@ export async function updateSurvey(survey: Survey) {
       Object.entries(page.conditions).map(async ([sectionId, conditions]) => {
         // Filter out null values from conditions caused by trying to save "-" as numeric condition
         const validConditions = {
-          equals: conditions.equals.filter(Boolean),
-          lessThan: conditions.lessThan.filter(Boolean),
-          greaterThan: conditions.greaterThan.filter(Boolean),
+          equals: conditions.equals.filter((value) => value != null),
+          lessThan: conditions.lessThan.filter((value) => value != null),
+          greaterThan: conditions.greaterThan.filter((value) => value != null),
         };
         await upsertSectionConditions(
           Number(sectionId),
@@ -1348,10 +1348,15 @@ export async function updateSurvey(survey: Survey) {
               await deleteSectionConditions(null, [sectionRow.id]);
               // Filter out null values from conditions caused by trying to save "-" as numeric condition
               const validConditions = {
-                equals: linkedSection.conditions.equals.filter(Boolean),
-                lessThan: linkedSection.conditions.lessThan.filter(Boolean),
-                greaterThan:
-                  linkedSection.conditions.greaterThan.filter(Boolean),
+                equals: linkedSection.conditions.equals.filter(
+                  (value) => value != null,
+                ),
+                lessThan: linkedSection.conditions.lessThan.filter(
+                  (value) => value != null,
+                ),
+                greaterThan: linkedSection.conditions.greaterThan.filter(
+                  (value) => value != null,
+                ),
               };
               await upsertSectionConditions(
                 sectionRow.id,
@@ -1606,17 +1611,17 @@ function dbSectionConditionsToConditions(
 ): Conditions {
   return dbSectionConditions.reduce(
     (conditions, condition) => {
-      if (condition.equals) {
+      if (condition.equals != null) {
         return {
           ...conditions,
           equals: [...conditions.equals, condition.equals],
         };
-      } else if (condition.less_than) {
+      } else if (condition.less_than != null) {
         return {
           ...conditions,
           lessThan: [...conditions.lessThan, condition.less_than],
         };
-      } else if (condition.greater_than) {
+      } else if (condition.greater_than != null) {
         return {
           ...conditions,
           greaterThan: [...conditions.greaterThan, condition.greater_than],
