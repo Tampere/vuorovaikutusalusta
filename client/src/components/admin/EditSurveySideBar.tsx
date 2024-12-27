@@ -181,7 +181,7 @@ export default function EditSurveySideBar(props: Props) {
                                   return {
                                     ...section,
                                     followUpSections:
-                                      section.followUpSections.map((fus) => {
+                                      section.followUpSections?.map((fus) => {
                                         return {
                                           ...fus,
                                           conditions: {
@@ -290,6 +290,11 @@ export default function EditSurveySideBar(props: Props) {
                 showToast({
                   severity: 'warning',
                   message: tr.EditSurvey.pageAttached,
+                  autoHideDuration: 30000,
+                });
+                showToast({
+                  severity: 'warning',
+                  message: tr.EditSurvey.checkConditionalSections,
                   autoHideDuration: 30000,
                 });
               } catch (error) {

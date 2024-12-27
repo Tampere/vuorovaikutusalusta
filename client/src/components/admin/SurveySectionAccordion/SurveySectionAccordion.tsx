@@ -335,7 +335,7 @@ export default function SurveySectionAccordion(props: Props) {
                 );
                 const copiedSurveySection: SurveyPageSection = {
                   ...deepCopy,
-                  followUpSections: deepCopy.followUpSections.map(
+                  followUpSections: deepCopy.followUpSections?.map(
                     (fus: SurveyFollowUpSection) => {
                       return {
                         ...fus,
