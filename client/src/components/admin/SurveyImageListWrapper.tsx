@@ -3,7 +3,11 @@ import { useState } from 'react';
 import SurveyImageList from './SurveyImageList';
 import { File } from '@interfaces/survey';
 
-export function SurveyMarginImageList() {
+interface Props {
+  canEdit?: boolean;
+}
+
+export function SurveyMarginImageList({ canEdit = true }: Props) {
   const [images, setImages] = useState<File[]>([]);
 
   return (
@@ -12,11 +16,13 @@ export function SurveyMarginImageList() {
         imageType={'topMarginImage'}
         images={images}
         setImages={setImages}
+        canEdit={canEdit}
       />
       <SurveyImageList
         imageType={'bottomMarginImage'}
         images={images}
         setImages={setImages}
+        canEdit={canEdit}
       />
     </>
   );

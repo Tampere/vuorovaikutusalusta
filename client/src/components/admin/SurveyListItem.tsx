@@ -75,7 +75,16 @@ export default function SurveyListItem(props: Props) {
   const { url } = useRouteMatch();
   const { activeUser } = useUser();
 
-  const disableUsersAccessToSurvey = useMemo(
+  const disableUsersViewAccessToSurvey = useMemo(
+    () =>
+      activeUser?.id !== survey.authorId &&
+      !survey.editors.includes(activeUser?.id) &&
+      !survey.viewers.includes(activeUser?.id),
+
+    [activeUser, survey],
+  );
+
+  const disableUsersWriteAccessToSurvey = useMemo(
     () =>
       activeUser?.id !== survey.authorId &&
       !survey.editors.includes(activeUser?.id),
@@ -214,14 +223,17 @@ export default function SurveyListItem(props: Props) {
           <Button
             component={NavLink}
             to={`${url}kyselyt/${survey.id}`}
-            disabled={disableUsersAccessToSurvey}
+            disabled={disableUsersViewAccessToSurvey}
           >
-            {tr.SurveyList.editSurvey}
+            {survey.editors.includes(activeUser?.id) ||
+            activeUser?.id === survey.authorId
+              ? tr.SurveyList.editSurvey
+              : tr.SurveyList.viewSurvey}
           </Button>
           {/* Allow publish only if it isn't yet published and has a name */}
           {!survey.isPublished && survey.name && (
             <Button
-              disabled={disableUsersAccessToSurvey}
+              disabled={disableUsersWriteAccessToSurvey}
               onClick={() => {
                 setPublishConfirmDialogOpen(true);
               }}
@@ -232,7 +244,7 @@ export default function SurveyListItem(props: Props) {
           {/* Allow unpublish when survey is published */}
           {survey.isPublished && (
             <Button
-              disabled={disableUsersAccessToSurvey}
+              disabled={disableUsersWriteAccessToSurvey}
               onClick={() => {
                 setUnpublishConfirmDialogOpen(true);
               }}
@@ -241,7 +253,7 @@ export default function SurveyListItem(props: Props) {
             </Button>
           )}
           <LoadingButton
-            disabled={disableUsersAccessToSurvey}
+            disabled={disableUsersViewAccessToSurvey}
             onClick={async () => {
               const newSurveyId = await creteSurveyFromPrevious(survey.id);
               if (!newSurveyId) return;
@@ -252,7 +264,7 @@ export default function SurveyListItem(props: Props) {
             {tr.SurveyList.copySurvey}{' '}
           </LoadingButton>
           <Button
-            disabled={disableUsersAccessToSurvey}
+            disabled={disableUsersViewAccessToSurvey}
             component={NavLink}
             style={{ marginLeft: 'auto' }}
             variant="contained"

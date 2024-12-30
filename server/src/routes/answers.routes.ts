@@ -3,7 +3,7 @@ import {
   getCSVFile,
   getGeoPackageFile,
 } from '@src/application/answer';
-import { userCanEditSurvey } from '@src/application/survey';
+import { userCanViewSurvey } from '@src/application/survey';
 import { ensureAuthenticated, ensureSurveyGroupAccess } from '@src/auth';
 import { BadRequestError, ForbiddenError } from '@src/error';
 import { Router } from 'express';
@@ -25,9 +25,11 @@ router.get(
   ]),
   asyncHandler(async (req, res) => {
     const surveyId = Number(req.params.id);
-    const permissionsOk = await userCanEditSurvey(req.user, surveyId);
+    const permissionsOk = await userCanViewSurvey(req.user, surveyId);
     if (!permissionsOk) {
-      throw new ForbiddenError('User not author nor editor of the survey');
+      throw new ForbiddenError(
+        'User not author, editor nor viewer of the survey',
+      );
     }
 
     const exportFiles = await getCSVFile(surveyId);
@@ -54,9 +56,11 @@ router.get(
   ]),
   asyncHandler(async (req, res) => {
     const surveyId = Number(req.params.id);
-    const permissionsOk = await userCanEditSurvey(req.user, surveyId);
+    const permissionsOk = await userCanViewSurvey(req.user, surveyId);
     if (!permissionsOk) {
-      throw new ForbiddenError('User not author nor editor of the survey');
+      throw new ForbiddenError(
+        'User not author, editor nor viewer of the survey',
+      );
     }
 
     const geopackageBuffer = await getGeoPackageFile(surveyId);
@@ -81,9 +85,11 @@ router.get(
   ]),
   asyncHandler(async (req, res) => {
     const surveyId = Number(req.params.id);
-    const permissionsOk = await userCanEditSurvey(req.user, surveyId);
+    const permissionsOk = await userCanViewSurvey(req.user, surveyId);
     if (!permissionsOk) {
-      throw new ForbiddenError('User not author nor editor of the survey');
+      throw new ForbiddenError(
+        'User not author, editor nor viewer of the survey',
+      );
     }
 
     const attachments = await getAttachments(surveyId);

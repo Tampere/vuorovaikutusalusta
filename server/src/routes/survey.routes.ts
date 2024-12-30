@@ -18,6 +18,7 @@ import {
   unpublishSurvey,
   updateSurvey,
   userCanEditSurvey,
+  userCanViewSurvey,
 } from '@src/application/survey';
 import { ensureAuthenticated, ensureSurveyGroupAccess } from '@src/auth';
 import { ForbiddenError } from '@src/error';
@@ -91,9 +92,11 @@ router.get(
   asyncHandler(async (req, res) => {
     const surveyId = Number(req.params.id);
 
-    const permissionsOk = await userCanEditSurvey(req.user, surveyId);
+    const permissionsOk = await userCanViewSurvey(req.user, surveyId);
     if (!permissionsOk) {
-      throw new ForbiddenError('User not author nor editor of the survey');
+      throw new ForbiddenError(
+        'User not author, editor nor viewer of the survey',
+      );
     }
 
     // For now, use the first organization
@@ -416,10 +419,12 @@ router.get(
   asyncHandler(async (req, res) => {
     const surveyId = Number(req.params.surveyId);
     const submissionId = Number(req.params.submissionId);
-    const permissionsOk = await userCanEditSurvey(req.user, surveyId);
+    const permissionsOk = await userCanViewSurvey(req.user, surveyId);
     const language = req.params.lang as LanguageCode;
     if (!permissionsOk) {
-      throw new ForbiddenError('User not author nor editor of the survey');
+      throw new ForbiddenError(
+        'User not author, editor nor viewer of the survey',
+      );
     }
 
     const [survey, answerEntries, timestamp] = await Promise.all([
@@ -454,10 +459,12 @@ router.get(
   asyncHandler(async (req, res) => {
     const surveyId = Number(req.params.id);
 
-    const isEditor = await userCanEditSurvey(req.user, surveyId);
+    const isEditor = await userCanViewSurvey(req.user, surveyId);
 
     if (!isEditor) {
-      throw new ForbiddenError('User not author nor editor of the survey');
+      throw new ForbiddenError(
+        'User not author, editor nor viewer of the survey',
+      );
     }
 
     const submissions = await getSubmissionsForSurvey(surveyId);

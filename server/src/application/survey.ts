@@ -58,6 +58,7 @@ interface DBSurvey {
   author_unit: string;
   author_id: string;
   editors: string[];
+  viewers: string[];
   map_url: string;
   start_date: Date;
   end_date: Date;
@@ -1154,21 +1155,22 @@ export async function updateSurvey(survey: Survey) {
         background_image_url = $13,
         thanks_page_image_url = $14,
         editors = $15,
-        theme_id = $16,
-        section_title_color = $17,
-        email_enabled = $18,
-        email_auto_send_to = $19,
-        email_subject = $20,
-        email_body = $21,
-        email_info = $22::json,
-        allow_saving_unfinished = $23,
-        localisation_enabled = $24,
-        display_privacy_statement = $25,
-        top_margin_image_url = $26,
-        bottom_margin_image_url = $27,
-        organization = $28,
-        tags = $29,
-        languages = $30
+        viewers = $16,
+        theme_id = $17,
+        section_title_color = $18,
+        email_enabled = $19,
+        email_auto_send_to = $20,
+        email_subject = $21,
+        email_body = $22,
+        email_info = $23::json,
+        allow_saving_unfinished = $24,
+        localisation_enabled = $25,
+        display_privacy_statement = $26,
+        top_margin_image_url = $27,
+        bottom_margin_image_url = $28,
+        organization = $29,
+        tags = $30,
+        languages = $31
       WHERE id = $1 RETURNING *`,
       [
         survey.id,
@@ -1186,6 +1188,7 @@ export async function updateSurvey(survey: Survey) {
         survey.backgroundImageUrl ?? null,
         survey.thanksPage.imageUrl ?? null,
         survey.editors,
+        survey.viewers,
         survey.theme?.id ?? null,
         survey.sectionTitleColor,
         survey.email.enabled,
@@ -1463,6 +1466,7 @@ function dbSurveyToSurvey(dbSurvey: DBSurvey | DBSurveyJoin): APISurvey {
     authorUnit: dbSurvey.author_unit,
     authorId: dbSurvey.author_id,
     editors: dbSurvey.editors,
+    viewers: dbSurvey.viewers,
     mapUrl: dbSurvey.map_url,
     startDate: dbSurvey.start_date,
     endDate: dbSurvey.end_date,
@@ -2075,6 +2079,31 @@ export async function userCanEditSurvey(user: User, surveyId: number) {
     editors: string[];
   }>(`SELECT author_id, editors FROM data.survey WHERE id = $1`, [surveyId]);
   return user.id === authorId || editors.includes(user.id);
+}
+
+/**
+ * Check if user is allowed to view the survey with given ID
+ * @param user User
+ * @param surveyId Survey ID
+ * @returns Can the user view the survey?
+ */
+export async function userCanViewSurvey(user: User, surveyId: number) {
+  const {
+    author_id: authorId,
+    editors,
+    viewers,
+  } = await getDb().oneOrNone<{
+    author_id: string;
+    editors: string[];
+    viewers: string[];
+  }>(`SELECT author_id, editors, viewers FROM data.survey WHERE id = $1`, [
+    surveyId,
+  ]);
+  return (
+    user.id === authorId ||
+    editors.includes(user.id) ||
+    viewers.includes(user.id)
+  );
 }
 
 /**

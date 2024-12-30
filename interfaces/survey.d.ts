@@ -367,6 +367,10 @@ export interface Survey {
    */
   editors: string[];
   /**
+   * Array of viewer user IDs
+   */
+  viewers: string[];
+  /**
    * URL of the embedded map component
    */
   mapUrl: string;

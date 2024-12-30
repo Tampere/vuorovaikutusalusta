@@ -38,7 +38,11 @@ const useStyles = makeStyles({
   },
 });
 
-export default function EditSurveyPage() {
+interface Props {
+  canDelete: boolean;
+}
+
+export default function EditSurveyPage(props: Props) {
   const [loading, setLoading] = useState(false);
   const [deleteConfirmDialogOpen, setDeleteConfirmDialogOpen] = useState(false);
   const [expandedSection, setExpandedSection] = useState<number>(null);
@@ -109,23 +113,26 @@ export default function EditSurveyPage() {
           });
         }}
       />
-      <Button
-        style={{
-          display: 'flex',
-          position: 'fixed',
-          right: '2rem',
-          zIndex: 10,
-        }}
-        disabled={loading}
-        color="error"
-        variant="contained"
-        className={classes.button}
-        onClick={() => {
-          setDeleteConfirmDialogOpen(true);
-        }}
-      >
-        {tr.EditSurveyPage.deletePage}
-      </Button>
+      {props.canDelete && (
+        <Button
+          style={{
+            display: 'flex',
+            position: 'fixed',
+            right: '2rem',
+            zIndex: 10,
+          }}
+          disabled={loading}
+          color="error"
+          variant="contained"
+          className={classes.button}
+          onClick={() => {
+            setDeleteConfirmDialogOpen(true);
+          }}
+        >
+          {tr.EditSurveyPage.deletePage}
+        </Button>
+      )}
+
       <EditSurveyPageConditions />
       <FormGroup>
         <FormLabel>{tr.EditSurveyPage.selectSidebarType}</FormLabel>

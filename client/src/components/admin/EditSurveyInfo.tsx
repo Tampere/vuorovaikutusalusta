@@ -46,7 +46,11 @@ const useStyles = makeStyles({
   },
 });
 
-export default function EditSurveyInfo() {
+interface Props {
+  canEdit: boolean;
+}
+
+export default function EditSurveyInfo(props: Props) {
   const [deleteConfirmDialogOpen, setDeleteConfirmDialogOpen] = useState(false);
   const [deleteSurveyLoading, setDeleteSurveyLoading] = useState(false);
 
@@ -179,7 +183,7 @@ export default function EditSurveyInfo() {
         <Autocomplete
           multiple
           filterSelectedOptions
-          disabled={allUsers == null}
+          disabled={allUsers == null || !props.canEdit}
           options={
             // Options: all users except the survey author and the current user
             allUsers?.filter(
@@ -223,6 +227,53 @@ export default function EditSurveyInfo() {
             });
           }}
         />
+        <Autocomplete
+          multiple
+          filterSelectedOptions
+          disabled={allUsers == null || !props.canEdit}
+          options={
+            // Options: all users except the survey author and the current user
+            allUsers?.filter(
+              (user) =>
+                user.id !== activeSurvey.authorId && user.id !== activeUser.id,
+            ) ?? []
+          }
+          getOptionLabel={(user) => user.fullName}
+          value={
+            allUsers?.filter(
+              (user) => activeSurvey.viewers?.includes(user.id),
+            ) ?? []
+          }
+          onChange={(_, value: User[]) => {
+            editSurvey({
+              ...activeSurvey,
+              viewers: value.map((user) => user.id),
+            });
+          }}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              variant="standard"
+              label={tr.EditSurveyInfo.viewers}
+              helperText={tr.EditSurveyInfo.viewersHelperText}
+            />
+          )}
+          // If active user is among the selected editor tags, disable the chip
+          renderTags={(value: User[], getTagProps) => {
+            return value.map((option, index) => {
+              const { key, ...tagProps } = getTagProps({ index });
+              return (
+                <Chip
+                  key={key}
+                  label={option.fullName}
+                  {...tagProps}
+                  // Disable selection of current user
+                  disabled={option.id === activeUser.id}
+                />
+              );
+            });
+          }}
+        />
         {availableMapLayersLoading && (
           <Skeleton variant="rectangular" height={200} width="100%" />
         )}
@@ -236,8 +287,11 @@ export default function EditSurveyInfo() {
             </ul>
           </div>
         )}
-        <SurveyImageList imageType={'backgroundImage'} />
-        <SurveyMarginImageList />
+        <SurveyImageList
+          imageType={'backgroundImage'}
+          canEdit={props.canEdit}
+        />
+        <SurveyMarginImageList canEdit={props.canEdit} />
 
         <Box
           sx={{
@@ -371,6 +425,7 @@ export default function EditSurveyInfo() {
         <div className={classes.actions}>
           <LoadingButton
             variant="contained"
+            disabled={!props.canEdit}
             color="error"
             loading={deleteSurveyLoading}
             onClick={() => {

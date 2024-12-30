@@ -6,7 +6,11 @@ import { useTranslations } from '@src/stores/TranslationContext';
 import RichTextEditor from '../RichTextEditor';
 import SurveyImageList from './SurveyImageList';
 
-export default function EditSurveyThanksPage() {
+interface Props {
+  canEdit?: boolean;
+}
+
+export default function EditSurveyThanksPage({ canEdit = true }: Props) {
   const { activeSurvey, activeSurveyLoading, editSurvey } = useSurvey();
   const { tr, surveyLanguage } = useTranslations();
 
@@ -44,7 +48,7 @@ export default function EditSurveyThanksPage() {
           });
         }}
       />
-      <SurveyImageList imageType={'thanksPageImage'} />
+      <SurveyImageList canEdit={canEdit} imageType={'thanksPageImage'} />
     </Fieldset>
   );
 }
