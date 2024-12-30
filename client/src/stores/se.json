@@ -550,6 +550,11 @@
     "logout": "Logga ut",
     "updateInstructions": "Uppdatera instruktioner"
   },
+  "AppBarInstructionsMenu": {
+    "label": "Instruktioner",
+    "instructions": "Användarmanual",
+    "apiDescription": "API-beskrivning"
+  },
   "InstructionsDialog": {
     "fetchingError": "Fel vid hämtning av aktuella instruktioner",
     "currentInstructions": "Aktuella instruktioner",

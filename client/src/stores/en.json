@@ -551,6 +551,11 @@
     "logout": "Logout",
     "updateInstructions": "Update user instructions"
   },
+  "AppBarInstructionsMenu": {
+    "label": "Instructions",
+    "instructions": "User manual",
+    "apiDescription": "API description"
+  },
   "InstructionsDialog": {
     "fetchingError": "Error while fetching current user instructions",
     "currentInstructions": "Current instructions",
