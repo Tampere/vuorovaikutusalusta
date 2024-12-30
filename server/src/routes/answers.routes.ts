@@ -27,7 +27,7 @@ router.get(
     const surveyId = Number(req.params.id);
     const permissionsOk = await userCanEditSurvey(req.user, surveyId);
     if (!permissionsOk) {
-      throw new ForbiddenError('User not author nor admin of the survey');
+      throw new ForbiddenError('User not author nor editor of the survey');
     }
 
     const exportFiles = await getCSVFile(surveyId);
@@ -56,7 +56,7 @@ router.get(
     const surveyId = Number(req.params.id);
     const permissionsOk = await userCanEditSurvey(req.user, surveyId);
     if (!permissionsOk) {
-      throw new ForbiddenError('User not author nor admin of the survey');
+      throw new ForbiddenError('User not author nor editor of the survey');
     }
 
     const geopackageBuffer = await getGeoPackageFile(surveyId);
@@ -83,7 +83,7 @@ router.get(
     const surveyId = Number(req.params.id);
     const permissionsOk = await userCanEditSurvey(req.user, surveyId);
     if (!permissionsOk) {
-      throw new ForbiddenError('User not author nor admin of the survey');
+      throw new ForbiddenError('User not author nor editor of the survey');
     }
 
     const attachments = await getAttachments(surveyId);

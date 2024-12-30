@@ -190,24 +190,24 @@ export default function EditSurveyInfo() {
           getOptionLabel={(user) => user.fullName}
           value={
             allUsers?.filter(
-              (user) => activeSurvey.admins?.includes(user.id),
+              (user) => activeSurvey.editors?.includes(user.id),
             ) ?? []
           }
           onChange={(_, value: User[]) => {
             editSurvey({
               ...activeSurvey,
-              admins: value.map((user) => user.id),
+              editors: value.map((user) => user.id),
             });
           }}
           renderInput={(params) => (
             <TextField
               {...params}
               variant="standard"
-              label={tr.EditSurveyInfo.admins}
-              helperText={tr.EditSurveyInfo.adminsHelperText}
+              label={tr.EditSurveyInfo.editors}
+              helperText={tr.EditSurveyInfo.editorsHelperText}
             />
           )}
-          // If active user is among the selected admin tags, disable the chip
+          // If active user is among the selected editor tags, disable the chip
           renderTags={(value: User[], getTagProps) => {
             return value.map((option, index) => {
               const { key, ...tagProps } = getTagProps({ index });

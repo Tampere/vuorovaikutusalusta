@@ -57,7 +57,7 @@ interface DBSurvey {
   author: string;
   author_unit: string;
   author_id: string;
-  admins: string[];
+  editors: string[];
   map_url: string;
   start_date: Date;
   end_date: Date;
@@ -1153,7 +1153,7 @@ export async function updateSurvey(survey: Survey) {
         thanks_page_text = $12,
         background_image_url = $13,
         thanks_page_image_url = $14,
-        admins = $15,
+        editors = $15,
         theme_id = $16,
         section_title_color = $17,
         email_enabled = $18,
@@ -1185,7 +1185,7 @@ export async function updateSurvey(survey: Survey) {
         survey.thanksPage.text,
         survey.backgroundImageUrl ?? null,
         survey.thanksPage.imageUrl ?? null,
-        survey.admins,
+        survey.editors,
         survey.theme?.id ?? null,
         survey.sectionTitleColor,
         survey.email.enabled,
@@ -1462,7 +1462,7 @@ function dbSurveyToSurvey(dbSurvey: DBSurvey | DBSurveyJoin): APISurvey {
     author: dbSurvey.author,
     authorUnit: dbSurvey.author_unit,
     authorId: dbSurvey.author_id,
-    admins: dbSurvey.admins,
+    editors: dbSurvey.editors,
     mapUrl: dbSurvey.map_url,
     startDate: dbSurvey.start_date,
     endDate: dbSurvey.end_date,
@@ -2070,11 +2070,11 @@ export async function removeFile(fileUrl: string) {
  * @returns Can the user edit the survey?
  */
 export async function userCanEditSurvey(user: User, surveyId: number) {
-  const { author_id: authorId, admins } = await getDb().oneOrNone<{
+  const { author_id: authorId, editors } = await getDb().oneOrNone<{
     author_id: string;
-    admins: string[];
-  }>(`SELECT author_id, admins FROM data.survey WHERE id = $1`, [surveyId]);
-  return user.id === authorId || admins.includes(user.id);
+    editors: string[];
+  }>(`SELECT author_id, editors FROM data.survey WHERE id = $1`, [surveyId]);
+  return user.id === authorId || editors.includes(user.id);
 }
 
 /**

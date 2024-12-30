@@ -363,9 +363,9 @@ export interface Survey {
    */
   authorId: string;
   /**
-   * Array of administrator user IDs
+   * Array of editor user IDs
    */
-  admins: string[];
+  editors: string[];
   /**
    * URL of the embedded map component
    */

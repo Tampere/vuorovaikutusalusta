@@ -78,7 +78,7 @@ export default function SurveyListItem(props: Props) {
   const disableUsersAccessToSurvey = useMemo(
     () =>
       activeUser?.id !== survey.authorId &&
-      !survey.admins.includes(activeUser?.id),
+      !survey.editors.includes(activeUser?.id),
     [activeUser, survey],
   );
 

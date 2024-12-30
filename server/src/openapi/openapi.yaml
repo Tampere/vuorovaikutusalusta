@@ -45,7 +45,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
   /surveys/{surveyId}:
     get:
-      description: Get a survey by its id. The survey must be created for the same organization as the authenticated user and the user must be an admin or author of the survey.
+      description: Get a survey by its id. The survey must be created for the same organization as the authenticated user and the user must be an editor or author of the survey.
       tags:
         - Surveys
       operationId: get-survey
@@ -87,7 +87,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
-          description: Forbidden request if the user is not an admin or author of the survey.
+          description: Forbidden request if the user is not an editor or author of the survey.
           content:
             text/html:
               schema:
@@ -96,7 +96,7 @@ paths:
           description: Internal server error if invalid survey id is provided.
   /surveys/{surveyId}/submissions:
     get:
-      description: Get all submissions for a survey by its id. The authenticated user must be an admin or an author of the survey.
+      description: Get all submissions for a survey by its id. The authenticated user must be an editor or an author of the survey.
       tags:
         - Surveys
       operationId: get-survey-submissions
@@ -200,7 +200,7 @@ components:
           author,
           authorUnit,
           authorId,
-          admins,
+          editors,
           mapUrl,
           startDate,
           endDate,
@@ -235,9 +235,9 @@ components:
           type: string
         authorId:
           type: string
-        admins:
+        editors:
           type: array
-          description: Array of administrator user IDs.
+          description: Array of editor user IDs.
           items:
             type: string
         mapUrl:
