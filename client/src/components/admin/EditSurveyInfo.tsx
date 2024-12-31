@@ -422,19 +422,20 @@ export default function EditSurveyInfo(props: Props) {
           </FormHelperText>
         </div>
 
-        <div className={classes.actions}>
-          <LoadingButton
-            variant="contained"
-            disabled={!props.canEdit}
-            color="error"
-            loading={deleteSurveyLoading}
-            onClick={() => {
-              setDeleteConfirmDialogOpen(true);
-            }}
-          >
-            {tr.EditSurvey.deleteSurvey}
-          </LoadingButton>
-        </div>
+        {props.canEdit && (
+          <div className={classes.actions}>
+            <LoadingButton
+              variant="contained"
+              color="error"
+              loading={deleteSurveyLoading}
+              onClick={() => {
+                setDeleteConfirmDialogOpen(true);
+              }}
+            >
+              {tr.EditSurvey.deleteSurvey}
+            </LoadingButton>
+          </div>
+        )}
       </Fieldset>
       <DeleteSurveyDialog
         open={deleteConfirmDialogOpen}
