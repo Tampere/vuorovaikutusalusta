@@ -69,6 +69,7 @@ interface Props {
   width: number;
   mobileOpen: boolean;
   onDrawerToggle: () => void;
+  allowEditing: boolean;
 }
 
 export default function EditSurveySideBar(props: Props) {
@@ -150,7 +151,7 @@ export default function EditSurveySideBar(props: Props) {
                             {Object.keys(page?.conditions)?.length > 0 && (
                               <BranchIcon />
                             )}
-                            <SurveyPageIcon /> 
+                            <SurveyPageIcon />
                           </ListItemIcon>
                           <ListItemText
                             primary={
@@ -218,10 +219,11 @@ export default function EditSurveySideBar(props: Props) {
                           >
                             <DocumentCopyIcon />
                           </IconButton>
+
                           <div {...provided.dragHandleProps}>
-                          <IconButton>
-                            <DraggableIcon />
-                          </IconButton>
+                            <IconButton>
+                              <DraggableIcon />
+                            </IconButton>
                           </div>
                         </ListItemLink>
                       </div>
@@ -233,86 +235,88 @@ export default function EditSurveySideBar(props: Props) {
             )}
           </Droppable>
         </DragDropContext>
-        <div style={{ display: 'flex', flexDirection: 'row' }}>
-          <ListItem
-            sx={{
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'space-around',
-            }}
-            className={`${
-              newPageDisabled || activeSurveyLoading ? classes.disabled : ''
-            } ${newPageLoading ? classes.loading : ''}`}
-            onClick={async () => {
-              setNewPageDisabled(true);
-              try {
-                const page = await createPage();
-                history.push(`${url}/sivut/${page.id}?lang=${language}`);
-                setNewPageDisabled(false);
-              } catch (error) {
-                showToast({
-                  severity: 'error',
-                  message: tr.EditSurvey.newPageFailed,
-                });
-                setNewPageDisabled(false);
-                throw error;
-              }
-            }}
-          >
-            <ListItemIcon>
-              <AddIcon />
-            </ListItemIcon>
-            <ListItemText primary={tr.EditSurvey.newPage} />
-          </ListItem>
-          <div
-            style={{
-              height: '2rem',
-              borderRight: '1px solid white',
-              alignSelf: 'center',
-            }}
-          ></div>
-          <ListItemButton
-            className={classes.listItemButton}
-            disabled={!clipboardPage}
-            sx={{
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'space-around',
-              width: '100%',
-            }}
-            onClick={async () => {
-              setNewPageDisabled(true);
-              try {
-                // Create new blank page and set its contents from Clipboard -context
-                const blankPage = await createPage();
-                history.push(`${url}/sivut/${blankPage.id}?lang=${language}`);
-                setNewPageDisabled(false);
+        {props.allowEditing && (
+          <div style={{ display: 'flex', flexDirection: 'row' }}>
+            <ListItem
+              sx={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'space-around',
+              }}
+              className={`${
+                newPageDisabled || activeSurveyLoading ? classes.disabled : ''
+              } ${newPageLoading ? classes.loading : ''}`}
+              onClick={async () => {
+                setNewPageDisabled(true);
+                try {
+                  const page = await createPage();
+                  history.push(`${url}/sivut/${page.id}?lang=${language}`);
+                  setNewPageDisabled(false);
+                } catch (error) {
+                  showToast({
+                    severity: 'error',
+                    message: tr.EditSurvey.newPageFailed,
+                  });
+                  setNewPageDisabled(false);
+                  throw error;
+                }
+              }}
+            >
+              <ListItemIcon>
+                <AddIcon />
+              </ListItemIcon>
+              <ListItemText primary={tr.EditSurvey.newPage} />
+            </ListItem>
+            <span
+              style={{
+                height: '2rem',
+                borderRight: '1px solid white',
+                alignSelf: 'center',
+              }}
+            />
+            <ListItemButton
+              className={classes.listItemButton}
+              disabled={!clipboardPage}
+              sx={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'space-around',
+                width: '100%',
+              }}
+              onClick={async () => {
+                setNewPageDisabled(true);
+                try {
+                  // Create new blank page and set its contents from Clipboard -context
+                  const blankPage = await createPage();
+                  history.push(`${url}/sivut/${blankPage.id}?lang=${language}`);
+                  setNewPageDisabled(false);
 
-                editPage({ ...clipboardPage, id: blankPage.id });
-                showToast({
-                  severity: 'warning',
-                  message: tr.EditSurvey.pageAttached,
-                  autoHideDuration: 30000,
-                });
-                showToast({
-                  severity: 'warning',
-                  message: tr.EditSurvey.checkConditionalSections,
-                  autoHideDuration: 30000,
-                });
-              } catch (error) {
-                showToast({
-                  severity: 'error',
-                  message: tr.EditSurvey.newPageFailed,
-                });
-                setNewPageDisabled(false);
-                throw error;
-              }
-            }}
-          >
-            <ClipboardIcon />
-            {tr.EditSurvey.attachNewPage}
-          </ListItemButton>
-        </div>
+                  editPage({ ...clipboardPage, id: blankPage.id });
+                  showToast({
+                    severity: 'warning',
+                    message: tr.EditSurvey.pageAttached,
+                    autoHideDuration: 30000,
+                  });
+                  showToast({
+                    severity: 'warning',
+                    message: tr.EditSurvey.checkConditionalSections,
+                    autoHideDuration: 30000,
+                  });
+                } catch (error) {
+                  showToast({
+                    severity: 'error',
+                    message: tr.EditSurvey.newPageFailed,
+                  });
+                  setNewPageDisabled(false);
+                  throw error;
+                }
+              }}
+            >
+              <ClipboardIcon />
+              {tr.EditSurvey.attachNewPage}
+            </ListItemButton>
+          </div>
+        )}
       </List>
       <Divider />
       <List>

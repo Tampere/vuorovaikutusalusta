@@ -46,7 +46,11 @@ const useStyles = makeStyles({
   },
 });
 
-export default function EditSurveyInfo() {
+interface Props {
+  canEdit: boolean;
+}
+
+export default function EditSurveyInfo(props: Props) {
   const [deleteConfirmDialogOpen, setDeleteConfirmDialogOpen] = useState(false);
   const [deleteSurveyLoading, setDeleteSurveyLoading] = useState(false);
 
@@ -179,7 +183,7 @@ export default function EditSurveyInfo() {
         <Autocomplete
           multiple
           filterSelectedOptions
-          disabled={allUsers == null}
+          disabled={allUsers == null || !props.canEdit}
           options={
             // Options: all users except the survey author and the current user
             allUsers?.filter(
@@ -190,24 +194,71 @@ export default function EditSurveyInfo() {
           getOptionLabel={(user) => user.fullName}
           value={
             allUsers?.filter(
-              (user) => activeSurvey.admins?.includes(user.id),
+              (user) => activeSurvey.editors?.includes(user.id),
             ) ?? []
           }
           onChange={(_, value: User[]) => {
             editSurvey({
               ...activeSurvey,
-              admins: value.map((user) => user.id),
+              editors: value.map((user) => user.id),
             });
           }}
           renderInput={(params) => (
             <TextField
               {...params}
               variant="standard"
-              label={tr.EditSurveyInfo.admins}
-              helperText={tr.EditSurveyInfo.adminsHelperText}
+              label={tr.EditSurveyInfo.editors}
+              helperText={tr.EditSurveyInfo.editorsHelperText}
             />
           )}
-          // If active user is among the selected admin tags, disable the chip
+          // If active user is among the selected editor tags, disable the chip
+          renderTags={(value: User[], getTagProps) => {
+            return value.map((option, index) => {
+              const { key, ...tagProps } = getTagProps({ index });
+              return (
+                <Chip
+                  key={key}
+                  label={option.fullName}
+                  {...tagProps}
+                  // Disable selection of current user
+                  disabled={option.id === activeUser.id}
+                />
+              );
+            });
+          }}
+        />
+        <Autocomplete
+          multiple
+          filterSelectedOptions
+          disabled={allUsers == null || !props.canEdit}
+          options={
+            // Options: all users except the survey author and the current user
+            allUsers?.filter(
+              (user) =>
+                user.id !== activeSurvey.authorId && user.id !== activeUser.id,
+            ) ?? []
+          }
+          getOptionLabel={(user) => user.fullName}
+          value={
+            allUsers?.filter(
+              (user) => activeSurvey.viewers?.includes(user.id),
+            ) ?? []
+          }
+          onChange={(_, value: User[]) => {
+            editSurvey({
+              ...activeSurvey,
+              viewers: value.map((user) => user.id),
+            });
+          }}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              variant="standard"
+              label={tr.EditSurveyInfo.viewers}
+              helperText={tr.EditSurveyInfo.viewersHelperText}
+            />
+          )}
+          // If active user is among the selected editor tags, disable the chip
           renderTags={(value: User[], getTagProps) => {
             return value.map((option, index) => {
               const { key, ...tagProps } = getTagProps({ index });
@@ -236,8 +287,11 @@ export default function EditSurveyInfo() {
             </ul>
           </div>
         )}
-        <SurveyImageList imageType={'backgroundImage'} />
-        <SurveyMarginImageList />
+        <SurveyImageList
+          imageType={'backgroundImage'}
+          canEdit={props.canEdit}
+        />
+        <SurveyMarginImageList canEdit={props.canEdit} />
 
         <Box
           sx={{
@@ -368,18 +422,20 @@ export default function EditSurveyInfo() {
           </FormHelperText>
         </div>
 
-        <div className={classes.actions}>
-          <LoadingButton
-            variant="contained"
-            color="error"
-            loading={deleteSurveyLoading}
-            onClick={() => {
-              setDeleteConfirmDialogOpen(true);
-            }}
-          >
-            {tr.EditSurvey.deleteSurvey}
-          </LoadingButton>
-        </div>
+        {props.canEdit && (
+          <div className={classes.actions}>
+            <LoadingButton
+              variant="contained"
+              color="error"
+              loading={deleteSurveyLoading}
+              onClick={() => {
+                setDeleteConfirmDialogOpen(true);
+              }}
+            >
+              {tr.EditSurvey.deleteSurvey}
+            </LoadingButton>
+          </div>
+        )}
       </Fieldset>
       <DeleteSurveyDialog
         open={deleteConfirmDialogOpen}

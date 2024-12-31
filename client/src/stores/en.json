@@ -53,9 +53,11 @@
     "authorUnit": "Survey author's / contact person's unit",
     "authorizedGroups": "Authorized user groups",
     "authorizedGroupsHelperText": "Users in these groups will have access to the survey.",
-    "admins": "Survey admins",
+    "editors": "Survey editors",
     "userFetchFailed": "Failed to fetch users. Try again later.",
-    "adminsHelperText": "Users besides the original author of the survey, who will have access to the survey answers and who can modify the survey.",
+    "editorsHelperText": "Users besides the original author of the survey, who will have access to the survey answers and who can modify the survey.",
+    "viewers": "Survey viewers",
+    "viewersHelperText": "Users who can view the survey and its answers.",
     "mapUrl": "URL for the Oskari map publication",
     "mapUrlError": "Failed to fetch map layers with given url. Check the url and try again later.",
     "availableMapLayers": "Available map layers:",
@@ -362,6 +364,7 @@
     },
     "errorFetchingSurveys": "Error while accessing surveys. Please try again later.",
     "editSurvey": "Edit survey",
+    "viewSurvey": "View survey",
     "publishNow": "Publish now",
     "confirmPublish": "Are you sure you want to publish the survey?",
     "publishSuccessful": "Survey published!",
@@ -547,6 +550,11 @@
     "label": "User menu",
     "logout": "Logout",
     "updateInstructions": "Update user instructions"
+  },
+  "AppBarInstructionsMenu": {
+    "label": "Instructions",
+    "instructions": "User manual",
+    "apiDescription": "API description"
   },
   "InstructionsDialog": {
     "fetchingError": "Error while fetching current user instructions",

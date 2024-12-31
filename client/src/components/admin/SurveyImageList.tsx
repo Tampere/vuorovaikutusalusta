@@ -11,7 +11,7 @@ import {
   ImageListItem,
   TextField,
   Theme,
-  Typography
+  Typography,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import ImageIcon from '@src/components/icons/ImageIcon';
@@ -52,12 +52,17 @@ interface Props {
   imageType: ImageType;
   images?: File[];
   setImages?: (images: File[]) => void;
+  canEdit?: boolean;
 }
 
 const MEGAS = 10;
 const MAX_FILE_SIZE = MEGAS * 1000 * 1000; // ten megabytes
 
-export default function SurveyImageList({ imageType, ...props }: Props) {
+export default function SurveyImageList({
+  imageType,
+  canEdit = true,
+  ...props
+}: Props) {
   const classes = useStyles();
   const { tr } = useTranslations();
   const { editSurvey, activeSurvey } = useSurvey();
@@ -424,6 +429,7 @@ export default function SurveyImageList({ imageType, ...props }: Props) {
   return (
     <div>
       <Button
+        disabled={!canEdit}
         startIcon={<ImageIcon />}
         variant="outlined"
         onClick={() => setImageDialogOpen((prev) => !prev)}
@@ -494,7 +500,9 @@ export default function SurveyImageList({ imageType, ...props }: Props) {
               </Container>
             </ImageListItem>
             {images.map((image) => {
-              const imageSrc = `data:image/${limitToSvg ? 'svg+xml' : ''};base64,${image.data}`;
+              const imageSrc = `data:image/${
+                limitToSvg ? 'svg+xml' : ''
+              };base64,${image.data}`;
               return (
                 <SurveyImageListItem
                   key={image.fileUrl}

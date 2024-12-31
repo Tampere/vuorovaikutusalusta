@@ -20,6 +20,7 @@ import EditSurveyPage from './EditSurveyPage';
 import EditSurveySideBar from './EditSurveySideBar';
 import EditSurveyThanksPage from './EditSurveyThanksPage';
 import EditSurveyTranslations from './EditSurveyTranslations';
+import { useUser } from '@src/stores/UserContext';
 
 const sideBarWidth = 320;
 
@@ -37,9 +38,18 @@ export default function EditSurvey() {
   const { tr } = useTranslations();
   const { showToast } = useToasts();
   const history = useHistory();
+  const { activeUser } = useUser();
+
+  const allowEditing =
+    !activeSurveyLoading &&
+    (activeUser?.id === activeSurvey.authorId ||
+      activeSurvey.editors.includes(activeUser?.id));
 
   // Prevent page unload when there are unsaved changes
-  usePreventUnload(hasActiveSurveyChanged, tr.EditSurvey.preventUnloadConfirm);
+  usePreventUnload(
+    allowEditing && hasActiveSurveyChanged,
+    tr.EditSurvey.preventUnloadConfirm,
+  );
 
   useEffect(() => {
     async function fetchSurvey() {
@@ -88,6 +98,7 @@ export default function EditSurvey() {
         onDrawerToggle={() => {
           setMobileOpen(!mobileOpen);
         }}
+        allowEditing={allowEditing}
       />
       <Box
         component="main"
@@ -102,16 +113,16 @@ export default function EditSurvey() {
         <Toolbar />
         <Switch>
           <Route path={`${path}/perustiedot`}>
-            <EditSurveyInfo />
+            <EditSurveyInfo canEdit={allowEditing} />
           </Route>
           <Route path={`${path}/sähköpostit`}>
             <EditSurveyEmail />
           </Route>
           <Route path={`${path}/sivut/:pageId`}>
-            <EditSurveyPage />
+            <EditSurveyPage canDelete={allowEditing} />
           </Route>
           <Route path={`${path}/kiitos-sivu`}>
-            <EditSurveyThanksPage />
+            <EditSurveyThanksPage canEdit={allowEditing} />
           </Route>
           <Route path={`${path}/käännökset`}>
             <EditSurveyTranslations />
@@ -121,7 +132,7 @@ export default function EditSurvey() {
             <Redirect to={`${url}/perustiedot`} />
           </Route>
         </Switch>
-        <EditSurveyControls />
+        {allowEditing && <EditSurveyControls />}
       </Box>
     </Box>
   );
