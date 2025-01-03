@@ -90,6 +90,7 @@ export function configureMockAuth(app: Express) {
     fullName: 'toinen Testaaja',
     email: 'toinen.testaaja@testi.com',
     organizations: ['test-group-id-1'],
+    roles: ['organization_user', 'organization_admin'],
   };
   upsertUser(mockUser);
 
