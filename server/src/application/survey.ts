@@ -36,6 +36,7 @@ import {
   InternalServerError,
   NotFoundError,
 } from '@src/error';
+import { isAdmin } from '@src/user';
 
 import { geometryToGeoJSONFeatureCollection } from '@src/utils';
 import { Geometry } from 'geojson';
@@ -2078,7 +2079,7 @@ export async function userCanEditSurvey(user: User, surveyId: number) {
     author_id: string;
     editors: string[];
   }>(`SELECT author_id, editors FROM data.survey WHERE id = $1`, [surveyId]);
-  return user.id === authorId || editors.includes(user.id);
+  return isAdmin(user) || user.id === authorId || editors.includes(user.id);
 }
 
 /**
@@ -2100,6 +2101,7 @@ export async function userCanViewSurvey(user: User, surveyId: number) {
     surveyId,
   ]);
   return (
+    isAdmin(user) ||
     user.id === authorId ||
     editors.includes(user.id) ||
     viewers.includes(user.id)

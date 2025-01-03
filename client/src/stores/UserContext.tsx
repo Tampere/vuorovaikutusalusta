@@ -70,6 +70,8 @@ export function useUser() {
   };
 
   return {
+    activeUserIsAdmin:
+      state.activeUser?.roles.includes('organization_admin') ?? false,
     setActiveUser,
     ...state,
   };
