@@ -15,6 +15,7 @@ interface DbUser {
   full_name: string;
   email: string;
   organizations: string[];
+  roles: string[];
 }
 
 /**
@@ -30,7 +31,13 @@ function dbUserToUser(dbUser: DbUser): Express.User {
         fullName: dbUser.full_name,
         email: dbUser.email,
         organizations: dbUser.organizations,
+        roles: dbUser.roles,
       };
+}
+
+/** Check if user has admin rights */
+export function isAdmin(user: Express.User) {
+  return user.roles.includes('organization-admin');
 }
 
 /**
@@ -41,10 +48,10 @@ function dbUserToUser(dbUser: DbUser): Express.User {
 export async function upsertUser(user: Express.User) {
   const newUser = await getDb().one<DbUser>(
     `
-    INSERT INTO "user" (id, full_name, email, organizations)
-    VALUES ($(id), $(fullName), $(email), $(organizations))
+    INSERT INTO "user" (id, full_name, email, organizations, roles)
+    VALUES ($(id), $(fullName), $(email), $(organizations), $(roles))
     ON CONFLICT (id) DO UPDATE
-      SET full_name = $(fullName), email = $(email), organizations = $(organizations)
+      SET full_name = $(fullName), email = $(email), organizations = $(organizations), roles = $(roles)
     RETURNING *
   `,
     {
@@ -52,6 +59,7 @@ export async function upsertUser(user: Express.User) {
       fullName: user.fullName,
       email: user.email,
       organizations: user.organizations,
+      roles: user.roles,
     },
   );
   return dbUserToUser(newUser);

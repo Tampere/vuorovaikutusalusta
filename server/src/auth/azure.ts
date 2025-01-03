@@ -30,6 +30,8 @@ export function configureAzureAuth(app: Express) {
           return done(new Error('No oid found'), null);
         } else if (!profile._json.groups || profile._json.groups.length === 0) {
           return done(new Error('No groups found'), null);
+        } else if (!profile._json.roles || profile._json.roles.length === 0) {
+          return done(new Error('No roles found'), null);
         }
 
         process.nextTick(async function () {
@@ -38,6 +40,7 @@ export function configureAzureAuth(app: Express) {
             fullName: profile.displayName,
             email: profile._json.email,
             organizations: JSON.parse(profile._json.groups), // Parse groups to trim extra characters
+            roles: JSON.parse(profile._json.roles), // Parse roles to trim extra characters
           });
           return done(null, user);
         });
