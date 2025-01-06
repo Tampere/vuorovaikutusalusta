@@ -1,6 +1,7 @@
 import {
   getAttachments,
   getCSVFile,
+  getGeometryDBEntriesAsGeoJSON,
   getGeoPackageFile,
 } from '@src/application/answer';
 import { userCanViewSurvey } from '@src/application/survey';
@@ -8,7 +9,7 @@ import { ensureAuthenticated, ensureSurveyGroupAccess } from '@src/auth';
 import { BadRequestError, ForbiddenError } from '@src/error';
 import { Router } from 'express';
 import asyncHandler from 'express-async-handler';
-import { param } from 'express-validator';
+import { param, query } from 'express-validator';
 import { validateRequest } from '../utils';
 
 const router = Router();
@@ -99,6 +100,45 @@ router.get(
     } else {
       res.status(200).json(attachments);
     }
+  }),
+);
+
+/**
+ * Get submissions for the map questions as vector layers
+ */
+router.get(
+  '/:id/map',
+  ensureAuthenticated(),
+  ensureSurveyGroupAccess(),
+  validateRequest([
+    param('id').isNumeric().toInt().withMessage('ID must be a number'),
+    query('question').toArray()
+  ]),
+  asyncHandler(async (req, res) => {
+    const surveyId = Number(req.params.id);
+    const isEditor = await userCanViewSurvey(req.user, surveyId);
+    if (!isEditor) {
+      throw new ForbiddenError(
+        'User not author, editor nor viewer of the survey',
+      );
+    }
+
+    const layers = await getGeometryDBEntriesAsGeoJSON(surveyId) ?? {};
+    const layerArr = Object.entries(layers)
+
+    // Filter layers by question number(s), possibly received as query parameters
+    const questionsToReturn = (req.query.question as string[])
+    .map(q => parseInt(q))
+    .filter(q => !isNaN(q) && q > 0 && q <= layerArr.length);
+
+    // To do: Use Object.fromEntries instead of reduce. Currently it gives a Typescript error
+    res.json(
+      !questionsToReturn.length ? layers : questionsToReturn.reduce((filtered, i) => {
+        const layer = layerArr[i-1];
+        filtered[layer[0]] = layer[1];
+        return filtered
+      }, {})
+    );
   }),
 );
 
