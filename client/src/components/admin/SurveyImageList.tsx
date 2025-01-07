@@ -108,17 +108,25 @@ export default function SurveyImageList({
   }
 
   function getApiFilePath(imageType: ImageType) {
+    const surveyOrganizationId = activeSurvey?.organization;
+    let baseUrl;
     switch (imageType) {
       case 'backgroundImage':
-        return '/api/file/background-images';
+        baseUrl = `/api/file/background-images`;
+        break;
       case 'thanksPageImage':
-        return '/api/file/thanks-page-images';
+        baseUrl = `/api/file/thanks-page-images`;
+        break;
       case 'topMarginImage':
       case 'bottomMarginImage':
-        return '/api/file/margin-images';
+        baseUrl = '/api/file/margin-images';
+        break;
       default:
-        return '/api/file';
+        baseUrl = '/api/file';
     }
+    return surveyOrganizationId
+      ? `${baseUrl}?organization=${surveyOrganizationId}`
+      : baseUrl;
   }
 
   async function getImages() {

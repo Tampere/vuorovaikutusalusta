@@ -8,7 +8,11 @@ import {
   removeFile,
   storeFile,
 } from '@src/application/survey';
-import { ensureAuthenticated, ensureFileGroupAccess } from '@src/auth';
+import {
+  ensureAuthenticated,
+  ensureFileGroupAccess,
+  ensureSuperUserAccess,
+} from '@src/auth';
 
 import { parseMimeType, validateRequest } from '@src/utils';
 import { Router } from 'express';
@@ -24,7 +28,6 @@ const upload = multer({ limits: { fileSize: 10 * 1000 * 1000 } });
  */
 router.get(
   '/instructions',
-
   ensureAuthenticated(),
   asyncHandler(async (_req, res) => {
     const row = await getAdminInstructions();
@@ -42,6 +45,7 @@ router.post(
   '/instructions',
   upload.single('file'),
   ensureAuthenticated(),
+  ensureSuperUserAccess(),
   asyncHandler(async (req, res) => {
     const { buffer, originalname, mimetype } = req.file;
     const { name } = await storeAdminInstructions(

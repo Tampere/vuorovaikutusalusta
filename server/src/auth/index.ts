@@ -1,6 +1,6 @@
 import { getSurveyOrganization } from '@src/application/survey';
 import logger from '@src/logger';
-import { getUser, upsertUser } from '@src/user';
+import { getUser, isSuperUser, upsertUser } from '@src/user';
 import ConnectPgSimple from 'connect-pg-simple';
 import { Express, NextFunction, Request, Response } from 'express';
 import expressSession from 'express-session';
@@ -90,7 +90,7 @@ export function configureMockAuth(app: Express) {
     fullName: 'toinen Testaaja',
     email: 'toinen.testaaja@testi.com',
     organizations: ['test-group-id-1'],
-    roles: ['organization_user', 'organization_admin'],
+    roles: ['organization_user', 'organization_admin', 'super_user'],
   };
   upsertUser(mockUser);
 
@@ -143,8 +143,20 @@ export function ensureAuthenticated(options?: { redirectToLogin?: boolean }) {
   };
 }
 
+export function ensureSuperUserAccess() {
+  return (req: Request, res: Response, next: NextFunction) => {
+    if (isSuperUser(req.user)) {
+      return next();
+    }
+    res.status(403).send('Forbidden, super user access required');
+  };
+}
+
 export function ensureSurveyGroupAccess(id: string = 'id') {
   return async (req: Request, res: Response, next: NextFunction) => {
+    if (isSuperUser(req.user)) {
+      return next();
+    }
     const surveyOrganization = req.params[id]
       ? await getSurveyOrganization(Number(req.params[id]))
       : null;
@@ -161,6 +173,11 @@ export function ensureSurveyGroupAccess(id: string = 'id') {
 
 export function ensureFileGroupAccess() {
   return async (req: Request, res: Response, next: NextFunction) => {
+    // Super user access to files for a survey with a different organization than the super users own organization
+    if (isSuperUser(req.user) && req.headers['organization']) {
+      res.locals.fileOrganizations = [req.headers['organization']];
+      return next();
+    }
     const surveyOrganizations = req.headers['organization']
       ? (req.headers['organization'] as string)
       : req.user.organizations;

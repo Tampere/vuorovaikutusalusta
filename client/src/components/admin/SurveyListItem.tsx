@@ -73,11 +73,11 @@ export default function SurveyListItem(props: Props) {
   const { tr, surveyLanguage } = useTranslations();
   const { showToast } = useToasts();
   const { url } = useRouteMatch();
-  const { activeUser, activeUserIsAdmin } = useUser();
+  const { activeUser, activeUserIsAdmin, activeUserIsSuperUser } = useUser();
 
   const disableUsersViewAccessToSurvey = useMemo(
     () =>
-      !activeUserIsAdmin &&
+      !(activeUserIsAdmin || activeUserIsSuperUser) &&
       activeUser?.id !== survey.authorId &&
       !survey.editors.includes(activeUser?.id) &&
       !survey.viewers.includes(activeUser?.id),
@@ -87,7 +87,7 @@ export default function SurveyListItem(props: Props) {
 
   const disableUsersWriteAccessToSurvey = useMemo(
     () =>
-      !activeUserIsAdmin &&
+      !(activeUserIsAdmin || activeUserIsSuperUser) &&
       activeUser?.id !== survey.authorId &&
       !survey.editors.includes(activeUser?.id),
     [activeUser, survey],
@@ -227,7 +227,8 @@ export default function SurveyListItem(props: Props) {
             to={`${url}kyselyt/${survey.id}`}
             disabled={disableUsersViewAccessToSurvey}
           >
-            {activeUserIsAdmin ||
+            {activeUserIsSuperUser ||
+            activeUserIsAdmin ||
             survey.editors.includes(activeUser?.id) ||
             activeUser?.id === survey.authorId
               ? tr.SurveyList.editSurvey

@@ -36,8 +36,13 @@ function dbUserToUser(dbUser: DbUser): Express.User {
 }
 
 /** Check if user has admin rights */
-export function isAdmin(user: Express.User) {
-  return user.roles.includes('organization_admin');
+export function isAdmin(user?: Express.User) {
+  return user?.roles.includes('organization_admin') ?? false;
+}
+
+/** Check if user has super user rights */
+export function isSuperUser(user?: Express.User) {
+  return user?.roles.includes('super_user') ?? false;
 }
 
 /**
