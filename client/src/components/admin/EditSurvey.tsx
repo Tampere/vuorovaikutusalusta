@@ -38,11 +38,12 @@ export default function EditSurvey() {
   const { tr } = useTranslations();
   const { showToast } = useToasts();
   const history = useHistory();
-  const { activeUser, activeUserIsAdmin } = useUser();
+  const { activeUser, activeUserIsAdmin, activeUserIsSuperUser } = useUser();
 
   const allowEditing =
     !activeSurveyLoading &&
-    (activeUserIsAdmin ||
+    (activeUserIsSuperUser ||
+      activeUserIsAdmin ||
       activeUser?.id === activeSurvey.authorId ||
       activeSurvey.editors.includes(activeUser?.id));
 
