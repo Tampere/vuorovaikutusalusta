@@ -31,6 +31,7 @@ import AnswersList, { AnswerItem, AnswerSelection } from './AnswersList';
 import { DataChart } from './DataChart';
 import SplitPaneLayout from './SplitPaneLayout';
 import { SurveyQuestionSummary } from './SurveyQuestionSummary';
+import DataPublish from '../DataPublish';
 
 function isMapEntry(
   entry: AnswerEntry,
@@ -287,6 +288,7 @@ export default function SurveySubmissionsPage() {
                   submissionsLoading={submissionsLoading}
                 />
                 <DataExport surveyId={survey.id} />
+                <DataPublish surveyId={survey.id} />
                 <SurveyQuestionSummary
                   setSelectedQuestion={setSelectedQuestion}
                 />

@@ -8,6 +8,9 @@
     "errorDownloadingGPKG": "GeoPackage -tiedoston lataaminen epäonnistui",
     "attachments": "Vastausliitteet"
   },
+  "DataPublish": {
+    "publishAnswers": "Julkaise vastaukset"
+  },
   "EditSurvey": {
     "errorFetchingSurvey": "Virhe haettaessa kyselyä. Tarkista osoite tai yritä myöhemmin uudestaan.",
     "untitledPage": "Nimetön sivu",

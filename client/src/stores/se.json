@@ -8,6 +8,9 @@
     "errorDownloadingGPKG": "Misslyckades att ladda ner GeoPackage-filen",
     "attachments": "Bilagor"
   },
+  "DataPublish": {
+    "publishAnswers": "Publicera svar"
+  },
   "EditSurvey": {
     "errorFetchingSurvey": "Fel vid hämtning av enkät. Kontrollera adressen eller försök igen senare.",
     "untitledPage": "Namnlös sida",

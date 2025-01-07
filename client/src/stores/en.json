@@ -8,6 +8,9 @@
     "errorDownloadingGPKG": "Failed to export GeoPackage -file",
     "attachments": "Survey response data attachments"
   },
+  "DataPublish": {
+    "publishAnswers": "Publish response data"
+  },
   "EditSurvey": {
     "errorFetchingSurvey": "Unable to access the survey. Please check the address or try again later.",
     "untitledPage": "Untitled page",
