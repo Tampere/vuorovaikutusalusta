@@ -4,6 +4,7 @@ import {
   getAnswerEntries,
   getSubmissionsForSurvey,
   getTimestamp,
+  publishSubmissions
 } from '@src/application/submission';
 import {
   createSurvey,
@@ -14,7 +15,6 @@ import {
   getSurvey,
   getSurveys,
   getTagsByOrganizations,
-  publishSubmissions,
   publishSurvey,
   unpublishSurvey,
   updateSurvey,

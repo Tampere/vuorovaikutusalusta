@@ -197,13 +197,6 @@ type DBSurveyJoin = DBSurvey & {
   mapViewSRID: number;
 };
 
-interface DBPublication {
-  id: number;
-  survey_id: number;
-  username: string;
-  password: string;
-}
-
 /**
  * Helper function for creating survey page column set for database queries
  */
@@ -2168,29 +2161,4 @@ export async function getTagsByOrganizations(organizations: string[]) {
     [organizations],
   );
   return rows.map((row) => row.tag);
-}
-
-export async function publishSubmissions(
-  surveyId: number,
-  username: string,
-  password: string
-) {
-  const row = await getDb().oneOrNone<DBPublication>(
-    `
-    INSERT INTO
-      data.publications (survey_id, username, password)
-    VALUES
-      ($1, $2, crypt($3, gen_salt('bf', 8)))
-      RETURNING *
-    `,
-    [surveyId, username, password],
-  );
-
-  if (!row) {
-    throw new InternalServerError(
-      `Error while publishing submissions with id:${surveyId}`,
-    );
-  }
-
-  return { id: row.id };
 }

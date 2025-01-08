@@ -45,6 +45,13 @@ interface DBSubmission {
   updated_at: Date;
 }
 
+interface DBPublication {
+  id: number;
+  survey_id: number;
+  username: string;
+  password: string;
+}
+
 /**
  * Temporary entry row object for inserting subquestion answers properly attached to the parent entry
  */
@@ -860,3 +867,29 @@ export async function getSubmissionsForSurvey(surveyId: number) {
       }) as Submission,
   );
 }
+
+export async function publishSubmissions(
+  surveyId: number,
+  username: string,
+  password: string
+) {
+  const row = await getDb().oneOrNone<DBPublication>(
+    `
+    INSERT INTO
+      data.publications (survey_id, username, password)
+    VALUES
+      ($1, $2, crypt($3, gen_salt('bf', 8)))
+      RETURNING *
+    `,
+    [surveyId, username, password],
+  );
+
+  if (!row) {
+    throw new InternalServerError(
+      `Error while publishing submissions with id:${surveyId}`,
+    );
+  }
+
+  return { id: row.id };
+}
+
