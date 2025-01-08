@@ -14,6 +14,7 @@ import {
   getSurvey,
   getSurveys,
   getTagsByOrganizations,
+  publishSubmissions,
   publishSurvey,
   unpublishSurvey,
   updateSurvey,
@@ -469,6 +470,28 @@ router.get(
 
     const submissions = await getSubmissionsForSurvey(surveyId);
     res.json(submissions);
+  }),
+);
+
+router.post(
+  '/:id/submissions/publish',
+  ensureAuthenticated(),
+  ensureSurveyGroupAccess(),
+  validateRequest([
+    param('id').isNumeric().toInt().withMessage('ID must be a number'),
+    body('username').isString().withMessage('Username must be a string'),
+    body('password').isString().withMessage('Password must be a string')
+  ]),
+  asyncHandler(async (req, res) => {
+    const surveyId = Number(req.params.id);
+    const permissionsOk = await userCanEditSurvey(req.user, surveyId);
+    if (!permissionsOk) {
+      throw new ForbiddenError('User not author nor editor of the survey');
+    }
+    const { username, password } = req.body;
+    const publication = publishSubmissions(surveyId, username, password);
+
+    res.status(200).json(publication);
   }),
 );
 

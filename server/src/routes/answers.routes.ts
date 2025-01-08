@@ -5,7 +5,11 @@ import {
   getGeoPackageFile,
 } from '@src/application/answer';
 import { userCanViewSurvey } from '@src/application/survey';
-import { ensureAuthenticated, ensureSurveyGroupAccess } from '@src/auth';
+import {
+  ensureAuthenticated,
+  ensurePublicationAccess,
+  ensureSurveyGroupAccess
+} from '@src/auth';
 import { BadRequestError, ForbiddenError } from '@src/error';
 import { Router } from 'express';
 import asyncHandler from 'express-async-handler';
@@ -108,20 +112,13 @@ router.get(
  */
 router.get(
   '/:id/map',
-  ensureAuthenticated(),
-  ensureSurveyGroupAccess(),
   validateRequest([
     param('id').isNumeric().toInt().withMessage('ID must be a number'),
     query('question').toArray()
   ]),
+  ensurePublicationAccess(),
   asyncHandler(async (req, res) => {
     const surveyId = Number(req.params.id);
-    const isEditor = await userCanViewSurvey(req.user, surveyId);
-    if (!isEditor) {
-      throw new ForbiddenError(
-        'User not author, editor nor viewer of the survey',
-      );
-    }
 
     const layers = await getGeometryDBEntriesAsGeoJSON(surveyId) ?? {};
     const layerArr = Object.entries(layers)

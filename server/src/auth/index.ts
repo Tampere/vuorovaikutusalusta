@@ -9,6 +9,7 @@ import { encrypt } from '../crypto';
 import { getDb } from '../database';
 import { configureAzureAuth } from './azure';
 import { configureGoogleOAuth } from './google-oauth';
+import basicAuth from 'basic-auth';
 
 /**
  * Configures authentication for given Express application.
@@ -175,4 +176,30 @@ export function ensureFileGroupAccess() {
       return next();
     }
   };
+}
+
+export function ensurePublicationAccess() {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    const user = basicAuth(req);
+    const surveyId = Number(req.params.id);
+    let authorized = false;
+
+    if (user) {
+      const row = await getDb().oneOrNone<{authorized: boolean}>(
+        `SELECT
+          password = crypt($1, password) as authorized
+        FROM data.publications
+        WHERE survey_id = $2
+        AND username = $3;`,
+        [user.pass, surveyId, user.name]
+      );
+      if (row) authorized = row.authorized;
+    }
+    if (!authorized) {
+      res.set('WWW-Authenticate', 'Basic realm="example"');
+      res.status(401).send('Authentication required.');
+    } else {
+      return next();
+    }
+  }
 }
