@@ -173,9 +173,17 @@ export function ensureSurveyGroupAccess(id: string = 'id') {
 
 export function ensureFileGroupAccess() {
   return async (req: Request, res: Response, next: NextFunction) => {
-    // Super user access to files for a survey with a different organization than the super users own organization
-    if (isSuperUser(req.user) && req.headers['organization']) {
-      res.locals.fileOrganizations = [req.headers['organization']];
+    if (isSuperUser(req.user)) {
+      // Super user access to files for a survey with a different organization than the super users own organization
+      if (req.query.organization) {
+        res.locals.fileOrganizations = [req.query.organization];
+      } else if (req.headers['organization']) {
+        res.locals.fileOrganizations = [req.headers['organization']];
+      } else if (req.body.organization) {
+        res.locals.fileOrganizations = [req.body.organization];
+      } else {
+        res.locals.fileOrganizations = req.user.organizations;
+      }
       return next();
     }
     const surveyOrganizations = req.headers['organization']

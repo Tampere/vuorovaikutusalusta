@@ -60,6 +60,7 @@ export default function FileUpload({
       const file = acceptedFiles[0];
       const formData = new FormData();
       formData.append('file', file);
+      formData.append('organization', surveyOrganization);
       if (surveyId != null) {
         formData.append('surveyId', String(surveyId));
       }
