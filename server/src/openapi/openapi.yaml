@@ -65,25 +65,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/APISurvey'
         '400':
-          description: Bad request if invalid survey id is provided.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                  info:
-                    type: object
-                examples:
-                  - error:
-                      message: 'Validation error'
-                      info:
-                        errors:
-                          - value: 'by-name'
-                            msg: 'ID must be a number'
-                            param: 'id'
-                            location: 'params'
+          $ref: '#/components/responses/BadRequestError'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
@@ -120,26 +102,41 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '400':
-          description: Bad request if invalid survey id is provided.
+          $ref: '#/components/responses/BadRequestError'
+        '500':
+          description: Internal server error if invalid survey id is provided.
+  /surveys/{surveyId}/submissions/map:
+    get:
+      description: Get submissions for the map questions as GeoJSON FeatureCollections. 
+      tags:
+        - Surveys
+      operationId: get-map-submissions
+      summary: Get all map submissions for a survey as GeoJSON
+      parameters:
+        - name: surveyId
+          in: path
+          required: true
+          schema:
+            type: number
+          description: The id of the survey.
+        - name: question
+          in: query
+          schema:
+            type: number
+          description: The number(s) of the question(s) whose submissions are to be returned. If not specified, returns the submissions for all the questions.
+      responses:
+        '200':
+          description: A mapping of the questions and corresponding GeoJSON FeatureCollections, representing distinct vector layers for each question.
           content:
             application/json:
               schema:
                 type: object
-                properties:
-                  message:
-                    type: string
-                  info:
-                    type: object
-                examples:
-                  - error:
-                      message: 'Validation error'
-                      info:
-                        errors:
-                          - value: 'by-name'
-                            msg: 'ID must be a number'
-                            param: 'id'
-                            location: 'params'
-
+                additionalProperties:
+                  $ref: 'https://gist.githubusercontent.com/zit0un/3ac0575eb0f3aabdc645c3faad47ab4a/raw/8db5e3ab89418def3a15474979e494c92b69592e/GeoJSON-OAS3.yaml#/components/schemas/FeatureCollection'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
         '500':
           description: Internal server error if invalid survey id is provided.
   /file/{groupId}/{fileType}/{fileName}:
@@ -187,6 +184,26 @@ components:
         text/html:
           schema:
             type: string
+    BadRequestError:
+      description: Bad request if invalid survey id is provided.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              info:
+                type: object
+            examples:
+              - error:
+                  message: 'Validation error'
+                  info:
+                    errors:
+                      - value: 'by-name'
+                        msg: 'ID must be a number'
+                        param: 'id'
+                        location: 'params'
   schemas:
     APISurvey:
       description: A survey object which contains all necessary information used by the client application.
