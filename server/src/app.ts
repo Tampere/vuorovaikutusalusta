@@ -1,6 +1,6 @@
 import compression from 'compression';
 import express from 'express';
-import morgan from 'morgan';
+import morgan, { compile } from 'morgan';
 import * as path from 'path';
 import { initializePuppeteerCluster } from './application/screenshot';
 import { configureAuth, configureMockAuth, ensureAuthenticated } from './auth';
@@ -34,22 +34,6 @@ async function start() {
   app.use(express.json({ limit: '10mb' }));
   app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-  // Use logging middleware for HTTP requests
-  app.use(
-    morgan('dev', {
-      stream: {
-        write: (message: string) => {
-          // Skip health check logging
-          if (message.includes('/api/health')) {
-            return;
-          }
-          // Message ends with an unnecessary newline - remove it from logs.
-          logger.info(message.split('\n')[0]);
-        },
-      },
-    }),
-  );
-
   if (process.env.AUTH_ENABLED === 'true') {
     configureAuth(app);
     logger.info('Authentication configured');
@@ -57,6 +41,61 @@ async function start() {
     configureMockAuth(app);
     logger.info('Authentication not enabled, using a mock user');
   }
+
+  // Use logging middleware for HTTP requests
+  app.use(
+    morgan(
+      // Use morgan's 'dev' format function as base here and modify it to include user ID
+      function developmentFormatLine(tokens, req, res) {
+        function headersSent(res) {
+          return typeof res.headersSent !== 'boolean'
+            ? Boolean(res._header)
+            : res.headersSent;
+        }
+
+        // get the status code if response written
+        const status = headersSent(res) ? res.statusCode : undefined;
+
+        // get status color
+        const color =
+          status >= 500
+            ? 31 // red
+            : status >= 400
+              ? 33 // yellow
+              : status >= 300
+                ? 36 // cyan
+                : status >= 200
+                  ? 32 // green
+                  : 0; // no color
+
+        const formatLineFunctions = [];
+        // get colored function
+        let fn = formatLineFunctions[color];
+        const userId = req.user?.id ?? '-';
+
+        if (!fn) {
+          // compile and color userId in development as magenta (35m)
+          fn = formatLineFunctions[color] = compile(
+            `\x1b[0m:method :url \x1b[${color}m:status\x1b[35m user: ${userId}\x1b[0m :response-time ms - :res[content-length]\x1b[0m`,
+          );
+        }
+
+        return fn(tokens, req, res);
+      },
+      {
+        stream: {
+          write: (message: string) => {
+            // Skip health check logging
+            if (message.includes('/api/health')) {
+              return;
+            }
+            // Message ends with an unnecessary newline - remove it from logs.
+            logger.info(message.split('\n')[0]);
+          },
+        },
+      },
+    ),
+  );
 
   // Serve static frontend files in production
   app.use(
