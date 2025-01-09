@@ -14,6 +14,7 @@ import {
 } from '@src/database';
 import {
   BadRequestError,
+  ForbiddenError,
   InternalServerError,
   NotFoundError,
 } from '@src/error';
@@ -48,8 +49,8 @@ interface DBSubmission {
 interface DBPublication {
   id: number;
   survey_id: number;
-  username: string;
-  password: string;
+  username?: string;
+  password?: string;
 }
 
 /**
@@ -868,6 +869,13 @@ export async function getSubmissionsForSurvey(surveyId: number) {
   );
 }
 
+/**
+ * Sets credentials so the survey submissions can be accessed using basic auth
+ * @param surveyId Survey ID
+ * @param username Username for basic auth
+ * @param password Password for basic auth
+ * @returns Inserted row, if successful
+ */
 export async function publishSubmissions(
   surveyId: number,
   username: string,
@@ -879,7 +887,8 @@ export async function publishSubmissions(
       data.publications (survey_id, username, password)
     VALUES
       ($1, $2, crypt($3, gen_salt('bf', 8)))
-      RETURNING *
+    ON CONFLICT DO NOTHING
+    RETURNING id, survey_id;
     `,
     [surveyId, username, password],
   );
@@ -889,7 +898,84 @@ export async function publishSubmissions(
       `Error while publishing submissions with id:${surveyId}`,
     );
   }
-
-  return { id: row.id };
+  return row;
 }
 
+/**
+ * Updates the credentials for the published survey
+ * submissions, if the password is correct
+ * @param surveyId Survey ID
+ * @param password Current password for the survey
+ * @param newUsername New username for basic auth
+ * @param newPassword New password for basic auth
+ * @returns Updated row, if successful
+ */
+export async function updatePublicationCredentials(
+  surveyId: number,
+  password: string,
+  newUsername: string,
+  newPassword: string
+) {
+  const row = await getDb().oneOrNone<DBPublication>(
+    `
+    UPDATE data.publications
+    SET username = $1, password = crypt($2, gen_salt('bf', 8))
+    WHERE survey_id = $3 and password = crypt($4, password)
+    RETURNING id, survey_id;
+    `,
+    [newUsername, newPassword, surveyId, password],
+  );
+
+  if (!row) {
+    throw new ForbiddenError(`Incorrect survey ID or password`);
+  }
+
+  return row;
+}
+
+/**
+ * Returns the credentials for the published survey submissions
+ * @param surveyId Survey ID
+ * @returns The publications as a list of objects of length 0-n
+ */
+export async function getPublications(
+  surveyId: number
+) {
+  const rows = await getDb().manyOrNone<{id: number, survey_id: number}>(
+    `
+    SELECT
+      id, survey_id
+    FROM data.publications
+    WHERE survey_id = $1;
+    `,
+    [surveyId]
+  );
+
+  return rows;
+}
+
+/**
+ * Deletes the credentials for the survey submissions
+ * @param surveyId Survey ID
+ * @returns The deleted row, if successful
+ */
+export async function deletePublication(
+  surveyId: number
+) {
+  const row = await getDb().oneOrNone<DBPublication>(
+    `
+    DELETE FROM data.publications
+    WHERE survey_id = $1
+    RETURNING id, survey_id
+    `,
+    [surveyId],
+  );
+
+  if (!row) {
+    throw new NotFoundError(`
+      Publication with survey ID ${surveyId} not found
+    `);
+  }
+
+  return row;
+}

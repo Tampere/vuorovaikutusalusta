@@ -1,10 +1,13 @@
 import { LanguageCode, Survey, SurveyPage } from '@interfaces/survey';
 import { generatePdf } from '@src/application/pdf-generator';
 import {
+  deletePublication,
   getAnswerEntries,
+  getPublications,
   getSubmissionsForSurvey,
   getTimestamp,
-  publishSubmissions
+  publishSubmissions,
+  updatePublicationCredentials
 } from '@src/application/submission';
 import {
   createSurvey,
@@ -510,8 +513,64 @@ router.get(
   }),
 );
 
+/**
+ * Get credentials for the published survey submissions
+ */
+router.get(
+  '/:id/submissions/publication',
+  ensureAuthenticated(),
+  ensureSurveyGroupAccess(),
+  validateRequest([
+    param('id').isNumeric().toInt().withMessage('ID must be a number')
+  ]),
+  asyncHandler(async (req, res) => {
+    const surveyId = Number(req.params.id);
+    const permissionsOk = await userCanEditSurvey(req.user, surveyId);
+    if (!permissionsOk) {
+      throw new ForbiddenError('User not author nor editor of the survey');
+    }
+    
+    const publications = await getPublications(surveyId);
+    res.status(200).json(publications);
+  }),
+);
+
+/**
+ * Update credentials for the published survey submissions
+ */
+router.put(
+  '/:id/submissions/publication',
+  ensureAuthenticated(),
+  ensureSurveyGroupAccess(),
+  validateRequest([
+    param('id').isNumeric().toInt().withMessage('ID must be a number'),
+    body('password').isString().withMessage('Password must be a string'),
+    body('newUsername').isString().withMessage('New username must be a string'),
+    body('newPassword').isString().withMessage('New password must be a string')
+  ]),
+  asyncHandler(async (req, res) => {
+    const surveyId = Number(req.params.id);
+    const permissionsOk = await userCanEditSurvey(req.user, surveyId);
+    if (!permissionsOk) {
+      throw new ForbiddenError('User not author nor editor of the survey');
+    }
+    const { password, newUsername, newPassword } = req.body;
+
+    const publication = await updatePublicationCredentials(
+      surveyId,
+      password,
+      newUsername,
+      newPassword
+    );
+    res.status(200).json(publication);
+  }),
+);
+
+/**
+ * Create new credentials for the survey submissions
+ */
 router.post(
-  '/:id/submissions/publish',
+  '/:id/submissions/publication',
   ensureAuthenticated(),
   ensureSurveyGroupAccess(),
   validateRequest([
@@ -526,10 +585,29 @@ router.post(
       throw new ForbiddenError('User not author nor editor of the survey');
     }
     const { username, password } = req.body;
-    const publication = publishSubmissions(surveyId, username, password);
-
+    const publication = await publishSubmissions(surveyId, username, password);
     res.status(200).json(publication);
   }),
 );
 
+/**
+ * Delete the credentials for the survey submissions
+ */
+router.delete(
+  '/:id/submissions/publication',
+  ensureAuthenticated(),
+  ensureSurveyGroupAccess(),
+  validateRequest([
+    param('id').isNumeric().toInt().withMessage('ID must be a number')
+  ]),
+  asyncHandler(async (req, res) => {
+    const surveyId = Number(req.params.id);
+    const permissionsOk = await userCanEditSurvey(req.user, surveyId);
+    if (!permissionsOk) {
+      throw new ForbiddenError('User not author nor editor of the survey');
+    }
+    const publication = await deletePublication(surveyId);
+    res.status(200).json(publication);
+  })
+)
 export default router;
