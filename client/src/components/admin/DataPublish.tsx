@@ -55,19 +55,6 @@ export default function DataPublish({ surveyId }: Props) {
         fetchPublications();
     }, []);
 
-    useEffect(() => {
-        async function fetchPublications() {
-            const publicationsUrl = `/api/surveys/${surveyId}/submissions/publication`;
-            try {
-                const publications = await request<{id: number, survey_id: number}[]>(publicationsUrl);
-                setIsPublished(publications.length > 0);
-            } catch (err) {
-                showToast(getErrorObject(err));
-            }
-        }
-        fetchPublications();
-    }, [displayDialog]);
-
     function getErrorObject(err: Response | Error) {
         return {
             severity: 'error',
