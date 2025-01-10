@@ -4,7 +4,7 @@ export const shorthands: ColumnDefinitions | undefined = undefined;
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.sql(`
-    CREATE EXTENSION pgcrypto;
+    CREATE EXTENSION IF NOT EXISTS pgcrypto;
   `);
   pgm.sql(`
     CREATE TABLE data.publications (
@@ -25,6 +25,6 @@ export async function down(pgm: MigrationBuilder): Promise<void> {
     DROP TABLE data.publications
   `);
   pgm.sql(`
-    DROP EXTENSION pgcrypto;
+    DROP EXTENSION IF EXISTS pgcrypto;
   `);
 }
