@@ -107,7 +107,7 @@ paths:
           description: Internal server error if invalid survey id is provided.
   /surveys/{surveyId}/submissions/map:
     get:
-      description: Get submissions for the map questions as GeoJSON FeatureCollections. 
+      description: Get submissions for the map questions as GeoJSON FeatureCollections. Requires authentication with a username and password that can be set by the administrator on the answers page.
       tags:
         - Surveys
       operationId: get-map-submissions
