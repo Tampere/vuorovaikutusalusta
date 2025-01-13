@@ -53,7 +53,11 @@ export async function upsertUser(user: Express.User) {
         full_name = pgp_sym_encrypt($(fullName), $(encryptionKey)),
         email = pgp_sym_encrypt($(email), $(encryptionKey)),
         organizations = $(organizations)
-    RETURNING *
+    RETURNING
+      id,
+      pgp_sym_decrypt(full_name, $(encryptionKey)),
+      pgp_sym_decrypt(email, $(encryptionKey)),
+      organizations
   `,
     {
       id: user.id,
