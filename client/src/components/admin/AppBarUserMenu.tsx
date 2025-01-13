@@ -4,6 +4,7 @@ import SettingsIcon from '@src/components/icons/SettingsIcon';
 import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { InstructionsDialog } from './InstructionsDialog';
+import { useUser } from '@src/stores/UserContext';
 
 const useStyles = makeStyles({
   root: {
@@ -16,7 +17,7 @@ export default function AppBarUserMenu() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [menuAnchorEl, setMenuAnchorEl] = useState<HTMLElement>(null);
   const [instructionsDialogOpen, setInstructionsDialogOpen] = useState(false);
-
+  const { activeUserIsSuperUser } = useUser();
   const classes = useStyles();
   const { tr } = useTranslations();
 
@@ -63,9 +64,11 @@ export default function AppBarUserMenu() {
         >
           {tr.AppBarUserMenu.logout}
         </MenuItem>
-        <MenuItem onClick={() => setInstructionsDialogOpen(true)}>
-          {tr.AppBarUserMenu.updateInstructions}
-        </MenuItem>
+        {activeUserIsSuperUser && (
+          <MenuItem onClick={() => setInstructionsDialogOpen(true)}>
+            {tr.AppBarUserMenu.updateInstructions}
+          </MenuItem>
+        )}
       </Menu>
       <InstructionsDialog
         isOpen={instructionsDialogOpen}

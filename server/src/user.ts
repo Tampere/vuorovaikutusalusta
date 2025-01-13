@@ -15,6 +15,7 @@ interface DbUser {
   full_name: string;
   email: string;
   organizations: string[];
+  roles: string[];
 }
 
 /**
@@ -30,7 +31,18 @@ function dbUserToUser(dbUser: DbUser): Express.User {
         fullName: dbUser.full_name,
         email: dbUser.email,
         organizations: dbUser.organizations,
+        roles: dbUser.roles,
       };
+}
+
+/** Check if user has admin rights */
+export function isAdmin(user?: Express.User) {
+  return user?.roles.includes('organization_admin') ?? false;
+}
+
+/** Check if user has super user rights */
+export function isSuperUser(user?: Express.User) {
+  return user?.roles.includes('super_user') ?? false;
 }
 
 /**
@@ -41,29 +53,33 @@ function dbUserToUser(dbUser: DbUser): Express.User {
 export async function upsertUser(user: Express.User) {
   const newUser = await getDb().one<DbUser>(
     `
-    INSERT INTO "user" (id, full_name, email, organizations)
+    INSERT INTO "user" (id, full_name, email, organizations, roles)
     VALUES (
       $(id),
       pgp_sym_encrypt($(fullName), $(encryptionKey)),
       pgp_sym_encrypt($(email), $(encryptionKey)),
-      $(organizations)
+      $(organizations),
+      $(roles)
     )
     ON CONFLICT (id) DO UPDATE
       SET
         full_name = pgp_sym_encrypt($(fullName), $(encryptionKey)),
         email = pgp_sym_encrypt($(email), $(encryptionKey)),
-        organizations = $(organizations)
+        organizations = $(organizations),
+        roles = $(roles)
     RETURNING
       id,
       pgp_sym_decrypt(full_name, $(encryptionKey)),
       pgp_sym_decrypt(email, $(encryptionKey)),
-      organizations
+      organizations,
+      roles
   `,
     {
       id: user.id,
       fullName: user.fullName,
       email: user.email,
       organizations: user.organizations,
+      roles: user.roles,
       encryptionKey
     },
   );
@@ -80,7 +96,8 @@ export async function getUser(id: string) {
       id,
       pgp_sym_decrypt(full_name, $2) as full_name,
       pgp_sym_decrypt(email, $2) as email,
-      organizations 
+      organizations,
+      roles
     FROM "user" WHERE id = $1`,
     [id, encryptionKey],
   );
@@ -98,7 +115,8 @@ export async function getUsers(userOrganizations: string[], excludeIds = []) {
       id,
       pgp_sym_decrypt(full_name, $3::text) as full_name,
       pgp_sym_decrypt(email, $3::text) as email,
-      organizations 
+      organizations,
+      roles
     FROM "user"
     WHERE NOT (id = ANY ($2)) ${userOrganizations.length > 0 ? 'AND organizations && $1' : ''}`,
     [userOrganizations, excludeIds, encryptionKey],
