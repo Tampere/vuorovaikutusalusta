@@ -239,7 +239,7 @@ export default function DataPublish({ surveyId }: Props) {
                 />
                 <TextField
                     required
-                    type="passwordConfirm"
+                    type="password"
                     error={passwordsMissmatch}
                     label="Confirm password"
                     name="passwordConfirm"
