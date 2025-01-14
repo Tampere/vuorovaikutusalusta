@@ -1,5 +1,5 @@
 import { User as ApplicationUser } from '@interfaces/user';
-import { getDb } from './database';
+import { getDb, encryptionKey } from './database';
 
 /**
  * Define user type inside Express types to make it globally accessible via req.user
@@ -54,10 +54,25 @@ export async function upsertUser(user: Express.User) {
   const newUser = await getDb().one<DbUser>(
     `
     INSERT INTO "user" (id, full_name, email, organizations, roles)
-    VALUES ($(id), $(fullName), $(email), $(organizations), $(roles))
+    VALUES (
+      $(id),
+      pgp_sym_encrypt($(fullName), $(encryptionKey)),
+      pgp_sym_encrypt($(email), $(encryptionKey)),
+      $(organizations),
+      $(roles)
+    )
     ON CONFLICT (id) DO UPDATE
-      SET full_name = $(fullName), email = $(email), organizations = $(organizations), roles = $(roles)
-    RETURNING *
+      SET
+        full_name = pgp_sym_encrypt($(fullName), $(encryptionKey)),
+        email = pgp_sym_encrypt($(email), $(encryptionKey)),
+        organizations = $(organizations),
+        roles = $(roles)
+    RETURNING
+      id,
+      pgp_sym_decrypt(full_name, $(encryptionKey)),
+      pgp_sym_decrypt(email, $(encryptionKey)),
+      organizations,
+      roles
   `,
     {
       id: user.id,
@@ -65,6 +80,7 @@ export async function upsertUser(user: Express.User) {
       email: user.email,
       organizations: user.organizations,
       roles: user.roles,
+      encryptionKey
     },
   );
   return dbUserToUser(newUser);
@@ -76,8 +92,14 @@ export async function upsertUser(user: Express.User) {
  */
 export async function getUser(id: string) {
   const user = await getDb().oneOrNone<DbUser>(
-    `SELECT * FROM "user" WHERE id = $1`,
-    [id],
+    `SELECT
+      id,
+      pgp_sym_decrypt(full_name, $2) as full_name,
+      pgp_sym_decrypt(email, $2) as email,
+      organizations,
+      roles
+    FROM "user" WHERE id = $1`,
+    [id, encryptionKey],
   );
   return dbUserToUser(user);
 }
@@ -89,8 +111,15 @@ export async function getUser(id: string) {
  */
 export async function getUsers(userOrganizations: string[], excludeIds = []) {
   const dbUsers = await getDb().manyOrNone<DbUser>(
-    `SELECT * FROM "user" WHERE NOT (id = ANY ($2)) ${userOrganizations.length > 0 ? 'AND organizations && $1' : ''}`,
-    [userOrganizations, excludeIds],
+    `SELECT
+      id,
+      pgp_sym_decrypt(full_name, $3::text) as full_name,
+      pgp_sym_decrypt(email, $3::text) as email,
+      organizations,
+      roles
+    FROM "user"
+    WHERE NOT (id = ANY ($2)) ${userOrganizations.length > 0 ? 'AND organizations && $1' : ''}`,
+    [userOrganizations, excludeIds, encryptionKey],
   );
   return dbUsers.map(dbUserToUser);
 }
