@@ -1,8 +1,11 @@
 import { MigrationBuilder, ColumnDefinitions } from 'node-pg-migrate';
-import { encryptionKey } from './../src/database';
 
 export const shorthands: ColumnDefinitions | undefined = undefined;
 
+const encryptionKey = process.env.DATABASE_ENCRYPTION_KEY;
+if (!encryptionKey) {
+  throw new Error(`Environment variable DATABASE_ENCRYPTION_KEY is missing!`);
+}
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.sql(`
