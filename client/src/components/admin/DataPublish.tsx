@@ -44,7 +44,7 @@ export default function DataPublish({ surveyId }: Props) {
 
     useEffect(() => {
         async function fetchPublications() {
-          const publicationsUrl = `/api/surveys/${surveyId}/submissions/publication`;
+          const publicationsUrl = `/api/surveys/${surveyId}/publication/credentials`;
           try {
             const publications = await request<{id: number, survey_id: number}[]>(publicationsUrl);
             setIsPublished(publications.length > 0);
@@ -83,7 +83,7 @@ export default function DataPublish({ surveyId }: Props) {
         setIsLoading(true);
         try {
             const res = await fetch(
-                `/api/surveys/${surveyId}/submissions/publication`,
+                `/api/surveys/${surveyId}/publication/credentials`,
                 {
                     method: 'POST',
                     body: JSON.stringify({
@@ -114,7 +114,7 @@ export default function DataPublish({ surveyId }: Props) {
         setIsLoading(true);
         try {
             const res = await fetch(
-                `/api/surveys/${surveyId}/submissions/publication`,
+                `/api/surveys/${surveyId}/publication/credentials`,
                 {
                     method: 'DELETE',
                 },
@@ -136,7 +136,7 @@ export default function DataPublish({ surveyId }: Props) {
         setIsLoading(true);
         try {
             const res = await fetch(
-                `/api/surveys/${surveyId}/submissions/publication`,
+                `/api/surveys/${surveyId}/publication/credentials`,
                 {
                     method: 'PUT',
                     body: JSON.stringify({

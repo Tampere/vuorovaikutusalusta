@@ -456,7 +456,7 @@ router.get(
 );
 
 /**
- * Get list of submissions for a survey
+ * Get list of survey submissions for an authenticated user with permissions
  */
 router.get(
   '/:id/submissions',
@@ -482,10 +482,27 @@ router.get(
 );
 
 /**
- * Get submissions for the map questions as vector layers
+ * Get the published survey submissions. Requires basic auth with the
+ * credentials set via the /:id/publication/credentials endpoint
  */
 router.get(
-  '/:id/submissions/map',
+  '/:id/publication',
+  validateRequest([
+    param('id').isNumeric().toInt().withMessage('ID must be a number'),
+  ]),
+  ensurePublicationAccess(),
+  asyncHandler(async (req, res) => {
+    const submissions = await getSubmissionsForSurvey(Number(req.params.id));
+    res.json(submissions);
+  }),
+);
+
+/**
+ * Get the published submissions for map questions as GeoJSON layers. Requires
+ * basic auth with the credentials set via the /:id/publication/credentials endpoint
+ */
+router.get(
+  '/:id/publication/geojson',
   validateRequest([
     param('id').isNumeric().toInt().withMessage('ID must be a number'),
     query('question').toArray()
@@ -517,7 +534,7 @@ router.get(
  * Get credentials for the published survey submissions
  */
 router.get(
-  '/:id/submissions/publication',
+  '/:id/publication/credentials',
   ensureAuthenticated(),
   ensureSurveyGroupAccess(),
   validateRequest([
@@ -539,7 +556,7 @@ router.get(
  * Update credentials for the published survey submissions
  */
 router.put(
-  '/:id/submissions/publication',
+  '/:id/publication/credentials',
   ensureAuthenticated(),
   ensureSurveyGroupAccess(),
   validateRequest([
@@ -570,7 +587,7 @@ router.put(
  * Create new credentials for the survey submissions
  */
 router.post(
-  '/:id/submissions/publication',
+  '/:id/publication/credentials',
   ensureAuthenticated(),
   ensureSurveyGroupAccess(),
   validateRequest([
@@ -594,7 +611,7 @@ router.post(
  * Delete the credentials for the survey submissions
  */
 router.delete(
-  '/:id/submissions/publication',
+  '/:id/publication/credentials',
   ensureAuthenticated(),
   ensureSurveyGroupAccess(),
   validateRequest([
