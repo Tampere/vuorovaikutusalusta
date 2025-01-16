@@ -119,11 +119,6 @@ paths:
           schema:
             type: number
           description: The id of the survey.
-        - name: question
-          in: query
-          schema:
-            type: number
-          description: The number(s) of the question(s) whose submissions are to be returned. If not specified, returns the submissions for all the questions.
       responses:
         '200':
           description: A mapping of the questions and corresponding GeoJSON FeatureCollections, representing distinct vector layers for each question.
