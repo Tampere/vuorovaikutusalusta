@@ -512,21 +512,7 @@ router.get(
     const surveyId = Number(req.params.id);
 
     const layers = await getGeometryDBEntriesAsGeoJSON(surveyId) ?? {};
-    const layerArr = Object.entries(layers)
-
-    // Filter layers by question number(s), possibly received as query parameters
-    const questionsToReturn = (req.query.question as string[])
-    .map(q => parseInt(q))
-    .filter(q => !isNaN(q) && q > 0 && q <= layerArr.length);
-
-    // To do: Use Object.fromEntries instead of reduce. Currently it gives a Typescript error
-    res.json(
-      !questionsToReturn.length ? layers : questionsToReturn.reduce((filtered, i) => {
-        const layer = layerArr[i-1];
-        filtered[layer[0]] = layer[1];
-        return filtered
-      }, {})
-    );
+    res.json(layers);
   }),
 );
 
