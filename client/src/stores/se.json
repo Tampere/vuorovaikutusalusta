@@ -9,6 +9,7 @@
     "attachments": "Bilagor"
   },
   "EditSurvey": {
+    "newSurvey": "Ny undersökning",
     "errorFetchingSurvey": "Fel vid hämtning av enkät. Kontrollera adressen eller försök igen senare.",
     "untitledPage": "Namnlös sida",
     "fetchFailed": "Fel vid hämtning av enkät. Försök igen senare.",

@@ -9,6 +9,7 @@
     "attachments": "Survey response data attachments"
   },
   "EditSurvey": {
+    "newSurvey": "New survey",
     "errorFetchingSurvey": "Unable to access the survey. Please check the address or try again later.",
     "untitledPage": "Untitled page",
     "fetchFailed": "Unable to access the survey. Please try again later.",
