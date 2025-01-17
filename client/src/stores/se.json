@@ -146,7 +146,14 @@
     },
     "sectionCopied": "Avsnitt kopierat till urklipp. Du kan nu klistra in det kopierade avsnittet i din undersökning.",
     "sectionAttached": "Observera att kartlagval inte kopieras. Kontrollera kartlagvalen och korrigera kartpubliceringsadressen vid behov.",
-    "attachSection": "Ny avsnitt från urklipp"
+    "attachSection": "Ny avsnitt från urklipp",
+    "confirmEditDialog": {
+      "title": "Kan redan insamlade svar bli förvrängda?",
+      "content": "Det har redan kommit in svar på undersökningen. Att redigera frågorna nu kan orsaka förvrängning av svaren.",
+      "confirm": "Vill du verkligen fortsätta?"
+    },
+    "fetchingSubmissions": "Hämtar svar",
+    "errorFetchingSubmissions": "Fel vid kontroll av undersökningens svarsinformation."
   },
   "FollowUpSection": {
     "title": "Uppföljningsfråga för fråga",

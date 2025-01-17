@@ -1425,10 +1425,23 @@ export async function updateSurvey(survey: Survey) {
  * @param survey
  */
 export async function deleteSurvey(id: Number) {
-  const row = await getDb().oneOrNone<DBSurvey>(
-    `DELETE FROM data.survey WHERE id = $1 RETURNING *`,
-    [id],
-  );
+  const row = await getDb().tx(async (t) => {
+    const submissions = await t.manyOrNone(
+      `SELECT id FROM data.submission WHERE survey_id = $1`,
+      [id],
+    );
+
+    if (submissions.length > 0) {
+      await t.any(
+        `DELETE FROM data.answer_entry WHERE submission_id = ANY ($1)`,
+        [submissions.map((s) => s.id)],
+      );
+    }
+
+    return t.oneOrNone(`DELETE FROM data.survey WHERE id = $1 RETURNING *`, [
+      id,
+    ]);
+  });
 
   if (!row) {
     throw new NotFoundError(`Survey with ID ${id} not found`);

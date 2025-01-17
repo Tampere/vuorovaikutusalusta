@@ -147,7 +147,14 @@
     },
     "sectionCopied": "Section copied to clipboard and can now be attached to a question.",
     "sectionAttached": "Please note that selected map layers are not copied. Check map layer selections and fix published map url if needed.",
-    "attachSection": "Copy section from clipboard"
+    "attachSection": "Copy section from clipboard",
+    "confirmEditDialog": {
+      "title": "Can the already accumulated responses be distorted?",
+      "content": "Responses have already been received for the survey. Editing the questions now may cause the responses to be distorted.",
+      "confirm": "Are you sure you want to continue?"
+    },
+    "fetchingSubmissions": "Fetching submissions",
+    "errorFetchingSubmissions": "Error checking survey response data."
   },
   "FollowUpSection": {
     "title": "Follow-up question for ",
