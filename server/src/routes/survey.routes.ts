@@ -6,8 +6,7 @@ import {
   getPublications,
   getSubmissionsForSurvey,
   getTimestamp,
-  publishSubmissions,
-  updatePublicationCredentials
+  upsertPublicationCredentials
 } from '@src/application/submission';
 import {
   createSurvey,
@@ -539,40 +538,9 @@ router.get(
 );
 
 /**
- * Update credentials for the published survey submissions
+ * Upsert the credentials for the survey submission publication
  */
 router.put(
-  '/:id/publication/credentials',
-  ensureAuthenticated(),
-  ensureSurveyGroupAccess(),
-  validateRequest([
-    param('id').isNumeric().toInt().withMessage('ID must be a number'),
-    body('password').isString().withMessage('Password must be a string'),
-    body('newUsername').isString().withMessage('New username must be a string'),
-    body('newPassword').isString().withMessage('New password must be a string')
-  ]),
-  asyncHandler(async (req, res) => {
-    const surveyId = Number(req.params.id);
-    const permissionsOk = await userCanEditSurvey(req.user, surveyId);
-    if (!permissionsOk) {
-      throw new ForbiddenError('User not author nor editor of the survey');
-    }
-    const { password, newUsername, newPassword } = req.body;
-
-    const publication = await updatePublicationCredentials(
-      surveyId,
-      password,
-      newUsername,
-      newPassword
-    );
-    res.status(200).json(publication);
-  }),
-);
-
-/**
- * Create new credentials for the survey submissions
- */
-router.post(
   '/:id/publication/credentials',
   ensureAuthenticated(),
   ensureSurveyGroupAccess(),
@@ -587,9 +555,25 @@ router.post(
     if (!permissionsOk) {
       throw new ForbiddenError('User not author nor editor of the survey');
     }
-    const { username, password } = req.body;
-    const publication = await publishSubmissions(surveyId, username, password);
-    res.status(200).json(publication);
+    const {
+      username,
+      password,
+      alphanumericIncluded,
+      mapIncluded,
+      attachmentsIncluded,
+      personalIncluded
+    } = req.body;
+
+    const credentials = await upsertPublicationCredentials(
+      surveyId,
+      username,
+      password,
+      alphanumericIncluded,
+      mapIncluded,
+      attachmentsIncluded,
+      personalIncluded
+    );
+    res.status(200).json(credentials);
   }),
 );
 

@@ -870,66 +870,72 @@ export async function getSubmissionsForSurvey(surveyId: number) {
 }
 
 /**
- * Sets credentials so the survey submissions can be accessed using basic auth
+ * Inserts or updates the credentials so the survey submissions can be accessed using basic auth
  * @param surveyId Survey ID
  * @param username Username for basic auth
  * @param password Password for basic auth
+ * @param alphanumericIncluded
+ * @param mapIncluded
+ * @param attachmentsIncluded
+ * @param personalIncluded
  * @returns Inserted row, if successful
  */
-export async function publishSubmissions(
+export async function upsertPublicationCredentials(
   surveyId: number,
   username: string,
-  password: string
+  password: string,
+  alphanumericIncluded: boolean = true,
+  mapIncluded: boolean = true,
+  attachmentsIncluded: boolean = true,
+  personalIncluded: boolean = true
 ) {
   const row = await getDb().oneOrNone<DBPublication>(
     `
     INSERT INTO
-      data.publications (survey_id, username, password)
+      data.publications (
+        survey_id,
+        username,
+        password,
+        alphanumeric_included,
+        map_included,
+        attachments_included,
+        personal_included
+      )
     VALUES
-      ($1, $2, crypt($3, gen_salt('bf', 8)))
-    ON CONFLICT DO NOTHING
-    RETURNING id, survey_id;
+      ($1, $2, crypt($3, gen_salt('bf', 8)), $4, $5, $6, $7)
+    ON CONFLICT(survey_id)
+    DO UPDATE SET
+      username = $2,
+      password = crypt($3, gen_salt('bf', 8)),
+      alphanumeric_included = $4,
+      map_included = $5,
+      attachments_included = $6,
+      personal_included = $7
+    RETURNING
+      id,
+      survey_id,
+      username,
+      alphanumeric_included,
+      map_included,
+      attachments_included,
+      personal_included;
     `,
-    [surveyId, username, password],
+    [
+      surveyId,
+      username,
+      password,
+      alphanumericIncluded,
+      mapIncluded,
+      attachmentsIncluded,
+      personalIncluded
+    ]
   );
 
   if (!row) {
     throw new InternalServerError(
-      `Error while publishing submissions with id:${surveyId}`,
+      `Error while publishing submissions with the survey ID: ${surveyId}`,
     );
   }
-  return row;
-}
-
-/**
- * Updates the credentials for the published survey
- * submissions, if the password is correct
- * @param surveyId Survey ID
- * @param password Current password for the survey
- * @param newUsername New username for basic auth
- * @param newPassword New password for basic auth
- * @returns Updated row, if successful
- */
-export async function updatePublicationCredentials(
-  surveyId: number,
-  password: string,
-  newUsername: string,
-  newPassword: string
-) {
-  const row = await getDb().oneOrNone<DBPublication>(
-    `
-    UPDATE data.publications
-    SET username = $1, password = crypt($2, gen_salt('bf', 8))
-    WHERE survey_id = $3 and password = crypt($4, password)
-    RETURNING id, survey_id;
-    `,
-    [newUsername, newPassword, surveyId, password],
-  );
-
-  if (!row) {
-    throw new ForbiddenError(`Incorrect survey ID or password`);
-  }
-
   return row;
 }
 
@@ -944,7 +950,13 @@ export async function getPublications(
   const rows = await getDb().manyOrNone<{id: number, survey_id: number}>(
     `
     SELECT
-      id, survey_id
+      id,
+      survey_id,
+      username,
+      alphanumeric_included,
+      map_included,
+      attachments_included,
+      personal_included
     FROM data.publications
     WHERE survey_id = $1;
     `,
@@ -966,14 +978,21 @@ export async function deletePublication(
     `
     DELETE FROM data.publications
     WHERE survey_id = $1
-    RETURNING id, survey_id
+    RETURNING
+      id,
+      survey_id,
+      username,
+      alphanumeric_included,
+      map_included,
+      attachments_included,
+      personal_included
     `,
     [surveyId],
   );
 
   if (!row) {
     throw new NotFoundError(`
-      Publication with survey ID ${surveyId} not found
+      Publication with the survey ID ${surveyId} not found
     `);
   }
 
