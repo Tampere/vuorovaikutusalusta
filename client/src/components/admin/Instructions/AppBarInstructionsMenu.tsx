@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { IconButton, Menu, MenuItem, Tooltip } from '@mui/material';
 
 import { useTranslations } from '@src/stores/TranslationContext';
-import { Quiz } from '@mui/icons-material';
 import { NavLink } from 'react-router-dom';
+import { HelpCircleIcon } from '@src/components/icons/HelpCircleIcon';
 
 export function AppBarInstructionsMenu() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -24,7 +24,7 @@ export function AppBarInstructionsMenu() {
           }}
           color="inherit"
         >
-          <Quiz />
+          <HelpCircleIcon />
         </IconButton>
       </Tooltip>
 
