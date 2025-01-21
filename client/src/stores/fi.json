@@ -9,7 +9,21 @@
     "attachments": "Vastausliitteet"
   },
   "DataPublish": {
-    "publishAnswers": "Julkaise vastaukset"
+    "alphanumericSubmissions": "Aakkosnumeeriset vastaukset",
+    "closeApi": "Sulje rajapinta",
+    "credentials": "Tunnistautumistiedot",
+    "geospatialSubmissions": "Paikkatietovastaukset",
+    "materialsOffered": "Tarjottavat aineistot",
+    "openApi": "Avaa rajapinta",
+    "openSubmissionsApi": "Avaa vastausrajapinta",
+    "password": "Salasana",
+    "passwordAgain": "Salasana uudelleen",
+    "passwordsMissmatch": "Salasanat eivät täsmää",
+    "personalDetails": "Henkilötiedot",
+    "submissionsApi": "Vastausrajapinta",
+    "submissionsApiOpening": "Vastausrajapinnan avaus",
+    "submissionsApiOptions": "Vastausrajapinnan tiedot",
+    "username": "Käyttäjätunnus"
   },
   "EditSurvey": {
     "errorFetchingSurvey": "Virhe haettaessa kyselyä. Tarkista osoite tai yritä myöhemmin uudestaan.",

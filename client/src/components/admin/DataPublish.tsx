@@ -294,7 +294,7 @@ export default function DataPublish({ surveyId }: Props) {
                     }
                   />
                   <FormControlLabel
-                    label={tr.DataPublish.mapSubmissions}
+                    label={tr.DataPublish.geospatialSubmissions}
                     control={
                       <Checkbox
                         name="mapIncluded"

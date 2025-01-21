@@ -9,7 +9,21 @@
     "attachments": "Bilagor"
   },
   "DataPublish": {
-    "publishAnswers": "Publicera svar"
+    "alphanumericSubmissions": "Alfanumeriska svar",
+    "closeApi": "Stäng gränssnitt",
+    "credentials": "Identifieringsinformation",
+    "geospatialSubmissions": "Rumsliga svar",
+    "materialsOffered": "Material som erbjuds",
+    "openApi": "Öppna gränssnitt",
+    "openSubmissionsApi": "Öppna svarsgränssnitt",
+    "password": "Lösenord",
+    "passwordAgain": "Lösenord igen",
+    "passwordsMissmatch": "Lösenorden stämmer inte överens",
+    "personalDetails": "Personliga uppgifter",
+    "submissionsApi": "Svarsgränssnitt",
+    "submissionsApiOpening": "Öppnandet av svarsgränssnittet",
+    "submissionsApiOptions": "Svarsgränssnittsinformation",
+    "username": "Användarnamn"
   },
   "EditSurvey": {
     "errorFetchingSurvey": "Fel vid hämtning av enkät. Kontrollera adressen eller försök igen senare.",

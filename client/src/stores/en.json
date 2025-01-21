@@ -9,7 +9,21 @@
     "attachments": "Survey response data attachments"
   },
   "DataPublish": {
-    "publishAnswers": "Publish response data"
+    "alphanumericSubmissions": "Alphanumeric submissions",
+    "closeApi": "Close API",
+    "credentials": "Credentials",
+    "geospatialSubmissions": "Geospatial submissions",
+    "materialsOffered": "Materials offered",
+    "openApi": "Open API",
+    "openSubmissionsApi": "Open submissions API",
+    "password": "Password",
+    "passwordAgain": "Password again",
+    "passwordsMissmatch": "The passwords do not match",
+    "personalDetails": "Personal details",
+    "submissionsApi": "Submissions API",
+    "submissionsApiOpening": "Submissions API opening",
+    "submissionsApiOptions": "Submissions API details",
+    "username": "Username"
   },
   "EditSurvey": {
     "errorFetchingSurvey": "Unable to access the survey. Please check the address or try again later.",
