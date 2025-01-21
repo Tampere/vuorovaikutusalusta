@@ -11,6 +11,7 @@ import {
   InputLabel,
   MenuItem,
   Select,
+  Stack,
   Typography,
 } from '@mui/material';
 import Chart from '@src/components/admin/SubmissionsPage/SurveySubmissionsChart';
@@ -287,8 +288,10 @@ export default function SurveySubmissionsPage() {
                   submissions={submissions}
                   submissionsLoading={submissionsLoading}
                 />
-                <DataExport surveyId={survey.id} />
-                <DataPublish surveyId={survey.id} />
+                <Stack direction="row" spacing={2}>
+                  <DataExport surveyId={survey.id} />
+                  <DataPublish surveyId={survey.id} />
+                </Stack>
                 <SurveyQuestionSummary
                   setSelectedQuestion={setSelectedQuestion}
                 />

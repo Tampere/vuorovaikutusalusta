@@ -46,11 +46,22 @@ interface DBSubmission {
   updated_at: Date;
 }
 
-interface DBPublication {
+interface DBCredentialsEntry {
   id: number;
   survey_id: number;
-  username?: string;
-  password?: string;
+  username: string;
+  alphanumeric_included: boolean;
+  map_included: boolean;
+  attachments_included: boolean;
+  personal_included: boolean;
+}
+
+export interface CredentialsEntry {
+  username: string;
+  alphanumericIncluded: boolean;
+  mapIncluded: boolean;
+  attachmentsIncluded: boolean;
+  personalIncluded: boolean;
 }
 
 /**
@@ -692,6 +703,25 @@ function dbAnswerEntriesToAnswerEntries(
 }
 
 /**
+ * Convert the db row to JS format
+ * @param row The row with the column names as in the database
+ * @returns An object with attribute names in JS format
+ */
+function dbCredentialEntryRowToCredentialEntry(
+  row: DBCredentialsEntry,
+): CredentialsEntry {
+  if (!row) return null;
+
+  return {
+    username: row.username,
+    alphanumericIncluded: row.alphanumeric_included,
+    mapIncluded: row.map_included,
+    attachmentsIncluded: row.attachments_included,
+    personalIncluded: row.personal_included,
+  };
+}
+
+/**
  * Get the language used for submitting an unfinished survey
  * @param token
  * @returns LanguageCode
@@ -887,9 +917,9 @@ export async function upsertPublicationCredentials(
   alphanumericIncluded: boolean = true,
   mapIncluded: boolean = true,
   attachmentsIncluded: boolean = true,
-  personalIncluded: boolean = true
-) {
-  const row = await getDb().oneOrNone<DBPublication>(
+  personalIncluded: boolean = true,
+): Promise<CredentialsEntry> {
+  const row = await getDb().oneOrNone<DBCredentialsEntry>(
     `
     INSERT INTO
       data.publications (
@@ -927,8 +957,8 @@ export async function upsertPublicationCredentials(
       alphanumericIncluded,
       mapIncluded,
       attachmentsIncluded,
-      personalIncluded
-    ]
+      personalIncluded,
+    ],
   );
 
   if (!row) {
@@ -936,18 +966,20 @@ export async function upsertPublicationCredentials(
       `Error while publishing submissions with the survey ID: ${surveyId}`,
     );
   }
-  return row;
+  return dbCredentialEntryRowToCredentialEntry(row);
 }
 
 /**
- * Returns the credentials for the published survey submissions
+ * Returns the credentials for the published survey submissions. Should
+ * currently return only one or no credentials per survey. However, the
+ * array format ensures support for multiple publications in the future
  * @param surveyId Survey ID
  * @returns The publications as a list of objects of length 0-n
  */
 export async function getPublications(
-  surveyId: number
-) {
-  const rows = await getDb().manyOrNone<{id: number, survey_id: number}>(
+  surveyId: number,
+): Promise<CredentialsEntry[]> {
+  const rows = await getDb().manyOrNone<{ id: number; survey_id: number }>(
     `
     SELECT
       id,
@@ -960,10 +992,12 @@ export async function getPublications(
     FROM data.publications
     WHERE survey_id = $1;
     `,
-    [surveyId]
+    [surveyId],
   );
 
-  return rows;
+  return rows.map((row: DBCredentialsEntry) =>
+    dbCredentialEntryRowToCredentialEntry(row),
+  );
 }
 
 /**
@@ -972,9 +1006,9 @@ export async function getPublications(
  * @returns The deleted row, if successful
  */
 export async function deletePublication(
-  surveyId: number
-) {
-  const row = await getDb().oneOrNone<DBPublication>(
+  surveyId: number,
+): Promise<CredentialsEntry> {
+  const row = await getDb().oneOrNone<DBCredentialsEntry>(
     `
     DELETE FROM data.publications
     WHERE survey_id = $1
@@ -996,5 +1030,5 @@ export async function deletePublication(
     `);
   }
 
-  return row;
+  return dbCredentialEntryRowToCredentialEntry(row);
 }
