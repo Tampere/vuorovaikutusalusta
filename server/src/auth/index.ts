@@ -185,13 +185,13 @@ export function ensurePublicationAccess() {
     let authorized = false;
 
     if (user) {
-      const row = await getDb().oneOrNone<{authorized: boolean}>(
+      const row = await getDb().oneOrNone<{ authorized: boolean }>(
         `SELECT
           password = crypt($1, password) as authorized
         FROM data.publications
         WHERE survey_id = $2
         AND username = $3;`,
-        [user.pass, surveyId, user.name]
+        [user.pass, surveyId, user.name],
       );
       if (row) authorized = row.authorized;
     }
@@ -201,5 +201,5 @@ export function ensurePublicationAccess() {
     } else {
       return next();
     }
-  }
+  };
 }

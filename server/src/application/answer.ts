@@ -117,8 +117,8 @@ interface FeatureCollection {
     type: string;
     properties: {
       name: string;
-    },
-  }
+    };
+  };
 }
 
 /**
@@ -381,7 +381,9 @@ export async function getCSVFile(surveyId: number): Promise<string> {
  * @param surveyId
  * @returns An object of FeatureCollections grouped by the question
  */
-export async function getGeometryDBEntriesAsGeoJSON(surveyId: number): Promise<{ [key: string]: FeatureCollection }> {
+export async function getGeometryDBEntriesAsGeoJSON(
+  surveyId: number,
+): Promise<{ [key: string]: FeatureCollection }> {
   const rows = await getGeometryDBEntries(surveyId);
   const srid = rows?.find((row) => row.geometrySRID)?.geometrySRID ?? '3857';
   const checkboxOptions = await getCheckboxOptionsFromDB(surveyId);
@@ -397,24 +399,21 @@ export async function getGeometryDBEntriesAsGeoJSON(surveyId: number): Promise<{
   if (!features.length) return null;
 
   // Group features by question to add them to separate layers
-  return features.reduce(
-    (questions, feature) => {
-      const { properties } = feature;
-      const questionTitle = properties['Kysymys'];
-      
-      questions[questionTitle] = questions[questionTitle] ?? {
-        type: 'FeatureCollection',
-        features: [],
-        crs: {
-          type: 'name',
-          properties: { name: `urn:ogc:def:crs:EPSG::${srid}` },
-        },
-      };
-      questions[questionTitle].features.push(feature);
-      return questions;
-    },
-    {}
-  );
+  return features.reduce((questions, feature) => {
+    const { properties } = feature;
+    const questionTitle = properties['Kysymys'];
+
+    questions[questionTitle] = questions[questionTitle] ?? {
+      type: 'FeatureCollection',
+      features: [],
+      crs: {
+        type: 'name',
+        properties: { name: `urn:ogc:def:crs:EPSG::${srid}` },
+      },
+    };
+    questions[questionTitle].features.push(feature);
+    return questions;
+  }, {});
 }
 
 /**
@@ -432,24 +431,18 @@ export async function getGeoPackageFile(surveyId: number): Promise<Buffer> {
 
   // The first question needs to be created first - the remaining questions will be added to it via -update
   // Tried to conditionally add the "-update" flag but there was some race condition and I couldn't figure it out
-  await ogr2ogr(
-    JSON.stringify(firstFeatures),
-    {
-      format: 'GPKG',
-      destination: tmpFilePath,
-      options: ['-nln', firstQuestion],
-    },
-  );
+  await ogr2ogr(JSON.stringify(firstFeatures), {
+    format: 'GPKG',
+    destination: tmpFilePath,
+    options: ['-nln', firstQuestion],
+  });
 
   for (const [question, features] of rest) {
-    await ogr2ogr(
-      JSON.stringify(features),
-      {
-        format: 'GPKG',
-        destination: tmpFilePath,
-        options: ['-nln', question, '-update'],
-      },
-    );
+    await ogr2ogr(JSON.stringify(features), {
+      format: 'GPKG',
+      destination: tmpFilePath,
+      options: ['-nln', question, '-update'],
+    });
   }
 
   // Read the file contents and remove it from the disk
@@ -972,7 +965,7 @@ function submissionAnswersToJson(
             sectionDetails.predecessorSection,
             predecessorIndexes,
           )
-        ] = answer.valueOptionId ? 1 : answer.valueText ?? '';
+        ] = answer.valueOptionId ? 1 : (answer.valueText ?? '');
         break;
       case 'multi-matrix':
         sectionDetails.details.subjects.forEach((subject, index) => {

@@ -14,7 +14,6 @@ import {
 } from '@src/database';
 import {
   BadRequestError,
-  ForbiddenError,
   InternalServerError,
   NotFoundError,
 } from '@src/error';

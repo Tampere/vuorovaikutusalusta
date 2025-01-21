@@ -6,7 +6,7 @@ import {
   getPublications,
   getSubmissionsForSurvey,
   getTimestamp,
-  upsertPublicationCredentials
+  upsertPublicationCredentials,
 } from '@src/application/submission';
 import {
   createSurvey,
@@ -26,7 +26,7 @@ import {
 import {
   ensureAuthenticated,
   ensurePublicationAccess,
-  ensureSurveyGroupAccess
+  ensureSurveyGroupAccess,
 } from '@src/auth';
 import { getGeometryDBEntriesAsGeoJSON } from '@src/application/answer';
 import { ForbiddenError } from '@src/error';
@@ -504,13 +504,13 @@ router.get(
   '/:id/publication/geojson',
   validateRequest([
     param('id').isNumeric().toInt().withMessage('ID must be a number'),
-    query('question').toArray()
+    query('question').toArray(),
   ]),
   ensurePublicationAccess(),
   asyncHandler(async (req, res) => {
     const surveyId = Number(req.params.id);
 
-    const layers = await getGeometryDBEntriesAsGeoJSON(surveyId) ?? {};
+    const layers = (await getGeometryDBEntriesAsGeoJSON(surveyId)) ?? {};
     res.json(layers);
   }),
 );
@@ -523,7 +523,7 @@ router.get(
   ensureAuthenticated(),
   ensureSurveyGroupAccess(),
   validateRequest([
-    param('id').isNumeric().toInt().withMessage('ID must be a number')
+    param('id').isNumeric().toInt().withMessage('ID must be a number'),
   ]),
   asyncHandler(async (req, res) => {
     const surveyId = Number(req.params.id);
@@ -531,7 +531,7 @@ router.get(
     if (!permissionsOk) {
       throw new ForbiddenError('User not author nor editor of the survey');
     }
-    
+
     const publications = await getPublications(surveyId);
     res.status(200).json(publications);
   }),
@@ -547,7 +547,7 @@ router.put(
   validateRequest([
     param('id').isNumeric().toInt().withMessage('ID must be a number'),
     body('username').isString().withMessage('Username must be a string'),
-    body('password').isString().withMessage('Password must be a string')
+    body('password').isString().withMessage('Password must be a string'),
   ]),
   asyncHandler(async (req, res) => {
     const surveyId = Number(req.params.id);
@@ -561,7 +561,7 @@ router.put(
       alphanumericIncluded,
       mapIncluded,
       attachmentsIncluded,
-      personalIncluded
+      personalIncluded,
     } = req.body;
 
     const credentials = await upsertPublicationCredentials(
@@ -571,7 +571,7 @@ router.put(
       alphanumericIncluded,
       mapIncluded,
       attachmentsIncluded,
-      personalIncluded
+      personalIncluded,
     );
     res.status(200).json(credentials);
   }),
@@ -585,7 +585,7 @@ router.delete(
   ensureAuthenticated(),
   ensureSurveyGroupAccess(),
   validateRequest([
-    param('id').isNumeric().toInt().withMessage('ID must be a number')
+    param('id').isNumeric().toInt().withMessage('ID must be a number'),
   ]),
   asyncHandler(async (req, res) => {
     const surveyId = Number(req.params.id);
@@ -595,6 +595,6 @@ router.delete(
     }
     const publication = await deletePublication(surveyId);
     res.status(200).json(publication);
-  })
-)
+  }),
+);
 export default router;
