@@ -207,6 +207,11 @@ export function ensureFileGroupAccess() {
   };
 }
 
+/**
+ * Middleware function to protect published submissions that require access. Sets
+ * included materials to the res.locals property so they can be accessed also later
+ * @returns Request middleware
+ */
 export function ensurePublicationAccess() {
   return async (req: Request, res: Response, next: NextFunction) => {
     const user = basicAuth(req);

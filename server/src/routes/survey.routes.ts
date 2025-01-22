@@ -602,7 +602,7 @@ router.put(
 );
 
 /**
- * Delete the credentials for the survey submissions
+ * Delete the credentials for the survey submission publication
  */
 router.delete(
   '/:id/publication/credentials',

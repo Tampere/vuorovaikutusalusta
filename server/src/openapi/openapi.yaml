@@ -78,7 +78,7 @@ paths:
           description: Internal server error if invalid survey id is provided.
   /surveys/{surveyId}/publication:
     get:
-      description: Get all published submissions for a survey by its id. Requires authentication with a username and password that can be set by the administrator on the answers page.
+      description: Get published submissions for a survey by its id. Requires authentication. The credentials as well as offered submission types can be determined by the administrator on the answers page.
       tags:
         - Surveys
       operationId: get-survey-submissions
@@ -107,7 +107,7 @@ paths:
           description: Internal server error if invalid survey id is provided.
   /surveys/{surveyId}/publication/map:
     get:
-      description: Get all published submissions for the map questions as GeoJSON FeatureCollections. Requires authentication with a username and password that can be set by the administrator on the answers page.
+      description: Get all published submissions for the map questions as GeoJSON FeatureCollections. Requires authentication as well as access to geospatial submissions that can be set by the administrator on the answers page.
       tags:
         - Surveys
       operationId: get-map-submissions
