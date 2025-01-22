@@ -12,7 +12,30 @@ import { encrypt } from '../crypto';
 import { getDb } from '../database';
 import { configureAzureAuth } from './azure';
 import { configureGoogleOAuth } from './google-oauth';
-import basicAuth from 'basic-auth';
+
+function basicAuth(req: Request): { name: string; pass: string } {
+  const string = req?.headers?.authorization;
+  if (!string) return;
+
+  const match = /^ *(?:[Bb][Aa][Ss][Ii][Cc]) +([A-Za-z0-9._~+/-]+=*) *$/.exec(
+    string,
+  );
+
+  if (!match) return;
+
+  // decode user pass
+  const userPass = /^([^:]*):(.*)$/.exec(
+    Buffer.from(match[1], 'base64').toString(),
+  );
+
+  if (!userPass) return;
+
+  // return credentials object
+  return {
+    name: userPass[1],
+    pass: userPass[2],
+  };
+}
 
 /**
  * Configures authentication for given Express application.
