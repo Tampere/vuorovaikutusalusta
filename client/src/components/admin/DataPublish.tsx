@@ -50,7 +50,6 @@ const initialInput = {
   passwordAgain: '',
   alphanumericIncluded: true,
   mapIncluded: true,
-  attachmentsIncluded: true,
   personalIncluded: true,
 };
 
@@ -118,7 +117,6 @@ export default function DataPublish({ surveyId }: Props) {
             passwordAgain: initialInput.passwordAgain,
             alphanumericIncluded: credentials.alphanumericIncluded,
             mapIncluded: credentials.mapIncluded,
-            attachmentsIncluded: credentials.attachmentsIncluded,
             personalIncluded: credentials.personalIncluded,
           }
         : initialInput,
@@ -306,16 +304,6 @@ export default function DataPublish({ surveyId }: Props) {
                     <Checkbox
                       name="mapIncluded"
                       checked={input.mapIncluded}
-                      onChange={handleInputChange}
-                    />
-                  }
-                />
-                <FormControlLabel
-                  label={tr.DataExport.attachments}
-                  control={
-                    <Checkbox
-                      name="attachmentsIncluded"
-                      checked={input.attachmentsIncluded}
                       onChange={handleInputChange}
                     />
                   }

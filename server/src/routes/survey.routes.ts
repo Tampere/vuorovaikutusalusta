@@ -576,7 +576,6 @@ router.put(
       password,
       alphanumericIncluded,
       mapIncluded,
-      attachmentsIncluded,
       personalIncluded,
     } = req.body;
 
@@ -586,7 +585,6 @@ router.put(
       password,
       alphanumericIncluded,
       mapIncluded,
-      attachmentsIncluded,
       personalIncluded,
     );
     res.status(200).json(credentials);

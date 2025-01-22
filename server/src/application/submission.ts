@@ -51,7 +51,6 @@ interface DBCredentialsEntry {
   username: string;
   alphanumeric_included: boolean;
   map_included: boolean;
-  attachments_included: boolean;
   personal_included: boolean;
 }
 
@@ -59,7 +58,6 @@ export interface CredentialsEntry {
   username: string;
   alphanumericIncluded: boolean;
   mapIncluded: boolean;
-  attachmentsIncluded: boolean;
   personalIncluded: boolean;
 }
 
@@ -715,7 +713,6 @@ function dbCredentialEntryRowToCredentialEntry(
     username: row.username,
     alphanumericIncluded: row.alphanumeric_included,
     mapIncluded: row.map_included,
-    attachmentsIncluded: row.attachments_included,
     personalIncluded: row.personal_included,
   };
 }
@@ -905,7 +902,6 @@ export async function getSubmissionsForSurvey(surveyId: number) {
  * @param password Password for basic auth
  * @param alphanumericIncluded
  * @param mapIncluded
- * @param attachmentsIncluded
  * @param personalIncluded
  * @returns Inserted row, if successful
  */
@@ -915,7 +911,6 @@ export async function upsertPublicationCredentials(
   password: string,
   alphanumericIncluded: boolean = true,
   mapIncluded: boolean = true,
-  attachmentsIncluded: boolean = true,
   personalIncluded: boolean = true,
 ): Promise<CredentialsEntry> {
   const row = await getDb().oneOrNone<DBCredentialsEntry>(
@@ -927,26 +922,23 @@ export async function upsertPublicationCredentials(
         password,
         alphanumeric_included,
         map_included,
-        attachments_included,
         personal_included
       )
     VALUES
-      ($1, $2, crypt($3, gen_salt('bf', 8)), $4, $5, $6, $7)
+      ($1, $2, crypt($3, gen_salt('bf', 8)), $4, $5, $6)
     ON CONFLICT(survey_id)
     DO UPDATE SET
       username = $2,
       password = crypt($3, gen_salt('bf', 8)),
       alphanumeric_included = $4,
       map_included = $5,
-      attachments_included = $6,
-      personal_included = $7
+      personal_included = $6
     RETURNING
       id,
       survey_id,
       username,
       alphanumeric_included,
       map_included,
-      attachments_included,
       personal_included;
     `,
     [
@@ -955,7 +947,6 @@ export async function upsertPublicationCredentials(
       password,
       alphanumericIncluded,
       mapIncluded,
-      attachmentsIncluded,
       personalIncluded,
     ],
   );
@@ -986,7 +977,6 @@ export async function getPublicationCredentials(
       username,
       alphanumeric_included,
       map_included,
-      attachments_included,
       personal_included
     FROM data.publications
     WHERE survey_id = $1;
@@ -1017,7 +1007,6 @@ export async function deletePublicationCredentials(
       username,
       alphanumeric_included,
       map_included,
-      attachments_included,
       personal_included
     `,
     [surveyId],
