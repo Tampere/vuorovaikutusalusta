@@ -970,12 +970,12 @@ export async function upsertPublicationCredentials(
 
 /**
  * Returns the credentials for the published survey submissions. Should
- * currently return only one or no credentials per survey. However, the
+ * currently return only one or no credentials per survey, however, the
  * array format ensures support for multiple publications in the future
  * @param surveyId Survey ID
  * @returns The publications as a list of objects of length 0-n
  */
-export async function getPublications(
+export async function getPublicationCredentials(
   surveyId: number,
 ): Promise<CredentialsEntry[]> {
   const rows = await getDb().manyOrNone<{ id: number; survey_id: number }>(
@@ -1004,7 +1004,7 @@ export async function getPublications(
  * @param surveyId Survey ID
  * @returns The deleted row, if successful
  */
-export async function deletePublication(
+export async function deletePublicationCredentials(
   surveyId: number,
 ): Promise<CredentialsEntry> {
   const row = await getDb().oneOrNone<DBCredentialsEntry>(

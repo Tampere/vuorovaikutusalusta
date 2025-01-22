@@ -1,9 +1,9 @@
 import { LanguageCode, Survey, SurveyPage } from '@interfaces/survey';
 import { generatePdf } from '@src/application/pdf-generator';
 import {
-  deletePublication,
+  deletePublicationCredentials,
   getAnswerEntries,
-  getPublications,
+  getPublicationCredentials,
   getSubmissionsForSurvey,
   getTimestamp,
   upsertPublicationCredentials,
@@ -532,7 +532,7 @@ router.get(
       throw new ForbiddenError('User not author nor editor of the survey');
     }
 
-    const publications = await getPublications(surveyId);
+    const publications = await getPublicationCredentials(surveyId);
     res.status(200).json(publications);
   }),
 );
@@ -593,7 +593,7 @@ router.delete(
     if (!permissionsOk) {
       throw new ForbiddenError('User not author nor editor of the survey');
     }
-    const publication = await deletePublication(surveyId);
+    const publication = await deletePublicationCredentials(surveyId);
     res.status(200).json(publication);
   }),
 );

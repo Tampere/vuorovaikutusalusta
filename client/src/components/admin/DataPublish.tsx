@@ -63,7 +63,9 @@ export default function DataPublish({ surveyId }: Props) {
 
   const { tr } = useTranslations();
   const { showToast } = useToasts();
-  const publicationURL = `${window.location.origin}/api/surveys/${surveyId}/publication`;
+  const publicationURL = `${window.location.protocol}//${window.location.hostname}${
+    window.location.port ? `:${window.location.port}` : ''
+  }/api/surveys/${surveyId}/publication`;
 
   useEffect(() => {
     const missmatchCheck =
@@ -75,7 +77,7 @@ export default function DataPublish({ surveyId }: Props) {
   }, [input.password, input.passwordAgain]);
 
   useEffect(() => {
-    async function fetchPublications() {
+    async function fetchCredentials() {
       try {
         setIsLoading(true);
         const credentialsArr = await request<CredentialsEntry[]>(
@@ -90,7 +92,7 @@ export default function DataPublish({ surveyId }: Props) {
         setIsLoading(false);
       }
     }
-    fetchPublications();
+    fetchCredentials();
   }, []);
 
   function getErrorObject(err: Response | Error) {
@@ -152,8 +154,8 @@ export default function DataPublish({ surveyId }: Props) {
   }
 
   async function deleteCredentials() {
-    setIsLoading(true);
     try {
+      setIsLoading(true);
       await request<CredentialsEntry>(
         `/api/surveys/${surveyId}/publication/credentials`,
         {
@@ -165,6 +167,7 @@ export default function DataPublish({ surveyId }: Props) {
         severity: 'success',
         message: 'Success!',
       });
+      setDisplayDialog(false);
     } catch (err) {
       showToast(getErrorObject(err));
     } finally {
@@ -194,139 +197,142 @@ export default function DataPublish({ surveyId }: Props) {
             ? tr.DataPublish.submissionsApiOptions
             : tr.DataPublish.submissionsApiOpening}
         </DialogTitle>
+        {isLoading && (
+          <DialogContent
+            component="div"
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              padding: 0,
+              position: 'absolute',
+              width: '100%',
+              height: '100%',
+              zIndex: 1,
+              background: 'inherit',
+            }}
+          >
+            <CircularProgress size={50} />
+          </DialogContent>
+        )}
         <DialogContent>
-          {isLoading ? (
-            <Box
-              component="div"
-              sx={{ display: 'flex', justifyContent: 'center' }}
-            >
-              <CircularProgress />
-            </Box>
-          ) : (
-            <Grid container spacing={10}>
-              <Grid item xs={6}>
-                <Typography level="h1">{tr.DataPublish.credentials}</Typography>
-                <Box
-                  component="form"
-                  sx={{
-                    mt: 2,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 1,
-                  }}
-                >
-                  <FormControl variant="standard">
-                    <CredentialsInputLabel
-                      shrink
-                      htmlFor="credentials-username"
-                    >
-                      {tr.DataPublish.username}
-                    </CredentialsInputLabel>
-                    <CredentialsInput
-                      required
-                      id="credentials-username"
-                      name="username"
-                      value={input.username}
-                      onChange={handleInputChange}
-                      autoComplete="username"
-                    />
-                  </FormControl>
-                  <FormControl variant="standard">
-                    <CredentialsInputLabel
-                      shrink
-                      htmlFor="credentials-password"
-                    >
-                      {tr.DataPublish.password}
-                    </CredentialsInputLabel>
-                    <CredentialsInput
-                      required
-                      id="credentials-password"
-                      name="password"
-                      type="password"
-                      value={input.password}
-                      onChange={handleInputChange}
-                      autoComplete="new-password"
-                      error={passwordsMissmatch}
-                    />
-                  </FormControl>
-                  <FormControl variant="standard">
-                    <CredentialsInputLabel
-                      shrink
-                      htmlFor="credentials-passwordAgain"
-                    >
-                      {tr.DataPublish.passwordAgain}
-                    </CredentialsInputLabel>
-                    <CredentialsInput
-                      required
-                      id="credentials-passwordAgain"
-                      name="passwordAgain"
-                      type="password"
-                      value={input.passwordAgain}
-                      onChange={handleInputChange}
-                      error={passwordsMissmatch}
-                      autoComplete="new-password"
-                      helperText={
-                        passwordsMissmatch && tr.DataPublish.passwordsMissmatch
-                      }
-                    />
-                  </FormControl>
-                </Box>
-              </Grid>
-              <Grid item xs={6}>
-                <Typography level="h1">
-                  {tr.DataPublish.materialsOffered}
-                </Typography>
-                <Box
-                  sx={{
-                    mt: 2,
-                    display: 'flex',
-                    flexDirection: 'column',
-                  }}
-                >
-                  <FormControlLabel
-                    label={tr.DataPublish.alphanumericSubmissions}
-                    control={
-                      <Checkbox
-                        name="alphanumericIncluded"
-                        checked={input.alphanumericIncluded}
-                        onChange={handleInputChange}
-                      />
+          <Grid container spacing={10}>
+            <Grid item xs={6}>
+              <Typography level="h1">{tr.DataPublish.credentials}</Typography>
+              <Box
+                component="form"
+                sx={{
+                  mt: 2,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 1,
+                }}
+              >
+                <FormControl variant="standard">
+                  <CredentialsInputLabel shrink htmlFor="credentials-username">
+                    {tr.DataPublish.username}
+                  </CredentialsInputLabel>
+                  <CredentialsInput
+                    required
+                    id="credentials-username"
+                    name="username"
+                    value={input.username}
+                    onChange={handleInputChange}
+                    autoComplete="username"
+                  />
+                </FormControl>
+                <FormControl variant="standard">
+                  <CredentialsInputLabel shrink htmlFor="credentials-password">
+                    {tr.DataPublish.password}
+                  </CredentialsInputLabel>
+                  <CredentialsInput
+                    required
+                    id="credentials-password"
+                    name="password"
+                    type="password"
+                    value={input.password}
+                    onChange={handleInputChange}
+                    autoComplete="new-password"
+                    error={passwordsMissmatch}
+                  />
+                </FormControl>
+                <FormControl variant="standard">
+                  <CredentialsInputLabel
+                    shrink
+                    htmlFor="credentials-passwordAgain"
+                  >
+                    {tr.DataPublish.passwordAgain}
+                  </CredentialsInputLabel>
+                  <CredentialsInput
+                    required
+                    id="credentials-passwordAgain"
+                    name="passwordAgain"
+                    type="password"
+                    value={input.passwordAgain}
+                    onChange={handleInputChange}
+                    error={passwordsMissmatch}
+                    autoComplete="new-password"
+                    helperText={
+                      passwordsMissmatch && tr.DataPublish.passwordsMissmatch
                     }
                   />
-                  <FormControlLabel
-                    label={tr.DataPublish.geospatialSubmissions}
-                    control={
-                      <Checkbox
-                        name="mapIncluded"
-                        checked={input.mapIncluded}
-                        onChange={handleInputChange}
-                      />
-                    }
-                  />
-                  <FormControlLabel
-                    label={tr.DataExport.attachments}
-                    control={
-                      <Checkbox
-                        name="attachmentsIncluded"
-                        checked={input.attachmentsIncluded}
-                        onChange={handleInputChange}
-                      />
-                    }
-                  />
-                  <FormControlLabel
-                    label={tr.DataPublish.personalDetails}
-                    control={
-                      <Checkbox
-                        name="personalIncluded"
-                        checked={input.personalIncluded}
-                        onChange={handleInputChange}
-                      />
-                    }
-                  />
-                </Box>
-              </Grid>
+                </FormControl>
+              </Box>
             </Grid>
-          )}
+            <Grid item xs={6}>
+              <Typography level="h1">
+                {tr.DataPublish.materialsOffered}
+              </Typography>
+              <Box
+                sx={{
+                  mt: 2,
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
+                <FormControlLabel
+                  label={tr.DataPublish.alphanumericSubmissions}
+                  control={
+                    <Checkbox
+                      name="alphanumericIncluded"
+                      checked={input.alphanumericIncluded}
+                      onChange={handleInputChange}
+                    />
+                  }
+                />
+                <FormControlLabel
+                  label={tr.DataPublish.geospatialSubmissions}
+                  control={
+                    <Checkbox
+                      name="mapIncluded"
+                      checked={input.mapIncluded}
+                      onChange={handleInputChange}
+                    />
+                  }
+                />
+                <FormControlLabel
+                  label={tr.DataExport.attachments}
+                  control={
+                    <Checkbox
+                      name="attachmentsIncluded"
+                      checked={input.attachmentsIncluded}
+                      onChange={handleInputChange}
+                    />
+                  }
+                />
+                <FormControlLabel
+                  label={tr.DataPublish.personalDetails}
+                  control={
+                    <Checkbox
+                      name="personalIncluded"
+                      checked={input.personalIncluded}
+                      onChange={handleInputChange}
+                    />
+                  }
+                />
+              </Box>
+            </Grid>
+          </Grid>
           <Link
             href={publicationURL}
             target="_blank"
@@ -341,10 +347,7 @@ export default function DataPublish({ surveyId }: Props) {
           {credentials && (
             <Button
               color="warning"
-              onClick={() => {
-                deleteCredentials();
-                setDisplayDialog(false);
-              }}
+              onClick={deleteCredentials}
               sx={{
                 textAlign: 'left',
               }}

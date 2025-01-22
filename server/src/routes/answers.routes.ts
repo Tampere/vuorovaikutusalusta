@@ -93,7 +93,6 @@ router.get(
     }
 
     const attachments = await getAttachments(surveyId);
-
     if (!attachments) {
       throw new BadRequestError('No attachments available');
     } else {
