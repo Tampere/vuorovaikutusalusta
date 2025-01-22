@@ -3,7 +3,7 @@
     "exportAnswers": "Export response data",
     "surveyAnswerExport": "Export survey response data",
     "chooseFileFormat": "Choose files to export",
-    "download": "download",
+    "download": "Download",
     "errorDownloadingCSV": "Failed to export CSV -file",
     "errorDownloadingGPKG": "Failed to export GeoPackage -file",
     "attachments": "Survey response data attachments"
