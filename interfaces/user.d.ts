@@ -18,4 +18,8 @@ export interface User {
    * User's group ids
    */
   organizations: string[];
+  /**
+   * User's roles
+   */
+  roles: string[];
 }

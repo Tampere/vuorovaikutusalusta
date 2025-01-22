@@ -20,6 +20,13 @@ const pgp: PgPromise.IMain<{}, IClient> = PgPromise({
 let db: PgPromise.IDatabase<{}, IClient> = null;
 let migrationConnection: PgPromise.IConnected<{}, IClient> = null;
 
+// Common DB encryption key
+export const encryptionKey = process.env.DATABASE_ENCRYPTION_KEY;
+// Ensure the environment variable is found to prevent runtime errors
+if (!encryptionKey) {
+  throw new Error(`Environment variable DATABASE_ENCRYPTION_KEY is missing!`);
+}
+
 /**
  * Initializes the database.
  */

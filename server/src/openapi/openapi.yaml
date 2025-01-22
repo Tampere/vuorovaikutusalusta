@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: Kartalla API
   description: API description for Kartalla survey platform.
-  version: 1.0.0
+  version: 1.1.0
 servers:
   - url: https://test.kartalla.io/api
     description: Test server
@@ -16,13 +16,13 @@ tags:
 paths:
   /surveys:
     get:
-      description: Get all surveys which are created for the same organization as the authenticated user.
+      description: Get all surveys for the authenticated user's organization or all surveys if the user is a super user.
       tags:
         - Surveys
       parameters:
         - name: filterByAuthored
           in: query
-          description: Show only surveys authored for the authenticated user.
+          description: Show only surveys authored by the authenticated user.
           schema:
             type: boolean
         - name: filterByPublished
@@ -45,7 +45,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
   /surveys/{surveyId}:
     get:
-      description: Get a survey by its id. The survey must be created for the same organization as the authenticated user and the user must be an editor or author of the survey.
+      description: Get a survey by its id. If the authenticated user is not a super user, the survey must be created for the same organization as the authenticated user and the user must be an editor or author of the survey.
       tags:
         - Surveys
       operationId: get-survey
@@ -69,7 +69,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
-          description: Forbidden request if the user is not an editor or author of the survey.
+          description: Forbidden request if the user is not an super user, admin, editor or author of the survey.
           content:
             text/html:
               schema:
@@ -133,7 +133,7 @@ paths:
         '400':
           $ref: '#/components/responses/BadRequestError'
         '500':
-          description: Internal server error if invalid survey id is provided.
+          description: Internal server error if non-existing survey id is provided.
   /file/{groupId}/{fileType}/{fileName}:
     get:
       description: Get a file from the file store by its group id, type and name.

@@ -26,12 +26,14 @@
     "username": "Käyttäjätunnus"
   },
   "EditSurvey": {
+    "newSurvey": "Uusi kysely",
     "errorFetchingSurvey": "Virhe haettaessa kyselyä. Tarkista osoite tai yritä myöhemmin uudestaan.",
     "untitledPage": "Nimetön sivu",
     "fetchFailed": "Kyselyn haussa tapahtui virhe. Yritä myöhemmin uudestaan.",
     "saveSuccessful": "Kysely tallennettiin onnistuneesti!",
     "saveFailed": "Kyselyn tallentaminen epäonnistui. Yritä myöhemmin uudestaan.",
     "saveFailedDuplicateName": "Saman niminen kysely on jo olemassa. Valitse toinen nimi ja yritä uudestaan.",
+    "saveFailedAnswerSubmitted": "Kyselyn vastaukset estävät muutosten tallentamisen.",
     "invalidFields": "Seuraavien kenttien arvot eivät ole sallittuja:",
     "validationError": {
       "survey.title": "Kyselyn otsikko",
@@ -164,7 +166,14 @@
     },
     "sectionCopied": "Osio kopioitu leikepöydälle. Voit nyt liittää kopioidun osion haluamallesi kyselylle.",
     "sectionAttached": "Huomaa, että karttatasovalinnat eivät kopioidu. Tarkista karttatasovalinnat ja korjaa tarvittaessa karttajulkaisuosoitetta",
-    "attachSection": "Uusi osio leikepöydältä"
+    "attachSection": "Uusi osio leikepöydältä",
+    "confirmEditDialog": {
+      "title": "Saavatko jo kertyneet vastaukset vääristyä?",
+      "content": "Kyselyyn on jo saapunut vastauksia. Kysymysten muokkaaminen nyt saattaa aiheuttaa vastausten vääristymisen.",
+      "confirm": "Haluatko varmasti jatkaa?"
+    },
+    "fetchingSubmissions": "Tarkistetaan vastauksia",
+    "errorFetchingSubmissions": "Virhe tarkistettaessa kyselyn vastaustietoja."
   },
   "FollowUpSection": {
     "title": "Jatkokysymys kysymykselle",

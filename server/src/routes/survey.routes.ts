@@ -29,11 +29,12 @@ import {
   ensureSurveyGroupAccess,
 } from '@src/auth';
 import { getGeometryDBEntriesAsGeoJSON } from '@src/application/answer';
-import { ForbiddenError } from '@src/error';
+import { BadRequestError, ForbiddenError } from '@src/error';
 import { Router } from 'express';
 import asyncHandler from 'express-async-handler';
 import { body, param, query } from 'express-validator';
 import { validateRequest } from '../utils';
+import { isSuperUser } from '@src/user';
 const router = Router();
 
 /**
@@ -79,11 +80,15 @@ router.get(
   asyncHandler(async (req, res) => {
     const userId = req.user.id;
     const { filterByAuthored, filterByPublished } = req.query;
+    const organization = isSuperUser(req.user)
+      ? null
+      : req.user.organizations[0];
     const surveys = await getSurveys(
       filterByAuthored ? userId : null,
       Boolean(filterByPublished),
-      req.user.organizations[0], // For now, use the first organization
+      organization,
     );
+
     res.status(200).json(surveys);
   }),
 );
@@ -103,14 +108,16 @@ router.get(
     const permissionsOk = await userCanViewSurvey(req.user, surveyId);
     if (!permissionsOk) {
       throw new ForbiddenError(
-        'User not author, editor nor viewer of the survey',
+        'User not author, editor nor viewer of the survey.',
       );
     }
 
     // For now, use the first organization
     const survey = await getSurvey({
       id: surveyId,
-      organization: req.user.organizations[0],
+      ...(!isSuperUser(req.user) && {
+        organization: req.user.organizations[0],
+      }),
     });
     res.status(200).json(survey);
   }),
@@ -224,8 +231,17 @@ router.put(
       endDate: req.body.endDate ? new Date(req.body.endDate) : null,
       pages: req.body.pages,
     };
-    const updatedSurvey = await updateSurvey(survey);
-    res.status(200).json(updatedSurvey);
+    try {
+      const updatedSurvey = await updateSurvey(survey);
+      res.status(200).json(updatedSurvey);
+    } catch (error) {
+      throw error.table === 'answer_entry' && Boolean(error.constraint)
+        ? new BadRequestError(
+            `Submitted answer prevents survey update: ${error.constraint}`,
+            'submitted_answer_prevents_update',
+          )
+        : error;
+    }
   }),
 );
 

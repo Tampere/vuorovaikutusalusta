@@ -12,6 +12,7 @@ export default function EditSurveyHeader(props: Props) {
   // Change title only on save?
   const { originalActiveSurvey } = useSurvey();
   const { surveyLanguage } = useTranslations();
+  const { tr } = useTranslations();
 
   return (
     <AdminAppBar
@@ -19,7 +20,10 @@ export default function EditSurveyHeader(props: Props) {
         width: { md: `calc(100% - ${props.sideBarWidth}px)` },
         ml: { md: `${props.sideBarWidth}px` },
       }}
-      labels={[originalActiveSurvey?.title?.[surveyLanguage] ?? '']}
+      labels={[
+        originalActiveSurvey?.title?.[surveyLanguage] ??
+          tr.EditSurvey.newSurvey,
+      ]}
       withHomeLink={false}
     />
   );

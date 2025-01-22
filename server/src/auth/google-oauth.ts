@@ -48,6 +48,7 @@ export function configureGoogleOAuth(app: Express) {
           fullName: profile.displayName,
           email: profile._json.email,
           organizations: [],
+          roles: [],
         });
         return done(null, user);
       },

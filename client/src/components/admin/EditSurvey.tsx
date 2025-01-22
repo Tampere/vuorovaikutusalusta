@@ -38,11 +38,13 @@ export default function EditSurvey() {
   const { tr } = useTranslations();
   const { showToast } = useToasts();
   const history = useHistory();
-  const { activeUser } = useUser();
+  const { activeUser, activeUserIsAdmin, activeUserIsSuperUser } = useUser();
 
   const allowEditing =
     !activeSurveyLoading &&
-    (activeUser?.id === activeSurvey.authorId ||
+    (activeUserIsSuperUser ||
+      activeUserIsAdmin ||
+      activeUser?.id === activeSurvey.authorId ||
       activeSurvey.editors.includes(activeUser?.id));
 
   // Prevent page unload when there are unsaved changes
