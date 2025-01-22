@@ -19,7 +19,7 @@
     "password": "Salasana",
     "passwordAgain": "Salasana uudelleen",
     "passwordsMissmatch": "Salasanat eivät täsmää",
-    "personalDetails": "Henkilötiedot",
+    "personalInfo": "Henkilötiedot",
     "submissionsApi": "Vastausrajapinta",
     "submissionsApiOpening": "Vastausrajapinnan avaus",
     "submissionsApiOptions": "Vastausrajapinnan tiedot",

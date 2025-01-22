@@ -507,7 +507,15 @@ router.get(
   ]),
   ensurePublicationAccess(),
   asyncHandler(async (req, res) => {
-    const submissions = await getSubmissionsForSurvey(Number(req.params.id));
+    const { alphanumericIncluded, geospatialIncluded, personalIncluded } =
+      res.locals;
+    const submissions = await getSubmissionsForSurvey(
+      Number(req.params.id),
+      alphanumericIncluded,
+      geospatialIncluded,
+      personalIncluded,
+      false,
+    );
     res.json(submissions);
   }),
 );
@@ -525,9 +533,11 @@ router.get(
   ensurePublicationAccess(),
   asyncHandler(async (req, res) => {
     const surveyId = Number(req.params.id);
-
-    const layers = (await getGeometryDBEntriesAsGeoJSON(surveyId)) ?? {};
-    res.json(layers);
+    if (!res.locals.geospatialIncluded) {
+      res.status(401).send('No geospatial submissions have been published.');
+    } else {
+      res.json((await getGeometryDBEntriesAsGeoJSON(surveyId)) ?? {});
+    }
   }),
 );
 
@@ -575,7 +585,7 @@ router.put(
       username,
       password,
       alphanumericIncluded,
-      mapIncluded,
+      geospatialIncluded,
       personalIncluded,
     } = req.body;
 
@@ -584,7 +594,7 @@ router.put(
       username,
       password,
       alphanumericIncluded,
-      mapIncluded,
+      geospatialIncluded,
       personalIncluded,
     );
     res.status(200).json(credentials);

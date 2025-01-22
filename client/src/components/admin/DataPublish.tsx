@@ -43,13 +43,22 @@ const CredentialsInput = styled(TextField)(({ theme }: { theme: Theme }) => ({
     padding: '10px 12px',
   },
 }));
+const ApiLink = styled(Link)(() => ({
+  display: 'flex',
+  alignItems: 'center',
+  marginTop: '16px',
+}));
+const ApiLinkIcon = styled(LinkSmallIcon)(() => ({
+  width: '15px',
+  marginRight: '8px',
+}));
 
 const initialInput = {
   username: '',
   password: '',
   passwordAgain: '',
   alphanumericIncluded: true,
-  mapIncluded: true,
+  geospatialIncluded: true,
   personalIncluded: true,
 };
 
@@ -116,7 +125,7 @@ export default function DataPublish({ surveyId }: Props) {
             password: initialInput.password,
             passwordAgain: initialInput.passwordAgain,
             alphanumericIncluded: credentials.alphanumericIncluded,
-            mapIncluded: credentials.mapIncluded,
+            geospatialIncluded: credentials.geospatialIncluded,
             personalIncluded: credentials.personalIncluded,
           }
         : initialInput,
@@ -302,14 +311,14 @@ export default function DataPublish({ surveyId }: Props) {
                   label={tr.DataPublish.geospatialSubmissions}
                   control={
                     <Checkbox
-                      name="mapIncluded"
-                      checked={input.mapIncluded}
+                      name="geospatialIncluded"
+                      checked={input.geospatialIncluded}
                       onChange={handleInputChange}
                     />
                   }
                 />
                 <FormControlLabel
-                  label={tr.DataPublish.personalDetails}
+                  label={tr.DataPublish.personalInfo}
                   control={
                     <Checkbox
                       name="personalIncluded"
@@ -321,15 +330,20 @@ export default function DataPublish({ surveyId }: Props) {
               </Box>
             </Grid>
           </Grid>
-          <Link
-            href={publicationURL}
-            target="_blank"
-            underline="none"
-            sx={{ display: 'flex', alignItems: 'center', mt: 2 }}
-          >
-            <LinkSmallIcon sx={{ width: 15, mr: 1 }} />
+          <ApiLink href={publicationURL} target="_blank" underline="none">
+            <ApiLinkIcon />
             {publicationURL}
-          </Link>
+          </ApiLink>
+          {input.geospatialIncluded && (
+            <ApiLink
+              href={`${publicationURL}/geojson`}
+              target="_blank"
+              underline="none"
+            >
+              <ApiLinkIcon />
+              {`${publicationURL}/geojson`}
+            </ApiLink>
+          )}
         </DialogContent>
         <DialogActions>
           {credentials && (

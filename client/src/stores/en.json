@@ -19,7 +19,7 @@
     "password": "Password",
     "passwordAgain": "Password again",
     "passwordsMissmatch": "The passwords do not match",
-    "personalDetails": "Personal details",
+    "personalInfo": "Personal info",
     "submissionsApi": "Submissions API",
     "submissionsApiOpening": "Submissions API opening",
     "submissionsApiOptions": "Submissions API details",

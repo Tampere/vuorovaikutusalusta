@@ -50,14 +50,14 @@ interface DBCredentialsEntry {
   survey_id: number;
   username: string;
   alphanumeric_included: boolean;
-  map_included: boolean;
+  geospatial_included: boolean;
   personal_included: boolean;
 }
 
 export interface CredentialsEntry {
   username: string;
   alphanumericIncluded: boolean;
-  mapIncluded: boolean;
+  geospatialIncluded: boolean;
   personalIncluded: boolean;
 }
 
@@ -712,7 +712,7 @@ function dbCredentialEntryRowToCredentialEntry(
   return {
     username: row.username,
     alphanumericIncluded: row.alphanumeric_included,
-    mapIncluded: row.map_included,
+    geospatialIncluded: row.geospatial_included,
     personalIncluded: row.personal_included,
   };
 }
@@ -841,7 +841,13 @@ export async function getTimestamp(submissionId: number) {
  * @param surveyId Survey ID
  * @returns Submissions
  */
-export async function getSubmissionsForSurvey(surveyId: number) {
+export async function getSubmissionsForSurvey(
+  surveyId: number,
+  alphanumeric: boolean = true,
+  geospatial: boolean = true,
+  personal: boolean = true,
+  attachments: boolean = true,
+) {
   const rows = await getDb().manyOrNone<DBSubmission & DBAnswerEntry>(
     `SELECT
       s.updated_at,
@@ -865,6 +871,24 @@ export async function getSubmissionsForSurvey(surveyId: number) {
       INNER JOIN data.page_section ps ON ps.id = ae.section_id
       INNER JOIN data.survey_page sp ON sp.id = ps.survey_page_id
     WHERE s.survey_id = $(surveyId) AND s.unfinished_token IS NULL
+    ${
+      !alphanumeric
+        ? `AND ps.type NOT IN (
+      'free-text',
+      'radio',
+      'checkbox',
+      'grouped-checkbox',
+      'numeric',
+      'sorting',
+      'slider',
+      'matrix',
+      'multi-matrix'
+    )`
+        : ''
+    }
+    ${!geospatial ? `AND ps.type != 'map'` : ''}
+    ${!personal ? `AND ps.type != 'personal-info'` : ''}
+    ${!attachments ? `AND ps.type != 'attachment'` : ''}
     ORDER BY updated_at, sp.idx, ps.idx;`,
     { surveyId },
   );
@@ -901,7 +925,7 @@ export async function getSubmissionsForSurvey(surveyId: number) {
  * @param username Username for basic auth
  * @param password Password for basic auth
  * @param alphanumericIncluded
- * @param mapIncluded
+ * @param geospatialIncluded
  * @param personalIncluded
  * @returns Inserted row, if successful
  */
@@ -910,7 +934,7 @@ export async function upsertPublicationCredentials(
   username: string,
   password: string,
   alphanumericIncluded: boolean = true,
-  mapIncluded: boolean = true,
+  geospatialIncluded: boolean = true,
   personalIncluded: boolean = true,
 ): Promise<CredentialsEntry> {
   const row = await getDb().oneOrNone<DBCredentialsEntry>(
@@ -921,7 +945,7 @@ export async function upsertPublicationCredentials(
         username,
         password,
         alphanumeric_included,
-        map_included,
+        geospatial_included,
         personal_included
       )
     VALUES
@@ -931,14 +955,14 @@ export async function upsertPublicationCredentials(
       username = $2,
       password = crypt($3, gen_salt('bf', 8)),
       alphanumeric_included = $4,
-      map_included = $5,
+      geospatial_included = $5,
       personal_included = $6
     RETURNING
       id,
       survey_id,
       username,
       alphanumeric_included,
-      map_included,
+      geospatial_included,
       personal_included;
     `,
     [
@@ -946,7 +970,7 @@ export async function upsertPublicationCredentials(
       username,
       password,
       alphanumericIncluded,
-      mapIncluded,
+      geospatialIncluded,
       personalIncluded,
     ],
   );
@@ -976,7 +1000,7 @@ export async function getPublicationCredentials(
       survey_id,
       username,
       alphanumeric_included,
-      map_included,
+      geospatial_included,
       personal_included
     FROM data.publications
     WHERE survey_id = $1;
@@ -1006,7 +1030,7 @@ export async function deletePublicationCredentials(
       survey_id,
       username,
       alphanumeric_included,
-      map_included,
+      geospatial_included,
       personal_included
     `,
     [surveyId],

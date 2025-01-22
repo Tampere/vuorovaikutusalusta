@@ -1,4 +1,7 @@
-import { getSurveyOrganization } from '@src/application/survey';
+import {
+  getPublicationAccesses,
+  getSurveyOrganization,
+} from '@src/application/survey';
 import logger from '@src/logger';
 import { getUser, isSuperUser, upsertUser } from '@src/user';
 import ConnectPgSimple from 'connect-pg-simple';
@@ -211,15 +214,15 @@ export function ensurePublicationAccess() {
     let authorized = false;
 
     if (user) {
-      const row = await getDb().oneOrNone<{ authorized: boolean }>(
-        `SELECT
-          password = crypt($1, password) as authorized
-        FROM data.publications
-        WHERE survey_id = $2
-        AND username = $3;`,
-        [user.pass, surveyId, user.name],
+      const accesses = await getPublicationAccesses(
+        surveyId,
+        user.name,
+        user.pass,
       );
-      if (row) authorized = row.authorized;
+      res.locals.alphanumericIncluded = accesses.alphanumericIncluded;
+      res.locals.geospatialIncluded = accesses.geospatialIncluded;
+      res.locals.personalIncluded = accesses.personalIncluded;
+      authorized = accesses.authorized;
     }
     if (!authorized) {
       res.set('WWW-Authenticate', 'Basic realm="example"');

@@ -19,7 +19,7 @@
     "password": "Lösenord",
     "passwordAgain": "Lösenord igen",
     "passwordsMissmatch": "Lösenorden stämmer inte överens",
-    "personalDetails": "Personliga uppgifter",
+    "personalInfo": "Personliga uppgifter",
     "submissionsApi": "Svarsgränssnitt",
     "submissionsApiOpening": "Öppnandet av svarsgränssnittet",
     "submissionsApiOptions": "Svarsgränssnittsinformation",
