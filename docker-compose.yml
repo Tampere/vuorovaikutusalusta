@@ -37,3 +37,8 @@ services:
       - .db-data:/var/lib/postgresql:delegated
     ports:
       - '5432:5432'
+  email:
+    profiles: [email]
+    extends:
+      file: docker-compose.email.yml
+      service: email
