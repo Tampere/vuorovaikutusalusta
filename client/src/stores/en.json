@@ -18,7 +18,7 @@
     "openSubmissionsApi": "Open submissions API",
     "password": "Password",
     "passwordAgain": "Password again",
-    "passwordsMissmatch": "The passwords do not match",
+    "passwordsMismatch": "The passwords do not match",
     "personalInfo": "Personal info",
     "submissionsApi": "Submissions API",
     "submissionsApiOpening": "Submissions API opening",

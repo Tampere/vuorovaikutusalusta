@@ -66,7 +66,7 @@ export default function DataPublish({ surveyId }: Props) {
   const [displayDialog, setDisplayDialog] = useState(false);
   const [credentials, setCredentials] = useState(null);
   const [input, setInput] = useState(initialInput);
-  const [passwordsMissmatch, setPasswordsMissmatch] = useState(false);
+  const [passwordsMismatch, setPasswordsMismatch] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const { tr } = useTranslations();
@@ -76,12 +76,12 @@ export default function DataPublish({ surveyId }: Props) {
   }/api/surveys/${surveyId}/publication`;
 
   useEffect(() => {
-    const missmatchCheck =
+    const mismatchCheck =
       input.passwordAgain.length > 0 && input.password !== input.passwordAgain;
 
-    if (passwordsMissmatch === missmatchCheck) return;
+    if (passwordsMismatch === mismatchCheck) return;
 
-    setPasswordsMissmatch(missmatchCheck);
+    setPasswordsMismatch(mismatchCheck);
   }, [input.password, input.passwordAgain]);
 
   useEffect(() => {
@@ -260,7 +260,7 @@ export default function DataPublish({ surveyId }: Props) {
                     value={input.password}
                     onChange={handleInputChange}
                     autoComplete="new-password"
-                    error={passwordsMissmatch}
+                    error={passwordsMismatch}
                   />
                 </FormControl>
                 <FormControl variant="standard">
@@ -277,10 +277,10 @@ export default function DataPublish({ surveyId }: Props) {
                     type="password"
                     value={input.passwordAgain}
                     onChange={handleInputChange}
-                    error={passwordsMissmatch}
+                    error={passwordsMismatch}
                     autoComplete="new-password"
                     helperText={
-                      passwordsMissmatch && tr.DataPublish.passwordsMissmatch
+                      passwordsMismatch && tr.DataPublish.passwordsMismatch
                     }
                   />
                 </FormControl>
@@ -368,7 +368,7 @@ export default function DataPublish({ surveyId }: Props) {
               input.username.length === 0 ||
               input.password.length === 0 ||
               input.passwordAgain.length === 0 ||
-              passwordsMissmatch
+              passwordsMismatch
             }
           >
             {credentials ? tr.commands.save : tr.DataPublish.openApi}

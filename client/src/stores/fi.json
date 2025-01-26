@@ -18,7 +18,7 @@
     "openSubmissionsApi": "Avaa vastausrajapinta",
     "password": "Salasana",
     "passwordAgain": "Salasana uudelleen",
-    "passwordsMissmatch": "Salasanat eivät täsmää",
+    "passwordsMismatch": "Salasanat eivät täsmää",
     "personalInfo": "Henkilötiedot",
     "submissionsApi": "Vastausrajapinta",
     "submissionsApiOpening": "Vastausrajapinnan avaus",

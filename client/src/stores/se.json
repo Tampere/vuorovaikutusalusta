@@ -18,7 +18,7 @@
     "openSubmissionsApi": "Öppna svarsgränssnitt",
     "password": "Lösenord",
     "passwordAgain": "Lösenord igen",
-    "passwordsMissmatch": "Lösenorden stämmer inte överens",
+    "passwordsMismatch": "Lösenorden stämmer inte överens",
     "personalInfo": "Personliga uppgifter",
     "submissionsApi": "Svarsgränssnitt",
     "submissionsApiOpening": "Öppnandet av svarsgränssnittet",
