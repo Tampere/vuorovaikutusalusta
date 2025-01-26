@@ -369,7 +369,6 @@ export default function DataPublish({ surveyId }: Props) {
           <Button
             onClick={upsertCredentials}
             disabled={
-              //Object.values(input).some((c: string) => c.length === 0)
               input.username.length === 0 ||
               input.password.length === 0 ||
               input.passwordAgain.length === 0 ||

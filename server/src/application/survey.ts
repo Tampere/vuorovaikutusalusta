@@ -813,14 +813,14 @@ export async function getPublicationAccesses(
 ): Promise<PublicationAccesses> {
   const row = await getDb().oneOrNone<DBPublicationAccesses>(
     `SELECT
-      password = crypt($1, password) as authorized,
+      password = crypt($(password), password) as authorized,
       alphanumeric_included,
       geospatial_included,
       personal_included
     FROM data.publications
-    WHERE survey_id = $2
-    AND username = $3;`,
-    [password, id, username],
+    WHERE survey_id = $(id)
+    AND username = $(username);`,
+    { password, id, username },
   );
   return {
     authorized: row?.authorized ?? false,

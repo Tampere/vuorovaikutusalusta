@@ -948,15 +948,21 @@ export async function upsertPublicationCredentials(
         geospatial_included,
         personal_included
       )
-    VALUES
-      ($1, $2, crypt($3, gen_salt('bf', 8)), $4, $5, $6)
+    VALUES (
+      $(surveyId),
+      $(username),
+      crypt($(password), gen_salt('bf', 8)),
+      $(alphanumericIncluded),
+      $(geospatialIncluded),
+      $(personalIncluded)
+    )
     ON CONFLICT(survey_id)
     DO UPDATE SET
-      username = $2,
-      password = crypt($3, gen_salt('bf', 8)),
-      alphanumeric_included = $4,
-      geospatial_included = $5,
-      personal_included = $6
+      username = $(username),
+      password = crypt($(password), gen_salt('bf', 8)),
+      alphanumeric_included = $(alphanumericIncluded),
+      geospatial_included = $(geospatialIncluded),
+      personal_included = $(personalIncluded)
     RETURNING
       id,
       survey_id,
@@ -965,14 +971,14 @@ export async function upsertPublicationCredentials(
       geospatial_included,
       personal_included;
     `,
-    [
+    {
       surveyId,
       username,
       password,
       alphanumericIncluded,
       geospatialIncluded,
       personalIncluded,
-    ],
+    },
   );
 
   if (!row) {

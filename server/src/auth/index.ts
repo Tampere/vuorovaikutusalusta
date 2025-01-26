@@ -17,24 +17,15 @@ function basicAuth(req: Request): { name: string; pass: string } {
   const string = req?.headers?.authorization;
   if (!string) return;
 
-  const match = /^ *(?:[Bb][Aa][Ss][Ii][Cc]) +([A-Za-z0-9._~+/-]+=*) *$/.exec(
-    string,
-  );
-
+  const match = /^ *(?:Basic) +([A-Z0-9._~+/-]+=*) *$/i.exec(string);
   if (!match) return;
 
-  // decode user pass
-  const userPass = /^([^:]*):(.*)$/.exec(
-    Buffer.from(match[1], 'base64').toString(),
-  );
-
-  if (!userPass) return;
+  // decode username and pass
+  const [name, pass] = Buffer.from(match[1], 'base64').toString().split(':');
+  if (!name || !pass) return;
 
   // return credentials object
-  return {
-    name: userPass[1],
-    pass: userPass[2],
-  };
+  return { name, pass };
 }
 
 /**
@@ -253,7 +244,10 @@ export function ensurePublicationAccess() {
       authorized = accesses.authorized;
     }
     if (!authorized) {
-      res.set('WWW-Authenticate', 'Basic realm="example"');
+      res.set(
+        'WWW-Authenticate',
+        `Basic realm="Kyselyn ${surveyId} vastaukset"`,
+      );
       res.status(401).send('Authentication required.');
     } else {
       return next();
