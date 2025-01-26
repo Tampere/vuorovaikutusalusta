@@ -1,6 +1,6 @@
 {
   "DataExport": {
-    "exportAnswers": "Ladda ner svar",
+    "exportAnswers": "Ladda ner svar…",
     "surveyAnswerExport": "Nedladdning av enkätsvar",
     "chooseFileFormat": "Välj önskat filformat",
     "download": "Ladda ner",
@@ -11,11 +11,13 @@
   "DataPublish": {
     "alphanumericSubmissions": "Alfanumeriska svar",
     "closeApi": "Stäng gränssnitt",
+    "closeApiSuccessful": "Gränssnitt stängdes framgångsrikt!",
     "credentials": "Identifieringsinformation",
     "geospatialSubmissions": "Rumsliga svar",
     "materialsOffered": "Material som erbjuds",
     "openApi": "Öppna gränssnitt",
-    "openSubmissionsApi": "Öppna svarsgränssnitt",
+    "openApiSuccessful": "Gränssnitt öppnade framgångsrikt!",
+    "openSubmissionsApi": "Öppna svarsgränssnitt…",
     "password": "Lösenord",
     "passwordAgain": "Lösenord igen",
     "passwordsMismatch": "Lösenorden stämmer inte överens",
@@ -23,6 +25,7 @@
     "submissionsApi": "Svarsgränssnitt",
     "submissionsApiOpening": "Öppnandet av svarsgränssnittet",
     "submissionsApiOptions": "Svarsgränssnittsinformation",
+    "updateApiSuccessful": "Gränssnitt uppdaterats framgångsrikt!",
     "username": "Användarnamn"
   },
   "EditSurvey": {

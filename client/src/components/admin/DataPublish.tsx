@@ -134,6 +134,7 @@ export default function DataPublish({ surveyId }: Props) {
   }
 
   async function upsertCredentials() {
+    const isUpdate = credentials !== null;
     try {
       setIsLoading(true);
       setCredentials(
@@ -150,7 +151,9 @@ export default function DataPublish({ surveyId }: Props) {
       );
       showToast({
         severity: 'success',
-        message: 'Success!',
+        message: isUpdate
+          ? tr.DataPublish.updateApiSuccessful
+          : tr.DataPublish.openApiSuccessful,
       });
       setDisplayDialog(false);
     } catch (err) {
@@ -172,7 +175,7 @@ export default function DataPublish({ surveyId }: Props) {
       setCredentials(null);
       showToast({
         severity: 'success',
-        message: 'Success!',
+        message: tr.DataPublish.closeApiSuccessful,
       });
       setDisplayDialog(false);
     } catch (err) {
@@ -195,7 +198,7 @@ export default function DataPublish({ surveyId }: Props) {
         >
           {credentials
             ? tr.DataPublish.submissionsApi
-            : tr.DataPublish.openSubmissionsApi + '…'}
+            : tr.DataPublish.openSubmissionsApi}
         </Button>
       )}
       <Dialog open={displayDialog} onClose={() => setDisplayDialog(false)}>

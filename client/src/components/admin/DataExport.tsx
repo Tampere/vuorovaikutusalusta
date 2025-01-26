@@ -121,7 +121,7 @@ export default function DataExport({ surveyId }: Props) {
         variant="contained"
         onClick={() => setDisplayDialog((prev) => !prev)}
       >
-        {tr.DataExport.exportAnswers}…
+        {tr.DataExport.exportAnswers}
       </Button>
       <Dialog open={displayDialog} onClose={() => setDisplayDialog(false)}>
         <DialogTitle> {tr.DataExport.surveyAnswerExport} </DialogTitle>

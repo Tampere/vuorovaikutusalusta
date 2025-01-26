@@ -1,6 +1,6 @@
 {
   "DataExport": {
-    "exportAnswers": "Lataa vastaukset",
+    "exportAnswers": "Lataa vastaukset…",
     "surveyAnswerExport": "Kyselyn vastausdatan lataus",
     "chooseFileFormat": "Valitse haluamasi tiedostomuodot",
     "download": "Lataa",
@@ -11,11 +11,13 @@
   "DataPublish": {
     "alphanumericSubmissions": "Aakkosnumeeriset vastaukset",
     "closeApi": "Sulje rajapinta",
+    "closeApiSuccessful": "Rajapinta suljettiin onnistuneesti!",
     "credentials": "Tunnistautumistiedot",
     "geospatialSubmissions": "Paikkatietovastaukset",
     "materialsOffered": "Tarjottavat aineistot",
     "openApi": "Avaa rajapinta",
-    "openSubmissionsApi": "Avaa vastausrajapinta",
+    "openApiSuccessful": "Rajapinta avattiin onnistuneesti!",
+    "openSubmissionsApi": "Avaa vastausrajapinta…",
     "password": "Salasana",
     "passwordAgain": "Salasana uudelleen",
     "passwordsMismatch": "Salasanat eivät täsmää",
@@ -23,6 +25,7 @@
     "submissionsApi": "Vastausrajapinta",
     "submissionsApiOpening": "Vastausrajapinnan avaus",
     "submissionsApiOptions": "Vastausrajapinnan tiedot",
+    "updateApiSuccessful": "Rajapinta päivitettiin onnistuneesti!",
     "username": "Käyttäjätunnus"
   },
   "EditSurvey": {

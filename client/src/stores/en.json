@@ -1,6 +1,6 @@
 {
   "DataExport": {
-    "exportAnswers": "Export response data",
+    "exportAnswers": "Export response data…",
     "surveyAnswerExport": "Export survey response data",
     "chooseFileFormat": "Choose files to export",
     "download": "Download",
@@ -11,11 +11,13 @@
   "DataPublish": {
     "alphanumericSubmissions": "Alphanumeric submissions",
     "closeApi": "Close API",
+    "closeApiSuccessful": "API closed successfully!",
     "credentials": "Credentials",
     "geospatialSubmissions": "Geospatial submissions",
     "materialsOffered": "Materials offered",
     "openApi": "Open API",
-    "openSubmissionsApi": "Open submissions API",
+    "openApiSuccessful": "API opened successfully!",
+    "openSubmissionsApi": "Open submissions API…",
     "password": "Password",
     "passwordAgain": "Password again",
     "passwordsMismatch": "The passwords do not match",
@@ -23,6 +25,7 @@
     "submissionsApi": "Submissions API",
     "submissionsApiOpening": "Submissions API opening",
     "submissionsApiOptions": "Submissions API details",
+    "updateApiSuccessful": "API updated successfully!",
     "username": "Username"
   },
   "EditSurvey": {
