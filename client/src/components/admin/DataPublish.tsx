@@ -228,7 +228,9 @@ export default function DataPublish({ surveyId }: Props) {
         <DialogContent>
           <Grid container spacing={10}>
             <Grid item xs={6}>
-              <Typography level="h1">{tr.DataPublish.credentials}</Typography>
+              <Typography component="h3">
+                {tr.DataPublish.credentials}
+              </Typography>
               <Box
                 component="form"
                 sx={{
@@ -290,7 +292,7 @@ export default function DataPublish({ surveyId }: Props) {
               </Box>
             </Grid>
             <Grid item xs={6}>
-              <Typography level="h1">
+              <Typography component="h3">
                 {tr.DataPublish.materialsOffered}
               </Typography>
               <Box
