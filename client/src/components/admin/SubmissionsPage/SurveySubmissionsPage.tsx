@@ -11,6 +11,7 @@ import {
   InputLabel,
   MenuItem,
   Select,
+  Stack,
   Typography,
 } from '@mui/material';
 import Chart from '@src/components/admin/SubmissionsPage/SurveySubmissionsChart';
@@ -31,6 +32,7 @@ import AnswersList, { AnswerItem, AnswerSelection } from './AnswersList';
 import { DataChart } from './DataChart';
 import SplitPaneLayout from './SplitPaneLayout';
 import { SurveyQuestionSummary } from './SurveyQuestionSummary';
+import DataPublish from '../DataPublish';
 
 function isMapEntry(
   entry: AnswerEntry,
@@ -286,7 +288,10 @@ export default function SurveySubmissionsPage() {
                   submissions={submissions}
                   submissionsLoading={submissionsLoading}
                 />
-                <DataExport surveyId={survey.id} />
+                <Stack direction="row" spacing={2}>
+                  <DataExport surveyId={survey.id} />
+                  <DataPublish surveyId={survey.id} />
+                </Stack>
                 <SurveyQuestionSummary
                   setSelectedQuestion={setSelectedQuestion}
                 />

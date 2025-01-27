@@ -1,12 +1,32 @@
 {
   "DataExport": {
-    "exportAnswers": "Export response data",
+    "exportAnswers": "Export response data…",
     "surveyAnswerExport": "Export survey response data",
     "chooseFileFormat": "Choose files to export",
-    "download": "download",
+    "download": "Download",
     "errorDownloadingCSV": "Failed to export CSV -file",
     "errorDownloadingGPKG": "Failed to export GeoPackage -file",
     "attachments": "Survey response data attachments"
+  },
+  "DataPublish": {
+    "alphanumericSubmissions": "Alphanumeric submissions",
+    "closeApi": "Close API",
+    "closeApiSuccessful": "API closed successfully!",
+    "credentials": "Credentials",
+    "geospatialSubmissions": "Geospatial submissions",
+    "materialsOffered": "Materials offered",
+    "openApi": "Open API",
+    "openApiSuccessful": "API opened successfully!",
+    "openSubmissionsApi": "Open submissions API…",
+    "password": "Password",
+    "passwordAgain": "Password again",
+    "passwordsMismatch": "The passwords do not match",
+    "personalInfo": "Personal info",
+    "submissionsApi": "Submissions API",
+    "submissionsApiOpening": "Submissions API opening",
+    "submissionsApiOptions": "Submissions API details",
+    "updateApiSuccessful": "API updated successfully!",
+    "username": "Username"
   },
   "EditSurvey": {
     "newSurvey": "New survey",

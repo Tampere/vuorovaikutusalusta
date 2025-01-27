@@ -1,9 +1,12 @@
 import { LanguageCode, Survey, SurveyPage } from '@interfaces/survey';
 import { generatePdf } from '@src/application/pdf-generator';
 import {
+  deletePublicationCredentials,
   getAnswerEntries,
+  getPublicationCredentials,
   getSubmissionsForSurvey,
   getTimestamp,
+  upsertPublicationCredentials,
 } from '@src/application/submission';
 import {
   createSurvey,
@@ -20,14 +23,18 @@ import {
   userCanEditSurvey,
   userCanViewSurvey,
 } from '@src/application/survey';
-import { ensureAuthenticated, ensureSurveyGroupAccess } from '@src/auth';
+import {
+  ensureAuthenticated,
+  ensurePublicationAccess,
+  ensureSurveyGroupAccess,
+} from '@src/auth';
+import { getGeometryDBEntriesAsGeoJSON } from '@src/application/answer';
 import { BadRequestError, ForbiddenError } from '@src/error';
 import { Router } from 'express';
 import asyncHandler from 'express-async-handler';
 import { body, param, query } from 'express-validator';
 import { validateRequest } from '../utils';
 import { isSuperUser } from '@src/user';
-import logger from '@src/logger';
 const router = Router();
 
 /**
@@ -464,7 +471,7 @@ router.get(
 );
 
 /**
- * Get list of submissions for a survey
+ * Get list of survey submissions for an authenticated user with permissions
  */
 router.get(
   '/:id/submissions',
@@ -489,4 +496,129 @@ router.get(
   }),
 );
 
+/**
+ * Get the published survey submissions. Requires basic auth with the
+ * credentials set via the /:id/publication/credentials endpoint
+ */
+router.get(
+  '/:id/publication',
+  validateRequest([
+    param('id').isNumeric().toInt().withMessage('ID must be a number'),
+  ]),
+  ensurePublicationAccess(),
+  asyncHandler(async (req, res) => {
+    const { alphanumericIncluded, geospatialIncluded, personalIncluded } =
+      res.locals;
+    const submissions = await getSubmissionsForSurvey(
+      Number(req.params.id),
+      alphanumericIncluded,
+      geospatialIncluded,
+      personalIncluded,
+      false,
+    );
+    res.json(submissions);
+  }),
+);
+
+/**
+ * Get the published submissions for map questions as GeoJSON layers. Requires
+ * basic auth with the credentials set via the /:id/publication/credentials endpoint
+ */
+router.get(
+  '/:id/publication/geojson',
+  validateRequest([
+    param('id').isNumeric().toInt().withMessage('ID must be a number'),
+    query('question').toArray(),
+  ]),
+  ensurePublicationAccess(),
+  asyncHandler(async (req, res) => {
+    const surveyId = Number(req.params.id);
+    if (!res.locals.geospatialIncluded) {
+      res.status(401).send('No geospatial submissions have been published.');
+    } else {
+      res.json((await getGeometryDBEntriesAsGeoJSON(surveyId)) ?? {});
+    }
+  }),
+);
+
+/**
+ * Get credentials for the published survey submissions
+ */
+router.get(
+  '/:id/publication/credentials',
+  ensureAuthenticated(),
+  ensureSurveyGroupAccess(),
+  validateRequest([
+    param('id').isNumeric().toInt().withMessage('ID must be a number'),
+  ]),
+  asyncHandler(async (req, res) => {
+    const surveyId = Number(req.params.id);
+    const permissionsOk = await userCanEditSurvey(req.user, surveyId);
+    if (!permissionsOk) {
+      throw new ForbiddenError('User not author nor editor of the survey');
+    }
+
+    const publications = await getPublicationCredentials(surveyId);
+    res.status(200).json(publications);
+  }),
+);
+
+/**
+ * Upsert the credentials for the survey submission publication
+ */
+router.put(
+  '/:id/publication/credentials',
+  ensureAuthenticated(),
+  ensureSurveyGroupAccess(),
+  validateRequest([
+    param('id').isNumeric().toInt().withMessage('ID must be a number'),
+    body('username').isString().withMessage('Username must be a string'),
+    body('password').isString().withMessage('Password must be a string'),
+  ]),
+  asyncHandler(async (req, res) => {
+    const surveyId = Number(req.params.id);
+    const permissionsOk = await userCanEditSurvey(req.user, surveyId);
+    if (!permissionsOk) {
+      throw new ForbiddenError('User not author nor editor of the survey');
+    }
+    const {
+      username,
+      password,
+      alphanumericIncluded,
+      geospatialIncluded,
+      personalIncluded,
+    } = req.body;
+
+    const credentials = await upsertPublicationCredentials(
+      surveyId,
+      username,
+      password,
+      alphanumericIncluded,
+      geospatialIncluded,
+      personalIncluded,
+    );
+    res.status(200).json(credentials);
+  }),
+);
+
+/**
+ * Delete the credentials for the survey submission publication
+ */
+router.delete(
+  '/:id/publication/credentials',
+  ensureAuthenticated(),
+  ensureSurveyGroupAccess(),
+  validateRequest([
+    param('id').isNumeric().toInt().withMessage('ID must be a number'),
+  ]),
+  asyncHandler(async (req, res) => {
+    const surveyId = Number(req.params.id);
+    const permissionsOk = await userCanEditSurvey(req.user, surveyId);
+    if (!permissionsOk) {
+      throw new ForbiddenError('User not author nor editor of the survey');
+    }
+    const publication = await deletePublicationCredentials(surveyId);
+    res.status(200).json(publication);
+  }),
+);
 export default router;

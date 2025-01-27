@@ -45,6 +45,22 @@ interface DBSubmission {
   updated_at: Date;
 }
 
+interface DBCredentialsEntry {
+  id: number;
+  survey_id: number;
+  username: string;
+  alphanumeric_included: boolean;
+  geospatial_included: boolean;
+  personal_included: boolean;
+}
+
+export interface CredentialsEntry {
+  username: string;
+  alphanumericIncluded: boolean;
+  geospatialIncluded: boolean;
+  personalIncluded: boolean;
+}
+
 /**
  * Temporary entry row object for inserting subquestion answers properly attached to the parent entry
  */
@@ -684,6 +700,24 @@ function dbAnswerEntriesToAnswerEntries(
 }
 
 /**
+ * Convert the db row to JS format
+ * @param row The row with the column names as in the database
+ * @returns An object with attribute names in JS format
+ */
+function dbCredentialEntryRowToCredentialEntry(
+  row: DBCredentialsEntry,
+): CredentialsEntry {
+  if (!row) return null;
+
+  return {
+    username: row.username,
+    alphanumericIncluded: row.alphanumeric_included,
+    geospatialIncluded: row.geospatial_included,
+    personalIncluded: row.personal_included,
+  };
+}
+
+/**
  * Get the language used for submitting an unfinished survey
  * @param token
  * @returns LanguageCode
@@ -807,7 +841,13 @@ export async function getTimestamp(submissionId: number) {
  * @param surveyId Survey ID
  * @returns Submissions
  */
-export async function getSubmissionsForSurvey(surveyId: number) {
+export async function getSubmissionsForSurvey(
+  surveyId: number,
+  alphanumeric: boolean = true,
+  geospatial: boolean = true,
+  personal: boolean = true,
+  attachments: boolean = true,
+) {
   const rows = await getDb().manyOrNone<DBSubmission & DBAnswerEntry>(
     `SELECT
       s.updated_at,
@@ -831,6 +871,24 @@ export async function getSubmissionsForSurvey(surveyId: number) {
       INNER JOIN data.page_section ps ON ps.id = ae.section_id
       INNER JOIN data.survey_page sp ON sp.id = ps.survey_page_id
     WHERE s.survey_id = $(surveyId) AND s.unfinished_token IS NULL
+    ${
+      !alphanumeric
+        ? `AND ps.type NOT IN (
+      'free-text',
+      'radio',
+      'checkbox',
+      'grouped-checkbox',
+      'numeric',
+      'sorting',
+      'slider',
+      'matrix',
+      'multi-matrix'
+    )`
+        : ''
+    }
+    ${!geospatial ? `AND ps.type != 'map'` : ''}
+    ${!personal ? `AND ps.type != 'personal-info'` : ''}
+    ${!attachments ? `AND ps.type != 'attachment'` : ''}
     ORDER BY updated_at, sp.idx, ps.idx;`,
     { surveyId },
   );
@@ -859,4 +917,136 @@ export async function getSubmissionsForSurvey(surveyId: number) {
         answerEntries: dbAnswerEntriesToAnswerEntries(x.entries),
       }) as Submission,
   );
+}
+
+/**
+ * Inserts or updates the credentials so the survey submissions can be accessed using basic auth
+ * @param surveyId Survey ID
+ * @param username Username for basic auth
+ * @param password Password for basic auth
+ * @param alphanumericIncluded
+ * @param geospatialIncluded
+ * @param personalIncluded
+ * @returns Inserted row, if successful
+ */
+export async function upsertPublicationCredentials(
+  surveyId: number,
+  username: string,
+  password: string,
+  alphanumericIncluded: boolean = true,
+  geospatialIncluded: boolean = true,
+  personalIncluded: boolean = true,
+): Promise<CredentialsEntry> {
+  const row = await getDb().oneOrNone<DBCredentialsEntry>(
+    `
+    INSERT INTO
+      data.publications (
+        survey_id,
+        username,
+        password,
+        alphanumeric_included,
+        geospatial_included,
+        personal_included
+      )
+    VALUES (
+      $(surveyId),
+      $(username),
+      crypt($(password), gen_salt('bf', 8)),
+      $(alphanumericIncluded),
+      $(geospatialIncluded),
+      $(personalIncluded)
+    )
+    ON CONFLICT(survey_id)
+    DO UPDATE SET
+      username = $(username),
+      password = crypt($(password), gen_salt('bf', 8)),
+      alphanumeric_included = $(alphanumericIncluded),
+      geospatial_included = $(geospatialIncluded),
+      personal_included = $(personalIncluded)
+    RETURNING
+      id,
+      survey_id,
+      username,
+      alphanumeric_included,
+      geospatial_included,
+      personal_included;
+    `,
+    {
+      surveyId,
+      username,
+      password,
+      alphanumericIncluded,
+      geospatialIncluded,
+      personalIncluded,
+    },
+  );
+
+  if (!row) {
+    throw new InternalServerError(
+      `Error while publishing submissions with the survey ID: ${surveyId}`,
+    );
+  }
+  return dbCredentialEntryRowToCredentialEntry(row);
+}
+
+/**
+ * Returns the credentials for the published survey submissions. Should
+ * currently return only one or no credentials per survey, however, the
+ * array format ensures support for multiple publications in the future
+ * @param surveyId Survey ID
+ * @returns The publications as a list of objects of length 0-n
+ */
+export async function getPublicationCredentials(
+  surveyId: number,
+): Promise<CredentialsEntry[]> {
+  const rows = await getDb().manyOrNone<{ id: number; survey_id: number }>(
+    `
+    SELECT
+      id,
+      survey_id,
+      username,
+      alphanumeric_included,
+      geospatial_included,
+      personal_included
+    FROM data.publications
+    WHERE survey_id = $1;
+    `,
+    [surveyId],
+  );
+
+  return rows.map((row: DBCredentialsEntry) =>
+    dbCredentialEntryRowToCredentialEntry(row),
+  );
+}
+
+/**
+ * Deletes the credentials for the survey submissions
+ * @param surveyId Survey ID
+ * @returns The deleted row, if successful
+ */
+export async function deletePublicationCredentials(
+  surveyId: number,
+): Promise<CredentialsEntry> {
+  const row = await getDb().oneOrNone<DBCredentialsEntry>(
+    `
+    DELETE FROM data.publications
+    WHERE survey_id = $1
+    RETURNING
+      id,
+      survey_id,
+      username,
+      alphanumeric_included,
+      geospatial_included,
+      personal_included
+    `,
+    [surveyId],
+  );
+
+  if (!row) {
+    throw new NotFoundError(`
+      Publication with the survey ID ${surveyId} not found
+    `);
+  }
+
+  return dbCredentialEntryRowToCredentialEntry(row);
 }

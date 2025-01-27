@@ -1,4 +1,7 @@
-import { getSurveyOrganization } from '@src/application/survey';
+import {
+  getPublicationAccesses,
+  getSurveyOrganization,
+} from '@src/application/survey';
 import logger from '@src/logger';
 import { getUser, isSuperUser, upsertUser } from '@src/user';
 import ConnectPgSimple from 'connect-pg-simple';
@@ -9,6 +12,21 @@ import { encrypt } from '../crypto';
 import { getDb } from '../database';
 import { configureAzureAuth } from './azure';
 import { configureGoogleOAuth } from './google-oauth';
+
+function basicAuth(req: Request): { name: string; pass: string } {
+  const string = req?.headers?.authorization;
+  if (!string) return;
+
+  const match = /^ *(?:Basic) +([A-Z0-9._~+/-]+=*) *$/i.exec(string);
+  if (!match) return;
+
+  // decode username and pass
+  const [name, pass] = Buffer.from(match[1], 'base64').toString().split(':');
+  if (!name || !pass) return;
+
+  // return credentials object
+  return { name, pass };
+}
 
 /**
  * Configures authentication for given Express application.
@@ -198,6 +216,40 @@ export function ensureFileGroupAccess() {
       res.status(403).send('Forbidden');
     } else {
       res.locals.fileOrganizations = fileOrganization;
+      return next();
+    }
+  };
+}
+
+/**
+ * Middleware function to protect published submissions that require access. Sets
+ * included materials to the res.locals property so they can be accessed also later
+ * @returns Request middleware
+ */
+export function ensurePublicationAccess() {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    const user = basicAuth(req);
+    const surveyId = Number(req.params.id);
+    let authorized = false;
+
+    if (user) {
+      const accesses = await getPublicationAccesses(
+        surveyId,
+        user.name,
+        user.pass,
+      );
+      res.locals.alphanumericIncluded = accesses.alphanumericIncluded;
+      res.locals.geospatialIncluded = accesses.geospatialIncluded;
+      res.locals.personalIncluded = accesses.personalIncluded;
+      authorized = accesses.authorized;
+    }
+    if (!authorized) {
+      res.set(
+        'WWW-Authenticate',
+        `Basic realm="Kyselyn ${surveyId} vastaukset"`,
+      );
+      res.status(401).send('Authentication required.');
+    } else {
       return next();
     }
   };

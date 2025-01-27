@@ -199,6 +199,27 @@ type DBSurveyJoin = DBSurvey & {
 };
 
 /**
+ * DB row indicating whether the user is authorized with an
+ * entered username and password and which materials they can be accessed
+ */
+interface DBPublicationAccesses {
+  authorized: boolean;
+  alphanumeric_included: boolean;
+  geospatial_included: boolean;
+  personal_included: boolean;
+}
+
+/**
+ * The publication accesses in a JS format
+ */
+interface PublicationAccesses {
+  authorized: boolean;
+  alphanumericIncluded: boolean;
+  geospatialIncluded: boolean;
+  personalIncluded: boolean;
+}
+
+/**
  * Helper function for creating survey page column set for database queries
  */
 const surveyPageColumnSet = (inputSRID: number) =>
@@ -776,6 +797,37 @@ export async function getSurveyOrganization(id: number) {
     [id],
   );
   return rows.organization;
+}
+
+/**
+ * Checks whether the user is authorized with an entered username
+ * and password and which publication materials they can be accessed
+ * @param id The ID of the survey
+ * @param username The given username
+ * @param password The given password
+ */
+export async function getPublicationAccesses(
+  id: number,
+  username: string,
+  password: string,
+): Promise<PublicationAccesses> {
+  const row = await getDb().oneOrNone<DBPublicationAccesses>(
+    `SELECT
+      password = crypt($(password), password) as authorized,
+      alphanumeric_included,
+      geospatial_included,
+      personal_included
+    FROM data.publications
+    WHERE survey_id = $(id)
+    AND username = $(username);`,
+    { password, id, username },
+  );
+  return {
+    authorized: row?.authorized ?? false,
+    alphanumericIncluded: row?.alphanumeric_included ?? false,
+    geospatialIncluded: row?.geospatial_included ?? false,
+    personalIncluded: row?.personal_included ?? false,
+  };
 }
 
 /**

@@ -108,6 +108,20 @@ interface Feature {
 }
 
 /**
+ * GeoJSON FeatureCollection interface
+ */
+interface FeatureCollection {
+  type: string;
+  features: Feature[];
+  crs: {
+    type: string;
+    properties: {
+      name: string;
+    };
+  };
+}
+
+/**
  * Interface for the custom JSON format from which the CSV is created
  */
 interface CSVJson {
@@ -363,11 +377,13 @@ export async function getCSVFile(surveyId: number): Promise<string> {
 }
 
 /**
- * Handler function for downloading geopackage file
+ * Get geometry DB entries for the survey as GeoJSON FeatureCollections
  * @param surveyId
- * @returns Promise resolving to readable stream streaming geopackage data
+ * @returns An object of FeatureCollections grouped by the question
  */
-export async function getGeoPackageFile(surveyId: number): Promise<Buffer> {
+export async function getGeometryDBEntriesAsGeoJSON(
+  surveyId: number,
+): Promise<{ [key: string]: FeatureCollection }> {
   const rows = await getGeometryDBEntries(surveyId);
   const srid = rows?.find((row) => row.geometrySRID)?.geometrySRID ?? '3857';
   const checkboxOptions = await getCheckboxOptionsFromDB(surveyId);
@@ -375,27 +391,38 @@ export async function getGeoPackageFile(surveyId: number): Promise<Buffer> {
     getAvailableMapLayers(survey.mapUrl),
   );
 
-  if (!rows) {
-    return null;
-  }
+  if (!rows) return null;
 
   const features = dbEntriesToFeatures(rows, checkboxOptions, mapLayers);
-  // There could be rows where the parent map answer (erroneously) has null geometry - if there are no valid map answers, return null from here too
-  if (!features.length) {
-    return null;
-  }
+  /* There could be rows where the parent map answer (erroneously) has null geometry
+  - if there are no valid map answers, return null from here too */
+  if (!features.length) return null;
 
   // Group features by question to add them to separate layers
-  const featuresByQuestion = features.reduce(
-    (questions, feature) => {
-      const { properties } = feature;
-      const questionTitle = properties['Kysymys'];
-      questions[questionTitle] = questions[questionTitle] ?? [];
-      questions[questionTitle].push(feature);
-      return questions;
-    },
-    {} as { [key: string]: Feature[] },
-  );
+  return features.reduce((questions, feature) => {
+    const { properties } = feature;
+    const questionTitle = properties['Kysymys'];
+
+    questions[questionTitle] = questions[questionTitle] ?? {
+      type: 'FeatureCollection',
+      features: [],
+      crs: {
+        type: 'name',
+        properties: { name: `urn:ogc:def:crs:EPSG::${srid}` },
+      },
+    };
+    questions[questionTitle].features.push(feature);
+    return questions;
+  }, {});
+}
+
+/**
+ * Handler function for downloading geopackage file
+ * @param surveyId
+ * @returns Promise resolving to readable stream streaming geopackage data
+ */
+export async function getGeoPackageFile(surveyId: number): Promise<Buffer> {
+  const featuresByQuestion = await getGeometryDBEntriesAsGeoJSON(surveyId);
 
   const tmpFilePath = `/tmp/geopackage_${Date.now()}.gpkg`;
 
@@ -404,38 +431,18 @@ export async function getGeoPackageFile(surveyId: number): Promise<Buffer> {
 
   // The first question needs to be created first - the remaining questions will be added to it via -update
   // Tried to conditionally add the "-update" flag but there was some race condition and I couldn't figure it out
-  await ogr2ogr(
-    {
-      type: 'FeatureCollection',
-      features: firstFeatures,
-      crs: {
-        type: 'name',
-        properties: { name: `urn:ogc:def:crs:EPSG::${srid}` },
-      },
-    },
-    {
-      format: 'GPKG',
-      destination: tmpFilePath,
-      options: ['-nln', firstQuestion],
-    },
-  );
+  await ogr2ogr(JSON.stringify(firstFeatures), {
+    format: 'GPKG',
+    destination: tmpFilePath,
+    options: ['-nln', firstQuestion],
+  });
 
   for (const [question, features] of rest) {
-    await ogr2ogr(
-      {
-        type: 'FeatureCollection',
-        features,
-        crs: {
-          type: 'name',
-          properties: { name: `urn:ogc:def:crs:EPSG::${srid}` },
-        },
-      },
-      {
-        format: 'GPKG',
-        destination: tmpFilePath,
-        options: ['-nln', question, '-update'],
-      },
-    );
+    await ogr2ogr(JSON.stringify(features), {
+      format: 'GPKG',
+      destination: tmpFilePath,
+      options: ['-nln', question, '-update'],
+    });
   }
 
   // Read the file contents and remove it from the disk
@@ -958,7 +965,7 @@ function submissionAnswersToJson(
             sectionDetails.predecessorSection,
             predecessorIndexes,
           )
-        ] = answer.valueOptionId ? 1 : answer.valueText ?? '';
+        ] = answer.valueOptionId ? 1 : (answer.valueText ?? '');
         break;
       case 'multi-matrix':
         sectionDetails.details.subjects.forEach((subject, index) => {
