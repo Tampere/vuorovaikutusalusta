@@ -638,9 +638,11 @@
     "status": "Status",
     "organization": "Organisation",
     "addUser": "Lägg till användare",
+    "superUser": "Superanvändare",
     "admin": "Administratör",
     "regularUser": "Vanlig användare",
     "loadingTitle": "Laddar användarinformation...",
+    "noUsers": "Inga användare",
     "userRequestComplete": "Användare tillagd.",
     "userExists": "Användaren finns redan.",
     "userRequestFailed": "Det gick inte att lägga till användarinformation."

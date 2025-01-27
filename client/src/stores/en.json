@@ -639,9 +639,11 @@
     "status": "Status",
     "organization": "Organization",
     "addUser": "Add user",
+    "superUser": "Super user",
     "admin": "Administrator",
     "regularUser": "Regular user",
     "loadingTitle": "Loading user information...",
+    "noUsers": "No users",
     "userRequestComplete": "User added.",
     "userExists": "User already exists.",
     "userRequestFailed": "Failed to add user information."

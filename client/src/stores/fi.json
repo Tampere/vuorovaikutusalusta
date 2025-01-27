@@ -640,9 +640,11 @@
     "status": "Tila",
     "organization": "Organisaatio",
     "addUser": "Lisää käyttäjä",
+    "superUser": "Superkäyttäjä",
     "admin": "Pääkäyttäjä",
     "regularUser": "Peruskäyttäjä",
     "loadingTitle": "Ladataan käyttäjätietoja...",
+    "noUsers": "Ei käyttäjiä",
     "userRequestComplete": "Käyttäjä lisätty.",
     "userExists": "Käyttäjä on jo olemassa.",
     "userRequestFailed": "Käyttäjätietojen lisääminen epäonnistui."

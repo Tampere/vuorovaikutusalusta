@@ -14,22 +14,6 @@ import { useTranslations } from '@src/stores/TranslationContext';
 import { useUser } from '@src/stores/UserContext';
 import React from 'react';
 
-const userRoleMap = {
-  organization_admin: 'Pääkäyttäjä',
-  organization_user: 'User',
-  super_user: 'Super user',
-};
-
-function getUserRoleLabel(roles: string[]) {
-  if (roles.some((role) => role === 'super_user')) {
-    return userRoleMap['super_user'];
-  }
-  if (roles.some((role) => role === 'organization_admin')) {
-    return userRoleMap['organization_admin'];
-  }
-  return userRoleMap['organization_user'];
-}
-
 export function UserList({
   users,
 }: {
@@ -37,6 +21,22 @@ export function UserList({
 }) {
   const { activeUserIsSuperUser } = useUser();
   const { tr } = useTranslations();
+
+  const userRoleMap = {
+    organization_admin: tr.UserManagement.admin,
+    organization_user: tr.UserManagement.regularUser,
+    super_user: tr.UserManagement.superUser,
+  };
+
+  function getUserRoleLabel(roles: string[]) {
+    if (roles.some((role) => role === 'super_user')) {
+      return userRoleMap['super_user'];
+    }
+    if (roles.some((role) => role === 'organization_admin')) {
+      return userRoleMap['organization_admin'];
+    }
+    return userRoleMap['organization_user'];
+  }
 
   return (
     <TableContainer sx={{ overflow: 'auto' }}>
@@ -118,7 +118,7 @@ export function UserList({
                   colSpan={3}
                   align="center"
                 >
-                  Ei käyttäjiä
+                  {tr.UserManagement.noUsers}
                 </TableCell>
               </TableRow>
             ) : (

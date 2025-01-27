@@ -5,6 +5,7 @@ import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { InstructionsDialog } from './InstructionsDialog';
 import { useUser } from '@src/stores/UserContext';
+import { useHistory } from 'react-router-dom';
 
 const useStyles = makeStyles({
   root: {
@@ -20,6 +21,7 @@ export default function AppBarUserMenu() {
   const { activeUserIsSuperUser, activeUserIsAdmin } = useUser();
   const classes = useStyles();
   const { tr } = useTranslations();
+  const history = useHistory();
 
   return (
     <div className={classes.root}>
@@ -60,7 +62,7 @@ export default function AppBarUserMenu() {
           <MenuItem
             onClick={() => {
               setMenuOpen(false);
-              window.location.pathname = '/admin/kayttajahallinta';
+              history.push('/kayttajahallinta');
             }}
           >
             {tr.AppBarUserMenu.userManagement}

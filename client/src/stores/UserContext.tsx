@@ -13,6 +13,7 @@ import { useTranslations } from './TranslationContext';
  * Context state type
  */
 type State = {
+  isInitialized: boolean;
   activeUser: User;
   otherUsers: User[];
   allUsers: User[];
@@ -33,6 +34,10 @@ type Action =
   | {
       type: 'SET_ALL_USERS';
       users: User[];
+    }
+  | {
+      type: 'SET_INITIALIZED';
+      isInitialized: boolean;
     };
 
 /**
@@ -49,6 +54,7 @@ interface Props {
 
 /** User context initial values */
 const stateDefaults: State = {
+  isInitialized: false,
   activeUser: null,
   otherUsers: null,
   allUsers: null,
@@ -59,7 +65,6 @@ export const UserContext = React.createContext<Context>(null);
 /** Custom hook for accessing the user context */
 export function useUser() {
   const context = useContext(UserContext);
-
   if (!context) {
     throw new Error('useUser must be used within the UserProvider');
   }
@@ -97,6 +102,11 @@ function reducer(state: State, action: Action): State {
         ...state,
         allUsers: action.users,
       };
+    case 'SET_INITIALIZED':
+      return {
+        ...state,
+        isInitialized: action.isInitialized,
+      };
     default:
       throw new Error('Invalid action type');
   }
@@ -111,7 +121,9 @@ export default function UserProvider({ children }: Props) {
    * Use React.useMemo here to avoid unnecessary rerenders
    * @see https://reactjs.org/docs/hooks-reference.html#usememo
    */
-  const value = useMemo<Context>(() => [state, dispatch], [state]);
+  const value = useMemo<Context>(() => {
+    return [state, dispatch];
+  }, [state]);
 
   useEffect(() => {
     async function fetchOtherUsers() {
@@ -130,6 +142,7 @@ export default function UserProvider({ children }: Props) {
           type: 'SET_ALL_USERS',
           users: [currentUser, ...otherUsers],
         });
+        dispatch({ type: 'SET_INITIALIZED', isInitialized: true });
       } catch (error) {
         showToast({
           severity: 'error',
