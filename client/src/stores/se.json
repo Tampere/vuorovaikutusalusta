@@ -556,7 +556,8 @@
   "AppBarUserMenu": {
     "label": "Användarmeny",
     "logout": "Logga ut",
-    "updateInstructions": "Uppdatera instruktioner"
+    "updateInstructions": "Uppdatera instruktioner",
+    "userManagement": "Användarhantering"
   },
   "AppBarInstructionsMenu": {
     "label": "Instruktioner",
@@ -629,6 +630,20 @@
       "yAxisTotalLabel": "Svarssammanställning",
       "yAxisLabel": "Svar"
     }
+  },
+  "UserManagement": {
+    "name": "Namn",
+    "email": "E-post",
+    "role": "Roll",
+    "status": "Status",
+    "organization": "Organisation",
+    "addUser": "Lägg till användare",
+    "admin": "Administratör",
+    "regularUser": "Vanlig användare",
+    "loadingTitle": "Laddar användarinformation...",
+    "userRequestComplete": "Användare tillagd.",
+    "userExists": "Användaren finns redan.",
+    "userRequestFailed": "Det gick inte att lägga till användarinformation."
   },
   "navigation": {
     "next": "Nästa",

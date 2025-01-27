@@ -1,6 +1,6 @@
 import { getSurveyOrganization } from '@src/application/survey';
 import logger from '@src/logger';
-import { getUser, isSuperUser, upsertUser } from '@src/user';
+import { getUser, isAdmin, isSuperUser, upsertUser } from '@src/user';
 import ConnectPgSimple from 'connect-pg-simple';
 import { Express, NextFunction, Request, Response } from 'express';
 import expressSession from 'express-session';
@@ -140,6 +140,18 @@ export function ensureAuthenticated(options?: { redirectToLogin?: boolean }) {
     } else {
       fail();
     }
+  };
+}
+
+export function ensureAdminAccess() {
+  return (req: Request, res: Response, next: NextFunction) => {
+    if (isSuperUser(req.user)) {
+      return next();
+    }
+    if (isAdmin(req.user)) {
+      return next();
+    }
+    res.status(403).send('Forbidden, admin or super user access required');
   };
 }
 

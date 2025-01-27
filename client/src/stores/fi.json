@@ -558,7 +558,8 @@
   "AppBarUserMenu": {
     "label": "Käyttäjävalikko",
     "logout": "Kirjaudu ulos",
-    "updateInstructions": "Päivitä käyttöohjeet"
+    "updateInstructions": "Päivitä käyttöohjeet",
+    "userManagement": "Käyttäjähallinta"
   },
   "AppBarInstructionsMenu": {
     "label": "Ohjeet",
@@ -632,6 +633,21 @@
       "yAxisLabel": "Vastauksia"
     }
   },
+  "UserManagement": {
+    "name": "Nimi",
+    "email": "Sähköposti",
+    "role": "Rooli",
+    "status": "Tila",
+    "organization": "Organisaatio",
+    "addUser": "Lisää käyttäjä",
+    "admin": "Pääkäyttäjä",
+    "regularUser": "Peruskäyttäjä",
+    "loadingTitle": "Ladataan käyttäjätietoja...",
+    "userRequestComplete": "Käyttäjä lisätty.",
+    "userExists": "Käyttäjä on jo olemassa.",
+    "userRequestFailed": "Käyttäjätietojen lisääminen epäonnistui."
+  },
+
   "navigation": {
     "next": "Seuraava",
     "back": "Takaisin"

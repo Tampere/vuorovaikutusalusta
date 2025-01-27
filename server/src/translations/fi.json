@@ -11,6 +11,7 @@
   "submissionId": "Vastaustunniste",
   "responseTime": "Tallennusaika",
   "attachments": "Liitteet",
+  "newUserRequest": "Uusi käyttäjäpyyntö",
   "fi": "suomi",
   "en": "englanti",
   "se": "ruotsi"

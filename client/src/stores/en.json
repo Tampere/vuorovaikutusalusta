@@ -557,7 +557,8 @@
   "AppBarUserMenu": {
     "label": "User menu",
     "logout": "Logout",
-    "updateInstructions": "Update user instructions"
+    "updateInstructions": "Update user instructions",
+    "userManagement": "User management"
   },
   "AppBarInstructionsMenu": {
     "label": "Instructions",
@@ -630,6 +631,20 @@
       "yAxisTotalLabel": "Total answers",
       "yAxisLabel": "Answers"
     }
+  },
+  "UserManagement": {
+    "name": "Name",
+    "email": "Email",
+    "role": "Role",
+    "status": "Status",
+    "organization": "Organization",
+    "addUser": "Add user",
+    "admin": "Administrator",
+    "regularUser": "Regular user",
+    "loadingTitle": "Loading user information...",
+    "userRequestComplete": "User added.",
+    "userExists": "User already exists.",
+    "userRequestFailed": "Failed to add user information."
   },
   "navigation": {
     "next": "Next",

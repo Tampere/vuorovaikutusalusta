@@ -17,7 +17,7 @@ export default function AppBarUserMenu() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [menuAnchorEl, setMenuAnchorEl] = useState<HTMLElement>(null);
   const [instructionsDialogOpen, setInstructionsDialogOpen] = useState(false);
-  const { activeUserIsSuperUser } = useUser();
+  const { activeUserIsSuperUser, activeUserIsAdmin } = useUser();
   const classes = useStyles();
   const { tr } = useTranslations();
 
@@ -56,6 +56,21 @@ export default function AppBarUserMenu() {
           setMenuOpen(false);
         }}
       >
+        {activeUserIsAdmin && (
+          <MenuItem
+            onClick={() => {
+              setMenuOpen(false);
+              window.location.pathname = '/admin/kayttajahallinta';
+            }}
+          >
+            {tr.AppBarUserMenu.userManagement}
+          </MenuItem>
+        )}
+        {activeUserIsSuperUser && (
+          <MenuItem onClick={() => setInstructionsDialogOpen(true)}>
+            {tr.AppBarUserMenu.updateInstructions}
+          </MenuItem>
+        )}
         <MenuItem
           onClick={() => {
             setMenuOpen(false);
@@ -64,11 +79,6 @@ export default function AppBarUserMenu() {
         >
           {tr.AppBarUserMenu.logout}
         </MenuItem>
-        {activeUserIsSuperUser && (
-          <MenuItem onClick={() => setInstructionsDialogOpen(true)}>
-            {tr.AppBarUserMenu.updateInstructions}
-          </MenuItem>
-        )}
       </Menu>
       <InstructionsDialog
         isOpen={instructionsDialogOpen}

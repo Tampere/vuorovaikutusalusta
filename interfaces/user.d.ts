@@ -22,4 +22,8 @@ export interface User {
    * User's roles
    */
   roles: string[];
+  /**
+   * Is user pending first time login
+   */
+  isPending?: boolean;
 }
