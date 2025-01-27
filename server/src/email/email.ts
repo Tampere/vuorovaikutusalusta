@@ -23,17 +23,28 @@ const config = {
 };
 
 // Nodemailer transport object
-const transport = createTransport({
-  service: process.env.EMAIL_SERVICE ?? 'gmail',
-  auth: {
-    type: 'OAuth2',
-    user: sender.address,
-    clientId: oauth.clientId,
-    clientSecret: oauth.clientSecret,
-    refreshToken: oauth.refreshToken,
-    accessUrl: oauth.accessUrl,
-  },
-});
+const transport = process.env.LOCAL_TEST_EMAIL_ENABLED
+  ? createTransport({
+      host: process.env.SMTP_HOST,
+      port: Number(process.env.SMTP_PORT),
+      secure: false,
+      tls: { rejectUnauthorized: false },
+      auth: {
+        user: process.env.SMTP_USERNAME,
+        pass: process.env.SMTP_PASSWORD,
+      },
+    })
+  : createTransport({
+      service: process.env.EMAIL_SERVICE ?? 'gmail',
+      auth: {
+        type: 'OAuth2',
+        user: sender.address,
+        clientId: oauth.clientId,
+        clientSecret: oauth.clientSecret,
+        refreshToken: oauth.refreshToken,
+        accessUrl: oauth.accessUrl,
+      },
+    });
 
 /**
  * Send an email with given options

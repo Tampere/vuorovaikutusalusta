@@ -19,6 +19,8 @@ import AdminFrontPage from './AdminFrontPage';
 import EditSurvey from './EditSurvey';
 import SurveySubmissionsPage from './SubmissionsPage/SurveySubmissionsPage';
 import { ApiInstructions } from './Instructions/ApiDescription';
+import { UserManagement } from './UserManagement';
+import { ProtectedRoute } from './ProtectedRoute';
 
 export default function AdminApplication() {
   return (
@@ -51,6 +53,9 @@ export default function AdminApplication() {
           <Route path="/rajapintakuvaus">
             <ApiInstructions />
           </Route>
+          <ProtectedRoute path="/kayttajahallinta">
+            <UserManagement />
+          </ProtectedRoute>
           <Route path="/" exact>
             <AdminFrontPage />
           </Route>

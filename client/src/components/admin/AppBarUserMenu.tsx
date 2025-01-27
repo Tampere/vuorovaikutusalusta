@@ -5,6 +5,7 @@ import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { InstructionsDialog } from './InstructionsDialog';
 import { useUser } from '@src/stores/UserContext';
+import { useHistory } from 'react-router-dom';
 
 const useStyles = makeStyles({
   root: {
@@ -17,9 +18,10 @@ export default function AppBarUserMenu() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [menuAnchorEl, setMenuAnchorEl] = useState<HTMLElement>(null);
   const [instructionsDialogOpen, setInstructionsDialogOpen] = useState(false);
-  const { activeUserIsSuperUser } = useUser();
+  const { activeUserIsSuperUser, activeUserIsAdmin } = useUser();
   const classes = useStyles();
   const { tr } = useTranslations();
+  const history = useHistory();
 
   return (
     <div className={classes.root}>
@@ -56,6 +58,21 @@ export default function AppBarUserMenu() {
           setMenuOpen(false);
         }}
       >
+        {activeUserIsAdmin && (
+          <MenuItem
+            onClick={() => {
+              setMenuOpen(false);
+              history.push('/kayttajahallinta');
+            }}
+          >
+            {tr.AppBarUserMenu.userManagement}
+          </MenuItem>
+        )}
+        {activeUserIsSuperUser && (
+          <MenuItem onClick={() => setInstructionsDialogOpen(true)}>
+            {tr.AppBarUserMenu.updateInstructions}
+          </MenuItem>
+        )}
         <MenuItem
           onClick={() => {
             setMenuOpen(false);
@@ -64,11 +81,6 @@ export default function AppBarUserMenu() {
         >
           {tr.AppBarUserMenu.logout}
         </MenuItem>
-        {activeUserIsSuperUser && (
-          <MenuItem onClick={() => setInstructionsDialogOpen(true)}>
-            {tr.AppBarUserMenu.updateInstructions}
-          </MenuItem>
-        )}
       </Menu>
       <InstructionsDialog
         isOpen={instructionsDialogOpen}

@@ -11,6 +11,7 @@
   "submissionId": "Submission identifier",
   "responseTime": "Time of the response",
   "attachments": "Attachments",
+  "newUserRequest": "New user request",
   "fi": "Finnish",
   "en": "English",
   "se": "Swedish"
