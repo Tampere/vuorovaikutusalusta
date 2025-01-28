@@ -1,0 +1,68 @@
+version: 2
+updates:
+  # Monthly checks
+  - package-ecosystem: 'npm'
+    directory: '/'
+    schedule:
+      interval: 'monthly'
+    prefix: 'PROJECT ROOT:'
+    groups:
+      npm:
+        patterns:
+          - '*'
+
+  - package-ecosystem: 'npm'
+    directory: '/e2e'
+    schedule:
+      interval: 'monthly'
+    prefix: 'E2E:'
+    groups:
+      npm:
+        patterns:
+          - '*'
+  - package-ecosystem: 'docker'
+    directory: '/'
+    schedule:
+      interval: 'monthly'
+    commit-message:
+      prefix: 'DOCKER: '
+      include: 'scope'
+    target-branch: 'dependabot-target'
+
+  # Weekly checks
+  - package-ecosystem: 'npm'
+    directory: '/client'
+    schedule:
+      interval: 'weekly'
+    prefix: 'CLIENT:'
+    groups:
+      npm:
+        patterns:
+          - '*'
+    ignore: # ignore major updates
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
+  - package-ecosystem: 'npm'
+    directory: '/server'
+    schedule:
+      interval: 'weekly'
+    prefix: 'SERVER:'
+    groups:
+      npm:
+        patterns:
+          - '*'
+    ignore: # ignore major updates
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+    prefix: 'ACTIONS:'
+    groups:
+      github-actions:
+        patterns:
+          - '*'
+    ignore: # ignore major updates
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
