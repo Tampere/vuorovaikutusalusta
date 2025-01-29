@@ -5,7 +5,8 @@ updates:
     directory: '/'
     schedule:
       interval: 'monthly'
-    prefix: 'PROJECT ROOT:'
+    commit-message:
+      prefix: 'PROJECT ROOT:'
     groups:
       npm:
         patterns:
@@ -15,7 +16,8 @@ updates:
     directory: '/e2e'
     schedule:
       interval: 'monthly'
-    prefix: 'E2E:'
+    commit-message:
+      prefix: 'E2E:'
     groups:
       npm:
         patterns:
@@ -34,7 +36,8 @@ updates:
     directory: '/client'
     schedule:
       interval: 'weekly'
-    prefix: 'CLIENT:'
+    commit-message:
+      prefix: 'CLIENT:'
     groups:
       npm:
         patterns:
@@ -46,7 +49,8 @@ updates:
     directory: '/server'
     schedule:
       interval: 'weekly'
-    prefix: 'SERVER:'
+    commit-message:
+      prefix: 'SERVER:'
     groups:
       npm:
         patterns:
@@ -58,11 +62,9 @@ updates:
     directory: '/'
     schedule:
       interval: 'weekly'
-    prefix: 'ACTIONS:'
+    commit-message:
+      prefix: 'ACTIONS:'
     groups:
       github-actions:
         patterns:
           - '*'
-    ignore: # ignore major updates
-      - dependency-name: '*'
-        update-types: ['version-update:semver-major']
