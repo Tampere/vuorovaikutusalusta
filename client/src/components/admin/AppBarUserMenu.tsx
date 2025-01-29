@@ -58,7 +58,7 @@ export default function AppBarUserMenu() {
           setMenuOpen(false);
         }}
       >
-        {activeUserIsAdmin && (
+        {(activeUserIsAdmin || activeUserIsSuperUser) && (
           <MenuItem
             onClick={() => {
               setMenuOpen(false);
