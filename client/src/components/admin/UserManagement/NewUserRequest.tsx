@@ -175,10 +175,10 @@ export function NewUserRequest({
             value={selectedRole}
             IconComponent={(props) => <ChevronDownSmallIcon {...props} />}
           >
-            <MenuItem value={'organization_admin'}>
+            <MenuItem value={'organization_user'}>
               {tr.UserManagement.regularUser}
             </MenuItem>
-            <MenuItem value={'organization_user'}>
+            <MenuItem value={'organization_admin'}>
               {tr.UserManagement.admin}
             </MenuItem>
           </Select>

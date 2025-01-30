@@ -525,10 +525,9 @@ router.get(
       res.locals;
     const submissions = await getSubmissionsForSurvey(
       Number(req.params.id),
+      personalIncluded,
       alphanumericIncluded,
       geospatialIncluded,
-      true,
-      personalIncluded,
     );
     res.json(submissions);
   }),
