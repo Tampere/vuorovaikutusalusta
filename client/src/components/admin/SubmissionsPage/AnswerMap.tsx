@@ -143,14 +143,21 @@ export default function AnswerMap({
     if (!survey || !selectedQuestion) {
       return [];
     }
-    const mapQuestion = questions.find((question) => question.type === 'map');
-    if (!mapQuestion) return [];
+
+    const firstQuestionWithMap = questions.find(
+      (question) =>
+        question.type === 'map' ||
+        question.followUpSections?.some((section) => section.type === 'map'),
+    );
+    if (!firstQuestionWithMap) return [];
     // If all answers are currently shown, find the first map question to determine shown map layers
     const page = survey.pages.find((page) =>
       page.sections.some(
         (section) =>
           section.id ===
-          (selectedQuestion.id === 0 ? mapQuestion.id : selectedQuestion.id),
+          (selectedQuestion.id === 0
+            ? firstQuestionWithMap.id
+            : selectedQuestion.id),
       ),
     );
     return page.sidebar.mapLayers;
