@@ -343,10 +343,12 @@
     "defaultMinLabel": "Helt oenig",
     "defaultMaxLabel": "Helt enig",
     "defaultTranslatedMinLabel": {
+      "se": "Helt oense",
       "en": "Strongly disagree",
       "fi": "Täysin eri mieltä"
     },
     "defaultTranslatedMaxLabel": {
+      "se": "Helt enig",
       "en": "Strongly agree",
       "fi": "Täysin samaa mieltä"
     },
