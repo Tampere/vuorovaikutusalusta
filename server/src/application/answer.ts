@@ -12,7 +12,6 @@ import moment from 'moment';
 import ogr2ogr from 'ogr2ogr';
 import { getAvailableMapLayers } from './map';
 import { getSurvey } from './survey';
-import logger from '@src/logger';
 
 const tr = useTranslations('fi');
 
@@ -940,7 +939,6 @@ function submissionAnswersToJson(
   const ret = {};
 
   answerEntries.forEach((answer) => {
-    logger.info(JSON.stringify(answer));
     const sectionDetails = sectionIdToDetails[answer.sectionId];
 
     switch (sectionDetails.type) {
@@ -978,7 +976,6 @@ function submissionAnswersToJson(
 
         break;
       case 'matrix':
-        logger.info(JSON.stringify(sectionDetails));
         sectionDetails.details.subjects.forEach((_subject, index) => {
           const classIndex = answer.valueJson?.[index];
           ret[
