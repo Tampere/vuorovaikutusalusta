@@ -181,6 +181,7 @@ export default function SurveyListItem(props: Props) {
             style={{ marginLeft: 'auto' }}
             variant="contained"
             to={`vastaukset/${survey.id}`}
+            disabled={survey?.submissionCount === 0}
           >
             {`${tr.SurveyList.answers} (${survey?.submissionCount ?? 0})`}
           </Button>
