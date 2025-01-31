@@ -258,7 +258,9 @@ export default function SurveyListItem(props: Props) {
             {tr.SurveyList.copySurvey}{' '}
           </LoadingButton>
           <Button
-            disabled={disableUsersViewAccessToSurvey}
+            disabled={
+              disableUsersViewAccessToSurvey || survey?.submissionCount === 0
+            }
             component={NavLink}
             style={{ marginLeft: 'auto' }}
             variant="contained"
