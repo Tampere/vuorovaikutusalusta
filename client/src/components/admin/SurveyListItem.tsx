@@ -11,7 +11,6 @@ import {
   Theme,
   Typography,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import CalendarSmallIcon from '@src/components/icons/CalendarSmallIcon';
 import LinkSmallIcon from '@src/components/icons/LinkSmallIcon';
 import UserSmallIcon from '@src/components/icons/UserSmallIcon';
@@ -23,15 +22,16 @@ import {
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { useUser } from '@src/stores/UserContext';
-import clsx from 'clsx';
+
 import { format } from 'date-fns';
 import React, { useMemo, useState } from 'react';
 import { NavLink, useRouteMatch } from 'react-router-dom';
 import ConfirmDialog from '../ConfirmDialog';
 import CopyToClipboard from '../CopyToClipboard';
 import LoadingButton from '../LoadingButton';
+import { theme } from '@src/themes/admin';
 
-const useStyles = makeStyles((theme: Theme) => ({
+const cardStyles = (theme: Theme, loading: boolean, published: boolean) => ({
   '@keyframes pulse': {
     '0%': {
       opacity: 0.4,
@@ -43,20 +43,16 @@ const useStyles = makeStyles((theme: Theme) => ({
       opacity: 0.4,
     },
   },
-  loading: {
-    animation: `$pulse 1s ${theme.transitions.easing.easeIn} infinite`,
+  ...(loading && {
+    animation: `pulse 2s ${theme.transitions.easing.easeIn} infinite`,
     pointerEvents: 'none',
     filter: 'grayscale(100%)',
-  },
-  cardRoot: {
-    paddingBottom: '8px',
-  },
-  publishedCard: {
+  }),
+  ...(published && {
     borderLeft: 'solid 5px',
     borderLeftColor: theme.palette.primary.main,
-  },
-}));
-
+  }),
+});
 interface Props {
   survey: Survey;
 }
@@ -69,7 +65,6 @@ export default function SurveyListItem(props: Props) {
     useState(false);
   const [loading, setLoading] = useState(false);
 
-  const classes = useStyles();
   const { tr, surveyLanguage } = useTranslations();
   const { showToast } = useToasts();
   const { url } = useRouteMatch();
@@ -104,13 +99,8 @@ export default function SurveyListItem(props: Props) {
 
   return (
     <li style={{ marginBottom: '20px' }}>
-      <Card
-        className={clsx(
-          loading && classes.loading,
-          survey.isPublished && classes.publishedCard,
-        )}
-      >
-        <CardContent classes={{ root: classes.cardRoot }}>
+      <Card sx={cardStyles(theme, loading, survey.isPublished)}>
+        <CardContent sx={{ paddingBottom: '8px' }}>
           <Typography variant="h6" component="h3">
             {!survey.title?.[surveyLanguage] ? (
               <em>{tr.SurveyList.untitledSurvey}</em>
