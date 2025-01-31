@@ -200,7 +200,7 @@ export default function MatrixQuestion({
                         className={classes.matrixCell}
                       >
                         <Radio
-                          name={`question-${subjectIndex}`}
+                          name={`question-${question.id}-${subjectIndex}`}
                           checked={
                             value[subjectIndex] === classIndex.toString()
                           }
@@ -217,7 +217,7 @@ export default function MatrixQuestion({
                         sx={{ backgroundColor: '#efefef' }}
                       >
                         <Radio
-                          name={`question-${subjectIndex}`}
+                          name={`question-${question.id}-${subjectIndex}`}
                           checked={value[subjectIndex] === '-1'}
                           value={'-1'}
                           onChange={(event) => {
