@@ -16,7 +16,7 @@ import {
   ResponderProvided,
 } from 'react-beautiful-dnd';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { visuallyHidden } from '@mui/utils';
 
 interface Props {
@@ -33,6 +33,22 @@ export default function SortingQuestion(props: Props) {
   const [sortedOptionIds, setSortedOptionIds] = useState(
     props.value ?? props.question.options.map((option) => option.id),
   );
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const optionElements = useRef<HTMLElement[]>([]);
+  const [optionIndexLabelHeights, setOptionIndexLabelHeights] = useState([]);
+
+  useLayoutEffect(() => {
+    const resizeObserver = new ResizeObserver(() => {
+      if (optionElements.current.length > 0) {
+        setOptionIndexLabelHeights(
+          optionElements.current.map((el) => el.offsetHeight),
+        );
+      }
+    });
+    if (wrapperRef.current) {
+      resizeObserver.observe(wrapperRef.current);
+    }
+  }, [wrapperRef.current]);
 
   useEffect(() => {
     if (!verified || !props.onChange) {
@@ -63,6 +79,15 @@ export default function SortingQuestion(props: Props) {
         ),
       );
       return;
+    }
+    // Resize the index label heights array to match the new order
+    if (optionElements.current.length > 0) {
+      setOptionIndexLabelHeights((prev) => {
+        const newHeights = [...prev];
+        const [removed] = newHeights.splice(source.index, 1);
+        newHeights.splice(destination.index, 0, removed);
+        return newHeights;
+      });
     }
     provided.announce(
       tr.SortingQuestion.announcement.drop.replace(
@@ -102,19 +127,23 @@ export default function SortingQuestion(props: Props) {
         }
         onDragEnd={onDragEnd}
       >
-        <div style={{ display: 'flex', flexDirection: 'row' }}>
+        <div style={{ display: 'flex', flexDirection: 'row' }} ref={wrapperRef}>
           <div>
             {props.question.options.map((_option, index) => (
               <Paper
                 key={index}
                 variant="outlined"
                 sx={{
+                  height: optionIndexLabelHeights[index],
                   backgroundColor: '#ededed',
                   borderTopRightRadius: '0',
                   borderBottomRightRadius: '0',
                   marginBottom: '0.5em',
                   marginRight: '-0.25em',
                   padding: '0.5em',
+                  display: 'flex',
+                  alignItems: 'center',
+                  transition: 'height 0.1s',
                 }}
               >
                 <Typography>{index + 1}.</Typography>
@@ -140,6 +169,12 @@ export default function SortingQuestion(props: Props) {
                   >
                     {(provided, snapshot) => (
                       <Paper
+                        ref={(el) => {
+                          if (el) {
+                            optionElements.current[index] = el;
+                          }
+                          return provided.innerRef(el);
+                        }}
                         variant="outlined"
                         sx={{
                           backgroundColor: snapshot.isDragging
@@ -157,7 +192,6 @@ export default function SortingQuestion(props: Props) {
                         }}
                         {...provided.draggableProps}
                         {...provided.dragHandleProps}
-                        ref={provided.innerRef}
                         aria-describedby={`drag-instruction-announcement-${props.question.id}`}
                       >
                         <Typography
