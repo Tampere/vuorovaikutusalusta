@@ -745,7 +745,7 @@ export async function getSurveys(
     survey.*
   FROM
     data.survey survey
-    LEFT JOIN data.submission sub ON sub.survey_id = survey.id
+    LEFT JOIN data.submission sub ON sub.survey_id = survey.id AND sub.unfinished_token IS NULL
   WHERE
     ($1 IS NULL OR author_id = $1)
   GROUP BY survey.id
