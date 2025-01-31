@@ -58,6 +58,7 @@ export function FollowUpSectionMenu({
       slider: 'sliderQuestion',
       sorting: 'sortingQuestion',
       text: 'textSection',
+      'personal-info': 'personalInfoQuestion',
     };
 
     if (!Object.keys(translationEntries).includes(type))

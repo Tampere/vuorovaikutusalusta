@@ -10,7 +10,7 @@ interface Props {
 }
 
 export function AdminMap({ url, page, allowDrawing = false }: Props) {
-  const iframeRef = useRef<HTMLIFrameElement>();
+  const iframeRef = useRef<HTMLIFrameElement>(null);
   const {
     setRpcChannel,
     isMapReady,
