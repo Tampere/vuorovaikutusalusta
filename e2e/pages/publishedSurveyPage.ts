@@ -12,7 +12,7 @@ export class PublishedSurveyPage {
   }
 
   async goto(surveyName: string) {
-    await this._page.goto(`http://localhost:8080/${surveyName}`);
+    await this._page.goto(`http://localhost:8080/ubigu2/${surveyName}`);
   }
 
   async startSurvey() {
