@@ -21,6 +21,7 @@ import SurveySubmissionsPage from './SubmissionsPage/SurveySubmissionsPage';
 import { ApiInstructions } from './Instructions/ApiDescription';
 import { UserManagement } from './UserManagement';
 import { ProtectedRoute } from './ProtectedRoute';
+import { GeneralNotifications } from './GeneralNotification';
 
 export default function AdminApplication() {
   return (
@@ -56,6 +57,9 @@ export default function AdminApplication() {
           <ProtectedRoute path="/kayttajahallinta">
             <UserManagement />
           </ProtectedRoute>
+          <Route path="/tiedotteet">
+            <GeneralNotifications />
+          </Route>
           <Route path="/" exact>
             <AdminFrontPage />
           </Route>

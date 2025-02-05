@@ -9,6 +9,7 @@ import surveyRouter from './survey.routes';
 import themesRouter from './themes.routes';
 import userRouter from './user.routes';
 import openApiRouter from './openapi.routes';
+import generalNotificationRouter from './generalNotification.routes';
 
 const router = Router();
 
@@ -22,5 +23,6 @@ router.use('/themes', themesRouter);
 router.use('/feature-styles', featureStylesRouter);
 router.use('/health', healthRouter);
 router.use('/openapi', openApiRouter);
+router.use('/general-notifications', generalNotificationRouter);
 
 export default router;

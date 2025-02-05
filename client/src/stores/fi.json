@@ -593,6 +593,11 @@
     "hideOldResponses": "Piilota vanhat kommentit...",
     "showOldResponses": "Näytä {x} vanhempaa kommenttia..."
   },
+  "AppBar": {
+    "generalNotifications": "Tiedotteet",
+    "generalNotificationsNew": "Uusia tiedotteita",
+    "generalNotificationsError": "Virhe haettaessa tiedotteita"
+  },
   "AppBarUserMenu": {
     "label": "Käyttäjävalikko",
     "logout": "Kirjaudu ulos",
@@ -715,5 +720,15 @@
   "TagPicker": {
     "addTags": "Lisää tunnisteita",
     "filterWithTags": "Suodata tunnisteilla"
+  },
+  "GeneralNotification": {
+    "addNew": "Lisää tiedote",
+    "formLabel": "Tiedotteen otsikko",
+    "noResults": "Ei avoimia tiedotteita",
+    "addSuccess": "Tiedote lisätty onnistuneesti.",
+    "updateSuccess": "Tiedote päivitetty onnistuneesti.",
+    "updateFailed": "Tiedotteen päivittäminen epäonnistui.",
+    "deleteSuccess": "Tiedote poistettu onnistuneesti.",
+    "deleteFailed": "Tiedotteen poistaminen epäonnistui."
   }
 }

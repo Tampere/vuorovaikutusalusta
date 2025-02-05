@@ -14,6 +14,7 @@ import AppBarUserMenu from './AppBarUserMenu';
 import { NavLink } from 'react-router-dom';
 import KartallaLogo from '@src/components/icons/KartallaLogo';
 import { AppBarInstructionsMenu } from './Instructions/AppBarInstructionsMenu';
+import { GeneralNotificationNavigationButton } from './GeneralNotification/GeneralNotificationNavigationButton';
 
 interface Props {
   labels?: string[];
@@ -93,6 +94,7 @@ export function AdminAppBar({
           >
             <SurveyLanguageMenu />
             <LanguageMenu />
+            <GeneralNotificationNavigationButton />
             <AppBarInstructionsMenu />
             <AppBarUserMenu />
           </div>

@@ -8,10 +8,12 @@ const baseTheme = createTheme({});
 declare module '@mui/material/styles' {
   interface Palette {
     borderPrimary: Palette['primary'];
+    brandYellow: Palette['primary'];
   }
 
   interface PaletteOptions {
     borderPrimary?: PaletteOptions['primary'];
+    brandYellow?: PaletteOptions['primary'];
   }
 }
 
@@ -19,6 +21,9 @@ export const ubiColors = createTheme({
   palette: {
     primary: {
       main: havu,
+    },
+    brandYellow: {
+      main: '#FFECAB',
     },
     borderPrimary: baseTheme.palette.augmentColor({
       color: {

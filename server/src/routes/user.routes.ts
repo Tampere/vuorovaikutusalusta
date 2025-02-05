@@ -3,8 +3,6 @@ import {
   ensureAuthenticated,
   ensureSuperUserAccess,
 } from '@src/auth';
-import { sendMail } from '@src/email/email';
-import logger from '@src/logger';
 import { addPendingUserRequest, getUsers } from '@src/user';
 import { validateRequest } from '@src/utils';
 import { Router } from 'express';

@@ -592,6 +592,11 @@
     "hideOldResponses": "Dölj äldre kommentarer...",
     "showOldResponses": "Visa {x} äldre kommentarer..."
   },
+  "AppBar": {
+    "generalNotifications": "Meddelanden",
+    "generalNotificationsNew": "Nya meddelanden",
+    "generalNotificationsError": "Fel vid hämtning av allmänna meddelanden"
+  },
   "AppBarUserMenu": {
     "label": "Användarmeny",
     "logout": "Logga ut",
@@ -714,5 +719,15 @@
     "addTags": "Lägg till taggar",
     "filterWithTags": "Filtrera med taggar"
   },
-  "adminInstructions": "Öppna användarmanual"
+  "adminInstructions": "Öppna användarmanual",
+  "GeneralNotification": {
+    "addNew": "Lägg till meddelande",
+    "formLabel": "Meddelandets titel",
+    "noResults": "Inga öppna meddelanden",
+    "addSuccess": "Meddelandet har lagts till framgångsrikt.",
+    "updateSuccess": "Meddelandet har uppdaterats framgångsrikt.",
+    "updateFailed": "Det gick inte att uppdatera meddelandet.",
+    "deleteSuccess": "Meddelandet har tagits bort framgångsrikt.",
+    "deleteFailed": "Det gick inte att ta bort meddelandet."
+  }
 }
