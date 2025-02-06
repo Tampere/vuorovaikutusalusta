@@ -1,0 +1,143 @@
+import { Box } from '@mui/material';
+import React, { useEffect, useRef, useState } from 'react';
+import { EditGeneralNotification } from './EditGeneralNotification';
+import { GeneralNotificationList } from './GeneralNotificationList';
+import { AdminAppBar } from '../AdminAppBar';
+import { GeneralNotification } from '@interfaces/generalNotification';
+import { useTranslations } from '@src/stores/TranslationContext';
+import { request } from '@src/utils/request';
+import { useToasts } from '@src/stores/ToastContext';
+import { useUser } from '@src/stores/UserContext';
+
+const containerStyle = {
+  margin: 'auto',
+  width: '800px',
+  display: 'flex',
+  overflowY: 'hidden',
+  height: 'calc(100vh - 64px)',
+  flexDirection: 'column',
+  padding: '3rem',
+  gap: '2rem',
+};
+
+export function GeneralNotifications() {
+  const { tr } = useTranslations();
+  const { showToast } = useToasts();
+  const { activeUserIsSuperUser } = useUser();
+  const [activeNotification, setActiveNotification] = useState<{
+    data: GeneralNotification | null;
+    editing: boolean;
+  }>({ data: null, editing: false });
+
+  const [loading, setLoading] = useState(true);
+  const [notifications, setNotifications] = useState<GeneralNotification[]>([]);
+
+  const editorRef = useRef<{ setEditorValue: (value: string) => void }>(null);
+
+  async function fetchNotifications() {
+    setLoading(true);
+    const data = await request<GeneralNotification[]>(
+      '/api/general-notifications',
+    );
+    setNotifications(data);
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    fetchNotifications();
+  }, []);
+
+  async function onSubmit(
+    formData: { message: string; title: string },
+    notificationId?: string,
+  ) {
+    try {
+      if (notificationId) {
+        await request(`/api/general-notifications/${notificationId}`, {
+          method: 'PUT',
+          body: {
+            message: formData.message,
+            title: formData.title,
+          },
+        });
+        showToast({
+          message: tr.GeneralNotification.updateSuccess,
+          severity: 'success',
+        });
+      } else {
+        await request('/api/general-notifications', {
+          method: 'POST',
+          body: {
+            message: formData.message,
+            title: formData.title,
+          },
+        });
+        showToast({
+          message: tr.GeneralNotification.addSuccess,
+          severity: 'success',
+        });
+      }
+      setActiveNotification({ data: null, editing: false });
+      editorRef.current?.setEditorValue('');
+      fetchNotifications();
+    } catch (e) {
+      showToast({
+        message: tr.GeneralNotification.updateFailed,
+        severity: 'error',
+      });
+    }
+  }
+
+  async function onDelete(notificationId: string) {
+    try {
+      await request(`/api/general-notifications/${notificationId}`, {
+        method: 'DELETE',
+      });
+      showToast({
+        message: tr.GeneralNotification.deleteSuccess,
+        severity: 'success',
+      });
+      setActiveNotification({ data: null, editing: false });
+      editorRef.current?.setEditorValue('');
+      fetchNotifications();
+    } catch (e) {
+      showToast({
+        message: tr.GeneralNotification.deleteFailed,
+        severity: 'error',
+      });
+    }
+  }
+
+  return (
+    <>
+      <AdminAppBar labels={[tr.AppBar.generalNotifications]} />
+      <Box sx={containerStyle}>
+        {activeUserIsSuperUser && (
+          <EditGeneralNotification
+            ref={editorRef}
+            notification={activeNotification.data}
+            onSubmit={onSubmit}
+            editing={activeNotification.editing}
+            onEdit={() => setActiveNotification({ data: null, editing: true })}
+            onCancel={() => {
+              editorRef.current?.setEditorValue('');
+              setActiveNotification({ data: null, editing: false });
+            }}
+            onDelete={(notificationId) => onDelete(notificationId)}
+          />
+        )}
+        <GeneralNotificationList
+          editing={activeNotification.editing}
+          loading={loading}
+          activeNotification={activeNotification.data}
+          notifications={notifications}
+          editingEnabled={activeUserIsSuperUser}
+          onCancel={() => setActiveNotification({ data: null, editing: false })}
+          onEdit={(notification) => {
+            setActiveNotification({ data: notification, editing: true });
+          }}
+        />
+      </Box>
+    </>
+  );
+}

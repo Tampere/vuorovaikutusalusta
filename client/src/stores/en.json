@@ -593,6 +593,11 @@
     "hideOldResponses": "Hide old comments...",
     "showOldResponses": "Display {x} older comments"
   },
+  "AppBar": {
+    "generalNotifications": "Notifications",
+    "generalNotificationsNew": "New notifications",
+    "generalNotificationsError": "Error while fetching general notifications"
+  },
   "AppBarUserMenu": {
     "label": "User menu",
     "logout": "Logout",
@@ -715,5 +720,15 @@
     "addTags": "Add tags",
     "filterWithTags": "Filter with tags"
   },
-  "adminInstructions": "Open user manual"
+  "adminInstructions": "Open user manual",
+  "GeneralNotification": {
+    "addNew": "Add notification",
+    "formLabel": "Notification title",
+    "noResults": "No open notifications",
+    "addSuccess": "Notification added successfully.",
+    "updateSuccess": "Notification updated successfully.",
+    "updateFailed": "Failed to update notification.",
+    "deleteSuccess": "Notification deleted successfully.",
+    "deleteFailed": "Failed to delete notification."
+  }
 }

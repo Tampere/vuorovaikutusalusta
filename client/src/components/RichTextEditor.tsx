@@ -3,7 +3,12 @@ import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { convertFromRaw, convertToRaw, EditorState } from 'draft-js';
 import { draftToMarkdown, markdownToDraft } from 'markdown-draft-js';
-import React, { useEffect, useState } from 'react';
+import React, {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useState,
+} from 'react';
 import { Editor } from 'react-draft-wysiwyg';
 
 const useStyles = makeStyles({
@@ -105,9 +110,18 @@ function editorStateToMarkdown(editorState: EditorState) {
   return draftToMarkdown(rawObject);
 }
 
-export default function RichTextEditor(props: Props) {
+const RichTextEditor = forwardRef(function RichTextEditor(props: Props, ref) {
   const [editorState, setEditorState] = useState(
     markdownToEditorState(props.value),
+  );
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      setEditorValue: (value: string) =>
+        setEditorState(markdownToEditorState(value)),
+    }),
+    [],
   );
 
   const { language, surveyLanguage } = useTranslations();
@@ -157,4 +171,6 @@ export default function RichTextEditor(props: Props) {
       {props.disabled && <div className={classes.disabledOverlay} />}
     </div>
   );
-}
+});
+
+export default RichTextEditor;
