@@ -13,9 +13,9 @@ export function GeneralNotificationNavigationButton() {
   const [newNotifications, setNewNotifications] = useState(false);
 
   async function refreshRecentCount() {
-    const data = (await request('/api/general-notifications/recent-count')) as {
-      count: number;
-    };
+    const data = await request<{ count: number }>(
+      '/api/general-notifications/recent-count',
+    );
 
     setNewNotifications(data.count > 0);
   }

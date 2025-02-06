@@ -103,59 +103,59 @@ export function GeneralNotificationList({
 
   return (
     <Box sx={{ overflowY: 'auto' }}>
-      {notifications.map((notification) => (
-        <Box
-          component="article"
-          key={notification.id}
-          sx={notificationListStyle}
-        >
-          <Accordion disableGutters>
-            <AccordionSummary
-              sx={{
-                marginLeft: 0,
-              }}
-              expandIcon={<ExpandMore />}
-            >
-              <Box
-                display="flex"
-                flex={1}
-                justifyContent="space-between"
-                alignItems="center"
+      {notifications.map((notification) => {
+        const editingNotification =
+          editing && notification.id === activeNotification?.id;
+        return (
+          <Box
+            component="article"
+            key={notification.id}
+            sx={notificationListStyle}
+          >
+            <Accordion disableGutters>
+              <AccordionSummary
+                sx={{
+                  marginLeft: 0,
+                }}
+                expandIcon={<ExpandMore />}
               >
-                <Typography variant="h5" component="h1" color="primary">
-                  {notification.title}
-                </Typography>
-                <Typography color={'#c4c4c4'} fontSize={'14px'}>
-                  {notification.publisher},{' '}
-                  {new Date(notification.createdAt).toLocaleDateString()}
-                </Typography>
-              </Box>
-            </AccordionSummary>
-            <AccordionDetails>
-              <ReactMarkdown>{notification.message}</ReactMarkdown>
-              {editingEnabled && (
-                <Button
-                  size="small"
-                  variant="outlined"
-                  onClick={() =>
-                    editing && notification.id === activeNotification?.id
-                      ? onCancel()
-                      : onEdit(notification)
-                  }
-                  {...(!(
-                    editing && notification.id === activeNotification?.id
-                  ) && { endIcon: <Edit /> })}
-                  sx={{ marginBottom: '1rem' }}
+                <Box
+                  display="flex"
+                  flex={1}
+                  justifyContent="space-between"
+                  alignItems="center"
                 >
-                  {editing && notification.id === activeNotification?.id
-                    ? tr.commands.cancel
-                    : tr.commands.edit}
-                </Button>
-              )}
-            </AccordionDetails>
-          </Accordion>
-        </Box>
-      ))}
+                  <Typography variant="h5" component="h1" color="primary">
+                    {notification.title}
+                  </Typography>
+                  <Typography color={'#c4c4c4'} fontSize={'14px'}>
+                    {notification.publisher},{' '}
+                    {new Date(notification.createdAt).toLocaleDateString()}
+                  </Typography>
+                </Box>
+              </AccordionSummary>
+              <AccordionDetails>
+                <ReactMarkdown>{notification.message}</ReactMarkdown>
+                {editingEnabled && (
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    onClick={() =>
+                      editingNotification ? onCancel() : onEdit(notification)
+                    }
+                    {...(!editingNotification && { endIcon: <Edit /> })}
+                    sx={{ marginBottom: '1rem' }}
+                  >
+                    {editingNotification
+                      ? tr.commands.cancel
+                      : tr.commands.edit}
+                  </Button>
+                )}
+              </AccordionDetails>
+            </Accordion>
+          </Box>
+        );
+      })}
     </Box>
   );
 }
