@@ -2063,7 +2063,7 @@ export async function storeFile({
   const fileUrl = `${organizationId}/${path.join('/')}/${name}`;
   const row = await getDb().oneOrNone<{ path: string[]; name: string }>(
     `
-    INSERT INTO data.files (file, details, mime_type, survey_id, url, organizationId)
+    INSERT INTO data.files (file, details, mime_type, survey_id, url, organization)
     VALUES ($(fileString), $(details), $(mimetype), $(surveyId), $(fileUrl), $(organizationId))
     ON CONFLICT ON CONSTRAINT pk_files DO UPDATE SET
       file = $(fileString),

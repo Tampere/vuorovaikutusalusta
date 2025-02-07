@@ -21,7 +21,7 @@ export default function OskariMap({
   onFeatureClick,
   selectedAnswer,
 }: Props) {
-  const iframeRef = useRef<HTMLIFrameElement>();
+  const iframeRef = useRef<HTMLIFrameElement>(null);
   const {
     initializeMap,
     setFeatureClickHandler,
@@ -38,7 +38,7 @@ export default function OskariMap({
       {
         stroke: {
           color: mapFeatureColorScheme.primaryColor,
-          width: 10,
+          width: 6,
         },
         fill: {
           color: mapFeatureColorScheme.primaryFillColor,
@@ -47,7 +47,7 @@ export default function OskariMap({
       {
         stroke: {
           color: mapFeatureColorScheme.secondaryColor,
-          width: 10,
+          width: 6,
         },
         fill: {
           color: mapFeatureColorScheme.secondaryFillColor,
@@ -64,8 +64,8 @@ export default function OskariMap({
       feature.geometry.type === 'Polygon'
         ? 'area'
         : feature.geometry.type === 'LineString'
-          ? 'line'
-          : 'point';
+        ? 'line'
+        : 'point';
     const question = feature.properties.question;
 
     // Use default style for points
@@ -83,21 +83,21 @@ export default function OskariMap({
     const fillColor = parsedStrokeColor
       ? `rgba(${parsedStrokeColor.values.join(',')}, 0.3)`
       : isPrimaryStyle
-        ? defaultFeatureStyles[0].fill.color
-        : defaultFeatureStyles[1].fill.color;
+      ? defaultFeatureStyles[0].fill.color
+      : defaultFeatureStyles[1].fill.color;
     return {
       stroke: {
         color:
           style.strokeColor || isPrimaryStyle
             ? defaultFeatureStyles[0].stroke.color
             : defaultFeatureStyles[1].stroke.color,
-        width: 10,
+        width: 5,
         lineDash:
           style.strokeStyle === 'dashed'
             ? [30, 10]
             : style.strokeStyle === 'dotted'
-              ? [0, 14]
-              : null,
+            ? [0, 14]
+            : null,
         lineCap: style.strokeStyle === 'dashed' ? 'butt' : 'round',
       },
       fill: {
