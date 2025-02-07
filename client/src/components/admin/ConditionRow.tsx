@@ -93,7 +93,6 @@ export function ConditionRow({
       <FormLabel
         sx={{
           flex: 1,
-          color: '#000',
           textAlign: alignment,
           transform: validationError ? 'translateY(-50%)' : null,
         }}

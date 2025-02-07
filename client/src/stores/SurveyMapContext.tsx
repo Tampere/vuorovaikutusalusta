@@ -16,6 +16,7 @@ import React, {
   useRef,
 } from 'react';
 import { useTranslations } from './TranslationContext';
+import { harmaa } from '@src/themes/common';
 
 interface State {
   visibleLayers: number[];
@@ -106,8 +107,8 @@ const stateDefaults: State = {
   },
   modifying: false,
   mapFeatureColorScheme: {
-    primaryColor: '#000000',
-    primaryFillColor: 'rgba(0,0,0,0.3)',
+    primaryColor: harmaa,
+    primaryFillColor: `${harmaa}d4`,
     secondaryColor: '#3e37bf',
     secondaryFillColor: 'rgba(62, 55, 191, 0.6)',
   },
@@ -133,11 +134,11 @@ const modifyEventId = 'modify';
 // Default feature style
 const defaultFeatureStyle = {
   stroke: {
-    color: '#000000',
-    width: 10,
+    color: harmaa,
+    width: 6,
   },
   fill: {
-    color: 'rgba(0,0,0,0.3)',
+    color: `${harmaa}d4`,
   },
 };
 
@@ -163,7 +164,7 @@ function getFeatureStyle(
   return {
     stroke: {
       color: style.strokeColor || defaultFeatureStyle.stroke.color,
-      width: 10,
+      width: 4,
       lineDash:
         style.strokeStyle === 'dashed'
           ? [30, 10]

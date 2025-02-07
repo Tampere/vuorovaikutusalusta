@@ -1,7 +1,6 @@
 import { LocalizedText, SectionOption } from '@interfaces/survey';
 import { Fab, IconButton, TextField, Tooltip, Typography } from '@mui/material';
 
-import DraggableIcon from '@src/components/icons/DraggableIcon';
 import DeleteBinIcon from '@src/components/icons/DeleteBinIcon';
 import AddIcon from '@src/components/icons/AddIcon';
 
@@ -22,7 +21,6 @@ const useStyles = makeStyles({
   },
   option: {
     alignItems: 'center',
-    background: 'rgba(0,0,0,0.2)',
     padding: '1rem 0.5rem',
     boxSizing: 'border-box',
   },
@@ -136,7 +134,6 @@ export default function QuestionOptions({
       <div>
         {options.map((option, index) => (
           <div className={`${classes.row} ${classes.option}`} key={index}>
-            <DraggableIcon style={{ fontSize: '14' }} />
             <div className={classes.textInput}>
               <TextField
                 data-testid={`radio-input-option-${index}`}
