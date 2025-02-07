@@ -5,7 +5,7 @@ import {
   CSSInterpolation,
 } from '@mui/material/styles';
 import { fiFI } from '@mui/material/locale';
-import { ubiColors } from './common';
+import { harmaa, ubiTheme } from './common';
 
 declare module '@mui/material/styles' {
   interface Palette {
@@ -159,62 +159,23 @@ export const stepperOverrides: Components<Omit<Theme, 'components'>> = {
           fill: '#e9e9e9',
         },
         '& .Mui-disabled text': {
-          fill: 'black',
+          fill: harmaa,
         },
       },
     },
   },
 };
 
-export const textOverrides: Components<Omit<Theme, 'components'>> = {
-  MuiTypography: {
-    variants: [
-      {
-        props: { variant: 'questionTitle' },
-        style: {
-          fontWeight: 700,
-          fontSize: '1.2em',
-          color: '#000000DE',
-          margin: '1em 0',
-        },
-      },
-      {
-        props: { variant: 'followUpSectionTitle' },
-        style: {
-          fontWeight: 700,
-          fontSize: '1em',
-          color: '#000000',
-          margin: '0.5em 0',
-        },
-      },
-    ],
-    styleOverrides: {
-      root: {
-        textTransform: 'none',
-      },
-      h1: { color: '#000000DE' },
-      h2: { color: '#000000DE' },
-      h3: { color: '#000000DE' },
-      h4: { color: '#000000DE' },
-      h5: { color: '#000000DE' },
-      h6: { color: '#000000DE' },
-    },
-  },
-};
 /**
  * Default theme - used only when survey doesn't have a theme at all set in DB
  */
 export let defaultSurveyTheme = createTheme(
+  ubiTheme,
   {
-    typography: {
-      fontFamily: 'Nunito'
-    },
     components: {
-      ...ubiColors,
       ...buttonOverrides,
       ...inputOverrides,
       ...stepperOverrides,
-      ...textOverrides,
     },
   },
   fiFI,

@@ -71,7 +71,6 @@ function SurveyQuestion({
     () => (dirty || pageUnfinished ? getValidationErrors(question) : []),
     [dirty, question, value, pageUnfinished],
   );
-
   return (
     <FormControl
       disabled={readOnly}
@@ -114,12 +113,16 @@ function SurveyQuestion({
         style={{
           display: 'flex',
           alignItems: 'center',
-          color: survey.sectionTitleColor ?? '#000000',
         }}
       >
         <Typography
           component="h3"
-          sx={{ margin: readOnly ? 0 : '' }}
+          sx={{
+            margin: readOnly ? 0 : '',
+            ...(survey.sectionTitleColor && {
+              color: survey.sectionTitleColor,
+            }),
+          }}
           variant={props.isFollowUp ? 'followUpSectionTitle' : 'questionTitle'}
         >
           {question.title?.[surveyLanguage]}

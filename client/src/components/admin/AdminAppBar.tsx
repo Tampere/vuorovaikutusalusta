@@ -36,6 +36,7 @@ export function AdminAppBar({
               ...style,
               display: 'flex',
               flexWrap: 'nowrap',
+              color: 'white',
               '& li': {
                 padding: '0',
               },
@@ -56,7 +57,6 @@ export function AdminAppBar({
                   to="/"
                   sx={{
                     textDecoration: 'none',
-                    color: 'white',
                     '&:hover': {
                       opacity: 0.6,
                     },
@@ -75,7 +75,7 @@ export function AdminAppBar({
                   noWrap
                   variant="subtitle1"
                   component="p"
-                  sx={{ textOverflow: 'ellipsis' }}
+                  sx={{ textOverflow: 'ellipsis', color: 'white' }}
                   title={item}
                 >
                   {item}

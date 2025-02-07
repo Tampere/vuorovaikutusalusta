@@ -2,6 +2,7 @@ import { Survey } from '@interfaces/survey';
 import { createTheme, Theme } from '@mui/material';
 import { fiFI } from '@mui/material/locale';
 import { ThemeProvider } from '@mui/material/styles';
+import { ubiTheme } from '@src/themes/common';
 
 import {
   buttonOverrides,
@@ -64,6 +65,7 @@ export function useSurveyTheme() {
     setThemeFromSurvey(survey: Survey) {
       const theme = survey.theme?.data
         ? createTheme(
+            ubiTheme,
             {
               ...survey.theme?.data,
               components: {

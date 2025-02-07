@@ -201,7 +201,6 @@ export function EditSurveyPageConditions() {
         <FormLabel
           sx={{
             minWidth: '90px',
-            color: '#000',
             textAlign: 'right',
           }}
         >
@@ -247,7 +246,6 @@ export function EditSurveyPageConditions() {
           >
             <FormLabel
               sx={{
-                color: '#000',
                 textAlign: 'right',
                 minWidth: '90px',
               }}
@@ -273,7 +271,7 @@ export function EditSurveyPageConditions() {
               value={
                 conditionList.length > 0
                   ? conditionList[0][0]
-                  : (String(previousQuestions?.[0].id) ?? '')
+                  : String(previousQuestions?.[0].id) ?? ''
               }
               onChange={(event) => handleQuestionSelect(event)}
             >

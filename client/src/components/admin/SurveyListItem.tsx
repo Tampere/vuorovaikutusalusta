@@ -101,7 +101,7 @@ export default function SurveyListItem(props: Props) {
     <li style={{ marginBottom: '20px' }}>
       <Card sx={cardStyles(theme, loading, survey.isPublished)}>
         <CardContent sx={{ paddingBottom: '8px' }}>
-          <Typography variant="h6" component="h3">
+          <Typography variant="h6" component="h3" sx={{ fontWeight: 700 }}>
             {!survey.title?.[surveyLanguage] ? (
               <em>{tr.SurveyList.untitledSurvey}</em>
             ) : (
