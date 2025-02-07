@@ -263,20 +263,20 @@ export async function createSurveySubmission(
 
   // If unfinished token was provided, delete the old submission and pick the old "created at" timestamp
   const oldRow = await getDb().tx(async (t) => {
-    const { submissionId } = await t.oneOrNone<{ submissionId: number }>(
+    const result = await t.oneOrNone<{ submissionId: number }>(
       `
       SELECT id AS "submissionId" FROM data.submission WHERE unfinished_token = $1;
     `,
       [unfinishedToken],
     );
-    if (!submissionId) {
+    if (!result?.submissionId) {
       return null;
     }
     await t.any(`DELETE FROM data.answer_entry WHERE submission_id = $1`, [
-      submissionId,
+      result.submissionId,
     ]);
     await t.any(`DELETE FROM data.personal_info WHERE submission_id = $1`, [
-      submissionId,
+      result.submissionId,
     ]);
     return t.oneOrNone<{ created_at: Date }>(
       'DELETE FROM data.submission WHERE unfinished_token = $1 RETURNING created_at',
