@@ -200,10 +200,10 @@ export default function MultiMatrixQuestion({
       question.answerLimits.min && question.answerLimits.max
         ? tr.MultiMatrixQuestion.answerLimitsMinMax
         : question.answerLimits.min
-          ? tr.MultiMatrixQuestion.answerLimitsMin
-          : question.answerLimits.max
-            ? tr.MultiMatrixQuestion.answerLimitsMax
-            : ''
+        ? tr.MultiMatrixQuestion.answerLimitsMin
+        : question.answerLimits.max
+        ? tr.MultiMatrixQuestion.answerLimitsMax
+        : ''
     )
       .replace('{min}', `${question.answerLimits.min}`)
       .replace('{max}', `${question.answerLimits.max}`);
@@ -557,7 +557,7 @@ export default function MultiMatrixQuestion({
                 sx={{ minWidth: 160, m: 1 }}
               >
                 <FormLabel
-                  id="matrix-select-label"
+                  id={`matrix-select-label-${question.id}-${subjectIndex}`}
                   sx={{
                     fontWeight: 'bold',
                     marginBottom: 1,
@@ -572,6 +572,7 @@ export default function MultiMatrixQuestion({
                   onClose={() => setBackdropOpen(false)}
                   displayEmpty
                   multiple
+                  labelId={`matrix-select-label-${question.id}-${subjectIndex}`}
                   renderValue={() => getSelectionRenderValue(subjectIndex)}
                   value={value?.[subjectIndex]}
                   onChange={(event) => {

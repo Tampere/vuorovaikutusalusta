@@ -20,7 +20,6 @@ interface Props {
 const useStyles = makeStyles({
   select: {
     minWidth: '10rem',
-    width: 'fit-content',
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',

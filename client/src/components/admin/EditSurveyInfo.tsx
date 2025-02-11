@@ -295,7 +295,7 @@ export default function EditSurveyInfo(props: Props) {
 
         <Box
           sx={{
-            width: '206px',
+            width: '220px',
             display: 'flex',
             flexDirection: 'column',
             gap: 3,

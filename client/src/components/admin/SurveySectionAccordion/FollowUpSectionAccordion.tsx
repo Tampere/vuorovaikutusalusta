@@ -286,7 +286,11 @@ export function FollowUpSectionAccordion(props: Props) {
         onChange={(_, isExpanded) => {
           props.onExpandedChange(isExpanded);
         }}
-        className={props.className ?? classes.accordion}
+        className={`${
+          props.className ?? classes.accordion
+        } follow-up-section-accordion-${
+          props.expanded ? 'expanded' : 'collapsed'
+        }`}
         style={{ backgroundColor: '#FDE1FF' }}
       >
         <AccordionSummary

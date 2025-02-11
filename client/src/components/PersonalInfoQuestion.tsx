@@ -3,17 +3,18 @@ import {
   SurveyPersonalInfoQuestion,
 } from '@interfaces/survey';
 import { Box, Typography } from '@mui/material';
+import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React from 'react';
 import { useState } from 'react';
 
-const labelWrapperStyle = {
+const labelWrapperStyle = (labelColor?: string) => ({
   display: 'flex',
   flexDirection: 'column',
   gap: '0.25rem',
   '& label': {
     fontSize: '12px',
-    color: 'primary.main',
+    color: labelColor ?? 'primary.main',
   },
   '& input': {
     boxShadow: '0px -1px 2px 0px rgba(89, 120, 134, 0.15)',
@@ -23,7 +24,7 @@ const labelWrapperStyle = {
     borderRadius: '4px',
     height: '28px',
   },
-};
+});
 
 interface Props {
   autoFocus?: boolean;
@@ -40,6 +41,7 @@ export function PersonalInfoQuestion({
   value,
   onChange,
 }: Props) {
+  const { survey } = useSurveyAnswers();
   const { tr } = useTranslations();
   const [hasInvalidInput, setHasInvalidInput] = useState({
     name: false,
@@ -65,7 +67,7 @@ export function PersonalInfoQuestion({
       }}
     >
       {question.askName && (
-        <Box sx={labelWrapperStyle}>
+        <Box sx={labelWrapperStyle(survey.sectionTitleColor)}>
           <label htmlFor={`${question.id}-nameInput`}>
             {tr.PersonalInfoQuestion.nameLabel}
           </label>
@@ -109,7 +111,7 @@ export function PersonalInfoQuestion({
         </Box>
       )}
       {question.askEmail && (
-        <Box sx={labelWrapperStyle}>
+        <Box sx={labelWrapperStyle(survey.sectionTitleColor)}>
           <label htmlFor={`${question.id}-emailInput`}>
             {tr.PersonalInfoQuestion.emailLabel}
           </label>
@@ -154,7 +156,7 @@ export function PersonalInfoQuestion({
         </Box>
       )}
       {question.askPhone && (
-        <Box sx={labelWrapperStyle}>
+        <Box sx={labelWrapperStyle(survey.sectionTitleColor)}>
           <label htmlFor={`${question.id}-phoneInput`}>
             {tr.PersonalInfoQuestion.phoneLabel}
           </label>

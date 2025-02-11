@@ -75,6 +75,7 @@ function SurveyQuestion({
     <FormControl
       disabled={readOnly}
       component="fieldset"
+      className={'question-fieldset'}
       required={question.isRequired}
       aria-required={question.isRequired}
       aria-invalid={validationErrors.includes('required')}

@@ -306,7 +306,9 @@ export default function SurveySectionAccordion(props: Props) {
         onChange={(_, isExpanded) => {
           props.onExpandedChange(isExpanded);
         }}
-        className={props.className ?? classes.accordion}
+        className={`${props.className ?? classes.accordion} section-accordion-${
+          props.expanded ? 'expanded' : 'collapsed'
+        }`}
       >
         <AccordionSummary
           expandIcon={<ChevronDownIcon />}

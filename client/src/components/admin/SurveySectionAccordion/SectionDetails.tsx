@@ -52,6 +52,7 @@ export function SectionDetails({
 
   return (
     <AccordionDetails
+      data-testid={`section${section.id}`}
       sx={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}
     >
       <TextField
