@@ -421,7 +421,7 @@ export default function SurveyStepper({
                     margin: 0,
                     fontSize: '1em',
                     '&:focus': { outline: 'none' },
-                    color: pageConditionsPassed(page) ? 'grey' : '',
+                    color: pageConditionsPassed(page) ? '#697586' : '',
                   }}
                 >
                   <span style={visuallyHidden}>

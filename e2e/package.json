@@ -6,15 +6,16 @@
   "scripts": {
     "codegen": "playwright codegen http://localhost:8080/admin",
     "test-ui": "playwright test --ui",
-    "test": "playwright test --workers=1"
+    "test": "playwright test --workers=1 --reporter=html"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@axe-core/playwright": "^4.10.1",
     "@playwright/test": "^1.49.1",
     "@types/node": "^22.10.2",
-    "pg": "^8.13.1",
-    "dayjs": "^1.11.13"
+    "dayjs": "^1.11.13",
+    "pg": "^8.13.1"
   }
 }

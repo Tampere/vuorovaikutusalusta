@@ -13,7 +13,6 @@ interface Props {
 const useStyles = makeStyles({
   select: {
     minWidth: '10rem',
-    width: 'fit-content',
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
@@ -51,7 +50,7 @@ export default function ColorSelect({ label, value, onChange }: Props) {
         classes={{
           select: classes.select,
         }}
-        value={value == null ? colors[0].value : value}
+        value={value}
         onChange={(event) => {
           onChange(event.target.value);
         }}

@@ -282,7 +282,6 @@ export default function MatrixQuestion({
                         <Select
                           onOpen={() => setBackdropOpen(true)}
                           onClose={() => setBackdropOpen(false)}
-                          id="matrix-select"
                           value={value?.[subjectIndex] ?? ''}
                           onChange={(event: SelectChangeEvent<string>) =>
                             handleChange(subjectIndex, event, 'select')
@@ -321,7 +320,7 @@ export default function MatrixQuestion({
                 sx={{ minWidth: 160, m: 1 }}
               >
                 <FormLabel
-                  id="matrix-select-label"
+                  id={`matrix-select-label-${question.id}-${subjectIndex}`}
                   sx={{
                     fontWeight: 'bold',
                     marginBottom: 1,
@@ -334,7 +333,7 @@ export default function MatrixQuestion({
                 <Select
                   onOpen={() => setBackdropOpen(true)}
                   onClose={() => setBackdropOpen(false)}
-                  id="matrix-select"
+                  labelId={`matrix-select-label-${question.id}-${subjectIndex}`}
                   displayEmpty
                   value={value?.[subjectIndex] ?? ''}
                   onChange={(event: SelectChangeEvent<string>) =>

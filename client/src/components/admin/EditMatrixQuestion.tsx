@@ -48,7 +48,7 @@ export default function EditMatrixQuestion({ section, onChange }: Props) {
             color="primary"
             aria-label="add-matrix-class"
             size="small"
-            sx={{boxShadow: 'none'}}
+            sx={{ boxShadow: 'none' }}
             onClick={() => {
               onChange({
                 ...section,
@@ -66,7 +66,11 @@ export default function EditMatrixQuestion({ section, onChange }: Props) {
       <div style={{ display: 'flex', flexDirection: 'row' }}>
         {section.classes?.map((entry: LocalizedText, index) => {
           return (
-            <div key={`matrix-class-${index}`} style={{ position: 'relative' }}>
+            <div
+              key={`matrix-class-${index}`}
+              data-testId={`matrix-class-${index}`}
+              style={{ position: 'relative' }}
+            >
               <Tooltip title={entry[surveyLanguage] ?? ''}>
                 <TextField
                   inputProps={{ autoFocus: true }}

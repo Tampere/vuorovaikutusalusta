@@ -1,6 +1,7 @@
 import { Components, createTheme, Theme } from '@mui/material/styles';
 
-const havu = '#00a393';
+const primary = '#008577';
+const havu = '#1a776d';
 export const harmaa = '#515b68';
 const textlink = '#219acd';
 const borderPrimary = '#E9ECF0';
@@ -107,7 +108,7 @@ const commonComponentOverrides: Components<Omit<Theme, 'components'>> = {
 export const ubiTheme = createTheme({
   palette: {
     primary: {
-      main: havu,
+      main: primary,
     },
     brandYellow: {
       main: '#FFECAB',

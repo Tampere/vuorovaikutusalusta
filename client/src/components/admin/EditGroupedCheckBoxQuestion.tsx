@@ -167,6 +167,9 @@ export default function EditGroupedCheckBoxQuestion({
                       ref={provided.innerRef}
                       key={group.id}
                       className={classes.accordion}
+                      data-testId={`group-${index}-${
+                        openedGroupId === group.id ? 'expanded' : 'collapsed'
+                      }`}
                       expanded={openedGroupId === group.id}
                       onChange={(_, isExpanded) => {
                         setOpenedGroupId(isExpanded ? group.id : null);
@@ -248,7 +251,7 @@ export default function EditGroupedCheckBoxQuestion({
           disabled={disabled}
           aria-label="add-checkbox-group"
           size="small"
-          sx={{boxShadow: 'none'}}
+          sx={{ boxShadow: 'none' }}
           onClick={() => {
             // Add a temporary new ID for the group
             const id =

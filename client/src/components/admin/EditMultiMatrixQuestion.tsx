@@ -99,7 +99,7 @@ export function EditMultiMatrixQuestion({
             color="primary"
             aria-label="add-matrix-class"
             size="small"
-            sx={{boxShadow: 'none'}}
+            sx={{ boxShadow: 'none' }}
             onClick={() => {
               onChange({
                 ...section,
@@ -117,7 +117,11 @@ export function EditMultiMatrixQuestion({
       <div style={{ display: 'flex', flexDirection: 'row' }}>
         {section.classes?.map((entry: LocalizedText, index) => {
           return (
-            <div key={`matrix-class-${index}`} style={{ position: 'relative' }}>
+            <div
+              key={`matrix-class-${index}`}
+              data-testId={`matrix-class-${index}`}
+              style={{ position: 'relative' }}
+            >
               <Tooltip title={entry[surveyLanguage] ?? ''}>
                 <TextField
                   inputProps={{ autoFocus: true }}
