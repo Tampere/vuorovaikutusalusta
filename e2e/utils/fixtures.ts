@@ -1,4 +1,4 @@
-import { test as base, chromium, devices, Page } from '@playwright/test';
+import { test as base, BrowserContext, chromium, Page } from '@playwright/test';
 import { SurveyEditPage, SurveyParams } from '../pages/surveyEditPage';
 import { SurveyAdminPage } from '../pages/adminPage';
 import { PublishedSurveyPage } from '../pages/publishedSurveyPage';
@@ -29,35 +29,28 @@ interface AxeFixture {
 
 export const test = base.extend<PageFixtures & AxeFixture, WorkerPageFixtures>({
   workerSurveyEditPage: [
-    async ({ browser }, use) => {
-      let page: Page;
+    async ({ browser, browserName }, use) => {
       // Prevent mobile viewports for edit page
-      if (
-        browser.browserType().name() === 'webkit' &&
-        (
-          (browser.browserType() as any)._defaultContextOptions as Record<
-            string,
-            any
-          >
-        ).viewport.width < 1024
-      ) {
-        // Some problems with webkit mobile browsers here: https://github.com/microsoft/playwright/issues/28364
+      // Always use chromium for edit page because firefox is not working in CI: https://github.com/microsoft/playwright/issues/32236
+      // Some problems with webkit mobile browsers here: https://github.com/microsoft/playwright/issues/28364
+      let page: Page;
+      let desktopContext: BrowserContext;
+      if (browserName !== 'chromium') {
         const chromiumBrowser = await chromium.launch();
-        const desktopContext = await chromiumBrowser.newContext({
+        desktopContext = await chromiumBrowser.newContext({
           viewport: { width: 1280, height: 720 },
           isMobile: false,
           hasTouch: false,
         });
-
-        page = await desktopContext.newPage();
       } else {
-        const context = await browser.newContext({
+        desktopContext = await browser.newContext({
           viewport: { width: 1280, height: 720 },
           isMobile: false,
           hasTouch: false,
         });
-        page = await context.newPage();
       }
+      page = await desktopContext.newPage();
+
       await use(new SurveyEditPage(page));
     },
     { scope: 'worker' },

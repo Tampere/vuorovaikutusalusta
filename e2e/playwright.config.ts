@@ -13,19 +13,32 @@ const config: PlaywrightTestConfig = {
     },
     {
       name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
+      use: {
+        ...devices['Desktop Firefox'],
+        contextOptions: { ignoreHTTPSErrors: true },
+      },
     },
     {
       name: 'Microsoft Edge',
-      use: { ...devices['Desktop Edge'], channel: 'msedge' },
+      use: {
+        ...devices['Desktop Edge'],
+        channel: 'msedge',
+        contextOptions: { ignoreHTTPSErrors: true },
+      },
     },
     {
       name: 'Mobile Chrome',
-      use: devices['Nokia Lumia 520'], // width: 320, height: 533
+      use: {
+        ...devices['Nokia Lumia 520'],
+        contextOptions: { ignoreHTTPSErrors: true },
+      }, // width: 320, height: 533
     },
     {
       name: 'Mobile Safari',
-      use: devices['iPhone SE'], // width: 320, height: 568
+      use: {
+        ...devices['iPhone SE'],
+        contextOptions: { ignoreHTTPSErrors: true },
+      }, // width: 320, height: 568
     },
   ],
 };

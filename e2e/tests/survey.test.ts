@@ -173,7 +173,14 @@ test.describe('Survey test', () => {
     await radioFieldset?.element.getByRole('radio').first().click();
     // Change page
     await surveyPage.page.getByRole('button', { name: 'Seuraava' }).click();
-
+    await expect(
+      surveyPage.page.getByRole('button', { name: 'Edellinen' }),
+    ).toBeVisible();
+    // Wait for the first question of the second page to be visible
+    await surveyPage.page
+      .locator('.question-fieldset')
+      .first()
+      .waitFor({ state: 'visible' });
     const secondPageQuestionFieldsets = await surveyPage.page
       .locator('.question-fieldset')
       .all();
@@ -289,6 +296,8 @@ test.describe('Survey test', () => {
 
     // Check that submission count has increased by one
     await surveyAdminPage.goto();
+    // No point of testing mobile viewports here
+    await surveyAdminPage.page.setViewportSize({ width: 1280, height: 720 });
     await expect(
       surveyAdminPage.page
         .locator('h3')

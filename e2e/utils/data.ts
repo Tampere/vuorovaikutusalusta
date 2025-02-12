@@ -19,8 +19,8 @@ export const testSurveyData: SurveyParams = {
   subtitle: 'Testikyselyn aliotsikko',
   urlName: 'testikysely',
   author: 'Testaaja',
-  startDate: dayjs().add(1, 'day').format('DD.MM.YYYY HH:mm'),
-  endDate: dayjs().add(1, 'year').format('DD.MM.YYYY HH:mm'),
+  startDate: dayjs().add(1, 'day').format('dd.MM.yyyy HH:mm'),
+  endDate: dayjs().add(1, 'year').format('dd.MM.yyyy HH:mm'),
   thanksPage: {
     title: 'Kiitos vastauksestasi!',
     text: 'Kiitos vastauksestasi! Voit sulkea tämän välilehden.',
