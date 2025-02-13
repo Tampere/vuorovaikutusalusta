@@ -90,6 +90,7 @@ export default function MapQuestion({
       return;
     }
     if (!selectionType) {
+      stopDrawing();
       return;
     }
 
