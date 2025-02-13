@@ -238,6 +238,7 @@ function SurveyQuestion({
             });
           }}
           question={question}
+          mobileDrawerOpen={mobileDrawerOpen}
         />
       )}
       {/* Sorting question */}

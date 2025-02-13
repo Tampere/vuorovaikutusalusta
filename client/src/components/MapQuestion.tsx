@@ -24,6 +24,7 @@ interface Props {
   onChange: (value: MapQuestionAnswer[]) => void;
   question: SurveyMapQuestion;
   setDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  mobileDrawerOpen?: boolean;
 }
 
 export default function MapQuestion({
@@ -31,6 +32,7 @@ export default function MapQuestion({
   onChange,
   question,
   setDialogOpen,
+  mobileDrawerOpen,
 }: Props) {
   const [drawingCancelled, setDrawingCancelled] = useState(false);
   const drawingCancelledRef = useRef(drawingCancelled);
@@ -41,6 +43,7 @@ export default function MapQuestion({
     useState<(answers: SurveyMapSubQuestionAnswer[]) => void>(null);
   const [deleteConfirmDialogOpen, setDeleteConfirmDialogOpen] = useState(false);
   const [clearConfirmDialogOpen, setClearConfirmDialogOpen] = useState(false);
+  const [readyForSubQuestion, setReadyForSubQuestion] = useState(false);
 
   const {
     draw,
@@ -55,8 +58,15 @@ export default function MapQuestion({
   } = useSurveyMap();
   const { tr, surveyLanguage } = useTranslations();
 
-  const valueRef = useRef<MapQuestionAnswer[]>();
+  const valueRef = useRef<MapQuestionAnswer[]>(null);
   valueRef.current = value;
+
+  useEffect(() => {
+    if (!mobileDrawerOpen && readyForSubQuestion) {
+      setReadyForSubQuestion(false);
+      setSubQuestionDialogOpen(true);
+    }
+  }, [mobileDrawerOpen, readyForSubQuestion]);
 
   // Listen to any geometry changes related to this question
   useEffect(() => {
@@ -169,7 +179,8 @@ export default function MapQuestion({
     }
     return await new Promise<MapQuestionAnswer['subQuestionAnswers']>(
       (resolve) => {
-        setSubQuestionDialogOpen(true);
+        // Open the subquestion dialog after drawing completes to prevent it from closing automatically on iPhones
+        setReadyForSubQuestion(true);
         setHandleSubQuestionDialogClose(
           () => (answers: SurveyMapSubQuestionAnswer[]) => {
             resolve(answers);
