@@ -1,5 +1,5 @@
 import { GeneralNotification } from '@interfaces/generalNotification';
-import { encryptionKey, getDb } from '@src/database';
+import { getDb } from '@src/database';
 
 interface DBGeneralNotification {
   id: string;
@@ -49,7 +49,7 @@ export async function getGeneralNotifications() {
     FROM data.general_notification gn
     ORDER BY created_at DESC
     `,
-    [encryptionKey],
+    [],
   );
 
   return result.map(DBGeneralNotificationToGeneralNotification);
@@ -67,7 +67,7 @@ export async function getGeneralNotification(id: string) {
     FROM data.general_notification gn
     WHERE id = $1
     `,
-    [id, encryptionKey],
+    [id],
   );
 
   return result ? DBGeneralNotificationToGeneralNotification(result) : null;
