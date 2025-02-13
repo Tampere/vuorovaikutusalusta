@@ -14,8 +14,10 @@ import { TagPicker } from '@src/components/admin/TagPicker';
 const useStyles = makeStyles({
   root: {
     display: 'flex',
+    flex: 1,
     flexDirection: 'column',
     gap: '1rem',
+    maxWidth: '40rem',
   },
   actions: {
     display: 'flex',
