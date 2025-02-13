@@ -61,6 +61,10 @@ jobs:
       - name: Install Playwright's dependencies
         if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps
+      # Some WebKit dependencies seem to lay outside the cache and will need to be installed separately
+      - name: Install system dependencies for WebKit
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps webkit
       # Start up the stack & wait for all services to be healthy
       - run: CI=1 docker compose up -d --wait
         timeout-minutes: 10
