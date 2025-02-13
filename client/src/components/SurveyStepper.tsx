@@ -775,6 +775,7 @@ export default function SurveyStepper({
           </Paper>
           <Drawer
             anchor="top"
+            variant="persistent"
             open={mobileDrawerOpen}
             onClose={() => {
               setMobileDrawerOpen(false);

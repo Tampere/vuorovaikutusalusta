@@ -729,6 +729,7 @@
     "updateSuccess": "Notification updated successfully.",
     "updateFailed": "Failed to update notification.",
     "deleteSuccess": "Notification deleted successfully.",
-    "deleteFailed": "Failed to delete notification."
+    "deleteFailed": "Failed to delete notification.",
+    "maintenance": "Maintenance"
   }
 }

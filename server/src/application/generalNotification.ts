@@ -1,5 +1,5 @@
 import { GeneralNotification } from '@interfaces/generalNotification';
-import { encryptionKey, getDb } from '@src/database';
+import { getDb } from '@src/database';
 
 interface DBGeneralNotification {
   id: string;
@@ -7,7 +7,7 @@ interface DBGeneralNotification {
   message: string;
   message_version: string;
   created_at: string;
-  publisher: string;
+  publisher?: string;
 }
 
 function DBGeneralNotificationToGeneralNotification(
@@ -18,7 +18,7 @@ function DBGeneralNotificationToGeneralNotification(
     title: dbGeneralNotification.title,
     message: dbGeneralNotification.message,
     createdAt: dbGeneralNotification.created_at,
-    publisher: dbGeneralNotification.publisher,
+    publisher: dbGeneralNotification?.publisher,
   };
 }
 
@@ -45,12 +45,11 @@ export async function getGeneralNotifications() {
       title,
       message,
       message_version,
-      created_at,
-      pgp_sym_decrypt(u.full_name, $1) as publisher
+      created_at
     FROM data.general_notification gn
-    LEFT JOIN application.user u ON gn.publisher = u.id
+    ORDER BY created_at DESC
     `,
-    [encryptionKey],
+    [],
   );
 
   return result.map(DBGeneralNotificationToGeneralNotification);
@@ -64,13 +63,11 @@ export async function getGeneralNotification(id: string) {
         title,
         message,
         message_version,
-        created_at,
-        pgp_sym_decrypt(u.full_name, $2) as publisher
+        created_at
     FROM data.general_notification gn
-    LEFT JOIN application.user u ON gn.publisher = u.id
     WHERE id = $1
     `,
-    [id, encryptionKey],
+    [id],
   );
 
   return result ? DBGeneralNotificationToGeneralNotification(result) : null;

@@ -14,9 +14,11 @@ export default function AdminFrontPage() {
         sx={{
           flexGrow: 1,
           p: 3,
-          width: '100%',
-          maxWidth: '40rem',
-          margin: '0 auto',
+          height: '100vh',
+          overflowY: 'auto',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
           boxSizing: 'border-box',
         }}
       >

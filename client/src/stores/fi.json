@@ -729,6 +729,7 @@
     "updateSuccess": "Tiedote päivitetty onnistuneesti.",
     "updateFailed": "Tiedotteen päivittäminen epäonnistui.",
     "deleteSuccess": "Tiedote poistettu onnistuneesti.",
-    "deleteFailed": "Tiedotteen poistaminen epäonnistui."
+    "deleteFailed": "Tiedotteen poistaminen epäonnistui.",
+    "maintenance": "Ylläpito"
   }
 }

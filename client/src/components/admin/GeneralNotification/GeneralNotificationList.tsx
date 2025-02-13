@@ -129,8 +129,9 @@ export function GeneralNotificationList({
                     {notification.title}
                   </Typography>
                   <Typography color={'#c4c4c4'} fontSize={'14px'}>
-                    {notification.publisher},{' '}
-                    {new Date(notification.createdAt).toLocaleDateString()}
+                    {notification.publisher ??
+                      tr.GeneralNotification.maintenance}
+                    , {new Date(notification.createdAt).toLocaleDateString()}
                   </Typography>
                 </Box>
               </AccordionSummary>
