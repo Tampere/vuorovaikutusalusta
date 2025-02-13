@@ -728,6 +728,7 @@
     "updateSuccess": "Meddelandet har uppdaterats framgångsrikt.",
     "updateFailed": "Det gick inte att uppdatera meddelandet.",
     "deleteSuccess": "Meddelandet har tagits bort framgångsrikt.",
-    "deleteFailed": "Det gick inte att ta bort meddelandet."
+    "deleteFailed": "Det gick inte att ta bort meddelandet.",
+    "maintenance": "Underhåll"
   }
 }

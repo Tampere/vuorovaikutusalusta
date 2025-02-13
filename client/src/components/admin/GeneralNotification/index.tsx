@@ -47,6 +47,20 @@ export function GeneralNotifications() {
     fetchNotifications();
   }, []);
 
+  useEffect(() => {
+    const eventSource = new EventSource('/api/general-notifications/events');
+    eventSource.onerror = () => {
+      showToast({
+        message: tr.AppBar.generalNotificationsError,
+        severity: 'error',
+      });
+    };
+    eventSource.onmessage = () => {
+      fetchNotifications();
+    };
+    return () => eventSource.close();
+  }, []);
+
   async function onSubmit(
     formData: { message: string; title: string },
     notificationId?: string,
@@ -120,8 +134,8 @@ export function GeneralNotifications() {
             editing={activeNotification.editing}
             onEdit={() => setActiveNotification({ data: null, editing: true })}
             onCancel={() => {
-              editorRef.current?.setEditorValue('');
               setActiveNotification({ data: null, editing: false });
+              editorRef.current?.setEditorValue('');
             }}
             onDelete={(notificationId) => onDelete(notificationId)}
           />

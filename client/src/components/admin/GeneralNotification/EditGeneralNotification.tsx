@@ -69,6 +69,9 @@ export const EditGeneralNotification = forwardRef(
             maxHeight: '500px',
             overflowY: 'auto',
           },
+          '& .DraftEditor-root': {
+            minHeight: '220px',
+          },
         }}
       >
         {editing ? (
@@ -146,6 +149,10 @@ export const EditGeneralNotification = forwardRef(
               <Button
                 variant="outlined"
                 onClick={() => {
+                  setFormData({
+                    message: notification?.message ?? '',
+                    title: notification?.title ?? '',
+                  });
                   onCancel();
                 }}
               >
