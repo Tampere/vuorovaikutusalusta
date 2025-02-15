@@ -64,7 +64,9 @@ export default function MapQuestion({
   useEffect(() => {
     if (!mobileDrawerOpen && readyForSubQuestion) {
       setReadyForSubQuestion(false);
-      setSubQuestionDialogOpen(true);
+      setTimeout(() => {
+        setSubQuestionDialogOpen(true);
+      }, 100);
     }
   }, [mobileDrawerOpen, readyForSubQuestion]);
 
