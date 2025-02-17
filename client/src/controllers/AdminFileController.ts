@@ -35,20 +35,29 @@ export async function duplicateFiles<T extends object>(
   activeSurvey: Survey,
 ) {
   if (typeof object !== 'object' || object == null) return object;
-
-  if (
-    'fileUrl' in object &&
-    object.fileUrl != null &&
-    typeof object.fileUrl === 'string'
+  async function processFileUrl(
+    object: any,
+    key: 'fileUrl' | 'imageUrl',
+    targetSurvey: any,
   ) {
-    console.log('Object.fileurl: ', object.fileUrl);
-    const { url } = await duplicateFileOnDb(
-      object.fileUrl,
-      activeSurvey.id,
-      activeSurvey.organization.id,
-    );
-    object.fileUrl = url;
+    if (
+      key in object &&
+      object[key] != null &&
+      typeof object[key] === 'string'
+    ) {
+      const { url } = await duplicateFileOnDb(
+        object[key],
+        targetSurvey.id,
+        targetSurvey.organization.id,
+      );
+      object[key] = url;
+    }
   }
+  // check for files in attachment/media sections
+  await processFileUrl(object, 'fileUrl', activeSurvey);
+  // Check for image on sidepanel
+  await processFileUrl(object, 'imageUrl', activeSurvey);
+
   Object.keys(object).map((key) => {
     const child = object[key as keyof typeof object];
     if (Array.isArray(child)) {
