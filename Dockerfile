@@ -21,6 +21,11 @@ RUN npm ci
 
 COPY interfaces ../interfaces
 COPY client ./
+
+# Build argument for the app version (to be injected into the application)
+ARG APP_VERSION
+ENV APP_VERSION ${APP_VERSION}
+
 RUN npm run build
 
 ###
