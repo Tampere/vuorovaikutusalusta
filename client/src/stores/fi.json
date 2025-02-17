@@ -607,7 +607,8 @@
   "AppBarInstructionsMenu": {
     "label": "Ohjeet",
     "instructions": "Käyttöohje",
-    "apiDescription": "Rajapintakuvaus"
+    "apiDescription": "Rajapintakuvaus",
+    "versionInfo": "Tietoja Kartalla-palvelusta"
   },
   "InstructionsDialog": {
     "fetchingError": "Virhe haettaessa nykyisiä käyttöohjeita",
@@ -731,5 +732,10 @@
     "deleteSuccess": "Tiedote poistettu onnistuneesti.",
     "deleteFailed": "Tiedotteen poistaminen epäonnistui.",
     "maintenance": "Ylläpito"
+  },
+  "VersionInfoDialog": {
+    "title": "Ubigu kartalla -karttakyselypalvelu",
+    "version": "Versio",
+    "developedBy": "Kehittänyt"
   }
 }

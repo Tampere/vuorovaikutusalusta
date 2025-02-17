@@ -606,7 +606,8 @@
   "AppBarInstructionsMenu": {
     "label": "Instruktioner",
     "instructions": "Användarmanual",
-    "apiDescription": "API-beskrivning"
+    "apiDescription": "API-beskrivning",
+    "versionInfo": "Information om Kartalla-tjänsten"
   },
   "InstructionsDialog": {
     "fetchingError": "Fel vid hämtning av aktuella instruktioner",
@@ -730,5 +731,10 @@
     "deleteSuccess": "Meddelandet har tagits bort framgångsrikt.",
     "deleteFailed": "Det gick inte att ta bort meddelandet.",
     "maintenance": "Underhåll"
+  },
+  "VersionInfoDialog": {
+    "title": "Ubigu kartalla - kartfrågetjänst",
+    "version": "Version",
+    "developedBy": "Utvecklat av"
   }
 }
