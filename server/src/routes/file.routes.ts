@@ -135,28 +135,28 @@ router.get(
  */
 
 router.post(
-  'copy/*',
+  '/copy/*',
   ensureAuthenticated(),
   ensureFileGroupAccess(),
   asyncHandler(async (req, res) => {
     const filePath = req.params[0];
-
-    const [org, surveyId, fileName] = filePath?.split('/') ?? [];
+    const { organizationId, surveyId } = req.body;
+    console.log(organizationId, typeof organizationId);
+    const [_org, _surveyid, fullFileName] = filePath?.split('/') ?? [];
     // For now, use the first organization
     const row = await getFile(filePath);
-    const newFileName = `${fileName}-copy`;
 
     const id = await storeFile({
       buffer: row.data,
-      path: [`${org}/${surveyId}/${newFileName}`],
-      name: newFileName,
+      path: [surveyId],
+      name: fullFileName,
       mimetype: row.mimeType,
       details: row.details,
       surveyId: Number(surveyId), //surveyId == null ? null : Number(surveyId),
-      organizationId: org, // For now, use the first organization
+      organizationId, // For now, use the first organization
     });
 
-    res.status(200).json({ ...row, data: [] });
+    res.status(200).json(id);
   }),
 );
 
