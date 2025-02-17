@@ -13,9 +13,9 @@
   "license": "ISC",
   "devDependencies": {
     "@axe-core/playwright": "^4.10.1",
-    "@playwright/test": "^1.49.1",
-    "@types/node": "^22.10.2",
+    "@playwright/test": "^1.50.1",
+    "@types/node": "^22.13.4",
     "dayjs": "^1.11.13",
-    "pg": "^8.13.1"
+    "pg": "^8.13.3"
   }
 }
