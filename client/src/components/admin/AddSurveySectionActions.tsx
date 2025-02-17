@@ -391,25 +391,27 @@ export default function AddSurveySectionActions(props: Props) {
                   sx={{ boxShadow: 'none' }}
                   onClick={async () => {
                     // Copy content from Clipboard context to active survey
-                    const duplicatedFiles: SurveyPageSection =
-                      await duplicateFiles(
-                        structuredClone(clipboardSection),
-                        activeSurvey,
-                      );
+                    if (clipboardSection) {
+                      const duplicatedFiles: SurveyPageSection =
+                        await duplicateFiles(
+                          structuredClone(clipboardSection),
+                          activeSurvey,
+                        );
 
-                    addSection(Number(pageId), {
-                      ...duplicatedFiles,
-                      id: sectionSequence,
-                    });
-
-                    setSectionSequence((prev) => prev - 1);
-
-                    if (clipboardSection.type === 'map') {
-                      showToast({
-                        severity: 'warning',
-                        autoHideDuration: 30000,
-                        message: tr.EditSurveyPage.sectionAttached,
+                      addSection(Number(pageId), {
+                        ...duplicatedFiles,
+                        id: sectionSequence,
                       });
+
+                      setSectionSequence((prev) => prev - 1);
+
+                      if (clipboardSection.type === 'map') {
+                        showToast({
+                          severity: 'warning',
+                          autoHideDuration: 30000,
+                          message: tr.EditSurveyPage.sectionAttached,
+                        });
+                      }
                     }
                   }}
                 >
