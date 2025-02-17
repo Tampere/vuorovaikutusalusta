@@ -141,7 +141,7 @@ router.post(
   asyncHandler(async (req, res) => {
     const filePath = req.params[0];
     const { organizationId, surveyId } = req.body;
-    console.log(organizationId, typeof organizationId);
+
     const [_org, _surveyid, fullFileName] = filePath?.split('/') ?? [];
     // For now, use the first organization
     const row = await getFile(filePath);
