@@ -11,11 +11,15 @@ declare module '@mui/material/styles' {
   interface Palette {
     borderPrimary: Palette['primary'];
     brandYellow: Palette['primary'];
+    havu: Palette['primary'];
+    harmaa: Palette['primary'];
   }
 
   interface PaletteOptions {
     borderPrimary?: PaletteOptions['primary'];
     brandYellow?: PaletteOptions['primary'];
+    havu?: PaletteOptions['primary'];
+    harmaa?: PaletteOptions['primary'];
   }
 }
 
@@ -112,6 +116,12 @@ export const ubiTheme = createTheme({
     },
     brandYellow: {
       main: '#FFECAB',
+    },
+    havu: {
+      main: havu,
+    },
+    harmaa: {
+      main: harmaa,
     },
     borderPrimary: baseTheme.palette.augmentColor({
       color: {

@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
-import { IconButton, Menu, MenuItem, Tooltip } from '@mui/material';
+import { Button, IconButton, Menu, MenuItem, Tooltip } from '@mui/material';
 
 import { useTranslations } from '@src/stores/TranslationContext';
 import { NavLink } from 'react-router-dom';
-import { HelpCircleIcon } from '@src/components/icons/HelpCircleIcon';
+
+import InfoIcon from '@src/components/icons/InfoIcon';
+import { VersionInfoDialog } from '../VersionInfoDialog';
 
 export function AppBarInstructionsMenu() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [versionInfoOpen, setVersionInfoOpen] = useState(false);
 
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
   const { tr } = useTranslations();
@@ -24,7 +27,7 @@ export function AppBarInstructionsMenu() {
           }}
           color="inherit"
         >
-          <HelpCircleIcon />
+          <InfoIcon />
         </IconButton>
       </Tooltip>
 
@@ -52,7 +55,14 @@ export function AppBarInstructionsMenu() {
         <MenuItem component={NavLink} to="/rajapintakuvaus">
           {tr.AppBarInstructionsMenu.apiDescription}
         </MenuItem>
+        <MenuItem component={Button} onClick={() => setVersionInfoOpen(true)}>
+          {tr.AppBarInstructionsMenu.versionInfo}
+        </MenuItem>
       </Menu>
+      <VersionInfoDialog
+        isOpen={versionInfoOpen}
+        onClose={() => setVersionInfoOpen(false)}
+      />
     </>
   );
 }

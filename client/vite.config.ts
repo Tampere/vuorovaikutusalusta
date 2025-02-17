@@ -5,6 +5,7 @@ import { defineConfig } from 'vite';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
 const proxyAddress = process.env.API_URL ?? 'http://localhost:3000';
+const appVersion = process.env.APP_VERSION ?? 'local-dev';
 
 export default defineConfig({
   appType: 'mpa',
@@ -25,7 +26,7 @@ export default defineConfig({
     },
   ],
   define: {
-    'process.env': {},
+    APP_VERSION: JSON.stringify(appVersion),
   },
   optimizeDeps: {
     esbuildOptions: {

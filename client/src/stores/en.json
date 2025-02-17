@@ -607,7 +607,8 @@
   "AppBarInstructionsMenu": {
     "label": "Instructions",
     "instructions": "User manual",
-    "apiDescription": "API description"
+    "apiDescription": "API description",
+    "versionInfo": "Information about the Kartalla service"
   },
   "InstructionsDialog": {
     "fetchingError": "Error while fetching current user instructions",
@@ -731,5 +732,10 @@
     "deleteSuccess": "Notification deleted successfully.",
     "deleteFailed": "Failed to delete notification.",
     "maintenance": "Maintenance"
+  },
+  "VersionInfoDialog": {
+    "title": "Ubigu kartalla - map query service",
+    "version": "Version",
+    "developedBy": "Developed by"
   }
 }
