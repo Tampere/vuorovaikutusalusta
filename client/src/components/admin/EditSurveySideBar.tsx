@@ -32,6 +32,7 @@ import ListItemLink from '../ListItemLink';
 import SideBar from '../SideBar';
 
 import { Conditions, SurveyPage } from '@interfaces/survey';
+import { duplicateFiles } from '@src/controllers/AdminFileController';
 import { useClipboard } from '@src/stores/ClipboardContext';
 import {
   replaceIdsWithNull,
@@ -286,7 +287,17 @@ export default function EditSurveySideBar(props: Props) {
                 history.push(`${url}/sivut/${blankPage.id}?lang=${language}`);
                 setNewPageDisabled(false);
 
-                editPage({ ...clipboardPage, id: blankPage.id });
+                // Duplicate any and all files in image and attachment
+                // sections before creating new page
+                const duplicatedFiles: SurveyPage = await duplicateFiles(
+                  structuredClone(clipboardPage),
+                  activeSurvey,
+                );
+
+                editPage({
+                  ...duplicatedFiles,
+                  id: blankPage.id,
+                });
                 showToast({
                   severity: 'warning',
                   message: tr.EditSurvey.pageAttached,
