@@ -159,6 +159,7 @@ export interface SurveyImageSection
     SectionFile {
   type: 'image';
   altText: LocalizedText;
+  fileUrl: string;
 }
 
 /**
@@ -282,6 +283,7 @@ export interface SurveyGroupedCheckboxQuestion
  */
 export interface SurveyAttachmentQuestion extends CommonSurveyPageQuestion {
   type: 'attachment';
+  fileUrl: string;
 }
 
 /**

@@ -131,6 +131,36 @@ router.get(
 );
 
 /**
+ * Endpoint for copying existing files by filepath
+ */
+
+router.post(
+  '/copy/*',
+  ensureAuthenticated(),
+  ensureFileGroupAccess(),
+  asyncHandler(async (req, res) => {
+    const filePath = req.params[0];
+    const { organizationId, surveyId } = req.body;
+
+    const [_org, _surveyid, fullFileName] = filePath?.split('/') ?? [];
+    // For now, use the first organization
+    const row = await getFile(filePath);
+
+    const id = await storeFile({
+      buffer: row.data,
+      path: [surveyId],
+      name: fullFileName,
+      mimetype: row.mimeType,
+      details: row.details,
+      surveyId: Number(surveyId),
+      organizationId, // For now, use the first organization
+    });
+
+    res.status(200).json(id);
+  }),
+);
+
+/**
  * Endpoint for deleting a single file
  */
 router.delete(

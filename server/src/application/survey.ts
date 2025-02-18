@@ -1,4 +1,5 @@
 import {
+  APISurvey,
   Conditions,
   EnabledLanguages,
   File,
@@ -20,7 +21,6 @@ import {
   SurveyPageSidebarType,
   SurveyRadioQuestion,
   SurveyTheme,
-  APISurvey,
 } from '@interfaces/survey';
 
 import { User } from '@interfaces/user';
@@ -36,7 +36,6 @@ import {
   InternalServerError,
   NotFoundError,
 } from '@src/error';
-import logger from '@src/logger';
 import {
   dbOrganizationIdToOrganization,
   isAdmin,
@@ -2059,9 +2058,20 @@ export async function storeFile({
   surveyId: number;
   organizationId: string;
 }) {
+  // Check if duplicate file exists
+
   const fileString = `\\x${buffer.toString('hex')}`;
-  const fileUrl = `${organizationId}/${path.join('/')}/${name}`;
-  const row = await getDb().oneOrNone<{ path: string[]; name: string }>(
+  const splittedFileNameArray = name.split('.');
+  const extension = splittedFileNameArray.pop();
+
+  const searchFileUrl = `${organizationId}/${path.join('/')}/${splittedFileNameArray.join('.')}%.${extension}`;
+  const { count } = await getDb().one<{ count: number }>(
+    `SELECT count(id) FROM data.files WHERE url LIKE $1;`,
+    [searchFileUrl],
+  );
+  const fileUrl = `${organizationId}/${path.join('/')}/${splittedFileNameArray.join('.')}${count > 0 ? `-${count}` : ''}.${extension}`;
+
+  const row = await getDb().oneOrNone<{ url: string }>(
     `
     INSERT INTO data.files (file, details, mime_type, survey_id, url, organization)
     VALUES ($(fileString), $(details), $(mimetype), $(surveyId), $(fileUrl), $(organizationId))
@@ -2070,7 +2080,6 @@ export async function storeFile({
       details = $(details),
       mime_type = $(mimetype),
       survey_id = $(surveyId),
-      url = $(fileUrl),
       organization = $(organizationId)
     RETURNING url as url;
     `,

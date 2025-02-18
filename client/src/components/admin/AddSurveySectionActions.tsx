@@ -1,29 +1,29 @@
 import { SurveyFollowUpSection, SurveyPageSection } from '@interfaces/survey';
-import ImageSmallIcon from '../icons/ImageSmallIcon';
-import RadioButtonCheckedIcon from '../icons/RadioButtonCheckedIcon';
-import CheckboxCheckedIcon from '../icons/CheckboxCheckedIcon';
-import TextFieldIcon from '../icons/TextFieldIcon';
-import NumericFieldIcon from '../icons/NumericFieldIcon';
-import MapIcon from '../icons/MapIcon';
-import OrderedIcon from '../icons/OrderedIcon';
-import SliderIcon from '../icons/SliderIcon';
-import PaperclipIcon from '../icons/PaperclipIcon';
-import MultiCheckmarkIcon from '../icons/MultiCheckmarkIcon';
-import MatrixIcon from '../icons/MatrixIcon';
-import LikertGroupIcon from '../icons/LikertGroupIcon';
-import TextFileIcon from '../icons/TextFileIcon';
-import TextSectionIcon from '../icons/TextSectionIcon';
-import ClipboardSmallIcon from '../icons/ClipboardSmallIcon';
+import { Person } from '@mui/icons-material';
 import { Fab, Grid, Tooltip, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import { duplicateFiles } from '@src/controllers/AdminFileController';
 import { useClipboard } from '@src/stores/ClipboardContext';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
-import { ReactNode, useState } from 'react';
+import React, { ReactNode, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Person } from '@mui/icons-material';
-import React from 'react';
+import CheckboxCheckedIcon from '../icons/CheckboxCheckedIcon';
+import ClipboardSmallIcon from '../icons/ClipboardSmallIcon';
+import ImageSmallIcon from '../icons/ImageSmallIcon';
+import LikertGroupIcon from '../icons/LikertGroupIcon';
+import MapIcon from '../icons/MapIcon';
+import MatrixIcon from '../icons/MatrixIcon';
+import MultiCheckmarkIcon from '../icons/MultiCheckmarkIcon';
+import NumericFieldIcon from '../icons/NumericFieldIcon';
+import OrderedIcon from '../icons/OrderedIcon';
+import PaperclipIcon from '../icons/PaperclipIcon';
+import RadioButtonCheckedIcon from '../icons/RadioButtonCheckedIcon';
+import SliderIcon from '../icons/SliderIcon';
+import TextFieldIcon from '../icons/TextFieldIcon';
+import TextFileIcon from '../icons/TextFileIcon';
+import TextSectionIcon from '../icons/TextSectionIcon';
 
 const useStyles = makeStyles({
   actionItem: {
@@ -194,6 +194,7 @@ export default function AddSurveySectionActions(props: Props) {
       type: 'attachment',
       isRequired: false,
       title: initializeLocalizedObject(''),
+      fileUrl: null,
     },
   };
 
@@ -388,13 +389,20 @@ export default function AddSurveySectionActions(props: Props) {
                   aria-label={'attach-section-from-clipboard'}
                   size="small"
                   sx={{ boxShadow: 'none' }}
-                  onClick={() => {
+                  onClick={async () => {
                     // Copy content from Clipboard context to active survey
                     if (clipboardSection) {
+                      const duplicatedFiles: SurveyPageSection =
+                        await duplicateFiles(
+                          structuredClone(clipboardSection),
+                          activeSurvey,
+                        );
+
                       addSection(Number(pageId), {
-                        ...clipboardSection,
+                        ...duplicatedFiles,
                         id: sectionSequence,
                       });
+
                       setSectionSequence((prev) => prev - 1);
 
                       if (clipboardSection.type === 'map') {
