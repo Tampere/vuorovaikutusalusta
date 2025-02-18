@@ -57,9 +57,9 @@ export async function duplicateFiles<T extends object>(
 }
 
 async function processFileUrl(
-  object: any,
+  object: { [key in 'fileUrl' | 'imageUrl']?: string },
   key: 'fileUrl' | 'imageUrl',
-  targetSurvey: any,
+  targetSurvey: Survey,
 ) {
   if (key in object && object[key] != null && typeof object[key] === 'string') {
     const { url } = await duplicateFileOnDb(
