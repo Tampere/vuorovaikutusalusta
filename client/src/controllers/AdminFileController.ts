@@ -35,24 +35,7 @@ export async function duplicateFiles<T extends object>(
   activeSurvey: Survey,
 ) {
   if (typeof object !== 'object' || object == null) return object;
-  async function processFileUrl(
-    object: any,
-    key: 'fileUrl' | 'imageUrl',
-    targetSurvey: any,
-  ) {
-    if (
-      key in object &&
-      object[key] != null &&
-      typeof object[key] === 'string'
-    ) {
-      const { url } = await duplicateFileOnDb(
-        object[key],
-        targetSurvey.id,
-        targetSurvey.organization.id,
-      );
-      object[key] = url;
-    }
-  }
+
   // check for files in attachment/media sections
   await processFileUrl(object, 'fileUrl', activeSurvey);
   // Check for image on sidepanel
@@ -71,4 +54,19 @@ export async function duplicateFiles<T extends object>(
     }
   });
   return object;
+}
+
+async function processFileUrl(
+  object: any,
+  key: 'fileUrl' | 'imageUrl',
+  targetSurvey: any,
+) {
+  if (key in object && object[key] != null && typeof object[key] === 'string') {
+    const { url } = await duplicateFileOnDb(
+      object[key],
+      targetSurvey.id,
+      targetSurvey.organization.id,
+    );
+    object[key] = url;
+  }
 }
