@@ -2063,25 +2063,13 @@ export async function storeFile({
   const fileString = `\\x${buffer.toString('hex')}`;
   const splittedFileNameArray = name.split('.');
   const extension = splittedFileNameArray.pop();
-  let fileUrl = `${organizationId}/${path.join('/')}/${splittedFileNameArray.join('.')}.${extension}`;
-  console.log(fileUrl);
 
-  // Find next free file name in format <filename-x.jpg> where x is a number
-  // Limited size to block long/infinite looping on fault.
-  for (let i = 1; i < 100; i++) {
-    const { exists } = await getDb().oneOrNone<{ exists: Boolean }>(
-      `
-        SELECT EXISTS(SELECT 1 FROM data.files WHERE url = $1);
-      `,
-      [fileUrl],
-    );
-
-    if (!exists) {
-      break;
-    }
-
-    fileUrl = `${organizationId}/${path.join('/')}/${splittedFileNameArray.join('.')}-${i}.${extension}`;
-  }
+  const searchFileUrl = `${organizationId}/${path.join('/')}/${splittedFileNameArray.join('.')}%.${extension}`;
+  const { count } = await getDb().one<{ count: number }>(
+    `SELECT count(id) FROM data.files WHERE url LIKE $1;`,
+    [searchFileUrl],
+  );
+  const fileUrl = `${organizationId}/${path.join('/')}/${splittedFileNameArray.join('.')}${count > 0 ? `-${count}` : ''}.${extension}`;
 
   const row = await getDb().oneOrNone<{ url: string }>(
     `
