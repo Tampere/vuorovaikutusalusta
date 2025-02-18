@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { createNewSurvey, getSurveys } from '@src/controllers/SurveyController';
 import { useToasts } from '@src/stores/ToastContext';
 import SurveyListItem from './SurveyListItem';
-import { FormControlLabel, Skeleton, Switch } from '@mui/material';
+import { FormControlLabel, List, Skeleton, Switch } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import LoadingButton from '../LoadingButton';
@@ -125,10 +125,16 @@ export default function SurveyList() {
         />
       </div>
       {surveysLoading ? (
-        <Skeleton variant="rectangular" width="100%" height={300} />
+        <Skeleton variant="rectangular" width="600px" height={280} />
       ) : (
-        <ul
-          style={{ listStyle: 'none', padding: '0' }}
+        <List
+          sx={{
+            listStyle: 'none',
+            padding: '0',
+            opacity: 0,
+            '@keyframes fadeIn': { '100%': { opacity: 1 } },
+            animation: 'fadeIn 1s forwards',
+          }}
           data-testid="survey-admin-list"
         >
           {surveys
@@ -142,7 +148,7 @@ export default function SurveyList() {
             .map((survey) => (
               <SurveyListItem key={survey.id} survey={survey} />
             ))}
-        </ul>
+        </List>
       )}
     </div>
   );

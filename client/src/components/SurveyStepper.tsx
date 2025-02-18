@@ -378,6 +378,7 @@ export default function SurveyStepper({
   const stepperPane = (
     <>
       {survey.localisationEnabled &&
+        mdUp &&
         Object.values(survey.enabledLanguages).filter(
           (langEnabled) => langEnabled,
         ).length > 1 && (
@@ -749,6 +750,7 @@ export default function SurveyStepper({
               alignItems: 'center',
               justifyContent: 'center',
               background: '#fff',
+              gap: '0.5rem',
               zIndex: 1,
             }}
           >
@@ -772,6 +774,15 @@ export default function SurveyStepper({
                 }}
               />
             )}
+            {survey.localisationEnabled &&
+              Object.values(survey.enabledLanguages).filter(
+                (langEnabled) => langEnabled,
+              ).length > 1 && (
+                <SurveyLanguageMenu
+                  changeUILanguage={true}
+                  style={{ flexGrow: 0 }}
+                />
+              )}
           </Paper>
           <Drawer
             anchor="top"
