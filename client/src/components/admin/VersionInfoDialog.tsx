@@ -58,7 +58,7 @@ const dialogActionsStyle: SxProps = {
 
 export function VersionInfoDialog({ isOpen, onClose }: Props) {
   const { tr } = useTranslations();
-  console.log('dialog');
+
   return (
     <Dialog open={isOpen} sx={dialogBaseStyle}>
       <DialogTitle sx={dialogTitleStyle}>
