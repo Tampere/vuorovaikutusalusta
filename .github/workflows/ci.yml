@@ -29,7 +29,7 @@ jobs:
           username: ${{ secrets.ACR_REGISTRY_USERNAME }}
           password: ${{ secrets.ACR_REGISTRY_PASSWORD }}
       - name: Build
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           push: true
           build-args: |
