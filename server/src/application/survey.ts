@@ -2066,6 +2066,8 @@ export async function storeFile({
   let fileUrl = `${organizationId}/${path.join('/')}/${splittedFileNameArray.join('.')}.${extension}`;
   console.log(fileUrl);
 
+  // Find next free file name in format <filename-x.jpg> where x is a number
+  // Limited size to block long/infinite looping on fault.
   for (let i = 1; i < 100; i++) {
     const { exists } = await getDb().oneOrNone<{ exists: Boolean }>(
       `
