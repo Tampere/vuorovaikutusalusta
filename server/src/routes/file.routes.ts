@@ -152,7 +152,7 @@ router.post(
       name: fullFileName,
       mimetype: row.mimeType,
       details: row.details,
-      surveyId: Number(surveyId), //surveyId == null ? null : Number(surveyId),
+      surveyId: Number(surveyId),
       organizationId, // For now, use the first organization
     });
 
