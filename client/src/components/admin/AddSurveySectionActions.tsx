@@ -18,6 +18,7 @@ import {
 } from '@mui/icons-material';
 import { Fab, Grid, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import { duplicateFiles } from '@src/controllers/AdminFileController';
 import { useClipboard } from '@src/stores/ClipboardContext';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useToasts } from '@src/stores/ToastContext';
@@ -46,6 +47,7 @@ export default function AddSurveySectionActions(props: Props) {
   const { tr, initializeLocalizedObject } = useTranslations();
   const { addSection } = useSurvey();
   const { clipboardSection } = useClipboard();
+  const { activeSurvey } = useSurvey();
   const { showToast } = useToasts();
   const { pageId } = useParams<{
     pageId: string;
@@ -344,7 +346,7 @@ export default function AddSurveySectionActions(props: Props) {
                 </div>
               </Grid>
             ))}
-          {!props.disableSectionPaste && 
+          {!props.disableSectionPaste && (
             <Grid item style={{ padding: '0.5rem' }}>
               <div className={classes.actionItem}>
                 <Fab
@@ -352,11 +354,17 @@ export default function AddSurveySectionActions(props: Props) {
                   color="secondary"
                   aria-label={'attach-section-from-clipboard'}
                   size="small"
-                  onClick={() => {
+                  onClick={async () => {
                     // Copy content from Clipboard context to active survey
                     if (clipboardSection) {
+                      const duplicatedFiles: SurveyPageSection =
+                        await duplicateFiles(
+                          structuredClone(clipboardSection),
+                          activeSurvey,
+                        );
+
                       addSection(Number(pageId), {
-                        ...clipboardSection,
+                        ...duplicatedFiles,
                         id: sectionSequence,
                       });
                       setSectionSequence((prev) => prev - 1);
@@ -376,7 +384,7 @@ export default function AddSurveySectionActions(props: Props) {
                 <Typography>{tr.EditSurveyPage.attachSection}</Typography>
               </div>
             </Grid>
-          }
+          )}
           <Grid
             item
             style={{

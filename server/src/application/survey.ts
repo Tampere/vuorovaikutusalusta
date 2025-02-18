@@ -1916,15 +1916,28 @@ export async function storeFile({
   surveyId: number;
 }) {
   const fileString = `\\x${buffer.toString('hex')}`;
+
+  const splittedFileNameArray = name.split('.');
+  const extension = splittedFileNameArray.pop();
+
+  const searchFileName = `${splittedFileNameArray.join('.')}%.${extension}`;
+  const { count } = await getDb().one<{ count: number }>(
+    `SELECT count(id) FROM data.files WHERE file_name LIKE $1;`,
+    [searchFileName],
+  );
+  const fileUrl = `${splittedFileNameArray.join('.')}${
+    count > 0 ? `-${count}` : ''
+  }.${extension}`;
+
   const row = await getDb().oneOrNone<{ path: string[]; name: string }>(
     `
     INSERT INTO data.files (file, details, file_path, file_name, mime_type, survey_id)
-    VALUES ($(fileString), $(details), $(path), $(name), $(mimetype), $(surveyId))
+    VALUES ($(fileString), $(details), $(path), $(fileUrl), $(mimetype), $(surveyId))
     ON CONFLICT ON CONSTRAINT pk_files DO UPDATE SET
       file = $(fileString),
       details = $(details),
       file_path = $(path),
-      file_name = $(name),
+      file_name = $(fileUrl),
       mime_type = $(mimetype),
       survey_id = $(surveyId)
     RETURNING file_path AS path, file_name AS name;
@@ -1933,7 +1946,7 @@ export async function storeFile({
       fileString,
       details,
       path,
-      name,
+      fileUrl,
       mimetype,
       surveyId,
     },

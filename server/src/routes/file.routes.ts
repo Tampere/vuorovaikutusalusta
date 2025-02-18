@@ -123,6 +123,33 @@ router.get(
 );
 
 /**
+ * Endpoint for copying existing files by filepath
+ */
+
+router.post(
+  '/copy/*',
+  ensureAuthenticated(),
+
+  asyncHandler(async (req, res) => {
+    const filePath = req.params[0];
+    const newPath: string = req.body.surveyId;
+    const [surveyid, fullFileName] = filePath?.split('/') ?? [];
+    const row = await getFile(fullFileName, [surveyid]);
+
+    const id = await storeFile({
+      buffer: row.data,
+      path: [newPath],
+      name: fullFileName,
+      mimetype: row.mimeType,
+      details: row.details,
+      surveyId: Number(newPath),
+    });
+
+    res.status(200).json(id);
+  }),
+);
+
+/**
  * Endpoint for deleting a single file
  */
 router.delete(
