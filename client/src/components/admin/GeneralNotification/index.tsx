@@ -31,6 +31,7 @@ export function GeneralNotifications() {
 
   const [loading, setLoading] = useState(true);
   const [notifications, setNotifications] = useState<GeneralNotification[]>([]);
+  const [sseReconnects, setSseReconnects] = useState(0);
 
   const editorRef = useRef<{ setEditorValue: (value: string) => void }>(null);
 
@@ -48,16 +49,29 @@ export function GeneralNotifications() {
   }, []);
 
   useEffect(() => {
-    const eventSource = new EventSource('/api/general-notifications/events');
-    eventSource.onerror = () => {
-      showToast({
-        message: tr.AppBar.generalNotificationsError,
-        severity: 'error',
-      });
-    };
-    eventSource.onmessage = () => {
-      fetchNotifications();
-    };
+    let eventSource: EventSource;
+    function initializeEventSource() {
+      eventSource = new EventSource('/api/general-notifications/events');
+      eventSource.onerror = () => {
+        setSseReconnects((prev) => prev + 1);
+        eventSource.close();
+
+        if (sseReconnects === 10) {
+          showToast({
+            message: tr.AppBar.generalNotificationsError,
+            severity: 'error',
+          });
+        } else {
+          setTimeout(() => {
+            initializeEventSource();
+          }, 5000);
+        }
+      };
+      eventSource.onmessage = () => {
+        fetchNotifications();
+      };
+    }
+    initializeEventSource();
     return () => eventSource.close();
   }, []);
 
