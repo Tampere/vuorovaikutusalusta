@@ -406,7 +406,6 @@
   },
   "SurveyList": {
     "title": {
-      "main": "Vuorovaikutusalusta",
       "frontPage": "Kyselyt"
     },
     "errorFetchingSurveys": "Virhe haettaessa kyselyitä. Yritä myöhemmin uudestaan.",

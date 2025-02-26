@@ -406,7 +406,6 @@
   },
   "SurveyList": {
     "title": {
-      "main": "Interaction platform",
       "frontPage": "Surveys"
     },
     "errorFetchingSurveys": "Error while accessing surveys. Please try again later.",

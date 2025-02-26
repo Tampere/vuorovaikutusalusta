@@ -405,7 +405,6 @@
   },
   "SurveyList": {
     "title": {
-      "main": "Interaktionsplattform",
       "frontPage": "Enkäter"
     },
     "errorFetchingSurveys": "Ett fel uppstod vid hämtning av enkäter. Försök igen senare.",
