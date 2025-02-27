@@ -1,7 +1,7 @@
 {
   "name": "server",
   "version": "1.0.0",
-  "description": "Ubigu Vuorovaikutusalusta API Server",
+  "description": "Ubigu Kartalla API Server",
   "main": "src/app.js",
   "scripts": {
     "dev": "concurrently npm:dev:* --color",
@@ -20,11 +20,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ubigu/vuorovaikutusalusta.git"
+    "url": "git+https://github.com/ubigu/kartalla.git"
   },
   "keywords": [
     "Ubigu",
-    "vuorovaikutusalusta",
+    "kartalla",
     "REST",
     "API",
     "server"
@@ -32,9 +32,9 @@
   "author": "Ubigu Oy",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ubigu/vuorovaikutusalusta/issues"
+    "url": "https://github.com/ubigu/kartalla/issues"
   },
-  "homepage": "https://github.com/ubigu/vuorovaikutusalusta#readme",
+  "homepage": "https://github.com/ubigu/kartalla#readme",
   "engines": {
     "node": "^20.5.0"
   },

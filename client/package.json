@@ -1,7 +1,7 @@
 {
-  "name": "vuorovaikutusalusta",
+  "name": "kartalla",
   "version": "1.0.0",
-  "description": "Ubigu Vuorovaikutusalusta UI",
+  "description": "Ubigu Kartalla UI",
   "main": "dist/main.js",
   "scripts": {
     "test": "jest --config ./jest.config.json",
@@ -17,7 +17,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ubigu/vuorovaikutusalusta.git"
+    "url": "git+https://github.com/ubigu/kartalla.git"
   },
   "keywords": [
     "React",
@@ -28,9 +28,9 @@
   "author": "Ubigu Oy",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ubigu/vuorovaikutusalusta/issues"
+    "url": "https://github.com/ubigu/kartalla/issues"
   },
-  "homepage": "https://github.com/ubigu/vuorovaikutusalusta#readme",
+  "homepage": "https://github.com/ubigu/kartalla#readme",
   "engines": {
     "node": "^20.5.0"
   },

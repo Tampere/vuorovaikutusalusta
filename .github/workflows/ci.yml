@@ -9,8 +9,8 @@ on:
     types: [released]
 
 env:
-  IMAGE_NAME_TEST: ${{ secrets.ACR_REGISTRY_ADDRESS }}/vuorovaikutusalusta-test
-  IMAGE_NAME_PROD: ${{ secrets.ACR_REGISTRY_ADDRESS }}/vuorovaikutusalusta
+  IMAGE_NAME_TEST: ${{ secrets.ACR_REGISTRY_ADDRESS }}/kartalla-test
+  IMAGE_NAME_PROD: ${{ secrets.ACR_REGISTRY_ADDRESS }}/kartalla
   APP_VERSION: ${{ github.event_name == 'release' && github.event.release.name || format('build {0}', github.sha) }}
 
 jobs:

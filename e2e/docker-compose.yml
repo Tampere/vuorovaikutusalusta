@@ -33,9 +33,9 @@ services:
   e2e-database:
     image: kartoza/postgis:12.4
     environment:
-      POSTGRES_USER: vuorovaikutusalusta_user
+      POSTGRES_USER: kartalla_user
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: vuorovaikutusalusta_e2e_db
+      POSTGRES_DB: kartalla_e2e_db
       DEFAULT_COLLATION: 'fi_FI.UTF8'
       DEFAULT_CTYPE: 'fi_FI.UTF8'
       TZ: Europe/Helsinki

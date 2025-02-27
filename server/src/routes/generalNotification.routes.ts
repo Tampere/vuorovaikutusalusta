@@ -9,7 +9,7 @@ import {
 } from '@src/application/generalNotification';
 import { ensureAuthenticated, ensureSuperUserAccess } from '@src/auth';
 import { validateRequest } from '@src/utils';
-import { Router } from 'express';
+import { Response, Router } from 'express';
 import asyncHandler from 'express-async-handler';
 import { param } from 'express-validator';
 import EventEmitter from 'events';
@@ -17,6 +17,42 @@ import logger from '@src/logger';
 
 const router = Router();
 const eventEmitter = new EventEmitter({ captureRejections: true });
+eventEmitter.on('error', (err) => {
+  logger.info(`EventEmitter error: ${err}`);
+  sseClients.forEach((client) => {
+    client.write('Server error in the general notification stream');
+    client.end();
+  });
+});
+eventEmitter.on('deletedGeneralNotification', async () => {
+  sseClients.forEach((client) => {
+    client.write(
+      `data: ${JSON.stringify({ deletedGeneralNotification: true })}\n\n`,
+    );
+    // Without flush compress waits the response to end
+    client.flush();
+  });
+});
+eventEmitter.on('newGeneralNotification', async () => {
+  sseClients.forEach((client) => {
+    client.write(
+      `data: ${JSON.stringify({ newGeneralNotifications: true })}\n\n`,
+    );
+    // Without flush compress waits the response to end
+    client.flush();
+    setTimeout(
+      () => {
+        client.write(
+          `data: ${JSON.stringify({ newGeneralNotifications: false })}\n\n`,
+        );
+        client.flush();
+      },
+      GENERAL_NOTIFICATION_TIMEOUT_DAYS * 24 * 60 * 60 * 1000,
+    );
+  });
+});
+
+const sseClients = new Set<Response>();
 
 router.get(
   '/events',
@@ -27,38 +63,10 @@ router.get(
     res.setHeader('Connection', 'keep-alive');
     res.flushHeaders();
 
-    eventEmitter.on('error', (err) => {
-      logger.info(`Event emitter error: ${err}`);
-      res.write('Server error in the general notification stream');
-      res.end();
-    });
-
-    eventEmitter.on('deletedGeneralNotification', async () => {
-      res.write(
-        `data: ${JSON.stringify({ deletedGeneralNotification: true })}\n\n`,
-      );
-      // Without flush compress waits the response to end
-      res.flush();
-    });
-
-    eventEmitter.on('newGeneralNotification', async () => {
-      res.write(
-        `data: ${JSON.stringify({ newGeneralNotifications: true })}\n\n`,
-      );
-      // Without flush compress waits the response to end
-      res.flush();
-      setTimeout(
-        () => {
-          res.write(
-            `data: ${JSON.stringify({ newGeneralNotifications: false })}\n\n`,
-          );
-          res.flush();
-        },
-        GENERAL_NOTIFICATION_TIMEOUT_DAYS * 24 * 60 * 60 * 1000,
-      );
-    });
+    sseClients.add(res);
 
     req.on('close', () => {
+      sseClients.delete(res);
       res.end();
     });
   }),

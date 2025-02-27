@@ -206,6 +206,7 @@
   },
   "FileUpload": {
     "deleteFile": "Delete file",
+    "downloadFile": "Download file",
     "addedFile": "Uploaded file",
     "errorUploadingFile": "Failed to upload the file. Please try again later.",
     "errorDeletingFile": "Failed to delete the file. Please try again later."
@@ -406,7 +407,6 @@
   },
   "SurveyList": {
     "title": {
-      "main": "Interaction platform",
       "frontPage": "Surveys"
     },
     "errorFetchingSurveys": "Error while accessing surveys. Please try again later.",

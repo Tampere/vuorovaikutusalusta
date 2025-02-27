@@ -11,6 +11,7 @@ export function GeneralNotificationNavigationButton() {
   const { showToast } = useToasts();
   const history = useHistory();
   const [newNotifications, setNewNotifications] = useState(false);
+  const [sseReconnects, setSseReconnects] = useState(0);
 
   async function refreshRecentCount() {
     const data = await request<{ count: number }>(
@@ -21,23 +22,40 @@ export function GeneralNotificationNavigationButton() {
   }
 
   useEffect(() => {
-    const eventSource = new EventSource('/api/general-notifications/events');
-    eventSource.onerror = () => {
-      showToast({
-        message: tr.AppBar.generalNotificationsError,
-        severity: 'error',
-      });
-    };
-    eventSource.onmessage = (message) => {
-      const data = JSON.parse(message.data);
+    let generalNotificationEventSource: EventSource;
+    function initializeEventSource() {
+      generalNotificationEventSource = new EventSource(
+        '/api/general-notifications/events',
+      );
+      generalNotificationEventSource.onerror = () => {
+        setSseReconnects((prev) => prev + 1);
+        generalNotificationEventSource.close();
 
-      if (data.newGeneralNotifications || data.deletedGeneralNotification) {
-        refreshRecentCount();
-      } else {
-        setNewNotifications(false);
-      }
+        if (sseReconnects === 10) {
+          showToast({
+            message: tr.AppBar.generalNotificationsError,
+            severity: 'error',
+          });
+        } else {
+          setTimeout(() => {
+            initializeEventSource();
+          }, 5000);
+        }
+      };
+      generalNotificationEventSource.onmessage = (message) => {
+        const data = JSON.parse(message.data);
+
+        if (data.newGeneralNotifications || data.deletedGeneralNotification) {
+          refreshRecentCount();
+        } else {
+          setNewNotifications(false);
+        }
+      };
+    }
+    initializeEventSource();
+    return () => {
+      generalNotificationEventSource.close();
     };
-    return () => eventSource.close();
   }, []);
 
   useEffect(() => {

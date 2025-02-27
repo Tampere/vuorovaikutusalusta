@@ -5,6 +5,7 @@ import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useEffect, useMemo, useState } from 'react';
 import DropZone from '../DropZone';
 import { getFileName, getFullFilePath } from '@src/utils/path';
+import DownloadIcon from '../icons/DownloadIcon';
 
 interface Props {
   targetPath?: string[];
@@ -65,13 +66,19 @@ export default function FileUpload({
         formData.append('surveyId', String(surveyId));
       }
       try {
-        await fetch(`/api/file${targetPath ? `/${targetPath}` : ''}`, {
-          method: 'POST',
-          body: formData,
-        });
+        const res = await fetch(
+          `/api/file${targetPath ? `/${targetPath}` : ''}`,
+          {
+            method: 'POST',
+            body: formData,
+          },
+        );
+        const resJson = await res.json();
         // Upload complete - notify via callback
         onUpload({
-          url: getFullFilePath(surveyOrganizationId, targetPath, file.name),
+          url:
+            resJson.id.url ??
+            getFullFilePath(surveyOrganizationId, targetPath, file.name),
         });
       } catch (error) {
         showToast({
@@ -98,11 +105,22 @@ export default function FileUpload({
             />
           )}
           <span>{name}</span>
+          <Tooltip title={tr.FileUpload.downloadFile}>
+            <IconButton
+              style={{ marginLeft: '1rem' }}
+              aria-label="download"
+              size="small"
+              onClick={(event) => event.stopPropagation()}
+              href={`/api/file/${url}`}
+              download
+            >
+              <DownloadIcon />
+            </IconButton>
+          </Tooltip>
           <Tooltip title={tr.FileUpload.deleteFile}>
             <IconButton
               aria-label="delete"
               size="small"
-              style={{ marginLeft: '1rem' }}
               onClick={async (event) => {
                 event.stopPropagation();
                 try {

@@ -7,9 +7,9 @@ class DatabaseConnection {
 
   constructor() {
     this.pool = new Pool({
-      user: 'vuorovaikutusalusta_user',
+      user: 'kartalla_user',
       host: '127.0.0.1',
-      database: 'vuorovaikutusalusta_e2e_db',
+      database: 'kartalla_e2e_db',
       password: 'password',
       port: 5432,
     });
