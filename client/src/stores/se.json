@@ -205,6 +205,7 @@
   },
   "FileUpload": {
     "deleteFile": "Ta bort fil",
+    "downloadFile": "Ladda ner fil",
     "addedFile": "Vald fil",
     "errorUploadingFile": "Det uppstod ett fel när filen skulle laddas upp. Försök igen senare.",
     "errorDeletingFile": "Det uppstod ett fel när filen skulle tas bort. Försök igen senare."

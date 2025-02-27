@@ -2069,7 +2069,11 @@ export async function storeFile({
     `SELECT count(id) FROM data.files WHERE url LIKE $1;`,
     [searchFileUrl],
   );
-  const fileUrl = `${organizationId}/${path.join('/')}/${splittedFileNameArray.join('.')}${count > 0 ? `-${count}` : ''}.${extension}`;
+  const randomHash = (Math.random() * 10)
+    .toString(36)
+    .replace(/\./g, '_')
+    .substring(0, 6);
+  const fileUrl = `${organizationId}/${path.join('/')}/${splittedFileNameArray.join('.')}${count > 0 ? `-${randomHash}` : ''}.${extension}`;
 
   const row = await getDb().oneOrNone<{ url: string }>(
     `

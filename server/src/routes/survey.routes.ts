@@ -364,18 +364,22 @@ async function duplicateFiles<T extends object>(
   // Check for image on sidepanel
   await processFileUrl(object, 'imageUrl', targetSurvey);
 
-  Object.keys(object).map((key) => {
-    const child = object[key as keyof typeof object];
-    if (Array.isArray(child)) {
-      child
-        .filter((item) => typeof item === 'object')
-        .map((item) => {
-          duplicateFiles(item, targetSurvey);
-        });
-    } else if (typeof child === 'object') {
-      duplicateFiles(child, targetSurvey);
-    }
-  });
+  await Promise.all(
+    Object.keys(object).map(async (key) => {
+      const child = object[key as keyof typeof object];
+      if (Array.isArray(child)) {
+        return Promise.all(
+          child
+            .filter((item) => typeof item === 'object')
+            .map(async (item) => {
+              await duplicateFiles(item, targetSurvey);
+            }),
+        );
+      } else if (typeof child === 'object') {
+        await duplicateFiles(child, targetSurvey);
+      }
+    }),
+  );
   return object;
 }
 
