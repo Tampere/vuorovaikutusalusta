@@ -1925,8 +1925,12 @@ export async function storeFile({
     `SELECT count(id) FROM data.files WHERE file_name LIKE $1;`,
     [searchFileName],
   );
+  const randomHash = (Math.random() * 10)
+    .toString(36)
+    .replace(/\./g, '_')
+    .substring(0, 6);
   const fileUrl = `${splittedFileNameArray.join('.')}${
-    count > 0 ? `-${count}` : ''
+    count > 0 ? `-${randomHash}` : ''
   }.${extension}`;
 
   const row = await getDb().oneOrNone<{ path: string[]; name: string }>(
