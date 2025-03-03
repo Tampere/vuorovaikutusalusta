@@ -169,6 +169,7 @@
   },
   "FileUpload": {
     "deleteFile": "Poista tiedosto",
+    "downloadFile": "Lataa tiedosto",
     "addedFile": "Valittu tiedosto",
     "errorUploadingFile": "Tiedoston lataamisessa tapahtui virhe. Yritä myöhemmin uudestaan.",
     "errorDeletingFile": "Tiedoston poistamisessa tapahtui virhe. Yritä myöhemmin uudestaan."
