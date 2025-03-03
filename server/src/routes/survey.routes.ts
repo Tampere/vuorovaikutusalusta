@@ -11,9 +11,11 @@ import {
   deleteSurvey,
   deleteSurveyPage,
   getDistinctAutoSendToEmails,
+  getFile,
   getSurvey,
   getSurveys,
   publishSurvey,
+  storeFile,
   unpublishSurvey,
   updateSurvey,
   userCanEditSurvey,
@@ -241,28 +243,34 @@ router.post(
 
     eachRecursive(copiedSurveyData);
 
+    // Duplicates all files in original survey to keep fileurls unique
+    const surveyWithDuplicatedFiles = await duplicateFiles(
+      copiedSurveyData,
+      createdSurvey,
+    );
+
     // For every page that exist on the copied survey's data, create a new page skeleton
     // createdSurvey.pages will already include one page on it by default
     const pageSkeletons = createdSurvey.pages;
-    if (copiedSurveyData.pages.length > 1) {
+    if (surveyWithDuplicatedFiles.pages.length > 1) {
       const additionalPages = await Promise.all(
-        Array(copiedSurveyData.pages.length - 1)
+        Array(surveyWithDuplicatedFiles.pages.length - 1)
           .fill(null)
           .map(() => createSurveyPage(createdSurvey.id)),
       );
       pageSkeletons.push(...additionalPages);
     }
 
-    const newPages = copiedSurveyData.pages.map((page, index) => ({
+    const newPages = surveyWithDuplicatedFiles.pages.map((page, index) => ({
       ...page,
       id: pageSkeletons[index].id,
     }));
 
     const newSurvey = {
       ...createdSurvey,
-      mapUrl: copiedSurveyData.mapUrl,
+      mapUrl: surveyWithDuplicatedFiles.mapUrl,
       pages: newPages,
-      thanksPage: copiedSurveyData.thanksPage,
+      thanksPage: surveyWithDuplicatedFiles.thanksPage,
     } as Survey;
 
     // Just to make sure that we are not overwriting the previous survey
@@ -276,6 +284,66 @@ router.post(
     }
   }),
 );
+
+export async function duplicateFiles<T extends object>(
+  object: T,
+  activeSurvey: Omit<Survey, 'createdAt' | 'updatedAt'>,
+) {
+  if (typeof object !== 'object' || object == null) return object;
+
+  // check for files in attachment/media sections
+  await processFileUrl(object, 'fileName', activeSurvey);
+  // Check for image on sidepanel
+  await processFileUrl(object, 'imageName', activeSurvey);
+
+  await Promise.all(
+    Object.keys(object).map(async (key) => {
+      const child = object[key as keyof typeof object];
+      if (Array.isArray(child)) {
+        return Promise.all(
+          child
+            .filter((item) => typeof item === 'object')
+            .map(async (item) => {
+              await duplicateFiles(item, activeSurvey);
+            }),
+        );
+      } else if (typeof child === 'object') {
+        await duplicateFiles(child, activeSurvey);
+      }
+    }),
+  );
+  return object;
+}
+
+async function processFileUrl(
+  object: { [key in 'fileName' | 'imageName']?: string } & {
+    [key in 'filePath' | 'imagePath']?: string[];
+  },
+  key: 'fileName' | 'imageName',
+  activeSurvey: Omit<Survey, 'createdAt' | 'updatedAt'>,
+) {
+  if (key in object && object[key] != null && typeof object[key] === 'string') {
+    const row = await getFile(
+      object[key],
+      key === 'fileName' ? object.filePath : object.imagePath,
+    );
+    const { name, path } = await storeFile({
+      buffer: row.data,
+      path: [String(activeSurvey.id)],
+      name: object[key],
+      mimetype: row.mimeType,
+      details: row.details,
+      surveyId: activeSurvey.id,
+    });
+
+    object[key] = name;
+    if (key === 'imageName') {
+      object.imagePath = path;
+    } else if (key === 'fileName') {
+      object.filePath = path;
+    }
+  }
+}
 
 /**
  * Endpoint for publishing the survey

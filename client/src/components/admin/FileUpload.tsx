@@ -1,5 +1,5 @@
 import { IconButton, Tooltip } from '@mui/material';
-import { Cancel } from '@mui/icons-material';
+import { Cancel, Download } from '@mui/icons-material';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { getFullFilePath } from '@src/utils/path';
@@ -46,7 +46,7 @@ export default function FileUpload({
       if (value) {
         try {
           await Promise.all(
-            (value ?? []).map(({ path, name }) => deleteFile(path, name))
+            (value ?? []).map(({ path, name }) => deleteFile(path, name)),
           );
         } catch (error) {
           showToast({
@@ -65,12 +65,20 @@ export default function FileUpload({
         formData.append('surveyId', String(surveyId));
       }
       try {
-        await fetch(`/api/file${targetPath ? `/${targetPath}` : ''}`, {
-          method: 'POST',
-          body: formData,
-        });
+        const res = await fetch(
+          `/api/file${targetPath ? `/${targetPath}` : ''}`,
+          {
+            method: 'POST',
+            body: formData,
+          },
+        );
+        const { id } = await res.json();
+
         // Upload complete - notify via callback
-        onUpload({ name: file.name, path: targetPath });
+        onUpload({
+          name: id.name ?? file.name,
+          path: id.path ?? targetPath,
+        });
       } catch (error) {
         showToast({
           severity: 'error',
@@ -96,11 +104,22 @@ export default function FileUpload({
             />
           )}
           <span>{name}</span>
+          <Tooltip title={tr.FileUpload.downloadFile}>
+            <IconButton
+              style={{ marginLeft: '1rem' }}
+              aria-label="download"
+              size="small"
+              onClick={(event) => event.stopPropagation()}
+              href={`/api/file/${fullFilePath}`}
+              download
+            >
+              <Download />
+            </IconButton>
+          </Tooltip>
           <Tooltip title={tr.FileUpload.deleteFile}>
             <IconButton
               aria-label="delete"
               size="small"
-              style={{ marginLeft: '1rem' }}
               onClick={async (event) => {
                 event.stopPropagation();
                 try {
