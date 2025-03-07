@@ -8,7 +8,6 @@ import {
   DialogContent,
   DialogTitle,
   FormControlLabel,
-  Typography,
 } from '@mui/material';
 import DownloadIcon from '@src/components/icons/DownloadIcon';
 import { useToasts } from '@src/stores/ToastContext';
@@ -16,9 +15,15 @@ import { useTranslations } from '@src/stores/TranslationContext';
 import { request } from '@src/utils/request';
 import { saveAs } from 'file-saver';
 import JSZip from 'jszip';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useState } from 'react';
 
+interface AnswerCounts {
+  aplhaNumericAnswers: number;
+  attachmentAnswers: number;
+  mapAnswers: number;
+  personalInfoAnswers: number;
+}
 interface Props {
   surveyId: number;
 }
@@ -27,12 +32,34 @@ export default function DataExport({ surveyId }: Props) {
   const [displayDialog, setDisplayDialog] = useState(false);
   const [withPersonalInfo, setWithPersonalInfo] = useState(false);
   const [selectedFileFormats, setSelectedFileFormats] = useState({
-    csv: true,
+    csv: false,
     geopackage: false,
     attachments: false,
   });
+  const [answerCounts, setAnswerCounts] = useState<AnswerCounts | null>();
   const { tr } = useTranslations();
   const { showToast } = useToasts();
+
+  useEffect(() => {
+    async function getAnswerCounts() {
+      try {
+        const result = await request<AnswerCounts>(
+          `/api/answers/${surveyId}/answer-counts`,
+        );
+        setAnswerCounts(result);
+        setSelectedFileFormats((prev) => ({
+          ...prev,
+          csv: result.aplhaNumericAnswers > 0 || result.personalInfoAnswers > 0,
+        }));
+      } catch {
+        showToast({
+          severity: 'error',
+          message: tr.DataExport.error,
+        });
+      }
+    }
+    getAnswerCounts();
+  }, []);
 
   const allowedFilesRegex =
     /^data:(image|application|video)\/(png|jpg|jpeg|pdf|vnd.openxmlformats-officedocument.spreadsheetml.sheet|xlsx|vnd.openxmlformats-officedocument.wordprocessingml.document|docx|mp4|mkv|webm|avi|wmv|m4p|m4v|mpg|mpeg|m4v|mov);base64,/;
@@ -137,6 +164,10 @@ export default function DataExport({ surveyId }: Props) {
               label={tr.DataExport.alphanumericSubmissions}
               control={
                 <Checkbox
+                  disabled={
+                    answerCounts?.aplhaNumericAnswers === 0 &&
+                    answerCounts?.personalInfoAnswers === 0
+                  }
                   checked={selectedFileFormats.csv}
                   onChange={(event) =>
                     setSelectedFileFormats({
@@ -160,6 +191,7 @@ export default function DataExport({ surveyId }: Props) {
                 label={tr.DataExport.personalInfo}
                 control={
                   <Checkbox
+                    disabled={answerCounts?.personalInfoAnswers === 0}
                     size="small"
                     checked={withPersonalInfo}
                     onChange={() => setWithPersonalInfo((prev) => !prev)}
@@ -172,6 +204,7 @@ export default function DataExport({ surveyId }: Props) {
             label={tr.DataExport.geospatialSubmissions}
             control={
               <Checkbox
+                disabled={answerCounts?.mapAnswers === 0}
                 checked={selectedFileFormats.geopackage}
                 onChange={(event) =>
                   setSelectedFileFormats({
@@ -186,6 +219,7 @@ export default function DataExport({ surveyId }: Props) {
             label={tr.DataExport.attachments}
             control={
               <Checkbox
+                disabled={answerCounts?.attachmentAnswers === 0}
                 checked={selectedFileFormats.attachments}
                 onChange={(event) =>
                   setSelectedFileFormats({

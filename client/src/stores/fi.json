@@ -1,6 +1,7 @@
 {
   "DataExport": {
     "exportAnswers": "Lataa vastaukset…",
+    "error": "Virhe tarkistettaessa vastausmääriä",
     "surveyAnswerExport": "Mitkä aineistot haluat ladata?",
     "download": "Lataa",
     "errorDownloadingCSV": "CSV -tiedoston lataaminen epäonnistui",

@@ -28,7 +28,7 @@ export const GENERAL_NOTIFICATION_TIMEOUT_DAYS = process.env
   : 3;
 
 export async function getRecentGeneralNotificationCount() {
-  return getDb().one<DBGeneralNotification>(
+  return getDb().one<{ count: number }>(
     `
     SELECT COUNT(id)
     FROM data.general_notification
