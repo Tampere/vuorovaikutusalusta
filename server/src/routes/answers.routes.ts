@@ -1,4 +1,5 @@
 import {
+  getAnswerCounts,
   getAttachments,
   getCSVFile,
   getGeoPackageFile,
@@ -12,6 +13,36 @@ import { param, query } from 'express-validator';
 import { validateRequest } from '../utils';
 
 const router = Router();
+
+/**
+ * Endpoint for checking if the give survey has answers
+ */
+router.get(
+  '/:id/answer-counts',
+  ensureAuthenticated(),
+  ensureSurveyGroupAccess(),
+  validateRequest([
+    param('id').isNumeric().toInt().withMessage('ID must be a number'),
+  ]),
+  asyncHandler(async (req, res) => {
+    const surveyId = Number(req.params.id);
+    const permissionsOk = await userCanViewSurvey(req.user, surveyId);
+    if (!permissionsOk) {
+      throw new ForbiddenError(
+        'User not author, editor nor viewer of the survey',
+      );
+    }
+
+    try {
+      const answerCounts = await getAnswerCounts(surveyId);
+      res.status(200).json(answerCounts);
+    } catch (error) {
+      res.status(500).json({
+        message: `Error getting answer counts: ${JSON.stringify(error)}`,
+      });
+    }
+  }),
+);
 
 /**
  * Endpoint for getting answer entry files for the given survey

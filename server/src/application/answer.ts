@@ -1090,7 +1090,7 @@ function submissionAnswersToJson(
             sectionDetails.predecessorSection,
             predecessorIndexes,
           )
-        ] = answer.valueOptionId ? 1 : answer.valueText ?? '';
+        ] = answer.valueOptionId ? 1 : (answer.valueText ?? '');
         break;
       case 'multi-matrix':
         sectionDetails.details.subjects.forEach((subject, index) => {
@@ -1189,5 +1189,40 @@ async function entriesToCSVFormat(
   return {
     headers: createCSVHeaders(sectionMetadata),
     submissions: createCSVSubmissions(answerEntries, sectionMetadata),
+  };
+}
+
+export async function getAnswerCounts(surveyId: number) {
+  const result = await getDb().one<{
+    alphaNumericAnswers: string;
+    attachmentAnswers: string;
+    mapAnswers: string;
+    personalInfoAnswers: string;
+  }>(
+    `
+    WITH answer_entries AS (
+      SELECT ae.id, ae.submission_id, ps.type, ps.parent_section FROM DATA.answer_entry ae
+      LEFT JOIN DATA.page_section ps ON ps.id = ae.section_id
+      LEFT JOIN DATA.submission sub ON sub.id = ae.submission_id 
+      LEFT JOIN DATA.survey s ON s.id = sub.survey_id
+      WHERE s.id = $1
+    ), personal_info_entries AS (
+      SELECT * FROM DATA.personal_info 
+      WHERE submission_id =  ANY(SELECT submission_id FROM answer_entries)
+    ) 
+    SELECT 
+        COUNT(*) FILTER (WHERE type <> 'map' AND TYPE <> 'attachment' AND parent_section IS NULL) AS "alphaNumericAnswers",
+        COUNT(*) FILTER (WHERE type = 'attachment') AS "attachmentAnswers",
+        COUNT(*) FILTER (WHERE type = 'map') AS "mapAnswers",
+        (SELECT COUNT(*) FROM personal_info_entries) AS "personalInfoAnswers"
+    FROM answer_entries;
+  `,
+    [surveyId],
+  );
+  return {
+    aplhaNumericAnswers: Number(result.alphaNumericAnswers),
+    attachmentAnswers: Number(result.attachmentAnswers),
+    mapAnswers: Number(result.mapAnswers),
+    personalInfoAnswers: Number(result.personalInfoAnswers),
   };
 }

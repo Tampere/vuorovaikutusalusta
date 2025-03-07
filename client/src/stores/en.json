@@ -1,6 +1,7 @@
 {
   "DataExport": {
     "exportAnswers": "Export response data…",
+    "error": "Error while fetching answer counts.",
     "surveyAnswerExport": "Which data would you like to download?",
     "download": "Download",
     "errorDownloadingCSV": "Failed to export CSV file",

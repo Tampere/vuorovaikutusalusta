@@ -1,6 +1,7 @@
 {
   "DataExport": {
     "exportAnswers": "Ladda ner svar…",
+    "error": "Fel vid hämtning av svarsräkningar.",
     "surveyAnswerExport": "Vilka data vill du ladda ner?",
     "download": "Ladda ner",
     "errorDownloadingCSV": "Misslyckades att ladda ner CSV-filen",
