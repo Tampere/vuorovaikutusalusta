@@ -241,6 +241,7 @@ export default function SurveySubmissionsPage() {
         labels={[survey.title[surveyLanguage], tr.AnswersList.answers]}
       />
       <SplitPaneLayout
+        height="calc(100vh - 64px)"
         mainPane={
           <Box
             sx={{
