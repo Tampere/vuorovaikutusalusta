@@ -2,7 +2,6 @@ import { Express } from 'express';
 import passport from 'passport';
 import { OIDCStrategy } from 'passport-azure-ad';
 import { decrypt } from '../crypto';
-import logger from '@src/logger';
 import { dbOrganizationIdToOrganization, upsertUser } from '../user';
 
 /**

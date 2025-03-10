@@ -340,7 +340,9 @@ export default function EditSurveySideBar(props: Props) {
         <ListItemLink
           external
           newTab
-          to={`/${originalActiveSurvey.name}${
+          to={`/${originalActiveSurvey.organization.name}/${
+            originalActiveSurvey.name
+          }${
             originalActiveSurvey?.localisationEnabled
               ? '?lang=' + surveyLanguage
               : ''
