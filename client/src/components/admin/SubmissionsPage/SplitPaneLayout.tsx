@@ -25,12 +25,14 @@ interface Props {
     helperText: string;
   };
   defaultSize?: string;
+  height?: string;
 }
 
 export default function SplitPaneLayout({
   mainPane,
   sidePane,
   mobileDrawer,
+  height,
 }: Props) {
   const [isResizing, setIsResizing] = useState(false);
   const theme = useTheme();
@@ -40,7 +42,7 @@ export default function SplitPaneLayout({
     <Box
       sx={{
         width: '100%',
-        height: '100vh',
+        height: height ?? '100vh',
         display: 'flex',
       }}
     >
