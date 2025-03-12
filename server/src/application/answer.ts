@@ -12,7 +12,6 @@ import moment from 'moment';
 import ogr2ogr from 'ogr2ogr';
 import { getAvailableMapLayers } from './map';
 import { getSurvey } from './survey';
-import logger from '@src/logger';
 
 const tr = useTranslations('fi');
 
