@@ -461,7 +461,8 @@ async function getCheckboxOptionsFromDB(surveyId: number) {
         LEFT JOIN data.page_section ps ON opt.section_id = ps.id
         LEFT JOIN data.survey_page sp ON ps.survey_page_id = sp.id
         LEFT JOIN data.survey s ON sp.survey_id = s.id
-      WHERE s.id = $1;`,
+      WHERE s.id = $1
+      ORDER BY opt.idx;`,
     [surveyId],
   );
   if (!rows || rows.length === 0) return null;
@@ -582,7 +583,7 @@ async function getGeometryDBEntries(surveyId: number): Promise<AnswerEntry[]> {
         WHERE (type = 'map' OR parent_section IS NOT NULL)
           AND sub.unfinished_token IS NULL
           AND sub.survey_id = $1
-          ORDER BY submission_id, ae.parent_entry_id ASC NULLS FIRST, section_index`,
+          ORDER BY submission_id, ae.parent_entry_id ASC NULLS FIRST, section_index, opt.idx`,
     [surveyId],
   )) as DBAnswerEntry[];
 
