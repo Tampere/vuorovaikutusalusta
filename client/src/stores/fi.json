@@ -735,8 +735,8 @@
     "maintenance": "Ylläpito"
   },
   "VersionInfoDialog": {
-    "title": "Ubigu kartalla -karttakyselypalvelu",
-    "version": "Versio",
+    "title": "Ubigu Kartalla -karttakyselypalvelu",
+    "version": "versio",
     "developedBy": "Kehittänyt"
   }
 }

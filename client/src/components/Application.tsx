@@ -19,6 +19,7 @@ import { NotFoundPage } from './NotFoundPage';
 import SurveyLanguageRouter from './SurveyLanguageRouter';
 import SurveyPage from './SurveyPage';
 import './react-split-pane.css';
+import { RootPage } from './RootPage';
 
 /** Application entry point wrapper component */
 const Application = () => {
@@ -41,6 +42,9 @@ const Application = () => {
         <BrowserRouter basename="/">
           <SurveyLanguageRouter />
           <Switch>
+            <Route path="/" exact>
+              <RootPage />
+            </Route>
             <Route path="/saavutettavuusseloste" exact>
               <A11yStatement />
             </Route>
