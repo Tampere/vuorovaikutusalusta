@@ -11,10 +11,10 @@ import {
 } from '@mui/material';
 import React from 'react';
 import CloseIcon from '../icons/CloseIcon';
-import KartallaLogo from '../icons/KartallaLogo';
 
 import UbiguLogoWhite from '../icons/UbiguLogoWhite';
 import { useTranslations } from '@src/stores/TranslationContext';
+import KartallaLogoInfo from '../icons/KartallaLogoWhite';
 
 interface Props {
   isOpen: boolean;
@@ -34,7 +34,7 @@ const dialogBaseStyle: SxProps = {
 
 const dialogTitleStyle: SxProps = {
   color: 'white',
-  marginTop: '30px',
+  marginTop: '15px',
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
@@ -62,7 +62,7 @@ export function VersionInfoDialog({ isOpen, onClose }: Props) {
   return (
     <Dialog open={isOpen} sx={dialogBaseStyle}>
       <DialogTitle sx={dialogTitleStyle}>
-        <KartallaLogo />
+        <KartallaLogoInfo />
         <Box sx={{ textAlign: 'center' }}>
           <Typography sx={{ fontWeight: 700 }}>
             {tr.VersionInfoDialog.title}

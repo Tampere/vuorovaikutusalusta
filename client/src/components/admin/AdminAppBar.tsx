@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   AppBar,
+  IconButton,
   List,
   ListItem,
   Theme,
@@ -11,8 +12,8 @@ import { SystemStyleObject } from '@mui/system';
 import SurveyLanguageMenu from '../SurveyLanguageMenu';
 import LanguageMenu from '../LanguageMenu';
 import AppBarUserMenu from './AppBarUserMenu';
-import { NavLink } from 'react-router-dom';
-import KartallaLogo from '@src/components/icons/KartallaLogo';
+import { NavLink, useHistory } from 'react-router-dom';
+import KartallaLogo from '@src/components/icons/KartallaLogoDense';
 import { AppBarInstructionsMenu } from './Instructions/AppBarInstructionsMenu';
 import { GeneralNotificationNavigationButton } from './GeneralNotification/GeneralNotificationNavigationButton';
 
@@ -27,6 +28,8 @@ export function AdminAppBar({
   withHomeLink = true,
   style = {},
 }: Props) {
+  const history = useHistory();
+
   return (
     <>
       <AppBar position="fixed">
@@ -50,20 +53,20 @@ export function AdminAppBar({
           >
             {withHomeLink && (
               <ListItem>
-                <Typography
-                  variant="subtitle1"
-                  noWrap
-                  component={NavLink}
-                  to="/"
+                <IconButton
+                  onClick={() => history.push('/')}
                   sx={{
-                    textDecoration: 'none',
+                    padding: 0,
+                    width: '140px',
+                    transform: 'translateY(-2px)',
                     '&:hover': {
+                      backgroundColor: 'transparent',
                       opacity: 0.6,
                     },
                   }}
                 >
                   <KartallaLogo />
-                </Typography>
+                </IconButton>
               </ListItem>
             )}
             {labels.map((item, index) => (
