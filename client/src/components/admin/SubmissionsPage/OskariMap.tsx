@@ -103,6 +103,18 @@ export default function OskariMap({
       fill: {
         color: fillColor,
       },
+      text: {
+        font: 'bold 14px Verdana',
+        labelProperty: 'submissionId',
+        labelText: feature.properties.submissionId,
+      },
+      ...(feature.properties.selected && {
+        stroke: {
+          ...style.stroke,
+          color: '#0076A3',
+          lineDash: null,
+        },
+      }),
     };
   }
 
@@ -129,12 +141,18 @@ export default function OskariMap({
     const customIcon: string =
       feature.properties.question?.featureStyles?.point?.markerIcon;
 
+    const markerSize =
+      customIcon && oskariVersion >= 270 && oskariVersion < 290 ? 64 : 6;
+
     const style = {
       shape: customIcon ?? (isPrimaryStyle ? 5 : 2),
-      size: customIcon && oskariVersion >= 270 && oskariVersion < 290 ? 64 : 6,
+      size: markerSize,
       color: isPrimaryStyle
         ? mapFeatureColorScheme.primaryColor
         : mapFeatureColorScheme.secondaryColor,
+      ...(feature.properties.selected && {
+        size: markerSize * 2,
+      }),
     };
     if (withMessage) {
       return {
