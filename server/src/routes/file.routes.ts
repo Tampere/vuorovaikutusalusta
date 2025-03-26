@@ -125,7 +125,7 @@ router.get(
     const fileUrl = req.params[0];
     const row = await getFile(fileUrl);
     res.set('Content-type', row.mimeType);
-    res.set('File-details', JSON.stringify(row.details));
+    res.set('File-details', JSON.stringify(row.details).normalize('NFC')); // Normalize to NFC to avoid issues with special characters
     res.status(200).send(row.data);
   }),
 );
