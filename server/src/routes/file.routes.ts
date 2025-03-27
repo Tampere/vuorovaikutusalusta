@@ -117,7 +117,7 @@ router.get(
     const filePathArray = filePath?.split('/') ?? [];
     const row = await getFile(fileName, filePathArray);
     res.set('Content-type', row.mimeType);
-    res.set('File-details', JSON.stringify(row.details));
+    res.set('File-details', JSON.stringify(row.details).normalize('NFC')); // Normalize to NFC to avoid issues with special characters
     res.status(200).send(row.data);
   }),
 );

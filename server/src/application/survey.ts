@@ -1028,11 +1028,23 @@ async function deleteRemovedLinkedSections(
 ) {
   // Get all existing linked sections (follow-up sections can have child sections but child sections can't have follow-up sections)
   const rows = await getDb().manyOrNone<{ id: number }>(
-    `WITH follow_ups AS 
-      (SELECT id FROM DATA.page_section WHERE predecessor_section = $1), 
-    child_sections AS 
-      (SELECT ps.id FROM DATA.page_section ps INNER JOIN follow_ups ON ps.parent_section = follow_ups.id) 
-    SELECT id FROM follow_ups UNION SELECT id FROM child_sections;`,
+    `
+    WITH follow_ups AS (
+      SELECT id 
+      FROM data.page_section 
+      WHERE predecessor_section = $1
+    ), 
+    follow_up_child_sections AS (
+      SELECT ps.id 
+      FROM data.page_section ps 
+      INNER JOIN follow_ups ON ps.parent_section = follow_ups.id
+    )
+    SELECT id FROM follow_ups 
+    UNION 
+    SELECT id FROM follow_up_child_sections 
+    UNION 
+    SELECT id FROM data.page_section WHERE parent_section = $1;
+    `,
     [parentSectionId],
   );
 
@@ -1932,6 +1944,15 @@ export async function storeFile({
   const fileUrl = `${splittedFileNameArray.join('.')}${
     count > 0 ? `-${randomHash}` : ''
   }.${extension}`;
+
+  // Normalize details to NFC to prevent errors when sending details in HTTP headers
+  if (details) {
+    for (const key in details) {
+      if (typeof details[key] === 'string') {
+        details[key] = details[key].normalize('NFC');
+      }
+    }
+  }
 
   const row = await getDb().oneOrNone<{ path: string[]; name: string }>(
     `
