@@ -1933,6 +1933,15 @@ export async function storeFile({
     count > 0 ? `-${randomHash}` : ''
   }.${extension}`;
 
+  // Normalize details to NFC to prevent errors when sending details in HTTP headers
+  if (details) {
+    for (const key in details) {
+      if (typeof details[key] === 'string') {
+        details[key] = details[key].normalize('NFC');
+      }
+    }
+  }
+
   const row = await getDb().oneOrNone<{ path: string[]; name: string }>(
     `
     INSERT INTO data.files (file, details, file_path, file_name, mime_type, survey_id)
