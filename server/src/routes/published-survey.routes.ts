@@ -245,10 +245,7 @@ router.get(
       // In case the survey shouldn't be published, throw the same not found error
       throw new NotFoundError(`Survey with name ${req.params.name} not found`);
     }
-    const answers = await getUnfinishedAnswerEntries(
-      String(req.query.token),
-      req.query.withPersonalInfo === 'true',
-    );
+    const answers = await getUnfinishedAnswerEntries(String(req.query.token));
     const language = await getSurveyAnswerLanguage(String(req.query.token));
     res.json({ answers, language });
   }),

@@ -215,7 +215,9 @@ async function savePersonalInfo(personalInfo: DBPersonalInfo) {
 }
 
 /** Get decrypted personal info question answer from database */
-async function getPersonalInfo(submissionId: number) {
+async function getPersonalInfo(
+  submissionId: number,
+): Promise<AnswerEntry | null> {
   const result = await getDb().oneOrNone<DBPersonalInfo>(
     `
     SELECT
@@ -828,10 +830,16 @@ export async function getSurveyAnswerLanguage(token: string) {
  * @param token Unfinished token
  * @returns Answer entries for the submission
  */
-export async function getUnfinishedAnswerEntries(
-  token: string,
-  withPersonalInfo?: boolean,
-) {
+export async function getUnfinishedAnswerEntries(token: string) {
+  const { id: submissionId } = await getDb().oneOrNone<{ id: number }>(
+    `SELECT id FROM data.submission WHERE unfinished_token = $1`,
+    [token],
+  );
+
+  if (!submissionId) {
+    throw new NotFoundError(`Token not found`);
+  }
+
   const rows = await getDb()
     .manyOrNone<
       DBAnswerEntry & {
@@ -867,16 +875,13 @@ export async function getUnfinishedAnswerEntries(
     .catch(() => {
       throw new BadRequestError(`Invalid token`);
     });
-  if (!rows.length) {
-    throw new NotFoundError(`Token not found`);
-  }
 
-  if (withPersonalInfo) {
-    const personalInfo = await getPersonalInfo(rows[0].submission_id);
-    return [...dbAnswerEntriesToAnswerEntries(rows), personalInfo];
-  }
+  const personalInfo = await getPersonalInfo(submissionId);
 
-  return dbAnswerEntriesToAnswerEntries(rows);
+  return [
+    ...(rows ? dbAnswerEntriesToAnswerEntries(rows) : []),
+    ...(personalInfo ? [personalInfo] : []),
+  ];
 }
 
 /**
