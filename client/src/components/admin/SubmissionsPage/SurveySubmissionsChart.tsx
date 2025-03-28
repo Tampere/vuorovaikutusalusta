@@ -1,5 +1,5 @@
 import { AnswerEntry, Submission, SurveyQuestion } from '@interfaces/survey';
-import { useTheme } from '@mui/material';
+import { useTheme, Box } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { FunctionComponent, useMemo, useState } from 'react';
 import {
@@ -31,6 +31,39 @@ type Range = {
   max: number;
 };
 
+function LabelTooltip({
+  tooltip,
+}: {
+  tooltip: { coordinate: number; value: string };
+}) {
+  if (!tooltip) return null;
+
+  return (
+    <Box
+      sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        '@keyframes fadeIn': {
+          from: { opacity: 0 },
+          to: { opacity: 1 },
+        },
+        animation: 'fadeIn 0.3s ease-in-out',
+        padding: '5px',
+        fontWeight: 600,
+        height: 'fit-content',
+        backgroundColor: 'white',
+        position: 'absolute',
+        left: tooltip.coordinate,
+        border: '1px solid #cfcece',
+        bottom: '100px',
+      }}
+    >
+      {tooltip.value}
+    </Box>
+  );
+}
+
 function buildNumericRange(range: Range, answersList: AnswerEntry[]): number[] {
   const maxBuckets = 10;
   const minBuckets = 5;
@@ -43,14 +76,14 @@ function buildNumericRange(range: Range, answersList: AnswerEntry[]): number[] {
   const min = Math.floor(
     range.min ??
       (answersList.reduce(
-        (min, answer) => ((answer.value as number) < min ? answer.value : min),
+        (min, answer) => (Number(answer.value) < min ? answer.value : min),
         null as number,
       ) as number),
   );
   const max = Math.ceil(
     range.max ??
       (answersList.reduce(
-        (max, answer) => ((answer.value as number) > max ? answer.value : max),
+        (max, answer) => (Number(answer.value) > max ? answer.value : max),
         null as number,
       ) as number),
   );
@@ -79,7 +112,12 @@ function buildNumericRange(range: Range, answersList: AnswerEntry[]): number[] {
     // Starting position is first power of 10 to fit full range
     Math.pow(10, Math.floor(Math.log10((max - min) / maxBuckets))),
   );
-  return Array.from({ length: numOfBuckets }, (_, i) => min + step * i);
+
+  return Array.from({ length: numOfBuckets }, (_, i) => {
+    const value = min + step * i;
+
+    return Number.isInteger(value) ? value : parseFloat(value.toFixed(2));
+  });
 }
 
 const CustomizedAxisTick: FunctionComponent<any> = (props: any) => {
@@ -108,6 +146,8 @@ export default function Chart({ submissions, selectedQuestion }: Props) {
   const [chartWidth, setChartWidth] = useState(240);
   const { surveyLanguage } = useTranslations();
   const theme = useTheme();
+  const { tr } = useTranslations();
+  const [tooltip, setTooltip] = useState(null);
 
   const answerData = useMemo(() => {
     if (!selectedQuestion) return;
@@ -151,12 +191,16 @@ export default function Chart({ submissions, selectedQuestion }: Props) {
             { min: selectedQuestion.minValue, max: selectedQuestion.maxValue },
             questionAnswers,
           ).map((bucket, bucketIndex, buckets) => {
+            const bucketMax = bucket + (buckets[1] - buckets[0]);
             return {
               id: bucket,
               text: `${bucket} ${
                 buckets[1] - buckets[0] === 1
                   ? ''
-                  : '\u2013 ' + (bucket + (buckets[1] - buckets[0]))
+                  : '\u2013 ' +
+                    (Number.isInteger(bucketMax)
+                      ? bucketMax
+                      : parseFloat(bucketMax.toFixed(2)))
               }`,
               count: questionAnswers.reduce(
                 (count, qa: AnswerEntry & { type: 'slider' | 'numeric' }) => {
@@ -192,32 +236,47 @@ export default function Chart({ submissions, selectedQuestion }: Props) {
   }, [selectedQuestion, surveyLanguage]);
 
   return answerData ? (
-    <ResponsiveContainer
-      minWidth={250}
-      height={340}
-      style={{
-        position: 'absolute',
-        backgroundColor: '#ffffffdd',
-        borderBottomRightRadius: '7px',
-        maxWidth: `${chartWidth}px`,
-      }}
-    >
-      <BarChart
-        data={answerData.options}
-        margin={{
-          top: 25,
-          right: 30,
-          left: 20,
-          bottom: 60,
+    <Box position={'relative'}>
+      <ResponsiveContainer
+        minWidth={250}
+        height={340}
+        style={{
+          backgroundColor: '#ffffffdd',
+          borderBottomRightRadius: '7px',
+          maxWidth: `${chartWidth}px`,
         }}
       >
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="text" tick={<CustomizedAxisTick />} interval={0} />
-        <YAxis />
-        <Tooltip />
-        <Bar dataKey="count" fill={theme.palette.primary.main} />
-      </BarChart>
-    </ResponsiveContainer>
+        <BarChart
+          style={{ fontWeight: 600 }}
+          data={answerData.options}
+          margin={{
+            top: 25,
+            right: 30,
+            left: 20,
+            bottom: 60,
+          }}
+        >
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis
+            dataKey="text"
+            tick={<CustomizedAxisTick />}
+            interval={0}
+            onMouseEnter={(params) => setTooltip(params)}
+            onMouseLeave={() => setTooltip(null)}
+          />
+          <YAxis />
+          <Tooltip
+            formatter={(val) => [
+              val,
+              tr.SurveySubmissionsPage.dataChart.tooltipCurrent,
+            ]}
+          />
+
+          <Bar dataKey="count" fill={theme.palette.primary.main} />
+        </BarChart>
+      </ResponsiveContainer>
+      <LabelTooltip tooltip={tooltip} />
+    </Box>
   ) : (
     <></>
   );

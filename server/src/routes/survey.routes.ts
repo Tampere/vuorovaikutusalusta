@@ -37,6 +37,7 @@ import { Router } from 'express';
 import asyncHandler from 'express-async-handler';
 import { body, param, query } from 'express-validator';
 import { validateRequest } from '../utils';
+import logger from '@src/logger';
 const router = Router();
 
 /**
@@ -240,7 +241,9 @@ router.put(
       const updatedSurvey = await updateSurvey(survey);
       res.status(200).json(updatedSurvey);
     } catch (error) {
-      throw error.table === 'answer_entry' && Boolean(error.constraint)
+      throw (error.table === 'answer_entry' ||
+        error.table === 'personal_info') &&
+        Boolean(error.constraint)
         ? new BadRequestError(
             `Submitted answer prevents survey update: ${error.constraint}`,
             'submitted_answer_prevents_update',
