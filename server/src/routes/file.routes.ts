@@ -23,6 +23,11 @@ import multer from 'multer';
 const router = Router();
 const upload = multer({ limits: { fileSize: 10 * 1000 * 1000 } });
 
+/** Normalizes header content to prevent issues with special characters. */
+function normalizeHeaderContent(content: string) {
+  return content.normalize('NFC');
+}
+
 /**
  * Endpoint for getting admin instructions
  */
@@ -33,7 +38,10 @@ router.get(
     const row = await getAdminInstructions();
 
     res.set('Content-type', row.mimeType);
-    res.set('File-details', JSON.stringify({ name: row.name }));
+    res.set(
+      'File-details',
+      normalizeHeaderContent(JSON.stringify({ name: row.name })),
+    );
     res.status(200).send(row.data);
   }),
 );
@@ -125,7 +133,10 @@ router.get(
     const fileUrl = req.params[0];
     const row = await getFile(fileUrl);
     res.set('Content-type', row.mimeType);
-    res.set('File-details', JSON.stringify(row.details).normalize('NFC')); // Normalize to NFC to avoid issues with special characters
+    res.set(
+      'File-details',
+      normalizeHeaderContent(JSON.stringify(row.details)),
+    );
     res.status(200).send(row.data);
   }),
 );
