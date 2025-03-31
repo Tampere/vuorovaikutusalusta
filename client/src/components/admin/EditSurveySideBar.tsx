@@ -99,7 +99,7 @@ export default function EditSurveySideBar(props: Props) {
       onDrawerToggle={props.onDrawerToggle}
     >
       <List>
-        <ListItemLink external to={`/admin?lang=${language}`}>
+        <ListItemLink to={`/admin?lang=${language}`}>
           <ListItemIcon>
             <ChevronLeftIcon />
           </ListItemIcon>
