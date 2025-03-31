@@ -62,6 +62,7 @@ router.get(
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
     res.flushHeaders();
+    res.flush(); // Flush to enable 'onopen' event
 
     sseClients.add(res);
 

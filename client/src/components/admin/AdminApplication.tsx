@@ -8,6 +8,7 @@ import SurveyMapProvider from '@src/stores/SurveyMapContext';
 import ToastProvider from '@src/stores/ToastContext';
 import TranslationProvider from '@src/stores/TranslationContext';
 import UserProvider from '@src/stores/UserContext';
+import GeneralNotificationProvider from '@src/stores/GeneralNotificationContext';
 import { theme } from '@src/themes/admin';
 import fiLocale from 'date-fns/locale/fi';
 import React from 'react';
@@ -39,6 +40,7 @@ export default function AdminApplication() {
         SurveyAnswerProvider,
         SurveyMapProvider,
         UserProvider,
+        GeneralNotificationProvider,
       ]}
     >
       <CssBaseline />
