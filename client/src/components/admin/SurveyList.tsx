@@ -17,7 +17,8 @@ const useStyles = makeStyles({
     flex: 1,
     flexDirection: 'column',
     gap: '1rem',
-    maxWidth: '40rem',
+    minWidth: '330px',
+    width: '45vw',
   },
   actions: {
     display: 'flex',
@@ -125,7 +126,7 @@ export default function SurveyList() {
         />
       </div>
       {surveysLoading ? (
-        <Skeleton variant="rectangular" width="600px" height={280} />
+        <Skeleton variant="rectangular" width="auto" height={210} />
       ) : (
         <List
           sx={{
