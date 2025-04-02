@@ -95,9 +95,6 @@ export default function DataExport({ surveyId }: Props) {
         `/api/answers/${surveyId}/file-export/geopackage`,
         {
           method: 'GET',
-          headers: {
-            Accept: 'application/octet-stream',
-          },
         },
       );
 

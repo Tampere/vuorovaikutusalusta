@@ -12,6 +12,8 @@ import moment from 'moment';
 import ogr2ogr from 'ogr2ogr';
 import { getAvailableMapLayers } from './map';
 import { getSurvey } from './survey';
+import fs from 'fs';
+import path from 'path';
 
 const tr = useTranslations('fi');
 
@@ -533,18 +535,34 @@ export async function getGeoPackageFile(surveyId: number): Promise<Buffer> {
 
   // The first question needs to be created first - the remaining questions will be added to it via -update
   // Tried to conditionally add the "-update" flag but there was some race condition and I couldn't figure it out
-  await ogr2ogr(JSON.stringify(firstFeatures), {
+  const firstFeaturesPath = path.join(
+    '/tmp',
+    `first_features_${Date.now()}.json`,
+  );
+  fs.writeFileSync(firstFeaturesPath, JSON.stringify(firstFeatures));
+
+  await ogr2ogr(firstFeaturesPath, {
     format: 'GPKG',
     destination: tmpFilePath,
     options: ['-nln', firstQuestion],
   });
 
+  fs.unlinkSync(firstFeaturesPath);
+
   for (const [question, features] of rest) {
-    await ogr2ogr(JSON.stringify(features), {
+    const featuresPath = path.join(
+      '/tmp',
+      `features_${question}_${Date.now()}.json`,
+    );
+    fs.writeFileSync(featuresPath, JSON.stringify(features));
+
+    await ogr2ogr(featuresPath, {
       format: 'GPKG',
       destination: tmpFilePath,
       options: ['-nln', question, '-update'],
     });
+
+    fs.unlinkSync(featuresPath);
   }
 
   // Read the file contents and remove it from the disk
