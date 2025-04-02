@@ -549,10 +549,11 @@ export async function getGeoPackageFile(surveyId: number): Promise<Buffer> {
 
   fs.unlinkSync(firstFeaturesPath);
 
+  let index = 1;
   for (const [question, features] of rest) {
     const featuresPath = path.join(
       '/tmp',
-      `features_${question}_${Date.now()}.json`,
+      `features_${index}_${Date.now()}.json`,
     );
     fs.writeFileSync(featuresPath, JSON.stringify(features));
 
@@ -563,6 +564,7 @@ export async function getGeoPackageFile(surveyId: number): Promise<Buffer> {
     });
 
     fs.unlinkSync(featuresPath);
+    index++;
   }
 
   // Read the file contents and remove it from the disk
