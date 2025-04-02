@@ -106,7 +106,13 @@ router.get(
       throw new BadRequestError('No answers available');
     } else {
       res.status(200);
-      res.end(geopackageBuffer);
+      const stream = Buffer.from(geopackageBuffer).toString('base64');
+      res.setHeader('Content-Type', 'application/octet-stream');
+      res.setHeader(
+        'Content-Disposition',
+        `attachment; filename=survey-${surveyId}-data.gpkg`,
+      );
+      res.end(stream, 'base64');
     }
   }),
 );
