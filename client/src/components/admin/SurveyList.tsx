@@ -18,6 +18,7 @@ const useStyles = makeStyles({
     flexDirection: 'column',
     gap: '1rem',
     minWidth: '330px',
+    maxWidth: '650px',
     width: '45vw',
   },
   actions: {
