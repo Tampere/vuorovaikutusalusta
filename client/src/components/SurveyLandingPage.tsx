@@ -157,7 +157,8 @@ export default function SurveyLandingPage({
           <img
             style={{
               maxWidth: '60%',
-              maxHeight: '100%',
+              maxHeight: '70%',
+              padding: '16px',
             }}
             src={topImagePath}
             alt={topImageHeaderQuery.imageHeaders?.imageAltText ?? ''}
