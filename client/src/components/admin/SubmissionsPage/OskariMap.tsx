@@ -141,18 +141,15 @@ export default function OskariMap({
     const customIcon: string =
       feature.properties.question?.featureStyles?.point?.markerIcon;
 
-    const markerSize =
-      customIcon && oskariVersion >= 270 && oskariVersion < 290 ? 64 : 6;
+    const markerSize = 6;
 
     const style = {
-      shape: customIcon ?? (isPrimaryStyle ? 5 : 2),
-      size: markerSize,
+      shape: customIcon?.length > 0 ? customIcon : isPrimaryStyle ? 5 : 2,
+      scale: 4,
+      size: feature.properties.selected ? 9 : markerSize, // Not over 10 because it works differently between Oskari versions
       color: isPrimaryStyle
         ? mapFeatureColorScheme.primaryColor
         : mapFeatureColorScheme.secondaryColor,
-      ...(feature.properties.selected && {
-        size: markerSize * 2,
-      }),
     };
     if (withMessage) {
       return {

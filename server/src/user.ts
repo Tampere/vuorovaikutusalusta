@@ -223,9 +223,10 @@ export async function getUsers(
     [userOrganizations, excludeIds, encryptionKey],
   );
   if (includePending) {
-    const pendingUsers = await getPendingUserRequests();
+    const pendingUsers = await getPendingUserRequests(userOrganizations);
     return [...dbUsers, ...pendingUsers].map(dbUserToUser);
   }
+
   return dbUsers.map(dbUserToUser);
 }
 
@@ -233,7 +234,7 @@ export async function getUsers(
  * Get pending user requests
  */
 
-async function getPendingUserRequests() {
+async function getPendingUserRequests(userOrganizations: string[] = []) {
   return getDb().manyOrNone<DbUser>(
     `SELECT
       id,
@@ -243,7 +244,8 @@ async function getPendingUserRequests() {
       roles,
       true as "isPending"
     FROM application.pending_user_requests
+    ${userOrganizations.length > 0 ? 'WHERE organizations && $2' : ''}
     ORDER BY organizations[1], pgp_sym_decrypt(full_name, $1::text), roles[1]`,
-    [encryptionKey],
+    [encryptionKey, userOrganizations],
   );
 }
