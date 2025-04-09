@@ -19,6 +19,7 @@
     "label": "Vastaajan tiedot",
     "name": "Nimi",
     "email": "Sähköpostiosoite",
-    "phone": "Puhelinnumero"
+    "phone": "Puhelinnumero",
+    "address": "Osoite"
   }
 }

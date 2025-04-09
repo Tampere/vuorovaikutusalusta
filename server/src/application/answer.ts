@@ -647,6 +647,8 @@ export async function getPersonalInfosForSurvey(surveyId: number) {
       pgp_sym_decrypt(pi.name, $(encryptionKey)) AS name,
       pgp_sym_decrypt(pi.email, $(encryptionKey)) AS email,
       pgp_sym_decrypt(pi.phone, $(encryptionKey)) AS phone,
+      pgp_sym_decrypt(pi.address, $(encryptionKey)) AS address,
+      pgp_sym_decrypt(pi.custom, $(encryptionKey)) AS custom,
       sub.created_at as "timeStamp",
       sub.language,
       ps.details

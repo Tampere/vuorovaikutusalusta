@@ -19,6 +19,7 @@
     "label": "Personal Information",
     "name": "Name",
     "email": "Email address",
-    "phone": "Phone number"
+    "phone": "Phone number",
+    "address": "Address"
   }
 }

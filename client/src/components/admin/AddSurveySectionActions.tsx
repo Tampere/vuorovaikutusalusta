@@ -69,6 +69,9 @@ export default function AddSurveySectionActions(props: Props) {
       askName: false,
       askEmail: false,
       askPhone: false,
+      askAddress: false,
+      askCustom: false,
+      customLabel: initializeLocalizedObject(''),
     },
     checkbox: {
       type: 'checkbox',

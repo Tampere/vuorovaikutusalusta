@@ -197,6 +197,7 @@ router.post(
     const answerEntries: AnswerEntry[] = req.body.entries;
     const language = req.body.language;
     const unfinishedToken = req.query.token ? String(req.query.token) : null;
+
     const { unfinishedToken: newToken } = await createSurveySubmission(
       survey.id,
       answerEntries,
@@ -246,6 +247,7 @@ router.get(
       throw new NotFoundError(`Survey with name ${req.params.name} not found`);
     }
     const answers = await getUnfinishedAnswerEntries(String(req.query.token));
+
     const language = await getSurveyAnswerLanguage(String(req.query.token));
     res.json({ answers, language });
   }),

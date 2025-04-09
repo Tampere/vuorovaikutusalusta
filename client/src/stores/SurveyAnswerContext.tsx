@@ -81,6 +81,8 @@ export function getEmptyAnswer(section: SurveyPageSection): AnswerEntry {
           name: '',
           email: '',
           phone: '',
+          address: '',
+          custom: '',
         },
       };
     case 'checkbox':
@@ -465,10 +467,8 @@ export function useSurveyAnswers() {
   function getAnswersForSubmission(visiblePages: number[]) {
     const visibleSectionIds = state.survey.pages
       .filter((page) => visiblePages.includes(page.id))
-      .map((page) => page.sections)
-      .flat(1)
-      .map((section) => [section, ...(section?.followUpSections ?? [])])
-      .flat(1)
+      .flatMap((page) => page.sections)
+      .flatMap((section) => [section, ...(section?.followUpSections ?? [])])
       .map((section) => section.id);
 
     return state.answers.filter((answer) =>

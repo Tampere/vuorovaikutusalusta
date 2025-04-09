@@ -50,6 +50,8 @@ interface DBPersonalInfo {
   name: string;
   email: string;
   phone: string;
+  address: string;
+  custom: string;
 }
 
 interface DBSubmission {
@@ -202,13 +204,15 @@ async function validateEntries(answerEntries: AnswerEntry[]) {
 async function savePersonalInfo(personalInfo: DBPersonalInfo) {
   await getDb().any(
     `
-    INSERT INTO data.personal_info (submission_id, section_id, name, email, phone)
+    INSERT INTO data.personal_info (submission_id, section_id, name, email, phone, address, custom)
     VALUES 
       ($(submission_id), 
       $(section_id),
       pgp_sym_encrypt($(name), $(encryptionKey)), 
       pgp_sym_encrypt($(email), $(encryptionKey)), 
-      pgp_sym_encrypt($(phone), $(encryptionKey))
+      pgp_sym_encrypt($(phone), $(encryptionKey)),
+      pgp_sym_encrypt($(address), $(encryptionKey)),
+      pgp_sym_encrypt($(custom), $(encryptionKey))
   );`,
     { ...personalInfo, encryptionKey },
   );
@@ -225,7 +229,9 @@ async function getPersonalInfo(
       section_id,
       pgp_sym_decrypt(name, $(encryptionKey)) as name,
       pgp_sym_decrypt(email, $(encryptionKey)) as email,
-      pgp_sym_decrypt(phone, $(encryptionKey)) as phone
+      pgp_sym_decrypt(phone, $(encryptionKey)) as phone,
+      pgp_sym_decrypt(address, $(encryptionKey)) as address,
+      pgp_sym_decrypt(custom, $(encryptionKey)) as custom
     FROM data.personal_info
     WHERE submission_id = $(submissionId);
   `,
@@ -239,7 +245,13 @@ async function getPersonalInfo(
   return {
     type: 'personal-info',
     sectionId: result.section_id,
-    value: { name: result.name, email: result.email, phone: result.phone },
+    value: {
+      name: result.name,
+      email: result.email,
+      phone: result.phone,
+      address: result.address,
+      custom: result.custom,
+    },
   } as AnswerEntry;
 }
 
@@ -1021,7 +1033,9 @@ export async function getSubmissionsForSurvey(
           pi.section_id,
           pgp_sym_decrypt(pi.name, $(encryptionKey)) as name,
           pgp_sym_decrypt(pi.email, $(encryptionKey)) as email,
-          pgp_sym_decrypt(pi.phone, $(encryptionKey)) as phone
+          pgp_sym_decrypt(pi.phone, $(encryptionKey)) as phone,
+          pgp_sym_decrypt(pi.address, $(encryptionKey)) as address,
+          pgp_sym_decrypt(pi.custom, $(encryptionKey)) as custom
         FROM data.submission s
         INNER JOIN data.personal_info pi ON pi.submission_id = s.id
         WHERE s.survey_id = $(surveyId) AND s.unfinished_token IS NULL
@@ -1058,30 +1072,26 @@ export async function getSubmissionsForSurvey(
       (sub) => sub.id === personalInfoRow.submission_id,
     );
 
+    const personalInfoData = {
+      type: 'personal-info',
+      sectionId: personalInfoRow.section_id,
+      value: {
+        name: personalInfoRow.name,
+        email: personalInfoRow.email,
+        phone: personalInfoRow.phone,
+        address: personalInfoRow.address,
+        custom: personalInfoRow.custom,
+      },
+    };
+
     if (submission) {
-      submission.personalInfo = {
-        type: 'personal-info',
-        sectionId: personalInfoRow.section_id,
-        value: {
-          name: personalInfoRow.name,
-          email: personalInfoRow.email,
-          phone: personalInfoRow.phone,
-        },
-      };
+      submission.personalInfo = personalInfoData;
     } else {
       result.push({
         id: personalInfoRow.submission_id,
         timestamp: personalInfoRow.updated_at,
         entries: [],
-        personalInfo: {
-          type: 'personal-info',
-          sectionId: personalInfoRow.section_id,
-          value: {
-            name: personalInfoRow.name,
-            email: personalInfoRow.email,
-            phone: personalInfoRow.phone,
-          },
-        },
+        personalInfo: personalInfoData,
       });
     }
   }

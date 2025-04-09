@@ -240,6 +240,20 @@ export default function EditSurveySectionTranslations({
           }}
         />
       )}
+      {section.type === 'personal-info' && (
+        <TranslationField
+          value={section.customLabel?.[languageCode] ?? ''}
+          onChange={(event) => {
+            onEdit({
+              ...section,
+              customLabel: {
+                ...section.customLabel,
+                [languageCode]: event.target.value,
+              },
+            });
+          }}
+        />
+      )}
       {/* Section info */}
       {section.info && (
         <div
