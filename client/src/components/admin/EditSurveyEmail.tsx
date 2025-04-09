@@ -67,6 +67,26 @@ export default function EditSurveyEmail() {
               <FormControlLabel
                 control={
                   <Checkbox
+                    name="margin-images-enabled"
+                    disabled={activeSurveyLoading}
+                    checked={activeSurvey.email.includeMarginImages}
+                    onChange={(event) => {
+                      editSurvey({
+                        ...activeSurvey,
+                        email: {
+                          ...activeSurvey.email,
+                          includeMarginImages: event.target.checked,
+                        },
+                      });
+                    }}
+                  />
+                }
+                label={tr.EditSurveyEmail.includeMarginImages}
+              />
+
+              <FormControlLabel
+                control={
+                  <Checkbox
                     name="personal-info-enabled"
                     disabled={activeSurveyLoading}
                     checked={activeSurvey.email.includePersonalInfo}

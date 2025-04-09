@@ -206,14 +206,16 @@ async function getFrontPage(
     return labels;
   }
 
-  const [logo, banner] = await Promise.all([
-    survey.marginImages.top.imageUrl
-      ? (await getFile(survey.marginImages.top.imageUrl)).data.toString()
-      : null,
-    survey.marginImages.bottom.imageUrl
-      ? (await getFile(survey.marginImages.bottom.imageUrl)).data.toString()
-      : null,
-  ]);
+  const [logo, banner] = survey.email.includeMarginImages
+    ? await Promise.all([
+        survey.marginImages.top.imageUrl
+          ? (await getFile(survey.marginImages.top.imageUrl)).data.toString()
+          : null,
+        survey.marginImages.bottom.imageUrl
+          ? (await getFile(survey.marginImages.bottom.imageUrl)).data.toString()
+          : null,
+      ])
+    : [];
 
   const attachmentFileNames = answerEntries
     .filter(

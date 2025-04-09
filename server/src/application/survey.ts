@@ -84,6 +84,7 @@ interface DBSurvey {
   email_body: LocalizedText;
   email_info: SurveyEmailInfoItem[];
   email_include_personal_info: boolean;
+  email_include_margin_images: boolean;
   allow_saving_unfinished: boolean;
   localisation_enabled: boolean;
   submission_count?: number;
@@ -1253,7 +1254,8 @@ export async function updateSurvey(survey: Survey) {
         organization = $29,
         tags = $30,
         languages = $31,
-        email_include_personal_info = $32
+        email_include_personal_info = $32,
+        email_include_margin_images = $33
       WHERE id = $1 RETURNING *`,
       [
         survey.id,
@@ -1290,6 +1292,7 @@ export async function updateSurvey(survey: Survey) {
           .filter(([, isEnabled]) => isEnabled)
           .map(([lang]) => lang),
         survey.email.includePersonalInfo,
+        survey.email.includeMarginImages,
       ],
     )
     .catch((error) => {
@@ -1591,6 +1594,7 @@ function dbSurveyToSurvey(dbSurvey: DBSurvey | DBSurveyJoin): APISurvey {
       body: dbSurvey.email_body,
       info: dbSurvey.email_info,
       includePersonalInfo: dbSurvey.email_include_personal_info,
+      includeMarginImages: dbSurvey.email_include_margin_images,
     },
     allowSavingUnfinished: dbSurvey.allow_saving_unfinished,
     localisationEnabled: dbSurvey.localisation_enabled,

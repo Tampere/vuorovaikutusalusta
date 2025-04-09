@@ -107,7 +107,8 @@
     "info": "Additional information",
     "infoHelperText": "Additional information will be displayed on the front page of the answer report.",
     "includePersonalInfo": "Include respondent's personal information",
-    "includePersonalInfoHelperText": "Responses to the personal information question, if any, will be included on the front page of the PDF report."
+    "includePersonalInfoHelperText": "Responses to the personal information question, if any, will be included on the front page of the PDF report.",
+    "includeMarginImages": "Include top and bottom margin images"
   },
   "KeyValueForm": {
     "key": "Key",
