@@ -483,6 +483,10 @@ export interface Survey {
      * Should personal info be included in the email
      */
     includePersonalInfo: boolean;
+    /**
+     * Should upper and lower margin images be included in the report front page
+     */
+    includeMarginImages: boolean;
   };
   /**
    * Should the survey be able to be saved as unfinished

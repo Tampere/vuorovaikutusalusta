@@ -107,7 +107,8 @@
     "info": "Lisätiedot",
     "infoHelperText": "Lisätiedot esitetään sähköpostitse lähetettävän vastausraportin etusivulla.",
     "includePersonalInfo": "Sisällytä vastaajan henkilötiedot",
-    "includePersonalInfoHelperText": "Mahdollisen henkilötietokysymyksen vastaukset sisällytetään pdf-raportin etusivulle."
+    "includePersonalInfoHelperText": "Mahdollisen henkilötietokysymyksen vastaukset sisällytetään pdf-raportin etusivulle.",
+    "includeMarginImages": "Sisällytä etusivun ylä- ja alamarginaalin kuvat"
   },
   "KeyValueForm": {
     "key": "Nimi",
