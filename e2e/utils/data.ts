@@ -34,9 +34,12 @@ export function getPersonalInfoQuestionData(
   return {
     pageName: pageName,
     title: 'Anna yhteystietosi',
+    customTitle: 'Y-tunnus',
     name: true,
     email: true,
     phone: true,
+    address: true,
+    custom: true,
   };
 }
 

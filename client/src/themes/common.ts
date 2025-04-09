@@ -92,6 +92,9 @@ const commonComponentOverrides: Components<Omit<Theme, 'components'>> = {
       body: {
         color: harmaa,
       },
+      input: {
+        color: harmaa,
+      },
     },
   },
   ...overridableComponents.reduce((object, component) => {

@@ -26,6 +26,9 @@ export interface PersonalInfoQuestionParams extends CommonQuestionParams {
   name: boolean;
   email: boolean;
   phone: boolean;
+  address: boolean;
+  custom: boolean;
+  customTitle: string;
 }
 
 export interface RadioQuestionParams extends CommonQuestionParams {
@@ -188,6 +191,16 @@ export class SurveyEditPage {
     if (personalInfoQuestionParams.phone) {
       await questionLocator.getByLabel('Puhelinnumero').check();
     }
+    if (personalInfoQuestionParams.address) {
+      await questionLocator.getByLabel('Osoite').check();
+    }
+    if (personalInfoQuestionParams.custom) {
+      await questionLocator.getByTestId('custom-checkbox').check();
+      await questionLocator
+        .getByPlaceholder('Muu tieto')
+        .fill(personalInfoQuestionParams.customTitle);
+    }
+
     if (personalInfoQuestionParams.additionalInfo) {
       await questionLocator.getByLabel('Anna lisätietoja kysymykseen').check();
       await questionLocator

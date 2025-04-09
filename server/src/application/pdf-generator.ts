@@ -8,6 +8,7 @@ import {
   SurveyMapQuestion,
   SurveyMatrixQuestion,
   SurveyPageSection,
+  SurveyPersonalInfoQuestion,
 } from '@interfaces/survey';
 import logger from '@src/logger';
 import useTranslations from '@src/translations/useTranslations';
@@ -148,20 +149,27 @@ async function getFrontPage(
     .map((page) =>
       page.sections.find((section) => section.type === 'personal-info'),
     )
-    .find(Boolean);
+    .find<SurveyPersonalInfoQuestion>(
+      (section): section is SurveyPersonalInfoQuestion => Boolean(section),
+    );
 
   const personalInfoAnswer = answerEntries.find(
     (entry) => entry.type === 'personal-info',
   );
 
-  function getPersonalInfoLabels(personalInfoQuestion) {
+  function getPersonalInfoLabels(
+    personalInfoQuestion: SurveyPersonalInfoQuestion,
+  ) {
     if (!personalInfoQuestion || !personalInfoAnswer) {
       return [];
     }
+
     const labelMap = {
       askName: tr.PersonalInfo.name,
       askEmail: tr.PersonalInfo.email,
       askPhone: tr.PersonalInfo.phone,
+      askAddress: tr.PersonalInfo.address,
+      askCustom: personalInfoQuestion.customLabel[language],
     };
 
     const answerValuesForLabelsMap = {
@@ -170,6 +178,8 @@ async function getFrontPage(
       askPhone: formatPhoneNumber(
         (personalInfoAnswer.value as PersonalInfoAnswer).phone,
       ),
+      askAddress: (personalInfoAnswer.value as PersonalInfoAnswer).address,
+      askCustom: (personalInfoAnswer.value as PersonalInfoAnswer).custom,
     };
 
     const labels: Content[] = [
@@ -366,9 +376,9 @@ function getContent(
                 ? tr.dontKnow
                 : answerEntry.value[index] == null
                   ? '-'
-                  : question.classes[Number(answerEntry.value[index])]?.[
+                  : (question.classes[Number(answerEntry.value[index])]?.[
                       language
-                    ] ?? '-'
+                    ] ?? '-')
             }`,
             style,
           })),

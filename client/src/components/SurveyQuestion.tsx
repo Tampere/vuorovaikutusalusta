@@ -71,6 +71,7 @@ function SurveyQuestion({
     () => (dirty || pageUnfinished ? getValidationErrors(question) : []),
     [dirty, question, value, pageUnfinished],
   );
+
   return (
     <FormControl
       disabled={readOnly}

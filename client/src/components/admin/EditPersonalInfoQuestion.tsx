@@ -4,6 +4,7 @@ import {
   FormControlLabel,
   FormGroup,
   FormLabel,
+  Input,
 } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { Check } from '@mui/icons-material';
@@ -13,6 +14,13 @@ interface Props {
   section: SurveyPersonalInfoQuestion;
   onChange: (section: SurveyPersonalInfoQuestion) => void;
 }
+
+const inputStyle = {
+  maxWidth: '600px',
+  border: 'none',
+  height: '28px',
+  fontSize: '1rem',
+};
 
 const checkedIcon = (
   <span
@@ -42,7 +50,7 @@ const uncheckedIcon = (
 );
 
 export function EditPersonalInfoQuestion({ section, onChange }: Props) {
-  const { tr } = useTranslations();
+  const { tr, surveyLanguage } = useTranslations();
 
   return (
     <>
@@ -129,6 +137,60 @@ export function EditPersonalInfoQuestion({ section, onChange }: Props) {
             />
           }
           label={tr.PersonalInfoQuestion.phoneLabel}
+        />
+        <FormControlLabel
+          sx={{ marginLeft: '-9px' }}
+          control={
+            <Checkbox
+              name="address"
+              size="large"
+              checkedIcon={checkedIcon}
+              icon={uncheckedIcon}
+              checked={section.askAddress}
+              onChange={(event) => {
+                onChange({
+                  ...section,
+                  askAddress: event.target.checked,
+                });
+              }}
+            />
+          }
+          label={tr.PersonalInfoQuestion.addressLabel}
+        />
+        <FormControlLabel
+          sx={{ marginLeft: '-9px' }}
+          control={
+            <Checkbox
+              data-testid="custom-checkbox"
+              name="customText"
+              size="large"
+              checkedIcon={checkedIcon}
+              icon={uncheckedIcon}
+              checked={Boolean(section.askCustom)}
+              onChange={(event) => {
+                onChange({
+                  ...section,
+                  askCustom: event.target.checked,
+                });
+              }}
+            />
+          }
+          label={
+            <Input
+              value={section.customLabel?.[surveyLanguage] ?? ''}
+              style={inputStyle}
+              placeholder={tr.PersonalInfoQuestion.customLabel}
+              onChange={(e) =>
+                onChange({
+                  ...section,
+                  customLabel: {
+                    ...section.customLabel,
+                    [surveyLanguage]: e.target.value,
+                  },
+                })
+              }
+            />
+          }
         />
       </FormGroup>
     </>

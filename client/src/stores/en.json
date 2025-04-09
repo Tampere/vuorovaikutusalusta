@@ -264,9 +264,14 @@
     "nameLabel": "Name",
     "emailLabel": "Email",
     "phoneLabel": "Phone number",
+    "addressLabel": "Address",
+    "customLegend": "Custom field",
+    "customLabel": "Other information...",
     "nameError": "Check the name.",
     "emailError": "Check the email address.",
-    "phoneError": "Check the phone number."
+    "phoneError": "Check the phone number.",
+    "addressError": "Check the address.",
+    "customError": "Check the {label}."
   },
   "SurveySections": {
     "limitAnswers": "Limit the number of answers",

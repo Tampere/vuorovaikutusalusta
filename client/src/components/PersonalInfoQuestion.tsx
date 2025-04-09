@@ -5,7 +5,7 @@ import {
 import { Box, Typography } from '@mui/material';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React from 'react';
+import React, { PropsWithChildren } from 'react';
 import { useState } from 'react';
 
 const labelWrapperStyle = (labelColor?: string) => ({
@@ -34,6 +34,32 @@ interface Props {
   readOnly?: boolean;
 }
 
+interface WrapperProps {
+  id: string;
+  errorMessage: string;
+  showError: boolean;
+  labelColor?: string;
+}
+
+function PersonalInfoInputWrapper({
+  id,
+  errorMessage,
+  showError,
+  labelColor,
+  children,
+}: PropsWithChildren<WrapperProps>) {
+  return (
+    <Box sx={labelWrapperStyle(labelColor)}>
+      {children}
+      <div aria-live="polite">
+        <Typography fontSize={12} color="error" id={`${id}-error`}>
+          {showError && errorMessage}
+        </Typography>
+      </div>
+    </Box>
+  );
+}
+
 export function PersonalInfoQuestion({
   readOnly = false,
   autoFocus = false,
@@ -42,16 +68,20 @@ export function PersonalInfoQuestion({
   onChange,
 }: Props) {
   const { survey } = useSurveyAnswers();
-  const { tr } = useTranslations();
+  const { tr, surveyLanguage } = useTranslations();
   const [hasInvalidInput, setHasInvalidInput] = useState({
     name: false,
     email: false,
     phone: false,
+    address: false,
+    custom: false,
   });
   const [showInputErrorsFor, setShowInputErrorsFor] = useState({
     name: false,
     email: false,
     phone: false,
+    address: false,
+    custom: false,
   });
 
   return (
@@ -67,7 +97,12 @@ export function PersonalInfoQuestion({
       }}
     >
       {question.askName && (
-        <Box sx={labelWrapperStyle(survey.sectionTitleColor)}>
+        <PersonalInfoInputWrapper
+          id={`${question.id}-nameInput`}
+          showError={showInputErrorsFor.name}
+          errorMessage={tr.PersonalInfoQuestion.nameError}
+          labelColor={survey.sectionTitleColor}
+        >
           <label htmlFor={`${question.id}-nameInput`}>
             {tr.PersonalInfoQuestion.nameLabel}
           </label>
@@ -98,20 +133,15 @@ export function PersonalInfoQuestion({
               );
             }}
           />
-
-          <div aria-live="polite">
-            <Typography
-              fontSize={12}
-              color="error"
-              id={`${question.id}-nameError`}
-            >
-              {showInputErrorsFor.name && tr.PersonalInfoQuestion.nameError}
-            </Typography>
-          </div>
-        </Box>
+        </PersonalInfoInputWrapper>
       )}
       {question.askEmail && (
-        <Box sx={labelWrapperStyle(survey.sectionTitleColor)}>
+        <PersonalInfoInputWrapper
+          id={`${question.id}-emailInput`}
+          showError={showInputErrorsFor.email}
+          errorMessage={tr.PersonalInfoQuestion.emailError}
+          labelColor={survey.sectionTitleColor}
+        >
           <label htmlFor={`${question.id}-emailInput`}>
             {tr.PersonalInfoQuestion.emailLabel}
           </label>
@@ -143,20 +173,15 @@ export function PersonalInfoQuestion({
               );
             }}
           />
-
-          <div aria-live="polite">
-            <Typography
-              fontSize={12}
-              color="error"
-              id={`${question.id}-emailError`}
-            >
-              {showInputErrorsFor.email && tr.PersonalInfoQuestion.emailError}
-            </Typography>
-          </div>
-        </Box>
+        </PersonalInfoInputWrapper>
       )}
       {question.askPhone && (
-        <Box sx={labelWrapperStyle(survey.sectionTitleColor)}>
+        <PersonalInfoInputWrapper
+          id={`${question.id}-phoneInput`}
+          showError={showInputErrorsFor.phone}
+          errorMessage={tr.PersonalInfoQuestion.phoneError}
+          labelColor={survey.sectionTitleColor}
+        >
           <label htmlFor={`${question.id}-phoneInput`}>
             {tr.PersonalInfoQuestion.phoneLabel}
           </label>
@@ -194,17 +219,86 @@ export function PersonalInfoQuestion({
               );
             }}
           />
-
-          <div aria-live="polite">
-            <Typography
-              fontSize={12}
-              color="error"
-              id={`${question.id}-phoneError`}
-            >
-              {showInputErrorsFor.phone && tr.PersonalInfoQuestion.phoneError}
-            </Typography>
-          </div>
-        </Box>
+        </PersonalInfoInputWrapper>
+      )}
+      {question.askAddress && (
+        <PersonalInfoInputWrapper
+          id={`${question.id}-addressInput`}
+          showError={showInputErrorsFor.address}
+          errorMessage={tr.PersonalInfoQuestion.addressError}
+          labelColor={survey.sectionTitleColor}
+        >
+          <label htmlFor={`${question.id}-addressInput`}>
+            {tr.PersonalInfoQuestion.addressLabel}
+          </label>
+          <input
+            aria-describedby={`${question.id}-addressError`}
+            id={`${question.id}-addressInput`}
+            disabled={readOnly}
+            autoFocus={autoFocus}
+            value={value?.address ?? ''}
+            maxLength={70}
+            required={question.isRequired}
+            onBlur={(event) =>
+              setShowInputErrorsFor((prev) => ({
+                ...prev,
+                address: !event.target.validity.valid,
+              }))
+            }
+            onChange={(event) => {
+              const newValue = {
+                ...hasInvalidInput,
+                address: !event.target.validity.valid,
+              };
+              setHasInvalidInput(newValue);
+              onChange(
+                { ...value, address: event.target.value },
+                Object.values(newValue).some((isInvalid) => isInvalid),
+              );
+            }}
+          />
+        </PersonalInfoInputWrapper>
+      )}
+      {question.askCustom && (
+        <PersonalInfoInputWrapper
+          id={`${question.id}-customInput`}
+          showError={showInputErrorsFor.custom}
+          errorMessage={tr.PersonalInfoQuestion.customError.replace(
+            '{label}',
+            question.customLabel?.[surveyLanguage] ?? '',
+          )}
+          labelColor={survey.sectionTitleColor}
+        >
+          <label htmlFor={`${question.id}-customInput`}>
+            {question?.customLabel?.[surveyLanguage] ?? ''}
+          </label>
+          <input
+            aria-describedby={`${question.id}-customError`}
+            id={`${question.id}-customInput`}
+            disabled={readOnly}
+            autoFocus={autoFocus}
+            value={value?.custom ?? ''}
+            maxLength={50}
+            required={question.isRequired}
+            onBlur={(event) =>
+              setShowInputErrorsFor((prev) => ({
+                ...prev,
+                custom: !event.target.validity.valid,
+              }))
+            }
+            onChange={(event) => {
+              const newValue = {
+                ...hasInvalidInput,
+                custom: !event.target.validity.valid,
+              };
+              setHasInvalidInput(newValue);
+              onChange(
+                { ...value, custom: event.target.value },
+                Object.values(newValue).some((isInvalid) => isInvalid),
+              );
+            }}
+          />
+        </PersonalInfoInputWrapper>
       )}
     </Box>
   );

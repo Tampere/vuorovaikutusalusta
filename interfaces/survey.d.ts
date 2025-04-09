@@ -108,6 +108,8 @@ interface PersonalInfoAnswer {
   name: string | null;
   email: string | null;
   phone: string | null;
+  address: string | null;
+  custom: string | null;
 }
 
 /**
@@ -131,6 +133,9 @@ export interface SurveyPersonalInfoQuestion extends CommonSurveyPageQuestion {
   askName: boolean;
   askEmail: boolean;
   askPhone: boolean;
+  askAddress: boolean;
+  askCustom: boolean;
+  customLabel?: LocalizedText;
 }
 
 /**

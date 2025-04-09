@@ -280,9 +280,14 @@
     "nameLabel": "Nimi",
     "emailLabel": "Sähköposti",
     "phoneLabel": "Puhelinnumero",
+    "addressLabel": "Osoite",
+    "customLegend": "Mukautettu kenttä",
+    "customLabel": "Muu tieto...",
     "nameError": "Tarkista nimi.",
     "emailError": "Tarkista sähköpostiosoite.",
-    "phoneError": "Tarkista puhelinnumero."
+    "phoneError": "Tarkista puhelinnumero.",
+    "addressError": "Tarkista osoite.",
+    "customError": "Tarkista {label}."
   },
   "NumericQuestion": {
     "minValue": "Arvon pitää olla vähintään {minValue}",

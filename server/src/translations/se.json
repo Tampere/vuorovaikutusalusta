@@ -19,6 +19,7 @@
     "label": "Personuppgifter",
     "name": "Namn",
     "email": "E-postadress",
-    "phone": "Telefonnummer"
+    "phone": "Telefonnummer",
+    "address": "Adress"
   }
 }

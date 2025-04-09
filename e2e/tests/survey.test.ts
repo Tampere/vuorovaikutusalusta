@@ -16,6 +16,7 @@ import {
   testSurveyData,
 } from '../utils/data';
 import { expect } from '@playwright/test';
+import { worker } from 'cluster';
 
 const personalInfoQuestion = getPersonalInfoQuestionData(
   testSurveyData.pageNames[0],
@@ -47,6 +48,7 @@ test.describe('Survey test', () => {
   test.afterAll(async () => {
     await clearData();
   });
+
   test('create questions', async ({ workerSurveyEditPage }) => {
     await workerSurveyEditPage.goto();
     await workerSurveyEditPage.createPersonalInfoQuestion(personalInfoQuestion);
@@ -118,6 +120,12 @@ test.describe('Survey test', () => {
     await personalInfoFieldset?.element
       .getByLabel('Puhelinnumero')
       .fill('0401234567');
+    await personalInfoFieldset?.element
+      .getByLabel('Osoite')
+      .fill('Testikatu 1, 00100 Helsinki');
+    await personalInfoFieldset?.element
+      .getByLabel('Y-tunnus')
+      .fill('1234567-8');
 
     // Radio question
     const radioFieldset = firstPageQuestions.find((item) =>

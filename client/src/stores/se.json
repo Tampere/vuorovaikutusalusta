@@ -279,9 +279,15 @@
     "nameLabel": "Namn",
     "emailLabel": "E-post",
     "phoneLabel": "Telefonnummer",
+    "addressLabel": "Adress",
+    "customLegend": "Anpassad text",
+    "customLabel": "Ange valfri text",
+    "additionalInfo": "Annan information...",
     "nameError": "Kontrollera namnet.",
     "emailError": "Kontrollera e-postadressen.",
-    "phoneError": "Kontrollera telefonnumret."
+    "phoneError": "Kontrollera telefonnumret.",
+    "addressError": "Kontrollera adressen.",
+    "customError": "Kontrollera {label}."
   },
   "NumericQuestion": {
     "minValue": "Värdet måste vara minst {minValue}",
