@@ -120,7 +120,7 @@ function SurveyQuestion({
         <Typography
           component="h3"
           sx={{
-            margin: readOnly ? 0 : '',
+            marginBottom: readOnly ? '1rem' : '',
             ...(survey.sectionTitleColor && {
               color: survey.sectionTitleColor,
             }),

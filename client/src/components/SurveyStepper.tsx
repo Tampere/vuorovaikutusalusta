@@ -317,10 +317,15 @@ export default function SurveyStepper({
   }
 
   async function saveMapLayers() {
+    const currentPageAcceptedLayers = currentPage.sidebar.mapLayers;
+
     // Get all currently visible map layer iDs and update to the survey page
     const mapLayers = (await getAllLayers())
-      // Old Oskari might return drawing or feature layers as a string of format "userlayer_<number>", filter these out (as well as invisible layers)
-      .filter((layer) => layer.visible && typeof layer.id === 'number')
+      // Old Oskari might return drawing or feature layers which are not part of survey layers, filter these out (as well as invisible layers)
+      .filter(
+        (layer) =>
+          layer.visible && currentPageAcceptedLayers.includes(layer.id),
+      )
       .map((layer) => layer.id);
     updatePageMapLayers(currentPage, mapLayers);
 

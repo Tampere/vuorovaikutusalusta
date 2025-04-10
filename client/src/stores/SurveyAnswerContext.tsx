@@ -191,8 +191,8 @@ export function isAnswerEmpty(
   }
   // Personal info is considered incomplete if all of the fields are null
   if (question.type === 'personal-info') {
-    const { name, email, phone } = value as PersonalInfoAnswer;
-    if (!name && !email && !phone) {
+    const { name, email, phone, address, custom } = value as PersonalInfoAnswer;
+    if (!name && !email && !phone && !address && !custom) {
       return true;
     }
   }
