@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: Kartalla API
   description: API description for Kartalla survey platform.
-  version: 1.1.2
+  version: 1.1.3
 servers:
   - url: https://test.kartalla.io/api
     description: Test server
@@ -244,6 +244,7 @@ components:
           organization,
           tags,
           enabledLanguages,
+          isArchived,
         ]
       properties:
         id:
@@ -296,7 +297,6 @@ components:
           type: string
           description: >
             URL of the survey background image. Can be used to fetch the image from the [file endpoint](#operation/get-file).
-
         thanksPage:
           type: object
           required: [title, text]
@@ -310,6 +310,9 @@ components:
         theme:
           type: object
           description: Theme of the survey.
+        isArchived:
+          type: boolean
+          description: Is the survey archived?
         sectionTitleColor:
           type: string
         email:
@@ -333,6 +336,9 @@ components:
               items:
                 type: object
               description: Optional free-form information to be shown on the front page of the report.
+            includeMarginImages:
+              type: boolean
+              description: Include margin images in the pdf report front pages sent by email.
         allowSavingsUnfinished:
           type: boolean
           description: Should the survey be able to be saved as unfinished?

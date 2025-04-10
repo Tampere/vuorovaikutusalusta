@@ -119,7 +119,7 @@ export default function SurveySectionAccordion(props: Props) {
   const { showToast } = useToasts();
 
   // Index is used inside a callback function -> useRef is required in React to catch all updates
-  const indexRef = useRef<number>();
+  const indexRef = useRef<number>(null);
   indexRef.current = props.index;
 
   function handleEdit(section: SurveyPageSection) {
@@ -274,6 +274,7 @@ export default function SurveySectionAccordion(props: Props) {
         <EditImageSection
           section={props.section as SurveyImageSection}
           onChange={handleEdit}
+          disabled={props.disabled}
         />
       ),
     },
@@ -284,6 +285,7 @@ export default function SurveySectionAccordion(props: Props) {
         <EditDocumentSection
           section={props.section as SurveyDocumentSection}
           onChange={handleEdit}
+          disabled={props.disabled}
         />
       ),
     },

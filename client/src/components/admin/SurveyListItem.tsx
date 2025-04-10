@@ -7,6 +7,7 @@ import {
   CardContent,
   Chip,
   Link,
+  ListItem,
   Stack,
   Theme,
   Typography,
@@ -15,8 +16,10 @@ import CalendarSmallIcon from '@src/components/icons/CalendarSmallIcon';
 import LinkSmallIcon from '@src/components/icons/LinkSmallIcon';
 import UserSmallIcon from '@src/components/icons/UserSmallIcon';
 import {
+  archiveSurvey,
   creteSurveyFromPrevious,
   publishSurvey,
+  restoreSurvey,
   unpublishSurvey,
 } from '@src/controllers/SurveyController';
 import { useToasts } from '@src/stores/ToastContext';
@@ -31,7 +34,10 @@ import CopyToClipboard from '../CopyToClipboard';
 import LoadingButton from '../LoadingButton';
 import { theme } from '@src/themes/admin';
 
+const fadeTimeout = 350;
+
 const cardStyles = (theme: Theme, loading: boolean, published: boolean) => ({
+  width: '100%',
   '@keyframes pulse': {
     '0%': {
       opacity: 0.4,
@@ -55,13 +61,19 @@ const cardStyles = (theme: Theme, loading: boolean, published: boolean) => ({
 });
 interface Props {
   survey: Survey;
+  onArchive?: (surveyId: number) => void;
+  onRestore?: (surveyId: number) => void;
 }
 
 export default function SurveyListItem(props: Props) {
+  const [fadeRight, setFadeRight] = useState(false);
+  const [fadeLeft, setFadeLeft] = useState(false);
   const [survey, setSurvey] = useState(props.survey);
   const [publishConfirmDialogOpen, setPublishConfirmDialogOpen] =
     useState(false);
   const [unpublishConfirmDialogOpen, setUnpublishConfirmDialogOpen] =
+    useState(false);
+  const [archiveConfirmDialogOpen, setArchiveConfirmDialogOpen] =
     useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -98,7 +110,34 @@ export default function SurveyListItem(props: Props) {
   }, [survey.name]);
 
   return (
-    <li style={{ marginBottom: '20px' }}>
+    <ListItem
+      sx={{
+        padding: '8px 0',
+        '@keyframes shiftRight': {
+          '0%': {
+            transform: 'translateX(0)',
+          },
+          '100%': {
+            opacity: 0,
+            transform: 'translateX(100%)',
+          },
+        },
+        '@keyframes shiftLeft': {
+          '0%': {
+            transform: 'translateX(0)',
+          },
+          '100%': {
+            opacity: 0,
+            transform: 'translateX(-100%)',
+          },
+        },
+        animation: fadeRight
+          ? `shiftRight ease-in-out ${fadeTimeout}ms`
+          : fadeLeft
+          ? `shiftLeft ease-in-out ${fadeTimeout}ms`
+          : 'none',
+      }}
+    >
       <Card sx={cardStyles(theme, loading, survey.isPublished)}>
         <CardContent sx={{ paddingBottom: '8px' }}>
           <Typography variant="h6" component="h3" sx={{ fontWeight: 700 }}>
@@ -217,15 +256,16 @@ export default function SurveyListItem(props: Props) {
             to={`${url}kyselyt/${survey.id}`}
             disabled={disableUsersViewAccessToSurvey}
           >
-            {activeUserIsSuperUser ||
-            activeUserIsAdmin ||
-            survey.editors.includes(activeUser?.id) ||
-            activeUser?.id === survey.authorId
+            {!survey.isArchived &&
+            (activeUserIsSuperUser ||
+              activeUserIsAdmin ||
+              survey.editors.includes(activeUser?.id) ||
+              activeUser?.id === survey.authorId)
               ? tr.SurveyList.editSurvey
               : tr.SurveyList.viewSurvey}
           </Button>
-          {/* Allow publish only if it isn't yet published and has a name */}
-          {!survey.isPublished && survey.name && (
+          {/* Allow publish only if it isn't yet published, has a name, and is not archived */}
+          {!survey.isPublished && survey.name && !survey.isArchived && (
             <Button
               disabled={disableUsersWriteAccessToSurvey}
               onClick={() => {
@@ -235,8 +275,8 @@ export default function SurveyListItem(props: Props) {
               {tr.SurveyList.publishNow}
             </Button>
           )}
-          {/* Allow unpublish when survey is published */}
-          {survey.isPublished && (
+          {/* Allow unpublish when survey is published and is not archived */}
+          {survey.isPublished && !survey.isArchived && (
             <Button
               disabled={disableUsersWriteAccessToSurvey}
               onClick={() => {
@@ -257,6 +297,40 @@ export default function SurveyListItem(props: Props) {
             {' '}
             {tr.SurveyList.copySurvey}{' '}
           </LoadingButton>
+          {(activeUserIsSuperUser ||
+            activeUserIsAdmin ||
+            survey.editors.includes(activeUser?.id) ||
+            activeUser?.id === survey.authorId) && (
+            <LoadingButton
+              onClick={async () => {
+                if (survey.isArchived) {
+                  try {
+                    await restoreSurvey(survey);
+                    setFadeLeft(true);
+
+                    setTimeout(() => {
+                      props.onRestore?.(survey.id);
+                      showToast({
+                        severity: 'success',
+                        message: tr.SurveyList.restoreSuccessful,
+                      });
+                    }, fadeTimeout);
+                  } catch (error) {
+                    showToast({
+                      severity: 'error',
+                      message: tr.SurveyList.restoreFailed,
+                    });
+                  }
+                } else {
+                  setArchiveConfirmDialogOpen(true);
+                }
+              }}
+            >
+              {survey.isArchived
+                ? tr.SurveyList.restore
+                : tr.SurveyList.archive}
+            </LoadingButton>
+          )}
           <Button
             disabled={
               disableUsersViewAccessToSurvey || survey?.submissionCount === 0
@@ -330,6 +404,34 @@ export default function SurveyListItem(props: Props) {
           setLoading(false);
         }}
       />
-    </li>
+      <ConfirmDialog
+        open={archiveConfirmDialogOpen}
+        submitColor="primary"
+        title={survey.title?.[surveyLanguage] ?? ''}
+        text={tr.SurveyList.archiveDialogContent}
+        onClose={async (result) => {
+          setArchiveConfirmDialogOpen(false);
+          if (!result) {
+            return;
+          }
+          try {
+            await archiveSurvey(survey);
+            setFadeRight(true);
+            setTimeout(() => {
+              props.onArchive?.(survey.id);
+              showToast({
+                severity: 'success',
+                message: tr.SurveyList.archiveSuccessful,
+              });
+            }, fadeTimeout);
+          } catch (error) {
+            showToast({
+              severity: 'error',
+              message: tr.SurveyList.archiveFailed,
+            });
+          }
+        }}
+      />
+    </ListItem>
   );
 }

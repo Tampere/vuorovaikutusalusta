@@ -91,6 +91,7 @@ interface DBSurvey {
   organization: string;
   tags: string[];
   languages: LanguageCode[];
+  is_archived: boolean;
 }
 
 /**
@@ -1215,6 +1216,26 @@ async function deleteRemovedOptionGroups(
   }
 }
 
+export async function changeSurveyArchiveStatus(
+  surveyId: number,
+  newArchiveStatus: boolean,
+) {
+  const { id } = await getDb().oneOrNone<DBSurvey>(
+    `UPDATE data.survey 
+      SET is_archived = $2, 
+      end_date = 
+        CASE 
+          WHEN $2 = true AND (SELECT start_date FROM data.survey WHERE id = $1) IS NOT NULL
+          THEN NOW() 
+          ELSE end_date 
+        END 
+      WHERE id = $1 RETURNING id`,
+    [surveyId, newArchiveStatus],
+  );
+
+  return id;
+}
+
 /**
  * Updates a premade survey entry
  * @param survey
@@ -1611,6 +1632,7 @@ function dbSurveyToSurvey(dbSurvey: DBSurvey | DBSurveyJoin): APISurvey {
     organization: dbOrganizationIdToOrganization(dbSurvey.organization),
     tags: dbSurvey.tags,
     enabledLanguages: dbSurvey.languages,
+    isArchived: dbSurvey.is_archived,
   };
 
   const enabledLanguages = dbSurvey.languages.reduce(
@@ -2204,19 +2226,37 @@ export async function removeFile(fileUrl: string) {
  * Checks if given user is allowed to edit the survey with given ID
  * @param user User
  * @param surveyId Survey ID
+ * @param disregardArchived If true, ignore the archived status of the survey
  * @returns Can the user edit the survey?
  */
-export async function userCanEditSurvey(user: User, surveyId: number) {
-  const { author_id: authorId, editors } = await getDb().oneOrNone<{
+export async function userCanEditSurvey(
+  user: User,
+  surveyId: number,
+  disregardArchived = false,
+) {
+  const {
+    author_id: authorId,
+    editors,
+    is_archived,
+  } = await getDb().oneOrNone<{
     author_id: string;
     editors: string[];
-  }>(`SELECT author_id, editors FROM data.survey WHERE id = $1`, [surveyId]);
-  return (
+    is_archived: boolean;
+  }>(`SELECT author_id, editors, is_archived FROM data.survey WHERE id = $1`, [
+    surveyId,
+  ]);
+
+  const userHasAccess =
     isSuperUser(user) ||
     isAdmin(user) ||
     user.id === authorId ||
-    editors.includes(user.id)
-  );
+    editors.includes(user.id);
+
+  if (disregardArchived) {
+    return userHasAccess;
+  }
+
+  return !is_archived && userHasAccess;
 }
 
 /**

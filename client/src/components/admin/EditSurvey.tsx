@@ -42,6 +42,7 @@ export default function EditSurvey() {
 
   const allowEditing =
     !activeSurveyLoading &&
+    !activeSurvey.isArchived &&
     (activeUserIsSuperUser ||
       activeUserIsAdmin ||
       activeUser?.id === activeSurvey.authorId ||
@@ -121,7 +122,7 @@ export default function EditSurvey() {
             <EditSurveyEmail />
           </Route>
           <Route path={`${path}/sivut/:pageId`}>
-            <EditSurveyPage canDelete={allowEditing} />
+            <EditSurveyPage canEdit={allowEditing} />
           </Route>
           <Route path={`${path}/kiitos-sivu`}>
             <EditSurveyThanksPage canEdit={allowEditing} />

@@ -439,7 +439,16 @@
     "showAuthoredOnly": "Visa bara mina enkäter",
     "showPublishedOnly": "Visa bara öppna enkäter",
     "copySurvey": "Kopiera",
-    "answers": "Svar"
+    "answers": "Svar",
+    "archiveLabel": "Arkiv",
+    "activeLabel": "Aktiva",
+    "archive": "Arkivera",
+    "restore": "Återställ från arkivet",
+    "archiveSuccessful": "Enkäten arkiverades framgångsrikt.",
+    "archiveFailed": "Ett fel uppstod vid arkiveringen av enkäten.",
+    "restoreSuccessful": "Enkäten återställdes från arkivet.",
+    "restoreFailed": "Ett fel uppstod vid återställningen av enkäten från arkivet.",
+    "archiveDialogContent": "Är du säker på att du vill arkivera enkäten? Arkiverade öppna enkäter kommer att stängas."
   },
   "SurveyPage": {
     "errorSurveyNotFound": "Enkäten kunde inte hittas eller är inte öppen för tillfället. Kontrollera adressen och försök igen.",

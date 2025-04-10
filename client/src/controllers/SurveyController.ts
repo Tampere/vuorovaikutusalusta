@@ -102,3 +102,25 @@ export async function getOrgTags() {
   const response = await request<any>(`${apiURL}/org-tags`, { method: 'GET' });
   return response;
 }
+
+/**
+ * Archive a survey
+ */
+export async function archiveSurvey(survey: Survey) {
+  const response = await request<{ message: string }>(
+    `${apiURL}/${survey.id}/archive`,
+    { method: 'POST', body: { archive: true } },
+  );
+  return response.message;
+}
+
+/**
+ * Restore archived survey
+ */
+export async function restoreSurvey(survey: Survey) {
+  const response = await request<{ message: string }>(
+    `${apiURL}/${survey.id}/archive`,
+    { method: 'POST', body: { archive: false } },
+  );
+  return response.message;
+}

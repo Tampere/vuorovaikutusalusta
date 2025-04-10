@@ -535,6 +535,10 @@ export interface Survey {
    * Survey languages
    */
   enabledLanguages: EnabledLanguages;
+  /**
+   * Is the survey archived
+   */
+  isArchived: boolean;
 }
 
 export type APISurvey = Omit<Survey, 'createdAt' | 'updatedAt'>;
