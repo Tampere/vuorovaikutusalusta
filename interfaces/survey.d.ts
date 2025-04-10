@@ -110,6 +110,7 @@ interface PersonalInfoAnswer {
   phone: string | null;
   address: string | null;
   custom: string | null;
+  customLabel?: LocalizedText;
 }
 
 /**

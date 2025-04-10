@@ -1,6 +1,7 @@
 import {
   AnswerEntry,
   LanguageCode,
+  LocalizedText,
   MapQuestionAnswer,
   PersonalInfoAnswer,
   Submission,
@@ -1026,7 +1027,9 @@ export async function getSubmissionsForSurvey(
   );
 
   const personalInfoRows = withPersonalInfo
-    ? await getDb().manyOrNone<DBPersonalInfo & DBSubmission>(
+    ? await getDb().manyOrNone<
+        DBPersonalInfo & DBSubmission & { customLabel: LocalizedText }
+      >(
         `SELECT 
           s.updated_at,
           s.id as submission_id,
@@ -1035,9 +1038,11 @@ export async function getSubmissionsForSurvey(
           pgp_sym_decrypt(pi.email, $(encryptionKey)) as email,
           pgp_sym_decrypt(pi.phone, $(encryptionKey)) as phone,
           pgp_sym_decrypt(pi.address, $(encryptionKey)) as address,
-          pgp_sym_decrypt(pi.custom, $(encryptionKey)) as custom
+          pgp_sym_decrypt(pi.custom, $(encryptionKey)) as custom,
+          (ps.details->>'customLabel')::jsonb as "customLabel"
         FROM data.submission s
         INNER JOIN data.personal_info pi ON pi.submission_id = s.id
+        LEFT JOIN data.page_section ps ON ps.id = pi.section_id
         WHERE s.survey_id = $(surveyId) AND s.unfinished_token IS NULL
       `,
         { surveyId, encryptionKey },
@@ -1049,7 +1054,9 @@ export async function getSubmissionsForSurvey(
     id: number;
     timestamp: Date;
     entries: DBAnswerEntry[];
-    personalInfo: Omit<DBPersonalInfo, 'submission_id'> | null;
+    personalInfo:
+      | (Omit<DBPersonalInfo, 'submission_id'> & { customLabel: LocalizedText })
+      | null;
   } | null = null;
 
   // First push all answer entries to the correct submission object
@@ -1081,6 +1088,7 @@ export async function getSubmissionsForSurvey(
         phone: personalInfoRow.phone,
         address: personalInfoRow.address,
         custom: personalInfoRow.custom,
+        customLabel: personalInfoRow.customLabel,
       },
     };
 

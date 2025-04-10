@@ -14,6 +14,7 @@ import { getAvailableMapLayers } from './map';
 import { getSurvey } from './survey';
 import fs from 'fs';
 import path from 'path';
+import logger from '@src/logger';
 
 const tr = useTranslations('fi');
 
@@ -140,6 +141,8 @@ interface SubmissionPersonalInfo {
   name: string | null;
   email: string | null;
   phone: string | null;
+  address: string | null;
+  custom: string | null;
   timeStamp: Date;
   language: LanguageCode;
   details: {
@@ -147,6 +150,9 @@ interface SubmissionPersonalInfo {
     askName: boolean;
     askEmail: boolean;
     askPhone: boolean;
+    askAddress: boolean;
+    askCustom: boolean;
+    customLabel: LocalizedText;
   };
 }
 
@@ -360,6 +366,8 @@ async function answerEntriesToCSV(
       askName: 'Vastaajan nimi',
       askEmail: 'Vastaajan sähköposti',
       askPhone: 'Vastaajan puhelinnumero',
+      askAddress: 'Vastaajan osoite',
+      askCustom: personalInfo?.details?.customLabel?.['fi'],
     };
 
     if (!personalInfo) {
@@ -367,7 +375,10 @@ async function answerEntriesToCSV(
     }
 
     const headerRow = Object.entries(personalInfo?.details ?? {})
-      .filter(([key, value]) => key !== 'isRequired' && value)
+      .filter(
+        ([key, value]) =>
+          key !== 'isRequired' && key !== 'customLabel' && value,
+      )
       .map(([key, _value]) => headerMap[key])
       .join(', ');
 
@@ -386,6 +397,8 @@ async function answerEntriesToCSV(
       askName: `,${personalInfo?.name}`,
       askEmail: `,${personalInfo?.email}`,
       askPhone: `,${personalInfo?.phone}`,
+      askAddress: `,${personalInfo?.address}`,
+      askCustom: `,${personalInfo?.custom}`,
     };
 
     return Object.entries(personalInfo?.details ?? {})
