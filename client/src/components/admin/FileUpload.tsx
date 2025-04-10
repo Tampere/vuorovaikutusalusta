@@ -16,9 +16,11 @@ interface Props {
   onUpload: (file: { url: string }) => void;
   onDelete: (file: { url: string }) => void;
   surveyOrganizationId: string;
+  disabled?: boolean;
 }
 
 export default function FileUpload({
+  disabled,
   onUpload,
   targetPath,
   value,
@@ -118,24 +120,27 @@ export default function FileUpload({
             </IconButton>
           </Tooltip>
           <Tooltip title={tr.FileUpload.deleteFile}>
-            <IconButton
-              aria-label="delete"
-              size="small"
-              onClick={async (event) => {
-                event.stopPropagation();
-                try {
-                  await deleteFile(url);
-                  onDelete({ url });
-                } catch (error) {
-                  showToast({
-                    severity: 'error',
-                    message: tr.FileUpload.errorDeletingFile,
-                  });
-                }
-              }}
-            >
-              <CancelIcon />
-            </IconButton>
+            <span>
+              <IconButton
+                aria-label="delete"
+                size="small"
+                disabled={disabled}
+                onClick={async (event) => {
+                  event.stopPropagation();
+                  try {
+                    await deleteFile(url);
+                    onDelete({ url });
+                  } catch (error) {
+                    showToast({
+                      severity: 'error',
+                      message: tr.FileUpload.errorDeletingFile,
+                    });
+                  }
+                }}
+              >
+                <CancelIcon />
+              </IconButton>
+            </span>
           </Tooltip>
         </div>
       );
@@ -144,7 +149,11 @@ export default function FileUpload({
 
   return (
     <div>
-      <DropZone maxFiles={1} fileCallback={(files) => setAcceptedFiles(files)}>
+      <DropZone
+        maxFiles={1}
+        fileCallback={(files) => setAcceptedFiles(files)}
+        readOnly={disabled}
+      >
         {value?.length ? (
           <aside>
             <h4>{tr.FileUpload.addedFile}</h4>

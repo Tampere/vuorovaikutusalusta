@@ -46,7 +46,7 @@ const useStyles = makeStyles({
 });
 
 interface Props {
-  canDelete: boolean;
+  canEdit: boolean;
 }
 
 export default function EditSurveyPage(props: Props) {
@@ -92,7 +92,7 @@ export default function EditSurveyPage(props: Props) {
       } catch (error) {
         showToast({
           severity: 'error',
-          message: tr.EditSurveyPage.errorCheckingSubmissions,
+          message: tr.EditSurveyPage.errorFetchingSubmissions,
         });
         setIsEditable(true);
       }
@@ -185,7 +185,7 @@ export default function EditSurveyPage(props: Props) {
           });
         }}
       />
-      {props.canDelete && (
+      {props.canEdit && (
         <Button
           style={{
             display: 'flex',
@@ -444,14 +444,14 @@ export default function EditSurveyPage(props: Props) {
       )}
       <SurveySections
         page={page}
-        disabled={loading}
+        disabled={loading || !props.canEdit}
         expandedSection={expandedSection}
         onExpandedSectionChange={(section) => {
           setExpandedSection(section);
         }}
       />
       <AddSurveySectionActions
-        disabled={loading}
+        disabled={loading || !props.canEdit}
         onAdd={(newSection) => {
           addSection(page.id, newSection);
           // Open last section after adding a new one

@@ -6,14 +6,20 @@ import FileUpload from './FileUpload';
 interface Props {
   section: SurveyDocumentSection;
   onChange: (section: SurveyDocumentSection) => void;
+  disabled?: boolean;
 }
 
-export default function EditDocumentSection({ section, onChange }: Props) {
+export default function EditDocumentSection({
+  section,
+  onChange,
+  disabled,
+}: Props) {
   const { activeSurvey } = useSurvey();
 
   return (
     <>
       <FileUpload
+        disabled={disabled}
         surveyId={activeSurvey.id}
         targetPath={[String(activeSurvey.id)]}
         surveyOrganizationId={activeSurvey.organization.id}

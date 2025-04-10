@@ -439,7 +439,16 @@
     "showAuthoredOnly": "Show authored surveys only",
     "showPublishedOnly": "Show published surveys only",
     "copySurvey": "Copy survey",
-    "answers": "Answers"
+    "answers": "Answers",
+    "archiveLabel": "Archive",
+    "activeLabel": "Active",
+    "archive": "Archive",
+    "restore": "Restore from archive",
+    "archiveSuccessful": "Survey archived successfully.",
+    "archiveFailed": "Error occurred while archiving the survey.",
+    "restoreSuccessful": "Survey restored from archive successfully.",
+    "restoreFailed": "Error occurred while restoring the survey from the archive.",
+    "archiveDialogContent": "Are you sure you want to archive the survey? Archived open surveys will be closed."
   },
   "SurveyPage": {
     "errorSurveyNotFound": "Survey was not found, or it is not published. Please check the address and try again.",

@@ -6,6 +6,7 @@ import { useTranslations } from '@src/stores/TranslationContext';
 
 export default function AdminFrontPage() {
   const { tr } = useTranslations();
+
   return (
     <Box sx={{ display: 'flex' }}>
       <AdminAppBar labels={[tr.SurveyList.title.frontPage]} />

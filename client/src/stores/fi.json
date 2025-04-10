@@ -439,7 +439,16 @@
     "showAuthoredOnly": "Näytä vain omat kyselyt",
     "showPublishedOnly": "Näytä vain avoinna olevat kyselyt",
     "copySurvey": "Kopioi",
-    "answers": "Vastaukset"
+    "answers": "Vastaukset",
+    "archiveLabel": "Arkisto",
+    "activeLabel": "Aktiiviset",
+    "archive": "Arkistoi",
+    "restore": "Palauta arkistosta",
+    "archiveSuccessful": "Kysely viety arkistoon.",
+    "archiveFailed": "Kyselyn arkistoinnissa tapahtui virhe.",
+    "restoreSuccessful": "Kysely palautettu arkistosta.",
+    "restoreFailed": "Kyselyn palauttamisessa arkistosta tapahtui virhe.",
+    "archiveDialogContent": "Haluatko varmasti arkistoida kyselyn? Arkistoidut avoimet kyselyt päätetään."
   },
   "SurveyPage": {
     "errorSurveyNotFound": "Kyselyä ei löytynyt, tai se ei ole avoinna. Tarkista osoite ja yritä uudestaan.",

@@ -4,7 +4,14 @@ import { useState } from 'react';
 import { createNewSurvey, getSurveys } from '@src/controllers/SurveyController';
 import { useToasts } from '@src/stores/ToastContext';
 import SurveyListItem from './SurveyListItem';
-import { FormControlLabel, List, Skeleton, Switch } from '@mui/material';
+import {
+  FormControlLabel,
+  List,
+  Skeleton,
+  Switch,
+  Tab,
+  Tabs,
+} from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import LoadingButton from '../LoadingButton';
@@ -30,7 +37,10 @@ const useStyles = makeStyles({
   },
 });
 
+const tabs = ['active', 'archived'];
+
 export default function SurveyList() {
+  const [tabView, setTabView] = useState<(typeof tabs)[number]>('active');
   const [surveysLoading, setSurveysLoading] = useState(true);
   const [surveys, setSurveys] = useState<Survey[]>([]);
   const [newSurveyLoading, setNewSurveyLoading] = useState(false);
@@ -73,6 +83,31 @@ export default function SurveyList() {
 
   return (
     <div className={classes.root}>
+      <Tabs
+        value={tabView}
+        indicatorColor="primary"
+        textColor="primary"
+        sx={{
+          mb: '16px',
+          minHeight: 'fit-content',
+          '& button': { minHeight: 'fit-content' },
+        }}
+        TabIndicatorProps={{ sx: { height: '2px' } }}
+      >
+        {tabs.map((tab) => (
+          <Tab
+            sx={{ textTransform: 'none' }}
+            value={tab}
+            key={tab}
+            onClick={() => setTabView(tab)}
+            label={
+              tab === 'active'
+                ? tr.SurveyList.activeLabel
+                : tr.SurveyList.archiveLabel
+            }
+          />
+        ))}
+      </Tabs>
       <div className={classes.actions}>
         <FormControlLabel
           value="showAuthored"
@@ -140,6 +175,7 @@ export default function SurveyList() {
           data-testid="survey-admin-list"
         >
           {surveys
+            .filter((s) => s.isArchived === (tabView === 'archived'))
             .filter((s) =>
               filterTags.length
                 ? filterTags.some((t) =>
@@ -148,7 +184,33 @@ export default function SurveyList() {
                 : true,
             )
             .map((survey) => (
-              <SurveyListItem key={survey.id} survey={survey} />
+              <SurveyListItem
+                onArchive={(surveyId) =>
+                  setSurveys((prev) =>
+                    prev.map((survey) =>
+                      survey.id === surveyId
+                        ? {
+                            ...survey,
+                            isArchived: true,
+                            isPublished: false,
+                            endDate: new Date(),
+                          }
+                        : survey,
+                    ),
+                  )
+                }
+                onRestore={(surveyId) =>
+                  setSurveys((prev) =>
+                    prev.map((survey) =>
+                      survey.id === surveyId
+                        ? { ...survey, isArchived: false }
+                        : survey,
+                    ),
+                  )
+                }
+                key={survey.id}
+                survey={survey}
+              />
             ))}
         </List>
       )}

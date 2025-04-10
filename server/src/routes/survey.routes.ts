@@ -10,6 +10,7 @@ import {
   upsertPublicationCredentials,
 } from '@src/application/submission';
 import {
+  changeSurveyArchiveStatus,
   createSurvey,
   createSurveyPage,
   deleteSurvey,
@@ -63,6 +64,36 @@ router.get(
       req.user.organizations.map((o) => o.id),
     );
     res.json(orgTags);
+  }),
+);
+
+/**
+ * Endpoint for changing survey's archive status
+ */
+router.post(
+  '/:id/archive',
+  ensureAuthenticated(),
+  ensureSurveyGroupAccess(),
+  validateRequest([
+    param('id').isNumeric().toInt().withMessage('ID must be a number'),
+  ]),
+  asyncHandler(async (req, res) => {
+    const surveyId = Number(req.params.id);
+    const permissionsOk = await userCanEditSurvey(req.user, surveyId, true);
+    if (!permissionsOk) {
+      throw new ForbiddenError('User not author nor editor of the survey');
+    }
+    const id = await changeSurveyArchiveStatus(surveyId, req.body.archive);
+
+    if (!id) {
+      throw new BadRequestError(
+        `Failed to change archive status for survey with id: ${surveyId}.`,
+      );
+    }
+
+    res.status(200).json({
+      message: req.body.archive ? 'archived' : 'restored',
+    });
   }),
 );
 
