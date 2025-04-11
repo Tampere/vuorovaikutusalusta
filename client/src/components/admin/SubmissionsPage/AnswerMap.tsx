@@ -168,6 +168,7 @@ export default function AnswerMap({
   return (
     <>
       <OskariMap
+        key={survey.localizedMapUrls[surveyLanguage]} // Force re-mount on URL change
         url={survey.localizedMapUrls[surveyLanguage]}
         layers={layers}
         features={features}
