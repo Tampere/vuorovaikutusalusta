@@ -606,7 +606,7 @@ export default function SurveyStepper({
           <Link
             color="primary"
             underline="hover"
-            href="/tietosuojaseloste"
+            href={`/tietosuojaseloste?lang=${surveyLanguage}`}
             target="_blank"
           >
             {tr.FooterLinks.privacyStatement}
