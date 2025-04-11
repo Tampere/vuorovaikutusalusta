@@ -120,39 +120,41 @@ export default function SurveyList() {
           label={tr.SurveyList.showAuthoredOnly}
         />
       </div>
-      <div className={classes.actions}>
-        <FormControlLabel
-          value="showPublished"
-          control={
-            <Switch
-              checked={showPublishedOnly}
-              onChange={(event) => setShowPublishedOnly(event.target.checked)}
-            />
-          }
-          label={tr.SurveyList.showPublishedOnly}
-        />
-        <LoadingButton
-          variant="contained"
-          loading={newSurveyLoading}
-          onClick={async () => {
-            setNewSurveyLoading(true);
-            try {
-              const newSurvey = await createNewSurvey();
-              setNewSurveyLoading(false);
-              history.push(`/kyselyt/${newSurvey.id}`);
-            } catch (error) {
-              showToast({
-                severity: 'error',
-                message: tr.SurveyList.errorCreatingNewSurvey,
-              });
-            } finally {
-              if (newSurveyLoading) setNewSurveyLoading(false);
+      {tabView === 'active' && (
+        <div className={classes.actions}>
+          <FormControlLabel
+            value="showPublished"
+            control={
+              <Switch
+                checked={showPublishedOnly}
+                onChange={(event) => setShowPublishedOnly(event.target.checked)}
+              />
             }
-          }}
-        >
-          {tr.SurveyList.createNewSurvey}
-        </LoadingButton>
-      </div>
+            label={tr.SurveyList.showPublishedOnly}
+          />
+          <LoadingButton
+            variant="contained"
+            loading={newSurveyLoading}
+            onClick={async () => {
+              setNewSurveyLoading(true);
+              try {
+                const newSurvey = await createNewSurvey();
+                setNewSurveyLoading(false);
+                history.push(`/kyselyt/${newSurvey.id}`);
+              } catch (error) {
+                showToast({
+                  severity: 'error',
+                  message: tr.SurveyList.errorCreatingNewSurvey,
+                });
+              } finally {
+                if (newSurveyLoading) setNewSurveyLoading(false);
+              }
+            }}
+          >
+            {tr.SurveyList.createNewSurvey}
+          </LoadingButton>
+        </div>
+      )}
 
       <div className={classes.actions}>
         <TagPicker

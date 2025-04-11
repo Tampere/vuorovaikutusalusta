@@ -448,7 +448,7 @@
     "archiveFailed": "Error occurred while archiving the survey.",
     "restoreSuccessful": "Survey restored from archive successfully.",
     "restoreFailed": "Error occurred while restoring the survey from the archive.",
-    "archiveDialogContent": "Are you sure you want to archive the survey? Archived open surveys will be closed."
+    "archiveDialogContent": "Are you sure you want to archive the survey? Archived open surveys will be closed and published APIs will be closed."
   },
   "SurveyPage": {
     "errorSurveyNotFound": "Survey was not found, or it is not published. Please check the address and try again.",
