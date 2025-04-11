@@ -215,7 +215,7 @@ export default function SurveyLandingPage({
           <Link
             color="primary"
             underline="hover"
-            href="/saavutettavuusseloste"
+            href={`/saavutettavuusseloste?lang=${surveyLanguage}`}
             target="_blank"
           >
             {tr.FooterLinks.accessibility}
