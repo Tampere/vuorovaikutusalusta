@@ -160,7 +160,7 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
             <Link
               color="primary"
               underline="hover"
-              href="/tietosuojaseloste"
+              href={`/tietosuojaseloste?lang=${surveyLanguage}`}
               target="_blank"
             >
               {tr.FooterLinks.privacyStatement}

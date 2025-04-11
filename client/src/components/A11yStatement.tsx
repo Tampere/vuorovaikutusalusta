@@ -65,7 +65,7 @@ export function A11yStatement() {
     },
   };
 
-  const t = translations[surveyLanguage] || translations.fi;
+  const t = translations[surveyLanguage] ?? translations.fi;
 
   return (
     <div
