@@ -18,6 +18,7 @@ import React, {
 } from 'react';
 import { useTranslations } from './TranslationContext';
 import { isFollowUpSectionParentType, isString } from '@src/utils/typeCheck';
+import { getLocalizedMapUrls } from './SurveyContext';
 
 interface State {
   answers: AnswerEntry[];
@@ -499,7 +500,13 @@ export function useSurveyAnswers() {
         dispatch({ type: 'SET_ANSWERS', answers: [] });
         return;
       }
-      dispatch({ type: 'SET_SURVEY', survey });
+      dispatch({
+        type: 'SET_SURVEY',
+        survey: {
+          ...survey,
+          localizedMapUrls: getLocalizedMapUrls(survey.mapUrl),
+        },
+      });
       // Get all sections across survey pages
       function getSectionsFollowUpSections(sections: SurveyPageSection[]) {
         return sections

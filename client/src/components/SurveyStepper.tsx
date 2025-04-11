@@ -622,9 +622,10 @@ export default function SurveyStepper({
       case 'map':
         return (
           <SurveyMap
+            key={survey.localizedMapUrls[surveyLanguage]} // Force re-mount if the map URL changes
             pageId={currentPage.id}
             defaultMapView={currentPage.sidebar?.defaultMapView}
-            url={survey.mapUrl}
+            url={survey.localizedMapUrls[surveyLanguage]}
             layers={currentPage.sidebar.mapLayers}
           />
         );

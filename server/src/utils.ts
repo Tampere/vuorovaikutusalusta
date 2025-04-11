@@ -125,3 +125,12 @@ export function formatPhoneNumber(phoneNumber: string) {
   // Return the combined number
   return `${prefix} ${formatted}`.trim();
 }
+
+/** Replace the language parameter in the map URL (like fi or fi_FI) with specific language codes. */
+export function getLocalizedMapUrls(mapUrl: string) {
+  return {
+    fi: mapUrl?.replace(/(&)?lang=\w\w(_\w\w)?/, '').concat('&lang=fi') ?? '',
+    se: mapUrl?.replace(/(&)?lang=\w\w(_\w\w)?/, '').concat('&lang=sv') ?? '',
+    en: mapUrl?.replace(/(&)?lang=\w\w(_\w\w)?/, '').concat('&lang=en') ?? '',
+  };
+}
