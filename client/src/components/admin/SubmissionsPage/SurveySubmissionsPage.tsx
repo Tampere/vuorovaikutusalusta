@@ -294,7 +294,7 @@ export default function SurveySubmissionsPage() {
                 />
                 <Stack direction="row" spacing={2}>
                   <DataExport surveyId={survey.id} />
-                  <DataPublish surveyId={survey.id} />
+                  {!survey.isArchived && <DataPublish surveyId={survey.id} />}
                 </Stack>
                 <SurveyQuestionSummary
                   setSelectedQuestion={setSelectedQuestion}

@@ -95,6 +95,7 @@ function findFollowUpMapQuestion(
 function prepareMapAnswers(
   survey: Survey,
   answerEntries: AnswerEntry[],
+  language: LanguageCode,
 ): ScreenshotJobData {
   return answerEntries
     .filter(
@@ -130,7 +131,7 @@ function prepareMapAnswers(
         };
       },
       {
-        mapUrl: survey.mapUrl,
+        mapUrl: survey.localizedMapUrls[language],
         answers: [],
       } as ScreenshotJobData,
     );
@@ -513,7 +514,7 @@ export async function generatePdf(
     [] as SurveyFollowUpSection[],
   );
 
-  const screenshotJobData = prepareMapAnswers(survey, answerEntries);
+  const screenshotJobData = prepareMapAnswers(survey, answerEntries, language);
   const screenshots = await getScreenshots(screenshotJobData);
 
   logger.debug(

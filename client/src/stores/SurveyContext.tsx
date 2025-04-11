@@ -30,6 +30,15 @@ interface State {
   availableMapLayersError: string;
 }
 
+/** Replace the language parameter in the map URL (like fi or fi_FI) with specific language codes. */
+export function getLocalizedMapUrls(mapUrl: string) {
+  return {
+    fi: mapUrl?.replace(/(&)?lang=\w\w(_\w\w)?/, '').concat('&lang=fi') ?? '',
+    se: mapUrl?.replace(/(&)?lang=\w\w(_\w\w)?/, '').concat('&lang=sv') ?? '',
+    en: mapUrl?.replace(/(&)?lang=\w\w(_\w\w)?/, '').concat('&lang=en') ?? '',
+  };
+}
+
 /**
  * Action type
  */
@@ -542,7 +551,12 @@ function reducer(state: State, action: Action): State {
     case 'SET_ACTIVE_SURVEY':
       return {
         ...state,
-        activeSurvey: { ...action.survey },
+        activeSurvey: {
+          ...action.survey,
+          localizedMapUrls:
+            action.survey.localizedMapUrls ??
+            getLocalizedMapUrls(action.survey.mapUrl),
+        },
         originalActiveSurvey: structuredClone(action.survey),
       };
     case 'START_LOADING_ACTIVE_SURVEY':
@@ -583,6 +597,7 @@ function reducer(state: State, action: Action): State {
         ...state,
         activeSurvey: {
           ...action.survey,
+          localizedMapUrls: getLocalizedMapUrls(action.survey.mapUrl),
           // Don't modify pages via this action
           pages: state.activeSurvey.pages,
         },

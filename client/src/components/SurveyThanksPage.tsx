@@ -151,7 +151,7 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
           <Link
             color="primary"
             underline="hover"
-            href="/saavutettavuusseloste"
+            href={`/saavutettavuusseloste?lang=${surveyLanguage}`}
             target="_blank"
           >
             {tr.FooterLinks.accessibility}

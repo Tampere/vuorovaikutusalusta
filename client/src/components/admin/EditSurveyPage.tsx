@@ -480,7 +480,7 @@ export default function EditSurveyPage(props: Props) {
         }}
       />
       <AdminSurveyMapPreview
-        url={activeSurvey.mapUrl}
+        url={activeSurvey.localizedMapUrls[surveyLanguage]}
         isOpen={mapPreviewOpen}
         setIsOpen={setMapPreviewOpen}
         modifyView={modifyMapView}

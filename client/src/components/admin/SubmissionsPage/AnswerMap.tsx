@@ -8,6 +8,7 @@ import {
 import React, { useEffect, useMemo } from 'react';
 import { AnswerSelection } from './AnswersList';
 import OskariMap from './OskariMap';
+import { useTranslations } from '@src/stores/TranslationContext';
 
 interface Props {
   survey: Survey;
@@ -30,6 +31,7 @@ export default function AnswerMap({
   surveyQuestions,
   questions,
 }: Props) {
+  const { surveyLanguage } = useTranslations();
   function holdsMapQuestions(question: SurveyQuestion) {
     if (!question) return false;
 
@@ -166,7 +168,7 @@ export default function AnswerMap({
   return (
     <>
       <OskariMap
-        url={survey.mapUrl}
+        url={survey.localizedMapUrls[surveyLanguage]}
         layers={layers}
         features={features}
         onFeatureClick={(feature) => {

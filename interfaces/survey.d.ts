@@ -404,6 +404,10 @@ export interface Survey {
    */
   mapUrl: string;
   /**
+   * Localized map urls for the survey
+   */
+  localizedMapUrls: LocalizedText;
+  /**
    * Date when the survey is planned to start and go public
    */
   startDate: Date;

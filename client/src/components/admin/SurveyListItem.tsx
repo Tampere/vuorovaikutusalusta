@@ -33,6 +33,8 @@ import ConfirmDialog from '../ConfirmDialog';
 import CopyToClipboard from '../CopyToClipboard';
 import LoadingButton from '../LoadingButton';
 import { theme } from '@src/themes/admin';
+import { request } from '@src/utils/request';
+import { CredentialsEntry } from '@interfaces/submission';
 
 const fadeTimeout = 350;
 
@@ -415,6 +417,12 @@ export default function SurveyListItem(props: Props) {
             return;
           }
           try {
+            await request<CredentialsEntry>(
+              `/api/surveys/${props.survey.id}/publication/credentials`,
+              {
+                method: 'DELETE',
+              },
+            );
             await archiveSurvey(survey);
             setFadeRight(true);
             setTimeout(() => {

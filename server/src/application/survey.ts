@@ -42,7 +42,10 @@ import {
   isSuperUser,
 } from '@src/user';
 
-import { geometryToGeoJSONFeatureCollection } from '@src/utils';
+import {
+  geometryToGeoJSONFeatureCollection,
+  getLocalizedMapUrls,
+} from '@src/utils';
 import { Geometry } from 'geojson';
 
 const sectionTypesWithOptions: SurveyPageSection['type'][] = [
@@ -1644,6 +1647,7 @@ function dbSurveyToSurvey(dbSurvey: DBSurvey | DBSurveyJoin): APISurvey {
   );
   return {
     ...survey,
+    localizedMapUrls: getLocalizedMapUrls(survey.mapUrl),
     submissionCount: Number(dbSurvey.submission_count),
     isPublished: isPublished(survey),
     ...('theme_id' in dbSurvey && {

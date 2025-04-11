@@ -448,7 +448,7 @@
     "archiveFailed": "Kyselyn arkistoinnissa tapahtui virhe.",
     "restoreSuccessful": "Kysely palautettu arkistosta.",
     "restoreFailed": "Kyselyn palauttamisessa arkistosta tapahtui virhe.",
-    "archiveDialogContent": "Haluatko varmasti arkistoida kyselyn? Arkistoidut avoimet kyselyt päätetään."
+    "archiveDialogContent": "Haluatko varmasti arkistoida kyselyn? Arkistoidut avoimet kyselyt päätetään ja vastausrajapinnat suljetaan."
   },
   "SurveyPage": {
     "errorSurveyNotFound": "Kyselyä ei löytynyt, tai se ei ole avoinna. Tarkista osoite ja yritä uudestaan.",

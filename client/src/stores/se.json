@@ -66,7 +66,8 @@
     "copyPage": "Kopiera sida",
     "attachNewPage": "Bifoga sida",
     "pageAttached": "Observera att kartlagval inte kopieras. Kontrollera kartlagvalen och korrigera kartpubliceringsadressen vid behov.",
-    "pageCopied": "Sidkopiering lyckades. Du kan nu klistra in den kopierade sidan i din undersökning."
+    "pageCopied": "Sidkopiering lyckades. Du kan nu klistra in den kopierade sidan i din undersökning.",
+    "checkConditionalSections": "Observera att villkor för uppföljningsfrågor inte kopieras."
   },
   "EditSurveyInfo": {
     "title": "Undersökningens titel",
@@ -448,7 +449,7 @@
     "archiveFailed": "Ett fel uppstod vid arkiveringen av enkäten.",
     "restoreSuccessful": "Enkäten återställdes från arkivet.",
     "restoreFailed": "Ett fel uppstod vid återställningen av enkäten från arkivet.",
-    "archiveDialogContent": "Är du säker på att du vill arkivera enkäten? Arkiverade öppna enkäter kommer att stängas."
+    "archiveDialogContent": "Är du säker på att du vill arkivera enkäten? Vid arkivering stängs både de öppna enkäterna och svarsgränssnitten."
   },
   "SurveyPage": {
     "errorSurveyNotFound": "Enkäten kunde inte hittas eller är inte öppen för tillfället. Kontrollera adressen och försök igen.",
