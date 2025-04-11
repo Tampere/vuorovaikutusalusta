@@ -12,7 +12,7 @@ import { SystemStyleObject } from '@mui/system';
 import SurveyLanguageMenu from '../SurveyLanguageMenu';
 import LanguageMenu from '../LanguageMenu';
 import AppBarUserMenu from './AppBarUserMenu';
-import { NavLink, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import KartallaLogo from '@src/components/icons/KartallaLogoDense';
 import { AppBarInstructionsMenu } from './Instructions/AppBarInstructionsMenu';
 import { GeneralNotificationNavigationButton } from './GeneralNotification/GeneralNotificationNavigationButton';

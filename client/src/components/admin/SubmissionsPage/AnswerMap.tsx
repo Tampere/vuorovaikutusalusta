@@ -8,7 +8,6 @@ import {
 import React, { useEffect, useMemo } from 'react';
 import { AnswerSelection } from './AnswersList';
 import OskariMap from './OskariMap';
-import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 
 interface Props {

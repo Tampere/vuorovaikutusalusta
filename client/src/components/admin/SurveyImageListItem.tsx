@@ -28,9 +28,7 @@ export default function SurveyImageListItem(props: Props) {
           fontSize: '26px',
           cursor: 'pointer',
         }}
-        onClick={async (event: MouseEvent) =>
-          await props.onDelete(event, image.fileUrl)
-        }
+        onClick={async (event) => await props.onDelete(event, image.fileUrl)}
       />
       <img
         src={props.src}
