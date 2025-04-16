@@ -45,7 +45,7 @@ interface DBAnswerEntry {
   created_at: Date;
   option_text: string;
   option_group_index: number;
-  map_layers: number[];
+  map_layers: (number | string)[];
 }
 
 /**
@@ -86,7 +86,7 @@ interface AnswerEntry {
   groupIndex: number;
   optionIndex: number;
   optionText?: string;
-  mapLayers: number[];
+  mapLayers: (number | string)[];
 }
 
 interface CheckboxOptions {

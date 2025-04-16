@@ -40,7 +40,7 @@ interface DBAnswerEntry {
   parent_entry_id: number;
   value_file: string;
   value_file_name: string;
-  map_layers: number[];
+  map_layers: (number | string)[];
 }
 
 /** DB row of special personal info question */
@@ -95,7 +95,7 @@ const answerEntryColumnSet = (inputSRID: number) =>
     'parent_entry_id',
     'value_file',
     'value_file_name',
-    'map_layers',
+    { name: 'map_layers', mod: ':json' },
   ]);
 
 /**

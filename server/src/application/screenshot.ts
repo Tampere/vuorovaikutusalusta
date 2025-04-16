@@ -28,7 +28,7 @@ export interface ScreenshotJobData {
     sectionId: number;
     index: number;
     feature: GeoJSONWithCRS<Feature<Point | LineString | Polygon>>;
-    visibleLayerIds: number[];
+    visibleLayerIds: (number | string)[];
     question: SurveyMapQuestion;
   }[];
 }

@@ -312,7 +312,7 @@ export interface SurveyPageSidebar {
   /**
    * IDs of the visible map layers for the page
    */
-  mapLayers: number[];
+  mapLayers: (number | string)[];
   /**
    * Geometry for the default map view
    */
@@ -608,7 +608,7 @@ export type SurveyMapSubQuestionAnswer = AnswerEntry & {
  */
 export interface MapQuestionAnswer {
   selectionType: MapQuestionSelectionType;
-  mapLayers: number[];
+  mapLayers: (number | string)[];
   geometry: GeoJSONWithCRS<
     GeoJSON.Feature<GeoJSON.Point | GeoJSON.LineString | GeoJSON.Polygon>
   >;
