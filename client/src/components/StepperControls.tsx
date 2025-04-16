@@ -28,11 +28,13 @@ interface Props {
   onSaveUnfinished?: (token: string) => void;
   nextPage: SurveyPage;
   previousPage: SurveyPage;
+  saveMapLayers: () => Promise<void>;
 }
 
 export default function StepperControls(props: Props) {
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const { tr } = useTranslations();
+
   const classes = useStyles();
 
   return (
@@ -72,7 +74,8 @@ export default function StepperControls(props: Props) {
         {props.allowSavingUnfinished && (
           <Button
             variant="outlined"
-            onClick={() => {
+            onClick={async () => {
+              await props.saveMapLayers();
               setSaveDialogOpen(true);
             }}
           >

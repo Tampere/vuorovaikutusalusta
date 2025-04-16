@@ -510,6 +510,7 @@ export default function SurveyStepper({
                     </div>
                   ))}
                   <StepperControls
+                    saveMapLayers={saveMapLayers}
                     nextPage={nextPage}
                     previousPage={previousPage}
                     isTestSurvey={isTestSurvey}
