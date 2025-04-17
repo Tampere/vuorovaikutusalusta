@@ -8,7 +8,7 @@ import { AnswerSelection } from './AnswersList';
 
 interface Props {
   url: string;
-  layers?: number[];
+  layers?: (number | string)[];
   features?: Feature[];
   onFeatureClick?: (feature: Feature) => void;
   selectedAnswer?: AnswerSelection;

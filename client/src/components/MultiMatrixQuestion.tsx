@@ -27,7 +27,13 @@ interface Props {
   onChange: (value: string[][]) => void;
   setDirty: (dirty: boolean) => void;
   question: SurveyMultiMatrixQuestion;
-  validationErrors: ('required' | 'answerLimits' | 'minValue' | 'maxValue')[];
+  validationErrors: (
+    | 'required'
+    | 'answerLimits'
+    | 'minValue'
+    | 'maxValue'
+    | 'custom'
+  )[];
   setBackdropOpen: React.Dispatch<React.SetStateAction<boolean>>;
   readOnly?: boolean;
 }

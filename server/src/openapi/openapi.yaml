@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: Kartalla API
   description: API description for Kartalla survey platform.
-  version: 1.1.3
+  version: 1.1.4
 servers:
   - url: https://test.kartalla.io/api
     description: Test server
@@ -16,7 +16,7 @@ tags:
 paths:
   /surveys:
     get:
-      description: Get all surveys for the authenticated user's organization or all surveys if the user is a super user.
+      description: Get all surveys for the authenticated user's organization and group or all surveys if the user is a super user.
       tags:
         - Surveys
       parameters:
@@ -45,7 +45,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
   /surveys/{surveyId}:
     get:
-      description: Get a survey by its id. If the authenticated user is not a super user, the survey must be created for the same organization as the authenticated user and the user must be an editor or author of the survey.
+      description: Get a survey by its id. If the authenticated user is not a super user, the survey must be created for the same organization and group (if the user is assigned to a group) as the authenticated user and the user must be an editor or author of the survey.
       tags:
         - Surveys
       operationId: get-survey
@@ -313,6 +313,11 @@ components:
         isArchived:
           type: boolean
           description: Is the survey archived?
+        userGroups:
+          type: array
+          description: Ids of user groups that can access the survey. If empty or not set, all groups can access the survey.
+          items:
+            type: integer
         sectionTitleColor:
           type: string
         email:

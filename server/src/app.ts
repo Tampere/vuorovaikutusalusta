@@ -38,7 +38,7 @@ async function start() {
     configureAuth(app);
     logger.info('Authentication configured');
   } else {
-    configureMockAuth(app);
+    await configureMockAuth(app);
     logger.info('Authentication not enabled, using a mock user');
   }
 

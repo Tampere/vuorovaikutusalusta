@@ -18,6 +18,7 @@ import UserSmallIcon from '@src/components/icons/UserSmallIcon';
 import {
   archiveSurvey,
   creteSurveyFromPrevious,
+  getSurveyPublicationCredentials,
   publishSurvey,
   restoreSurvey,
   unpublishSurvey,
@@ -417,12 +418,16 @@ export default function SurveyListItem(props: Props) {
             return;
           }
           try {
-            await request<CredentialsEntry>(
-              `/api/surveys/${props.survey.id}/publication/credentials`,
-              {
-                method: 'DELETE',
-              },
-            );
+            const publicationCredentials =
+              await getSurveyPublicationCredentials(props.survey.id);
+            if (publicationCredentials.length > 0) {
+              await request<CredentialsEntry>(
+                `/api/surveys/${props.survey.id}/publication/credentials`,
+                {
+                  method: 'DELETE',
+                },
+              );
+            }
             await archiveSurvey(survey);
             setFadeRight(true);
             setTimeout(() => {

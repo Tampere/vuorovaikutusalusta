@@ -45,7 +45,7 @@ declare module 'oskari-rpc' {
      */
     export type MapLayerVisibilityRequest = (
       name: 'MapModulePlugin.MapLayerVisibilityRequest',
-      params: [layerId: number, visibility: boolean],
+      params: [layerId: number | string, visibility: boolean],
     ) => void;
     /**
      * Add features to map request

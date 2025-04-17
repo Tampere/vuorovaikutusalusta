@@ -86,7 +86,6 @@ export function NewUserRequest({
         },
         '& input': {
           padding: '0 0.25rem',
-          color: 'rgba(0, 0, 0, 0.8)',
           '&:focus': {
             border: `solid 2px ${theme.palette.primary.main}`,
             outline: 'none',

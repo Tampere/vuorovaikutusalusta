@@ -95,7 +95,10 @@
     "titleColor": "Osioiden otsikoiden väri",
     "allowTestSurvey": "Julkaise testikysely",
     "allowTestSurveyHelperText": "Kyselystä julkaistaan testiversio oman osoitteen taakse. Testikyselystä ei tallenneta vastauksia.",
-    "testSurveyUrl": "Testikyselyn osoite"
+    "testSurveyUrl": "Testikyselyn osoite",
+    "userGroupFetchFailed": "Käyttäjäryhmien haku epäonnistui.",
+    "userGroups": "Käyttäjäryhmien rajaus",
+    "userGroupsHelperText": "Käyttäjäryhmät, joille kysely on nähtävissä kyselylistauksessa. Jos käyttäjäryhmiä ei ole valittu, kysely on nähtävissä kaikille käyttäjille. Vain kyselyn laatija ja pääkäyttäjä voivat muokata käyttäjäryhmiä."
   },
   "EditSurveyEmail": {
     "enable": "Salli vastausten raportointi sähköpostitse",
@@ -707,7 +710,26 @@
     "noUsers": "Ei käyttäjiä",
     "userRequestComplete": "Käyttäjä lisätty.",
     "userExists": "Käyttäjä on jo olemassa.",
-    "userRequestFailed": "Käyttäjätietojen lisääminen epäonnistui."
+    "userRequestFailed": "Käyttäjätietojen lisääminen epäonnistui.",
+    "isPending": "Odottaa",
+    "isActive": "Aktiivinen",
+    "userGroupFetchFailed": "Käyttäjäryhmien haku epäonnistui."
+  },
+  "UserGroupManagement": {
+    "userGroups": "Käyttäjäryhmät",
+    "addGroupPlaceholder": "Uusi ryhmä",
+    "addGroup": "Lisää ryhmä",
+    "addGroupLabel": "Ryhmän nimi",
+    "noGroups": "Ei määriteltyjä käyttäjäryhmiä.",
+    "groupFetchError": "Virhe haettaessa käyttäjäryhmiä.",
+    "groupCreationComplete": "Käyttäjäryhmä lisätty.",
+    "groupCreationFailed": "Käyttäjäryhmän lisääminen epäonnistui.",
+    "groupDeletionComplete": "Käyttäjäryhmä poistettu.",
+    "groupDeletionFailed": "Käyttäjäryhmän poistaminen epäonnistui."
+  },
+  "UserGroupSelect": {
+    "updateSuccess": "Käyttäjäryhmä päivitetty onnistuneesti.",
+    "updateFailed": "Käyttäjäryhmän päivittäminen epäonnistui."
   },
 
   "navigation": {

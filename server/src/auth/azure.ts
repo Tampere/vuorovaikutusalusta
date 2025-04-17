@@ -2,7 +2,11 @@ import { Express } from 'express';
 import passport from 'passport';
 import { OIDCStrategy } from 'passport-azure-ad';
 import { decrypt } from '../crypto';
-import { dbOrganizationIdToOrganization, upsertUser } from '../user';
+import {
+  dbOrganizationIdToOrganization,
+  getUserGroupsForUser,
+  upsertUser,
+} from '../user';
 
 /**
  * Configures authentication for given Express application.
@@ -44,7 +48,8 @@ export function configureAzureAuth(app: Express) {
             ), // Parse groups to trim extra characters
             roles: JSON.parse(profile._json.roles), // Parse roles to trim extra characters
           });
-          return done(null, user);
+          const userGroups = await getUserGroupsForUser(user.id);
+          return done(null, { ...user, groups: userGroups.map((g) => g.id) });
         });
       },
     ),

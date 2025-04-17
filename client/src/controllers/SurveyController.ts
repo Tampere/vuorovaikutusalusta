@@ -1,3 +1,4 @@
+import { CredentialsEntry } from '@interfaces/submission';
 import { Survey } from '@interfaces/survey';
 import { request } from '@src/utils/request';
 import { parseISO } from 'date-fns';
@@ -123,4 +124,15 @@ export async function restoreSurvey(survey: Survey) {
     { method: 'POST', body: { archive: false } },
   );
   return response.message;
+}
+
+/**
+ * Get survey publication credentials
+ */
+export async function getSurveyPublicationCredentials(surveyId: number) {
+  const credentials = await request<CredentialsEntry[]>(
+    `${apiURL}/${surveyId}/publication/credentials`,
+    { method: 'GET' },
+  );
+  return credentials;
 }

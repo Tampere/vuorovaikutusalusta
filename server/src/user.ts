@@ -1,9 +1,15 @@
 import { User as ApplicationUser, Organization } from '@interfaces/user';
-import { getDb, encryptionKey } from './database';
+import {
+  getDb,
+  encryptionKey,
+  getColumnSet,
+  getMultiInsertQuery,
+} from './database';
 import { BadRequestError, InternalServerError } from './error';
 import { sendMail } from './email/email';
 import logger from './logger';
 import useTranslations from './translations/useTranslations';
+import { UserGroup } from '@interfaces/userGroup';
 
 /**
  * Define user type inside Express types to make it globally accessible via req.user
@@ -21,6 +27,33 @@ interface DbUser {
   organizations: string[];
   roles: string[];
   isPending?: boolean;
+  groups?: string[];
+}
+
+interface DBUserGroupMember {
+  id?: string;
+  user_id: string;
+  group_id: string;
+}
+
+/**
+ * Helper function for creating user group column set
+ */
+const userGroupMemberColumnSet = () =>
+  getColumnSet<DBUserGroupMember>(
+    'user_group_member',
+    ['user_id', 'group_id'],
+    'application',
+  );
+
+function userGroupsToDBUserGroupMemberRows(
+  userId: string,
+  groupIds: string[],
+): DBUserGroupMember[] {
+  return groupIds.map((groupId) => ({
+    user_id: userId,
+    group_id: groupId,
+  }));
 }
 
 export function dbOrganizationIdToOrganization(
@@ -57,6 +90,7 @@ function dbUserToUser(dbUser: DbUser): Express.User {
         ),
         roles: dbUser.roles,
         ...(dbUser.isPending && { isPending: dbUser.isPending }),
+        ...(dbUser.groups && { groups: dbUser.groups }),
       };
 }
 
@@ -189,12 +223,16 @@ export async function upsertUser(user: Express.User) {
 export async function getUser(id: string) {
   const user = await getDb().oneOrNone<DbUser>(
     `SELECT
-      id,
+      usr.id,
       pgp_sym_decrypt(full_name, $2) as full_name,
       pgp_sym_decrypt(email, $2) as email,
       organizations,
-      roles
-    FROM "user" WHERE id = $1`,
+      roles,
+      COALESCE(array_agg(ugm.group_id) FILTER (WHERE ugm.group_id IS NOT NULL), '{}') as groups
+    FROM application.user usr
+    LEFT JOIN application.user_group_member ugm ON usr.id = ugm.user_id
+    GROUP BY usr.id
+    HAVING usr.id = $1`,
     [id, encryptionKey],
   );
   return dbUserToUser(user);
@@ -212,14 +250,17 @@ export async function getUsers(
 ) {
   const dbUsers = await getDb().manyOrNone<DbUser>(
     `SELECT
-      id,
+      usr.id,
       pgp_sym_decrypt(full_name, $3::text) as full_name,
       pgp_sym_decrypt(email, $3::text) as email,
       organizations,
-      roles
-    FROM "user"
-    WHERE NOT (id = ANY ($2)) ${userOrganizations.length > 0 ? 'AND organizations && $1' : ''}
-    ORDER BY organizations[1], pgp_sym_decrypt(full_name, $3::text), roles[1]`,
+      roles,
+      COALESCE(array_agg(ugm.group_id) FILTER (WHERE ugm.group_id IS NOT NULL), '{}') as groups
+    FROM application.user usr
+    LEFT JOIN application.user_group_member ugm ON usr.id = ugm.user_id
+    GROUP BY usr.id
+    HAVING NOT (usr.id = ANY ($2)) ${userOrganizations.length > 0 ? 'AND organizations && $1' : ''}
+    ORDER BY organizations[1], pgp_sym_decrypt(full_name, $3::text), roles[1], id`,
     [userOrganizations, excludeIds, encryptionKey],
   );
   if (includePending) {
@@ -245,7 +286,40 @@ async function getPendingUserRequests(userOrganizations: string[] = []) {
       true as "isPending"
     FROM application.pending_user_requests
     ${userOrganizations.length > 0 ? 'WHERE organizations && $2' : ''}
-    ORDER BY organizations[1], pgp_sym_decrypt(full_name, $1::text), roles[1]`,
+    ORDER BY organizations[1], pgp_sym_decrypt(full_name, $1::text), roles[1], id`,
     [encryptionKey, userOrganizations],
+  );
+}
+
+export async function updateUserGroupMembership(
+  userId: string,
+  groupIds: string[],
+) {
+  return getDb().tx(async (t) => {
+    await t.none(
+      `DELETE FROM application.user_group_member WHERE user_id = $1`,
+      [userId],
+    );
+    if (groupIds.length === 0) {
+      return;
+    }
+    await t.none(
+      getMultiInsertQuery(
+        userGroupsToDBUserGroupMemberRows(userId, groupIds),
+        userGroupMemberColumnSet(),
+      ),
+      {},
+    );
+  });
+}
+
+export async function getUserGroupsForUser(userId: string) {
+  return getDb().manyOrNone<UserGroup>(
+    `
+    SELECT ug.id, ug.name, ug.organization
+    FROM application.user_group ug, application.user_group_member ugm
+	  WHERE ugm.user_id = $1 AND ug.id = ugm.group_id;
+    `,
+    [userId],
   );
 }

@@ -16,7 +16,6 @@ import {
   testSurveyData,
 } from '../utils/data';
 import { expect } from '@playwright/test';
-import { worker } from 'cluster';
 
 const personalInfoQuestion = getPersonalInfoQuestionData(
   testSurveyData.pageNames[0],

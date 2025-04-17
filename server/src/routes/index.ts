@@ -10,6 +10,7 @@ import themesRouter from './themes.routes';
 import userRouter from './user.routes';
 import openApiRouter from './openapi.routes';
 import generalNotificationRouter from './generalNotification.routes';
+import userGroupRouter from './userGroup.routes';
 
 const router = Router();
 
@@ -24,5 +25,6 @@ router.use('/feature-styles', featureStylesRouter);
 router.use('/health', healthRouter);
 router.use('/openapi', openApiRouter);
 router.use('/general-notifications', generalNotificationRouter);
+router.use('/user-groups', userGroupRouter);
 
 export default router;

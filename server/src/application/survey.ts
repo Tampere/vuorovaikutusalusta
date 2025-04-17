@@ -95,6 +95,7 @@ interface DBSurvey {
   tags: string[];
   languages: LanguageCode[];
   is_archived: boolean;
+  user_groups?: string[];
 }
 
 /**
@@ -174,6 +175,15 @@ interface DBAllConditions {
   equals: string;
   less_than: number;
   greater_than: number;
+}
+
+/**
+ * DB row of table data.survey_user_group
+ */
+interface DBSurveyUserGroup {
+  id?: number;
+  survey_id: number;
+  group_id: number;
 }
 
 /**
@@ -275,6 +285,12 @@ const conditionColumnSet = getColumnSet<DBSectionCondition>(
     { name: 'greater_than', cast: 'int' },
   ],
 );
+
+const surveyUserGroupColumnSet = () =>
+  getColumnSet<DBSurveyUserGroup>('survey_user_group', [
+    'survey_id',
+    'group_id',
+  ]);
 
 /**
  * Gets the survey with given ID or name from the database.
@@ -557,7 +573,8 @@ export async function getSurvey(
       option.text as option_text,
       option.idx as option_idx,
       option.group_id as option_group_id,
-      option.info as option_info
+      option.info as option_info,
+      COALESCE((SELECT jsonb_agg(group_id) FROM data.survey_user_group WHERE survey_id = survey_page_section.id), '[]') as user_groups
     FROM (
       SELECT
         survey_page.*,
@@ -784,20 +801,29 @@ export async function getSurveys(
   authorId?: string | null,
   filterByPublished?: boolean,
   organizationId?: string | null,
+  groups?: string[],
 ) {
   const rows = await getDb().manyOrNone<DBSurvey>(
-    `SELECT
-    COUNT(sub) AS submission_count,
-    survey.*
-  FROM
-    data.survey survey
-    LEFT JOIN data.submission sub ON sub.survey_id = survey.id AND sub.unfinished_token IS NULL
-  WHERE
-    ($1 IS NULL OR author_id = $1)
-    ${typeof organizationId === 'string' ? `AND survey.organization = $3` : ''}
-  GROUP BY survey.id
-  ORDER BY updated_at DESC`,
-    [authorId, filterByPublished, organizationId],
+    `WITH user_groups AS (
+      SELECT survey_id, array_agg(group_id)::integer[] AS groups
+      FROM data.survey_user_group
+      GROUP BY survey_id
+    )
+    SELECT
+      COUNT(sub) AS submission_count,
+      survey.*,
+      COALESCE(ug.groups, '{}') as user_groups
+    FROM
+      data.survey survey
+      LEFT JOIN data.submission sub ON sub.survey_id = survey.id AND sub.unfinished_token IS NULL
+      LEFT JOIN user_groups ug ON ug.survey_id = survey.id
+    WHERE
+      ($1 IS NULL OR author_id = $1)
+      ${typeof organizationId === 'string' ? `AND survey.organization = $3` : ''}
+      ${groups?.length > 0 ? `AND (ug.groups IS NULL OR $4 && ug.groups)` : ''} 
+    GROUP BY survey.id, ug.groups
+    ORDER BY updated_at DESC`,
+    [authorId, filterByPublished, organizationId, groups],
   );
 
   return rows
@@ -809,12 +835,41 @@ export async function getSurveys(
     );
 }
 
-export async function getSurveyOrganization(id: number) {
-  const rows = await getDb().one<{ organization: string }>(
-    `SELECT organization FROM data.survey WHERE id = $1`,
+async function updateSurveyUserGroups(surveyId: number, groups: string[]) {
+  const insertQuery =
+    groups.length > 0
+      ? getMultiInsertQuery(
+          groups.map((groupId) => ({ group_id: groupId, survey_id: surveyId })),
+          surveyUserGroupColumnSet(),
+        )
+      : null;
+
+  await getDb().tx(async (t) => {
+    await t.none(`DELETE FROM data.survey_user_group WHERE survey_id = $1`, [
+      surveyId,
+    ]);
+    if (insertQuery) {
+      await t.none(insertQuery);
+    }
+  });
+}
+
+export async function getSurveyOrganizationAndGroups(id: number) {
+  const rows = await getDb().oneOrNone<{
+    organization: string;
+    groups: string[];
+  }>(
+    `SELECT organization, jsonb_agg(sug.group_id) AS groups 
+    FROM data.survey
+    LEFT JOIN data.survey_user_group sug ON survey.id = sug.survey_id
+    GROUP BY survey.id
+    HAVING survey.id = $1`,
     [id],
   );
-  return rows.organization;
+  if (!rows) {
+    throw new NotFoundError(`Survey with ID ${id} not found`);
+  }
+  return { organizationId: rows.organization, groupIds: rows.groups };
 }
 
 /**
@@ -853,18 +908,31 @@ export async function getPublicationAccesses(
  * @param user Author
  */
 export async function createSurvey(user: User) {
-  const surveyRow = await getDb().one<DBSurvey>(
-    `INSERT INTO data.survey (author_id, organization)
-    VALUES ($1, $2)
-    RETURNING *`,
-    [user.id, user.organizations[0].id], // For now, use the first organization
-  );
+  const { surveyRow, groupRow } = await getDb().tx(async (t) => {
+    const row = await t.one<DBSurvey>(
+      `INSERT INTO data.survey (author_id, organization)
+      VALUES ($1, $2)
+      RETURNING *`,
+      [user.id, user.organizations[0].id], // For now, use the first organization
+    );
+    if (user.groups.length === 1) {
+      const groupRow = await t.one(
+        `INSERT INTO data.survey_user_group (survey_id, group_id)
+        VALUES ($1, $2)
+        RETURNING id`,
+        [row.id, user.groups[0]],
+      );
+      return { surveyRow: row, groupRow };
+    }
+
+    return { surveyRow: row };
+  });
 
   if (!surveyRow) {
     throw new InternalServerError(`Error while creating a new survey`);
   }
 
-  const survey = dbSurveyToSurvey(surveyRow);
+  const survey = dbSurveyToSurvey({ ...surveyRow, user_groups: groupRow });
   const page = await createSurveyPage(survey.id);
 
   return { ...survey, pages: [page] };
@@ -1332,6 +1400,9 @@ export async function updateSurvey(survey: Survey) {
     throw new NotFoundError(`Survey with ID ${survey.id} not found`);
   }
 
+  // Update survey's user groups
+  await updateSurveyUserGroups(surveyRow.id, survey.userGroups);
+
   // Find out what coordinate system was used for the default map view
   const pageWithDefaultMapView = survey.pages.find(
     (page) => page.sidebar.defaultMapView,
@@ -1636,6 +1707,7 @@ function dbSurveyToSurvey(dbSurvey: DBSurvey | DBSurveyJoin): APISurvey {
     tags: dbSurvey.tags,
     enabledLanguages: dbSurvey.languages,
     isArchived: dbSurvey.is_archived,
+    userGroups: dbSurvey.user_groups,
   };
 
   const enabledLanguages = dbSurvey.languages.reduce(
@@ -2320,10 +2392,13 @@ export async function getOptionsForSurvey(surveyId: number) {
  * Get all distinct email addresses used for report auto sending
  * @returns Distinct email addresses
  */
-export async function getDistinctAutoSendToEmails() {
-  const rows = await getDb().manyOrNone<{ email: string }>(`
-    SELECT DISTINCT UNNEST(email_auto_send_to) AS email FROM data.survey
-  `);
+export async function getDistinctAutoSendToEmails(organizationId: string) {
+  const rows = await getDb().manyOrNone<{ email: string }>(
+    `
+    SELECT DISTINCT UNNEST(email_auto_send_to) AS email FROM data.survey WHERE organization = $1
+  `,
+    [organizationId],
+  );
   return rows.map((row) => row.email);
 }
 

@@ -24,7 +24,7 @@ import { assertNever } from '@src/utils/typeCheck';
 import enLocale from 'date-fns/locale/en-GB';
 import fiLocale from 'date-fns/locale/fi';
 import svLocale from 'date-fns/locale/sv';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useUser } from '../../stores/UserContext';
 import CopyToClipboard from '../CopyToClipboard';
@@ -35,6 +35,8 @@ import ColorSelect from './ColorSelect';
 import SurveyImageList from './SurveyImageList';
 import { SurveyMarginImageList } from './SurveyImageListWrapper';
 import ThemeSelect from './ThemeSelect';
+import { getUserGroups } from '@src/controllers/UserGroupController';
+import { UserGroup } from '@interfaces/userGroup';
 
 const useStyles = makeStyles({
   dateTimePicker: {
@@ -53,6 +55,9 @@ interface Props {
 export default function EditSurveyInfo(props: Props) {
   const [deleteConfirmDialogOpen, setDeleteConfirmDialogOpen] = useState(false);
   const [deleteSurveyLoading, setDeleteSurveyLoading] = useState(false);
+  const [availableUserGroups, setAvailableUserGroups] = useState<UserGroup[]>(
+    [],
+  );
 
   const {
     activeSurvey,
@@ -68,11 +73,42 @@ export default function EditSurveyInfo(props: Props) {
   const { showToast } = useToasts();
   const history = useHistory();
   const classes = useStyles();
-  const { allUsers, activeUser } = useUser();
+  const { allUsers, activeUser, activeUserIsAdmin, activeUserIsSuperUser } =
+    useUser();
+
+  useEffect(() => {
+    async function refreshUserGroups() {
+      try {
+        const userGroups = await getUserGroups();
+        setAvailableUserGroups(userGroups);
+      } catch (error) {
+        showToast({
+          severity: 'error',
+          message: tr.EditSurveyInfo.userGroupFetchFailed,
+        });
+      }
+    }
+    refreshUserGroups();
+  }, []);
 
   const testSurveyUrl = useMemo(() => {
     return `${window.location.origin}/${originalActiveSurvey.organization.name}/${originalActiveSurvey.name}/testi`;
   }, [originalActiveSurvey.name]);
+
+  function surveyUserGroupEditingDisabled() {
+    if (activeUserIsAdmin || activeUserIsSuperUser) {
+      return false;
+    }
+
+    if (!activeUser || activeSurvey.authorId !== activeUser.id) {
+      return true;
+    }
+
+    return (
+      !props.canEdit ||
+      (activeUser.groups?.length === 1 && activeSurvey.userGroups?.length > 0)
+    );
+  }
 
   const localLanguage = useMemo(() => {
     switch (language) {
@@ -178,6 +214,39 @@ export default function EditSurveyInfo(props: Props) {
             validationErrors.includes('survey.mapUrl') &&
             tr.EditSurveyInfo.mapUrlError
           }
+        />
+        <Autocomplete
+          multiple
+          filterSelectedOptions
+          disabled={surveyUserGroupEditingDisabled()}
+          options={availableUserGroups}
+          getOptionLabel={(group) => group.name}
+          value={
+            availableUserGroups.filter(
+              (group) => activeSurvey.userGroups?.includes(group.id),
+            ) ?? []
+          }
+          onChange={(_, value) => {
+            editSurvey({
+              ...activeSurvey,
+              userGroups: value.map((group) => group.id),
+            });
+          }}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              variant="standard"
+              label={tr.EditSurveyInfo.userGroups}
+              helperText={tr.EditSurveyInfo.userGroupsHelperText}
+            />
+          )}
+          // If active user is among the selected editor tags, disable the chip
+          renderTags={(value, getTagProps) => {
+            return value.map((option, index) => {
+              const { key, ...tagProps } = getTagProps({ index });
+              return <Chip key={key} label={option.name} {...tagProps} />;
+            });
+          }}
         />
 
         <Autocomplete

@@ -6,6 +6,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import DropZone from '../DropZone';
 import { getFileName, getFullFilePath } from '@src/utils/path';
 import DownloadIcon from '../icons/DownloadIcon';
+import { FileWithPath } from 'react-dropzone/.';
 
 interface Props {
   targetPath?: string[];
@@ -30,7 +31,9 @@ export default function FileUpload({
 }: Props) {
   const { tr } = useTranslations();
   const { showToast } = useToasts();
-  const [acceptedFiles, setAcceptedFiles] = useState([]);
+  const [acceptedFiles, setAcceptedFiles] = useState<readonly FileWithPath[]>(
+    [],
+  );
 
   const imageFileFormats = ['jpg', 'jpeg', 'png', 'tiff', 'bmp'];
 
