@@ -87,7 +87,14 @@ export function UserManagement() {
             await refreshUsers();
           }}
         />
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '1.5rem',
+            overflowY: 'auto',
+          }}
+        >
           <NewUserRequest onSubmitSuccess={refreshUsers} />
           <UserList users={users} availableUserGroups={availableUserGroups} />
         </Box>

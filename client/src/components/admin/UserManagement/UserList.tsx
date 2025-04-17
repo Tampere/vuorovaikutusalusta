@@ -43,7 +43,7 @@ export function UserList({
   }
 
   return (
-    <TableContainer sx={{ overflow: 'auto' }}>
+    <TableContainer>
       <Table
         size="small"
         sx={{
@@ -142,7 +142,7 @@ export function UserList({
                 </TableCell>
               </TableRow>
             ) : (
-              users.data.map((user) => (
+              users.data?.map((user) => (
                 <Fragment key={user.id}>
                   <TableRow
                     hover={true}
