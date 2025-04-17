@@ -12,12 +12,16 @@ import {
 } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { useUser } from '@src/stores/UserContext';
-import React from 'react';
+import React, { Fragment } from 'react';
+import { UserGroupSelect } from './UserGroupSelect';
+import { UserGroup } from '@interfaces/userGroup';
 
 export function UserList({
   users,
+  availableUserGroups,
 }: {
   users: { data: User[]; loading: boolean };
+  availableUserGroups: UserGroup[];
 }) {
   const { activeUserIsSuperUser } = useUser();
   const { tr } = useTranslations();
@@ -45,16 +49,27 @@ export function UserList({
         sx={{
           borderCollapse: 'separate',
           borderSpacing: '0px',
+          '@keyframes fadeIn': {
+            '0%': {
+              opacity: 0,
+            },
+            '100%': {
+              opacity: 1,
+            },
+          },
+          animation: 'fadeIn 0.5s ease-in-out',
         }}
       >
         <TableHead
           sx={(theme) => ({
+            animation: users.loading ? 'none' : 'fadeIn 1s ease-in-out',
             position: 'sticky',
             top: 0,
             backgroundColor: 'white',
             zIndex: 1,
             outline: `2px solid ${theme.palette.primary.main}`,
             '& th': {
+              opacity: users.loading ? 0 : 1,
               border: 0,
               fontSize: '16px',
               fontWeight: 700,
@@ -71,12 +86,19 @@ export function UserList({
                 {tr.UserManagement.organization}
               </TableCell>
             )}
+            <TableCell align="left">
+              {tr.UserGroupManagement.userGroups}
+            </TableCell>
           </TableRow>
         </TableHead>
         {users.loading ? (
-          <TableBody>
+          <TableBody
+            sx={{
+              animation: 'fadeIn 0.5s ease-in-out',
+            }}
+          >
             <TableRow>
-              <TableCell colSpan={5} align="center">
+              <TableCell colSpan={6} align="center">
                 <Box margin={2}>
                   <CircularProgress />
                   <Typography>{tr.UserManagement.loadingTitle}</Typography>
@@ -99,13 +121,11 @@ export function UserList({
               },
 
               '& td:first-of-type': {
-                borderLeftStyle: 'solid 1px rgba(0, 0, 0, 0.04)',
                 borderTopLeftRadius: '16px',
                 borderBottomLeftRadius: '16px',
               },
 
               '& td:last-of-type': {
-                borderLeftStyle: 'solid 1px rgba(0, 0, 0, 0.04)',
                 borderBottomRightRadius: '16px',
                 borderTopRightRadius: '16px',
               },
@@ -123,28 +143,49 @@ export function UserList({
               </TableRow>
             ) : (
               users.data.map((user) => (
-                <TableRow key={user.id} hover={true}>
-                  <TableCell
-                    sx={{
-                      color: 'rgba(37, 103, 131, 1)',
-                      fontWeight: 600,
-                    }}
+                <Fragment key={user.id}>
+                  <TableRow
+                    hover={true}
+                    sx={{ animation: 'fadeIn 0.5s ease-in-out' }}
                   >
-                    {user.fullName}
-                  </TableCell>
-                  <TableCell align="left">{user.email}</TableCell>
-                  <TableCell align="left">
-                    {getUserRoleLabel(user.roles)}
-                  </TableCell>
-                  <TableCell align="left">
-                    {user?.isPending ? 'Odottaa' : 'Aktiivinen'}
-                  </TableCell>
-                  {activeUserIsSuperUser && (
-                    <TableCell align="left">
-                      {user.organizations.map((org) => org.name).join(', ')}
+                    <TableCell
+                      sx={{
+                        color: 'rgba(37, 103, 131, 1)',
+                        fontWeight: 600,
+                      }}
+                    >
+                      {user.fullName}
                     </TableCell>
-                  )}
-                </TableRow>
+                    <TableCell align="left">{user.email}</TableCell>
+                    <TableCell align="left">
+                      {getUserRoleLabel(user.roles)}
+                    </TableCell>
+                    <TableCell align="left">
+                      {user?.isPending
+                        ? tr.UserManagement.isPending
+                        : tr.UserManagement.isActive}
+                    </TableCell>
+                    {activeUserIsSuperUser && (
+                      <TableCell align="left">
+                        {user.organizations.map((org) => org.name).join(', ')}
+                      </TableCell>
+                    )}
+                    <TableCell>
+                      {!user.isPending && (
+                        <UserGroupSelect
+                          availableUserGroups={availableUserGroups.filter(
+                            (group) =>
+                              user.organizations.some(
+                                (org) => org.id === group.organization,
+                              ),
+                          )}
+                          selectedGroups={user.groups ?? []}
+                          userId={user.id}
+                        />
+                      )}
+                    </TableCell>
+                  </TableRow>
+                </Fragment>
               ))
             )}
           </TableBody>

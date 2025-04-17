@@ -7,6 +7,12 @@ import { NewUserRequest } from './NewUserRequest';
 import { User } from '@interfaces/user';
 import { useUser } from '@src/stores/UserContext';
 import { useToasts } from '@src/stores/ToastContext';
+import { UserGroupManagement } from './UserGroupManagement';
+import { UserGroup } from '@interfaces/userGroup';
+import {
+  getAllUserGroups,
+  getUserGroups,
+} from '@src/controllers/UserGroupController';
 
 export function UserManagement() {
   const { tr } = useTranslations();
@@ -16,8 +22,11 @@ export function UserManagement() {
     data: [],
     loading: false,
   });
+  const [availableUserGroups, setAvailableUserGroups] = useState<UserGroup[]>(
+    [],
+  );
 
-  async function fetchUsers() {
+  async function refreshUsers() {
     try {
       setUsers((prev) => ({ ...prev, loading: true }));
       const response = await fetch(
@@ -34,8 +43,27 @@ export function UserManagement() {
     }
   }
 
+  async function refreshUserGroups() {
+    try {
+      const userGroups = activeUserIsSuperUser
+        ? await getAllUserGroups()
+        : await getUserGroups();
+
+      setAvailableUserGroups(userGroups);
+    } catch (error) {
+      showToast({
+        severity: 'error',
+        message: tr.UserManagement.userGroupFetchFailed,
+      });
+    }
+  }
+
   useEffect(() => {
-    fetchUsers();
+    refreshUserGroups();
+  }, []);
+
+  useEffect(() => {
+    refreshUsers();
   }, []);
 
   return (
@@ -46,13 +74,23 @@ export function UserManagement() {
           padding: '2rem 8rem',
           display: 'flex',
           flexDirection: 'column',
-          gap: '1rem',
+          gap: '84px',
           height: 'calc(100vh - 70px)',
           overflowY: 'hidden',
         }}
       >
-        <NewUserRequest onSubmitSuccess={fetchUsers} />
-        <UserList users={users} />
+        <UserGroupManagement
+          availableUserGroups={availableUserGroups}
+          onGroupChange={refreshUserGroups}
+          onGroupDelete={async () => {
+            await refreshUserGroups();
+            await refreshUsers();
+          }}
+        />
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          <NewUserRequest onSubmitSuccess={refreshUsers} />
+          <UserList users={users} availableUserGroups={availableUserGroups} />
+        </Box>
       </Box>
     </>
   );

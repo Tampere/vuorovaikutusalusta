@@ -543,6 +543,10 @@ export interface Survey {
    * Is the survey archived
    */
   isArchived: boolean;
+  /**
+   * Survey user groups used to restric access to the survey. Not available for public surveys.
+   */
+  userGroups?: string[];
 }
 
 export type APISurvey = Omit<Survey, 'createdAt' | 'updatedAt'>;

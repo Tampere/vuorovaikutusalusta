@@ -170,7 +170,7 @@ async function getFrontPage(
       askEmail: tr.PersonalInfo.email,
       askPhone: tr.PersonalInfo.phone,
       askAddress: tr.PersonalInfo.address,
-      askCustom: personalInfoQuestion.customLabel[language],
+      askCustom: personalInfoQuestion.customLabel?.[language],
     };
 
     const answerValuesForLabelsMap = {

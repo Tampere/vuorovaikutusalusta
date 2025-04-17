@@ -30,4 +30,4 @@ RUN npm i
 ENV TZ=Europe/Helsinki
 
 # Run migrations before starting the server
-CMD npm run dev
+CMD ["npm", "run", "dev"]

@@ -7,7 +7,7 @@
 ###
 FROM node:20.5-alpine AS base
 
-ENV APPDIR /app
+ENV APPDIR=/app
 
 ###
 # Client build stage
@@ -24,7 +24,7 @@ COPY client ./
 
 # Build argument for the app version (to be injected into the application)
 ARG APP_VERSION
-ENV APP_VERSION ${APP_VERSION}
+ENV APP_VERSION=${APP_VERSION}
 
 RUN npm run build
 
@@ -78,4 +78,4 @@ ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 # Don't run the app as root
 USER appUser
 
-CMD npm start
+CMD ["npm", "start"]

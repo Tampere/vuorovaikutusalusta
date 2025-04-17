@@ -251,7 +251,7 @@ export function useOskari() {
    * Set visible layers
    * @param visibleLayers Visible layer IDs
    */
-  function setVisibleLayers(visibleLayers: number[]) {
+  function setVisibleLayers(visibleLayers: (number | string)[]) {
     allLayers.forEach((layerId) => {
       // Update visibility for each layer - only show it if current page has that layer visible
       rpcChannel.postRequest('MapModulePlugin.MapLayerVisibilityRequest', [

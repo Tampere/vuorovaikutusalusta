@@ -3,11 +3,15 @@ import {
   ensureAuthenticated,
   ensureSuperUserAccess,
 } from '@src/auth';
-import { addPendingUserRequest, getUsers } from '@src/user';
+import {
+  addPendingUserRequest,
+  getUsers,
+  updateUserGroupMembership,
+} from '@src/user';
 import { validateRequest } from '@src/utils';
 import { Router } from 'express';
 import asyncHandler from 'express-async-handler';
-import { body, query } from 'express-validator';
+import { body, param, query } from 'express-validator';
 
 const router = Router();
 
@@ -100,6 +104,23 @@ router.post(
     const user = await addPendingUserRequest(newUser);
 
     res.json(user);
+  }),
+);
+
+/** Update user's group assignment */
+router.post(
+  '/:id/groups',
+  ensureAuthenticated(),
+  ensureAdminAccess(),
+  validateRequest([
+    param('id').isString().withMessage('Invalid or missing user ID'),
+    body('groups')
+      .isArray()
+      .withMessage('Groups must be an array of group IDs'),
+  ]),
+  asyncHandler(async (req, res) => {
+    await updateUserGroupMembership(req.params.id, req.body.groups);
+    res.status(201).end();
   }),
 );
 

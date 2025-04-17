@@ -31,4 +31,8 @@ export interface User {
    * Is user pending first time login
    */
   isPending?: boolean;
+  /**
+   * User's group ids
+   */
+  groups?: string[];
 }

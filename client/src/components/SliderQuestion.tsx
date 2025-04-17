@@ -28,7 +28,7 @@ export default function SliderQuestion({
 }: Props) {
   const { surveyLanguage } = useTranslations();
   const classes = useStyles();
-  const sliderRef = useRef<HTMLElement>();
+  const sliderRef = useRef<HTMLElement | null>(null);
   const { tr } = useTranslations();
   const verbalExtremes = question.presentationType === 'literal';
   const labels = useMemo(() => {

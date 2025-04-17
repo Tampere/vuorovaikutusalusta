@@ -1,11 +1,12 @@
 import {
   getPublicationAccesses,
-  getSurveyOrganization,
+  getSurveyOrganizationAndGroups,
 } from '@src/application/survey';
 import logger from '@src/logger';
 import {
   dbOrganizationIdToOrganization,
   getUser,
+  getUserGroupsForUser,
   isAdmin,
   isSuperUser,
   upsertUser,
@@ -18,6 +19,8 @@ import { encrypt } from '../crypto';
 import { getDb } from '../database';
 import { configureAzureAuth } from './azure';
 import { configureGoogleOAuth } from './google-oauth';
+import { ForbiddenError } from '@src/error';
+import asyncHandler from 'express-async-handler';
 
 function basicAuth(req: Request): { name: string; pass: string } {
   const string = req?.headers?.authorization;
@@ -107,23 +110,25 @@ export function configureAuth(app: Express) {
 /**
  * Injects mock user to request when actual auth is not enabled
  */
-export function configureMockAuth(app: Express) {
+export async function configureMockAuth(app: Express) {
   // Create a mock user & persist it in the database
   const mockOrganization = ['test-group-id-2'];
   const mockUser: Express.User = {
-    id: '12345-67890-abcde-fghij1',
-    fullName: 'toinen Testaaja',
+    id: '12345-67890-abcde-fghij2',
+    fullName: 'perus',
     email: 'toinen.testaaja@testi.com',
     organizations: mockOrganization.map((id) =>
       dbOrganizationIdToOrganization(id),
     ),
-    roles: ['organization_user', 'organization_admin', 'super_user'],
+    roles: ['organization_user' /*'organization_admin' /*    'super_user' */],
   };
-  upsertUser(mockUser);
+  const userGroups = await getUserGroupsForUser(mockUser.id);
+  await upsertUser(mockUser);
+  const userGroupIds = userGroups.map((g) => g.id);
 
   // Inject the mock user to each request
   app.use((req, _res, next) => {
-    req.user = mockUser;
+    req.user = { ...mockUser, groups: userGroupIds };
     return next();
   });
 }
@@ -178,7 +183,7 @@ export function ensureAdminAccess() {
     if (isAdmin(req.user)) {
       return next();
     }
-    res.status(403).send('Forbidden, admin or super user access required');
+    throw new ForbiddenError('Forbidden, admin or super user access required');
   };
 }
 
@@ -187,29 +192,58 @@ export function ensureSuperUserAccess() {
     if (isSuperUser(req.user)) {
       return next();
     }
-    res.status(403).send('Forbidden, super user access required');
+    throw new ForbiddenError('Forbidden, super user access required');
   };
 }
 
-export function ensureSurveyGroupAccess(id: string = 'id') {
-  return async (req: Request, res: Response, next: NextFunction) => {
-    if (isSuperUser(req.user)) {
-      return next();
-    }
-    const surveyOrganizationId = req.params[id]
-      ? await getSurveyOrganization(Number(req.params[id]))
-      : null;
-    if (
-      typeof surveyOrganizationId === 'string' &&
-      req.user.organizations.findIndex(
-        (org) => org.id === surveyOrganizationId,
-      ) === -1
-    ) {
-      res.status(403).send('Forbidden');
-    } else {
-      return next();
-    }
-  };
+/**
+ * Super users and admins have unrestricted access. Regular users are restricted to their assigned groups.
+ * Returns an empty array if there are no limiting groups.
+ */
+export function getLimitingUserGroups(req: Request) {
+  if (isSuperUser(req.user) || isAdmin(req.user)) {
+    return [];
+  }
+
+  return req.user.groups ?? [];
+}
+
+export function ensureSurveyGroupAccess(surveyId: string = 'id') {
+  return asyncHandler(
+    // Note! Super important to wrap this in asyncHandler to catch errors as express doesn't catch async errors by default
+    async (req: Request, res: Response, next: NextFunction) => {
+      // Super user has access to all surveys
+      if (isSuperUser(req.user)) {
+        return next();
+      }
+
+      // Check for organization access
+      const { organizationId, groupIds } = req.params[surveyId]
+        ? await getSurveyOrganizationAndGroups(Number(req.params[surveyId]))
+        : { organizationId: null, groupIds: [] };
+      if (
+        typeof organizationId === 'string' &&
+        req.user.organizations.findIndex((org) => org.id === organizationId) ===
+          -1
+      ) {
+        throw new ForbiddenError('No organization access to this survey.');
+      } else {
+        // Admin has access to all groups in an organization
+        if (isAdmin(req.user)) {
+          return next();
+        }
+        // Check for group access limitations
+        const userGroups = req.user.groups ?? [];
+        const hasAccess =
+          userGroups.length === 0 ||
+          userGroups.some((group) => groupIds.includes(group));
+        if (!hasAccess) {
+          throw new ForbiddenError('No user group access to this survey.');
+        }
+        return next();
+      }
+    },
+  );
 }
 
 export function ensureFileGroupAccess() {
@@ -238,7 +272,7 @@ export function ensureFileGroupAccess() {
       );
 
     if (fileOrganizations.length === 0) {
-      res.status(403).send('Forbidden');
+      throw new ForbiddenError();
     } else {
       res.locals.fileOrganizations = fileOrganizations;
       return next();

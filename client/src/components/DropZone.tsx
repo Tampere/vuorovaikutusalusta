@@ -1,7 +1,7 @@
 import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useEffect } from 'react';
-import { useDropzone } from 'react-dropzone';
+import { FileWithPath, useDropzone } from 'react-dropzone';
 
 const useStyles = makeStyles({
   container: {
@@ -35,7 +35,7 @@ const DEFAULT_MAX_FILE_SIZE = '10';
 
 interface Props {
   maxFiles: number;
-  fileCallback: (files: File[]) => void;
+  fileCallback: (files: readonly FileWithPath[]) => void;
   children?: React.ReactNode;
   maxFileSize?: number;
   readOnly?: boolean;

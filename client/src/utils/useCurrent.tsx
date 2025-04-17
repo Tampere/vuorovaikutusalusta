@@ -7,7 +7,7 @@ import { useRef } from 'react';
  * @returns Getter function for the current value
  */
 export function useCurrent<Value>(value: Value) {
-  const ref = useRef<Value>();
+  const ref = useRef<Value | null>(null);
   ref.current = value;
   return () => ref.current;
 }

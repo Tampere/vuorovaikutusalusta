@@ -8,7 +8,7 @@ import React, { useEffect, useRef, useState } from 'react';
 
 interface Props {
   url: string;
-  layers: number[];
+  layers: (number | string)[];
   onAnswer?: () => void;
   defaultMapView?: GeoJSON.FeatureCollection;
   pageId: number;

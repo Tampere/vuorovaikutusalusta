@@ -19,8 +19,8 @@ import { useTranslations } from './TranslationContext';
 import { harmaa } from '@src/themes/common';
 
 interface State {
-  visibleLayers: number[];
-  allLayers: number[];
+  visibleLayers: (number | string)[];
+  allLayers: (number | string)[];
   rpcChannel: Channel;
   helperText: string;
   selectionType: MapQuestionSelectionType;
@@ -45,11 +45,11 @@ interface State {
 type Action =
   | {
       type: 'SET_VISIBLE_LAYERS';
-      layers: number[];
+      layers: (number | string)[];
     }
   | {
       type: 'SET_ALL_LAYERS';
-      layers: number[];
+      layers: (number | string)[];
     }
   | {
       type: 'SET_RPC_CHANNEL';
@@ -297,7 +297,7 @@ export function useAdminMap() {
     setDefaultView(viewGeometry: GeoJSON.FeatureCollection) {
       dispatch({ type: 'SET_DEFAULT_VIEW', value: viewGeometry });
     },
-    setVisibleLayers(layers: number[]) {
+    setVisibleLayers(layers: (number | string)[]) {
       dispatch({ type: 'SET_VISIBLE_LAYERS', layers });
     },
   };
@@ -317,7 +317,7 @@ export function useSurveyMap() {
 
   const [state, dispatch] = context;
 
-  const drawingRef = useRef<boolean>();
+  const drawingRef = useRef<boolean | null>(null);
   drawingRef.current = state.questionId != null;
 
   const isMapReady = useMemo(() => {
@@ -420,7 +420,7 @@ export function useSurveyMap() {
      * Set visible layers
      * @param layers Visible layers
      */
-    setVisibleLayers(layers: number[]) {
+    setVisibleLayers(layers: (number | string)[]) {
       dispatch({ type: 'SET_VISIBLE_LAYERS', layers });
     },
     /**

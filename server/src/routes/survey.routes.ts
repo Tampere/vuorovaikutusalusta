@@ -31,6 +31,7 @@ import {
   ensureAuthenticated,
   ensurePublicationAccess,
   ensureSurveyGroupAccess,
+  getLimitingUserGroups,
 } from '@src/auth';
 import { BadRequestError, ForbiddenError } from '@src/error';
 import { isSuperUser } from '@src/user';
@@ -38,7 +39,6 @@ import { Router } from 'express';
 import asyncHandler from 'express-async-handler';
 import { body, param, query } from 'express-validator';
 import { validateRequest } from '../utils';
-import logger from '@src/logger';
 const router = Router();
 
 /**
@@ -48,7 +48,9 @@ router.get(
   '/report-emails',
   ensureAuthenticated(),
   asyncHandler(async (req, res) => {
-    const emails = await getDistinctAutoSendToEmails();
+    const emails = await getDistinctAutoSendToEmails(
+      req.user.organizations[0].id,
+    );
     res.json(emails);
   }),
 );
@@ -120,10 +122,13 @@ router.get(
       ? null
       : req.user.organizations[0];
 
+    const userGroups = getLimitingUserGroups(req);
+
     const surveys = await getSurveys(
       filterByAuthored ? userId : null,
       Boolean(filterByPublished),
       organization?.id ?? null,
+      userGroups,
     );
 
     res.status(200).json(surveys);
@@ -139,6 +144,7 @@ router.get(
     param('id').isNumeric().toInt().withMessage('ID must be a number'),
   ]),
   ensureAuthenticated(),
+  ensureSurveyGroupAccess(),
   asyncHandler(async (req, res) => {
     const surveyId = Number(req.params.id);
 
@@ -156,6 +162,7 @@ router.get(
         organization: req.user.organizations[0].id,
       }),
     });
+
     res.status(200).json(survey);
   }),
 );
@@ -254,6 +261,7 @@ router.put(
       .isObject()
       .withMessage('Organization must be an object'),
     body('tags').optional().isArray().withMessage('Tags must be an array.'),
+    body('userGroups').isArray().withMessage('User groups must be an array'),
   ]),
   asyncHandler(async (req, res) => {
     const surveyId = Number(req.params.id);

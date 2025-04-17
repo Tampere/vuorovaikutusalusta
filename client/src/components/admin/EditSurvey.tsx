@@ -42,10 +42,10 @@ export default function EditSurvey() {
 
   const allowEditing =
     !activeSurveyLoading &&
-    !activeSurvey.isArchived &&
+    !activeSurvey?.isArchived &&
     (activeUserIsSuperUser ||
       activeUserIsAdmin ||
-      activeUser?.id === activeSurvey.authorId ||
+      activeUser?.id === activeSurvey?.authorId ||
       activeSurvey.editors.includes(activeUser?.id));
 
   // Prevent page unload when there are unsaved changes
