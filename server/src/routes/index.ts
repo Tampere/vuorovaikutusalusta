@@ -11,6 +11,7 @@ import userRouter from './user.routes';
 import openApiRouter from './openapi.routes';
 import generalNotificationRouter from './generalNotification.routes';
 import userGroupRouter from './userGroup.routes';
+import keyVaultRouter from './keyvault.routes';
 
 const router = Router();
 
@@ -26,5 +27,6 @@ router.use('/health', healthRouter);
 router.use('/openapi', openApiRouter);
 router.use('/general-notifications', generalNotificationRouter);
 router.use('/user-groups', userGroupRouter);
+router.use('/keyvault', keyVaultRouter);
 
 export default router;
