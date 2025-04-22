@@ -54,6 +54,8 @@ export function configureAuth(app: Express) {
     done(null, user ?? null);
   });
 
+  app.set('trust proxy', 1); // Needed for secure cookie to work if the app is behind a proxy (e.g. Azure App Service)
+
   // Initialize Express session middleware
   app.use(
     expressSession({
