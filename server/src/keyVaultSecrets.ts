@@ -2,7 +2,10 @@ import { DefaultAzureCredential } from '@azure/identity';
 import { SecretClient } from '@azure/keyvault-secrets';
 import logger from '@src/logger';
 
-export const secrets: Record<string, string> = {};
+type SecretKeys = 'userGroupNameMapping';
+
+/** Secrets are used to get the value directly from Azure Key vault and they enable application state refresh without restart using the "/keyvault" route. */
+export const secrets: Partial<Record<SecretKeys, string>> = {};
 
 export async function initSecrets() {
   const credential = new DefaultAzureCredential();
@@ -18,7 +21,6 @@ export async function initSecrets() {
     const secret = await client.getSecret(secretProperties.name);
     if (secret.value) {
       secrets[secretProperties.name] = secret.value;
-      process.env[secretProperties.name] = secret.value;
     }
   }
 }
