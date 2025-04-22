@@ -10,6 +10,7 @@ import { sendMail } from './email/email';
 import logger from './logger';
 import useTranslations from './translations/useTranslations';
 import { UserGroup } from '@interfaces/userGroup';
+import { secrets } from './keyVaultSecrets';
 
 /**
  * Define user type inside Express types to make it globally accessible via req.user
@@ -59,7 +60,9 @@ function userGroupsToDBUserGroupMemberRows(
 export function dbOrganizationIdToOrganization(
   organizationId: string,
 ): Organization {
-  const userGroupNameMapping = JSON.parse(process.env.USER_GROUP_NAME_MAPPING);
+  const userGroupNameMapping = JSON.parse(
+    secrets.userGroupNameMapping ?? process.env.USER_GROUP_NAME_MAPPING,
+  );
   return {
     id: organizationId,
     name: userGroupNameMapping[organizationId] ?? organizationId,
@@ -67,7 +70,9 @@ export function dbOrganizationIdToOrganization(
 }
 
 export function getOrganizationIdWithName(organizationName: string) {
-  const userGroupNameMapping = JSON.parse(process.env.USER_GROUP_NAME_MAPPING);
+  const userGroupNameMapping = JSON.parse(
+    secrets.userGroupNameMapping ?? process.env.USER_GROUP_NAME_MAPPING,
+  );
   return Object.keys(userGroupNameMapping).find(
     (key) => userGroupNameMapping[key] === organizationName,
   );
