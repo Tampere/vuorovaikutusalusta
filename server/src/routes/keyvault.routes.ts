@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { initSecrets } from '../../keyVaultSecrets';
+import { initSecrets } from '../keyVaultSecrets';
 import logger from '@src/logger';
 import { ensureSuperUserAccess } from '@src/auth';
 import asyncHandler from 'express-async-handler';

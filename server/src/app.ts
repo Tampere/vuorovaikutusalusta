@@ -8,7 +8,7 @@ import { initializeDatabase, migrateUp } from './database';
 import { HttpResponseError } from './error';
 import logger from './logger';
 import rootRouter from './routes';
-import { initSecrets } from '../keyVaultSecrets';
+import { initSecrets } from './keyVaultSecrets';
 
 async function start() {
   const app = express();
