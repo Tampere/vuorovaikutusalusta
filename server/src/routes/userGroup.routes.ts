@@ -66,6 +66,7 @@ router.delete(
       res.status(404).json({ message: 'User group not found' });
       return;
     }
+
     if (
       userGroup.organization !== req.user.organizations[0].id &&
       !isSuperUser(req.user)

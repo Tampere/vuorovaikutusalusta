@@ -239,6 +239,7 @@ export function ensureSurveyGroupAccess(surveyId: string = 'id') {
         const userGroups = req.user.groups ?? [];
         const hasAccess =
           userGroups.length === 0 ||
+          groupIds.length === 0 ||
           userGroups.some((group) => groupIds.includes(group));
         if (!hasAccess) {
           throw new ForbiddenError('No user group access to this survey.');
