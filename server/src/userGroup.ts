@@ -45,7 +45,7 @@ export async function deleteUserGroup(groupId: string) {
 export async function getUserGroup(groupId: string) {
   return getDb().one<UserGroup>(
     `
-    SELECT id, name
+    SELECT id, name, organization
     FROM application.user_group
     WHERE id = $1
     `,

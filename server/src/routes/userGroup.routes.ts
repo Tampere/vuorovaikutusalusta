@@ -16,7 +16,6 @@ import {
 } from '@src/userGroup';
 import { isSuperUser } from '@src/user';
 import { ForbiddenError } from '@src/error';
-import logger from '@src/logger';
 
 const router = Router();
 
