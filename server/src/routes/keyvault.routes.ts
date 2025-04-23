@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { initSecrets } from '../keyVaultSecrets';
 import logger from '@src/logger';
-import { ensureSuperUserAccess } from '@src/auth';
+import { ensureAuthenticated, ensureSuperUserAccess } from '@src/auth';
 import asyncHandler from 'express-async-handler';
 import { InternalServerError } from '@src/error';
 
@@ -10,6 +10,7 @@ const router = Router();
 // Route to trigger initiSecrets
 router.post(
   '/init',
+  ensureAuthenticated(),
   ensureSuperUserAccess(),
   asyncHandler(async (_req, res) => {
     try {
