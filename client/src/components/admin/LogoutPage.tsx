@@ -12,11 +12,11 @@ export function LogoutPage() {
 
   React.useEffect(() => {
     if (activeUser) {
-      history.replace('/admin');
+      window.location.pathname = '/admin';
     }
-  }, [activeUser, history]);
+  }, [activeUser, history, isInitialized]);
 
-  if (!isInitialized) {
+  if (!isInitialized || activeUser) {
     return null;
   }
 
