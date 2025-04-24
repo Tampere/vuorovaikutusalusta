@@ -133,10 +133,11 @@ async function start() {
   app.use('/api', rootRouter);
 
   app.get('/admin/logout-success', (req, res) => {
+    logger.info(
+      `isAuthenticated: ${req.isAuthenticated?.()}, passport user: ${JSON.stringify(req.session)}`,
+    );
     if (process.env['AUTH_ENABLED'] !== 'true' || req.isAuthenticated()) {
-      logger.debug(
-        `isAuthenticated: ${req.isAuthenticated?.()}, passport user: ${JSON.stringify(req.session)}`,
-      );
+      logger.info(`redirecting to "/" because user seems to be authenticated`);
       res.redirect('/');
       return;
     }
