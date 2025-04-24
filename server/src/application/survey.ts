@@ -1707,7 +1707,7 @@ function dbSurveyToSurvey(dbSurvey: DBSurvey | DBSurveyJoin): APISurvey {
     tags: dbSurvey.tags,
     enabledLanguages: dbSurvey.languages,
     isArchived: dbSurvey.is_archived,
-    userGroups: dbSurvey.user_groups,
+    userGroups: dbSurvey.user_groups ?? [],
   };
 
   const enabledLanguages = dbSurvey.languages.reduce(
