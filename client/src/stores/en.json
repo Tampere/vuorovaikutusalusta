@@ -775,5 +775,9 @@
     "title": "Ubigu kartalla - map query service",
     "version": "Version",
     "developedBy": "Developed by"
+  },
+  "LogoutPage": {
+    "logoutSuccessful": "You have successfully logged out.",
+    "loginAgain": "Log in again"
   }
 }
