@@ -8,7 +8,7 @@ import { initializeDatabase, migrateUp } from './database';
 import { HttpResponseError } from './error';
 import logger from './logger';
 import rootRouter from './routes';
-import { initSecrets } from './keyVaultSecrets';
+import { initSecrets, secrets } from './keyVaultSecrets';
 import helmet from 'helmet';
 
 async function start() {
@@ -24,7 +24,13 @@ async function start() {
     if (req.path.startsWith('/api')) {
       return helmet({ contentSecurityPolicy: false })(req, res, next);
     } else {
-      return helmet()(req, res, next);
+      return helmet({
+        contentSecurityPolicy: {
+          directives: {
+            'frame-src': secrets.allowedFrameSources ?? "'self'",
+          },
+        },
+      })(req, res, next);
     }
   });
 
@@ -127,6 +133,9 @@ async function start() {
   app.use('/api', rootRouter);
 
   app.get('/admin/logout-success', (req, res) => {
+    if (process.env['AUTH_ENABLED'] !== 'true' || req.isAuthenticated()) {
+      res.redirect('/admin');
+    }
     res.setHeader('Clear-Site-Data', '"cache","cookies","storage"');
     res.sendFile(path.join(__dirname, '../static/admin/index.html'));
   });
