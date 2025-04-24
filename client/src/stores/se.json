@@ -776,5 +776,9 @@
     "title": "Ubigu kartalla - kartfrågetjänst",
     "version": "Version",
     "developedBy": "Utvecklat av"
+  },
+  "LogoutPage": {
+    "logoutSuccessful": "Du har loggat ut framgångsrikt.",
+    "loginAgain": "Logga in igen"
   }
 }

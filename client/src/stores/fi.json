@@ -775,5 +775,9 @@
     "title": "Ubigu Kartalla -karttakyselypalvelu",
     "version": "versio",
     "developedBy": "Kehittänyt"
+  },
+  "LogoutPage": {
+    "logoutSuccessful": "Olet kirjautunut ulos onnistuneesti.",
+    "loginAgain": "Kirjaudu sisään uudestaan"
   }
 }

@@ -9,10 +9,24 @@ import { HttpResponseError } from './error';
 import logger from './logger';
 import rootRouter from './routes';
 import { initSecrets } from './keyVaultSecrets';
+import helmet from 'helmet';
 
 async function start() {
   const app = express();
   await initSecrets();
+
+  app.use((_req, res, next) => {
+    res.set('Cache-Control', 'no-store, max-age=0');
+    next();
+  });
+
+  app.use((req, res, next) => {
+    if (req.path.startsWith('/api')) {
+      return helmet({ contentSecurityPolicy: false })(req, res, next);
+    } else {
+      return helmet()(req, res, next);
+    }
+  });
 
   const port = Number(process.env.PORT ?? 3000);
   // Database initialization and connection test
@@ -112,6 +126,11 @@ async function start() {
   // Root router for the API
   app.use('/api', rootRouter);
 
+  app.get('/admin/logout-success', (req, res) => {
+    res.setHeader('Clear-Site-Data', '"cache","cookies","storage"');
+    res.sendFile(path.join(__dirname, '../static/admin/index.html'));
+  });
+
   // Serve admin frontend from remaining admin URLs
   app.get(
     '/admin/*',
@@ -119,6 +138,7 @@ async function start() {
       redirectToLogin: true,
     }),
     (req, res) => {
+      res.removeHeader('Clear-Site-Data');
       res.sendFile(path.join(__dirname, '../static/admin/index.html'));
     },
   );
