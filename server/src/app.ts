@@ -134,7 +134,11 @@ async function start() {
 
   app.get('/admin/logout-success', (req, res) => {
     if (process.env['AUTH_ENABLED'] !== 'true' || req.isAuthenticated()) {
-      res.redirect('/admin');
+      logger.debug(
+        `isAuthenticated: ${req.isAuthenticated?.()}, passport user: ${JSON.stringify(req.session)}`,
+      );
+      res.redirect('/');
+      return;
     }
     res.setHeader('Clear-Site-Data', '"cache","cookies","storage"');
     res.sendFile(path.join(__dirname, '../static/admin/index.html'));
