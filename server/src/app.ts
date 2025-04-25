@@ -119,19 +119,6 @@ async function start() {
     ),
   );
 
-  // Serve static frontend files in production
-  app.use(
-    '/admin',
-    ensureAuthenticated({
-      redirectToLogin: true,
-    }),
-    express.static('static/admin'),
-  );
-  app.use('/', express.static('static'));
-
-  // Root router for the API
-  app.use('/api', rootRouter);
-
   app.get('/admin/logout-success', (req, res) => {
     logger.info(
       `isAuthenticated: ${req.isAuthenticated?.()}, passport user: ${JSON.stringify(req.session)}`,
@@ -144,6 +131,19 @@ async function start() {
     res.setHeader('Clear-Site-Data', '"cache","cookies","storage"');
     res.sendFile(path.join(__dirname, '../static/admin/index.html'));
   });
+
+  // Serve static frontend files in production
+  app.use(
+    '/admin',
+    ensureAuthenticated({
+      redirectToLogin: true,
+    }),
+    express.static('static/admin'),
+  );
+  app.use('/', express.static('static'));
+
+  // Root router for the API
+  app.use('/api', rootRouter);
 
   // Serve admin frontend from remaining admin URLs
   app.get(
