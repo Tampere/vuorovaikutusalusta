@@ -63,9 +63,6 @@ export default function AdminApplication() {
           <Route path="/tiedotteet">
             <GeneralNotifications />
           </Route>
-          <Route path="/logout-success">
-            <LogoutPage />
-          </Route>
           <Route path="/" exact>
             <AdminFrontPage />
           </Route>

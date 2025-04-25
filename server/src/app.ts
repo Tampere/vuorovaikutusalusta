@@ -119,19 +119,6 @@ async function start() {
     ),
   );
 
-  app.get('/admin/logout-success', (req, res) => {
-    logger.info(
-      `isAuthenticated: ${req.isAuthenticated?.()}, passport user: ${JSON.stringify(req.session)}`,
-    );
-    if (process.env['AUTH_ENABLED'] !== 'true' || req.isAuthenticated()) {
-      logger.info(`redirecting to "/" because user seems to be authenticated`);
-      res.redirect('/');
-      return;
-    }
-    res.setHeader('Clear-Site-Data', '"cache","cookies","storage"');
-    res.sendFile(path.join(__dirname, '../static/admin/index.html'));
-  });
-
   // Serve static frontend files in production
   app.use(
     '/admin',
@@ -156,6 +143,11 @@ async function start() {
       res.sendFile(path.join(__dirname, '../static/admin/index.html'));
     },
   );
+
+  app.get('/logout-success', (req, res) => {
+    res.set('Clear-Site-Data', '"cache", "cookies", "storage"');
+    res.redirect('/');
+  });
 
   // Serve frontend files from remaining URLs
   app.get('/*', (req, res, next) => {
