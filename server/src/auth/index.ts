@@ -59,10 +59,12 @@ export function configureAuth(app: Express) {
   // Initialize Express session middleware
   app.use(
     expressSession({
+      name: '_HOST-connect.sid',
       secret: process.env.SESSION_SECRET,
       cookie: {
-        // 30 days
+        sameSite: 'strict',
         secure: true,
+        // 30 days
         maxAge: 30 * 24 * 60 * 60 * 1000,
       },
       resave: false,
