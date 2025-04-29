@@ -632,13 +632,15 @@ export default function SurveyStepper({
         );
       case 'image':
         return (
-          <div
-            style={{
+          <Box
+            sx={{
               display: 'flex',
               alignItems: 'center',
               overflow: 'auto',
               height: '100%',
               width: '100%',
+              containerType: 'inline-size',
+              containerName: 'sidebar-image-wrapper',
             }}
           >
             {currentPage.sidebar?.imageUrl && (
@@ -655,7 +657,27 @@ export default function SurveyStepper({
                 src={`/api/file/${currentPage.sidebar?.imageUrl}`}
               />
             )}
-          </div>
+            {currentPage.sidebar?.imageAttributions && (
+              <Typography
+                sx={(theme) => ({
+                  ...(currentPage.sidebar.imageSize === 'fitted' && {
+                    '@container sidebar-image-wrapper (max-width: 500px)': {
+                      fontSize: '0.8rem',
+                    },
+                  }),
+                  position: 'absolute',
+                  bottom: 0,
+                  padding: '0.5rem',
+                  borderTopLeftRadius: '0.25rem',
+                  right: 0,
+                  color: 'white',
+                  backgroundColor: theme.palette.primary.main,
+                })}
+              >
+                {currentPage.sidebar.imageAttributions}
+              </Typography>
+            )}
+          </Box>
         );
       case 'none':
         return null;

@@ -171,6 +171,7 @@
     "addFollowUpButtonTile": "Tallenna kysymys lisätäksesi jatkokysymyksen",
     "confirmDeleteSection": "Haluatko varmasti poistaa tämän osion?",
     "imageAltText": "Kuvan vaihtoehtoinen teksti",
+    "imageAttributions": "Tekijänoikeustiedot",
     "imageScaling": "Kuvan skaalaus",
     "imageScalingLabel": {
       "original": "Alkuperäinen koko",
@@ -338,7 +339,8 @@
     "bodyColor": "Tekstin väri"
   },
   "EditImageSection": {
-    "altText": "Vaihtoehtoinen teksti kuvalle"
+    "altText": "Vaihtoehtoinen teksti kuvalle",
+    "attributions": "Tekijänoikeustiedot"
   },
   "EditMapQuestion": {
     "selectionTypes": "Sallitut karttavalinnan tyypit",

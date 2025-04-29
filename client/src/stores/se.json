@@ -171,6 +171,7 @@
     "addFollowUpButtonTile": "Spara frågan för att lägga till en uppföljningsfråga",
     "confirmDeleteSection": "Vill du verkligen ta bort det här avsnittet?",
     "imageAltText": "Alternativ text för bild",
+    "imageAttributions": "Upphovsrätt och tillägg",
     "imageScaling": "Bildskalning",
     "imageScalingLabel": {
       "original": "Originalstorlek",
@@ -339,7 +340,8 @@
     "bodyColor": "Textfärg"
   },
   "EditImageSection": {
-    "altText": "Alternativ text för bild"
+    "altText": "Alternativ text för bild",
+    "attributions": "Upphovsrätt och tillägg"
   },
   "EditMapQuestion": {
     "selectionTypes": "Tillåtna kartvalstyper",

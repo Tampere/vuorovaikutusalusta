@@ -60,7 +60,17 @@ export default function EditImageSection({
             },
           })
         }
-      ></TextField>
+      />
+      <TextField
+        value={section.attributions}
+        label={tr.EditImageSection.attributions}
+        onChange={(event) =>
+          onChange({
+            ...section,
+            attributions: event.target.value,
+          })
+        }
+      />
     </>
   );
 }

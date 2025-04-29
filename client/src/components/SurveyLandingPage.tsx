@@ -78,6 +78,7 @@ const useStyles = makeStyles((theme: Theme & { [customKey: string]: any }) => ({
     position: 'absolute',
     right: 0,
     bottom: 0,
+    borderTopLeftRadius: '0.25rem',
     backgroundColor: theme.palette.primary.main,
     color: theme.palette.primary.contrastText,
     padding: '0.6rem',

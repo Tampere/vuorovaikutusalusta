@@ -171,6 +171,7 @@
     "addFollowUpButtonTile": "Save the draft question to add a follow-up section",
     "confirmDeleteSection": "Are you sure you want to delete this section?",
     "imageAltText": "Alternative text for the image",
+    "imageAttributions": "Copyright & attributions",
     "imageScaling": "Image scaling",
     "imageScalingLabel": {
       "original": "Original size",
@@ -338,7 +339,8 @@
     "bodyColor": "Color of the text"
   },
   "EditImageSection": {
-    "altText": "Alternative text for the image"
+    "altText": "Alternative text for the image",
+    "attributions": "Copyright & attributions"
   },
   "EditMapQuestion": {
     "selectionTypes": "Allowed geometry types for the map markings",
