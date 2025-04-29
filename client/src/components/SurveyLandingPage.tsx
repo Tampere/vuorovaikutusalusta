@@ -26,6 +26,7 @@ const useStyles = makeStyles((theme: Theme & { [customKey: string]: any }) => ({
     lineHeight: 1.5,
     margin: '2rem',
     '& span': {
+      borderRadius: '0.25rem',
       backgroundColor: theme.palette.primary.main,
       color: theme.palette.primary.contrastText,
       padding: '1rem',
@@ -46,16 +47,19 @@ const useStyles = makeStyles((theme: Theme & { [customKey: string]: any }) => ({
   },
   subtitle: {
     fontFamily: '"Montserrat", sans-serif',
-    fontSize: '2rem',
+    lineHeight: 2,
+    fontSize: '1.5rem',
     textTransform: 'none',
     ...theme.landingPage?.subtitle,
     [theme.breakpoints.down(600)]: {
-      fontSize: '6vw',
+      lineHeight: 1.85,
+      fontSize: '5vw',
     },
   },
   start: {
     fontFamily: '"Montserrat", sans-serif',
     fontSize: '2rem',
+    borderRadius: '0.25rem',
     backgroundColor: theme.palette.secondary.main,
     color: theme.palette.secondary.contrastText,
     padding: '0.5rem',

@@ -59,7 +59,7 @@ export function configureAuth(app: Express) {
   // Initialize Express session middleware
   app.use(
     expressSession({
-      name: '_SECURE-connect.sid',
+      name: '_Secure-connect.sid',
       secret: process.env.SESSION_SECRET,
       cookie: {
         sameSite: 'none',
@@ -119,13 +119,13 @@ export async function configureMockAuth(app: Express) {
   // Create a mock user & persist it in the database
   const mockOrganization = ['test-group-id-2'];
   const mockUser: Express.User = {
-    id: '12345-67890-abcde-fghij2',
+    id: '12345-67890-abcde-fghij1',
     fullName: 'perus',
     email: 'toinen.testaaja@testi.com',
     organizations: mockOrganization.map((id) =>
       dbOrganizationIdToOrganization(id),
     ),
-    roles: ['organization_user' /*'organization_admin' /*    'super_user' */],
+    roles: ['organization_user' /* 'organization_admin', 'super_user'*/],
   };
   const userGroups = await getUserGroupsForUser(mockUser.id);
   await upsertUser(mockUser);
@@ -213,7 +213,7 @@ export function getLimitingUserGroups(req: Request) {
   return req.user.groups ?? [];
 }
 
-export function ensureSurveyGroupAccess(surveyId: string = 'id') {
+export function ensureSurveyGroupAccess(surveyIdIdentifier: string = 'id') {
   return asyncHandler(
     // Note! Super important to wrap this in asyncHandler to catch errors as express doesn't catch async errors by default
     async (req: Request, res: Response, next: NextFunction) => {
@@ -223,8 +223,10 @@ export function ensureSurveyGroupAccess(surveyId: string = 'id') {
       }
 
       // Check for organization access
-      const { organizationId, groupIds } = req.params[surveyId]
-        ? await getSurveyOrganizationAndGroups(Number(req.params[surveyId]))
+      const { organizationId, groupIds } = req.params[surveyIdIdentifier]
+        ? await getSurveyOrganizationAndGroups(
+            Number(req.params[surveyIdIdentifier]),
+          )
         : { organizationId: null, groupIds: [] };
       if (
         typeof organizationId === 'string' &&
