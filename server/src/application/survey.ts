@@ -859,7 +859,9 @@ export async function getSurveyOrganizationAndGroups(id: number) {
     organization: string;
     groups: string[];
   }>(
-    `SELECT organization, jsonb_agg(sug.group_id) AS groups 
+    `SELECT 
+      organization, 
+      COALESCE(jsonb_agg(sug.group_id) FILTER (WHERE sug.group_id IS NOT NULL), '[]') AS groups 
     FROM data.survey
     LEFT JOIN data.survey_user_group sug ON survey.id = sug.survey_id
     GROUP BY survey.id
