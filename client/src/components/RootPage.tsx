@@ -72,7 +72,7 @@ export function RootPage() {
         <Typography>
           Jos taas olet kiinnostunut tutustumaan tarkemmin
           osallistamisalustaamme, olet lämpimästi tervetullut vierailemaan{' '}
-          <Link color="#219ACD" href="https://www.ubigu.fi/fi/">
+          <Link color="#219ACD" href="https://www.ubigu.fi/">
             kotisivuillamme
           </Link>
           !

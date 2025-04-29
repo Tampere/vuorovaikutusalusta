@@ -49,7 +49,10 @@ export function configureAzureAuth(app: Express) {
             roles: JSON.parse(profile._json.roles), // Parse roles to trim extra characters
           });
           const userGroups = await getUserGroupsForUser(user.id);
-          return done(null, { ...user, groups: userGroups.map((g) => g.id) });
+          return done(null, {
+            ...user,
+            groups: [...(user.groups ?? []), ...userGroups.map((g) => g.id)], // Merges possible pending user groups and actual user groups
+          });
         });
       },
     ),

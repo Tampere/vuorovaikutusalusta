@@ -37,6 +37,12 @@ interface DBUserGroupMember {
   group_id: string;
 }
 
+interface DBPendingUserGroupMember {
+  id?: string;
+  pending_user_id: string;
+  group_id: string;
+}
+
 /**
  * Helper function for creating user group column set
  */
@@ -47,12 +53,29 @@ const userGroupMemberColumnSet = () =>
     'application',
   );
 
+const pendingUserGroupMemberColumnSet = () =>
+  getColumnSet<DBPendingUserGroupMember>(
+    'pending_user_group_member',
+    ['pending_user_id', 'group_id'],
+    'application',
+  );
+
 function userGroupsToDBUserGroupMemberRows(
   userId: string,
   groupIds: string[],
 ): DBUserGroupMember[] {
   return groupIds.map((groupId) => ({
     user_id: userId,
+    group_id: groupId,
+  }));
+}
+
+function userGroupToDBPendingUserGroupMemberRows(
+  pendingUserId: string,
+  groupIds: string[],
+): DBPendingUserGroupMember[] {
+  return groupIds.map((groupId) => ({
+    pending_user_id: pendingUserId,
     group_id: groupId,
   }));
 }
@@ -180,6 +203,13 @@ export async function addPendingUserRequest(
  */
 export async function upsertUser(user: Express.User) {
   const newUser = await getDb().tx(async (t) => {
+    const pendingUserGroups = await t.manyOrNone<{ group_id: number }>(
+      `SELECT group_id FROM application.pending_user_group_member pugm
+      INNER JOIN application.pending_user_requests pur ON pugm.pending_user_id = pur.id
+      WHERE pgp_sym_decrypt(pur.email, $(encryptionKey)) = $(email) `,
+      { email: user.email, encryptionKey },
+    );
+
     await t.none(
       `DELETE FROM application.pending_user_requests WHERE pgp_sym_decrypt(email, $(encryptionKey)) = $(email)`,
       { email: user.email, encryptionKey },
@@ -214,6 +244,7 @@ export async function upsertUser(user: Express.User) {
         organizations: user.organizations.map((org) => org.id),
         roles: user.roles,
         encryptionKey,
+        groups: pendingUserGroups.map((group) => group.group_id),
       },
     );
   });
@@ -283,14 +314,17 @@ export async function getUsers(
 async function getPendingUserRequests(userOrganizations: string[] = []) {
   return getDb().manyOrNone<DbUser>(
     `SELECT
-      id,
+      pur.id,
       pgp_sym_decrypt(full_name, $1) as full_name,
       pgp_sym_decrypt(email, $1) as email,
       organizations,
       roles,
-      true as "isPending"
-    FROM application.pending_user_requests
-    ${userOrganizations.length > 0 ? 'WHERE organizations && $2' : ''}
+      true as "isPending",
+      COALESCE(array_agg(ugm.group_id) FILTER (WHERE ugm.group_id IS NOT NULL), '{}') as groups
+    FROM application.pending_user_requests pur
+    LEFT JOIN application.pending_user_group_member ugm ON pur.id = ugm.pending_user_id
+    GROUP BY pur.id
+    ${userOrganizations.length > 0 ? 'HAVING organizations && $2' : ''}
     ORDER BY organizations[1], pgp_sym_decrypt(full_name, $1::text), roles[1], id`,
     [encryptionKey, userOrganizations],
   );
@@ -312,6 +346,28 @@ export async function updateUserGroupMembership(
       getMultiInsertQuery(
         userGroupsToDBUserGroupMemberRows(userId, groupIds),
         userGroupMemberColumnSet(),
+      ),
+      {},
+    );
+  });
+}
+
+export async function updatePendingUserGroupMembership(
+  pendingUserId: string,
+  groupIds: string[],
+) {
+  return getDb().tx(async (t) => {
+    await t.none(
+      `DELETE FROM application.pending_user_group_member WHERE pending_user_id = $1`,
+      [pendingUserId],
+    );
+    if (groupIds.length === 0) {
+      return;
+    }
+    await t.none(
+      getMultiInsertQuery(
+        userGroupToDBPendingUserGroupMemberRows(pendingUserId, groupIds),
+        pendingUserGroupMemberColumnSet(),
       ),
       {},
     );

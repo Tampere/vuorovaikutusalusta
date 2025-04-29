@@ -20,6 +20,7 @@ interface Props {
   selectedGroups: string[];
   userId: string;
   availableUserGroups: UserGroup[];
+  forPendingUser: boolean;
 }
 
 export function UserGroupSelect(props: Props) {
@@ -34,10 +35,15 @@ export function UserGroupSelect(props: Props) {
 
   async function updateUserGroups(userId: string, groupIds: string[]) {
     try {
-      await request(`/api/users/${userId}/groups`, {
-        method: 'POST',
-        body: { groups: groupIds },
-      });
+      await request(
+        `/api/users/${userId}/${
+          props.forPendingUser ? 'pending-groups' : 'groups'
+        }`,
+        {
+          method: 'POST',
+          body: { groups: groupIds },
+        },
+      );
       showToast({
         severity: 'success',
         message: tr.UserGroupSelect.updateSuccess,
