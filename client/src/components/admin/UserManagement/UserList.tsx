@@ -171,18 +171,17 @@ export function UserList({
                       </TableCell>
                     )}
                     <TableCell>
-                      {!user.isPending && (
-                        <UserGroupSelect
-                          availableUserGroups={availableUserGroups.filter(
-                            (group) =>
-                              user.organizations.some(
-                                (org) => org.id === group.organization,
-                              ),
-                          )}
-                          selectedGroups={user.groups ?? []}
-                          userId={user.id}
-                        />
-                      )}
+                      <UserGroupSelect
+                        forPendingUser={user.isPending}
+                        availableUserGroups={availableUserGroups.filter(
+                          (group) =>
+                            user.organizations.some(
+                              (org) => org.id === group.organization,
+                            ),
+                        )}
+                        selectedGroups={user.groups ?? []}
+                        userId={user.id}
+                      />
                     </TableCell>
                   </TableRow>
                 </Fragment>

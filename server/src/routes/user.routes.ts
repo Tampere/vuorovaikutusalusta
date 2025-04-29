@@ -6,6 +6,7 @@ import {
 import {
   addPendingUserRequest,
   getUsers,
+  updatePendingUserGroupMembership,
   updateUserGroupMembership,
 } from '@src/user';
 import { validateRequest } from '@src/utils';
@@ -120,6 +121,23 @@ router.post(
   ]),
   asyncHandler(async (req, res) => {
     await updateUserGroupMembership(req.params.id, req.body.groups);
+    res.status(201).end();
+  }),
+);
+
+/** Update pending user's group assignment */
+router.post(
+  '/:id/pending-groups',
+  ensureAuthenticated(),
+  ensureAdminAccess(),
+  validateRequest([
+    param('id').isString().withMessage('Invalid or missing user ID'),
+    body('groups')
+      .isArray()
+      .withMessage('Groups must be an array of group IDs'),
+  ]),
+  asyncHandler(async (req, res) => {
+    await updatePendingUserGroupMembership(req.params.id, req.body.groups);
     res.status(201).end();
   }),
 );
