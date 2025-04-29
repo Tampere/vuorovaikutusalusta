@@ -58,7 +58,7 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
   const lowHeight = useMediaQuery('(max-height: 400px');
   const landscape = useMediaQuery('(orientation: landscape)');
   const mobileLandscape = lowHeight && landscape;
-
+  console.log(thanksPageImageHeaderQuery);
   return (
     <Stack
       style={{ minHeight: '100svh' }} // primary
@@ -85,7 +85,11 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
       >
         {topImageHeaderQuery.imageHeaders && (
           <img
-            style={{ maxWidth: '60%', maxHeight: '15vh' }}
+            style={{
+              maxWidth: '60%',
+              maxHeight: '70%',
+              padding: '16px',
+            }}
             src={topImagePath}
             alt={topImageHeaderQuery.imageHeaders?.imageAltText ?? ''}
           />
@@ -122,7 +126,10 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
           </ReactMarkdown>
         </div>
         {thanksPageImageHeaderQuery.imageHeaders && (
-          <div className="spacer" style={{ minHeight: '40vh', width: '100%' }}>
+          <div
+            className="spacer"
+            style={{ minHeight: '40vh', width: '100%', position: 'relative' }}
+          >
             <img
               style={{
                 maxHeight: !mobileLandscape ? '40vh' : '100vh',
@@ -131,6 +138,21 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
               src={thanksPageImagePath}
               alt={thanksPageImageHeaderQuery.imageHeaders?.imageAltText ?? ''}
             />
+            {thanksPageImageHeaderQuery.imageHeaders?.attributions && (
+              <Typography
+                sx={(theme) => ({
+                  position: 'absolute',
+                  bottom: 0,
+                  padding: '0.5rem',
+                  borderTopLeftRadius: '0.25rem',
+                  right: 0,
+                  color: 'white',
+                  backgroundColor: theme.palette.primary.main,
+                })}
+              >
+                {thanksPageImageHeaderQuery.imageHeaders?.attributions}
+              </Typography>
+            )}
           </div>
         )}
       </Box>
