@@ -165,6 +165,7 @@ export interface SurveyImageSection
     SectionFile {
   type: 'image';
   altText: LocalizedText;
+  attributions: string;
   fileUrl: string;
 }
 

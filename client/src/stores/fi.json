@@ -339,7 +339,8 @@
     "bodyColor": "Tekstin väri"
   },
   "EditImageSection": {
-    "altText": "Vaihtoehtoinen teksti kuvalle"
+    "altText": "Vaihtoehtoinen teksti kuvalle",
+    "attributions": "Tekijänoikeustiedot"
   },
   "EditMapQuestion": {
     "selectionTypes": "Sallitut karttavalinnan tyypit",

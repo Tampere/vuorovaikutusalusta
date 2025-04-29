@@ -339,7 +339,8 @@
     "bodyColor": "Color of the text"
   },
   "EditImageSection": {
-    "altText": "Alternative text for the image"
+    "altText": "Alternative text for the image",
+    "attributions": "Copyright & attributions"
   },
   "EditMapQuestion": {
     "selectionTypes": "Allowed geometry types for the map markings",

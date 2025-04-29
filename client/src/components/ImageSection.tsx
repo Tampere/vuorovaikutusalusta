@@ -1,5 +1,12 @@
 import { SurveyImageSection } from '@interfaces/survey';
-import { Card, CardMedia, FormLabel, Link, Typography } from '@mui/material';
+import {
+  Box,
+  Card,
+  CardMedia,
+  FormLabel,
+  Link,
+  Typography,
+} from '@mui/material';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useEffect, useState } from 'react';
@@ -56,21 +63,45 @@ export default function ImageSection({ section, isFollowUp = false }: Props) {
           />
         )}
       </div>
-      {isVideo ? (
-        <Card>
-          <CardMedia
-            controls
-            component="video"
-            src={`/api/file/${section.fileUrl}`}
-          />
-        </Card>
-      ) : (
-        <img
-          style={{ maxWidth: '100%' }}
-          src={`/api/file/${section.fileUrl}`}
-          alt={section.altText[language]}
-        />
-      )}
+      {
+        <Box
+          position="relative"
+          sx={{
+            border: 'solid 1px #e4e4e4',
+          }}
+        >
+          {isVideo ? (
+            <Card>
+              <CardMedia
+                controls
+                component="video"
+                src={`/api/file/${section.fileUrl}`}
+              />
+            </Card>
+          ) : (
+            <img
+              style={{ maxWidth: '100%' }}
+              src={`/api/file/${section.fileUrl}`}
+              alt={section.altText[language]}
+            />
+          )}
+          {section.attributions && (
+            <Typography
+              sx={(theme) => ({
+                position: 'absolute',
+                bottom: 0,
+                padding: '0.5rem',
+                borderTopLeftRadius: '0.25rem',
+                right: 0,
+                color: 'white',
+                backgroundColor: theme.palette.primary.main,
+              })}
+            >
+              {section.attributions}
+            </Typography>
+          )}
+        </Box>
+      }
       <div style={{ display: 'flex', flexDirection: 'row' }}>
         <Link href={`/api/file/${section.fileUrl}`} target={'__blank'}>
           {tr.ImageSection.openInNewTab}

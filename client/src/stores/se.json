@@ -340,7 +340,8 @@
     "bodyColor": "Textfärg"
   },
   "EditImageSection": {
-    "altText": "Alternativ text för bild"
+    "altText": "Alternativ text för bild",
+    "attributions": "Upphovsrätt och tillägg"
   },
   "EditMapQuestion": {
     "selectionTypes": "Tillåtna kartvalstyper",
