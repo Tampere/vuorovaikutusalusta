@@ -58,7 +58,7 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
   const lowHeight = useMediaQuery('(max-height: 400px');
   const landscape = useMediaQuery('(orientation: landscape)');
   const mobileLandscape = lowHeight && landscape;
-  console.log(thanksPageImageHeaderQuery);
+
   return (
     <Stack
       style={{ minHeight: '100svh' }} // primary
