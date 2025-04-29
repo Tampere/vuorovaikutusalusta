@@ -22,6 +22,8 @@ import { configureGoogleOAuth } from './google-oauth';
 import { ForbiddenError } from '@src/error';
 import asyncHandler from 'express-async-handler';
 
+const SESSION_COOKIE_NAME = '_Secure-connect.sid';
+
 function basicAuth(req: Request): { name: string; pass: string } {
   const string = req?.headers?.authorization;
   if (!string) return;
@@ -59,7 +61,7 @@ export function configureAuth(app: Express) {
   // Initialize Express session middleware
   app.use(
     expressSession({
-      name: '_Secure-connect.sid',
+      name: SESSION_COOKIE_NAME,
       secret: process.env.SESSION_SECRET,
       cookie: {
         sameSite: 'none',
@@ -80,7 +82,7 @@ export function configureAuth(app: Express) {
 
   // Logout route
   app.get('/logout', (req, res) => {
-    res.clearCookie('connect.sid');
+    res.clearCookie(SESSION_COOKIE_NAME);
     req.logout((err) => {
       if (err) {
         return req.next(err);
@@ -165,7 +167,7 @@ export function ensureAuthenticated(options?: { redirectToLogin?: boolean }) {
     };
 
     if (req.session) {
-      res.clearCookie('connect.sid');
+      res.clearCookie(SESSION_COOKIE_NAME);
       req.logout((err) => {
         if (err) {
           return req.next(err);
