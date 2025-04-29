@@ -411,6 +411,20 @@ export default function EditSurveyPage(props: Props) {
               });
             }}
           />
+          <TextField
+            style={{ width: '100%', marginTop: 10 }}
+            label={tr.EditSurveyPage.imageAttributions}
+            value={page.sidebar?.imageAttributions ?? ''}
+            onChange={(event) => {
+              editPage({
+                ...page,
+                sidebar: {
+                  ...page.sidebar,
+                  imageAttributions: event.target.value,
+                },
+              });
+            }}
+          />
           <FormControl sx={{ marginTop: 2 }}>
             <FormLabel>{tr.EditSurveyPage.imageScaling}</FormLabel>
             <RadioGroup

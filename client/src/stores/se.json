@@ -171,6 +171,7 @@
     "addFollowUpButtonTile": "Spara frågan för att lägga till en uppföljningsfråga",
     "confirmDeleteSection": "Vill du verkligen ta bort det här avsnittet?",
     "imageAltText": "Alternativ text för bild",
+    "imageAttributions": "Upphovsrätt och tillägg",
     "imageScaling": "Bildskalning",
     "imageScalingLabel": {
       "original": "Originalstorlek",

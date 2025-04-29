@@ -171,6 +171,7 @@
     "addFollowUpButtonTile": "Tallenna kysymys lisätäksesi jatkokysymyksen",
     "confirmDeleteSection": "Haluatko varmasti poistaa tämän osion?",
     "imageAltText": "Kuvan vaihtoehtoinen teksti",
+    "imageAttributions": "Tekijänoikeustiedot",
     "imageScaling": "Kuvan skaalaus",
     "imageScalingLabel": {
       "original": "Alkuperäinen koko",

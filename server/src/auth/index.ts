@@ -120,12 +120,12 @@ export async function configureMockAuth(app: Express) {
   const mockOrganization = ['test-group-id-2'];
   const mockUser: Express.User = {
     id: '12345-67890-abcde-fghij1',
-    fullName: 'perus',
-    email: 'toinen.testaaja@testi.com',
+    fullName: 'super',
+    email: 'super@testi.com',
     organizations: mockOrganization.map((id) =>
       dbOrganizationIdToOrganization(id),
     ),
-    roles: ['organization_user' /* 'organization_admin', 'super_user'*/],
+    roles: ['organization_user', 'organization_admin', 'super_user'],
   };
   const userGroups = await getUserGroupsForUser(mockUser.id);
   await upsertUser(mockUser);

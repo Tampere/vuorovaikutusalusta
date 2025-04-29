@@ -171,6 +171,7 @@
     "addFollowUpButtonTile": "Save the draft question to add a follow-up section",
     "confirmDeleteSection": "Are you sure you want to delete this section?",
     "imageAltText": "Alternative text for the image",
+    "imageAttributions": "Copyright & attributions",
     "imageScaling": "Image scaling",
     "imageScalingLabel": {
       "original": "Original size",

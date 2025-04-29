@@ -326,6 +326,10 @@ export interface SurveyPageSidebar {
    */
   imageAltText: LocalizedText;
   /**
+   * Attribution text for the sidebar image
+   */
+  imageAttributions: string;
+  /**
    * Information how the picture is displayed
    */
   imageSize: SurveyPageSidebarImageSize;

@@ -115,6 +115,7 @@ interface DBSurveyPage {
   sidebar_image_url: string;
   sidebar_image_alt_text: LocalizedText;
   sidebar_image_size: SurveyPageSidebarImageSize;
+  sidebar_image_attributions: string;
 }
 
 /**
@@ -197,6 +198,7 @@ type DBSurveyJoin = DBSurvey & {
   page_sidebar_image_url: string;
   page_sidebar_image_alt_text: LocalizedText;
   page_sidebar_image_size: SurveyPageSidebarImageSize;
+  page_sidebar_image_attributions: string;
   section_id: number;
   section_title: LocalizedText;
   section_title_color: string;
@@ -262,6 +264,7 @@ const surveyPageColumnSet = (inputSRID: number) =>
       cast: 'json',
     },
     'sidebar_image_size',
+    'sidebar_image_attributions',
     getGeoJSONColumn('default_map_view', inputSRID),
   ]);
 
@@ -359,6 +362,7 @@ export async function getPublishedSurvey(
           page.sidebar_image_url as page_sidebar_image_url,
           page.sidebar_image_alt_text as page_sidebar_image_alt_text,
           page.sidebar_image_size as page_sidebar_image_size,
+          page.sidebar_image_attributions as page_sidebar_image_attributions,
           public.ST_AsGeoJSON(page.default_map_view)::json as default_map_view,
           public.ST_SRID(page.default_map_view) AS "mapViewSRID"
         FROM
@@ -599,6 +603,7 @@ export async function getSurvey(
           page.sidebar_image_url as page_sidebar_image_url,
           page.sidebar_image_alt_text as page_sidebar_image_alt_text,
           page.sidebar_image_size as page_sidebar_image_size,
+          page.sidebar_image_attributions as page_sidebar_image_attributions,
           public.ST_AsGeoJSON(page.default_map_view)::json as default_map_view,
           public.ST_SRID(page.default_map_view) AS "mapViewSRID"
         FROM
@@ -1762,6 +1767,7 @@ function dbSurveyJoinToPage(dbSurveyJoin: DBSurveyJoin): SurveyPage {
           imageUrl: dbSurveyJoin.page_sidebar_image_url,
           imageAltText: dbSurveyJoin.page_sidebar_image_alt_text,
           imageSize: dbSurveyJoin.page_sidebar_image_size,
+          imageAttributions: dbSurveyJoin.page_sidebar_image_attributions,
           defaultMapView: dbSurveyJoin.default_map_view
             ? geometryToGeoJSONFeatureCollection(
                 dbSurveyJoin.default_map_view,
@@ -1968,6 +1974,7 @@ function surveyPagesToRows(
       sidebar_image_url: surveyPage.sidebar.imageUrl,
       sidebar_image_alt_text: surveyPage.sidebar.imageAltText,
       sidebar_image_size: surveyPage.sidebar.imageSize,
+      sidebar_image_attributions: surveyPage.sidebar.imageAttributions,
       default_map_view:
         surveyPage.sidebar.defaultMapView?.features[0]?.geometry ?? null,
     } as DBSurveyPage;
