@@ -59,7 +59,7 @@ export function configureAuth(app: Express) {
   // Initialize Express session middleware
   app.use(
     expressSession({
-      name: '_SECURE-connect.sid',
+      name: '_Secure-connect.sid',
       secret: process.env.SESSION_SECRET,
       cookie: {
         sameSite: 'none',
