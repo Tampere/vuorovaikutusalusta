@@ -214,7 +214,8 @@ export async function upsertUser(user: Express.User) {
       `DELETE FROM application.pending_user_requests WHERE pgp_sym_decrypt(email, $(encryptionKey)) = $(email)`,
       { email: user.email, encryptionKey },
     );
-    return t.one<DbUser>(
+
+    const newUser = await t.one<DbUser>(
       `
       INSERT INTO "user" (id, full_name, email, organizations, roles)
       VALUES (
@@ -247,6 +248,20 @@ export async function upsertUser(user: Express.User) {
         groups: pendingUserGroups.map((group) => group.group_id),
       },
     );
+
+    if (pendingUserGroups.length > 0) {
+      await t.none(
+        getMultiInsertQuery(
+          userGroupsToDBUserGroupMemberRows(
+            newUser.id,
+            pendingUserGroups.map((group) => String(group.group_id)),
+          ),
+          userGroupMemberColumnSet(),
+        ),
+      );
+    }
+
+    return newUser;
   });
 
   return dbUserToUser(newUser);
