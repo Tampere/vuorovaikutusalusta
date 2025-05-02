@@ -2,6 +2,7 @@ import {
   AnswerEntry,
   LanguageCode,
   PersonalInfoAnswer,
+  SectionImageOption,
   SectionOption,
   Survey,
   SurveyFollowUpSection,
@@ -22,7 +23,11 @@ import {
   ScreenshotJobReturnData,
   getScreenshots,
 } from './screenshot';
-import { getFile, getOptionsForSurvey } from './survey';
+import {
+  getFile,
+  getImageOptionsForSurvey,
+  getOptionsForSurvey,
+} from './survey';
 import { formatPhoneNumber } from '@src/utils';
 
 const fonts = {
@@ -289,11 +294,20 @@ function getOptionSelectionText(
   return option?.text[language] ?? '-';
 }
 
+function getOptionSelectionImage(
+  value: string | number,
+  options: (SectionImageOption & { image?: string })[],
+) {
+  const option = options.find((option) => option.id === value);
+  return option?.image;
+}
+
 function getContent(
   answerEntry: AnswerEntry,
   sections: SurveyPageSection[],
   screenshots: ScreenshotJobReturnData[],
   options: SectionOption[],
+  optionsWithImages: (SectionImageOption & { image?: string })[],
   isSubQuestion = false,
   isFollowUpSection = false,
   language: LanguageCode,
@@ -337,6 +351,38 @@ function getContent(
         {
           text: getOptionSelectionText(answerEntry.value, options, language),
           style,
+        },
+      ];
+    }
+    case 'radio-image': {
+      const image = getOptionSelectionImage(
+        answerEntry.value,
+        optionsWithImages,
+      );
+      return [
+        heading,
+        {
+          columns: [
+            [
+              {
+                text: getOptionSelectionText(
+                  answerEntry.value,
+                  optionsWithImages,
+                  language,
+                ),
+                style,
+              },
+              ...(image
+                ? [
+                    {
+                      image,
+                      width: 200,
+                      style,
+                    },
+                  ]
+                : []),
+            ],
+          ],
         },
       ];
     }
@@ -468,6 +514,7 @@ function getContent(
                     mapQuestion.subQuestions,
                     [],
                     options,
+                    optionsWithImages,
                     true,
                     false,
                     language,
@@ -499,6 +546,7 @@ export async function generatePdf(
   language: LanguageCode,
 ) {
   const start = Date.now();
+  const imageOptions = await getImageOptionsForSurvey(survey.id);
   const options = await getOptionsForSurvey(survey.id);
 
   const sections = survey.pages.reduce(
@@ -516,6 +564,18 @@ export async function generatePdf(
 
   const screenshotJobData = prepareMapAnswers(survey, answerEntries, language);
   const screenshots = await getScreenshots(screenshotJobData);
+  const optionsWithImages = await Promise.all(
+    imageOptions.map(async (option) => {
+      if (!option.imageUrl) {
+        return { ...option, image: null };
+      }
+      const file = await getFile(option.imageUrl);
+      return {
+        ...option,
+        image: `data:${file.mimeType};base64,${file.data.toString('base64')}`,
+      };
+    }),
+  );
 
   logger.debug(
     `Fetched ${screenshots.length} screenshots in ${Date.now() - start}ms`,
@@ -534,6 +594,7 @@ export async function generatePdf(
         sections,
         screenshots,
         options,
+        optionsWithImages,
         false,
         false,
         language,
@@ -544,6 +605,7 @@ export async function generatePdf(
           followUpSections,
           screenshots,
           options,
+          optionsWithImages,
           false,
           true,
           language,

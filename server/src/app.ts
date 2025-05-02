@@ -22,7 +22,15 @@ async function start() {
 
   app.use((req, res, next) => {
     if (req.path.startsWith('/api')) {
-      return helmet({ contentSecurityPolicy: false })(req, res, next);
+      return helmet({
+        contentSecurityPolicy: {
+          useDefaults: false,
+          directives: {
+            'default-src': "'none'",
+            'frame-ancestors': "'none'",
+          },
+        },
+      })(req, res, next);
     } else {
       return helmet({
         contentSecurityPolicy: {

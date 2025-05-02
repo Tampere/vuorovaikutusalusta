@@ -29,6 +29,7 @@ import SectionInfo from './SectionInfo';
 import SliderQuestion from './SliderQuestion';
 import SortingQuestion from './SortingQuestion';
 import { PersonalInfoQuestion } from './PersonalInfoQuestion';
+import { RadioImageQuestion } from './RadioImageQuestion';
 
 interface Props {
   question: SurveyQuestionType;
@@ -163,6 +164,21 @@ function SurveyQuestion({
       {/* Radio question */}
       {question.type === 'radio' && (
         <RadioQuestion
+          value={value as number | string}
+          onChange={(value) => {
+            updateAnswer({
+              sectionId: question.id,
+              type: question.type,
+              value,
+            });
+          }}
+          question={question}
+          setDirty={setDirty}
+        />
+      )}
+      {/* Radio image question */}
+      {question.type === 'radio-image' && (
+        <RadioImageQuestion
           value={value as number | string}
           onChange={(value) => {
             updateAnswer({

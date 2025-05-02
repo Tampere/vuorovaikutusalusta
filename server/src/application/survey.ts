@@ -5,12 +5,14 @@ import {
   File,
   LanguageCode,
   LocalizedText,
+  SectionImageOption,
   SectionOption,
   SectionOptionGroup,
   Survey,
   SurveyCheckboxQuestion,
   SurveyEmailInfoItem,
   SurveyFollowUpSection,
+  SurveyGroupedCheckboxQuestion,
   SurveyImage,
   SurveyMapQuestion,
   SurveyMapSubQuestion,
@@ -19,6 +21,7 @@ import {
   SurveyPageSection,
   SurveyPageSidebarImageSize,
   SurveyPageSidebarType,
+  SurveyRadioImageQuestion,
   SurveyRadioQuestion,
   SurveyTheme,
 } from '@interfaces/survey';
@@ -47,6 +50,7 @@ import {
   getLocalizedMapUrls,
 } from '@src/utils';
 import { Geometry } from 'geojson';
+import { initializePuppeteerCluster } from './screenshot';
 
 const sectionTypesWithOptions: SurveyPageSection['type'][] = [
   'radio',
@@ -145,6 +149,8 @@ interface DBSectionOption {
   section_id: number;
   info?: LocalizedText;
   group_id: number;
+  file_url: string | null;
+  details: object | null;
 }
 
 interface DBSectionCondition {
@@ -213,6 +219,8 @@ type DBSurveyJoin = DBSurvey & {
   option_text: LocalizedText;
   option_group_id: number;
   option_info: LocalizedText;
+  option_file_url: string | null;
+  option_details: object | null;
   theme_id: number;
   theme_name: string;
   theme_data: SurveyTheme;
@@ -314,7 +322,9 @@ export async function getPublishedSurvey(
       option.text as option_text,
       option.idx as option_idx,
       option.group_id as option_group_id,
-      option.info as option_info
+      option.info as option_info,
+      option.file_url as option_file_url,
+      option.details as option_details
     FROM (
       SELECT
         survey_page.*,
@@ -503,9 +513,16 @@ export async function getPublishedSurvey(
 
         // If question contains options, add the option in the current row there
         if ('options' in linkedSection) {
-          const option = dbSurveyJoinToOption(row);
-          if (option) {
-            linkedSection.options.push(option);
+          if (linkedSection.type === 'radio-image') {
+            const option = dbSurveyJoinToImageOption(row);
+            if (option) {
+              linkedSection.options.push(option);
+            }
+          } else {
+            const option = dbSurveyJoinToOption(row);
+            if (option) {
+              linkedSection.options.push(option);
+            }
           }
         }
       } else {
@@ -524,6 +541,17 @@ export async function getPublishedSurvey(
       if (!option && (option = dbSurveyJoinToOption(row))) {
         // Option not yet added - add converted row to section
         question.options.push(option);
+      }
+    }
+
+    if (section?.type === 'radio-image') {
+      // Try to find the pre-existing question option object
+      let option = section.options.find(
+        (option) => option.id === row.option_id,
+      );
+      if (!option && (option = dbSurveyJoinToImageOption(row))) {
+        // Option not yet added - add converted row to section
+        section.options.push(option);
       }
     }
 
@@ -578,6 +606,8 @@ export async function getSurvey(
       option.idx as option_idx,
       option.group_id as option_group_id,
       option.info as option_info,
+      option.file_url as option_file_url,
+      option.details as option_details,
       COALESCE((SELECT jsonb_agg(group_id) FROM data.survey_user_group WHERE survey_id = survey_page_section.id), '[]') as user_groups
     FROM (
       SELECT
@@ -740,9 +770,16 @@ export async function getSurvey(
 
         // If question contains options, add the option in the current row there
         if ('options' in linkedSection) {
-          const option = dbSurveyJoinToOption(row);
-          if (option) {
-            linkedSection.options.push(option);
+          if (linkedSection.type === 'radio-image') {
+            const option = dbSurveyJoinToImageOption(row);
+            if (option) {
+              linkedSection.options.push(option);
+            }
+          } else {
+            const option = dbSurveyJoinToOption(row);
+            if (option) {
+              linkedSection.options.push(option);
+            }
           }
         }
       } else {
@@ -761,6 +798,17 @@ export async function getSurvey(
       if (!option && (option = dbSurveyJoinToOption(row))) {
         // Option not yet added - add converted row to section
         question.options.push(option);
+      }
+    }
+
+    if (section?.type === 'radio-image') {
+      // Try to find the pre-existing question option object
+      let option = section.options.find(
+        (option) => option.id === row.option_id,
+      );
+      if (!option && (option = dbSurveyJoinToImageOption(row))) {
+        // Option not yet added - add converted row to section
+        section.options.push(option);
       }
     }
 
@@ -969,7 +1017,7 @@ async function upsertSection(section: DBSurveyPageSection, index: number) {
       $(title)::json,
       $(type),
       $(body)::json,
-      $(details)::json,
+      $(details)::jsonb,
       $(parentSection),
       $(info),
       $(fileUrl),
@@ -981,7 +1029,7 @@ async function upsertSection(section: DBSurveyPageSection, index: number) {
         idx = $(index),
         title = $(title)::json,
         body = $(body)::json,
-        details = $(details)::json,
+        details = $(details)::jsonb,
         parent_section = $(parentSection),
         info = $(info),
         file_url = $(fileUrl),
@@ -1014,7 +1062,7 @@ async function upsertOption(option: DBSectionOption, index: number) {
   // Negative IDs can be assigned as temporary IDs for e.g. drag and drop - change them to null
   return await getDb().one<DBSectionOption>(
     `
-    INSERT INTO data.option (id, text, section_id, idx, group_id, info)
+    INSERT INTO data.option (id, text, section_id, idx, group_id, info, file_url, details)
     VALUES (
       COALESCE(
         CASE
@@ -1027,7 +1075,9 @@ async function upsertOption(option: DBSectionOption, index: number) {
       $(sectionId),
       $(index),
       $(groupId),
-      $(info)::json
+      $(info)::json,
+      $(fileUrl),
+      $(details)::json
     )
     ON CONFLICT (id) DO
       UPDATE SET
@@ -1035,7 +1085,9 @@ async function upsertOption(option: DBSectionOption, index: number) {
         section_id = $(sectionId),
         idx = $(index),
         group_id = $(groupId),
-        info = $(info)::json
+        info = $(info)::json,
+        file_url = $(fileUrl),
+        details = $(details)::json
     RETURNING *
   `,
     {
@@ -1045,6 +1097,8 @@ async function upsertOption(option: DBSectionOption, index: number) {
       index,
       groupId: option.group_id,
       info: option.info,
+      fileUrl: option.file_url,
+      details: option.details,
     },
   );
 }
@@ -1239,7 +1293,7 @@ async function deleteRemovedLinkedSections(
  */
 async function deleteRemovedOptions(
   sectionId: number,
-  newOptions: SectionOption[],
+  newOptions: SectionOption[] | SectionImageOption[],
   optionGroupId?: number,
 ) {
   // Get all existing options
@@ -1799,7 +1853,8 @@ function dbSurveyJoinToSection(dbSurveyJoin: DBSurveyJoin): SurveyPageSection {
         // Trust that the JSON in the DB fits the rest of the detail fields
         ...(dbSurveyJoin.section_details as any),
         // Add an initial empty option array if the type allows options
-        ...(sectionTypesWithOptions.includes(type) && { options: [] }),
+        ...((sectionTypesWithOptions.includes(type) ||
+          type === 'radio-image') && { options: [] }),
         // Add an initial empty group array if the type allows option groups
         ...(type === 'grouped-checkbox' && { groups: [] }),
       };
@@ -1810,13 +1865,41 @@ function dbSurveyJoinToSection(dbSurveyJoin: DBSurveyJoin): SurveyPageSection {
  * @param dbSurveyJoin Join query row
  * @returns Question option
  */
-function dbSurveyJoinToOption(dbSurveyJoin: DBSurveyJoin): SectionOption {
+
+function dbSurveyJoinToOption(
+  dbSurveyJoin: DBSurveyJoin,
+): SectionOption | null {
   return dbSurveyJoin.option_id == null
     ? null
     : {
         id: dbSurveyJoin.option_id,
         text: dbSurveyJoin.option_text,
         info: dbSurveyJoin.option_info,
+      };
+}
+
+/** Converts a DB survey join query row into a question image option.
+ * @param dbSurveyJoin Join query row
+ * @returns Question image option
+ */
+function dbSurveyJoinToImageOption(
+  dbSurveyJoin: DBSurveyJoin,
+): SectionImageOption | null {
+  return dbSurveyJoin.option_id == null
+    ? null
+    : {
+        id: dbSurveyJoin.option_id,
+        text: dbSurveyJoin.option_text,
+        info: dbSurveyJoin.option_info,
+        imageUrl: dbSurveyJoin.option_file_url,
+        altText:
+          'altText' in dbSurveyJoin.option_details
+            ? (dbSurveyJoin.option_details.altText as LocalizedText)
+            : { fi: '', en: '', se: '' },
+        attributions:
+          'attributions' in dbSurveyJoin.option_details
+            ? (dbSurveyJoin.option_details.attributions as string)
+            : null,
       };
 }
 
@@ -2028,7 +2111,7 @@ function surveySectionsToRows(
       file_url: fileUrl,
       conditions,
     } as DBSurveyPageSection & {
-      options: SectionOption[];
+      options: SectionOption[] | SectionImageOption[];
       subQuestions: SurveyMapSubQuestion[];
       followUpSections: SurveyFollowUpSection[];
       groups: SectionOptionGroup[];
@@ -2082,20 +2165,37 @@ function conditionsToRows(
  * @returns DBSectionOption[]
  */
 function optionsToRows(
-  sectionOptions: SectionOption[],
+  sectionOptions: SectionOption[] | SectionImageOption[],
   sectionId: number,
   optionGroupId?: number,
 ): DBSectionOption[] {
-  return sectionOptions.map((option, index) => {
-    return {
-      section_id: sectionId,
-      id: option.id ?? null,
-      idx: index,
-      text: option.text,
-      info: option.info,
-      group_id: optionGroupId ?? null,
-    } as DBSectionOption;
-  });
+  return sectionOptions.map<DBSectionOption>(
+    (option: SectionOption | SectionImageOption, index: number) => {
+      let imageSectionOptions: Partial<DBSectionOption> = {
+        file_url: null,
+        details: null,
+      };
+      if ('imageUrl' in option) {
+        imageSectionOptions = {
+          file_url: option.imageUrl,
+          details: {
+            altText: option.altText,
+            attributions: option.attributions,
+          },
+        };
+      }
+      return {
+        section_id: sectionId,
+        id: option.id ?? null,
+        idx: index,
+        text: option.text,
+        info: option.info,
+        file_url: imageSectionOptions.file_url,
+        details: imageSectionOptions.details,
+        group_id: optionGroupId ?? null,
+      };
+    },
+  );
 }
 
 /**
@@ -2372,9 +2472,44 @@ export async function userCanViewSurvey(user: User, surveyId: number) {
 }
 
 /**
+ * Get all image options for a given survey
+ * @param surveyId Survey ID
+ * @returns SectionImageOption[]
+ */
+export async function getImageOptionsForSurvey(surveyId: number) {
+  const rows = await getDb().manyOrNone<DBSectionOption>(
+    `
+    SELECT o.* FROM
+      data.option o
+      INNER JOIN data.page_section ps ON ps.id = o.section_id
+      INNER JOIN data.survey_page sp ON sp.id = ps.survey_page_id
+    WHERE sp.survey_id = $1 AND ps.type = 'radio-image'
+  `,
+    [surveyId],
+  );
+
+  return rows.map(
+    (row): SectionImageOption => ({
+      id: row.id,
+      text: row.text,
+      info: row.info,
+      altText:
+        'altText' in row.details
+          ? (row.details.altText as LocalizedText)
+          : { fi: '', en: '', se: '' },
+      attributions:
+        'attributions' in row.details
+          ? (row.details.attributions as string)
+          : null,
+      imageUrl: row.file_url,
+    }),
+  );
+}
+
+/**
  * Get all options for a given survey
  * @param surveyId Survey ID
- * @returns Options
+ * @returns SectionImageOption[]
  */
 export async function getOptionsForSurvey(surveyId: number) {
   const rows = await getDb().manyOrNone<DBSectionOption>(
@@ -2383,7 +2518,7 @@ export async function getOptionsForSurvey(surveyId: number) {
       data.option o
       INNER JOIN data.page_section ps ON ps.id = o.section_id
       INNER JOIN data.survey_page sp ON sp.id = ps.survey_page_id
-    WHERE sp.survey_id = $1
+    WHERE sp.survey_id = $1 AND ps.type <> 'radio-image'
   `,
     [surveyId],
   );

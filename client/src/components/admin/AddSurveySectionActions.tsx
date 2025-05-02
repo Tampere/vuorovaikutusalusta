@@ -1,5 +1,5 @@
 import { SurveyFollowUpSection, SurveyPageSection } from '@interfaces/survey';
-import { Person } from '@mui/icons-material';
+import { BurstMode, Person } from '@mui/icons-material';
 import { Fab, Grid, Tooltip, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { duplicateFiles } from '@src/controllers/AdminFileController';
@@ -88,6 +88,21 @@ export default function AddSurveySectionActions(props: Props) {
       isRequired: false,
       info: null,
       options: [{ text: initializeLocalizedObject('') }],
+      allowCustomAnswer: false,
+    },
+    'radio-image': {
+      type: 'radio-image',
+      title: initializeLocalizedObject(''),
+      isRequired: false,
+      info: null,
+      options: [
+        {
+          text: initializeLocalizedObject(''),
+          imageUrl: null,
+          altText: initializeLocalizedObject(''),
+          attributions: '',
+        },
+      ],
       allowCustomAnswer: false,
     },
     numeric: {
@@ -187,6 +202,7 @@ export default function AddSurveySectionActions(props: Props) {
       title: initializeLocalizedObject(''),
       fileUrl: null,
       altText: initializeLocalizedObject(''),
+      attributions: '',
     },
     document: {
       type: 'document',
@@ -229,6 +245,12 @@ export default function AddSurveySectionActions(props: Props) {
       label: tr.AddSurveySectionActions.radioQuestion,
       ariaLabel: 'add-radio-question',
       icon: <RadioButtonCheckedIcon />,
+    },
+    {
+      type: 'radio-image',
+      label: tr.AddSurveySectionActions.radioImageQuestion,
+      ariaLabel: 'add-radio-image-question',
+      icon: <BurstMode />,
     },
     {
       type: 'checkbox',

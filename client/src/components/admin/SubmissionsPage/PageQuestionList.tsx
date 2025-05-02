@@ -16,7 +16,7 @@ import ChevronRightIcon from '@src/components/icons/ChevronRightIcon';
 import { SurveyQuestion } from '@interfaces/survey';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { assertNever } from '@src/utils/typeCheck';
-import { Person } from '@mui/icons-material';
+import { BurstMode, Person } from '@mui/icons-material';
 import React from 'react';
 
 interface Props {
@@ -32,6 +32,8 @@ function getQuestionIcon(
       return <CheckboxCheckedIcon color="primary" />;
     case 'radio':
       return <RadioButtonCheckedIcon color="primary" />;
+    case 'radio-image':
+      return <BurstMode color="primary" />;
     case 'numeric':
       return <NumericFieldIcon color="primary" />;
     case 'map':

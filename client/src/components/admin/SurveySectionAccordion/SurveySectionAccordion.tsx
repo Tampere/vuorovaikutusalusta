@@ -12,6 +12,7 @@ import {
   SurveyNumericQuestion,
   SurveyPageSection,
   SurveyPersonalInfoQuestion,
+  SurveyRadioImageQuestion,
   SurveyRadioQuestion,
   SurveySliderQuestion,
   SurveySortingQuestion,
@@ -67,8 +68,9 @@ import EditSliderQuestion from '../EditSliderQuestion';
 import EditSortingQuestion from '../EditSortingQuestion';
 import EditTextSection from '../EditTextSection';
 import { SectionDetails } from './SectionDetails';
-import { Person } from '@mui/icons-material';
+import { BurstMode, Person } from '@mui/icons-material';
 import { EditPersonalInfoQuestion } from '../EditPersonalInfoQuestion';
+import EditRadioImageQuestion from '../EditRadioImageQuestion';
 
 const useStyles = makeStyles({
   accordion: {
@@ -169,6 +171,18 @@ export default function SurveySectionAccordion(props: Props) {
         />
       ),
     },
+    'radio-image': {
+      icon: <BurstMode />,
+      tooltip: tr.SurveySection.radioImageQuestion,
+      form: (
+        <EditRadioImageQuestion
+          disabled={props.disabled}
+          section={props.section as SurveyRadioImageQuestion}
+          onChange={handleEdit}
+        />
+      ),
+    },
+
     numeric: {
       icon: <NumericFieldIcon />,
       tooltip: tr.SurveySection.numericQuestion,

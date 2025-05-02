@@ -657,7 +657,7 @@ export default function SurveyStepper({
                 src={`/api/file/${currentPage.sidebar?.imageUrl}`}
               />
             )}
-            {currentPage.sidebar?.imageAttributions && (
+            {mdUp && currentPage.sidebar?.imageAttributions && (
               <Typography
                 sx={(theme) => ({
                   ...(currentPage.sidebar.imageSize === 'fitted' && {
@@ -863,7 +863,22 @@ export default function SurveyStepper({
                 </>
               )}
             </Paper>
+
             <div style={{ flexGrow: 1 }}>{sidePane}</div>
+            <Typography
+              sx={(theme) => ({
+                position: 'sticky',
+                textAlign: 'center',
+                bottom: 0,
+                padding: '0.5rem',
+                borderTopLeftRadius: '0.25rem',
+                right: 0,
+                color: 'white',
+                backgroundColor: theme.palette.primary.main,
+              })}
+            >
+              {currentPage.sidebar.imageAttributions}
+            </Typography>
           </Drawer>
         </>
       )}

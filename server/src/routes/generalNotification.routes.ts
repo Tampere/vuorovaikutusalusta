@@ -18,7 +18,7 @@ import logger from '@src/logger';
 const router = Router();
 const eventEmitter = new EventEmitter({ captureRejections: true });
 eventEmitter.on('error', (err) => {
-  logger.info(`EventEmitter error: ${err}`);
+  logger.error(`EventEmitter error: ${err}`);
   sseClients.forEach((client) => {
     client.write('Server error in the general notification stream');
     client.end();

@@ -11,8 +11,8 @@ router.get('/', ensureAuthenticated(), (req, res) => {
   const pathName = __dirname + '/../openapi/openapi.yaml';
   fs.readFile(pathName, { encoding: 'utf-8' }, (err, data) => {
     if (err) {
-      logger.info(`Error reading OpenAPI file at path ${pathName}`);
-      logger.info(JSON.stringify(err));
+      logger.error(`Error reading OpenAPI file at path ${pathName}`);
+      logger.error(JSON.stringify(err));
       return res
         .status(500)
         .json({ message: `Error reading OpenAPI file at path ${pathName}` });
