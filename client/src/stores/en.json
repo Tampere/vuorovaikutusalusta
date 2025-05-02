@@ -188,6 +188,10 @@
     "fetchingSubmissions": "Fetching submissions",
     "errorFetchingSubmissions": "Error checking survey response data."
   },
+  "QuestionImageOption": {
+    "optionLabel": "Answer option description",
+    "optionLabelHelp": "The answer option description is only shown in the survey response data. In the published survey, only the images are displayed, and alternative text is provided for screen readers."
+  },
   "FollowUpSection": {
     "title": "Follow-up question for ",
     "conditions": {
@@ -227,6 +231,7 @@
     "personalInfoDisabled": "The personal information question has already been added to the survey.",
     "personalInfoQuestion": "Add personal information question",
     "radioQuestion": "Add radio button question (single choice)",
+    "radioImageQuestion": "Lisää kuvavalintakysymys",
     "checkBoxQuestion": "Add checkbox question (multiple choice)",
     "numericQuestion": "Add numeric question",
     "mapQuestion": "Add map question",
@@ -249,6 +254,7 @@
   "SurveySection": {
     "personalInfoQuestion": "Personal information question",
     "radioQuestion": "Radio button question (single choice)",
+    "radioImageQuestion": "Kuvavalintakysymys",
     "checkBoxQuestion": "Radio button question (single choice)",
     "numericQuestion": "Numeric question",
     "mapQuestion": "Map question",

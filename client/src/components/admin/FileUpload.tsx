@@ -1,4 +1,4 @@
-import { IconButton, Tooltip } from '@mui/material';
+import { IconButton, Tooltip, Typography } from '@mui/material';
 import CancelIcon from '@src/components/icons/CancelIcon';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
@@ -7,6 +7,7 @@ import DropZone from '../DropZone';
 import { getFileName, getFullFilePath } from '@src/utils/path';
 import DownloadIcon from '../icons/DownloadIcon';
 import { FileWithPath } from 'react-dropzone/.';
+import { useFileValidator } from '@src/utils/fileValidator';
 
 interface Props {
   targetPath?: string[];
@@ -18,6 +19,7 @@ interface Props {
   onDelete: (file: { url: string }) => void;
   surveyOrganizationId: string;
   disabled?: boolean;
+  allowedFilesRegex?: RegExp;
 }
 
 export default function FileUpload({
@@ -28,12 +30,14 @@ export default function FileUpload({
   onDelete,
   surveyId,
   surveyOrganizationId,
+  allowedFilesRegex,
 }: Props) {
   const { tr } = useTranslations();
   const { showToast } = useToasts();
   const [acceptedFiles, setAcceptedFiles] = useState<readonly FileWithPath[]>(
     [],
   );
+  const fileValidator = useFileValidator();
 
   const imageFileFormats = ['jpg', 'jpeg', 'png', 'tiff', 'bmp'];
 
@@ -154,12 +158,23 @@ export default function FileUpload({
     <div>
       <DropZone
         maxFiles={1}
-        fileCallback={(files) => setAcceptedFiles(files)}
+        fileCallback={async (files: File[]) => {
+          await fileValidator(
+            files,
+            () => {
+              setAcceptedFiles(files);
+            },
+            allowedFilesRegex,
+          );
+        }}
+        /* fileCallback={(files) => setAcceptedFiles(files)} */
         readOnly={disabled}
       >
         {value?.length ? (
           <aside>
-            <h4>{tr.FileUpload.addedFile}</h4>
+            <Typography sx={{ fontWeight: 'bold', padding: '0.5rem 0' }}>
+              {tr.FileUpload.addedFile}
+            </Typography>
             {filesList}
           </aside>
         ) : null}

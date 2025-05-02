@@ -188,6 +188,10 @@
     "fetchingSubmissions": "Hämtar svar",
     "errorFetchingSubmissions": "Fel vid kontroll av undersökningens svarsinformation."
   },
+  "QuestionImageOption": {
+    "optionLabel": "Svarsalternativets beskrivning",
+    "optionLabelHelp": "Svarsalternativets beskrivning visas endast i enkätens svardata. I en publicerad enkät listas endast bilder och en alternativ text för bilden erbjuds för skärmläsare."
+  },
   "FollowUpSection": {
     "title": "Uppföljningsfråga för fråga",
     "conditions": {
@@ -227,6 +231,7 @@
     "personalInfoDisabled": "Personuppgiftsfrågan har redan lagts till i enkäten.",
     "personalInfoQuestion": "Lägg till personuppgiftsfråga",
     "radioQuestion": "Lägg till alternativfråga",
+    "radioImageQuestion": "Lisää kuvavalintakysymys",
     "checkBoxQuestion": "Lägg till flervalsfråga",
     "numericQuestion": "Lägg till numerisk fråga",
     "mapQuestion": "Lägg till kartfråga",
@@ -249,6 +254,7 @@
   "SurveySection": {
     "personalInfoQuestion": "Personuppgiftsfråga",
     "radioQuestion": "Alternativfråga",
+    "radioImageQuestion": "Kuvavalintakysymys",
     "checkBoxQuestion": "Flervalsfråga",
     "numericQuestion": "Numerisk fråga",
     "mapQuestion": "Kartfråga",

@@ -98,6 +98,12 @@ export function getEmptyAnswer(section: SurveyPageSection): AnswerEntry {
         type: section.type,
         value: null,
       };
+    case 'radio-image':
+      return {
+        sectionId: section.id,
+        type: section.type,
+        value: null,
+      };
     case 'free-text':
       return {
         sectionId: section.id,

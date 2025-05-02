@@ -464,6 +464,24 @@ function answerEntriesToRows(
           },
         ];
         break;
+      case 'radio-image':
+        newEntries = [
+          {
+            submission_id: submissionID,
+            section_id: entry.sectionId,
+            parent_entry_id: parentEntryId,
+            value_text: typeof entry.value === 'string' ? entry.value : null,
+            value_option_id:
+              typeof entry.value === 'number' ? entry.value : null,
+            value_geometry: null,
+            value_numeric: null,
+            value_json: null,
+            value_file: null,
+            value_file_name: null,
+            map_layers: null,
+          },
+        ];
+        break;
       case 'checkbox':
       case 'grouped-checkbox':
         newEntries =
@@ -660,6 +678,15 @@ function dbAnswerEntriesToAnswerEntries(
           });
           break;
         }
+        case 'radio-image':
+          {
+            entries.push({
+              sectionId: row.section_id,
+              type: 'radio-image',
+              value: row.value_option_id,
+            });
+          }
+          break;
         case 'checkbox': {
           // Try to find an existing entry for this section
           let entry = entries.find(
@@ -1009,6 +1036,7 @@ export async function getSubmissionsForSurvey(
         ? `AND ps.type NOT IN (
       'free-text',
       'radio',
+      'radio-image',
       'checkbox',
       'grouped-checkbox',
       'numeric',

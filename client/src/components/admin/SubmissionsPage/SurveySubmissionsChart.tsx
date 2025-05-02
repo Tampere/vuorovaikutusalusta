@@ -163,6 +163,7 @@ export default function Chart({ submissions, selectedQuestion }: Props) {
     let base: Data;
     switch (selectedQuestion.type) {
       case 'radio':
+      case 'radio-image':
       case 'checkbox':
         base = {
           id: selectedQuestion.id,

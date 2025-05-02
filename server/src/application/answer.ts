@@ -910,6 +910,7 @@ function createCSVHeaders(sectionMetadata: SectionHeader[]) {
     const sectionHead = sectionGroup[0];
     switch (sectionHead.type) {
       case 'radio':
+      case 'radio-image':
       case 'checkbox':
       case 'grouped-checkbox':
         sectionGroup.forEach((section) => {
@@ -1115,6 +1116,7 @@ function submissionAnswersToJson(
 
     switch (sectionDetails.type) {
       case 'radio':
+      case 'radio-image':
       case 'checkbox':
       case 'grouped-checkbox':
         ret[

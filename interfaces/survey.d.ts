@@ -25,6 +25,7 @@ export type SurveyQuestion =
   | SurveyPersonalInfoQuestion
   | SurveyCheckboxQuestion
   | SurveyRadioQuestion
+  | SurveyRadioImageQuestion
   | SurveyNumericQuestion
   | SurveyFreeTextQuestion
   | SurveyMapQuestion
@@ -145,6 +146,15 @@ export interface SurveyPersonalInfoQuestion extends CommonSurveyPageQuestion {
 export interface SurveyRadioQuestion extends CommonSurveyPageQuestion {
   type: 'radio';
   options: SectionOption[];
+  allowCustomAnswer: boolean;
+}
+
+/**
+ * Radio image question
+ */
+export interface SurveyRadioImageQuestion extends CommonSurveyPageQuestion {
+  type: 'radio-image';
+  options: SectionImageOption[];
   allowCustomAnswer: boolean;
 }
 
@@ -577,6 +587,24 @@ export interface SectionOption {
 }
 
 /**
+ * A single option of a multichoise question with an image
+ */
+export interface SectionImageOption extends SectionOption {
+  /**
+   * Url of the image
+   */
+  imageUrl: string | null;
+  /**
+   * Alt text of the image
+   */
+  altText: LocalizedText;
+  /**
+   * Attribution text of the image
+   */
+  attributions: string | null;
+}
+
+/**
  * A group of options of a grouped checkbox question
  */
 export interface SectionOptionGroup {
@@ -654,6 +682,10 @@ export type AnswerEntry = {
     }
   | {
       type: 'radio';
+      value: string | number;
+    }
+  | {
+      type: 'radio-image';
       value: string | number;
     }
   | {
