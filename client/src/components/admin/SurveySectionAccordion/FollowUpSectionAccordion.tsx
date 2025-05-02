@@ -61,9 +61,10 @@ import EditSliderQuestion from '../EditSliderQuestion';
 import EditSortingQuestion from '../EditSortingQuestion';
 import EditTextSection from '../EditTextSection';
 import { FollowUpSectionMenu } from './FollowUpSectionMenu';
-import { BurstMode, Person } from '@mui/icons-material';
+import { Person } from '@mui/icons-material';
 import { EditPersonalInfoQuestion } from '../EditPersonalInfoQuestion';
 import EditRadioImageQuestion from '../EditRadioImageQuestion';
+import { ImageCheckIcon } from '@src/components/icons/ImageCheckIcon';
 
 const useStyles = makeStyles({
   accordion: {
@@ -165,7 +166,7 @@ export function FollowUpSectionAccordion(props: Props) {
       ),
     },
     'radio-image': {
-      icon: <BurstMode />,
+      icon: <ImageCheckIcon />,
       tooltip: tr.SurveySection.radioImageQuestion,
       form: (
         <EditRadioImageQuestion
