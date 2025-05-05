@@ -28,7 +28,8 @@ export function useFileValidator() {
   * @param allowedFilesRegex - An optional regular expression used to verify if the file's data URL string matches the permitted format.
   *                            If not provided, any file type is allowed.
   * @param callBack - A callback function that is invoked with an array of validated FileAnswer objects (each containing the file's name and data URL string)
-  *                   if all the files are successfully validated.*/
+  *                   if all the files are successfully validated.
+  * */
   return async function fileValidator(
     files: File[],
     callBack: (value: FileAnswer[]) => void,
@@ -41,7 +42,7 @@ export function useFileValidator() {
       if (filesSize > MEGAS * 1000 * 1000) {
         showToast({
           severity: 'error',
-          message: tr.AttachmentQuestion.fileSizeLimitError,
+          message: tr.fileValidator.fileSizeLimitError,
         });
         return;
       }
@@ -65,13 +66,13 @@ export function useFileValidator() {
       } else {
         showToast({
           severity: 'error',
-          message: tr.AttachmentQuestion.unsupportedFileFormat,
+          message: tr.fileValidator.unsupportedFileFormat,
         });
       }
     } catch (err) {
       showToast({
         severity: 'error',
-        message: err?.message ?? tr.AttachmentQuestion.fileUploadError,
+        message: err?.message ?? tr.fileValidator.fileUploadError,
       });
     }
   };

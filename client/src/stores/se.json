@@ -308,12 +308,14 @@
   },
   "AttachmentQuestion": {
     "addedFile": "Tillagd fil",
-    "fileUploadError": "Ett fel uppstod vid uppladdning av filen",
-    "fileSizeLimitError": "Filstorleken får inte vara över 10MB",
-    "unsupportedFileFormat": "Filformatet stöds inte",
     "attachmentFileFormats": "Tillåtna filformat: jpg, jpeg, png, pdf, docx, xlsx samt de vanligaste videoformaten.",
     "deleteUploadedFile": "Ta bort uppladdad fil",
     "replace": "Ersätt vald bilaga genom att klicka."
+  },
+  "fileValidator": {
+    "fileUploadError": "Fel vid uppladdning av filen",
+    "fileSizeLimitError": "Den uppladdade filens storlek får inte överstiga 10 MB",
+    "unsupportedFileFormat": "Filformatet stöds inte"
   },
   "SurveyImageList": {
     "attributions": "Tillägg",
