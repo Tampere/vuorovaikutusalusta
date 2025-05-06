@@ -109,29 +109,41 @@ export default function SurveyImageList({
 
   function getApiFilePath(imageType: ImageType) {
     const surveyOrganizationId = activeSurvey?.organization.id;
-    let baseUrl;
+    let baseUrls: { get: string; post: string };
     switch (imageType) {
       case 'backgroundImage':
-        baseUrl = `/api/file/background-images`;
+        baseUrls = {
+          get: `/api/file/background-images`,
+          post: `/api/file/media/background-images`,
+        };
         break;
       case 'thanksPageImage':
-        baseUrl = `/api/file/thanks-page-images`;
+        baseUrls = {
+          get: `/api/file/thanks-page-images`,
+          post: `/api/file/media/thanks-page-images`,
+        };
         break;
       case 'topMarginImage':
       case 'bottomMarginImage':
-        baseUrl = '/api/file/margin-images';
+        baseUrls = {
+          get: `/api/file/margin-images`,
+          post: `/api/file/media/margin-images`,
+        };
         break;
       default:
-        baseUrl = '/api/file';
+        baseUrls = { get: `/api/file`, post: `/api/file/media` };
     }
     return surveyOrganizationId
-      ? `${baseUrl}?organization=${surveyOrganizationId}`
-      : baseUrl;
+      ? {
+          post: `${baseUrls.post}?organization=${surveyOrganizationId}`,
+          get: `${baseUrls.get}?organization=${surveyOrganizationId}`,
+        }
+      : baseUrls;
   }
 
   async function getImages() {
     try {
-      const res = await request<File[]>(getApiFilePath(imageType));
+      const res = await request<File[]>(getApiFilePath(imageType).get);
       props.setImages?.(res) ?? setImages(res);
     } catch (error) {
       showToast({
@@ -255,25 +267,24 @@ export default function SurveyImageList({
     formData.append('file', acceptedFiles[0]);
     formData.append('attributions', imageAttributions);
     imageAltText && formData.append('imageAltText', imageAltText);
-
-    try {
-      await fetch(getApiFilePath(imageType), {
-        method: 'POST',
-        body: formData,
-        headers: {
-          organization: activeSurvey.organization.id,
-        },
-      });
-      acceptedFiles.shift();
-      getImages();
-      setImageAltText('');
-      setImageAttributions('');
-    } catch (error) {
+    const res = await fetch(getApiFilePath(imageType).post, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        organization: activeSurvey.organization.id,
+      },
+    });
+    if (!res.ok) {
       showToast({
         severity: 'error',
         message: tr.SurveyImageList.imageUploadError,
       });
+      return;
     }
+    acceptedFiles.shift();
+    getImages();
+    setImageAltText('');
+    setImageAttributions('');
   }
 
   function handleEmptyImage() {

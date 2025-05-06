@@ -307,15 +307,15 @@
     "minMaxValue": "Värdet måste vara mellan {minValue} och {maxValue}"
   },
   "AttachmentQuestion": {
-    "addedFile": "Tillagd fil",
+    "addedFile": "Tillagd fil.",
     "attachmentFileFormats": "Tillåtna filformat: jpg, jpeg, png, pdf, docx, xlsx samt de vanligaste videoformaten.",
     "deleteUploadedFile": "Ta bort uppladdad fil",
     "replace": "Ersätt vald bilaga genom att klicka."
   },
   "fileValidator": {
-    "fileUploadError": "Fel vid uppladdning av filen",
-    "fileSizeLimitError": "Den uppladdade filens storlek får inte överstiga 10 MB",
-    "unsupportedFileFormat": "Filformatet stöds inte"
+    "fileUploadError": "Fel vid uppladdning av filen.",
+    "fileSizeLimitError": "Den uppladdade filens storlek får inte överstiga 10 MB.",
+    "unsupportedFileFormat": "Filformatet stöds inte."
   },
   "SurveyImageList": {
     "attributions": "Tillägg",
@@ -641,12 +641,12 @@
     "versionInfo": "Information om Kartalla-tjänsten"
   },
   "InstructionsDialog": {
-    "fetchingError": "Fel vid hämtning av aktuella instruktioner",
+    "fetchingError": "Fel vid hämtning av aktuella instruktioner.",
     "currentInstructions": "Aktuella instruktioner",
     "uploadNewInstructions": "Ladda upp nya instruktioner",
-    "wrongFileFormat": "Filen ska vara i pdf-format",
-    "fileUploadError": "Fel vid uppladdning av filen",
-    "fileSizeLimitError": "Filstorleken får inte vara över {x} MB",
+    "wrongFileFormat": "Filen ska vara i pdf-format.",
+    "fileUploadError": "Fel vid uppladdning av filen.",
+    "fileSizeLimitError": "Filstorleken får inte vara över {x} MB.",
     "submit": "Skicka",
     "cancel": "Avbryt"
   },

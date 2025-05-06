@@ -24,6 +24,12 @@ import {
 import logger from '@src/logger';
 import { assertNever } from '@src/utils';
 import { LineString, Point, Polygon } from 'geojson';
+import {
+  bufferFromDataUrl,
+  validateBinaryFile,
+  validateDataUrl,
+  validateTextFile,
+} from '@src/fileValidation';
 
 /**
  * DB row of table data.answer_entry
@@ -201,6 +207,41 @@ async function validateEntries(answerEntries: AnswerEntry[]) {
   ]);
 }
 
+async function validateAttachmentEntries(answerEntries: AnswerEntry[]) {
+  const attachmentEntries = answerEntries.filter(
+    (entry) => entry.type === 'attachment',
+  );
+
+  for (const entry of attachmentEntries) {
+    // Issues with type inference here so using assertion
+    for (const value of entry.value as (AnswerEntry & {
+      type: 'attachment';
+    })['value']) {
+      // Data URL validation is the first step
+      validateDataUrl('attachment', value.fileString, () => {
+        throw new BadRequestError('Invalid file type');
+      });
+
+      // Then check that the fileName and mimetype are valid
+      const mimeType = value.fileString
+        .split(',')[0]
+        .split(':')[1]
+        .split(';')[0];
+      validateTextFile(
+        'attachment',
+        { originalname: value.fileName, mimetype: mimeType },
+        () => {
+          throw new BadRequestError('Invalid file type');
+        },
+      );
+
+      // Check the buffer to ensure no tampering of the data URL
+      const fileBuffer = bufferFromDataUrl(value.fileString);
+      await validateBinaryFile(fileBuffer, 'attachment');
+    }
+  }
+}
+
 /** Encrypt and save personal info question answers to database */
 async function savePersonalInfo(personalInfo: DBPersonalInfo) {
   await getDb().any(
@@ -271,6 +312,8 @@ export async function createSurveySubmission(
   unfinished = false,
   language: LanguageCode,
 ) {
+  await validateAttachmentEntries(answerEntries);
+
   // Only validate the entries if saving the final submission (not unfinished)
   if (!unfinished) {
     await validateEntries(answerEntries);

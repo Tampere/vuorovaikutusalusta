@@ -13,15 +13,61 @@ import {
   ensureFileGroupAccess,
   ensureSuperUserAccess,
 } from '@src/auth';
+import { BadRequestError, InternalServerError } from '@src/error';
+import { validateBinaryFile, validateTextFile } from '@src/fileValidation';
 
-import { parseMimeType, validateRequest } from '@src/utils';
+import { parsePdfMimeType, validateRequest } from '@src/utils';
 import { Router } from 'express';
 import asyncHandler from 'express-async-handler';
 import { param } from 'express-validator';
-import multer from 'multer';
+import multer, { FileFilterCallback } from 'multer';
+import path from 'path';
 
 const router = Router();
-const upload = multer({ limits: { fileSize: 10 * 1000 * 1000 } });
+
+const fileTypeRegex = {
+  pdf: /pdf/,
+  media: /svg|png|jpg|jpeg|mp4|mkv|webm|avi|wmv|m4p|m4v|mpg|mpeg|m4v|mov/,
+  all: /svg|png|jpg|jpeg|pdf|vnd\.openxmlformats-officedocument\.spreadsheetml\.sheet|xlsx|vnd\.openxmlformats-officedocument\.wordprocessingml\.document|docx|mp4|mkv|webm|avi|wmv|m4p|m4v|mpg|mpeg|m4v|mov/,
+};
+
+export function validateBinary(fileType: keyof typeof fileTypeRegex) {
+  return asyncHandler(async (req, _res, next) => {
+    if (!req.file) {
+      return next();
+    }
+
+    const { buffer } = req.file;
+    await validateBinaryFile(buffer, fileType, next);
+  });
+}
+
+function validateText(
+  fileType: keyof typeof fileTypeRegex,
+  file: Express.Multer.File,
+  cb: FileFilterCallback,
+) {
+  validateTextFile(
+    fileType,
+    { originalname: file.originalname, mimetype: file.mimetype },
+    () => cb(new BadRequestError('Invalid file type')),
+    () => cb(null, true),
+  );
+}
+
+function upload(fileType: keyof typeof fileTypeRegex) {
+  const multerUpload = multer({
+    limits: { fileSize: 10 * 1000 * 1000 },
+    fileFilter: (_req, file, cb) => validateText(fileType, file, cb),
+  });
+
+  return {
+    single: (fieldName: string) => [
+      multerUpload.single(fieldName),
+      validateBinary(fileType),
+    ],
+  };
+}
 
 /** Normalizes header content to prevent issues with special characters. */
 function normalizeHeaderContent(content: string) {
@@ -51,14 +97,14 @@ router.get(
  */
 router.post(
   '/instructions',
-  upload.single('file'),
+  upload('pdf').single('file'),
   ensureAuthenticated(),
   ensureSuperUserAccess(),
   asyncHandler(async (req, res) => {
     const { buffer, originalname, mimetype } = req.file;
     const { name } = await storeAdminInstructions(
       originalname,
-      parseMimeType(mimetype),
+      parsePdfMimeType(mimetype),
       buffer,
     );
 
@@ -67,7 +113,48 @@ router.post(
 );
 
 /**
- * Endpoint for inserting a single file
+ * Endpoint for inserting a single media file
+ */
+router.post(
+  '/media/:filePath?',
+  validateRequest([
+    param('filePath')
+      .optional()
+      .isString()
+      .withMessage('filePath must be a string'),
+  ]),
+  upload('media').single('file'),
+  ensureAuthenticated(),
+  ensureFileGroupAccess(),
+  asyncHandler(async (req, res) => {
+    const { buffer, originalname, mimetype } = req.file;
+    const path = req.params.filePath?.split('/') ?? [];
+
+    // Pick the survey ID from the request - the rest will be the remaining details/metadata
+    const { surveyId, ...details } = req.body;
+    const organizations = res.locals.fileOrganizations;
+    if (surveyId == null && organizations == null) {
+      res
+        .status(400)
+        .json({ message: 'Survey ID and organizations must be provided' });
+      return;
+    }
+
+    const id = await storeFile({
+      buffer,
+      path,
+      name: originalname,
+      mimetype,
+      details,
+      surveyId: surveyId == null ? null : Number(surveyId),
+      organizationId: organizations[0], // For now, use the first organization
+    });
+    res.status(200).json({ id });
+  }),
+);
+
+/**
+ * Endpoint for inserting a single file (of any accepted type)
  */
 router.post(
   '/:filePath?',
@@ -77,7 +164,7 @@ router.post(
       .isString()
       .withMessage('filePath must be a string'),
   ]),
-  upload.single('file'),
+  upload('all').single('file'),
   ensureAuthenticated(),
   ensureFileGroupAccess(),
   asyncHandler(async (req, res) => {

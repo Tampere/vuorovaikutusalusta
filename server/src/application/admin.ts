@@ -1,5 +1,5 @@
-import { AdminFile, MimeType } from '@interfaces/admin';
-import { parseMimeType } from '@src/utils';
+import { AdminFile, PdfMimeType } from '@interfaces/admin';
+import { parsePdfMimeType } from '@src/utils';
 import { getDb } from '@src/database';
 import { InternalServerError, NotFoundError } from '@src/error';
 
@@ -12,7 +12,7 @@ interface DbAdminFile {
 function dbAdminFileToAdminFile(dbFile: DbAdminFile): AdminFile {
   return {
     name: dbFile.name,
-    mimeType: parseMimeType(dbFile.mime_type),
+    mimeType: parsePdfMimeType(dbFile.mime_type),
     data: dbFile.data,
   };
 }
@@ -29,7 +29,7 @@ export async function getAdminInstructions() {
 
 export async function storeAdminInstructions(
   name: string,
-  mimeType: MimeType,
+  mimeType: PdfMimeType,
   data: Buffer,
 ) {
   const row = await getDb().oneOrNone(

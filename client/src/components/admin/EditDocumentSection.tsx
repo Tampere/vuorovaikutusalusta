@@ -19,6 +19,9 @@ export default function EditDocumentSection({
   return (
     <>
       <FileUpload
+        allowedFilesRegex={
+          /^data:(?:image\/(svg|png|jpg|jpeg)|application\/(pdf|vnd\.openxmlformats-officedocument\.spreadsheetml\.sheet|xlsx|vnd\.openxmlformats-officedocument\.wordprocessingml\.document|docx)|video\/(mp4|mkv|webm|avi|wmv|m4p|m4v|mpg|mpeg|mov));base64/
+        }
         disabled={disabled}
         surveyId={activeSurvey.id}
         targetPath={[String(activeSurvey.id)]}
