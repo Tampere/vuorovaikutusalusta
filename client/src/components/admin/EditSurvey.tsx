@@ -108,7 +108,7 @@ export default function EditSurvey() {
         sx={{
           flexGrow: 1,
           p: 3,
-          maxWidth: '45rem',
+          maxWidth: 'min(55em, 60%)',
           margin: '0 auto',
           boxSizing: 'border-box',
         }}

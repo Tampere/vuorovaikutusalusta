@@ -307,12 +307,14 @@
   },
   "AttachmentQuestion": {
     "addedFile": "Added file",
-    "fileUploadError": "Error while uploading file",
-    "fileSizeLimitError": "File size cannot exceed 10MB",
-    "unsupportedFileFormat": "Unsupported file format",
     "attachmentFileFormats": "Supported file formats: jpg, jpeg, png, pdf, docx, xlsx and most video formats.",
     "deleteUploadedFile": "Delete uploaded file",
     "replace": "Replace the selected file by clicking here."
+  },
+  "fileValidator": {
+    "fileUploadError": "Error while uploading the file",
+    "fileSizeLimitError": "The uploaded file size must not exceed 10MB",
+    "unsupportedFileFormat": "The file format is not supported"
   },
   "SurveyImageList": {
     "attributions": "Copyright & attributions",

@@ -308,12 +308,18 @@
   "AttachmentQuestion": {
     "addedFile": "Lisätty tiedosto",
     "fileUploadError": "Virhe ladattaessa tiedostoa",
-    "fileSizeLimitError": "Ladattavan tiedoston koko ei saa olla yli 10MB",
+    "fileSizeLimitError": "Ladattavan tiedoston koko ei saa olla yli 10Mt",
     "unsupportedFileFormat": "Tiedostoformaattia ei tueta",
     "attachmentFileFormats": "Sallitut tiedostoformaatit: jpg, jpeg, png, pdf, docx, xlsx sekä yleisimmät videoformaatit.",
     "deleteUploadedFile": "Poista ladattu tiedosto",
     "replace": "Korvaa valittu liite napsauttamalla."
   },
+  "fileValidator": {
+    "fileUploadError": "Virhe ladattaessa tiedostoa",
+    "fileSizeLimitError": "Ladattavan tiedoston koko ei saa olla yli 10Mt",
+    "unsupportedFileFormat": "Tiedostoformaattia ei tueta"
+  },
+
   "SurveyImageList": {
     "attributions": "Tekijänoikeustiedot",
     "noBackgroundImage": "Ei taustakuvaa",
@@ -643,7 +649,7 @@
     "uploadNewInstructions": "Uuden käyttöohjeen lataaminen",
     "wrongFileFormat": "Tiedoston tulee olla pdf-muodossa",
     "fileUploadError": "Virhe ladattaessa tiedostoa",
-    "fileSizeLimitError": "Ladattavan tiedoston koko ei saa olla yli {x}MB",
+    "fileSizeLimitError": "Ladattavan tiedoston koko ei saa olla yli {x}Mt",
     "submit": "Lähetä",
     "cancel": "Peruuta"
   },

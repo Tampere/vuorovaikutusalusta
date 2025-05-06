@@ -1,5 +1,5 @@
 import { SurveyFollowUpSection, SurveyPageSection } from '@interfaces/survey';
-import { BurstMode, Person } from '@mui/icons-material';
+import { Person } from '@mui/icons-material';
 import { Fab, Grid, Tooltip, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { duplicateFiles } from '@src/controllers/AdminFileController';
@@ -24,6 +24,7 @@ import SliderIcon from '../icons/SliderIcon';
 import TextFieldIcon from '../icons/TextFieldIcon';
 import TextFileIcon from '../icons/TextFileIcon';
 import TextSectionIcon from '../icons/TextSectionIcon';
+import { ImageCheckIcon } from '../icons/ImageCheckIcon';
 
 const useStyles = makeStyles({
   actionItem: {
@@ -250,7 +251,7 @@ export default function AddSurveySectionActions(props: Props) {
       type: 'radio-image',
       label: tr.AddSurveySectionActions.radioImageQuestion,
       ariaLabel: 'add-radio-image-question',
-      icon: <BurstMode />,
+      icon: <ImageCheckIcon />,
     },
     {
       type: 'checkbox',
