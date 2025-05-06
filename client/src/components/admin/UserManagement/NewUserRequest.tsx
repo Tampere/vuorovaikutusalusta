@@ -133,7 +133,7 @@ export function NewUserRequest({
             type="text"
             required
             minLength={3}
-            maxLength={25}
+            maxLength={50}
           />
         </Box>
         <Box
@@ -150,7 +150,7 @@ export function NewUserRequest({
             type="email"
             required
             minLength={3}
-            maxLength={25}
+            maxLength={75}
           />
         </Box>
 
