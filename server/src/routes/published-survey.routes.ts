@@ -37,9 +37,7 @@ router.get(
         `Organization with name ${req.params.organization} not found`,
       );
     }
-    logger.info(
-      `Getting survey ${req.params.name} for organization ${organizationId}: ${req.params.organization}`,
-    );
+
     const survey = await getPublishedSurvey({
       name: req.params.name,
       organizationId: organizationId,

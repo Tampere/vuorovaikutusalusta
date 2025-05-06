@@ -14,7 +14,7 @@ import {
   ensureSuperUserAccess,
 } from '@src/auth';
 import { BadRequestError, InternalServerError } from '@src/error';
-import logger from '@src/logger';
+import { validateBinaryFile, validateTextFile } from '@src/fileValidation';
 
 import { parsePdfMimeType, validateRequest } from '@src/utils';
 import { Router } from 'express';
@@ -31,62 +31,40 @@ const fileTypeRegex = {
   all: /svg|png|jpg|jpeg|pdf|vnd\.openxmlformats-officedocument\.spreadsheetml\.sheet|xlsx|vnd\.openxmlformats-officedocument\.wordprocessingml\.document|docx|mp4|mkv|webm|avi|wmv|m4p|m4v|mpg|mpeg|m4v|mov/,
 };
 
-function validateBinaryFile(fileType: keyof typeof fileTypeRegex) {
+export function validateBinary(fileType: keyof typeof fileTypeRegex) {
   return asyncHandler(async (req, _res, next) => {
     if (!req.file) {
       return next();
     }
-    logger.info(JSON.stringify(req.file));
+
     const { buffer } = req.file;
-
-    try {
-      const { fileTypeFromBuffer } = await import('file-type');
-
-      const uint8 = new Uint8Array(buffer);
-      const type = await fileTypeFromBuffer(uint8);
-      if (!type) {
-        return next();
-      }
-      if (!type || !fileTypeRegex[fileType].test(type.mime)) {
-        throw new BadRequestError('Invalid file type');
-      }
-      return next();
-    } catch (err) {
-      throw new InternalServerError('Error validating file type');
-    }
+    await validateBinaryFile(buffer, fileType, next);
   });
 }
 
-async function validateTextFile(
+function validateText(
   fileType: keyof typeof fileTypeRegex,
   file: Express.Multer.File,
   cb: FileFilterCallback,
 ) {
-  try {
-    const validExtname = fileTypeRegex[fileType].test(
-      path.extname(file.originalname).toLowerCase(),
-    );
-    const validMimetype = fileTypeRegex[fileType].test(file.mimetype);
-    logger.info(`validateTextFile: ${validExtname} ${validMimetype}`);
-    if (validExtname && validMimetype) {
-      return cb(null, true);
-    }
-    return cb(new BadRequestError('Invalid file type'));
-  } catch (err) {
-    return cb(new InternalServerError('Error validating file type'));
-  }
+  validateTextFile(
+    fileType,
+    { originalname: file.originalname, mimetype: file.mimetype },
+    () => cb(new BadRequestError('Invalid file type')),
+    () => cb(null, true),
+  );
 }
 
 function upload(fileType: keyof typeof fileTypeRegex) {
   const multerUpload = multer({
     limits: { fileSize: 10 * 1000 * 1000 },
-    fileFilter: (_req, file, cb) => validateTextFile(fileType, file, cb),
+    fileFilter: (_req, file, cb) => validateText(fileType, file, cb),
   });
-  logger.info(`upload: ${fileType}`);
+
   return {
     single: (fieldName: string) => [
       multerUpload.single(fieldName),
-      validateBinaryFile(fileType),
+      validateBinary(fileType),
     ],
   };
 }
@@ -149,7 +127,6 @@ router.post(
   ensureAuthenticated(),
   ensureFileGroupAccess(),
   asyncHandler(async (req, res) => {
-    logger.info(`req.file: ${JSON.stringify(req.file)}`);
     const { buffer, originalname, mimetype } = req.file;
     const path = req.params.filePath?.split('/') ?? [];
 

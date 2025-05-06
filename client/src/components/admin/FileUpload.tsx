@@ -87,7 +87,6 @@ export default function FileUpload({
           },
         );
         const resJson = await res.json();
-        console.log(resJson);
         // Upload complete - notify via callback
         onUpload({
           url:
