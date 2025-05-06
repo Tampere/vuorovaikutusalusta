@@ -2,10 +2,10 @@
   "devDependencies": {
     "husky": "^8.0.3",
     "lint-staged": "^14.0.1",
-    "prettier": "^3.5.1"
+    "prettier": "^3.5.3"
   },
   "scripts": {
     "prepare": "husky install"
   },
-  "packageManager": "pnpm@9.15.5"
+  "packageManager": "pnpm@9.15.9"
 }
