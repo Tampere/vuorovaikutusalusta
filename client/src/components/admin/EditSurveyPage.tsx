@@ -361,6 +361,7 @@ export default function EditSurveyPage(props: Props) {
       {page.sidebar.type === 'image' && (
         <div>
           <FileUpload
+            forMedia
             surveyId={activeSurvey.id}
             targetPath={[String(activeSurvey.id)]}
             surveyOrganizationId={activeSurvey.organization.id}

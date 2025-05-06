@@ -201,6 +201,12 @@ async function validateEntries(answerEntries: AnswerEntry[]) {
   ]);
 }
 
+async function validateAttachmentEntries(answerEntries: AnswerEntry[]) {
+  const attachmentEntries = answerEntries.filter(
+    (entry) => entry.type === 'attachment',
+  );
+}
+
 /** Encrypt and save personal info question answers to database */
 async function savePersonalInfo(personalInfo: DBPersonalInfo) {
   await getDb().any(

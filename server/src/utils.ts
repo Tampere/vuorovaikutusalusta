@@ -1,4 +1,4 @@
-import { MimeType } from '@interfaces/admin';
+import { PdfMimeType } from '@interfaces/admin';
 import { ImageType } from '@interfaces/survey';
 import { NextFunction, Request, Response } from 'express';
 import { ValidationChain, validationResult } from 'express-validator';
@@ -56,15 +56,27 @@ export function parseImageType(val: unknown): ImageType | null {
   return val;
 }
 
-function isMimeType(val: string): val is MimeType {
+function isPdfMimeType(val: string): val is PdfMimeType {
   return val === 'application/pdf';
 }
 
-export function parseMimeType(val: unknown): MimeType {
-  if (!isString(val) || !isMimeType(val)) {
+export function parsePdfMimeType(val: unknown): PdfMimeType {
+  if (!isString(val) || !isPdfMimeType(val)) {
     throw new Error('Invalid value for mimeType');
   }
   return val;
+}
+
+export function checkFileNameValidity(
+  filename: string,
+  fileType: 'image' | 'pdf',
+) {
+  switch (fileType) {
+    case 'pdf':
+      return filename.endsWith('.pdf');
+    case 'image':
+      return false;
+  }
 }
 
 export function assertNever(value: never): never {

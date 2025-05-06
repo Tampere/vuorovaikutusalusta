@@ -307,17 +307,14 @@
   },
   "AttachmentQuestion": {
     "addedFile": "Lisätty tiedosto",
-    "fileUploadError": "Virhe ladattaessa tiedostoa",
-    "fileSizeLimitError": "Ladattavan tiedoston koko ei saa olla yli 10Mt",
-    "unsupportedFileFormat": "Tiedostoformaattia ei tueta",
     "attachmentFileFormats": "Sallitut tiedostoformaatit: jpg, jpeg, png, pdf, docx, xlsx sekä yleisimmät videoformaatit.",
     "deleteUploadedFile": "Poista ladattu tiedosto",
     "replace": "Korvaa valittu liite napsauttamalla."
   },
   "fileValidator": {
     "fileUploadError": "Virhe ladattaessa tiedostoa",
-    "fileSizeLimitError": "Ladattavan tiedoston koko ei saa olla yli 10Mt",
-    "unsupportedFileFormat": "Tiedostoformaattia ei tueta"
+    "fileSizeLimitError": "Ladattavan tiedoston koko ei saa olla yli 10Mt.",
+    "unsupportedFileFormat": "Tiedostoformaattia ei tueta."
   },
 
   "SurveyImageList": {
@@ -644,12 +641,12 @@
     "versionInfo": "Tietoja Kartalla-palvelusta"
   },
   "InstructionsDialog": {
-    "fetchingError": "Virhe haettaessa nykyisiä käyttöohjeita",
+    "fetchingError": "Virhe haettaessa nykyisiä käyttöohjeita.",
     "currentInstructions": "Nykyiset käyttöohjeet",
     "uploadNewInstructions": "Uuden käyttöohjeen lataaminen",
-    "wrongFileFormat": "Tiedoston tulee olla pdf-muodossa",
-    "fileUploadError": "Virhe ladattaessa tiedostoa",
-    "fileSizeLimitError": "Ladattavan tiedoston koko ei saa olla yli {x}Mt",
+    "wrongFileFormat": "Tiedoston tulee olla pdf-muodossa.",
+    "fileUploadError": "Virhe ladattaessa tiedostoa.",
+    "fileSizeLimitError": "Ladattavan tiedoston koko ei saa olla yli {x}Mt.",
     "submit": "Lähetä",
     "cancel": "Peruuta"
   },

@@ -306,15 +306,15 @@
     "minMaxValue": "The value has to be between {minValue} and {maxValue}"
   },
   "AttachmentQuestion": {
-    "addedFile": "Added file",
+    "addedFile": "Added file.",
     "attachmentFileFormats": "Supported file formats: jpg, jpeg, png, pdf, docx, xlsx and most video formats.",
     "deleteUploadedFile": "Delete uploaded file",
     "replace": "Replace the selected file by clicking here."
   },
   "fileValidator": {
-    "fileUploadError": "Error while uploading the file",
-    "fileSizeLimitError": "The uploaded file size must not exceed 10MB",
-    "unsupportedFileFormat": "The file format is not supported"
+    "fileUploadError": "Error while uploading the file.",
+    "fileSizeLimitError": "The uploaded file size must not exceed 10MB.",
+    "unsupportedFileFormat": "The file format is not supported."
   },
   "SurveyImageList": {
     "attributions": "Copyright & attributions",
@@ -640,12 +640,12 @@
     "versionInfo": "Information about the Kartalla service"
   },
   "InstructionsDialog": {
-    "fetchingError": "Error while fetching current user instructions",
+    "fetchingError": "Error while fetching current user instructions.",
     "currentInstructions": "Current instructions",
     "uploadNewInstructions": "Upload new instructions",
-    "wrongFileFormat": "The file needs to be in pdf format",
-    "fileUploadError": "Error while uploading file",
-    "fileSizeLimitError": "File size cannot exceed {x}MB",
+    "wrongFileFormat": "The file needs to be in pdf format.",
+    "fileUploadError": "Error while uploading file.",
+    "fileSizeLimitError": "File size cannot exceed {x}MB.",
     "submit": "Send",
     "cancel": "Cancel"
   },

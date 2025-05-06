@@ -22,6 +22,10 @@ export default function EditImageSection({
   return (
     <>
       <FileUpload
+        allowedFilesRegex={
+          /^data:(?:image|video)\/(svg|png|jpg|jpeg|mp4|mkv|webm|avi|wmv|m4p|m4v|mpg|mpeg|mov);base64/
+        }
+        forMedia
         disabled={disabled}
         surveyId={activeSurvey.id}
         targetPath={[String(activeSurvey.id)]}

@@ -10,6 +10,7 @@ import { FileWithPath } from 'react-dropzone/.';
 import { useFileValidator } from '@src/utils/fileValidator';
 
 interface Props {
+  forMedia?: boolean;
   targetPath?: string[];
   surveyId?: number;
   value: {
@@ -23,6 +24,7 @@ interface Props {
 }
 
 export default function FileUpload({
+  forMedia,
   disabled,
   onUpload,
   targetPath,
@@ -76,13 +78,16 @@ export default function FileUpload({
       }
       try {
         const res = await fetch(
-          `/api/file${targetPath ? `/${targetPath}` : ''}`,
+          `/api/file${forMedia ? '/media' : ''}${
+            targetPath ? `/${targetPath}` : ''
+          }`,
           {
             method: 'POST',
             body: formData,
           },
         );
         const resJson = await res.json();
+        console.log(resJson);
         // Upload complete - notify via callback
         onUpload({
           url:
@@ -90,6 +95,7 @@ export default function FileUpload({
             getFullFilePath(surveyOrganizationId, targetPath, file.name),
         });
       } catch (error) {
+        console.log(error);
         showToast({
           severity: 'error',
           message: tr.FileUpload.errorUploadingFile,

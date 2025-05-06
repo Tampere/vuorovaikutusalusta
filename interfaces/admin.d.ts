@@ -1,7 +1,7 @@
-type MimeType = 'application/pdf';
+type PdfMimeType = 'application/pdf';
 
 export interface AdminFile {
   name: string;
-  mimeType: MimeType;
+  mimeType: PdfMimeType;
   data: Buffer;
 }
