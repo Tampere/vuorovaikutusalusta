@@ -1,5 +1,6 @@
 import {
   LanguageCode,
+  SectionImageOption,
   SectionOption,
   SurveyMapSubQuestion,
   SurveyPageSection,
@@ -66,6 +67,39 @@ export default function EditSurveySectionTranslations({
               onEdit({ ...section, options: updatedOptions });
             }}
           />
+        ))}
+      {section.type === 'radio-image' &&
+        section.options?.map((option: SectionImageOption, optionIndex) => (
+          <div key={`image-option-field-${optionIndex}`}>
+            <TranslationField
+              value={option.text[languageCode] ?? ''}
+              onChange={(event) => {
+                const updatedOptions = [...section.options];
+                updatedOptions[optionIndex] = {
+                  ...updatedOptions[optionIndex],
+                  text: {
+                    ...option.text,
+                    [languageCode]: event.target.value,
+                  },
+                };
+                onEdit({ ...section, options: updatedOptions });
+              }}
+            />
+            <TranslationField
+              value={option.altText[languageCode] ?? ''}
+              onChange={(event) => {
+                const updatedOptions = [...section.options];
+                updatedOptions[optionIndex] = {
+                  ...updatedOptions[optionIndex],
+                  altText: {
+                    ...option.altText,
+                    [languageCode]: event.target.value,
+                  },
+                };
+                onEdit({ ...section, options: updatedOptions });
+              }}
+            />
+          </div>
         ))}
       {section.type === 'grouped-checkbox' && (
         <div>
