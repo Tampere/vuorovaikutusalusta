@@ -16,6 +16,7 @@ interface Props {
   open: boolean;
   onCancel: () => void;
   onSubmit: (info: SubmissionInfo) => void;
+  emailRequired: boolean;
 }
 
 const useStyles = makeStyles({
@@ -28,11 +29,13 @@ export default function SubmissionInfoDialog({
   open,
   onCancel,
   onSubmit,
+  emailRequired,
 }: Props) {
   const { tr } = useTranslations();
   const classes = useStyles();
   const [email, setEmail] = useState<string>(null);
   const [emailDirty, setEmailDirty] = useState(false);
+  const [emailValid, setEmailValid] = useState(!emailRequired);
 
   return (
     <Dialog
@@ -44,16 +47,32 @@ export default function SubmissionInfoDialog({
       <DialogTitle>{tr.SubmissionInfoDialog.title}</DialogTitle>
       <DialogContent>
         <Typography variant="body1" className={classes.paragraph}>
-          {tr.SubmissionInfoDialog.text}
+          {emailRequired
+            ? tr.SubmissionInfoDialog.textRequired
+            : tr.SubmissionInfoDialog.text}
         </Typography>
         <TextField
-          aria-label={tr.SubmissionInfoDialog.email}
-          label={tr.SubmissionInfoDialog.email}
-          error={emailDirty && !email?.length}
+          aria-label={
+            emailRequired
+              ? tr.SubmissionInfoDialog.emailRequired
+              : tr.SubmissionInfoDialog.email
+          }
+          label={
+            emailRequired
+              ? tr.SubmissionInfoDialog.emailRequired
+              : tr.SubmissionInfoDialog.email
+          }
+          error={(emailDirty && !email?.length) || !emailValid}
           value={email ?? ''}
-          inputProps={{ type: 'email' }}
+          inputProps={{
+            type: 'email',
+            pattern: '[a-zA-Z0-9\\+._%\\-]+@[a-zA-Z0-9.\\-]+\\.[a-zA-Z]{2,}',
+          }}
           style={{ width: '25rem', maxWidth: '100%' }}
           onChange={(event) => {
+            setEmailValid(
+              event.target.value.length > 0 && event.target.validity.valid,
+            );
             setEmail(event.target.value.length > 0 ? event.target.value : null);
           }}
           onBlur={() => {
@@ -64,6 +83,7 @@ export default function SubmissionInfoDialog({
       <DialogActions>
         <Button onClick={onCancel}>{tr.commands.cancel}</Button>
         <Button
+          disabled={!emailValid}
           variant="contained"
           onClick={() => {
             onSubmit({ email });

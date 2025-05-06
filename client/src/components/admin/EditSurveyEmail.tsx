@@ -108,6 +108,30 @@ export default function EditSurveyEmail() {
                   {tr.EditSurveyEmail.includePersonalInfoHelperText}
                 </FormHelperText>
               </div>
+              <div>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      name="email-required"
+                      disabled={activeSurveyLoading}
+                      checked={activeSurvey.email.required}
+                      onChange={(event) => {
+                        editSurvey({
+                          ...activeSurvey,
+                          email: {
+                            ...activeSurvey.email,
+                            required: event.target.checked,
+                          },
+                        });
+                      }}
+                    />
+                  }
+                  label={tr.EditSurveyEmail.required}
+                />
+                <FormHelperText>
+                  {tr.EditSurveyEmail.requiredHelperText}
+                </FormHelperText>
+              </div>
             </Box>
             <Autocomplete
               multiple

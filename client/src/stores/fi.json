@@ -111,7 +111,9 @@
     "infoHelperText": "Lisätiedot esitetään sähköpostitse lähetettävän vastausraportin etusivulla.",
     "includePersonalInfo": "Sisällytä vastaajan henkilötiedot",
     "includePersonalInfoHelperText": "Mahdollisen henkilötietokysymyksen vastaukset sisällytetään pdf-raportin etusivulle.",
-    "includeMarginImages": "Sisällytä etusivun ylä- ja alamarginaalin kuvat"
+    "includeMarginImages": "Sisällytä etusivun ylä- ja alamarginaalin kuvat",
+    "required": "Vastaajan sähköpostiosoite pakollinen",
+    "requiredHelperText": "Vastaajan on annettava sähköpostiosoitteensa vastatakseen kyselyyn."
   },
   "KeyValueForm": {
     "key": "Nimi",
@@ -612,7 +614,9 @@
   "SubmissionInfoDialog": {
     "title": "Lähetä vastaus",
     "text": "Jos haluat saada kopion vastauksestasi, anna sähköpostiosoitteesi oheiseen kenttään.",
-    "email": "Sähköposti (valinnainen)"
+    "email": "Sähköposti (valinnainen)",
+    "textRequired": "Syötä sähköpostiosoitteesi vastataksesi kyselyyn ja saadaksesi kopion vastauksestasi.",
+    "emailRequired": "Sähköposti"
   },
   "AnswersList": {
     "answers": "Vastaukset",

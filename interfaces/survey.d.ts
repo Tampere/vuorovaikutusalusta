@@ -512,6 +512,10 @@ export interface Survey {
      * Should upper and lower margin images be included in the report front page
      */
     includeMarginImages: boolean;
+    /**
+     * Does the survey respondent need to provide an email address in order to submit answers?
+     */
+    required: boolean;
   };
   /**
    * Should the survey be able to be saved as unfinished

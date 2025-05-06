@@ -883,6 +883,7 @@ export default function SurveyStepper({
         </>
       )}
       <SubmissionInfoDialog
+        emailRequired={survey.email.required}
         open={submissionInfoDialogOpen}
         onCancel={() => {
           setSubmissionInfoDialogOpen(false);
