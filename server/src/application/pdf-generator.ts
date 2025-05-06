@@ -616,6 +616,26 @@ export async function generatePdf(
 
   const document = new PdfPrinter(fonts).createPdfKitDocument({
     content,
+    footer: (currentPage, pageCount) => {
+      if (currentPage === 1) return '';
+      return {
+        margin: [40, 0, 40, 0],
+        columns: [
+          {
+            alignment: 'left',
+            text: `${survey.title?.[language]}: ${submission.id}`,
+            color: '#5e5e5e',
+            fontSize: 10,
+          },
+          {
+            alignment: 'right',
+            text: `${currentPage - 1}/${pageCount - 1}`,
+            color: '#5e5e5e',
+            fontSize: 10,
+          },
+        ],
+      };
+    },
     defaultStyle: {
       font: 'Helvetica',
     },

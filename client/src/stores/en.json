@@ -111,7 +111,9 @@
     "infoHelperText": "Additional information will be displayed on the front page of the answer report.",
     "includePersonalInfo": "Include respondent's personal information",
     "includePersonalInfoHelperText": "Responses to the personal information question, if any, will be included on the front page of the PDF report.",
-    "includeMarginImages": "Include top and bottom margin images"
+    "includeMarginImages": "Include top and bottom margin images",
+    "required": "Vastaajan sähköpostiosoite pakollinen",
+    "requiredHelperText": "Vastaajan on annettava sähköpostiosoitteensa vastatakseen kyselyyn."
   },
   "KeyValueForm": {
     "key": "Key",
@@ -611,7 +613,9 @@
   "SubmissionInfoDialog": {
     "title": "Submit answers",
     "text": "If you want a copy of your answers, please write your email address in the provided field.",
-    "email": "Email address (optional)"
+    "email": "Email address (optional)",
+    "textRequired": "Enter your email address to respond to the survey and receive a copy of your response.",
+    "emailRequired": "Email"
   },
   "AnswersList": {
     "answers": "Answers",

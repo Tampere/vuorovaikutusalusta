@@ -92,6 +92,7 @@ interface DBSurvey {
   email_info: SurveyEmailInfoItem[];
   email_include_personal_info: boolean;
   email_include_margin_images: boolean;
+  email_required: boolean;
   allow_saving_unfinished: boolean;
   localisation_enabled: boolean;
   submission_count?: number;
@@ -355,6 +356,7 @@ export async function getPublishedSurvey(
           survey.top_margin_image_url,
           survey.bottom_margin_image_url,
           survey.email_enabled,
+          survey.email_required,
           survey.allow_saving_unfinished,
           survey.allow_test_survey,
           survey.localisation_enabled,
@@ -1399,16 +1401,17 @@ export async function updateSurvey(survey: Survey) {
         email_subject = $21,
         email_body = $22,
         email_info = $23::json,
-        allow_saving_unfinished = $24,
-        localisation_enabled = $25,
-        display_privacy_statement = $26,
-        top_margin_image_url = $27,
-        bottom_margin_image_url = $28,
-        organization = $29,
-        tags = $30,
-        languages = $31,
-        email_include_personal_info = $32,
-        email_include_margin_images = $33
+        email_required = $24,
+        allow_saving_unfinished = $25,
+        localisation_enabled = $26,
+        display_privacy_statement = $27,
+        top_margin_image_url = $28,
+        bottom_margin_image_url = $29,
+        organization = $30,
+        tags = $31,
+        languages = $32,
+        email_include_personal_info = $33,
+        email_include_margin_images = $34
       WHERE id = $1 RETURNING *`,
       [
         survey.id,
@@ -1434,6 +1437,7 @@ export async function updateSurvey(survey: Survey) {
         survey.email.subject,
         survey.email.body,
         JSON.stringify(survey.email.info),
+        survey.email.required,
         survey.allowSavingUnfinished,
         survey.localisationEnabled,
         survey.displayPrivacyStatement,
@@ -1751,6 +1755,7 @@ function dbSurveyToSurvey(dbSurvey: DBSurvey | DBSurveyJoin): APISurvey {
       info: dbSurvey.email_info,
       includePersonalInfo: dbSurvey.email_include_personal_info,
       includeMarginImages: dbSurvey.email_include_margin_images,
+      required: dbSurvey.email_required,
     },
     allowSavingUnfinished: dbSurvey.allow_saving_unfinished,
     localisationEnabled: dbSurvey.localisation_enabled,

@@ -374,6 +374,8 @@ router.post(
 
     const newSurvey = {
       ...createdSurvey,
+      localisationEnabled: copiedSurveyData.localisationEnabled,
+      enabledLanguages: copiedSurveyData.enabledLanguages,
       mapUrl: surveyWithDuplicatedFiles.mapUrl,
       pages: newPages,
       thanksPage: surveyWithDuplicatedFiles.thanksPage,
