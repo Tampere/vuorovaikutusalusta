@@ -1,5 +1,6 @@
 import {
   Autocomplete,
+  Box,
   Checkbox,
   FormControlLabel,
   FormHelperText,
@@ -63,7 +64,7 @@ export default function EditSurveyEmail() {
         </div>
         {activeSurvey.email.enabled && (
           <>
-            <div>
+            <Box display={'flex'} flexDirection="column" gap={'1rem'}>
               <FormControlLabel
                 control={
                   <Checkbox
@@ -83,30 +84,31 @@ export default function EditSurveyEmail() {
                 }
                 label={tr.EditSurveyEmail.includeMarginImages}
               />
-
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    name="personal-info-enabled"
-                    disabled={activeSurveyLoading}
-                    checked={activeSurvey.email.includePersonalInfo}
-                    onChange={(event) => {
-                      editSurvey({
-                        ...activeSurvey,
-                        email: {
-                          ...activeSurvey.email,
-                          includePersonalInfo: event.target.checked,
-                        },
-                      });
-                    }}
-                  />
-                }
-                label={tr.EditSurveyEmail.includePersonalInfo}
-              />
-              <FormHelperText>
-                {tr.EditSurveyEmail.includePersonalInfoHelperText}
-              </FormHelperText>
-            </div>
+              <div>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      name="personal-info-enabled"
+                      disabled={activeSurveyLoading}
+                      checked={activeSurvey.email.includePersonalInfo}
+                      onChange={(event) => {
+                        editSurvey({
+                          ...activeSurvey,
+                          email: {
+                            ...activeSurvey.email,
+                            includePersonalInfo: event.target.checked,
+                          },
+                        });
+                      }}
+                    />
+                  }
+                  label={tr.EditSurveyEmail.includePersonalInfo}
+                />
+                <FormHelperText>
+                  {tr.EditSurveyEmail.includePersonalInfoHelperText}
+                </FormHelperText>
+              </div>
+            </Box>
             <Autocomplete
               multiple
               freeSolo
