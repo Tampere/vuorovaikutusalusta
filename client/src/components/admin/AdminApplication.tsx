@@ -23,7 +23,6 @@ import { ApiInstructions } from './Instructions/ApiDescription';
 import { UserManagement } from './UserManagement';
 import { ProtectedRoute } from './ProtectedRoute';
 import { GeneralNotifications } from './GeneralNotification';
-import { LogoutPage } from './LogoutPage';
 
 export default function AdminApplication() {
   return (
