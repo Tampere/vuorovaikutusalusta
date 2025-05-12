@@ -27,7 +27,7 @@ import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { useUser } from '@src/stores/UserContext';
 
-import { format } from 'date-fns';
+import { format, set } from 'date-fns';
 import React, { useMemo, useState } from 'react';
 import { NavLink, useRouteMatch } from 'react-router-dom';
 import ConfirmDialog from '../ConfirmDialog';
@@ -36,6 +36,7 @@ import LoadingButton from '../LoadingButton';
 import { theme } from '@src/themes/admin';
 import { request } from '@src/utils/request';
 import { CredentialsEntry } from '@interfaces/submission';
+import { LoadingBackdrop } from './LoadingBackdrop';
 
 const fadeTimeout = 350;
 
@@ -79,6 +80,7 @@ export default function SurveyListItem(props: Props) {
   const [archiveConfirmDialogOpen, setArchiveConfirmDialogOpen] =
     useState(false);
   const [loading, setLoading] = useState(false);
+  const [copying, setCopying] = useState(false);
 
   const { tr, surveyLanguage } = useTranslations();
   const { showToast } = useToasts();
@@ -289,17 +291,20 @@ export default function SurveyListItem(props: Props) {
               {tr.SurveyList.unpublish}
             </Button>
           )}
-          <LoadingButton
+          <Button
             disabled={disableUsersViewAccessToSurvey}
             onClick={async () => {
+              setCopying(true);
               const newSurveyId = await creteSurveyFromPrevious(survey.id);
               if (!newSurveyId) return;
+              setCopying(false);
               window.open(`/admin/kyselyt/${newSurveyId}`);
             }}
           >
             {' '}
             {tr.SurveyList.copySurvey}{' '}
-          </LoadingButton>
+          </Button>
+          <LoadingBackdrop open={copying} />
           {(activeUserIsSuperUser ||
             activeUserIsAdmin ||
             survey.editors.includes(activeUser?.id) ||
