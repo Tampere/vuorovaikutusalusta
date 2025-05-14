@@ -161,7 +161,7 @@ export default function SurveyLandingPage({
         {topImageHeaderQuery.imageHeaders && (
           <img
             style={{
-              maxWidth: '60%',
+              maxWidth: '20%',
               maxHeight: '70%',
               padding: '16px',
             }}

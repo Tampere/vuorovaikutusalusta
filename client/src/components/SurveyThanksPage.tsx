@@ -86,8 +86,8 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
         {topImageHeaderQuery.imageHeaders && (
           <img
             style={{
-              maxWidth: '60%',
-              maxHeight: '70%',
+              maxWidth: '20%',
+              maxHeight: '20%',
               padding: '16px',
             }}
             src={topImagePath}
