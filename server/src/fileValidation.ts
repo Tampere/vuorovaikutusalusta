@@ -1,6 +1,5 @@
 import path from 'path';
-import { BadRequestError, InternalServerError } from './error';
-import logger from './logger';
+import { BadRequestError } from './error';
 
 const fileTypeRegex = {
   pdf: /pdf/,
