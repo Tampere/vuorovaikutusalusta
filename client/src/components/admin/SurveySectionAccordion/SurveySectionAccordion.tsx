@@ -28,7 +28,7 @@ import MatrixIcon from '@src/components/icons/MatrixIcon';
 import LikertGroupIcon from '@src/components/icons/LikertGroupIcon';
 import MultiCheckmarkIcon from '@src/components/icons/MultiCheckmarkIcon';
 import ImageSmallIcon from '@src/components/icons/ImageSmallIcon';
-import TextFileIcon from '@src/components/icons/TextFileIcon';
+import DownloadFileIcon from '@src/components/icons/DownloadFileIcon';
 import PaperclipIcon from '@src/components/icons/PaperclipIcon';
 import SliderIcon from '@src/components/icons/SliderIcon';
 import TextSectionIcon from '@src/components/icons/TextSectionIcon';
@@ -294,7 +294,7 @@ export default function SurveySectionAccordion(props: Props) {
       ),
     },
     document: {
-      icon: <TextFileIcon />,
+      icon: <DownloadFileIcon />,
       tooltip: tr.SurveySection.documentSection,
       form: (
         <EditDocumentSection

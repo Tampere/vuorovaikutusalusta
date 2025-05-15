@@ -1,5 +1,4 @@
 import { SurveyFollowUpSection, SurveyPageSection } from '@interfaces/survey';
-import { Person } from '@mui/icons-material';
 import { Fab, Grid, Tooltip, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { duplicateFiles } from '@src/controllers/AdminFileController';
@@ -22,9 +21,10 @@ import PaperclipIcon from '../icons/PaperclipIcon';
 import RadioButtonCheckedIcon from '../icons/RadioButtonCheckedIcon';
 import SliderIcon from '../icons/SliderIcon';
 import TextFieldIcon from '../icons/TextFieldIcon';
-import TextFileIcon from '../icons/TextFileIcon';
+import DownloadFileIcon from '../icons/DownloadFileIcon';
 import TextSectionIcon from '../icons/TextSectionIcon';
 import { ImageCheckIcon } from '../icons/ImageCheckIcon';
+import PersonIcon from '../icons/PersonIcon';
 
 const useStyles = makeStyles({
   actionItem: {
@@ -239,7 +239,7 @@ export default function AddSurveySectionActions(props: Props) {
       type: 'personal-info',
       label: tr.AddSurveySectionActions.personalInfoQuestion,
       ariaLabel: 'add-personal-info-section',
-      icon: <Person />,
+      icon: <PersonIcon />,
     },
     {
       type: 'radio',
@@ -337,7 +337,7 @@ export default function AddSurveySectionActions(props: Props) {
       type: 'document',
       label: tr.AddSurveySectionActions.documentSection,
       ariaLabel: 'add-document-section',
-      icon: <TextFileIcon />,
+      icon: <DownloadFileIcon />,
     },
   ];
 
