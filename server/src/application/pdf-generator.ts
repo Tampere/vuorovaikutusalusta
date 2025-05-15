@@ -8,6 +8,7 @@ import {
   SurveyFollowUpSection,
   SurveyMapQuestion,
   SurveyMatrixQuestion,
+  SurveyPage,
   SurveyPageSection,
   SurveyPersonalInfoQuestion,
 } from '@interfaces/survey';
@@ -613,7 +614,9 @@ export async function generatePdf(
       ) ?? []),
     ]),
   ];
-
+  const personalInfo = answerEntries.find(
+    (entry) => entry.type === 'personal-info',
+  );
   const document = new PdfPrinter(fonts).createPdfKitDocument({
     content,
     footer: (currentPage, pageCount) => {
@@ -623,7 +626,7 @@ export async function generatePdf(
         columns: [
           {
             alignment: 'left',
-            text: `${survey.title?.[language]}: ${submission.id}`,
+            text: `${survey.title?.[language]}: ${(personalInfo?.value as PersonalInfoAnswer)?.name ?? submission.id}`,
             color: '#5e5e5e',
             fontSize: 10,
           },
