@@ -150,7 +150,7 @@ export class SurveyEditPage {
     await this._page.getByRole('link', { name: 'Kiitos-sivu' }).click();
     await this._page.getByLabel('Kiitos-sivun otsikko').fill(params.title);
     await this._page
-      .getByLabel('rdw-editor')
+      .getByLabel('Kiitos-sivun teksti')
       .locator('div')
       .nth(2)
       .fill(params.text);
@@ -204,7 +204,7 @@ export class SurveyEditPage {
     if (personalInfoQuestionParams.additionalInfo) {
       await questionLocator.getByLabel('Anna lisätietoja kysymykseen').check();
       await questionLocator
-        .getByLabel('rdw-editor')
+        .getByLabel('Teksti')
         .locator('div')
         .nth(2)
         .fill(personalInfoQuestionParams.additionalInfo);
@@ -240,7 +240,7 @@ export class SurveyEditPage {
     if (radioQuestionParams.additionalInfo) {
       await questionLocator.getByLabel('Anna lisätietoja kysymykseen').check();
       await questionLocator
-        .getByLabel('rdw-editor')
+        .getByLabel('Teksti')
         .locator('div')
         .nth(2)
         .fill(radioQuestionParams.additionalInfo);
@@ -289,7 +289,7 @@ export class SurveyEditPage {
     if (checkBoxQuestionParams.additionalInfo) {
       await questionLocator.getByLabel('Anna lisätietoja kysymykseen').check();
       await questionLocator
-        .getByLabel('rdw-editor')
+        .getByLabel('Teksti')
         .locator('div')
         .nth(2)
         .fill(checkBoxQuestionParams.additionalInfo);
@@ -317,7 +317,7 @@ export class SurveyEditPage {
     if (freeTextQuestionParams.additionalInfo) {
       await questionLocator.getByLabel('Anna lisätietoja kysymykseen').check();
       await questionLocator
-        .getByLabel('rdw-editor')
+        .getByLabel('Teksti')
         .locator('div')
         .nth(2)
         .fill(freeTextQuestionParams.additionalInfo);
@@ -351,7 +351,7 @@ export class SurveyEditPage {
     if (numericQuestionParams.additionalInfo) {
       await questionLocator.getByLabel('Anna lisätietoja kysymykseen').check();
       await questionLocator
-        .getByLabel('rdw-editor')
+        .getByLabel('Teksti')
         .locator('div')
         .nth(2)
         .fill(numericQuestionParams.additionalInfo);
@@ -381,7 +381,7 @@ export class SurveyEditPage {
     if (mapQuestionParams.additionalInfo) {
       await questionLocator.getByLabel('Anna lisätietoja kysymykseen').check();
       await questionLocator
-        .getByLabel('rdw-editor')
+        .getByLabel('Teksti')
         .locator('div')
         .nth(2)
         .fill(mapQuestionParams.additionalInfo);
@@ -413,7 +413,7 @@ export class SurveyEditPage {
     if (sortingQuestionParams.additionalInfo) {
       await questionLocator.getByLabel('Anna lisätietoja kysymykseen').check();
       await questionLocator
-        .getByLabel('rdw-editor')
+        .getByLabel('Teksti')
         .locator('div')
         .nth(2)
         .fill(sortingQuestionParams.additionalInfo);
@@ -449,7 +449,7 @@ export class SurveyEditPage {
     if (sliderQuestionParams.additionalInfo) {
       await questionLocator.getByLabel('Anna lisätietoja kysymykseen').check();
       await questionLocator
-        .getByLabel('rdw-editor')
+        .getByLabel('Teksti')
         .locator('div')
         .nth(2)
         .fill(sliderQuestionParams.additionalInfo);
@@ -504,7 +504,7 @@ export class SurveyEditPage {
     if (multiMatrixQuestionParams.additionalInfo) {
       await questionLocator.getByLabel('Anna lisätietoja kysymykseen').check();
       await questionLocator
-        .getByLabel('rdw-editor')
+        .getByLabel('Teksti')
         .locator('div')
         .nth(2)
         .fill(multiMatrixQuestionParams.additionalInfo);
@@ -543,7 +543,7 @@ export class SurveyEditPage {
     if (matrixQuestionParams.additionalInfo) {
       await questionLocator.getByLabel('Anna lisätietoja kysymykseen').check();
       await questionLocator
-        .getByLabel('rdw-editor')
+        .getByLabel('Teksti')
         .locator('div')
         .nth(2)
         .fill(matrixQuestionParams.additionalInfo);
@@ -587,7 +587,7 @@ export class SurveyEditPage {
     if (groupedCheckboxQuestionParams.additionalInfo) {
       await questionLocator.getByLabel('Anna lisätietoja kysymykseen').check();
       await questionLocator
-        .getByLabel('rdw-editor')
+        .getByLabel('Teksti')
         .locator('div')
         .nth(2)
         .fill(groupedCheckboxQuestionParams.additionalInfo);

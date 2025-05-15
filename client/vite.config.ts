@@ -29,6 +29,7 @@ export default defineConfig({
     APP_VERSION: JSON.stringify(appVersion),
   },
   optimizeDeps: {
+    include: ['draft-convert'],
     esbuildOptions: {
       define: {
         global: 'globalThis',

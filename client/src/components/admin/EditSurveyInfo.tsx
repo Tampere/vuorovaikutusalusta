@@ -37,6 +37,8 @@ import { SurveyMarginImageList } from './SurveyImageListWrapper';
 import ThemeSelect from './ThemeSelect';
 import { getUserGroups } from '@src/controllers/UserGroupController';
 import { UserGroup } from '@interfaces/userGroup';
+import RichTextEditor from '../RichTextEditor';
+import { Label } from '@mui/icons-material';
 
 const useStyles = makeStyles({
   dateTimePicker: {
@@ -144,15 +146,38 @@ export default function EditSurveyInfo(props: Props) {
         <TextField
           label={tr.EditSurveyInfo.subtitle}
           value={activeSurvey.subtitle?.[surveyLanguage] ?? ''}
-          onChange={(event) => {
+          onChange={(event) =>
             editSurvey({
               ...activeSurvey,
               subtitle: {
                 ...activeSurvey.subtitle,
                 [surveyLanguage]: event.target.value,
               },
-            });
+            })
+          }
+        />
+
+        <RichTextEditor
+          toolbarOptions={{
+            options: ['inline', 'fontSize'],
+            fontSize: {
+              options: [8, 9, 10, 11, 12, 14, 16, 18, 24, 30, 36, 48, 60],
+            },
+            inline: {
+              options: ['bold', 'italic'],
+            },
           }}
+          label={tr.EditSurveyInfo.description}
+          value={activeSurvey.description?.[surveyLanguage] ?? ''}
+          onChange={(value) =>
+            editSurvey({
+              ...activeSurvey,
+              description: {
+                ...activeSurvey.description,
+                [surveyLanguage]: value,
+              },
+            })
+          }
         />
         <TextField
           required
@@ -222,8 +247,8 @@ export default function EditSurveyInfo(props: Props) {
           options={availableUserGroups}
           getOptionLabel={(group) => group.name}
           value={
-            availableUserGroups.filter(
-              (group) => activeSurvey.userGroups?.includes(group.id),
+            availableUserGroups.filter((group) =>
+              activeSurvey.userGroups?.includes(group.id),
             ) ?? []
           }
           onChange={(_, value) => {
@@ -262,8 +287,8 @@ export default function EditSurveyInfo(props: Props) {
           }
           getOptionLabel={(user) => user.fullName}
           value={
-            allUsers?.filter(
-              (user) => activeSurvey.editors?.includes(user.id),
+            allUsers?.filter((user) =>
+              activeSurvey.editors?.includes(user.id),
             ) ?? []
           }
           onChange={(_, value: User[]) => {
@@ -309,8 +334,8 @@ export default function EditSurveyInfo(props: Props) {
           }
           getOptionLabel={(user) => user.fullName}
           value={
-            allUsers?.filter(
-              (user) => activeSurvey.viewers?.includes(user.id),
+            allUsers?.filter((user) =>
+              activeSurvey.viewers?.includes(user.id),
             ) ?? []
           }
           onChange={(_, value: User[]) => {

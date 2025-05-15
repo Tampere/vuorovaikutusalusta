@@ -15,6 +15,10 @@ import React from 'react';
 
 import { useImageHeaderQuery } from '@src/hooks/UseImageHeaderQuery';
 import Footer from './Footer';
+import ReactMarkdown from 'react-markdown';
+import { defaultSchema } from 'hast-util-sanitize';
+import rehypeSanitize from 'rehype-sanitize';
+import rehypeRaw from 'rehype-raw';
 
 const useStyles = makeStyles((theme: Theme & { [customKey: string]: any }) => ({
   heading: {
@@ -90,6 +94,14 @@ const useStyles = makeStyles((theme: Theme & { [customKey: string]: any }) => ({
     textAlign: 'center',
   },
 }));
+
+const customSchema = {
+  ...defaultSchema,
+  tagNames: ['em', 'span', 'h2', 'br'],
+  attributes: {
+    span: ['style'],
+  },
+};
 
 interface Props {
   survey: Survey;
@@ -189,6 +201,26 @@ export default function SurveyLandingPage({
             </h2>
           )}
         </div>
+        <Box
+          component="aside"
+          sx={(theme) => ({
+            backgroundColor: theme.palette.primary.main,
+            color: theme.palette.primary.contrastText,
+            borderRadius: '0.25rem',
+            padding: '0.5rem',
+            margin: '1rem 1rem 2rem 1rem',
+            textAlign: 'center',
+          })}
+        >
+          {survey.description?.[surveyLanguage] && (
+            <ReactMarkdown
+              rehypePlugins={[[rehypeRaw], [rehypeSanitize, customSchema]]}
+              components={{ div: 'aside' }}
+            >
+              {survey.description?.[surveyLanguage]}
+            </ReactMarkdown>
+          )}
+        </Box>
         <Button onClick={onStart}>
           <Typography variant="body1" className={classes.start}>
             {continueUnfinished
