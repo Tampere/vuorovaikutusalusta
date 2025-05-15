@@ -9,7 +9,6 @@ import { getPublishedSurvey, getSurvey } from '@src/application/survey';
 import { sendSubmissionReport } from '@src/email/submission-report';
 import { sendUnfinishedSubmissionLink } from '@src/email/unfinished-submission';
 import { ForbiddenError, NotFoundError } from '@src/error';
-import logger from '@src/logger';
 import { getOrganizationIdWithName } from '@src/user';
 import { validateRequest } from '@src/utils';
 import { Router } from 'express';

@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: Kartalla API
   description: API description for Kartalla survey platform.
-  version: 1.1.4
+  version: 1.2.0
 servers:
   - url: https://test.kartalla.io/api
     description: Test server
@@ -223,6 +223,7 @@ components:
           name,
           title,
           subtitle,
+          description,
           author,
           authorUnit,
           authorId,
@@ -253,9 +254,18 @@ components:
           type: string
           description: Used to generate the public URL of the survey.
         title:
-          type: string
+          $ref: '#/components/schemas/LocalizedText'
         subtitle:
-          type: string
+          oneOf:
+            - $ref: '#/components/schemas/LocalizedText'
+            - type: 'null'
+        description:
+          oneOf:
+            - $ref: '#/components/schemas/LocalizedText'
+            - type: 'null'
+          description: >
+            Description of the survey. This is shown on the front page of the survey.
+            The description can contain HTML markup.
         author:
           type: string
         authorUnit:
@@ -427,3 +437,13 @@ components:
         isVisible:
           type: boolean
           description: Are conditional page conditions fulfilled.
+    LocalizedText:
+      description: A localized text object which contains the text in different languages.
+      type: object
+      properties:
+        fi:
+          type: string
+        se:
+          type: string
+        en:
+          type: string

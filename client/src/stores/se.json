@@ -72,6 +72,7 @@
   "EditSurveyInfo": {
     "title": "Undersökningens titel",
     "subtitle": "Undersökningens undertitel",
+    "description": "Kyselyn kuvaus",
     "name": "Undersökningens namn",
     "nameHelperText": "Namnet som syns i undersökningens URL-adress. Kan innehålla endast bokstäver (a-z), siffror (0-9) och bindestreck (- och _).",
     "author": "Undersökningens författare/kontaktperson",
@@ -681,6 +682,7 @@
     "surveyPages": "Enkätens sidor",
     "surveyTitle": "Enkätens rubrik",
     "surveySubtitle": "Enkätens underrubrik",
+    "surveyDescription": "Enkätens beskrivning",
     "fi": "Finska",
     "en": "Engelska",
     "se": "Svenska",

@@ -72,6 +72,7 @@
   "EditSurveyInfo": {
     "title": "Survey title",
     "subtitle": "Survey subtitle",
+    "description": "Kyselyn kuvaus",
     "name": "Survey name",
     "nameHelperText": "The name displayed on the survey URL-address. This can only include characters (a-z), numbers (0-9), hyphen (-) and underline (_).",
     "author": "Survey author / contact person",
@@ -679,6 +680,7 @@
     "supportedLanguages": "Supported languages",
     "surveyPages": "Survey pages",
     "surveyTitle": "Survey title",
+    "surveyDescription": "Survey description",
     "surveySubtitle": "Survey subtitle",
     "fi": "Finnish",
     "en": "English",

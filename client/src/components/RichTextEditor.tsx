@@ -1,8 +1,11 @@
 import { FormLabel } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
-import { convertFromRaw, convertToRaw, EditorState } from 'draft-js';
-import { draftToMarkdown, markdownToDraft } from 'markdown-draft-js';
+import { convertToRaw, EditorState } from 'draft-js';
+import { Remarkable } from 'remarkable';
+import { draftToMarkdown } from 'markdown-draft-js';
+import { convertFromHTML } from 'draft-convert';
+
 import React, {
   forwardRef,
   useEffect,
@@ -76,8 +79,25 @@ const useStyles = makeStyles({
     '& .rdw-option-disabled': {
       pointerEvents: 'none',
     },
+    '& .rdw-fontsize-wrapper': {
+      background: 'white',
+      margin: 0,
+      border: 'none',
+      '&:hover': {
+        background: '#aaa',
+      },
+      '& .rdw-dropdown-wrapper:hover': {
+        boxShadow: 'none',
+        background: '#aaa',
+      },
+      '& .rdw-dropdown-selectedtext': {
+        width: '35px',
+      },
+    },
   },
 });
+
+const DEFAULT_FONT_SIZES = [8, 9, 10, 11, 12, 14, 16, 18, 24, 30, 36, 48, 60];
 
 interface Props {
   value: string;
@@ -86,6 +106,7 @@ interface Props {
   onChange: (value: string) => void;
   editorHeight?: string;
   missingValue?: boolean;
+  toolbarOptions?: Record<string, any>;
 }
 
 /**
@@ -93,9 +114,27 @@ interface Props {
  * @param markdown Text as markdown
  * @returns Draft.js editor state
  */
-function markdownToEditorState(markdown: string) {
-  const rawData = markdownToDraft(markdown);
-  const contentState = convertFromRaw(rawData);
+export function markdownToEditorState(markdown: string): EditorState {
+  // Step 1: Markdown → HTML
+  const md = new Remarkable('commonmark', {
+    html: true,
+    breaks: true, // Enable line breaks
+  });
+  const html = md.render(markdown);
+
+  // Step 2: HTML → ContentState using draft-convert with custom inline style parsing
+  const contentState = convertFromHTML({
+    htmlToStyle: (nodeName, node, currentStyle) => {
+      if (nodeName === 'span' && node instanceof HTMLElement) {
+        const fontSize = node.style.fontSize?.replace(/[^0-9]/g, '');
+        if (fontSize) {
+          return currentStyle.add(`fontsize-${fontSize}`);
+        }
+      }
+      return currentStyle;
+    },
+  })(html);
+
   return EditorState.createWithContent(contentState);
 }
 
@@ -104,10 +143,32 @@ function markdownToEditorState(markdown: string) {
  * @param editorState Draft.js editor state
  * @returns Text as markdown
  */
-function editorStateToMarkdown(editorState: EditorState) {
+function editorStateToMarkdown(
+  editorState: EditorState,
+  enabledFontSizes: number[] = DEFAULT_FONT_SIZES,
+) {
   const content = editorState.getCurrentContent();
   const rawObject = convertToRaw(content);
-  return draftToMarkdown(rawObject);
+
+  const fontSizeStyles = Object.fromEntries(
+    enabledFontSizes.map((size) => [
+      `fontsize-${size}`,
+      {
+        open: () => `<span style="font-size:${size}px">`,
+        close: () => '</span>',
+      },
+    ]),
+  );
+
+  let markdown = draftToMarkdown(rawObject, {
+    styleItems: fontSizeStyles,
+    preserveNewlines: true,
+  });
+
+  // Replace each newline with <br/>
+  markdown = markdown.replace(/\n/g, '<br/>');
+
+  return markdown;
 }
 
 const RichTextEditor = forwardRef(function RichTextEditor(props: Props, ref) {
@@ -139,26 +200,34 @@ const RichTextEditor = forwardRef(function RichTextEditor(props: Props, ref) {
       return;
     }
     setEditorState(editorState);
-    props.onChange(editorStateToMarkdown(editorState));
+    props.onChange(
+      editorStateToMarkdown(
+        editorState,
+        props.toolbarOptions?.fontSize?.options,
+      ),
+    );
   }
 
   return (
     <div className={classes.root}>
       {props.label && <FormLabel>{props.label}</FormLabel>}
       <Editor
+        {...(props.label && { ariaLabel: props.label })}
         readOnly={props.disabled}
-        toolbar={{
-          options: ['inline', 'list', 'link'],
-          inline: {
-            options: ['bold', 'italic'],
-          },
-          list: {
-            options: ['unordered', 'ordered'],
-          },
-          link: {
-            defaultTargetOption: '_blank',
-          },
-        }}
+        toolbar={
+          props.toolbarOptions ?? {
+            options: ['inline', 'list', 'link'],
+            inline: {
+              options: ['bold', 'italic'],
+            },
+            list: {
+              options: ['unordered', 'ordered'],
+            },
+            link: {
+              defaultTargetOption: '_blank',
+            },
+          }
+        }
         wrapperClassName={`${props.missingValue ? classes.missingValue : ''} ${
           props.disabled ? ` ${classes.disabled}` : ''
         } ${classes.wrapper}`}
@@ -167,6 +236,14 @@ const RichTextEditor = forwardRef(function RichTextEditor(props: Props, ref) {
         localization={{ translations: tr.RichTextEditor }}
         editorState={editorState}
         onEditorStateChange={handleEditorStateChange}
+        customStyleMap={{
+          'fontsize-24': {
+            fontSize: '24px',
+          },
+          'fontsize-20': {
+            fontSize: '20px',
+          },
+        }}
       />
       {props.disabled && <div className={classes.disabledOverlay} />}
     </div>

@@ -395,6 +395,10 @@ export interface Survey {
    */
   subtitle: LocalizedText;
   /**
+   *  Detailed description of the survey
+   */
+  description: LocalizedText;
+  /**
    * Author of the survey
    */
   author: string;

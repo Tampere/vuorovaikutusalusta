@@ -261,6 +261,40 @@ export default function EditSurveyTranslations() {
                         });
                       }}
                     />
+                    <Typography
+                      sx={{ marginTop: '0.5rem' }}
+                      className={classes.titleText}
+                    >
+                      {langIndex === 0
+                        ? tr.EditSurveyTranslations.surveyDescription
+                        : ''}{' '}
+                      &nbsp;
+                    </Typography>
+                    <RichTextEditor
+                      value={activeSurvey.description?.[lang] ?? ''}
+                      missingValue={Boolean(!activeSurvey.description?.[lang])}
+                      toolbarOptions={{
+                        options: ['inline', 'fontSize'],
+                        fontSize: {
+                          options: [
+                            8, 9, 10, 11, 12, 14, 16, 18, 24, 30, 36, 48, 60,
+                          ],
+                        },
+                        inline: {
+                          options: ['bold', 'italic'],
+                        },
+                      }}
+                      onChange={(value) =>
+                        editSurvey({
+                          ...activeSurvey,
+                          description: {
+                            ...activeSurvey.description,
+                            [lang]: value,
+                          },
+                        })
+                      }
+                      editorHeight={'100px'}
+                    />
                     {activeSurvey.email.enabled && (
                       <>
                         <br />
