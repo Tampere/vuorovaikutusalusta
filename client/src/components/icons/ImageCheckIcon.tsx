@@ -20,12 +20,15 @@ export function ImageCheckIcon(props: SvgIconProps) {
           />
         </g>
         <defs>
-          <clipPath id="clip0_5768_16">
+          <clipPath>
             <rect
               width="14"
               height="14"
-              fill="white"
-              style={{ fill: 'white', fillOpacity: 1 }}
+              fill={props.htmlColor ?? 'currentColor'}
+              style={{
+                fill: props.htmlColor ?? 'currentColor',
+                fillOpacity: 1,
+              }}
             />
           </clipPath>
         </defs>

@@ -25,6 +25,7 @@ import FreeTextQuestion from './FreeTextQuestion';
 import NumericQuestion from './NumericQuestion';
 import RadioQuestion from './RadioQuestion';
 import SectionInfo from './SectionInfo';
+import { RadioImageQuestion } from './RadioImageQuestion';
 
 const useStyles = makeStyles({
   content: {
@@ -143,9 +144,12 @@ export default function MapSubQuestionDialog({
             <FormLabel
               component="legend"
               style={{
+                fontSize: '1rem',
+                fontWeight: 700,
                 display: 'flex',
                 flexDirection: 'row',
                 alignItems: 'center',
+                marginBottom: '0.5rem',
               }}
             >
               {question.title?.[surveyLanguage]} {question.isRequired && '*'}
@@ -174,6 +178,21 @@ export default function MapSubQuestionDialog({
               />
             ) : question.type === 'radio' ? (
               <RadioQuestion
+                autoFocus={index === 0}
+                value={answers[index]?.value as number | string}
+                onChange={(value) => {
+                  answers[index].value = value;
+                  setAnswers([...answers]);
+                }}
+                question={question}
+                setDirty={(value) => {
+                  dirty[index] = value;
+                  setDirty([...dirty]);
+                }}
+              />
+            ) : question.type === 'radio-image' ? (
+              <RadioImageQuestion
+                isMapSubQuestion
                 autoFocus={index === 0}
                 value={answers[index]?.value as number | string}
                 onChange={(value) => {
