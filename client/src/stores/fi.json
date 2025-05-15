@@ -110,7 +110,7 @@
     "info": "Lisätiedot",
     "infoHelperText": "Lisätiedot esitetään sähköpostitse lähetettävän vastausraportin etusivulla.",
     "includePersonalInfo": "Sisällytä vastaajan henkilötiedot",
-    "includePersonalInfoHelperText": "Mahdollisen henkilötietokysymyksen vastaukset sisällytetään pdf-raportin etusivulle.",
+    "includePersonalInfoHelperText": "Mahdollisen henkilötietokysymyksen vastaukset sisällytetään pdf-raportin etusivulle sekä sivujen alamarginaaleihin.",
     "includeMarginImages": "Sisällytä etusivun ylä- ja alamarginaalin kuvat",
     "required": "Vastaajan sähköpostiosoite pakollinen",
     "requiredHelperText": "Vastaajan on annettava sähköpostiosoitteensa vastatakseen kyselyyn."
