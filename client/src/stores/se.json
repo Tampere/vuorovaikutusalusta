@@ -233,7 +233,7 @@
     "personalInfoDisabled": "Personuppgiftsfrågan har redan lagts till i enkäten.",
     "personalInfoQuestion": "Lägg till personuppgiftsfråga",
     "radioQuestion": "Lägg till alternativfråga",
-    "radioImageQuestion": "Lisää kuvavalintakysymys",
+    "radioImageQuestion": "Lägg till bildvalfråga",
     "checkBoxQuestion": "Lägg till flervalsfråga",
     "numericQuestion": "Lägg till numerisk fråga",
     "mapQuestion": "Lägg till kartfråga",

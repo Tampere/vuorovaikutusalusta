@@ -233,7 +233,7 @@
     "personalInfoDisabled": "The personal information question has already been added to the survey.",
     "personalInfoQuestion": "Add personal information question",
     "radioQuestion": "Add radio button question (single choice)",
-    "radioImageQuestion": "Lisää kuvavalintakysymys",
+    "radioImageQuestion": "Add radio button image question (single choice)",
     "checkBoxQuestion": "Add checkbox question (multiple choice)",
     "numericQuestion": "Add numeric question",
     "mapQuestion": "Add map question",
