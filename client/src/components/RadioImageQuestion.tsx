@@ -15,9 +15,11 @@ interface Props {
   value: number | string;
   onChange: (value: number | string) => void;
   setDirty: (dirty: boolean) => void;
+  isMapSubQuestion?: boolean;
 }
 
 export function RadioImageQuestion({
+  isMapSubQuestion,
   question,
   value,
   autoFocus,
@@ -65,7 +67,7 @@ export function RadioImageQuestion({
               sx={{
                 display: 'flex',
                 flexDirection: 'column',
-                maxWidth: '60%',
+                maxWidth: isMapSubQuestion ? 'min(350px, 100%)' : '60%',
                 border: '1px solid #e4e4e4',
                 borderRadius: '0.25rem',
                 overflow: 'hidden',
@@ -105,7 +107,7 @@ export function RadioImageQuestion({
             lineHeight: 1.2,
             marginBottom: '0.5em',
             marginTop: '0.5em',
-            '& .MuiRadio-root': { padding: '16px' },
+            '& .MuiRadio-root': { padding: '16px', marginRight: '8px' },
           }}
         />
       ))}
