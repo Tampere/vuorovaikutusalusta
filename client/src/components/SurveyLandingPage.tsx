@@ -97,7 +97,7 @@ const useStyles = makeStyles((theme: Theme & { [customKey: string]: any }) => ({
 
 const customSchema = {
   ...defaultSchema,
-  tagNames: ['em', 'span', 'h2', 'br'],
+  tagNames: ['strong', 'em', 'span', 'h2', 'br'],
   attributes: {
     span: ['style'],
   },
