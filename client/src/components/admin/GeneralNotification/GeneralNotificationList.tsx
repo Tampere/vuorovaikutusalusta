@@ -16,6 +16,8 @@ import ReactMarkdown from 'react-markdown';
 
 import { useTranslations } from '@src/stores/TranslationContext';
 import { MegaphoneIcon } from '@src/components/icons/MegaphoneIcon';
+import rehypeExternalLinks from 'rehype-external-links';
+import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
 
 const notificationListStyle = (theme: Theme) => ({
   marginBottom: theme.spacing(1),
@@ -136,7 +138,23 @@ export function GeneralNotificationList({
                 </Box>
               </AccordionSummary>
               <AccordionDetails>
-                <ReactMarkdown>{notification.message}</ReactMarkdown>
+                <ReactMarkdown
+                  rehypePlugins={[
+                    [rehypeExternalLinks],
+                    [
+                      rehypeSanitize,
+                      {
+                        ...defaultSchema,
+                        attributes: {
+                          ...defaultSchema.attributes,
+                          a: ['href', 'rel'],
+                        },
+                      },
+                    ],
+                  ]}
+                >
+                  {notification.message}
+                </ReactMarkdown>
                 {editingEnabled && (
                   <Button
                     size="small"

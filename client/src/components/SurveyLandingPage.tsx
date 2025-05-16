@@ -201,26 +201,26 @@ export default function SurveyLandingPage({
             </h2>
           )}
         </div>
-        <Box
-          component="aside"
-          sx={(theme) => ({
-            backgroundColor: theme.palette.primary.main,
-            color: theme.palette.primary.contrastText,
-            borderRadius: '0.25rem',
-            padding: '0.5rem',
-            margin: '1rem 1rem 2rem 1rem',
-            textAlign: 'center',
-          })}
-        >
-          {survey.description?.[surveyLanguage] && (
+        {survey.description?.[surveyLanguage] && (
+          <Box
+            component="aside"
+            sx={(theme) => ({
+              backgroundColor: theme.palette.primary.main,
+              color: theme.palette.primary.contrastText,
+              borderRadius: '0.25rem',
+              padding: '0.5rem',
+              margin: '1rem 1rem 2rem 1rem',
+              textAlign: 'center',
+            })}
+          >
             <ReactMarkdown
               rehypePlugins={[[rehypeRaw], [rehypeSanitize, customSchema]]}
-              components={{ div: 'aside' }}
             >
-              {survey.description?.[surveyLanguage]}
+              {/* Replace each newline with <br/> */}
+              {survey.description?.[surveyLanguage]?.replace(/\n/g, '<br/>')}
             </ReactMarkdown>
-          )}
-        </Box>
+          </Box>
+        )}
         <Button onClick={onStart}>
           <Typography variant="body1" className={classes.start}>
             {continueUnfinished
