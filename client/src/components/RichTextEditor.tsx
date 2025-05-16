@@ -160,15 +160,10 @@ function editorStateToMarkdown(
     ]),
   );
 
-  let markdown = draftToMarkdown(rawObject, {
+  return draftToMarkdown(rawObject, {
     styleItems: fontSizeStyles,
     preserveNewlines: true,
   });
-
-  // Replace each newline with <br/>
-  markdown = markdown.replace(/\n/g, '<br/>');
-
-  return markdown;
 }
 
 const RichTextEditor = forwardRef(function RichTextEditor(props: Props, ref) {
