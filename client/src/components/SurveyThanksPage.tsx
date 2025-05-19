@@ -14,8 +14,6 @@ import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import rehypeExternalLinks from 'rehype-external-links';
 import Footer from './Footer';
-import rehypeRaw from 'rehype-raw';
-import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
 
 type StyleKeys = 'testSurveyHeader';
 
@@ -118,26 +116,13 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
             display: 'flex',
             flexDirection: 'column',
             justifyContent: hasImage ? 'end' : 'center',
+            whiteSpace: 'pre-line',
           }}
         >
           <Typography variant="h5" component="h1">
             {survey.thanksPage.title?.[surveyLanguage]}
           </Typography>
-          <ReactMarkdown
-            rehypePlugins={[
-              [rehypeExternalLinks],
-              [
-                rehypeSanitize,
-                {
-                  ...defaultSchema,
-                  attributes: {
-                    ...defaultSchema.attributes,
-                    a: ['href', 'rel'],
-                  },
-                },
-              ],
-            ]}
-          >
+          <ReactMarkdown rehypePlugins={[[rehypeExternalLinks]]}>
             {survey.thanksPage.text?.[surveyLanguage]}
           </ReactMarkdown>
         </div>
