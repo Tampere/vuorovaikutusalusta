@@ -795,5 +795,8 @@
   "LogoutPage": {
     "logoutSuccessful": "You have successfully logged out.",
     "loginAgain": "Log in again"
+  },
+  "LoadingBackdrop": {
+    "copying": "Copying survey"
   }
 }

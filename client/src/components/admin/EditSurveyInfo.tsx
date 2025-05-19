@@ -38,7 +38,6 @@ import ThemeSelect from './ThemeSelect';
 import { getUserGroups } from '@src/controllers/UserGroupController';
 import { UserGroup } from '@interfaces/userGroup';
 import RichTextEditor from '../RichTextEditor';
-import { Label } from '@mui/icons-material';
 
 const useStyles = makeStyles({
   dateTimePicker: {

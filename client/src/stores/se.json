@@ -796,5 +796,8 @@
   "LogoutPage": {
     "logoutSuccessful": "Du har loggat ut framgångsrikt.",
     "loginAgain": "Logga in igen"
+  },
+  "LoadingBackdrop": {
+    "copying": "Kopierar enkät"
   }
 }

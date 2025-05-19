@@ -70,7 +70,7 @@ export default function EditSurvey() {
     fetchSurvey();
   }, [surveyId]);
 
-  return !activeSurvey ? (
+  return !activeSurvey || String(activeSurvey.id) !== surveyId ? (
     <Box
       sx={{
         display: 'flex',

@@ -1,4 +1,4 @@
-import { FormLabel } from '@mui/material';
+import { Box, CircularProgress, FormLabel } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { convertToRaw, EditorState } from 'draft-js';
@@ -15,9 +15,6 @@ import React, {
 import { Editor } from 'react-draft-wysiwyg';
 
 const useStyles = makeStyles({
-  root: {
-    position: 'relative',
-  },
   disabled: {
     opacity: 0.4,
     pointerEvents: 'none',
@@ -207,7 +204,11 @@ const RichTextEditor = forwardRef(function RichTextEditor(props: Props, ref) {
   }
 
   return (
-    <div className={classes.root}>
+    <Box
+      sx={{
+        position: 'relative',
+      }}
+    >
       {props.label && <FormLabel>{props.label}</FormLabel>}
       <Editor
         {...(props.label && { ariaLabel: props.label })}
@@ -244,7 +245,7 @@ const RichTextEditor = forwardRef(function RichTextEditor(props: Props, ref) {
         }}
       />
       {props.disabled && <div className={classes.disabledOverlay} />}
-    </div>
+    </Box>
   );
 });
 
