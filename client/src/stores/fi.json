@@ -796,5 +796,8 @@
   "LogoutPage": {
     "logoutSuccessful": "Olet kirjautunut ulos onnistuneesti.",
     "loginAgain": "Kirjaudu sisään uudestaan"
+  },
+  "LoadingBackdrop": {
+    "copying": "Kopioidaan kyselyä"
   }
 }

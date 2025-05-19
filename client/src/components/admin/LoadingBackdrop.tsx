@@ -1,4 +1,5 @@
 import { Backdrop, Box, CircularProgress, Typography } from '@mui/material';
+import { useTranslations } from '@src/stores/TranslationContext';
 import React from 'react';
 
 interface Props {
@@ -6,6 +7,7 @@ interface Props {
 }
 
 export function LoadingBackdrop({ open }: Props) {
+  const { tr } = useTranslations();
   return (
     <Backdrop
       sx={(theme) => ({
@@ -42,7 +44,7 @@ export function LoadingBackdrop({ open }: Props) {
             },
           }}
         >
-          Kopioidaan kyselyä
+          {tr.LoadingBackdrop.copying}
         </Typography>
       </Box>
     </Backdrop>

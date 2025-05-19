@@ -139,8 +139,8 @@ export default function SurveyListItem(props: Props) {
         animation: fadeRight
           ? `shiftRight ease-in-out ${fadeTimeout}ms`
           : fadeLeft
-          ? `shiftLeft ease-in-out ${fadeTimeout}ms`
-          : 'none',
+            ? `shiftLeft ease-in-out ${fadeTimeout}ms`
+            : 'none',
       }}
     >
       <Card sx={cardStyles(theme, loading, survey.isPublished)}>
@@ -149,7 +149,7 @@ export default function SurveyListItem(props: Props) {
             {!survey.title?.[surveyLanguage] ? (
               <em>{tr.SurveyList.untitledSurvey}</em>
             ) : (
-              survey?.title?.[surveyLanguage] ?? ''
+              (survey?.title?.[surveyLanguage] ?? '')
             )}
           </Typography>
           <Typography color="textSecondary" component="h4" gutterBottom>
