@@ -120,7 +120,10 @@ export function markdownToEditorState(markdown: string): EditorState {
     html: true,
     breaks: true, // Enable line breaks
   });
-  const html = md.render(markdown);
+  let html = md.render(markdown);
+
+  // Remove any space or &nbsp; immediately after <br> or <br />
+  html = html.replace(/(<br\s*\/?>)\s+/gi, '$1');
 
   // Step 2: HTML → ContentState using draft-convert with custom inline style parsing
   const contentState = convertFromHTML({
