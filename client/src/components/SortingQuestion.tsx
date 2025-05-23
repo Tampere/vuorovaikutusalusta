@@ -8,16 +8,12 @@ import {
   Typography,
 } from '@mui/material';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
-import {
-  DragDropContext,
-  Droppable,
-  Draggable,
-  DropResult,
-  ResponderProvided,
-} from 'react-beautiful-dnd';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { visuallyHidden } from '@mui/utils';
+import { DndWrapper, DragEndOptions } from './DragAndDrop/DndWrapper';
+import { DragHandle } from './DragAndDrop/SortableItem';
+import { UniqueIdentifier } from '@dnd-kit/core';
 
 interface Props {
   value: number[];
@@ -58,185 +54,153 @@ export default function SortingQuestion(props: Props) {
     props.onChange(sortedOptionIds);
   }, [sortedOptionIds, verified]);
 
-  const reorder = (
-    list: Array<number>,
-    startIndex: number,
-    endIndex: number,
-  ) => {
-    const result = Array.from(list);
-    const [removed] = result.splice(startIndex, 1);
-    result.splice(endIndex, 0, removed);
-    return result;
-  };
+  /** Gets the announceable index of the current option  */
+  function getOptionPositionString(optionId: UniqueIdentifier) {
+    return String(
+      sortedOptionIds.findIndex((id) => id === Number(optionId)) + 1,
+    );
+  }
 
-  const onDragEnd = (result: DropResult, provided: ResponderProvided) => {
-    const { destination, source } = result;
-    if (!destination || destination.index === source.index) {
-      provided.announce(
-        tr.SortingQuestion.announcement.droppedInPlace.replace(
-          '{position}',
-          (destination.index + 1).toString(),
-        ),
-      );
-      return;
-    }
+  const onDragEnd = (opts: DragEndOptions) => {
     // Resize the index label heights array to match the new order
     if (optionElements.current.length > 0) {
       setOptionIndexLabelHeights((prev) => {
         const newHeights = [...prev];
-        const [removed] = newHeights.splice(source.index, 1);
-        newHeights.splice(destination.index, 0, removed);
+        const [removed] = newHeights.splice(opts.oldIndex, 1);
+        newHeights.splice(opts.newIndex, 0, removed);
         return newHeights;
       });
     }
-    provided.announce(
-      tr.SortingQuestion.announcement.drop.replace(
-        '{position}',
-        (destination.index + 1).toString(),
-      ),
-    );
+
     setVerified(false);
-    setSortedOptionIds(
-      reorder(sortedOptionIds, source.index, destination.index),
-    );
+
+    setSortedOptionIds(opts.newItemOrder.map((item) => Number(item.id)));
   };
 
   return (
     <FormGroup id={`${props.question.id}-input`}>
-      <Box
-        style={visuallyHidden}
-        id={`drag-instruction-announcement-${props.question.id}`}
-      >
-        {tr.SortingQuestion.announcement.focus}
-      </Box>
-      <DragDropContext
-        onDragStart={(start, provided) =>
-          provided.announce(
-            tr.SortingQuestion.announcement.grab.replace(
-              '{position}',
-              (start.source.index + 1).toString(),
-            ),
-          )
-        }
-        onDragUpdate={(update, provided) =>
-          provided.announce(
-            tr.SortingQuestion.announcement.move
-              .replace('{position}', (update.destination.index + 1).toString())
-              .replace('{length}', props.question.options.length.toString()),
-          )
-        }
-        onDragEnd={onDragEnd}
-      >
-        <div style={{ display: 'flex', flexDirection: 'row' }} ref={wrapperRef}>
-          <div>
-            {props.question.options.map((_option, index) => (
-              <Paper
-                key={index}
-                variant="outlined"
-                sx={{
-                  height: optionIndexLabelHeights[index],
-                  backgroundColor: '#ededed',
-                  borderTopRightRadius: '0',
-                  borderBottomRightRadius: '0',
-                  marginBottom: '0.5em',
-                  marginRight: '-0.25em',
-                  padding: '0.5em',
-                  display: 'flex',
-                  alignItems: 'center',
-                  transition: 'height 0.1s',
-                }}
-              >
-                <Typography>{index + 1}.</Typography>
-              </Paper>
-            ))}
-          </div>
-          <Droppable
-            droppableId={`question-dropzone-${props.question.id}`}
-            isDropDisabled={props.readOnly}
-          >
-            {(provided) => (
-              <div
-                {...provided.droppableProps}
-                ref={provided.innerRef}
-                style={{ flexGrow: 1 }}
-              >
-                {sortedOptionIds.map((optionId, index) => (
-                  <Draggable
-                    isDragDisabled={props.readOnly}
-                    key={`option-${optionId}`}
-                    index={index}
-                    draggableId={`option-${optionId}`}
-                  >
-                    {(provided, snapshot) => (
-                      <Paper
-                        ref={(el) => {
-                          if (el) {
-                            optionElements.current[index] = el;
-                          }
-                          return provided.innerRef(el);
-                        }}
-                        variant="outlined"
-                        sx={{
-                          backgroundColor: snapshot.isDragging
-                            ? '#c2dcf1'
-                            : 'white',
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          marginBottom: '0.5em',
-                          padding: '0.5em',
-                          transition: 'background-color 200ms',
-                          '&:focus': {
-                            outlineOffset: '2px',
-                            outline: '2px solid black',
-                          },
-                        }}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                        aria-describedby={`drag-instruction-announcement-${props.question.id}`}
-                      >
-                        <Typography
-                          color={props.readOnly ? 'disabled' : 'primary'}
-                        >
-                          {
-                            props.question.options.find(
-                              (option) => option.id === optionId,
-                            ).text?.[surveyLanguage]
-                          }
-                        </Typography>
-                        <Box style={visuallyHidden}>
-                          {tr.SortingQuestion.inPosition} {index + 1} /{' '}
-                          {sortedOptionIds.length}
-                        </Box>
-                        <DragIndicatorIcon
-                          color={snapshot.isDragging ? 'info' : 'action'}
-                        />
-                      </Paper>
-                    )}
-                  </Draggable>
-                ))}
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
-        </div>
-        <FormControlLabel
-          label={tr.SortingQuestion.orderComplete}
-          control={
-            <Checkbox
-              name={`verify-order-question_${props.question.id}`}
-              checked={verified}
-              onChange={(event) => {
-                setVerified(event.target.checked);
-                props.setDirty(true);
+      <div style={{ display: 'flex', flexDirection: 'row' }} ref={wrapperRef}>
+        <div>
+          {props.question.options.map((option, index) => (
+            <Paper
+              key={option.id}
+              variant="outlined"
+              sx={{
+                height: optionIndexLabelHeights[index],
+                backgroundColor: '#ededed',
+                borderTopRightRadius: '0',
+                borderBottomRightRadius: '0',
+                borderRight: '0',
+                marginBottom: '0.5em',
+                padding: '0.5em',
+                display: 'flex',
+                alignItems: 'center',
+                transition: 'height 0.1s',
               }}
-            />
-          }
-          sx={{
-            lineHeight: 1.2,
-            marginBottom: '0.5em',
-          }}
-        />
-      </DragDropContext>
+            >
+              <Typography>{index + 1}.</Typography>
+            </Paper>
+          ))}
+        </div>
+        <div style={{ flexGrow: 1 }}>
+          <DndWrapper
+            screenReaderInstructions={tr.SortingQuestion.announcement.focus}
+            announcements={{
+              onDragStart({ active }) {
+                return tr.SortingQuestion.announcement.grab.replace(
+                  '{position}',
+                  getOptionPositionString(active.id),
+                );
+              },
+              onDragOver({ over }) {
+                if (over) {
+                  return `${tr.SortingQuestion.announcement.move
+                    .replace('{position}', getOptionPositionString(over.id))
+                    .replace(
+                      '{length}',
+                      String(props.question.options.length),
+                    )}`;
+                }
+              },
+              onDragEnd({ over }) {
+                if (over) {
+                  return tr.SortingQuestion.announcement.drop.replace(
+                    '{position}',
+                    getOptionPositionString(over.id),
+                  );
+                }
+              },
+              onDragCancel({ active }) {
+                return tr.SortingQuestion.announcement.droppedInPlace.replace(
+                  '{position}',
+                  getOptionPositionString(active.id),
+                );
+              },
+            }}
+            onDragEnd={(opts) => onDragEnd(opts)}
+            sortableItems={sortedOptionIds.map((optionId, index) => ({
+              id: String(optionId),
+              renderElement: (isDragging) => (
+                <Paper
+                  ref={(el) => {
+                    if (el) {
+                      optionElements.current[index] = el;
+                    }
+                  }}
+                  variant="outlined"
+                  sx={{
+                    height: optionIndexLabelHeights[index],
+                    borderTopLeftRadius: '0',
+                    borderBottomLeftRadius: '0',
+                    backgroundColor: isDragging ? '#c2dcf1' : 'white',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    marginBottom: '0.5em',
+                    padding: '0.5em',
+                    transition: 'background-color 200ms',
+                    '&:focus': {
+                      outlineOffset: '2px',
+                      outline: '2px solid black',
+                    },
+                  }}
+                >
+                  <Typography color={props.readOnly ? 'disabled' : 'primary'}>
+                    {
+                      props.question.options.find(
+                        (option) => option.id === optionId,
+                      ).text?.[surveyLanguage]
+                    }
+                  </Typography>
+                  <Box style={visuallyHidden}>
+                    {tr.SortingQuestion.inPosition} {index + 1} /{' '}
+                    {sortedOptionIds.length}
+                  </Box>
+                  <DragHandle isDragging={isDragging}>
+                    <DragIndicatorIcon color={isDragging ? 'info' : 'action'} />
+                  </DragHandle>
+                </Paper>
+              ),
+            }))}
+          />
+        </div>
+      </div>
+      <FormControlLabel
+        label={tr.SortingQuestion.orderComplete}
+        control={
+          <Checkbox
+            name={`verify-order-question_${props.question.id}`}
+            checked={verified}
+            onChange={(event) => {
+              setVerified(event.target.checked);
+              props.setDirty(true);
+            }}
+          />
+        }
+        sx={{
+          lineHeight: 1.2,
+          marginBottom: '0.5em',
+        }}
+      />
     </FormGroup>
   );
 }

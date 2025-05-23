@@ -489,7 +489,11 @@ export interface Survey {
  */
 export interface SectionOption {
   /**
-   * id of the option
+   * Draft ID of the option which is used when Id is not yet available. Used for sorting purposes but not saved to the database.
+   */
+  draftId?: string;
+  /**
+   * Id of the option
    */
   id?: number;
   /**

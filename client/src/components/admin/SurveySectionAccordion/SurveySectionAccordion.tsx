@@ -51,7 +51,6 @@ import {
   replaceTranslationsWithNull,
 } from '@src/utils/schemaValidation';
 import React, { ReactNode, useMemo, useRef, useState } from 'react';
-import { DraggableProvided } from 'react-beautiful-dnd';
 import ConfirmDialog from '../../ConfirmDialog';
 import EditAttachmentSection from '../EditAttachmentSection';
 import EditCheckBoxQuestion from '../EditCheckBoxQuestion';
@@ -68,6 +67,7 @@ import EditSliderQuestion from '../EditSliderQuestion';
 import EditSortingQuestion from '../EditSortingQuestion';
 import EditTextSection from '../EditTextSection';
 import { SectionDetails } from './SectionDetails';
+import { DragHandle } from '@src/components/DragAndDrop/SortableItem';
 
 const useStyles = makeStyles({
   accordion: {
@@ -105,9 +105,9 @@ interface Props {
   name: string;
   onEdit: (index: number, section: SurveyPageSection) => void;
   onDelete: (index: number) => void;
-  provided: DraggableProvided;
   disableSectionCopying?: boolean;
   pageId?: number;
+  isDragging?: boolean;
 }
 
 export default function SurveySectionAccordion(props: Props) {
@@ -290,7 +290,6 @@ export default function SurveySectionAccordion(props: Props) {
   return (
     <>
       <Accordion
-        ref={props.provided.innerRef}
         expanded={props.expanded}
         onChange={(_, isExpanded) => {
           props.onExpandedChange(isExpanded);
@@ -367,9 +366,9 @@ export default function SurveySectionAccordion(props: Props) {
               <ContentCopy />
             </IconButton>
           )}
-          <div {...props.provided.dragHandleProps} style={{ display: 'flex' }}>
+          <DragHandle isDragging={props.isDragging}>
             <DragIndicator />
-          </div>
+          </DragHandle>
         </AccordionSummary>
         <SectionDetails
           pageId={props.pageId}

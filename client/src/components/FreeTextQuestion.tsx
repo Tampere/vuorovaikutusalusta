@@ -11,7 +11,7 @@ interface Props {
   setDirty: (dirty: boolean) => void;
   maxLength?: number;
   readOnly?: boolean;
-  isEmptyAndRequired: boolean;
+  isEmptyAndRequired?: boolean;
 }
 
 export default function FreeTextQuestion({

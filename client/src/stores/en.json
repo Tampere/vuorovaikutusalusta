@@ -496,10 +496,10 @@
     "inPosition": "In position ",
     "announcement": {
       "focus": "Move this item by pressing spacebar. You may need to activate focus mode.",
-      "grab": "Picked up from position {position} . Move with arrow keys.",
-      "move": "Now at position {position} out of {length} . Set here by pressing spacebar.",
-      "drop": "Set to position {position} .",
-      "droppedInPlace": "Replaced to the original position {position} ."
+      "grab": "Picked up from position {position}. Move with arrow keys.",
+      "move": "Now at position {position} out of {length}. Set here by pressing spacebar.",
+      "drop": "Set to position {position}.",
+      "droppedInPlace": "Replaced to the original position {position}."
     }
   },
   "DocumentSection": {
@@ -604,6 +604,9 @@
       "yAxisTotalLabel": "Total answers",
       "yAxisLabel": "Answers"
     }
+  },
+  "DragAndDrop": {
+    "draggable": "draggable"
   },
   "navigation": {
     "next": "Next",
