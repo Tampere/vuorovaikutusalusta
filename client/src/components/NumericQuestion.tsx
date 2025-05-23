@@ -10,7 +10,7 @@ interface Props {
   onChange: (value: number) => void;
   setDirty: (dirty: boolean) => void;
   readOnly?: boolean;
-  isEmptyAndRequired: boolean;
+  isEmptyAndRequired?: boolean;
 }
 
 export default function NumericQuestion({

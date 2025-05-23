@@ -1,8 +1,8 @@
 import { SurveyPage, SurveyPageSection } from '@interfaces/survey';
 import React, { useState } from 'react';
-import { Draggable, Droppable } from 'react-beautiful-dnd';
 import { FollowUpSectionAccordion } from './FollowUpSectionAccordion';
 import { useSurvey } from '@src/stores/SurveyContext';
+import { DndWrapper } from '@src/components/DragAndDrop/DndWrapper';
 
 interface Props {
   parentSection: Extract<
@@ -22,62 +22,49 @@ export function FollowUpSections({
 }: Props) {
   const [expandedFollowUpSection, setExpandedFollowUpSection] =
     useState<number>(null);
-  const { editFollowUpSection, deleteSection } = useSurvey();
+  const { editFollowUpSection, moveFollowUpSection, deleteSection } =
+    useSurvey();
 
   return (
-    <Droppable
-      droppableId={`follow-up-sections-${parentSection.id}`}
-      type={`followUpSection-${parentSection.id}`}
-    >
-      {(provided, _snapshot) => (
-        <div {...provided.droppableProps} ref={provided.innerRef}>
-          {parentSection?.followUpSections?.map((sect, index) => (
-            <Draggable
-              key={`${parentSection.id}-${sect.id}`}
-              draggableId={String(sect.id)}
+    <DndWrapper
+      onDragEnd={(opts) => {
+        moveFollowUpSection(
+          page.id,
+          parentSection.id,
+          opts.oldIndex,
+          opts.newIndex,
+        );
+      }}
+      sortableItems={
+        parentSection?.followUpSections?.map((sect, index) => ({
+          id: String(sect.id),
+          renderElement: (isDragging) => (
+            <FollowUpSectionAccordion
+              isDragging={isDragging}
+              pageId={page.id}
+              isLastItem={parentSection.followUpSections.length === index + 1}
+              parentSectionIndex={parentSectionIndex}
               index={index}
-            >
-              {(provided, _snapshot) => {
-                return (
-                  <div
-                    style={{ margin: '10px' }}
-                    ref={provided.innerRef}
-                    {...provided.draggableProps}
-                  >
-                    <FollowUpSectionAccordion
-                      pageId={page.id}
-                      isLastItem={
-                        parentSection.followUpSections.length === index + 1
-                      }
-                      parentSectionIndex={parentSectionIndex}
-                      index={index}
-                      provided={provided}
-                      disabled={disabled}
-                      parentSection={parentSection}
-                      section={sect}
-                      name={`section-${index}`}
-                      expanded={expandedFollowUpSection === index}
-                      onExpandedChange={(isExpanded) => {
-                        setExpandedFollowUpSection(isExpanded ? index : null);
-                      }}
-                      onEdit={(section) => {
-                        editFollowUpSection(page.id, parentSection.id, section);
-                      }}
-                      onDelete={(index) => {
-                        deleteSection(page.id, index);
-                        // Reset expanded section to null
-                        setExpandedFollowUpSection(null);
-                      }}
-                    />
-                  </div>
-                );
+              disabled={disabled}
+              parentSection={parentSection}
+              section={sect}
+              name={`section-${index}`}
+              expanded={expandedFollowUpSection === index}
+              onExpandedChange={(isExpanded) => {
+                setExpandedFollowUpSection(isExpanded ? index : null);
               }}
-            </Draggable>
-          ))}
-
-          {provided.placeholder}
-        </div>
-      )}
-    </Droppable>
+              onEdit={(section) => {
+                editFollowUpSection(page.id, parentSection.id, section);
+              }}
+              onDelete={(index) => {
+                deleteSection(page.id, index);
+                // Reset expanded section to null
+                setExpandedFollowUpSection(null);
+              }}
+            />
+          ),
+        })) ?? []
+      }
+    />
   );
 }

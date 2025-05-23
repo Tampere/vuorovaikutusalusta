@@ -26,7 +26,7 @@ import { useSurvey } from '@src/stores/SurveyContext';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useState } from 'react';
-import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
+
 import { useHistory, useRouteMatch } from 'react-router-dom';
 import ListItemLink from '../ListItemLink';
 import SideBar from '../SideBar';
@@ -39,6 +39,8 @@ import {
   replaceTranslationsWithNull,
 } from '@src/utils/schemaValidation';
 import { BranchIcon } from '../icons/BranchIcon';
+import { DndWrapper } from '../DragAndDrop/DndWrapper';
+import { DragHandle } from '../DragAndDrop/SortableItem';
 
 const useStyles = makeStyles((theme: Theme) => ({
   '@keyframes pulse': {
@@ -125,113 +127,96 @@ export default function EditSurveySideBar(props: Props) {
       </List>
       <Divider />
       <List>
-        <DragDropContext
-          onDragEnd={(event) => {
-            if (!event.destination) {
-              return;
-            }
-            movePage(Number(event.draggableId), event.destination.index);
+        <DndWrapper
+          onDragEnd={(opts) => {
+            movePage(Number(opts.movedItemId), opts.newIndex);
           }}
-        >
-          <Droppable droppableId="pages">
-            {(provided) => (
-              <div {...provided.droppableProps} ref={provided.innerRef}>
-                {activeSurvey.pages.map((page, index) => (
-                  <Draggable
-                    key={page.id}
-                    draggableId={String(page.id)}
-                    index={index}
-                  >
-                    {(provided) => (
-                      <div ref={provided.innerRef} {...provided.draggableProps}>
-                        <ListItemLink
-                          to={`${url}/sivut/${page.id}?lang=${language}`}
-                        >
-                          <ListItemIcon>
-                            {Object.keys(page?.conditions)?.length > 0 && (
-                              <BranchIcon />
-                            )}
-                            <InsertDriveFileOutlined />
-                          </ListItemIcon>
-                          <ListItemText
-                            primary={
-                              page.title?.[surveyLanguage] || (
-                                <em>{tr.EditSurvey.untitledPage}</em>
-                              )
-                            }
-                          />
-                          <IconButton
-                            onClick={(event) => {
-                              event.stopPropagation();
-                              event.preventDefault();
-                              // Deep copy page to avoid changes to current context
-                              const deepCopy = replaceTranslationsWithNull(
-                                replaceIdsWithNull({
-                                  ...structuredClone(page),
-                                  id: -1,
-                                  sidebar: {
-                                    ...structuredClone(page.sidebar),
-                                    mapLayers: [],
-                                  },
-                                }),
-                              ) as SurveyPage;
-                              // Remove conditions from Follow up question
-                              const copiedSurveyPage: SurveyPage = {
-                                ...deepCopy,
-                                sections: deepCopy.sections.map((section) => {
-                                  return {
-                                    ...section,
-                                    followUpSections:
-                                      section.followUpSections?.map((fus) => {
-                                        return {
-                                          ...fus,
-                                          conditions: {
-                                            equals: [],
-                                            lessThan: [],
-                                            greaterThan: [],
-                                          } as Conditions,
-                                        };
-                                      }),
-                                  };
-                                }),
-                              };
-                              // Store section to locale storage for other browser tabs to get access to it
-                              localStorage.setItem(
-                                'clipboard-content',
-                                JSON.stringify({
-                                  clipboardPage: {
-                                    ...copiedSurveyPage,
-                                    conditions: {},
-                                  },
-                                  clipboardSection,
-                                }),
-                              );
-                              // Store page to context for the currently active browser tab to get access to it
-                              setClipboardPage({
-                                ...copiedSurveyPage,
-                                conditions: {},
-                              });
-                              showToast({
-                                message: tr.EditSurvey.pageCopied,
-                                severity: 'success',
-                              });
-                            }}
-                          >
-                            <ContentCopy />
-                          </IconButton>
-                          <div {...provided.dragHandleProps}>
-                            <DragIndicator />
-                          </div>
-                        </ListItemLink>
-                      </div>
+          sortableItems={activeSurvey.pages.map((page) => ({
+            id: String(page.id),
+            renderElement: (isDragging) => (
+              <div>
+                <ListItemLink to={`${url}/sivut/${page.id}?lang=${language}`}>
+                  <ListItemIcon>
+                    {Object.keys(page?.conditions)?.length > 0 && (
+                      <BranchIcon />
                     )}
-                  </Draggable>
-                ))}
-                {provided.placeholder}
+                    <InsertDriveFileOutlined />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={
+                      page.title?.[surveyLanguage] || (
+                        <em>{tr.EditSurvey.untitledPage}</em>
+                      )
+                    }
+                  />
+                  <IconButton
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      event.preventDefault();
+                      // Deep copy page to avoid changes to current context
+                      const deepCopy = replaceTranslationsWithNull(
+                        replaceIdsWithNull({
+                          ...structuredClone(page),
+                          id: -1,
+                          sidebar: {
+                            ...structuredClone(page.sidebar),
+                            mapLayers: [],
+                          },
+                        }),
+                      ) as SurveyPage;
+                      // Remove conditions from Follow up question
+                      const copiedSurveyPage: SurveyPage = {
+                        ...deepCopy,
+                        sections: deepCopy.sections.map((section) => {
+                          return {
+                            ...section,
+                            followUpSections: section.followUpSections?.map(
+                              (fus) => {
+                                return {
+                                  ...fus,
+                                  conditions: {
+                                    equals: [],
+                                    lessThan: [],
+                                    greaterThan: [],
+                                  } as Conditions,
+                                };
+                              },
+                            ),
+                          };
+                        }),
+                      };
+                      // Store section to locale storage for other browser tabs to get access to it
+                      localStorage.setItem(
+                        'clipboard-content',
+                        JSON.stringify({
+                          clipboardPage: {
+                            ...copiedSurveyPage,
+                            conditions: {},
+                          },
+                          clipboardSection,
+                        }),
+                      );
+                      // Store page to context for the currently active browser tab to get access to it
+                      setClipboardPage({
+                        ...copiedSurveyPage,
+                        conditions: {},
+                      });
+                      showToast({
+                        message: tr.EditSurvey.pageCopied,
+                        severity: 'success',
+                      });
+                    }}
+                  >
+                    <ContentCopy />
+                  </IconButton>
+                  <DragHandle isDragging={isDragging}>
+                    <DragIndicator />
+                  </DragHandle>
+                </ListItemLink>
               </div>
-            )}
-          </Droppable>
-        </DragDropContext>
+            ),
+          }))}
+        />
         <div style={{ display: 'flex', flexDirection: 'row' }}>
           <ListItem
             sx={{

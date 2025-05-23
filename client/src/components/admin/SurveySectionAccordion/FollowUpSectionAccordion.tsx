@@ -38,15 +38,13 @@ import {
   Accordion,
   AccordionSummary,
   Tooltip,
-  Typography
+  Typography,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { FollowUpListItemIcon } from '@src/components/icons/FollowUpListItemIcon';
-import { useClipboard } from '@src/stores/ClipboardContext';
-import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { ReactNode, useMemo, useRef, useState } from 'react';
-import { DraggableProvided } from 'react-beautiful-dnd';
+
 import ConfirmDialog from '../../ConfirmDialog';
 import EditAttachmentSection from '../EditAttachmentSection';
 import EditCheckBoxQuestion from '../EditCheckBoxQuestion';
@@ -63,6 +61,7 @@ import EditSliderQuestion from '../EditSliderQuestion';
 import EditSortingQuestion from '../EditSortingQuestion';
 import EditTextSection from '../EditTextSection';
 import { FollowUpSectionMenu } from './FollowUpSectionMenu';
+import { DragHandle } from '@src/components/DragAndDrop/SortableItem';
 
 const useStyles = makeStyles({
   accordion: {
@@ -104,15 +103,13 @@ interface Props {
   name: string;
   onEdit: (section: SurveyPageSection | SurveyFollowUpSection) => void;
   onDelete: (index: number) => void;
-  provided: DraggableProvided;
+  isDragging?: boolean;
 }
 
 export function FollowUpSectionAccordion(props: Props) {
   const [deleteConfirmDialogOpen, setDeleteConfirmDialogOpen] = useState(false);
   const classes = useStyles();
   const { tr, surveyLanguage } = useTranslations();
-  const { setSection, clipboardPage } = useClipboard();
-  const { showToast } = useToasts();
 
   // Index is used inside a callback function -> useRef is required in React to catch all updates
   const indexRef = useRef<number>();
@@ -171,7 +168,6 @@ export function FollowUpSectionAccordion(props: Props) {
       tooltip: tr.SurveySection.mapQuestion,
       form: (
         <EditMapQuestion
-          disableSectionCopying
           disabled={props.disabled}
           section={props.section as SurveyMapQuestion}
           onChange={handleEdit}
@@ -288,7 +284,6 @@ export function FollowUpSectionAccordion(props: Props) {
   return (
     <>
       <Accordion
-        ref={props.provided.innerRef}
         expanded={props.expanded}
         onChange={(_, isExpanded) => {
           props.onExpandedChange(isExpanded);
@@ -330,9 +325,9 @@ export function FollowUpSectionAccordion(props: Props) {
               <em>{tr.EditSurveyPage.untitledSection}</em>
             )}
           </Typography>
-          <div {...props.provided.dragHandleProps} style={{ display: 'flex' }}>
+          <DragHandle isDragging={props.isDragging}>
             <DragIndicator />
-          </div>
+          </DragHandle>
         </AccordionSummary>
 
         <FollowUpSectionMenu

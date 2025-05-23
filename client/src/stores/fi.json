@@ -496,10 +496,10 @@
     "inPosition": "Sijalla ",
     "announcement": {
       "focus": "Siirrä tätä vaihtoehtoa painamalla välilyöntiä. Saattaa olla tarpeen aktivoida kohdistustila.",
-      "grab": "Tartuit vaihtoehtoon sijalla {position} . Siirrä ylös tai alaspäin nuolinäppäimillä.",
-      "move": "Nyt sijalla {position} kautta {length} . Aseta tähän painamalla välilyöntiä.",
-      "drop": "Asetettu sijalle {position} .",
-      "droppedInPlace": "Asetettu alkuperäiselle paikalleen sijalle {position}"
+      "grab": "Tartuit vaihtoehtoon sijalla {position}. Siirrä ylös tai alaspäin nuolinäppäimillä.",
+      "move": "Nyt sijalla {position} kautta {length}. Aseta tähän painamalla välilyöntiä.",
+      "drop": "Asetettu sijalle {position}.",
+      "droppedInPlace": "Asetettu alkuperäiselle paikalleen sijalle {position}."
     }
   },
   "DocumentSection": {
@@ -604,6 +604,9 @@
       "yAxisTotalLabel": "Vastauskertymä",
       "yAxisLabel": "Vastauksia"
     }
+  },
+  "DragAndDrop": {
+    "draggable": "Raahattava"
   },
   "navigation": {
     "next": "Seuraava",
