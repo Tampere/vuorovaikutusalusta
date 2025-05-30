@@ -21,7 +21,8 @@ import { isFollowUpSectionParentType, isString } from '@src/utils/typeCheck';
 interface State {
   answers: AnswerEntry[];
   survey: Survey;
-  unfinishedToken: string;
+  unfinishedToken: string | null;
+  registrationId: string | null;
 }
 
 type Action =
@@ -48,6 +49,10 @@ type Action =
   | {
       type: 'SET_UNFINISHED_TOKEN';
       token: string;
+    }
+  | {
+      type: 'SET_REGISTRATION_ID';
+      registrationId: string;
     };
 
 type Context = [State, React.Dispatch<Action>];
@@ -56,6 +61,7 @@ const stateDefaults: State = {
   answers: [],
   survey: null,
   unfinishedToken: null,
+  registrationId: null,
 };
 
 // Section types that won't have an answer (e.g. text sections)
@@ -567,6 +573,13 @@ export function useSurveyAnswers() {
       dispatch({ type: 'SET_UNFINISHED_TOKEN', token });
     },
     /**
+     * Sets the registration ID into the context.
+     * @param registrationId Registration ID
+     */
+    setRegistrationId(registrationId: string) {
+      dispatch({ type: 'SET_REGISTRATION_ID', registrationId });
+    },
+    /**
      * Updates the given map layers to the state.
      * @param page Page to be updated
      * @param mapLayers Visible map layers
@@ -628,6 +641,11 @@ function reducer(state: State, action: Action): State {
       return {
         ...state,
         unfinishedToken: action.token,
+      };
+    case 'SET_REGISTRATION_ID':
+      return {
+        ...state,
+        registrationId: action.registrationId,
       };
     default:
       throw new Error('Invalid action type');

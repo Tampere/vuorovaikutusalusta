@@ -28,6 +28,7 @@ interface Props {
   onSaveUnfinished?: (token: string) => void;
   nextPage: SurveyPage;
   previousPage: SurveyPage;
+  registrationId?: string;
 }
 
 export default function StepperControls(props: Props) {
@@ -91,6 +92,7 @@ export default function StepperControls(props: Props) {
             props.onSaveUnfinished?.(token);
             setSaveDialogOpen(false);
           }}
+          registrationId={props.registrationId}
         />
       )}
     </>

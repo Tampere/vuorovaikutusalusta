@@ -147,6 +147,10 @@ router.put(
       .isString()
       .optional({ nullable: true })
       .withMessage('End date must be a date'),
+    body('emailIdentRequired')
+      .optional()
+      .isBoolean()
+      .withMessage('emailIdentRequired must be a boolean'),
     body('pages').optional().isArray().withMessage('Pages must be an array'),
     body('pages.*.id')
       .optional()

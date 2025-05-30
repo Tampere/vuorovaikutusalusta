@@ -123,6 +123,7 @@ export default function SurveyStepper({
     isPageValid,
     answers,
     unfinishedToken,
+    registrationId,
     getPageInvalidQuestions,
     updatePageMapLayers,
     updateAnswer,
@@ -314,9 +315,14 @@ export default function SurveyStepper({
     const visibleAnswers = getAnswersForSubmission(visiblePages);
 
     try {
+      const searchParamsString = new URLSearchParams({
+        ...(unfinishedToken && { token: unfinishedToken }),
+        ...(registrationId && { registration: registrationId }),
+      }).toString();
+
       await request(
         `/api/published-surveys/${survey.name}/submission${
-          unfinishedToken ? `?token=${unfinishedToken}` : ''
+          searchParamsString ? `?${searchParamsString}` : ''
         }`,
         { method: 'POST', body: { entries: visibleAnswers, info, language } },
       );
@@ -516,6 +522,7 @@ export default function SurveyStepper({
                     </div>
                   ))}
                   <StepperControls
+                    registrationId={registrationId}
                     nextPage={nextPage}
                     previousPage={previousPage}
                     isTestSurvey={isTestSurvey}

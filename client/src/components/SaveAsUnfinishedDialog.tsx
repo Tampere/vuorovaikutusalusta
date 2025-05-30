@@ -19,6 +19,7 @@ interface Props {
   isTestSurvey: boolean;
   onCancel: () => void;
   onSave: (token: string) => void;
+  registrationId?: string;
 }
 
 const useStyles = makeStyles({
@@ -32,6 +33,7 @@ export default function SaveAsUnfinishedDialog({
   isTestSurvey,
   onCancel,
   onSave,
+  registrationId,
 }: Props) {
   const { tr, language } = useTranslations();
   const classes = useStyles();
@@ -50,9 +52,14 @@ export default function SaveAsUnfinishedDialog({
     }
     setLoading(true);
     try {
+      const searchParamsString = new URLSearchParams({
+        ...(unfinishedToken && { token: unfinishedToken }),
+        ...(registrationId && { registration: registrationId }),
+      }).toString();
+
       const { token } = await request<{ token: string }>(
         `/api/published-surveys/${survey.name}/unfinished-submission${
-          unfinishedToken ? `?token=${unfinishedToken}` : ''
+          searchParamsString ? `?${searchParamsString}` : ''
         }`,
         {
           method: 'POST',
@@ -61,7 +68,7 @@ export default function SaveAsUnfinishedDialog({
             entries: answers,
             language,
           },
-        }
+        },
       );
       showToast({
         message: tr.SaveAsUnfinishedDialog.saveSuccessful,
@@ -86,11 +93,11 @@ export default function SaveAsUnfinishedDialog({
         setEmailDirty(false);
         onCancel();
       }}
-      aria-describedby='save-dialog-content'
+      aria-describedby="save-dialog-content"
     >
       <DialogTitle>{tr.SurveyStepper.saveAsUnfinished}</DialogTitle>
       <DialogContent>
-        <div id='save-dialog-content'>
+        <div id="save-dialog-content">
           <Typography variant="body1" className={classes.paragraph}>
             {tr.SaveAsUnfinishedDialog.description}
           </Typography>
@@ -103,7 +110,7 @@ export default function SaveAsUnfinishedDialog({
           aria-label={tr.SaveAsUnfinishedDialog.email}
           label={tr.SaveAsUnfinishedDialog.email}
           required
-          name='email'
+          name="email"
           error={emailDirty && !email.length}
           value={email}
           inputProps={{ type: 'email' }}
@@ -117,7 +124,7 @@ export default function SaveAsUnfinishedDialog({
           sx={{
             '& .MuiOutlinedInput-root.Mui-focused': {
               outlineOffset: '.5em', // Outline obstructs label otherwise
-            }
+            },
           }}
         />
       </DialogContent>
@@ -132,7 +139,7 @@ export default function SaveAsUnfinishedDialog({
           {tr.commands.cancel}
         </Button>
         <Button
-          variant='contained'
+          variant="contained"
           onClick={handleSave}
           disabled={loading || !email.length}
         >

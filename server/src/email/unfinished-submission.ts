@@ -11,15 +11,24 @@ export async function sendUnfinishedSubmissionLink({
   token,
   survey,
   language,
+  registrationId,
 }: {
   to: string;
   token: string;
   survey: Survey;
   language: LanguageCode;
+  registrationId?: string;
 }) {
   const tr = useTranslations(language);
   const subject = `${survey.title[language]} - ${tr.unfinishedSubmission}`;
-  const url = `${process.env.EMAIL_APP_URL}/${survey.name}?token=${token}`;
+  const searchParams = new URLSearchParams({
+    ...(token && { token }),
+    ...(registrationId && { registration: registrationId }),
+  }).toString();
+
+  const url = `${process.env.EMAIL_APP_URL}/${survey.name}${
+    searchParams ? `?${searchParams}` : ''
+  }`;
   try {
     await sendMail({
       message: {
@@ -32,7 +41,7 @@ export async function sendUnfinishedSubmissionLink({
         noReply: tr.noReply,
         unfinishedSurveyInfo: tr.unfinishedSurveyInfo.replace(
           '{surveyTitle}',
-          survey.title[language]
+          survey.title[language],
         ),
         continueWithLink: tr.continueWithLink,
       },

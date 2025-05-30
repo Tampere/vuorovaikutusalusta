@@ -76,6 +76,7 @@ interface DBSurvey {
   allow_saving_unfinished: boolean;
   localisation_enabled: boolean;
   submission_count?: number;
+  email_registration_required: boolean;
 }
 
 /**
@@ -193,6 +194,15 @@ type DBSurveyJoin = DBSurvey & {
 };
 
 /**
+ * DB row for survey email registration
+ */
+interface DBSurveyEmailRegistration {
+  survey_id: number;
+  email: string;
+  id: string;
+}
+
+/**
  * Helper function for creating survey page column set for database queries
  */
 const surveyPageColumnSet = getColumnSet<DBSurveyPage>('survey_page', [
@@ -241,6 +251,117 @@ const conditionColumnSet = getColumnSet<DBSectionCondition>(
     { name: 'greater_than', cast: 'int' },
   ],
 );
+
+/**
+ * Registers a user to a survey if survey email identification is required.
+ * If the user is already registered, it returns the existing registration.
+ */
+export async function registerSubmitterToSurvey(
+  surveyId: number,
+  email: string,
+) {
+  const registration = await getDb().oneOrNone<{
+    surveyId: string;
+    email: string;
+    id: string;
+  }>(
+    `SELECT id, pgp_sym_decrypt(email, $2) AS email, survey_id AS "surveyId" 
+      FROM data.survey_email_registration 
+      WHERE survey_id = $1 AND pgp_sym_decrypt(email, $2) = $3`,
+    [surveyId, process.env.DATABASE_ENCRYPTION_KEY, email],
+  );
+  if (registration) {
+    return registration;
+  }
+  return getDb().one<{ surveyId: string; email: string; id: string }>(
+    `INSERT INTO data.survey_email_registration (survey_id, email) 
+      VALUES ($1, pgp_sym_encrypt($2, $3))
+      RETURNING survey_id AS "surveyId", pgp_sym_decrypt(email, $3) as email, id 
+      `,
+    [surveyId, email, process.env.DATABASE_ENCRYPTION_KEY],
+  );
+}
+
+/**
+ * Get survey email registration by ID
+ */
+export async function getSurveyRegistration(id: string) {
+  const registration = await getDb().oneOrNone<{
+    id: string;
+    email: string;
+    survey_id: number;
+    has_submission: boolean;
+  }>(
+    `
+    SELECT 
+      ser.id, 
+      pgp_sym_decrypt(ser.email, $2) AS email, 
+      ser.survey_id, 
+      EXISTS (
+        SELECT 1 FROM data.submission s WHERE s.registration_id = ser.id AND s.unfinished_token IS NULL
+      ) AS has_submission
+    FROM data.survey_email_registration ser
+    WHERE ser.id = $1
+    `,
+    [id, process.env.DATABASE_ENCRYPTION_KEY],
+  );
+
+  if (!registration) {
+    throw new NotFoundError(`Registration token for id ${id} not found`);
+  }
+
+  return {
+    emai: registration.email,
+    surveyId: registration.survey_id,
+    id: registration.id,
+    hasSubmission: registration.has_submission,
+  };
+}
+
+/**
+ * Get survey email registration by survey ID
+ */
+export async function getSurveyRegistrationsForSurvey(surveyId: number) {
+  const registrations = await getDb().manyOrNone<DBSurveyEmailRegistration>(
+    `SELECT id, pgp_sym_decrypt(email, $2), survey_id 
+      FROM data.survey_email_registration 
+      WHERE survey_id = $1`,
+    [surveyId, process.env.DATABASE_ENCRYPTION_KEY],
+  );
+
+  return registrations.map((registration) => ({
+    email: registration.email,
+    surveyId: registration.survey_id,
+    id: registration.id,
+  }));
+}
+
+export async function validateRegistrationForSubmission(
+  surveyId: number,
+  registrationId: string,
+) {
+  // Check that registration exists or throw an error
+  const registration = await getSurveyRegistration(registrationId);
+
+  if (registration.surveyId !== surveyId) {
+    throw new BadRequestError(
+      `Registration with id ${registrationId} does not belong to survey with id ${surveyId}`,
+    );
+  }
+
+  // Check that no submissions exist for the registration expect submissions with unfinished token
+  const submission = await getDb().manyOrNone<{ id: number }>(
+    `
+    SELECT id FROM data.submission WHERE unfinished_token IS NULL AND survey_id = $1 AND registration_id = $2`,
+    [registration.surveyId, registration.id],
+  );
+
+  if (submission.length > 0) {
+    throw new BadRequestError(
+      `Registration with id ${registration.id} already has a submission`,
+    );
+  }
+}
 
 /**
  * Gets the survey with given ID or name from the database.
@@ -295,6 +416,7 @@ export async function getPublishedSurvey(
           survey.thanks_page_image_path,
           survey.display_privacy_statement,
           survey.theme_id,
+          survey.email_registration_required,
           theme_name,
           theme_data,
           page.id as page_id,
@@ -1163,7 +1285,8 @@ export async function updateSurvey(survey: Survey) {
         email_info = $24::json,
         allow_saving_unfinished = $25,
         localisation_enabled = $26,
-        display_privacy_statement = $27
+        display_privacy_statement = $27,
+        email_registration_required = $28
       WHERE id = $1 RETURNING *`,
       [
         survey.id,
@@ -1193,6 +1316,7 @@ export async function updateSurvey(survey: Survey) {
         survey.allowSavingUnfinished,
         survey.localisationEnabled,
         survey.displayPrivacyStatement,
+        survey.emailRegistrationRequired,
       ],
     )
     .catch((error) => {
@@ -1470,6 +1594,7 @@ function dbSurveyToSurvey(
     },
     allowSavingUnfinished: dbSurvey.allow_saving_unfinished,
     localisationEnabled: dbSurvey.localisation_enabled,
+    emailRegistrationRequired: dbSurvey.email_registration_required,
     // Single survey row won't contain pages - they get aggregated from a join query
     pages: [],
   };
