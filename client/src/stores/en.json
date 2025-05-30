@@ -153,7 +153,8 @@
     "alreadySubmitted": "This survey has already been answered using this link.",
     "registrationSuccessful": "Thank you for registering! A link to the survey has been sent to your email. You can now close this tab.",
     "registrationHelper": "You must order a link to your email to answer the survey. You can only order the survey link once to your email address.",
-    "submit": "Send"
+    "submit": "Send",
+    "sendingLink": "Sending the link to your email"
   },
   "FollowUpSection": {
     "title": "Follow-up question for ",

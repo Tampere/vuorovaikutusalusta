@@ -2,6 +2,7 @@ import { Survey } from '@interfaces/survey';
 import {
   Box,
   Button,
+  CircularProgress,
   FormControl,
   Link,
   Stack,
@@ -31,10 +32,12 @@ export function SurveyRegistrationPage({
   const mediumWidth = useMediaQuery('(max-width: 640px)');
   const [error, setError] = useState(false);
   const [isRegistered, setIsRegistered] = useState(false);
+  const [sendingRegistration, setSendingRegistration] = useState(false);
   const { showToast } = useToasts();
 
   async function registerUserToSurvey(email: string) {
     try {
+      setSendingRegistration(true);
       await request(
         `/api/published-surveys/${survey.name}/register${
           isTestSurvey ? '?test=true' : ''
@@ -49,6 +52,7 @@ export function SurveyRegistrationPage({
         },
       );
       setIsRegistered(true);
+      setSendingRegistration(false);
     } catch (error) {
       showToast({ message: error.message, severity: 'error' });
     }
@@ -154,6 +158,13 @@ export function SurveyRegistrationPage({
           >
             {tr.SurveyRegistrationPage.registrationSuccessful}
           </Typography>
+        ) : sendingRegistration ? (
+          <Box sx={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+            <Typography aria-hidden="true">
+              {tr.SurveyRegistrationPage.sendingLink}
+            </Typography>
+            <CircularProgress title={tr.SurveyRegistrationPage.sendingLink} />
+          </Box>
         ) : (
           <>
             <Typography
