@@ -107,7 +107,7 @@ export default function SurveyPage({ isTestSurvey }: Props) {
 
   // Check if survey has been registered with the provided registration ID
   useEffect(() => {
-    if (!survey || !registrationId) {
+    if (!survey || !registrationId || registration) {
       return;
     }
     async function checkRegistration() {
