@@ -1,4 +1,4 @@
-import { LocalizedText, SectionOption } from '@interfaces/survey';
+import { SectionOption } from '@interfaces/survey';
 import { Fab, IconButton, TextField, Tooltip, Typography } from '@mui/material';
 import { Add, Delete, DragIndicator } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
@@ -29,7 +29,7 @@ const useStyles = makeStyles({
   },
 });
 
-function generateDraftId() {
+export function generateDraftId() {
   return Math.random().toString(36);
 }
 
@@ -75,7 +75,7 @@ export default function QuestionOptions({
   ) {
     const clipboardRows = optionValue.split(/(?!\B"[^"]*)\n(?![^"]*"\B)/);
     const optionFields = clipboardRows
-      .map((row, index): { text: LocalizedText; info?: LocalizedText } => {
+      .map((row, index): SectionOption => {
         const optionFields = row.split('\t');
         let optionInfo = optionFields?.[1] ?? '';
         if (optionInfo.charAt(0) === '"') {
@@ -90,6 +90,7 @@ export default function QuestionOptions({
         )
           return null;
         return {
+          draftId: index > 0 ? generateDraftId() : optionToChange.draftId,
           text: {
             ...(index === 0
               ? optionToChange.text
@@ -181,17 +182,18 @@ export default function QuestionOptions({
                         handleClipboardInput(event.target.value, index, option);
                       } else {
                         onChange(
-                          options.map((option, i) =>
-                            index === i
+                          options.map((option, i) => {
+                            return index === i
                               ? {
                                   ...option,
+                                  draftId: option.draftId,
                                   text: {
                                     ...option.text,
                                     [surveyLanguage]: event.target.value,
                                   },
                                 }
-                              : option,
-                          ),
+                              : option;
+                          }),
                         );
                       }
                     }}
