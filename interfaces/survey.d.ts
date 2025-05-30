@@ -482,6 +482,10 @@ export interface Survey {
    * Number of submissions for the survey
    */
   submissionCount: number;
+  /**
+   * Is email registration required for submissions?
+   */
+  emailRegistrationRequired: boolean;
 }
 
 /**
@@ -745,3 +749,13 @@ export interface Conditions {
 }
 
 export type SurveyPageConditions = Record<SurveyPageSection['id'], Conditions>;
+
+/**
+ * Survey registration
+ */
+export interface SurveyRegistration {
+  id: string;
+  surveyId: number;
+  email: string;
+  hasSubmission: boolean;
+}

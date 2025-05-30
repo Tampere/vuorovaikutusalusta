@@ -39,7 +39,6 @@ export function SortableItem(props: Props) {
     id: props.id,
     ...(props.type && { type: props.type }),
   });
-
   const style = {
     opacity: isDragging ? 0 : 1,
     transform: CSS.Transform.toString(transform),

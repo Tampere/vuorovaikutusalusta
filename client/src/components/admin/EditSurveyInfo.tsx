@@ -293,6 +293,26 @@ export default function EditSurveyInfo() {
           }
           label={tr.EditSurvey.allowSavingUnfinished}
         />
+        <div>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={activeSurvey.emailRegistrationRequired}
+                onChange={(event) =>
+                  editSurvey({
+                    ...activeSurvey,
+                    emailRegistrationRequired: event.target.checked,
+                  })
+                }
+                inputProps={{ 'aria-label': 'require-email-identification' }}
+              />
+            }
+            label={tr.EditSurveyInfo.requireEmailRegistration}
+          />
+          <FormHelperText>
+            {tr.EditSurveyInfo.requireEmailRegistrationHelperText}
+          </FormHelperText>
+        </div>
         <FormControlLabel
           control={
             <Checkbox

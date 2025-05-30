@@ -66,7 +66,9 @@
     "titleColor": "Color for the section titles",
     "allowTestSurvey": "Publish test survey",
     "allowTestSurveyHelperText": "Test survey will be published under its own url. Test survey answers are not saved.",
-    "testSurveyUrl": "Test survey url"
+    "testSurveyUrl": "Test survey url",
+    "requireEmailRegistration": "Require email identification for the survey",
+    "requireEmailRegistrationHelperText": "On the survey front page, the respondent must provide their email address. A link will be sent to the address, from which the survey can be answered. The survey can only be answered once from the same email address."
   },
   "EditSurveyEmail": {
     "enable": "Enable sending reports of the survey answers via email",
@@ -144,6 +146,14 @@
     "sectionCopied": "Section copied to clipboard and can now be attached to a question.",
     "sectionAttached": "Please note that selected map layers are not copied. Check map layer selections and fix published map url if needed.",
     "attachSection": "Copy section from clipboard"
+  },
+  "SurveyRegistrationPage": {
+    "email": "Email",
+    "emailHelperText": "The email address is invalid.",
+    "alreadySubmitted": "This survey has already been answered using this link.",
+    "registrationSuccessful": "Thank you for registering! A link to the survey has been sent to your email. You can now close this tab.",
+    "registrationHelper": "You must order a link to your email to answer the survey. You can only order the survey link once to your email address.",
+    "submit": "Send"
   },
   "FollowUpSection": {
     "title": "Follow-up question for ",
@@ -382,7 +392,9 @@
     "continueSurveyLink": "Continue the survey",
     "loadUnfinishedSuccessful": "Previous answers were loaded successfully! You can now continue answering the survey.",
     "errorTokenNotFound": "Previous answers were not found with the provided address. Please check the address and try again, or start the survey from the beginning.",
-    "errorLoadingUnfinished": "Failed to load previously stored answers. Please try again later."
+    "errorLoadingUnfinished": "Failed to load previously stored answers. Please try again later.",
+    "registrationNotFound": "No registrations found with the provided token. Please register for the survey again.",
+    "errorLoadingRegistration": "Error while loading survey registrations."
   },
   "UnavailableSurvey": {
     "surveyNotPublished": "The survey is not available at the moment. Thank You for your interest on the survey!",

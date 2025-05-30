@@ -5,10 +5,18 @@ import {
   getSurveyAnswerLanguage,
   getUnfinishedAnswerEntries,
 } from '@src/application/submission';
-import { getPublishedSurvey, getSurvey } from '@src/application/survey';
+import {
+  getPublishedSurvey,
+  getSurvey,
+  getSurveyRegistration,
+  registerSubmitterToSurvey,
+  validateRegistrationForSubmission,
+} from '@src/application/survey';
 import { sendSubmissionReport } from '@src/email/submission-report';
+import { sendSurveyRegistrationEmail } from '@src/email/survey-registration';
 import { sendUnfinishedSubmissionLink } from '@src/email/unfinished-submission';
-import { ForbiddenError, NotFoundError } from '@src/error';
+import { BadRequestError, ForbiddenError, NotFoundError } from '@src/error';
+import logger from '@src/logger';
 import { validateRequest } from '@src/utils';
 import { Router } from 'express';
 import asyncHandler from 'express-async-handler';
@@ -30,6 +38,56 @@ router.get(
       throw new ForbiddenError(`Survey with name ${req.params.name} not found`);
     }
     res.json(survey);
+  }),
+);
+
+/** Endpoint for getting a published survey registration */
+router.get(
+  '/:name/registration/:id',
+  validateRequest([query('test').optional().isString()]),
+  asyncHandler(async (req, res) => {
+    const { surveyId, id, hasSubmission } = await getSurveyRegistration(
+      req.params.id,
+    );
+    res.json({ surveyId, id, hasSubmission });
+  }),
+);
+
+/**
+ * Endpoint for registering a submitter to a survey
+ */
+
+router.post(
+  '/:name/register',
+  validateRequest([
+    body('email').isEmail().withMessage('Email must be valid'),
+    body('language').isString().withMessage('Language must be a string'),
+  ]),
+  asyncHandler(async (req, res) => {
+    const survey = await getPublishedSurvey({ name: req.params.name });
+    const test = req.query.test === 'true';
+    if (!survey.emailRegistrationRequired) {
+      throw new ForbiddenError(
+        'Email registration is not allowed for this survey',
+      );
+    }
+    if ((!test && !survey.isPublished) || test) {
+      throw new ForbiddenError(`Survey with name ${req.params.name} not found`);
+    }
+
+    const registration = await registerSubmitterToSurvey(
+      survey.id,
+      req.body.email,
+    );
+    logger.info(`registration email ${registration.email}`);
+    await sendSurveyRegistrationEmail(
+      registration.email,
+      req.body.language,
+      survey.title[req.body.language],
+      `${process.env.EMAIL_APP_URL}/${survey.name}?registration=${registration.id}`,
+    );
+
+    res.status(201).send();
   }),
 );
 
@@ -55,6 +113,10 @@ router.post(
       .withMessage('Email must be valid'),
     body('language').isString().withMessage('Language must be a string'),
     query('token').optional().isString().withMessage('Token must be a string'),
+    query('registration')
+      .optional()
+      .isString()
+      .withMessage('Registration must be a string'),
   ]),
   asyncHandler(async (req, res) => {
     const survey = await getSurvey({ name: req.params.name });
@@ -62,6 +124,18 @@ router.post(
       // In case the survey shouldn't be published, throw the same not found error
       throw new NotFoundError(`Survey with name ${req.params.name} not found`);
     }
+    const registrationId = req.query.registration
+      ? String(req.query.registration)
+      : null;
+    if (survey.emailRegistrationRequired) {
+      if (!registrationId) {
+        throw new BadRequestError(
+          'Registration ID is required in order to submit',
+        );
+      }
+      await validateRegistrationForSubmission(survey.id, registrationId);
+    }
+
     const answerEntries: AnswerEntry[] = req.body.entries;
     const answerLanguage = req.body.language;
     const unfinishedToken = req.query.token ? String(req.query.token) : null;
@@ -69,6 +143,7 @@ router.post(
       survey.id,
       answerEntries,
       unfinishedToken,
+      registrationId,
       false,
       answerLanguage,
     );
@@ -136,12 +211,27 @@ router.post(
     body('email').isEmail().withMessage('Email must be valid'),
     body('language').isString().withMessage('Language must be a string'),
     query('token').optional().isString().withMessage('Token must be a string'),
+    query('registration')
+      .optional()
+      .isString()
+      .withMessage('Registration must be a string'),
   ]),
   asyncHandler(async (req, res) => {
     const survey = await getSurvey({ name: req.params.name });
     if (!survey.isPublished) {
       // In case the survey shouldn't be published, throw the same not found error
       throw new NotFoundError(`Survey with name ${req.params.name} not found`);
+    }
+    const registrationId = req.query.registration
+      ? String(req.query.registration)
+      : null;
+    if (survey.emailRegistrationRequired) {
+      if (!registrationId) {
+        throw new BadRequestError(
+          'Registration ID is required in order to submit',
+        );
+      }
+      await validateRegistrationForSubmission(survey.id, registrationId);
     }
     const answerEntries: AnswerEntry[] = req.body.entries;
     const language = req.body.language;
@@ -150,6 +240,7 @@ router.post(
       survey.id,
       answerEntries,
       unfinishedToken,
+      registrationId,
       true,
       language,
     );
@@ -161,6 +252,7 @@ router.post(
       token: newToken,
       survey,
       language,
+      registrationId,
     });
   }),
 );

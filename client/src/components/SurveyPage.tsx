@@ -1,4 +1,4 @@
-import { Survey } from '@interfaces/survey';
+import { Survey, SurveyRegistration } from '@interfaces/survey';
 import { Box, CircularProgress } from '@mui/material';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import { useSurveyTheme } from '@src/stores/SurveyThemeProvider';
@@ -15,6 +15,7 @@ import SurveyStepper from './SurveyStepper';
 import SurveyThanksPage from './SurveyThanksPage';
 import TestSurveyFrame from './TestSurveyFrame';
 import { UnavailableSurvey } from './UnavailableSurvey';
+import { SurveyRegistrationPage } from './SurveyRegistrationPage';
 
 interface Props {
   isTestSurvey?: boolean;
@@ -29,16 +30,34 @@ export default function SurveyPage({ isTestSurvey }: Props) {
   }>(null);
   const [errorStatusCode, setErrorStatusCode] = useState<number>(null);
   const [continueUnfinished, setContinueUnfinished] = useState(false);
+  const [registration, setRegistration] = useState<SurveyRegistration | null>(
+    null,
+  );
+  const [registrationLoading, setRegistrationLoading] = useState(false);
 
   const { name } = useParams<{ name: string }>();
-  const { setSurvey, survey, loadUnfinishedEntries } = useSurveyAnswers();
+  const { setSurvey, survey, loadUnfinishedEntries, setRegistrationId } =
+    useSurveyAnswers();
   const { setThemeFromSurvey } = useSurveyTheme();
   const { search } = useLocation();
   const { tr, language } = useTranslations();
   const { showToast } = useToasts();
 
+  const needsRegistration =
+    survey?.emailRegistrationRequired && registration?.surveyId !== survey?.id;
+
+  const registrationHasSubmission =
+    survey?.emailRegistrationRequired &&
+    registration?.surveyId === survey?.id &&
+    registration?.hasSubmission;
+
   const unfinishedToken = useMemo(
     () => new URLSearchParams(search)?.get('token'),
+    [search],
+  );
+
+  const registrationId = useMemo(
+    () => new URLSearchParams(search)?.get('registration'),
     [search],
   );
 
@@ -86,6 +105,39 @@ export default function SurveyPage({ isTestSurvey }: Props) {
       .join(' - ');
   }, [survey]);
 
+  // Check if survey has been registered with the provided registration ID
+  useEffect(() => {
+    if (!survey || !registrationId) {
+      return;
+    }
+    async function checkRegistration() {
+      setRegistrationLoading(true);
+      try {
+        const response = await request<SurveyRegistration>(
+          `/api/published-surveys/${survey.name}/registration/${registrationId}`,
+        );
+        if (response.surveyId === survey.id) {
+          setRegistration(response);
+          setRegistrationId(registrationId);
+        }
+      } catch (error) {
+        if (error.status === 404) {
+          showToast({
+            message: tr.SurveyPage.registrationNotFound,
+            severity: 'error',
+          });
+        } else {
+          showToast({
+            message: tr.SurveyPage.errorLoadingRegistration,
+            severity: 'error',
+          });
+        }
+      }
+      setRegistrationLoading(false);
+    }
+    checkRegistration();
+  }, [survey, registrationId, setRegistrationLoading]);
+
   // Try to continue unfinished submission if an unfinished token is provided in query parameters
   useEffect(() => {
     if (!survey || !unfinishedToken) {
@@ -119,8 +171,8 @@ export default function SurveyPage({ isTestSurvey }: Props) {
     continueSubmission();
   }, [survey, unfinishedToken]);
 
-  return !survey ? (
-    loading ? (
+  return !survey || registrationLoading ? (
+    loading || registrationLoading ? (
       <Box
         sx={{
           display: 'flex',
@@ -144,29 +196,41 @@ export default function SurveyPage({ isTestSurvey }: Props) {
           maxHeight: '-webkit-fill-available',
         }}
       >
-        {(showLandingPage || showThanksPage) && survey.localisationEnabled && (
-          <SurveyLanguageMenu
-            changeUILanguage={true}
-            style={{
-              position: 'absolute',
-              top: '1rem',
-              left: '1rem',
-              zIndex: 10,
-            }}
-          />
-        )}
-        {/* Landing page */}
-        {showLandingPage && (
-          <SurveyLandingPage
-            survey={survey}
+        {(showLandingPage ||
+          showThanksPage ||
+          (survey.emailRegistrationRequired &&
+            (needsRegistration || registrationHasSubmission))) &&
+          survey.localisationEnabled && (
+            <SurveyLanguageMenu
+              changeUILanguage={true}
+              style={{
+                position: 'absolute',
+                top: '1rem',
+                left: '1rem',
+                zIndex: 10,
+              }}
+            />
+          )}
+        {needsRegistration || registrationHasSubmission ? (
+          <SurveyRegistrationPage
             isTestSurvey={isTestSurvey}
-            continueUnfinished={continueUnfinished}
-            surveyBackgroundImage={surveyBackgroundImage}
-            onStart={() => {
-              setShowLandingPage(false);
-            }}
+            survey={survey}
+            isSubmitted={registration?.hasSubmission}
           />
+        ) : (
+          showLandingPage && (
+            <SurveyLandingPage
+              survey={survey}
+              isTestSurvey={isTestSurvey}
+              continueUnfinished={continueUnfinished}
+              surveyBackgroundImage={surveyBackgroundImage}
+              onStart={() => {
+                setShowLandingPage(false);
+              }}
+            />
+          )
         )}
+
         {/* Survey page */}
         {!showLandingPage && !showThanksPage && (
           <SurveyStepper

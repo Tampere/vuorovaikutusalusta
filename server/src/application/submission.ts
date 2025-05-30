@@ -188,6 +188,7 @@ export async function createSurveySubmission(
   surveyID: number,
   answerEntries: AnswerEntry[],
   unfinishedToken: string,
+  registrationId: string | null = null,
   unfinished = false,
   language: LanguageCode,
 ) {
@@ -211,20 +212,28 @@ export async function createSurveySubmission(
   }>(
     !unfinished
       ? `
-    INSERT INTO data.submission (survey_id, created_at, language) VALUES (
+    INSERT INTO data.submission (survey_id, created_at, language, registration_id) VALUES (
       $1,
       COALESCE($2, NOW()),
-      $4
+      $4,
+      $5
     ) RETURNING id, updated_at;
   `
       : `
-    INSERT INTO data.submission (survey_id, created_at, unfinished_token, language) VALUES (
+    INSERT INTO data.submission (survey_id, created_at, unfinished_token, language, registration_id) VALUES (
         $1,
         COALESCE($2, NOW()),
         COALESCE($3, gen_random_uuid()),
-        $4
+        $4,
+        $5
     ) RETURNING id, unfinished_token, updated_at;`,
-    [surveyID, oldRow?.created_at ?? null, unfinishedToken ?? null, language],
+    [
+      surveyID,
+      oldRow?.created_at ?? null,
+      unfinishedToken ?? null,
+      language,
+      registrationId,
+    ],
   );
 
   if (!submissionRow) {

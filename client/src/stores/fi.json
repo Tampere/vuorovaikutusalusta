@@ -66,7 +66,9 @@
     "titleColor": "Osioiden otsikoiden väri",
     "allowTestSurvey": "Julkaise testikysely",
     "allowTestSurveyHelperText": "Kyselystä julkaistaan testiversio oman osoitteen taakse. Testikyselystä ei tallenneta vastauksia.",
-    "testSurveyUrl": "Testikyselyn osoite"
+    "testSurveyUrl": "Testikyselyn osoite",
+    "requireEmailRegistration": "Kyselyyn tunnistautuminen sähköpostilla",
+    "requireEmailRegistrationHelperText": "Kyselyn etusivulla vastaajan täytyy antaa sähköpostiosoitteensa. Osoitteeseen toimitetaan linkki, josta pääsee vastaamaan kyselyyn. Kyselyyn voi vastata vain kerran samasta sähköpostiosoitteesta."
   },
   "EditSurveyEmail": {
     "enable": "Salli vastausten raportointi sähköpostitse",
@@ -144,6 +146,14 @@
     "sectionCopied": "Osio kopioitu leikepöydälle. Voit nyt liittää kopioidun osion haluamallesi kyselylle.",
     "sectionAttached": "Huomaa, että karttatasovalinnat eivät kopioidu. Tarkista karttatasovalinnat ja korjaa tarvittaessa karttajulkaisuosoitetta",
     "attachSection": "Uusi osio leikepöydältä"
+  },
+  "SurveyRegistrationPage": {
+    "email": "Sähköposti",
+    "emailHelperText": "Sähköpostiosoite on virheellinen.",
+    "alreadySubmitted": "Tämän linkin kautta on jo vastattu kyselyyn.",
+    "registrationSuccessful": "Kiitos rekisteröitymisestä! Sähköpostiin on lähetetty linkki kyselyyn. Voit nyt sulkea tämän välilehden.",
+    "registrationHelper": "Sinun tulee tilata linkki sähköpostiisi, jotta pystyt vastaamaan kyselyyn. Voit tilata kyselylinkin vain kerran sähköpostiosoitteeseesi.",
+    "submit": "Lähetä"
   },
   "FollowUpSection": {
     "title": "Jatkokysymys kysymykselle",
@@ -382,7 +392,9 @@
     "continueSurveyLink": "Jatka kyselyä tästä",
     "loadUnfinishedSuccessful": "Tallennetut vastaukset ladattu onnistuneesti! Voit jatkaa kyselyn täyttämistä.",
     "errorTokenNotFound": "Antamallasi osoitteella ei löytynyt tallennettuja vastauksia. Tarkista osoite tai aloita kyselyn täyttäminen alusta.",
-    "errorLoadingUnfinished": "Tallennettujen vastausten lataamisessa tapahtui virhe. Yritä myöhemmin uudestaan."
+    "errorLoadingUnfinished": "Tallennettujen vastausten lataamisessa tapahtui virhe. Yritä myöhemmin uudestaan.",
+    "registrationNotFound": "Tunnuksella ei löydy tallennettuja rekisteröitymisiä. Ole hyvä ja rekisteröidy kyselyyn uudelleen.",
+    "errorLoadingRegistration": "Virhe ladattaessa kyselyn rekisteröitymisiä."
   },
   "UnavailableSurvey": {
     "surveyNotPublished": "Kiitos mielenkiinnostasi! Kysely ei ole tällä hetkellä avoinna eikä siihen voi vastata.",

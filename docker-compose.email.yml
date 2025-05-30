@@ -1,0 +1,11 @@
+services:
+  email:
+    image: rnwood/smtp4dev:v3
+    restart: always
+    ports:
+      # Web interface
+      - '8081:80'
+      # SMTP server
+      - '2525:25'
+      # IMAP server
+      - '143:143'

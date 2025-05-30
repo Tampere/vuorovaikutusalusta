@@ -25,6 +25,7 @@ import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { ReactNode, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { generateDraftId } from './QuestionOptions';
 
 const useStyles = makeStyles({
   actionItem: {
@@ -64,7 +65,9 @@ export default function AddSurveySectionActions(props: Props) {
       title: initializeLocalizedObject(''),
       isRequired: false,
       info: null,
-      options: [{ text: initializeLocalizedObject('') }],
+      options: [
+        { text: initializeLocalizedObject(''), draftId: generateDraftId() },
+      ],
       answerLimits: null,
       allowCustomAnswer: false,
     },
@@ -73,7 +76,9 @@ export default function AddSurveySectionActions(props: Props) {
       title: initializeLocalizedObject(''),
       isRequired: false,
       info: null,
-      options: [{ text: initializeLocalizedObject('') }],
+      options: [
+        { text: initializeLocalizedObject(''), draftId: generateDraftId() },
+      ],
       allowCustomAnswer: false,
     },
     numeric: {
@@ -121,7 +126,9 @@ export default function AddSurveySectionActions(props: Props) {
     sorting: {
       type: 'sorting',
       title: initializeLocalizedObject(''),
-      options: [{ text: initializeLocalizedObject('') }],
+      options: [
+        { text: initializeLocalizedObject(''), draftId: generateDraftId() },
+      ],
       isRequired: false,
       info: null,
     },
