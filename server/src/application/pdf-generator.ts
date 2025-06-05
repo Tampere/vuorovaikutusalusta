@@ -8,7 +8,6 @@ import {
   SurveyFollowUpSection,
   SurveyMapQuestion,
   SurveyMatrixQuestion,
-  SurveyPage,
   SurveyPageSection,
   SurveyPersonalInfoQuestion,
 } from '@interfaces/survey';
@@ -619,25 +618,57 @@ export async function generatePdf(
   );
   const document = new PdfPrinter(fonts).createPdfKitDocument({
     content,
-    footer: (currentPage, pageCount) => {
-      if (currentPage === 1) return '';
+    pageMargins: [40, 20, 40, 60],
+    footer: (currentPage, pageCount): Content => {
+      if (currentPage === 1) {
+        return {
+          margin: [40, 0, 40, 0],
+          columns: [
+            {
+              alignment: 'right',
+              text: `${currentPage}/${pageCount}`,
+              color: '#5e5e5e',
+              fontSize: 10,
+            },
+          ],
+        } as Content;
+      }
       return {
         margin: [40, 0, 40, 0],
         columns: [
           {
-            alignment: 'left',
-            text: `${survey.title?.[language]}: ${(personalInfo?.value as PersonalInfoAnswer)?.name ?? submission.id}`,
-            color: '#5e5e5e',
-            fontSize: 10,
+            width: '90%',
+            stack: [
+              {
+                alignment: 'left',
+                text: `${survey.title?.[language]}`,
+                color: '#5e5e5e',
+                fontSize: 10,
+                marginBottom: 2,
+              },
+              {
+                alignment: 'left',
+                text: `${(personalInfo?.value as PersonalInfoAnswer)?.name}`,
+                color: '#5e5e5e',
+                fontSize: 10,
+                marginBottom: 2,
+              },
+              {
+                alignment: 'left',
+                text: submission.id,
+                color: '#5e5e5e',
+                fontSize: 10,
+              },
+            ],
           },
           {
             alignment: 'right',
-            text: `${currentPage - 1}/${pageCount - 1}`,
+            text: `${currentPage}/${pageCount}`,
             color: '#5e5e5e',
             fontSize: 10,
           },
         ],
-      };
+      } as Content;
     },
     defaultStyle: {
       font: 'Helvetica',
