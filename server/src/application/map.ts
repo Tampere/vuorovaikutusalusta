@@ -18,22 +18,25 @@ export async function getAvailableMapLayers(
       configuration: {
         mapfull: {
           conf: {
-            layers: MapLayer[];
+            layers: {
+              id: number;
+              name?: string;
+              locale?: Record<
+                'fi' | 'en' | 'sv',
+                {
+                  name?: string;
+                }
+              >;
+            }[];
           };
         };
       };
     };
     const layers = responseJson.configuration?.mapfull?.conf?.layers?.map(
-      ({ id, name }) => ({
+      ({ id, name, locale }) => ({
         id,
-        name:
-          typeof name === 'string'
-            ? name
-            : // For user-created datasets, the name might be a localized object instead of a string.
-              // In this case, just pick the first one available
-              Object.keys(name).length > 0
-              ? name[Object.keys(name)[0]]
-              : '<untitled layer>',
+        // For user-created datasets, the name is inside the locale object
+        name: locale?.fi?.name ?? name ?? '<untitled layer>',
       }),
     );
     // For non-existent UUIDs the full layer path won't exist in the response object
