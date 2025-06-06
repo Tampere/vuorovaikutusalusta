@@ -8,7 +8,6 @@ import parseCSSColor from 'parse-css-color';
 import { Page } from 'puppeteer';
 import { Cluster } from 'puppeteer-cluster';
 import { getAvailableMapLayers } from './map';
-import logger from '@src/logger';
 
 /**
  * Oskari needs to be declared, because it is available as a global variable inside
@@ -147,7 +146,7 @@ async function generateScreenshots({
               shape: question.featureStyles?.point?.markerIcon ?? 0,
               offsetX: 0,
               offsetY: 0,
-              size: question.featureStyles?.point?.markerIcon ? 64 : 12,
+              size: question.featureStyles?.point?.markerIcon ? 128 : 12,
             },
           ]);
           sandbox.postRequestByName('MapMoveRequest', [
