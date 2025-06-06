@@ -139,14 +139,17 @@ async function generateScreenshots({
 
         if (feature.geometry.type === 'Point') {
           // In case of adding a point, create a marker and zoom to it
+          const isCustomIcon = !!question.featureStyles?.point?.markerIcon;
           sandbox.postRequestByName('MapModulePlugin.AddMarkerRequest', [
             {
               x: feature.geometry.coordinates[0],
               y: feature.geometry.coordinates[1],
-              shape: question.featureStyles?.point?.markerIcon ?? 0,
+              shape: isCustomIcon
+                ? question.featureStyles?.point?.markerIcon
+                : 0,
               offsetX: 0,
               offsetY: 0,
-              size: question.featureStyles?.point?.markerIcon ? 128 : 12,
+              size: isCustomIcon ? 128 : 12,
             },
           ]);
           sandbox.postRequestByName('MapMoveRequest', [
