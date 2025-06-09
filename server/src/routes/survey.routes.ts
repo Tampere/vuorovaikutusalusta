@@ -20,12 +20,13 @@ import {
   updateSurvey,
   userCanEditSurvey,
 } from '@src/application/survey';
-import { ensureAuthenticated } from '@src/auth';
+import { ensureAuthenticated, ensureSurveyGroupAccess } from '@src/auth';
 import { ForbiddenError } from '@src/error';
 import { Router } from 'express';
 import asyncHandler from 'express-async-handler';
 import { body, param, query } from 'express-validator';
 import { validateRequest } from '../utils';
+import { isInternalUser } from '@src/user';
 const router = Router();
 
 /**
@@ -59,9 +60,11 @@ router.get(
   asyncHandler(async (req, res) => {
     const userId = req.user.id;
     const { filterByAuthored, filterByPublished } = req.query;
+
     const surveys = await getSurveys(
       filterByAuthored ? userId : null,
       Boolean(filterByPublished),
+      isInternalUser(req.user) ? undefined : req.user,
     );
     res.status(200).json(surveys);
   }),
@@ -76,6 +79,7 @@ router.get(
     param('id').isNumeric().toInt().withMessage('ID must be a number'),
   ]),
   ensureAuthenticated(),
+  ensureSurveyGroupAccess(),
   asyncHandler(async (req, res) => {
     const id = Number(req.params.id);
     const survey = await getSurvey({ id });
@@ -101,6 +105,7 @@ router.post(
 router.put(
   '/:id',
   ensureAuthenticated(),
+  ensureSurveyGroupAccess(),
   validateRequest([
     param('id').isNumeric().toInt().withMessage('ID must be a number'),
     body('name')
@@ -198,6 +203,7 @@ router.put(
 router.delete(
   '/:id',
   ensureAuthenticated(),
+  ensureSurveyGroupAccess(),
   validateRequest([
     param('id').isNumeric().toInt().withMessage('ID must be a number'),
   ]),
@@ -218,6 +224,7 @@ router.delete(
 router.post(
   '/:id/copy',
   ensureAuthenticated(),
+  ensureSurveyGroupAccess(),
   validateRequest([
     param('id').isNumeric().toInt().withMessage('ID must be a number'),
   ]),
@@ -355,6 +362,7 @@ async function processFileUrl(
 router.post(
   '/:id/publish',
   ensureAuthenticated(),
+  ensureSurveyGroupAccess(),
   validateRequest([
     param('id').isNumeric().toInt().withMessage('ID must be a number'),
   ]),
@@ -376,6 +384,7 @@ router.post(
 router.post(
   '/:id/unpublish',
   ensureAuthenticated(),
+  ensureSurveyGroupAccess(),
   validateRequest([
     param('id').isNumeric().toInt().withMessage('ID must be a number'),
   ]),
@@ -397,6 +406,7 @@ router.post(
 router.post(
   '/:id/page',
   ensureAuthenticated(),
+  ensureSurveyGroupAccess(),
   validateRequest([
     param('id').isNumeric().toInt().withMessage('ID must be a number'),
   ]),
@@ -418,6 +428,7 @@ router.post(
 router.delete(
   '/:surveyId/page/:id',
   ensureAuthenticated(),
+  ensureSurveyGroupAccess('surveyId'),
   validateRequest([
     param('surveyId')
       .isNumeric()
@@ -446,6 +457,7 @@ router.delete(
 router.get(
   '/:surveyId/report/:submissionId/:lang',
   ensureAuthenticated(),
+  ensureSurveyGroupAccess('surveyId'),
   asyncHandler(async (req, res) => {
     const surveyId = Number(req.params.surveyId);
     const submissionId = Number(req.params.submissionId);
@@ -480,6 +492,7 @@ router.get(
 router.get(
   '/:id/submissions',
   ensureAuthenticated(),
+  ensureSurveyGroupAccess(),
   validateRequest([
     param('id').isNumeric().toInt().withMessage('ID must be a number'),
   ]),

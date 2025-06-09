@@ -1,13 +1,23 @@
 import logger from '@src/logger';
-import { getUser, upsertUser } from '@src/user';
+import { getUser, isAdmin, isInternalUser, upsertUser } from '@src/user';
 import ConnectPgSimple from 'connect-pg-simple';
 import { Express, NextFunction, Request, Response } from 'express';
+import asyncHandler from 'express-async-handler';
 import expressSession from 'express-session';
 import passport from 'passport';
 import { encrypt } from '../crypto';
 import { getDb } from '../database';
 import { configureAzureAuth } from './azure';
 import { configureGoogleOAuth } from './google-oauth';
+import { userCanEditSurvey } from '@src/application/survey';
+import { ForbiddenError } from '@src/error';
+
+/** Can see all surveys and edit them */
+export const ADMIN_ROLE = 'TRE_FIILIS_ADMINS';
+/**  Can see all surveys, and edit if user is author or admin of the survey */
+export const INTERNAL_USER_GROUP_ROLES = ['TRE_FIILIS_USERS'] as const;
+/** Can see only external surveys, and edit if user is author or admin of the survey */
+export const EXTERNAL_USER_GROUP_ROLES = ['TRE_FIILIS_CONSULTANTS'] as const;
 
 /**
  * Configures authentication for given Express application.
@@ -85,9 +95,10 @@ export function configureAuth(app: Express) {
 export function configureMockAuth(app: Express) {
   // Create a mock user & persist it in the database
   const mockUser: Express.User = {
-    id: '12345-67890-abcde-fghij',
-    fullName: 'Teemu Testaaja',
+    id: '12345-67890-abcde-fghij1',
+    fullName: 'Teemu Konsultti',
     email: 'teemu.testaaja@testi.com',
+    roles: ['TRE_FIILIS_CONSULTANTS'],
   };
   upsertUser(mockUser);
 
@@ -138,4 +149,24 @@ export function ensureAuthenticated(options?: { redirectToLogin?: boolean }) {
       fail();
     }
   };
+}
+
+export function ensureSurveyGroupAccess(surveyIdIdentifier: string = 'id') {
+  return asyncHandler(
+    // Note! Super important to wrap this in asyncHandler to catch errors as express doesn't catch async errors by default
+    async (req: Request, res: Response, next: NextFunction) => {
+      // Admin and internal users have access to all surveys
+      if (isAdmin(req.user) || isInternalUser(req.user)) {
+        return next();
+      }
+
+      if (userCanEditSurvey(req.user, Number(req.params[surveyIdIdentifier]))) {
+        return next();
+      }
+
+      throw new ForbiddenError(
+        `User ${req.user.id} does not have access to survey with ID ${req.params[surveyIdIdentifier]}`,
+      );
+    },
+  );
 }
