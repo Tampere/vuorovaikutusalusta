@@ -38,6 +38,7 @@ import { AdminSurveyMapPreview } from './AdminSurveyMapPreview';
 import { EditSurveyPageConditions } from './EditSurveyPageConditions';
 import FileUpload from './FileUpload';
 import SurveySections from './SurveySections';
+import { getLayerName } from '@src/utils/oskariHelpers';
 
 const useStyles = makeStyles({
   button: {
@@ -251,7 +252,11 @@ export default function EditSurveyPage(props: Props) {
                     <FormControlLabel
                       sx={{ maxWidth: '500px' }}
                       key={layer.id}
-                      label={layer.name}
+                      label={getLayerName(
+                        layer,
+                        surveyLanguage,
+                        tr.EditSurveyInfo.layerNameFallback,
+                      )}
                       control={
                         <Checkbox
                           checked={page.sidebar.mapLayers?.includes(layer.id)}
@@ -271,7 +276,11 @@ export default function EditSurveyPage(props: Props) {
                               },
                             });
                           }}
-                          name={layer.name}
+                          name={getLayerName(
+                            layer,
+                            surveyLanguage,
+                            tr.EditSurveyInfo.layerNameFallback,
+                          )}
                         />
                       }
                     />

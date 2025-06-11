@@ -19,7 +19,7 @@ const translations = {
 /**
  * All possible languages
  */
-type Language = keyof typeof translations;
+export type Language = keyof typeof translations;
 
 /**
  * Reducer state type
