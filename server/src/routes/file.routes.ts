@@ -13,25 +13,24 @@ import {
   ensureFileGroupAccess,
   ensureSuperUserAccess,
 } from '@src/auth';
-import { BadRequestError, InternalServerError } from '@src/error';
-import { validateBinaryFile, validateTextFile } from '@src/fileValidation';
+import { BadRequestError } from '@src/error';
+import {
+  fileTypeRegex,
+  validateBinaryFile,
+  validateTextFile,
+} from '@src/fileValidation';
 
 import { parsePdfMimeType, validateRequest } from '@src/utils';
 import { Router } from 'express';
 import asyncHandler from 'express-async-handler';
 import { param } from 'express-validator';
 import multer, { FileFilterCallback } from 'multer';
-import path from 'path';
 
 const router = Router();
 
-const fileTypeRegex = {
-  pdf: /pdf/,
-  media: /svg|png|jpg|jpeg|mp4|mkv|webm|avi|wmv|m4p|m4v|mpg|mpeg|m4v|mov/,
-  all: /svg|png|jpg|jpeg|pdf|vnd\.openxmlformats-officedocument\.spreadsheetml\.sheet|xlsx|vnd\.openxmlformats-officedocument\.wordprocessingml\.document|docx|mp4|mkv|webm|avi|wmv|m4p|m4v|mpg|mpeg|m4v|mov/,
-};
+type FileType = keyof typeof fileTypeRegex;
 
-export function validateBinary(fileType: keyof typeof fileTypeRegex) {
+export function validateBinary(fileType: FileType) {
   return asyncHandler(async (req, _res, next) => {
     if (!req.file) {
       return next();
@@ -43,7 +42,7 @@ export function validateBinary(fileType: keyof typeof fileTypeRegex) {
 }
 
 function validateText(
-  fileType: keyof typeof fileTypeRegex,
+  fileType: FileType,
   file: Express.Multer.File,
   cb: FileFilterCallback,
 ) {
@@ -55,7 +54,7 @@ function validateText(
   );
 }
 
-function upload(fileType: keyof typeof fileTypeRegex) {
+function upload(fileType: FileType) {
   const multerUpload = multer({
     limits: { fileSize: 10 * 1000 * 1000 },
     fileFilter: (_req, file, cb) => validateText(fileType, file, cb),
