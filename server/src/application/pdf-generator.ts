@@ -646,13 +646,17 @@ export async function generatePdf(
                 fontSize: 10,
                 marginBottom: 2,
               },
-              {
-                alignment: 'left',
-                text: `${(personalInfo?.value as PersonalInfoAnswer)?.name}`,
-                color: '#5e5e5e',
-                fontSize: 10,
-                marginBottom: 2,
-              },
+              ...(personalInfo?.value
+                ? [
+                    {
+                      alignment: 'left',
+                      text: `${(personalInfo.value as PersonalInfoAnswer)?.name}`,
+                      color: '#5e5e5e',
+                      fontSize: 10,
+                      marginBottom: 2,
+                    },
+                  ]
+                : []),
               {
                 alignment: 'left',
                 text: submission.id,
