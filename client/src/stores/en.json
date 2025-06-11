@@ -72,7 +72,7 @@
   "EditSurveyInfo": {
     "title": "Survey title",
     "subtitle": "Survey subtitle",
-    "description": "Kyselyn kuvaus",
+    "description": "Survey description",
     "name": "Survey name",
     "nameHelperText": "The name displayed on the survey URL-address. This can only include characters (a-z), numbers (0-9), hyphen (-) and underline (_).",
     "author": "Survey author / contact person",
@@ -97,13 +97,14 @@
     "allowTestSurvey": "Publish test survey",
     "allowTestSurveyHelperText": "Test survey will be published under its own url. Test survey answers are not saved.",
     "testSurveyUrl": "Test survey url",
-    "userGroupFetchFailed": "Käyttäjäryhmien haku epäonnistui.",
-    "userGroups": "Käyttäjäryhmien rajaus",
-    "userGroupsHelperText": "Käyttäjäryhmät, joille kysely on nähtävissä kyselylistauksessa. Jos käyttäjäryhmiä ei ole valittu, kysely on nähtävissä kaikille käyttäjille. Vain kyselyn laatija ja pääkäyttäjä voivat muokata käyttäjäryhmiä."
+    "userGroupFetchFailed": "Failed to fetch user groups.",
+    "userGroups": "User group restriction",
+    "userGroupsHelperText": "User groups that can see the survey in the survey list. If no user groups are selected, the survey is visible to all users. Only the survey author and superuser can edit user groups.",
+    "layerNameFallback": "Own map layer (No translation)"
   },
   "EditSurveyEmail": {
     "enable": "Enable sending reports of the survey answers via email",
-    "enableHelperText": "If you enable sending answer reports via email, reports of individual respondent's answers will be send as pdf-reports to the mailing list described below. At the end of the survey, the respondent is asked for an email address where the answer report can be sent to.",
+    "enableHelperText": "If you enable sending answer reports via email, reports of individual respondent's answers will be sent as PDF reports to the mailing list described below. At the end of the survey, the respondent is asked for an email address where the answer report can be sent.",
     "autoSendTo": "Email recipients",
     "autoSendToHelperText": "The answer report will be sent as an attachment to each of these email recipients (in addition to the respondent)",
     "emailSubject": "Email subject",
@@ -113,8 +114,8 @@
     "includePersonalInfo": "Include respondent's personal information",
     "includePersonalInfoHelperText": "Responses to the personal information question, if any, will be included on the front page of the PDF report.",
     "includeMarginImages": "Include top and bottom margin images",
-    "required": "Vastaajan sähköpostiosoite pakollinen",
-    "requiredHelperText": "Vastaajan on annettava sähköpostiosoitteensa vastatakseen kyselyyn."
+    "required": "Respondent's email address required",
+    "requiredHelperText": "The respondent must provide their email address to answer the survey."
   },
   "KeyValueForm": {
     "key": "Key",
@@ -257,7 +258,7 @@
   "SurveySection": {
     "personalInfoQuestion": "Personal information question",
     "radioQuestion": "Radio button question (single choice)",
-    "radioImageQuestion": "Kuvavalintakysymys",
+    "radioImageQuestion": "Radio button image question (single choice)",
     "checkBoxQuestion": "Radio button question (single choice)",
     "numericQuestion": "Numeric question",
     "mapQuestion": "Map question",
@@ -727,25 +728,25 @@
     "userRequestComplete": "User added.",
     "userExists": "User already exists.",
     "userRequestFailed": "Failed to add user information.",
-    "isPending": "Odottaa",
-    "isActive": "Aktiivinen",
-    "userGroupFetchFailed": "Käyttäjäryhmien haku epäonnistui."
+    "isPending": "Pending",
+    "isActive": "Active",
+    "userGroupFetchFailed": "Failed to fetch user groups."
   },
   "UserGroupManagement": {
-    "userGroups": "Käyttäjäryhmät",
-    "addGroupPlaceholder": "Uusi ryhmä",
-    "addGroup": "Lisää ryhmä",
-    "addGroupLabel": "Ryhmän nimi",
-    "noGroups": "Ei määriteltyjä käyttäjäryhmiä.",
-    "groupFetchError": "Virhe haettaessa käyttäjäryhmiä.",
-    "groupCreationComplete": "Käyttäjäryhmä lisätty.",
-    "groupCreationFailed": "Käyttäjäryhmän lisääminen epäonnistui.",
-    "groupDeletionComplete": "Käyttäjäryhmä poistettu.",
-    "groupDeletionFailed": "Käyttäjäryhmän poistaminen epäonnistui."
+    "userGroups": "User groups",
+    "addGroupPlaceholder": "New group",
+    "addGroup": "Add group",
+    "addGroupLabel": "Group name",
+    "noGroups": "No defined user groups.",
+    "groupFetchError": "Error fetching user groups.",
+    "groupCreationComplete": "User group added.",
+    "groupCreationFailed": "Failed to add user group.",
+    "groupDeletionComplete": "User group deleted.",
+    "groupDeletionFailed": "Failed to delete user group."
   },
   "UserGroupSelect": {
-    "updateSuccess": "Käyttäjäryhmä päivitetty onnistuneesti.",
-    "updateFailed": "Käyttäjäryhmän päivittäminen epäonnistui."
+    "updateSuccess": "User group updated successfully.",
+    "updateFailed": "Failed to update user group."
   },
   "navigation": {
     "next": "Next",

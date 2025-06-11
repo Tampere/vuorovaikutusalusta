@@ -72,7 +72,7 @@
   "EditSurveyInfo": {
     "title": "Undersökningens titel",
     "subtitle": "Undersökningens undertitel",
-    "description": "Kyselyn kuvaus",
+    "description": "Undersökningens beskrivning",
     "name": "Undersökningens namn",
     "nameHelperText": "Namnet som syns i undersökningens URL-adress. Kan innehålla endast bokstäver (a-z), siffror (0-9) och bindestreck (- och _).",
     "author": "Undersökningens författare/kontaktperson",
@@ -97,9 +97,10 @@
     "allowTestSurvey": "Publicera testundersökning",
     "allowTestSurveyHelperText": "En testversion av undersökningen publiceras på din egen adress. Testundersökningen sparar inte svar.",
     "testSurveyUrl": "Testundersökningens adress",
-    "userGroupFetchFailed": "Käyttäjäryhmien haku epäonnistui.",
-    "userGroups": "Käyttäjäryhmien rajaus",
-    "userGroupsHelperText": "Käyttäjäryhmät, joille kysely on nähtävissä kyselylistauksessa. Jos käyttäjäryhmiä ei ole valittu, kysely on nähtävissä kaikille käyttäjille. Vain kyselyn laatija ja pääkäyttäjä voivat muokata käyttäjäryhmiä."
+    "userGroupFetchFailed": "Det gick inte att hämta användargrupper.",
+    "userGroups": "Begränsa till användargrupper",
+    "userGroupsHelperText": "Användargrupper som kan se enkäten i enkätlistan. Om inga användargrupper har valts är enkäten synlig för alla användare. Endast enkätens skapare och superanvändare kan redigera användargrupper.",
+    "layerNameFallback": "Eget kartlager (Ingen översättning)"
   },
   "EditSurveyEmail": {
     "enable": "Tillåt rapportering av svar via e-post",
@@ -113,8 +114,8 @@
     "includePersonalInfo": "Inkludera respondentens personuppgifter",
     "includePersonalInfoHelperText": "Eventuella svar på personuppgiftsfrågan inkluderas på framsidan av pdf-rapporten.",
     "includeMarginImages": "Inkludera bilder för övre och nedre marginal",
-    "required": "Vastaajan sähköpostiosoite pakollinen",
-    "requiredHelperText": "Vastaajan on annettava sähköpostiosoitteensa vastatakseen kyselyyn."
+    "required": "Respondentens e-postadress är obligatorisk",
+    "requiredHelperText": "Respondenten måste ange sin e-postadress för att kunna svara på enkäten."
   },
   "KeyValueForm": {
     "key": "Namn",
@@ -257,7 +258,7 @@
   "SurveySection": {
     "personalInfoQuestion": "Personuppgiftsfråga",
     "radioQuestion": "Alternativfråga",
-    "radioImageQuestion": "Kuvavalintakysymys",
+    "radioImageQuestion": "Bildvalfråga",
     "checkBoxQuestion": "Flervalsfråga",
     "numericQuestion": "Numerisk fråga",
     "mapQuestion": "Kartfråga",
@@ -728,25 +729,25 @@
     "userRequestComplete": "Användare tillagd.",
     "userExists": "Användaren finns redan.",
     "userRequestFailed": "Det gick inte att lägga till användarinformation.",
-    "isPending": "Odottaa",
-    "isActive": "Aktiivinen",
-    "userGroupFetchFailed": "Käyttäjäryhmien haku epäonnistui."
+    "isPending": "Väntar",
+    "isActive": "Aktiv",
+    "userGroupFetchFailed": "Det gick inte att hämta användargrupper."
   },
   "UserGroupManagement": {
-    "userGroups": "Käyttäjäryhmät",
-    "addGroupPlaceholder": "Uusi ryhmä",
-    "addGroup": "Lisää ryhmä",
-    "addGroupLabel": "Ryhmän nimi",
-    "noGroups": "Ei määriteltyjä käyttäjäryhmiä.",
-    "groupFetchError": "Virhe haettaessa käyttäjäryhmiä.",
-    "groupCreationComplete": "Käyttäjäryhmä lisätty.",
-    "groupCreationFailed": "Käyttäjäryhmän lisääminen epäonnistui.",
-    "groupDeletionComplete": "Käyttäjäryhmä poistettu.",
-    "groupDeletionFailed": "Käyttäjäryhmän poistaminen epäonnistui."
+    "userGroups": "Användargrupper",
+    "addGroupPlaceholder": "Ny grupp",
+    "addGroup": "Lägg till grupp",
+    "addGroupLabel": "Gruppens namn",
+    "noGroups": "Inga definierade användargrupper.",
+    "groupFetchError": "Fel vid hämtning av användargrupper.",
+    "groupCreationComplete": "Användargruppen har lagts till.",
+    "groupCreationFailed": "Det gick inte att lägga till användargruppen.",
+    "groupDeletionComplete": "Användargruppen har tagits bort.",
+    "groupDeletionFailed": "Det gick inte att ta bort användargruppen."
   },
   "UserGroupSelect": {
-    "updateSuccess": "Käyttäjäryhmä päivitetty onnistuneesti.",
-    "updateFailed": "Käyttäjäryhmän päivittäminen epäonnistui."
+    "updateSuccess": "Användargruppen har uppdaterats.",
+    "updateFailed": "Det gick inte att uppdatera användargruppen."
   },
   "navigation": {
     "next": "Nästa",
