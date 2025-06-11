@@ -12,11 +12,10 @@ import {
 import React from 'react';
 import { GeneralNotification } from '@interfaces/generalNotification';
 import { Edit, ExpandMore } from '@mui/icons-material';
-import ReactMarkdown from 'react-markdown';
 
 import { useTranslations } from '@src/stores/TranslationContext';
 import { MegaphoneIcon } from '@src/components/icons/MegaphoneIcon';
-import rehypeExternalLinks from 'rehype-external-links';
+import { MarkdownView } from '@src/components/MarkdownView';
 
 const notificationListStyle = (theme: Theme) => ({
   marginBottom: theme.spacing(1),
@@ -136,10 +135,8 @@ export function GeneralNotificationList({
                   </Typography>
                 </Box>
               </AccordionSummary>
-              <AccordionDetails sx={{ whiteSpace: 'pre-line' }}>
-                <ReactMarkdown rehypePlugins={[[rehypeExternalLinks]]}>
-                  {notification.message}
-                </ReactMarkdown>
+              <AccordionDetails>
+                <MarkdownView>{notification.message}</MarkdownView>
                 {editingEnabled && (
                   <Button
                     size="small"

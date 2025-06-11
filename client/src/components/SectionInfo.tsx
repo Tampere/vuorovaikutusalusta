@@ -8,10 +8,9 @@ import {
 } from '@mui/material';
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
 import { Help as HelpIcon } from '@mui/icons-material';
-import ReactMarkdown from 'react-markdown';
-import rehypeExternalLinks from 'rehype-external-links';
 import { useTranslations } from '@src/stores/TranslationContext';
 import useId from '@mui/material/utils/useId';
+import { MarkdownView } from './MarkdownView';
 
 interface Props {
   subject: string;
@@ -49,9 +48,7 @@ export default forwardRef(function SectionInfo(
         open={infoDialogOpen}
       >
         <DialogContent id={`${dialogId}-dialog-content`}>
-          <ReactMarkdown rehypePlugins={[rehypeExternalLinks]}>
-            {infoText}
-          </ReactMarkdown>
+          <MarkdownView>{infoText}</MarkdownView>
         </DialogContent>
         <DialogActions>
           <Button

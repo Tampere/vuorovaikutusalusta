@@ -1,10 +1,10 @@
-import { Box, CircularProgress, FormLabel } from '@mui/material';
+import { Box, FormLabel } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
-import { convertToRaw, EditorState } from 'draft-js';
-import { Remarkable } from 'remarkable';
-import { draftToMarkdown } from 'markdown-draft-js';
 import { convertFromHTML } from 'draft-convert';
+import { convertToRaw, EditorState } from 'draft-js';
+import { draftToMarkdown } from 'markdown-draft-js';
+import remarkRehype from 'remark-rehype';
 
 import React, {
   forwardRef,
@@ -13,6 +13,11 @@ import React, {
   useState,
 } from 'react';
 import { Editor } from 'react-draft-wysiwyg';
+import rehypeFormat from 'rehype-format';
+import rehypeRaw from 'rehype-raw';
+import rehypeSanitize from 'rehype-sanitize';
+import rehypeStringify from 'rehype-stringify';
+import { remark } from 'remark';
 
 const useStyles = makeStyles({
   disabled: {
@@ -111,16 +116,23 @@ interface Props {
  * @param markdown Text as markdown
  * @returns Draft.js editor state
  */
-export function markdownToEditorState(markdown: string): EditorState {
+export async function markdownToEditorState(
+  markdown: string,
+): Promise<EditorState> {
   // Step 1: Markdown → HTML
-  const md = new Remarkable('commonmark', {
-    html: true,
-    breaks: true, // Enable line breaks
-  });
-  let html = md.render(markdown);
+  // Replace each newline with <br/> to preserve line breaks
+  const markdownWithBreaks = markdown.replace(/\n/g, '<br/>');
 
-  // Remove any space or &nbsp; immediately after <br> or <br />
-  html = html.replace(/(<br\s*\/?>)\s+/gi, '$1');
+  const vFile = await remark()
+    .use(remarkRehype, { allowDangerousHtml: true })
+    .use(rehypeRaw)
+    .use(rehypeSanitize, {
+      tagNames: ['strong', 'em', 'span', 'br', 'a'],
+      attributes: { span: ['style'], a: ['href', 'rel', 'target'] },
+    })
+    .use(rehypeFormat)
+    .use(rehypeStringify)
+    .process(markdownWithBreaks);
 
   // Step 2: HTML → ContentState using draft-convert with custom inline style parsing
   const contentState = convertFromHTML({
@@ -133,7 +145,15 @@ export function markdownToEditorState(markdown: string): EditorState {
       }
       return currentStyle;
     },
-  })(html);
+    htmlToEntity: (nodeName, node, createEntity) => {
+      if (nodeName === 'a' && node instanceof HTMLAnchorElement) {
+        return createEntity('LINK', 'MUTABLE', {
+          url: node.getAttribute('href'),
+        });
+      }
+      return undefined;
+    },
+  })(vFile.toString());
 
   return EditorState.createWithContent(contentState);
 }
@@ -167,25 +187,31 @@ function editorStateToMarkdown(
 }
 
 const RichTextEditor = forwardRef(function RichTextEditor(props: Props, ref) {
-  const [editorState, setEditorState] = useState(
-    markdownToEditorState(props.value),
-  );
+  const [editorState, setEditorState] = useState(null);
 
   useImperativeHandle(
     ref,
     () => ({
-      setEditorValue: (value: string) =>
-        setEditorState(markdownToEditorState(value)),
+      setEditorValue: async (value: string) => {
+        const newEditorState = await markdownToEditorState(value);
+        setEditorState(newEditorState);
+      },
     }),
     [],
   );
 
   const { language, surveyLanguage } = useTranslations();
 
-  useEffect(
-    () => setEditorState(markdownToEditorState(props.value)),
-    [language, surveyLanguage],
-  );
+  useEffect(() => {
+    async function updateEditorState() {
+      const newEditorState = await markdownToEditorState(props.value);
+      setEditorState(newEditorState);
+    }
+    updateEditorState();
+    return () => {
+      updateEditorState();
+    };
+  }, [language, surveyLanguage]);
 
   const classes = useStyles(props);
   const { tr } = useTranslations();
