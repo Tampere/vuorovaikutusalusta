@@ -15,10 +15,8 @@ import React from 'react';
 
 import { useImageHeaderQuery } from '@src/hooks/UseImageHeaderQuery';
 import Footer from './Footer';
-import ReactMarkdown from 'react-markdown';
 import { defaultSchema } from 'hast-util-sanitize';
-import rehypeSanitize from 'rehype-sanitize';
-import rehypeRaw from 'rehype-raw';
+import { MarkdownView } from './MarkdownView';
 
 const useStyles = makeStyles((theme: Theme & { [customKey: string]: any }) => ({
   heading: {
@@ -213,12 +211,10 @@ export default function SurveyLandingPage({
               textAlign: 'center',
             })}
           >
-            <ReactMarkdown
-              rehypePlugins={[[rehypeRaw], [rehypeSanitize, customSchema]]}
-            >
-              {/* Replace each newline with <br/> */}
+            <MarkdownView sanitizeCustomSchema={customSchema}>
+              {/* Replace each newline with <br/> to get multiple line breaks working */}
               {survey.description?.[surveyLanguage]?.replace(/\n/g, '<br/>')}
-            </ReactMarkdown>
+            </MarkdownView>
           </Box>
         )}
         <Button onClick={onStart}>

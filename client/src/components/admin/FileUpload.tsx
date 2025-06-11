@@ -94,7 +94,6 @@ export default function FileUpload({
             getFullFilePath(surveyOrganizationId, targetPath, file.name),
         });
       } catch (error) {
-        console.log(error);
         showToast({
           severity: 'error',
           message: tr.FileUpload.errorUploadingFile,

@@ -741,7 +741,7 @@ export interface MapLayer {
   /**
    * Name of the map layer
    */
-  name: string;
+  name: string | Record<'fi' | 'en' | 'sv', string>;
 }
 
 /**

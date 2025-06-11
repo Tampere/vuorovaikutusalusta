@@ -11,9 +11,8 @@ import {
 import { useImageHeaderQuery } from '@src/hooks/UseImageHeaderQuery';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React from 'react';
-import ReactMarkdown from 'react-markdown';
-import rehypeExternalLinks from 'rehype-external-links';
 import Footer from './Footer';
+import { MarkdownView } from './MarkdownView';
 
 type StyleKeys = 'testSurveyHeader';
 
@@ -110,22 +109,25 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
           margin: '0 auto',
         }}
       >
-        <div
-          style={{
+        <Box
+          sx={{
             flexGrow: !lowWidth ? 1 : 0,
             display: 'flex',
             flexDirection: 'column',
             justifyContent: hasImage ? 'end' : 'center',
-            whiteSpace: 'pre-line',
+            '& ul, & ol': {
+              width: 'fit-content',
+              alignSelf: 'center',
+            },
           }}
         >
           <Typography variant="h5" component="h1">
             {survey.thanksPage.title?.[surveyLanguage]}
           </Typography>
-          <ReactMarkdown rehypePlugins={[[rehypeExternalLinks]]}>
+          <MarkdownView>
             {survey.thanksPage.text?.[surveyLanguage]}
-          </ReactMarkdown>
-        </div>
+          </MarkdownView>
+        </Box>
         {thanksPageImageHeaderQuery.imageHeaders && (
           <div
             className="spacer"

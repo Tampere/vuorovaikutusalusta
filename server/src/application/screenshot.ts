@@ -203,10 +203,14 @@ async function generateScreenshots({
       index: answer.index,
       image,
       layerNames: answer.visibleLayerIds
-        .map(
-          (layerId) =>
-            availableMapLayers.find((layer) => layer.id === layerId)?.name,
-        )
+        .map((layerId) => {
+          const layer = availableMapLayers.find(
+            (layer) => layer.id === layerId,
+          );
+          return typeof layer?.name === 'string'
+            ? layer.name
+            : (layer?.name?.['fi'] ?? null);
+        })
         .filter(Boolean),
     });
   }

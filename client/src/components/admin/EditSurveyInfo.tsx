@@ -38,6 +38,7 @@ import ThemeSelect from './ThemeSelect';
 import { getUserGroups } from '@src/controllers/UserGroupController';
 import { UserGroup } from '@interfaces/userGroup';
 import RichTextEditor from '../RichTextEditor';
+import { getLayerName } from '@src/utils/oskariHelpers';
 
 const useStyles = makeStyles({
   dateTimePicker: {
@@ -375,7 +376,13 @@ export default function EditSurveyInfo(props: Props) {
             <FormLabel>{tr.EditSurveyInfo.availableMapLayers}</FormLabel>
             <ul>
               {availableMapLayers.map((layer) => (
-                <li key={layer.id}>{layer.name}</li>
+                <li key={layer.id}>
+                  {getLayerName(
+                    layer,
+                    surveyLanguage,
+                    tr.EditSurveyInfo.layerNameFallback,
+                  )}
+                </li>
               ))}
             </ul>
           </div>

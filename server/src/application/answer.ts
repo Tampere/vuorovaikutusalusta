@@ -233,7 +233,12 @@ function geometryAnswerToFeature(answer: AnswerEntry, mapLayers: MapLayer[]) {
   const mapLayerNames = answer.mapLayers
     .map((layerId) => mapLayers.find((layer) => layer.id === layerId))
     .filter(Boolean)
-    .map((layer) => layer.name);
+    .map((layer) =>
+      typeof layer?.name === 'string'
+        ? layer.name
+        : (layer?.name?.['fi'] ?? ''),
+    )
+    .filter(Boolean);
   return {
     type: 'Feature',
     geometry: {

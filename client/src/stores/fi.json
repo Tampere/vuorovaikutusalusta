@@ -99,7 +99,8 @@
     "testSurveyUrl": "Testikyselyn osoite",
     "userGroupFetchFailed": "Käyttäjäryhmien haku epäonnistui.",
     "userGroups": "Käyttäjäryhmien rajaus",
-    "userGroupsHelperText": "Käyttäjäryhmät, joille kysely on nähtävissä kyselylistauksessa. Jos käyttäjäryhmiä ei ole valittu, kysely on nähtävissä kaikille käyttäjille. Vain kyselyn laatija ja pääkäyttäjä voivat muokata käyttäjäryhmiä."
+    "userGroupsHelperText": "Käyttäjäryhmät, joille kysely on nähtävissä kyselylistauksessa. Jos käyttäjäryhmiä ei ole valittu, kysely on nähtävissä kaikille käyttäjille. Vain kyselyn laatija ja pääkäyttäjä voivat muokata käyttäjäryhmiä.",
+    "layerNameFallback": "Oma karttataso (Ei käännöstä)"
   },
   "EditSurveyEmail": {
     "enable": "Salli vastausten raportointi sähköpostitse",
