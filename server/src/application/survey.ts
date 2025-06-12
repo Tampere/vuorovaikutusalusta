@@ -20,7 +20,6 @@ import {
   SurveyTheme,
 } from '@interfaces/survey';
 import { User } from '@interfaces/user';
-import { INTERNAL_USER_GROUP_ROLES } from '@src/auth';
 import {
   getColumnSet,
   getDb,
@@ -33,8 +32,7 @@ import {
   InternalServerError,
   NotFoundError,
 } from '@src/error';
-import logger from '@src/logger';
-import { getUserGroupRoles, isAdmin } from '@src/user';
+import { isAdmin } from '@src/user';
 
 import { geometryToGeoJSONFeatureCollection } from '@src/utils';
 import { Geometry } from 'geojson';
@@ -80,7 +78,6 @@ interface DBSurvey {
   localisation_enabled: boolean;
   submission_count?: number;
   email_registration_required: boolean;
-  group_role: string;
 }
 
 /**
@@ -2216,9 +2213,7 @@ export async function userCanEditSurvey(
     (await getDb().oneOrNone<{
       author_id: string;
       admins: string[];
-    }>(`SELECT author_id, admins, group_role FROM data.survey WHERE id = $1`, [
-      surveyId,
-    ]));
+    }>(`SELECT author_id, admins FROM data.survey WHERE id = $1`, [surveyId]));
 
   return isAdmin(user) || user.id === authorId || admins.includes(user.id);
 }
