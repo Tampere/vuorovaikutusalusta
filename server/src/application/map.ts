@@ -1,13 +1,21 @@
-import { MapLayer } from '@interfaces/survey';
+import { LanguageCode, MapLayer } from '@interfaces/survey';
 import fetch, { Response } from 'node-fetch';
 import { NotFoundError } from '../error';
 
 export async function getAvailableMapLayers(
   mapUrl: string,
+  language: LanguageCode = 'fi',
 ): Promise<MapLayer[]> {
   if (!mapUrl) {
     return [];
   }
+  // Convert language code to Oskari's format
+  const oskariLanguage = {
+    fi: 'fi',
+    en: 'en',
+    se: 'sv',
+  }[language];
+
   // Separate query parameters and possible trailing slash
   const [baseUrl, queryParams] = mapUrl.split(/\/?\?/);
   try {
@@ -36,7 +44,7 @@ export async function getAvailableMapLayers(
       ({ id, name, locale }) => ({
         id,
         // For user-created datasets, the name is inside the locale object
-        name: locale?.fi?.name ?? name ?? '<untitled layer>',
+        name: locale?.[oskariLanguage]?.name ?? name ?? '<untitled layer>',
       }),
     );
     // For non-existent UUIDs the full layer path won't exist in the response object

@@ -137,6 +137,7 @@ function prepareMapAnswers(
       },
       {
         mapUrl: survey.localizedMapUrls[language],
+        language,
         answers: [],
       } as ScreenshotJobData,
     );
