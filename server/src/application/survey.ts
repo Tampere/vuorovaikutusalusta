@@ -20,6 +20,7 @@ import {
   SurveyTheme,
 } from '@interfaces/survey';
 import { User } from '@interfaces/user';
+import { INTERNAL_USER_GROUP_ROLES } from '@src/auth';
 import {
   getColumnSet,
   getDb,
@@ -32,6 +33,8 @@ import {
   InternalServerError,
   NotFoundError,
 } from '@src/error';
+import logger from '@src/logger';
+import { getUserGroupRoles, isAdmin } from '@src/user';
 
 import { geometryToGeoJSONFeatureCollection } from '@src/utils';
 import { Geometry } from 'geojson';
@@ -77,6 +80,7 @@ interface DBSurvey {
   localisation_enabled: boolean;
   submission_count?: number;
   email_registration_required: boolean;
+  group_role: string;
 }
 
 /**
@@ -854,12 +858,17 @@ export async function getSurvey(params: { id: number } | { name: string }) {
 }
 
 /**
- * Get all surveys from the db
+ * Get all surveys from the db.
+ *
+ * @param authorId - Optional ID of the author to filter surveys by. If not provided, surveys from all authors are returned.
+ * @param filterByPublished - Optional flag to filter only published surveys. If true, only published surveys are included.
+ * @param editingUser - Optional user object. If provided, only surveys editable by this user are returned.
  * @returns Array of Surveys
  */
 export async function getSurveys(
   authorId?: string,
   filterByPublished?: boolean,
+  editingUser?: Express.User,
 ) {
   const rows = await getDb().manyOrNone<DBSurvey>(
     `SELECT
@@ -874,7 +883,20 @@ export async function getSurveys(
   ORDER BY updated_at DESC`,
     [authorId, filterByPublished],
   );
-  return rows
+
+  const filteredRowsByEditingUser = editingUser
+    ? (
+        await Promise.all(
+          rows.map(async (survey) =>
+            (await userCanEditSurvey(editingUser, survey.id, survey))
+              ? survey
+              : null,
+          ),
+        )
+      ).filter(Boolean)
+    : rows;
+
+  return filteredRowsByEditingUser
     .map((row) => dbSurveyToSurvey(row))
     .filter((survey) => (filterByPublished ? isPublished(survey) : survey));
 }
@@ -2178,17 +2200,27 @@ export async function removeFile(fileName: string, filePath: string[]) {
 }
 
 /**
- * Checks if given user is allowed to edit the survey with given ID
+ * Checks if the given user is allowed to edit the survey with the given ID.
  * @param user User
  * @param surveyId Survey ID
- * @returns Can the user edit the survey?
+ * @param survey Optional partial survey object to avoid DB query
+ * @returns Whether the user can edit the survey
  */
-export async function userCanEditSurvey(user: User, surveyId: number) {
-  const { author_id: authorId, admins } = await getDb().oneOrNone<{
-    author_id: string;
-    admins: string[];
-  }>(`SELECT author_id, admins FROM data.survey WHERE id = $1`, [surveyId]);
-  return user.id === authorId || admins.includes(user.id);
+export async function userCanEditSurvey(
+  user: User,
+  surveyId: number,
+  survey?: Partial<DBSurvey>,
+) {
+  const { author_id: authorId, admins } =
+    survey ??
+    (await getDb().oneOrNone<{
+      author_id: string;
+      admins: string[];
+    }>(`SELECT author_id, admins, group_role FROM data.survey WHERE id = $1`, [
+      surveyId,
+    ]));
+
+  return isAdmin(user) || user.id === authorId || admins.includes(user.id);
 }
 
 /**
