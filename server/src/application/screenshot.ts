@@ -1,5 +1,6 @@
 import { GeoJSONWithCRS } from '@interfaces/geojson';
 import {
+  LanguageCode,
   MapQuestionSelectionType,
   SurveyMapQuestion,
 } from '@interfaces/survey';
@@ -23,6 +24,7 @@ const networkIdleTimeout = process.env.PUPPETEER_NETWORK_IDLE_TIMEOUT
 
 export interface ScreenshotJobData {
   mapUrl: string;
+  language: LanguageCode;
   answers?: {
     sectionId: number;
     index: number;
@@ -94,10 +96,10 @@ async function generateScreenshots({
   page: Page;
   data: ScreenshotJobData;
 }) {
-  const { mapUrl, answers } = data;
+  const { mapUrl, answers, language } = data;
   const returnData: ScreenshotJobReturnData[] = [];
 
-  const availableMapLayers = await getAvailableMapLayers(mapUrl);
+  const availableMapLayers = await getAvailableMapLayers(mapUrl, language);
 
   // Setting a real user agent _might_ make requests flow faster
   await page.setUserAgent(
