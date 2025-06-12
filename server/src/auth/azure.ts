@@ -35,7 +35,7 @@ export function configureAzureAuth(app: Express) {
           const user = await upsertUser({
             id: profile.oid,
             fullName: profile.displayName,
-            email: profile._json.email,
+            email: profile._json.email ?? profile.upn,
             roles: JSON.parse(profile._json.roles), // Parse roles to trim extra characters
           });
           return done(null, user);
