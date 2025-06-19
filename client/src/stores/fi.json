@@ -150,8 +150,8 @@
   "SurveyRegistrationPage": {
     "email": "Sähköposti",
     "emailHelperText": "Sähköpostiosoite on virheellinen.",
-    "alreadySubmitted": "Tämän linkin kautta on jo vastattu kyselyyn.",
-    "registrationSuccessful": "Kiitos rekisteröitymisestä! Sähköpostiin on lähetetty linkki kyselyyn. Voit nyt sulkea tämän välilehden.",
+    "alreadySubmitted": "Olet jo vastannut tähän kyselyyn. Kiitos vastauksestasi!",
+    "registrationSuccessful": "Kiitos! Sähköpostisi on lähetetty linkki kyselyyn. Voit nyt sulkea tämän välilehden.",
     "registrationHelper": "Sinun tulee tilata linkki sähköpostiisi, jotta pystyt vastaamaan kyselyyn. Voit tilata kyselylinkin vain kerran sähköpostiosoitteeseesi.",
     "submit": "Lähetä",
     "sendingLink": "Lähetetään linkkiä sähköpostiin"
