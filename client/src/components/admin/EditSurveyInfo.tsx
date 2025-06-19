@@ -195,6 +195,11 @@ export default function EditSurveyInfo() {
               admins: value.map((user) => user.id),
             });
           }}
+          renderOption={(props, user) => (
+            <li {...props} key={user.id}>
+              {user.fullName}
+            </li>
+          )}
           renderInput={(params) => (
             <TextField
               {...params}
