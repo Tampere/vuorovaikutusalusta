@@ -79,7 +79,7 @@ router.post(
       survey.id,
       req.body.email,
     );
-    logger.info(`registration email ${registration.email}`);
+
     await sendSurveyRegistrationEmail(
       registration.email,
       req.body.language,

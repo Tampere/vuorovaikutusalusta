@@ -17,6 +17,18 @@ import Footer from './Footer';
 import { request } from '@src/utils/request';
 import { useToasts } from '@src/stores/ToastContext';
 
+const helperText = (
+  theme: Theme,
+  padding?: string | number,
+  margin?: string | number,
+) => ({
+  padding: padding ?? '0.5rem',
+  margin: margin ?? '2rem',
+  textAlign: 'center',
+  fontSize: '1.25rem',
+  backgroundColor: theme.palette.secondary.main,
+});
+
 interface Props {
   isTestSurvey: boolean;
   survey: Survey;
@@ -55,6 +67,7 @@ export function SurveyRegistrationPage({
       setSendingRegistration(false);
     } catch (error) {
       showToast({ message: error.message, severity: 'error' });
+      setSendingRegistration(false);
     }
   }
 
@@ -147,38 +160,71 @@ export function SurveyRegistrationPage({
           <span>{survey.title?.[surveyLanguage]}</span>
         </Typography>
         {isSubmitted ? (
-          <Typography
-            sx={{ margin: '2rem', textAlign: 'center', fontSize: '1.25rem' }}
-          >
+          <Typography sx={helperText}>
             {tr.SurveyRegistrationPage.alreadySubmitted}
           </Typography>
         ) : isRegistered ? (
-          <Typography
-            sx={{ margin: '2rem', textAlign: 'center', fontSize: '1.25rem' }}
-          >
+          <Typography sx={helperText}>
             {tr.SurveyRegistrationPage.registrationSuccessful}
           </Typography>
         ) : sendingRegistration ? (
-          <Box sx={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-            <Typography aria-hidden="true">
+          <Box
+            sx={(theme) => ({
+              display: 'flex',
+              gap: '1rem',
+              alignItems: 'center',
+              backgroundColor: theme.palette.secondary.main,
+              padding: '1rem',
+            })}
+          >
+            <Typography
+              aria-hidden="true"
+              sx={(theme) => helperText(theme, 0, 0)}
+            >
               {tr.SurveyRegistrationPage.sendingLink}
             </Typography>
             <CircularProgress title={tr.SurveyRegistrationPage.sendingLink} />
           </Box>
         ) : (
           <>
-            <Typography
-              sx={{ margin: '2rem', textAlign: 'center', fontSize: '1.25rem' }}
-            >
+            <Typography sx={helperText}>
               {tr.SurveyRegistrationPage.registrationHelper}
             </Typography>
             <FormControl>
               <Stack
-                sx={{ gap: '1.5rem', minWidth: '300px' }}
+                sx={{
+                  gap: '1.5rem',
+                  minWidth: '300px',
+                }}
                 component={'form'}
               >
                 <TextField
-                  sx={{ '& .Mui-focused.Mui-focused': { outline: 'none' } }}
+                  sx={(theme) => ({
+                    borderRadius: 0,
+                    '& .Mui-focused.Mui-focused': { outline: 'none' },
+
+                    '& .MuiInputLabel-animated[data-shrink=true]': {
+                      padding: '0.25rem 0.25rem',
+                      borderRadius: '0rem',
+                      transform: 'translate(9%, -50%) scale(0.85)',
+                      border: `1px solid ${
+                        error
+                          ? theme.palette.error.main
+                          : theme.palette.primary.main
+                      }`,
+                      backgroundColor: 'white',
+                    },
+                    '& .MuiInputBase-root.MuiInputBase-root': {
+                      backgroundColor: 'white',
+                      borderRadius: '0rem',
+                    },
+                    '& .MuiFormHelperText-root': {
+                      border: `1px solid ${theme.palette.error.main}`,
+                      padding: '0.25rem',
+                      borderRadius: '0rem',
+                      backgroundColor: 'white',
+                    },
+                  })}
                   variant="outlined"
                   label={tr.SurveyRegistrationPage.email}
                   type="email"
@@ -207,12 +253,17 @@ export function SurveyRegistrationPage({
                   sx={(theme: Theme & { landingPage: { start: object } }) => ({
                     backgroundColor: theme.palette.secondary.main,
                     color: theme.palette.secondary.contrastText,
+                    borderRadius: 0,
                     fontSize: '1.125rem',
                     padding: '0.5rem',
                     transition: 'transform 200ms ease-out',
                     '&:hover': {
                       transform: 'scale(1.1)',
                       backgroundColor: theme.palette.secondary.light,
+                    },
+                    '&:focus&:focus': {
+                      backgroundColor: theme.palette.secondary.main,
+                      outlineOffset: 0,
                     },
                     ...theme.landingPage?.start,
                     [theme.breakpoints.down(600)]: {
