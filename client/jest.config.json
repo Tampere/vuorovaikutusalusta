@@ -8,7 +8,6 @@
   "transform": {
     "^.+\\.(ts|tsx)$": "ts-jest"
   },
-  "setupFiles": ["./setupTests.ts", "jest-canvas-mock"],
   "transformIgnorePatterns": ["node_modules/(?!(ol)/)"],
   "automock": false
 }

@@ -235,7 +235,7 @@ const surveyPageColumnSet = getColumnSet<DBSurveyPage>('survey_page', [
 /**
  * Helper function for creating section option column set for database queries
  */
-const sectionOptionColumnSet = getColumnSet<DBSectionOption>('option', [
+const _sectionOptionColumnSet = getColumnSet<DBSectionOption>('option', [
   'section_id',
   'idx',
   { name: 'text', cast: 'json' },

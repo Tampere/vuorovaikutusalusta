@@ -62,7 +62,7 @@ export function configureAuth(app: Express) {
       if (err) {
         return req.next(err);
       }
-      req.session.destroy((err) => {
+      req.session.destroy(() => {
         res.redirect(process.env.AUTH_LOGOUT_URL);
       });
     });
@@ -141,7 +141,7 @@ export function ensureAuthenticated(options?: { redirectToLogin?: boolean }) {
         if (err) {
           return req.next(err);
         }
-        req.session.destroy((err) => {
+        req.session.destroy(() => {
           fail();
         });
       });
