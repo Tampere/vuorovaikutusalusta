@@ -29,27 +29,21 @@ const useStyles = makeStyles((theme: Theme & { [customKey: string]: any }) => ({
       padding: '1rem',
       boxDecorationBreak: 'clone',
       ...theme.landingPage?.title,
-      [theme.breakpoints.down(600)]: {
-        padding: '2vw',
-      },
+      [theme.breakpoints.down(600)]: { padding: '2vw' },
     },
   },
   title: {
     fontFamily: '"Montserrat", sans-serif',
     fontSize: '3rem',
     ...theme.landingPage?.title,
-    [theme.breakpoints.down(600)]: {
-      fontSize: '9vw',
-    },
+    [theme.breakpoints.down(600)]: { fontSize: '9vw' },
   },
   subtitle: {
     fontFamily: '"Montserrat", sans-serif',
     fontSize: '2rem',
     textTransform: 'none',
     ...theme.landingPage?.subtitle,
-    [theme.breakpoints.down(600)]: {
-      fontSize: '6vw',
-    },
+    [theme.breakpoints.down(600)]: { fontSize: '6vw' },
   },
   start: {
     fontFamily: '"Montserrat", sans-serif',
@@ -59,13 +53,9 @@ const useStyles = makeStyles((theme: Theme & { [customKey: string]: any }) => ({
     padding: '0.5rem',
     textDecoration: 'none',
     transition: 'transform 200ms ease-out',
-    '&:hover': {
-      transform: 'scale(1.1)',
-    },
+    '&:hover': { transform: 'scale(1.1)' },
     ...theme.landingPage?.start,
-    [theme.breakpoints.down(600)]: {
-      fontSize: '6vw',
-    },
+    [theme.breakpoints.down(600)]: { fontSize: '6vw' },
   },
 
   imageCopyright: {
@@ -140,10 +130,7 @@ export default function SurveyLandingPage({
         }}
       >
         <img
-          style={{
-            maxWidth: '60%',
-            maxHeight: '100%',
-          }}
+          style={{ maxWidth: '60%', maxHeight: '100%' }}
           src={`/api/feature-styles/icons/logo`}
           alt={tr.IconAltTexts.logoAltText}
         />
@@ -187,7 +174,9 @@ export default function SurveyLandingPage({
           whiteSpace: 'nowrap',
         }}
       >
-        <Footer>
+        <Footer
+          {...(mediumWidth && { style: { transform: 'translateY(-20%)' } })}
+        >
           <Link
             color="primary"
             underline="hover"
