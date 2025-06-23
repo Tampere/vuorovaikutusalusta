@@ -24,7 +24,7 @@ export function encrypt(text: string) {
     JSON.stringify({
       iv: iv.toString('hex'),
       content: encrypted.toString('hex'),
-    })
+    }),
   );
 }
 
@@ -41,7 +41,7 @@ export function decrypt(encrypted: string) {
   const decipher = crypto.createDecipheriv(
     algorithm,
     secretKey,
-    Buffer.from(hash.iv, 'hex')
+    Buffer.from(hash.iv, 'hex'),
   );
   const decrypted = Buffer.concat([
     decipher.update(Buffer.from(hash.content, 'hex')),
