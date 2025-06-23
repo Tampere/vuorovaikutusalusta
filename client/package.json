@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Tampere Vuorovaikutusalusta UI",
   "main": "dist/main.js",
+  "type": "module",
   "scripts": {
     "test": "jest --config ./jest.config.json",
     "test:watch": "npm run test -- --watch",
@@ -10,7 +11,8 @@
     "dev": "vite",
     "dev:local": "API_URL='http://localhost:3000' vite",
     "prebuild": "npm run lint && npm run test",
-    "build": "vite build"
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,json}": "prettier --write --ignore-unknown"
@@ -54,6 +56,7 @@
     "date-fns": "^2.30.0",
     "draft-js": "^0.11.7",
     "file-saver": "^2.0.5",
+    "globals": "^16.2.0",
     "jszip": "^3.10.1",
     "markdown-draft-js": "^2.4.0",
     "oskari-rpc": "^2.1.0",
@@ -84,18 +87,17 @@
     "@types/react-dom": "^17.0.26",
     "@types/react-draft-wysiwyg": "^1.13.8",
     "@types/react-router-dom": "^5.3.3",
-    "@typescript-eslint/eslint-plugin": "^4.33.0",
-    "@typescript-eslint/parser": "^4.33.0",
+    "@typescript-eslint/eslint-plugin": "^8.34.1",
+    "@typescript-eslint/parser": "^8.34.1",
     "@vitejs/plugin-react": "^4.6.0",
     "@wojtekmaj/enzyme-adapter-react-17": "^0.8.0",
     "babel-eslint": "^10.1.0",
     "dotenv": "^10.0.0",
     "enzyme": "^3.11.0",
-    "eslint": "^7.32.0",
-    "eslint-config-standard": "^16.0.3",
+    "eslint": "^9.29.0",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^5.2.0",
+    "eslint-plugin-promise": "^7.2.1",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-standard": "^5.0.0",
     "glob-parent": "^6.0.2",
@@ -108,8 +110,8 @@
     "ts-jest": "^28.0.8",
     "typescript": "^4.9.5",
     "url-parse": "^1.5.10",
-    "vite": "^4.5.14",
-    "vite-tsconfig-paths": "^4.3.2"
+    "vite": "^6.3.5",
+    "vite-tsconfig-paths": "^5.1.4"
   },
   "overrides": {
     "react-split-pane": {

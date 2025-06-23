@@ -24,20 +24,10 @@ export default defineConfig({
       },
     },
   ],
-  define: {
-    'process.env': {},
-  },
-  optimizeDeps: {
-    esbuildOptions: {
-      define: {
-        global: 'globalThis',
-      },
-    },
-  },
+  define: { 'process.env': {} },
+  optimizeDeps: { esbuildOptions: { define: { global: 'globalThis' } } },
   server: {
-    watch: {
-      usePolling: process.env.VITE_USE_POLLING === 'true',
-    },
+    watch: { usePolling: process.env.VITE_USE_POLLING === 'true' },
     host: '0.0.0.0',
     port: 8080,
     proxy: {

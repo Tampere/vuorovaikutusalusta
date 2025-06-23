@@ -2,7 +2,6 @@
 
 import { File, ImageType } from '@interfaces/survey';
 import {
-  Box,
   Button,
   Container,
   Dialog,
@@ -24,9 +23,7 @@ import React, { useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 
 const useStyles = makeStyles((theme: Theme) => ({
-  noImageBackground: {
-    backgroundColor: '#D3D3D3',
-  },
+  noImageBackground: { backgroundColor: '#D3D3D3' },
   container: {
     width: '90%',
     display: 'flex',
@@ -42,9 +39,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     backgroundColor: '#fafafa',
     transition: 'border .24s ease-in-out',
   },
-  addImageIcon: {
-    color: theme.palette.primary.main,
-  },
+  addImageIcon: { color: theme.palette.primary.main },
   deleteImageIcon: {
     position: 'absolute',
     top: '5px',
@@ -160,10 +155,7 @@ export default function SurveyImageList({ imageType }: Props) {
   }
 
   const { acceptedFiles, fileRejections, getRootProps, getInputProps } =
-    useDropzone({
-      maxFiles: 1,
-      validator: fileSizeValidator,
-    });
+    useDropzone({ maxFiles: 1, validator: fileSizeValidator });
 
   useEffect(() => {
     if (fileRejections?.length > 0) {
@@ -339,15 +331,11 @@ export default function SurveyImageList({ imageType }: Props) {
               style={
                 imageType === 'backgroundImage'
                   ? !activeSurvey?.backgroundImageName
-                    ? {
-                        border: '4px solid #1976d2',
-                      }
+                    ? { border: '4px solid #1976d2' }
                     : null
                   : imageType === 'thanksPageImage'
                   ? !activeSurvey?.thanksPage.imageName
-                    ? {
-                        border: '4px solid #1976d2',
-                      }
+                    ? { border: '4px solid #1976d2' }
                     : null
                   : null
               }
@@ -363,11 +351,7 @@ export default function SurveyImageList({ imageType }: Props) {
                   justifyContent: 'center',
                 }}
               >
-                <Typography
-                  style={{
-                    textAlign: 'center',
-                  }}
-                >
+                <Typography style={{ textAlign: 'center' }}>
                   {imageType === 'backgroundImage'
                     ? tr.SurveyImageList.noBackgroundImage
                     : imageType === 'thanksPageImage'
