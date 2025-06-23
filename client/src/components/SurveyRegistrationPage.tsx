@@ -56,11 +56,7 @@ export function SurveyRegistrationPage({
         }`,
         {
           method: 'POST',
-          body: {
-            surveyId: survey.id,
-            email: email,
-            language: surveyLanguage,
-          },
+          body: { surveyId: survey.id, email: email, language: surveyLanguage },
         },
       );
       setIsRegistered(true);
@@ -114,21 +110,14 @@ export function SurveyRegistrationPage({
         }}
       >
         <img
-          style={{
-            maxWidth: '60%',
-            maxHeight: '100%',
-          }}
+          style={{ maxWidth: '60%', maxHeight: '100%' }}
           src={`/api/feature-styles/icons/logo`}
           alt={tr.IconAltTexts.logoAltText}
         />
       </Box>
       <Stack
         className="middle-content"
-        sx={{
-          gap: '1rem',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
+        sx={{ gap: '1rem', alignItems: 'center', justifyContent: 'center' }}
       >
         <Typography
           component={'h1'}
@@ -146,15 +135,11 @@ export function SurveyRegistrationPage({
               padding: '1rem',
               boxDecorationBreak: 'clone',
               ...theme.landingPage?.title,
-              [theme.breakpoints.down(600)]: {
-                padding: '2vw',
-              },
+              [theme.breakpoints.down(600)]: { padding: '2vw' },
             },
             fontFamily: '"Montserrat", sans-serif',
             ...theme.landingPage?.title,
-            [theme.breakpoints.down(600)]: {
-              fontSize: '9vw',
-            },
+            [theme.breakpoints.down(600)]: { fontSize: '9vw' },
           })}
         >
           <span>{survey.title?.[surveyLanguage]}</span>
@@ -192,10 +177,7 @@ export function SurveyRegistrationPage({
             </Typography>
             <FormControl>
               <Stack
-                sx={{
-                  gap: '1.5rem',
-                  minWidth: '300px',
-                }}
+                sx={{ gap: '1.5rem', minWidth: '300px' }}
                 component={'form'}
               >
                 <TextField
@@ -266,9 +248,7 @@ export function SurveyRegistrationPage({
                       outlineOffset: 0,
                     },
                     ...theme.landingPage?.start,
-                    [theme.breakpoints.down(600)]: {
-                      fontSize: '4vw',
-                    },
+                    [theme.breakpoints.down(600)]: { fontSize: '4vw' },
                   })}
                   onClick={async (e) => {
                     e.preventDefault();
@@ -302,7 +282,9 @@ export function SurveyRegistrationPage({
           whiteSpace: 'nowrap',
         }}
       >
-        <Footer>
+        <Footer
+          {...(mediumWidth && { style: { transform: 'translateY(-20%)' } })}
+        >
           <Link
             color="primary"
             underline="hover"
