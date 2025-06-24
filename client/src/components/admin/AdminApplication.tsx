@@ -48,9 +48,7 @@ export default function AdminApplication() {
           <Route path="/" exact>
             <AdminFrontPage />
           </Route>
-          <Route path="*">
-            <Redirect to="/" />
-          </Route>
+          <Route path="*" render={() => <Redirect to="/" />} />
         </Switch>
       </BrowserRouter>
     </Compose>

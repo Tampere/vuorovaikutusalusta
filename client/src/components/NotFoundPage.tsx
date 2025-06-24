@@ -7,9 +7,7 @@ const styles = {
     margin: '0rem 1rem 0rem 1rem',
     display: 'flex',
     flexDirection: 'column',
-  },
-  infoText: {
-    '& .MuiTypography-body1': {
+    '& p': {
       fontSize: '1.25rem',
       paddingBottom: '0.5rem',
     },
@@ -29,10 +27,8 @@ export function NotFoundPage() {
         justifyContent: 'center',
       }}
     >
-      <Typography sx={styles.infoText}>
-        {tr.NotFoundPage.pageNotFound}
-      </Typography>{' '}
-      <Typography sx={styles.infoText} style={{ color: 'purple' }}>
+      <Typography>{tr.NotFoundPage.pageNotFound}</Typography>{' '}
+      <Typography style={{ color: 'purple' }}>
         {' '}
         (404: page not found){' '}
       </Typography>
