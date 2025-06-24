@@ -6,23 +6,43 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 
 const proxyAddress = process.env.API_URL ?? 'http://localhost:3000';
 
+const isAdminRoute = (url: string) => url!.startsWith('/admin');
+const isIndexRoute = (url: string) =>
+  !url.startsWith('/api') &&
+  !url.startsWith('/login') &&
+  !url.startsWith('/.auth') &&
+  !url.startsWith('/logout') &&
+  !url.startsWith('/@') &&
+  !url.includes('.');
+
 export default defineConfig({
   appType: 'mpa',
   plugins: [
-    react(),
-    tsconfigPaths(),
     {
       name: 'rewrite-middleware',
-      configureServer(config) {
-        // Rewrite all /admin paths to use the admin client application
-        config.middlewares.use((req, _res, next) => {
-          if (req.url.startsWith('/admin')) {
+      configureServer(server) {
+        server.middlewares.use((req, _res, next) => {
+          if (isAdminRoute(req.url!)) {
             req.url = '/admin/';
+          } else if (isIndexRoute(req.url!)) {
+            req.url = '/';
+          }
+          next();
+        });
+      },
+      configurePreviewServer(server) {
+        server.middlewares.use((req, _res, next) => {
+          if (isAdminRoute(req.url!)) {
+            req.url = '/admin/';
+          } else if (isIndexRoute(req.url!)) {
+            req.url = '/';
           }
           next();
         });
       },
     },
+    react(),
+    tsconfigPaths(),
   ],
   define: { 'process.env': {} },
   optimizeDeps: { esbuildOptions: { define: { global: 'globalThis' } } },
