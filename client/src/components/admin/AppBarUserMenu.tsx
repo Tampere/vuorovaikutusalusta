@@ -1,27 +1,25 @@
 import React, { useState } from 'react';
-import { IconButton, Menu, MenuItem, Tooltip } from '@mui/material';
+import { Box, IconButton, Menu, MenuItem, Tooltip } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
-import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { InstructionsDialog } from './InstructionsDialog';
 
-const useStyles = makeStyles({
+const styles = {
   root: {
     display: 'flex',
     justifyContent: 'flex-end',
   },
-});
+};
 
 export default function AppBarUserMenu() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [menuAnchorEl, setMenuAnchorEl] = useState<HTMLElement>(null);
   const [instructionsDialogOpen, setInstructionsDialogOpen] = useState(false);
 
-  const classes = useStyles();
   const { tr } = useTranslations();
 
   return (
-    <div className={classes.root}>
+    <Box sx={styles.root}>
       <Tooltip arrow title={tr.AppBarUserMenu.label}>
         <IconButton
           aria-label={tr.AppBarUserMenu.label}
@@ -72,6 +70,6 @@ export default function AppBarUserMenu() {
         setIsOpen={setInstructionsDialogOpen}
         setMenuOpen={setMenuOpen}
       />
-    </div>
+    </Box>
   );
 }

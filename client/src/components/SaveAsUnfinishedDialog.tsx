@@ -7,7 +7,6 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
@@ -22,11 +21,11 @@ interface Props {
   registrationId?: string;
 }
 
-const useStyles = makeStyles({
+const styles = {
   paragraph: {
     marginBottom: '1rem',
   },
-});
+};
 
 export default function SaveAsUnfinishedDialog({
   open,
@@ -36,7 +35,7 @@ export default function SaveAsUnfinishedDialog({
   registrationId,
 }: Props) {
   const { tr, language } = useTranslations();
-  const classes = useStyles();
+
   const [email, setEmail] = useState('');
   const [emailDirty, setEmailDirty] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -98,10 +97,10 @@ export default function SaveAsUnfinishedDialog({
       <DialogTitle>{tr.SurveyStepper.saveAsUnfinished}</DialogTitle>
       <DialogContent>
         <div id="save-dialog-content">
-          <Typography variant="body1" className={classes.paragraph}>
+          <Typography variant="body1" sx={styles.paragraph}>
             {tr.SaveAsUnfinishedDialog.description}
           </Typography>
-          <Typography variant="body1" className={classes.paragraph}>
+          <Typography variant="body1" sx={styles.paragraph}>
             {tr.SaveAsUnfinishedDialog.disclaimer}
           </Typography>
         </div>

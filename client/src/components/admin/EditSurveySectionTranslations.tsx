@@ -4,13 +4,13 @@ import {
   SurveyMapSubQuestion,
   SurveyPageSection,
 } from '@interfaces/survey';
-import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React from 'react';
 import RichTextEditor from '../RichTextEditor';
 import TranslationField from './TranslationField';
+import Box from '@mui/material/Box';
 
-const useStyles = makeStyles({
+const styles = {
   sectionContainer: {
     border: '2px solid grey',
     padding: '1rem',
@@ -19,7 +19,7 @@ const useStyles = makeStyles({
   titleText: {
     color: 'grey',
   },
-});
+};
 
 interface Props {
   section: SurveyPageSection;
@@ -33,10 +33,9 @@ export default function EditSurveySectionTranslations({
   onEdit,
 }: Props) {
   const { languages } = useTranslations();
-  const classes = useStyles();
 
   return (
-    <div className={classes.sectionContainer}>
+    <Box sx={styles.sectionContainer}>
       <TranslationField
         variant="standard"
         value={section.title?.[languageCode] ?? ''}
@@ -264,6 +263,6 @@ export default function EditSurveySectionTranslations({
           />
         </div>
       )}
-    </div>
+    </Box>
   );
 }

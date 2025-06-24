@@ -74,6 +74,13 @@ export default function AnswersList({
         answers.length > 0 &&
         answers.map((answer, index) => (
           <Accordion
+            slotProps={{
+              transition: {
+                onEntered: (node) =>
+                  node.scrollIntoView({ behavior: 'smooth', block: 'end' }),
+                heading: { component: 'div' },
+              },
+            }}
             sx={{
               borderTop: '1px solid rgba(0, 0, 0, 0.15)',
               '&:first-of-type, &:last-child': { borderTop: 0 },
@@ -81,10 +88,6 @@ export default function AnswersList({
             elevation={0}
             key={index}
             expanded={isItemSelected(answer, selectedAnswer, selectedQuestion)}
-            TransitionProps={{
-              onEntered: (node) =>
-                node.scrollIntoView({ behavior: 'smooth', block: 'end' }),
-            }}
             onChange={(_event, isExpanded) => {
               if (isExpanded) {
                 setSelectedAnswer({
@@ -117,6 +120,7 @@ export default function AnswersList({
             >
               <div style={{ flexGrow: 1 }}>
                 <Typography
+                  component="span"
                   sx={{
                     fontWeight: isItemSelected(
                       answer,
@@ -135,7 +139,7 @@ export default function AnswersList({
               </div>
               {(index === 0 ||
                 answer.submission.id !== answers[index - 1].submission.id) && (
-                <Typography style={{ color: '#797979' }}>
+                <Typography component="span" style={{ color: '#797979' }}>
                   {format(answer.submission.timestamp, 'dd.MM.yyyy')}
                 </Typography>
               )}

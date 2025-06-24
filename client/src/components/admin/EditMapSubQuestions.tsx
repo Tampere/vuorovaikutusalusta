@@ -1,5 +1,4 @@
 import { SurveyMapQuestion, SurveyMapSubQuestion } from '@interfaces/survey';
-import { makeStyles } from '@mui/styles';
 import React from 'react';
 import SurveySectionAccordion from './SurveySectionAccordion/SurveySectionAccordion';
 import { DndWrapper } from '../DragAndDrop/DndWrapper';
@@ -12,15 +11,13 @@ interface Props {
   onExpandedSectionChange: (expandedSectionIndex: number) => void;
 }
 
-const useStyles = makeStyles({
+const styles = {
   accordion: {
     background: '#bbb',
   },
-});
+};
 
 export default function EditMapSubQuestions(props: Props) {
-  const classes = useStyles();
-
   return (
     <div>
       <DndWrapper
@@ -32,7 +29,7 @@ export default function EditMapSubQuestions(props: Props) {
               disableSectionCopying
               index={index}
               key={index}
-              className={classes.accordion}
+              sx={styles.accordion}
               disabled={props.disabled}
               section={section}
               name={`section-${index}`}

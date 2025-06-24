@@ -11,9 +11,9 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
+
 import { LocalizationProvider } from '@mui/x-date-pickers';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV2';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useToasts } from '@src/stores/ToastContext';
@@ -31,7 +31,7 @@ import SurveyImageList from './SurveyImageList';
 import ThemeSelect from './ThemeSelect';
 import { assertNever } from '@src/utils/typeCheck';
 
-const useStyles = makeStyles({
+const styles = {
   dateTimePicker: {
     width: 'fit-content',
   },
@@ -39,7 +39,7 @@ const useStyles = makeStyles({
     display: 'flex',
     justifyContent: 'flex-start',
   },
-});
+};
 
 export default function EditSurveyInfo() {
   const [deleteConfirmDialogOpen, setDeleteConfirmDialogOpen] = useState(false);
@@ -60,8 +60,6 @@ export default function EditSurveyInfo() {
   const { tr, surveyLanguage, language } = useTranslations();
   const { showToast } = useToasts();
   const history = useHistory();
-
-  const classes = useStyles();
 
   const testSurveyUrl = useMemo(() => {
     return `${window.location.origin}/${originalActiveSurvey.name}/testi`;
@@ -372,7 +370,7 @@ export default function EditSurveyInfo() {
           </FormHelperText>
         </div>
 
-        <div className={classes.actions}>
+        <Box sx={styles.actions}>
           <LoadingButton
             variant="contained"
             color="error"
@@ -383,7 +381,7 @@ export default function EditSurveyInfo() {
           >
             {tr.EditSurvey.deleteSurvey}
           </LoadingButton>
-        </div>
+        </Box>
       </Fieldset>
       <DeleteSurveyDialog
         open={deleteConfirmDialogOpen}

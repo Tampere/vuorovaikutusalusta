@@ -7,14 +7,13 @@ import {
   TextField,
 } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
-import { makeStyles } from '@mui/styles';
 import QuestionOptions from './QuestionOptions';
 
-const useStyles = makeStyles({
+const styles = {
   answerLimitInput: {
     marginRight: '1rem',
   },
-});
+};
 
 interface Props {
   section: SurveyCheckboxQuestion;
@@ -27,7 +26,6 @@ export default function EditCheckBoxQuestion({
   disabled,
   onChange,
 }: Props) {
-  const classes = useStyles();
   const { tr } = useTranslations();
 
   function clampValue(value: number, min: number, max: number) {
@@ -120,15 +118,15 @@ export default function EditCheckBoxQuestion({
           <TextField
             id="min-answers"
             disabled={disabled}
-            className={classes.answerLimitInput}
+            sx={styles.answerLimitInput}
             type="number"
             variant="standard"
             label={tr.SurveySections.minAnswers}
-            InputLabelProps={{ shrink: true }}
+            slotProps={{ inputLabel: { shrink: true } }}
             value={section.answerLimits?.min ?? ''}
             onChange={(event) => {
               handleAnswerLimitsMinChange(
-                !event.target.value.length ? null : Number(event.target.value)
+                !event.target.value.length ? null : Number(event.target.value),
               );
             }}
           />
@@ -138,11 +136,11 @@ export default function EditCheckBoxQuestion({
             type="number"
             variant="standard"
             label={tr.SurveySections.maxAnswers}
-            InputLabelProps={{ shrink: true }}
+            slotProps={{ inputLabel: { shrink: true } }}
             value={section.answerLimits?.max ?? ''}
             onChange={(event) => {
               handleAnswerLimitsMaxChange(
-                !event.target.value.length ? null : Number(event.target.value)
+                !event.target.value.length ? null : Number(event.target.value),
               );
             }}
           />

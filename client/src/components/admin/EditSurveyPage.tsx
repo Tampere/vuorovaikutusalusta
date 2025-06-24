@@ -16,7 +16,6 @@ import {
   ToggleButtonGroup,
   Typography,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useAdminMap } from '@src/stores/SurveyMapContext';
 import { useToasts } from '@src/stores/ToastContext';
@@ -31,18 +30,18 @@ import { EditSurveyPageConditions } from './EditSurveyPageConditions';
 import FileUpload from './FileUpload';
 import SurveySections from './SurveySections';
 
-const useStyles = makeStyles({
+const styles = {
   button: {
     width: 'fit-content',
   },
-});
+};
 
 export default function EditSurveyPage() {
   const [loading, setLoading] = useState(false);
   const [deleteConfirmDialogOpen, setDeleteConfirmDialogOpen] = useState(false);
   const [expandedSection, setExpandedSection] = useState<number>(null);
   const { defaultView } = useAdminMap();
-  const classes = useStyles();
+
   const { surveyId, pageId } = useParams<{
     surveyId: string;
     pageId: string;
@@ -118,7 +117,7 @@ export default function EditSurveyPage() {
         disabled={loading}
         color="error"
         variant="contained"
-        className={classes.button}
+        sx={styles.button}
         onClick={() => {
           setDeleteConfirmDialogOpen(true);
         }}

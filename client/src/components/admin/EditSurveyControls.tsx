@@ -1,12 +1,11 @@
 import React, { useMemo } from 'react';
 import { useSurvey } from '@src/stores/SurveyContext';
-import { makeStyles } from '@mui/styles';
-import { Fab, Tooltip } from '@mui/material';
+import { Box, Fab, Tooltip } from '@mui/material';
 import { Save, Undo } from '@mui/icons-material';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 
-const useStyles = makeStyles({
+const styles = {
   root: {
     display: 'flex',
     gap: '1rem',
@@ -14,10 +13,9 @@ const useStyles = makeStyles({
     bottom: '1rem',
     right: '1rem',
   },
-});
+};
 
 export default function EditSurveyControls() {
-  const classes = useStyles();
   const {
     hasActiveSurveyChanged,
     activeSurveyLoading,
@@ -42,7 +40,7 @@ export default function EditSurveyControls() {
   }, [validationErrors]);
 
   return (
-    <div className={classes.root}>
+    <Box sx={styles.root}>
       <Tooltip
         title={
           validationErrors.length > 0
@@ -95,6 +93,6 @@ export default function EditSurveyControls() {
           </Fab>
         </span>
       </Tooltip>
-    </div>
+    </Box>
   );
 }

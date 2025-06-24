@@ -1,41 +1,38 @@
 import { Box, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React from 'react';
 
-const useStyles = makeStyles({
+const styles = {
   infoContainer: {
     margin: '0rem 1rem 0rem 1rem',
     display: 'flex',
     flexDirection: 'column',
   },
   infoText: {
-    fontSize: '1.25rem',
-    paddingBottom: '0.5rem',
+    '& .MuiTypography-body1': {
+      fontSize: '1.25rem',
+      paddingBottom: '0.5rem',
+    },
   },
-});
+};
 
 export function NotFoundPage() {
   const { tr } = useTranslations();
-  const classes = useStyles();
 
   return (
     <Box
-      className={classes.infoContainer}
       sx={{
+        ...styles.infoContainer,
         display: 'flex',
         height: '100vh',
         alignItems: 'center',
         justifyContent: 'center',
       }}
     >
-      <Typography classes={{ body1: classes.infoText }}>
+      <Typography sx={styles.infoText}>
         {tr.NotFoundPage.pageNotFound}
       </Typography>{' '}
-      <Typography
-        classes={{ body1: classes.infoText }}
-        style={{ color: 'purple' }}
-      >
+      <Typography sx={styles.infoText} style={{ color: 'purple' }}>
         {' '}
         (404: page not found){' '}
       </Typography>

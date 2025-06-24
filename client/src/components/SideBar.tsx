@@ -1,9 +1,8 @@
 import React, { ReactNode } from 'react';
 import { Box, Divider, Drawer, Toolbar } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 
-const useStyles = makeStyles({
+const styles = {
   paper: {
     // TODO: use theme colors?
     background: '#333',
@@ -23,7 +22,7 @@ const useStyles = makeStyles({
       backgroundColor: '#747474',
     },
   },
-});
+};
 
 interface Props {
   width: number;
@@ -32,10 +31,7 @@ interface Props {
   children: ReactNode;
 }
 
-
 export default function SideBar(props: Props) {
-  
-  const classes = useStyles();
   const { tr } = useTranslations();
 
   return (
@@ -45,9 +41,6 @@ export default function SideBar(props: Props) {
       aria-label={tr.EditSurveyPage.sidebarLabel}
     >
       <Drawer
-        classes={{
-          paper: classes.paper,
-        }}
         container={window.document.body}
         variant="temporary"
         open={props.mobileOpen}
@@ -58,6 +51,7 @@ export default function SideBar(props: Props) {
         sx={{
           display: { xs: 'block', md: 'none' },
           '& .MuiDrawer-paper': {
+            ...styles.paper,
             boxSizing: 'border-box',
             width: props.width,
           },
@@ -68,13 +62,11 @@ export default function SideBar(props: Props) {
         {props.children}
       </Drawer>
       <Drawer
-        classes={{
-          paper: classes.paper,
-        }}
         variant="permanent"
         sx={{
           display: { xs: 'none', md: 'block' },
           '& .MuiDrawer-paper': {
+            ...styles.paper,
             boxSizing: 'border-box',
             width: props.width,
           },

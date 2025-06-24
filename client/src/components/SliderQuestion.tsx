@@ -1,6 +1,5 @@
 import { SurveySliderQuestion } from '@interfaces/survey';
 import { FormLabel, Slider } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { visuallyHidden } from '@mui/utils';
 import React, { useMemo, useRef } from 'react';
@@ -13,11 +12,11 @@ interface Props {
   readOnly: boolean;
 }
 
-const useStyles = makeStyles({
+const styles = {
   label: {
     cursor: 'pointer',
   },
-});
+};
 
 export default function SliderQuestion({
   value,
@@ -27,8 +26,8 @@ export default function SliderQuestion({
   readOnly = false,
 }: Props) {
   const { surveyLanguage } = useTranslations();
-  const classes = useStyles();
-  const sliderRef = useRef<HTMLElement>();
+
+  const sliderRef = useRef<HTMLElement>(null);
   const { tr } = useTranslations();
   const verbalExtremes = question.presentationType === 'literal';
   const labels = useMemo(() => {
@@ -63,9 +62,12 @@ export default function SliderQuestion({
       }}
     >
       <FormLabel
-        sx={{ display: 'flex', justifyContent: 'space-between' }}
+        sx={{
+          ...styles.label,
+          display: 'flex',
+          justifyContent: 'space-between',
+        }}
         id={`${question.id}-value-label`}
-        className={classes.label}
         required={false}
       >
         <span style={visuallyHidden}>{tr.SliderQuestion.scale}: </span>

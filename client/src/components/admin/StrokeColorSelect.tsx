@@ -1,6 +1,5 @@
 import { MapStrokeColor } from '@interfaces/survey';
 import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { request } from '@src/utils/request';
@@ -12,7 +11,7 @@ interface Props {
   onChange: (value: string) => void;
 }
 
-const useStyles = makeStyles({
+const styles = {
   select: {
     minWidth: '10rem',
     width: 'fit-content',
@@ -20,14 +19,14 @@ const useStyles = makeStyles({
     flexDirection: 'row',
     alignItems: 'center',
   },
-});
+};
 
 export default function StrokeColorSelect({ value, onChange }: Props) {
   const [colors, setColors] = useState<MapStrokeColor[]>();
   const [loading, setLoading] = useState(true);
 
   const { tr } = useTranslations();
-  const classes = useStyles();
+
   const { showToast } = useToasts();
 
   useEffect(() => {
@@ -35,7 +34,7 @@ export default function StrokeColorSelect({ value, onChange }: Props) {
       setLoading(true);
       try {
         const colors = await request<MapStrokeColor[]>(
-          '/api/feature-styles/stroke-colors'
+          '/api/feature-styles/stroke-colors',
         );
         setColors(colors);
       } catch (error) {
@@ -64,9 +63,7 @@ export default function StrokeColorSelect({ value, onChange }: Props) {
         onChange={(event) => {
           onChange(event.target.value == null ? null : event.target.value);
         }}
-        classes={{
-          select: classes.select,
-        }}
+        sx={{ '&. MuiSelect-select': styles.select }}
       >
         <MenuItem value="">
           <em>{tr.StrokeColorSelect.selectStrokeColor}</em>

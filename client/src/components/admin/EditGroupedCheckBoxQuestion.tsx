@@ -10,9 +10,9 @@ import {
   FormGroup,
   FormControlLabel,
   Checkbox,
+  Box,
 } from '@mui/material';
 import { Add, DragIndicator, ExpandMore } from '@mui/icons-material';
-import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useState } from 'react';
 import QuestionOptions from './QuestionOptions';
@@ -25,7 +25,7 @@ interface Props {
   onChange: (section: SurveyGroupedCheckboxQuestion) => void;
 }
 
-const useStyles = makeStyles({
+const styles = {
   accordion: {
     background: '#bbb',
   },
@@ -41,7 +41,7 @@ const useStyles = makeStyles({
   answerLimitInput: {
     marginRight: '1rem',
   },
-});
+};
 
 export default function EditGroupedCheckBoxQuestion({
   section,
@@ -51,7 +51,6 @@ export default function EditGroupedCheckBoxQuestion({
   const [openedGroupId, setOpenedGroupId] = useState<number>(null);
 
   const { tr, surveyLanguage } = useTranslations();
-  const classes = useStyles();
 
   return (
     <>
@@ -83,11 +82,11 @@ export default function EditGroupedCheckBoxQuestion({
           <TextField
             id="min-answers"
             disabled={disabled}
-            className={classes.answerLimitInput}
+            sx={styles.answerLimitInput}
             type="number"
             variant="standard"
             label={tr.SurveySections.minAnswers}
-            InputLabelProps={{ shrink: true }}
+            slotProps={{ inputLabel: { shrink: true } }}
             value={section.answerLimits?.min ?? ''}
             onChange={(event) => {
               // Negative numbers shouldn't be allowed
@@ -107,7 +106,7 @@ export default function EditGroupedCheckBoxQuestion({
             type="number"
             variant="standard"
             label={tr.SurveySections.maxAnswers}
-            InputLabelProps={{ shrink: true }}
+            slotProps={{ inputLabel: { shrink: true } }}
             value={section.answerLimits?.max ?? ''}
             onChange={(event) => {
               // Negative numbers shouldn't be allowed
@@ -128,14 +127,16 @@ export default function EditGroupedCheckBoxQuestion({
           id: String(group.id),
           renderElement: (isDragging) => (
             <Accordion
+              slotProps={{ heading: { component: 'div' } }}
               key={group.id}
-              className={classes.accordion}
+              sx={styles.accordion}
               expanded={openedGroupId === group.id}
               onChange={(_, isExpanded) => {
                 setOpenedGroupId(isExpanded ? group.id : null);
               }}
             >
               <AccordionSummary
+                component="div"
                 expandIcon={<ExpandMore />}
                 aria-controls={`group-${index}-content`}
                 id={`group-${index}-header`}
@@ -149,7 +150,7 @@ export default function EditGroupedCheckBoxQuestion({
                   <DragIndicator />
                 </DragHandle>
               </AccordionSummary>
-              <AccordionDetails className={classes.group}>
+              <AccordionDetails sx={styles.group}>
                 <TextField
                   autoFocus
                   disabled={disabled}
@@ -215,7 +216,7 @@ export default function EditGroupedCheckBoxQuestion({
         }}
       />
 
-      <div className={classes.row}>
+      <Box sx={styles.row}>
         <Fab
           color="primary"
           disabled={disabled}
@@ -244,7 +245,7 @@ export default function EditGroupedCheckBoxQuestion({
         <Typography style={{ paddingLeft: '1rem' }}>
           {tr.EditGroupedCheckBoxQuestion.addGroup}
         </Typography>
-      </div>
+      </Box>
     </>
   );
 }

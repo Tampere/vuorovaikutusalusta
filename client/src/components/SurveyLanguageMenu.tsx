@@ -1,7 +1,6 @@
-import { MenuItem, Select, Tooltip } from '@mui/material';
+import { Box, MenuItem, Select, Tooltip } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { LanguageCode } from '@interfaces/survey';
-import { makeStyles } from '@mui/styles';
 import LanguageIcon from '@mui/icons-material/Language';
 import React from 'react';
 
@@ -10,14 +9,14 @@ interface Props {
   changeUILanguage?: boolean;
 }
 
-const useStyles = makeStyles({
+const styles = {
   root: {
     cursor: 'pointer',
     display: 'flex',
     flexGrow: 1,
     justifyContent: 'flex-end',
   },
-});
+};
 
 export default function SurveyLanguageMenu({
   style,
@@ -25,10 +24,9 @@ export default function SurveyLanguageMenu({
 }: Props) {
   const { tr, setSurveyLanguage, setLanguage, languages, surveyLanguage } =
     useTranslations();
-  const classes = useStyles();
 
   return (
-    <div className={classes.root} style={style}>
+    <Box sx={styles.root} style={style}>
       <Tooltip
         arrow
         placement="left-end"
@@ -71,6 +69,6 @@ export default function SurveyLanguageMenu({
           ))}
         </Select>
       </Tooltip>
-    </div>
+    </Box>
   );
 }

@@ -8,7 +8,7 @@ import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
 import SurveyProvider from '@src/stores/SurveyContext';
 import TranslationProvider from '@src/stores/TranslationContext';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV2';
 import SurveyAnswerProvider from '@src/stores/SurveyAnswerContext';
 import ToastProvider from '@src/stores/ToastContext';
 import AdminFrontPage from './AdminFrontPage';

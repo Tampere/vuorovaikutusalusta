@@ -11,7 +11,7 @@ import { Help as HelpIcon } from '@mui/icons-material';
 import ReactMarkdown from 'react-markdown';
 import rehypeExternalLinks from 'rehype-external-links';
 import { useTranslations } from '@src/stores/TranslationContext';
-import useId from '@mui/material/utils/useId';
+import { useId } from 'react';
 
 interface Props {
   subject: string;

@@ -35,7 +35,7 @@
   },
   "homepage": "https://github.com/ubigu/vuorovaikutusalusta#readme",
   "engines": {
-    "node": "^20.5.0"
+    "node": "^24.2.0"
   },
   "dependencies": {
     "@date-io/date-fns": "^2.17.0",
@@ -46,11 +46,10 @@
     "@fontsource/montserrat": "^4.5.14",
     "@fontsource/open-sans": "^4.5.14",
     "@fontsource/roboto": "^4.5.8",
-    "@mui/icons-material": "^5.17.1",
-    "@mui/lab": "^5.0.0-alpha.176",
-    "@mui/material": "^5.17.1",
-    "@mui/styles": "^5.17.1",
-    "@mui/x-date-pickers": "^6.20.2",
+    "@mui/icons-material": "^7.1.2",
+    "@mui/lab": "^7.0.0-beta.14",
+    "@mui/material": "^7.1.2",
+    "@mui/x-date-pickers": "^8.5.3",
     "@turf/centroid": "^6.5.0",
     "assert": "^2.1.0",
     "date-fns": "^2.30.0",

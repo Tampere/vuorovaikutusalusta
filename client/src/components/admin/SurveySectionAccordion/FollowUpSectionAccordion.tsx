@@ -40,7 +40,7 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
+
 import { FollowUpListItemIcon } from '@src/components/icons/FollowUpListItemIcon';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { ReactNode, useMemo, useRef, useState } from 'react';
@@ -63,7 +63,7 @@ import EditTextSection from '../EditTextSection';
 import { FollowUpSectionMenu } from './FollowUpSectionMenu';
 import { DragHandle } from '@src/components/DragAndDrop/SortableItem';
 
-const useStyles = makeStyles({
+const styles = {
   accordion: {
     background: '#ddd',
   },
@@ -87,7 +87,7 @@ const useStyles = makeStyles({
     alignItems: 'center',
     margin: 0,
   },
-});
+};
 
 interface Props {
   pageId: number;
@@ -108,11 +108,11 @@ interface Props {
 
 export function FollowUpSectionAccordion(props: Props) {
   const [deleteConfirmDialogOpen, setDeleteConfirmDialogOpen] = useState(false);
-  const classes = useStyles();
+
   const { tr, surveyLanguage } = useTranslations();
 
   // Index is used inside a callback function -> useRef is required in React to catch all updates
-  const indexRef = useRef<number>();
+  const indexRef = useRef<number>(null);
   indexRef.current = props.index;
 
   function handleEdit(section: SurveyPageSection | SurveyFollowUpSection) {
@@ -288,15 +288,20 @@ export function FollowUpSectionAccordion(props: Props) {
         onChange={(_, isExpanded) => {
           props.onExpandedChange(isExpanded);
         }}
-        className={props.className ?? classes.accordion}
+        {...(props.className && { className: props.className })}
+        sx={styles.accordion}
         style={{ backgroundColor: '#FDE1FF' }}
+        slotProps={{ heading: { component: 'div' } }}
       >
         <AccordionSummary
+          component="div"
           expandIcon={<ExpandMore />}
           aria-controls={`${props.name}-content`}
           id={`${props.name}-header`}
-          className={classes.customAccordionSummary}
-          classes={{ contentGutters: classes.contentGutters }}
+          sx={{
+            ...styles.customAccordionSummary,
+            '& .MuiAccordionSummary-contentGutters': styles.contentGutters,
+          }}
         >
           <div
             style={{
@@ -320,7 +325,7 @@ export function FollowUpSectionAccordion(props: Props) {
             )}
           </div>
 
-          <Typography className={classes.sectionTitle}>
+          <Typography sx={styles.sectionTitle}>
             {props.section.title?.[surveyLanguage] || (
               <em>{tr.EditSurveyPage.untitledSection}</em>
             )}

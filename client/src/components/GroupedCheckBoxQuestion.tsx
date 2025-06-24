@@ -12,7 +12,6 @@ import {
   Typography,
 } from '@mui/material';
 import { ArrowForwardIosSharp } from '@mui/icons-material';
-import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { visuallyHidden } from '@mui/utils';
 import React, { useMemo, useState } from 'react';
@@ -32,7 +31,7 @@ interface Props {
   readOnly: boolean;
 }
 
-const useStyles = makeStyles((theme: Theme) => ({
+const styles = (theme: Theme) => ({
   accordion: {
     border: `1px solid ${theme.palette.divider}`,
     '&:not(:last-child)': {
@@ -43,6 +42,8 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
   },
   accordionSummary: {
+    fontFamily: 'inherit',
+    fontSize: 'inherit',
     backgroundColor:
       theme.palette.mode === 'dark'
         ? 'rgba(255, 255, 255, .05)'
@@ -68,11 +69,13 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
   },
   labelStyles: {
-    lineHeight: 1.2,
-    marginBottom: '0.5em',
-    marginTop: '0.5em',
+    '& .MuiFormControlLabel-label': {
+      lineHeight: 1.2,
+      marginBottom: '0.5em',
+      marginTop: '0.5em',
+    },
   },
-}));
+});
 
 export default function GroupedCheckBoxQuestion({
   value,
@@ -84,7 +87,6 @@ export default function GroupedCheckBoxQuestion({
   const [expanded, setExpanded] = useState<number>(null);
 
   const { tr, surveyLanguage } = useTranslations();
-  const classes = useStyles();
 
   const amountsByGroup = useMemo(
     () =>
@@ -134,31 +136,32 @@ export default function GroupedCheckBoxQuestion({
       </Typography>
       <Typography style={{ marginTop: '1rem' }} id={`${question.id}-indicator`}>
         {indicatorTextStart}
-        <span
-          className={[classes.indicatorNumbers, maxReached && 'max-reached']
-            .filter(Boolean)
-            .join(' ')}
+        <Box
+          component="span"
+          sx={(theme) => styles(theme).indicatorNumbers}
+          className={[maxReached && 'max-reached'].filter(Boolean).join(' ')}
         >
           {value.length}
           {question.answerLimits?.max && `/${question.answerLimits.max}`}
-        </span>
+        </Box>
         {indicatorTextEnd}
       </Typography>
       <div style={{ marginTop: '1rem' }}>
         {question.groups.map((group, index) => (
           <Accordion
+            slotProps={{ heading: { component: 'div' } }}
             expanded={expanded === group.id}
             onChange={(_, newExpanded) => {
               setExpanded(newExpanded ? group.id : null);
             }}
             key={group.id}
-            className={classes.accordion}
+            sx={(theme) => styles(theme).accordion}
             disableGutters
             elevation={0}
             square
           >
             <AccordionSummary
-              className={classes.accordionSummary}
+              sx={(theme) => styles(theme).accordionSummary}
               expandIcon={<ArrowForwardIosSharp sx={{ fontSize: '0.9rem' }} />}
             >
               {group.name?.[surveyLanguage]}
@@ -180,7 +183,7 @@ export default function GroupedCheckBoxQuestion({
                 </>
               )}
             </AccordionSummary>
-            <AccordionDetails className={classes.accordionDetails}>
+            <AccordionDetails sx={(theme) => styles(theme).accordionDetails}>
               <FormGroup
                 // Indicate the amount of selections inside the group for screen readers
                 aria-label={`${group.name?.[
@@ -203,8 +206,10 @@ export default function GroupedCheckBoxQuestion({
                       label={option.text?.[surveyLanguage] ?? ''}
                       control={
                         <Checkbox
-                          inputProps={{
-                            'aria-describedby': `${question.id}-indicator`,
+                          slotProps={{
+                            input: {
+                              'aria-describedby': `${question.id}-indicator`,
+                            },
                           }}
                           checked={value.includes(option.id)}
                           disabled={
@@ -225,7 +230,7 @@ export default function GroupedCheckBoxQuestion({
                           name={option.text?.[surveyLanguage]}
                         />
                       }
-                      classes={{ label: classes.labelStyles }}
+                      sx={(theme) => styles(theme).labelStyles}
                     />
                     {option.info?.[surveyLanguage] && (
                       <SectionInfo

@@ -1,7 +1,6 @@
-import { MenuItem, Select, Tooltip } from '@mui/material';
+import { Box, MenuItem, Select, Tooltip } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { LanguageCode } from '@interfaces/survey';
-import { makeStyles } from '@mui/styles';
 import LanguageIcon from '@mui/icons-material/Language';
 import React from 'react';
 
@@ -9,21 +8,20 @@ interface Props {
   style?: React.CSSProperties;
 }
 
-const useStyles = makeStyles({
+const styles = {
   root: {
     cursor: 'pointer',
     display: 'flex',
     flexGrow: 1,
     justifyContent: 'flex-end',
   },
-});
+};
 
 export default function LanguageMenu({ style }: Props) {
   const { tr, setLanguage, languages, language } = useTranslations();
-  const classes = useStyles();
 
   return (
-    <div className={classes.root} style={style}>
+    <Box sx={styles.root} style={style}>
       <Tooltip
         arrow
         placement="left-end"
@@ -66,6 +64,6 @@ export default function LanguageMenu({ style }: Props) {
           ))}
         </Select>
       </Tooltip>
-    </div>
+    </Box>
   );
 }

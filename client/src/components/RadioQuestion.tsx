@@ -1,21 +1,7 @@
 import { SurveyRadioQuestion } from '@interfaces/survey';
 import { FormControlLabel, Radio, RadioGroup, TextField } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { createRef, useEffect, useRef, useState } from 'react';
-
-const useStyles = makeStyles({
-  labelStyles: {
-    lineHeight: 1.2,
-    marginBottom: '0.5em',
-    marginTop: '0.5em',
-  },
-});
-
-/**
- * Max length of a custom answer in radio/checkbox questions
- */
-const customAnswerMaxLength = 250;
 
 interface Props {
   autoFocus?: boolean;
@@ -24,6 +10,21 @@ interface Props {
   question: SurveyRadioQuestion;
   setDirty: (dirty: boolean) => void;
 }
+
+/**
+ * Max length of a custom answer in radio/checkbox questions
+ */
+const customAnswerMaxLength = 250;
+
+const styles = {
+  labelStyles: {
+    '& .MuiFormControlLabel-label': {
+      lineHeight: 1.2,
+      marginBottom: '0.5em',
+      marginTop: '0.5em',
+    },
+  },
+};
 
 export default function RadioQuestion({
   autoFocus = false,
@@ -34,7 +35,6 @@ export default function RadioQuestion({
 }: Props) {
   const [customAnswerValue, setCustomAnswerValue] = useState('');
   const { tr, surveyLanguage } = useTranslations();
-  const classes = useStyles();
   const actionRef = useRef([]);
 
   if (autoFocus) {
@@ -78,13 +78,13 @@ export default function RadioQuestion({
             key={option.id}
             value={option.id}
             label={option.text?.[surveyLanguage] ?? ''}
+            sx={styles.labelStyles}
             control={
               <Radio
                 action={actionRef.current[index]}
                 autoFocus={index === 0 && autoFocus}
               />
             }
-            classes={{ label: classes.labelStyles }}
           />
         ))}
         {question.allowCustomAnswer && (

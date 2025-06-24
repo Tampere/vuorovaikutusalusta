@@ -4,13 +4,13 @@ import { useState } from 'react';
 import { createNewSurvey, getSurveys } from '@src/controllers/SurveyController';
 import { useToasts } from '@src/stores/ToastContext';
 import SurveyListItem from './SurveyListItem';
-import { FormControlLabel, Skeleton, Switch } from '@mui/material';
-import { makeStyles } from '@mui/styles';
+import { Box, FormControlLabel, Skeleton, Switch } from '@mui/material';
+
 import { useTranslations } from '@src/stores/TranslationContext';
 import LoadingButton from '../LoadingButton';
 import { useHistory } from 'react-router-dom';
 
-const useStyles = makeStyles({
+const styles = {
   root: {
     display: 'flex',
     flexDirection: 'column',
@@ -20,7 +20,7 @@ const useStyles = makeStyles({
     display: 'flex',
     justifyContent: 'space-between',
   },
-});
+};
 
 export default function SurveyList() {
   const [surveysLoading, setSurveysLoading] = useState(true);
@@ -29,7 +29,6 @@ export default function SurveyList() {
   const [showAuthoredOnly, setShowAuthoredOnly] = useState<boolean>(false);
   const [showPublishedOnly, setShowPublishedOnly] = useState<boolean>(false);
 
-  const classes = useStyles();
   const { showToast } = useToasts();
   const { tr } = useTranslations();
   const history = useHistory();
@@ -62,10 +61,10 @@ export default function SurveyList() {
       abortController?.abort();
     };
   }, [showAuthoredOnly, showPublishedOnly]);
-  
+
   return (
-    <div className={classes.root}>
-      <div className={classes.actions}>
+    <Box sx={styles.root}>
+      <Box sx={styles.actions}>
         <FormControlLabel
           value="showAuthored"
           control={
@@ -76,8 +75,8 @@ export default function SurveyList() {
           }
           label={tr.SurveyList.showAuthoredOnly}
         />
-      </div>
-      <div className={classes.actions}>
+      </Box>
+      <Box sx={styles.actions}>
         <FormControlLabel
           value="showPublished"
           control={
@@ -108,7 +107,7 @@ export default function SurveyList() {
         >
           {tr.SurveyList.createNewSurvey}
         </LoadingButton>
-      </div>
+      </Box>
       {surveysLoading ? (
         <Skeleton variant="rectangular" width="100%" height={300} />
       ) : (
@@ -118,6 +117,6 @@ export default function SurveyList() {
           ))}
         </>
       )}
-    </div>
+    </Box>
   );
 }

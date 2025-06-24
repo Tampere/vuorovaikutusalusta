@@ -1,21 +1,20 @@
 import React, { ReactNode } from 'react';
-import { Theme } from '@mui/material';
-import { makeStyles } from '@mui/styles';
+import { Box, Theme } from '@mui/material';
 
-const useStyles = makeStyles((theme: Theme) => ({
-  '@keyframes pulse': {
-    '0%': {
-      opacity: 0.4,
-    },
-    '50%': {
-      opacity: 0.7,
-    },
-    '100%': {
-      opacity: 0.4,
-    },
-  },
+const styles = (theme: Theme) => ({
   loading: {
-    animation: `$pulse 1s ${theme.transitions.easing.easeIn} infinite`,
+    '@keyframes pulse': {
+      '0%': {
+        opacity: 0.4,
+      },
+      '50%': {
+        opacity: 0.7,
+      },
+      '100%': {
+        opacity: 0.4,
+      },
+    },
+    animation: `pulse 1s ${theme.transitions.easing.easeIn} infinite`,
     pointerEvents: 'none',
   },
   fieldset: {
@@ -24,7 +23,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     flexDirection: 'column',
     gap: '2rem',
   },
-}));
+});
 
 interface Props {
   disabled?: boolean;
@@ -33,14 +32,16 @@ interface Props {
 }
 
 export default function Fieldset({ disabled, loading, children }: Props) {
-  const classes = useStyles();
-
   return (
-    <fieldset
+    <Box
+      component="fieldset"
       disabled={disabled || loading}
-      className={`${classes.fieldset} ${loading ? classes.loading : ''}`}
+      sx={(theme) => ({
+        ...styles(theme).fieldset,
+        ...(loading ? styles(theme).loading : {}),
+      })}
     >
       {children}
-    </fieldset>
+    </Box>
   );
 }
