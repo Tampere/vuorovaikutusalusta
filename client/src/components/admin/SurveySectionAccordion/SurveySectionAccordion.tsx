@@ -38,7 +38,6 @@ import {
 import {
   Accordion,
   AccordionSummary,
-  Box,
   IconButton,
   SxProps,
   Tooltip,

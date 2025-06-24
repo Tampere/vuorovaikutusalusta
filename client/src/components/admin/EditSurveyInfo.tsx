@@ -13,13 +13,13 @@ import {
 } from '@mui/material';
 
 import { LocalizationProvider } from '@mui/x-date-pickers';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV2';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
-import fiLocale from 'date-fns/locale/fi';
-import enLocale from 'date-fns/locale/en-GB';
+import { fi, enGB } from 'date-fns/locale';
+
 import React, { useEffect, useMemo, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import CopyToClipboard from '../CopyToClipboard';
@@ -88,9 +88,9 @@ export default function EditSurveyInfo() {
   const localLanguage = useMemo(() => {
     switch (language) {
       case 'fi':
-        return fiLocale;
+        return fi;
       case 'en':
-        return enLocale;
+        return enGB;
       default:
         return assertNever(language);
     }

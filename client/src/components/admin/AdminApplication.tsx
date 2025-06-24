@@ -1,5 +1,5 @@
 import React from 'react';
-import fiLocale from 'date-fns/locale/fi';
+import { fi } from 'date-fns/locale';
 import { CssBaseline, ThemeProvider } from '@mui/material';
 import { theme } from '@src/themes/admin';
 import Compose from '../Compose';
@@ -8,7 +8,7 @@ import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
 import SurveyProvider from '@src/stores/SurveyContext';
 import TranslationProvider from '@src/stores/TranslationContext';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV2';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import SurveyAnswerProvider from '@src/stores/SurveyAnswerContext';
 import ToastProvider from '@src/stores/ToastContext';
 import AdminFrontPage from './AdminFrontPage';
@@ -24,7 +24,7 @@ export default function AdminApplication() {
       components={[
         [
           LocalizationProvider,
-          { dateAdapter: AdapterDateFns, adapterLocale: fiLocale },
+          { dateAdapter: AdapterDateFns, adapterLocale: fi },
         ],
         [ThemeProvider, { theme }],
         SurveyProvider,
