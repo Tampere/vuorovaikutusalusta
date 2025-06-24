@@ -1693,6 +1693,8 @@ function dbSurveyJoinToSection(dbSurveyJoin: DBSurveyJoin): SurveyPageSection {
         ...(sectionTypesWithOptions.includes(type) && { options: [] }),
         // Add an initial empty group array if the type allows option groups
         ...(type === 'grouped-checkbox' && { groups: [] }),
+        // Add an initial empty subquestions array if the type allows subquestions
+        ...(type === 'map' && { subQuestions: [] }),
       };
 }
 
