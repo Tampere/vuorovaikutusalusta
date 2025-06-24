@@ -10,7 +10,8 @@ client/*
 !client/vite.config.ts
 !client/jest.config.json
 !client/setupTests.ts
-!client/.eslintrc
+!client/eslint.config.mjs
+
 
 server/*
 !server/package*.json
