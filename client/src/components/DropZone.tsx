@@ -1,9 +1,9 @@
-import { makeStyles } from '@mui/styles';
+import { Box } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 
-const useStyles = makeStyles({
+const styles = {
   container: {
     width: '90%',
     display: 'flex',
@@ -29,7 +29,7 @@ const useStyles = makeStyles({
       outlineOffset: '2px',
     },
   },
-});
+};
 
 const DEFAULT_MAX_FILE_SIZE = '10';
 
@@ -48,7 +48,6 @@ export default function DropZone({
   maxFileSize,
   readOnly = false,
 }: Props) {
-  const classes = useStyles();
   const { tr } = useTranslations();
   const { acceptedFiles, getRootProps, getInputProps } = useDropzone({
     maxFiles: maxFiles,
@@ -61,9 +60,9 @@ export default function DropZone({
   }, [acceptedFiles]);
 
   return (
-    <section className={classes.container}>
-      <div
-        {...getRootProps({ className: `dropzone ${classes.dropzone}` })}
+    <Box component="section" sx={styles.container}>
+      <Box
+        {...getRootProps({ sx: styles.dropzone })}
         aria-label={children ? tr.AttachmentQuestion.replace : ''}
       >
         <input {...getInputProps()} />
@@ -75,7 +74,7 @@ export default function DropZone({
                 maxFileSize ? String(maxFileSize) : DEFAULT_MAX_FILE_SIZE,
               )}
         </div>
-      </div>
-    </section>
+      </Box>
+    </Box>
   );
 }

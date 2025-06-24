@@ -1,14 +1,20 @@
 import { SectionOption } from '@interfaces/survey';
-import { Fab, IconButton, TextField, Tooltip, Typography } from '@mui/material';
+import {
+  Box,
+  Fab,
+  IconButton,
+  TextField,
+  Tooltip,
+  Typography,
+} from '@mui/material';
 import { Add, Delete, DragIndicator } from '@mui/icons-material';
-import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { createRef, useEffect, useMemo } from 'react';
 import OptionInfoDialog from './OptionInfoDialog';
 import { DndWrapper } from '../DragAndDrop/DndWrapper';
 import { DragHandle } from '../DragAndDrop/SortableItem';
 
-const useStyles = makeStyles({
+const styles = {
   wrapper: {
     display: 'flex',
     flexDirection: 'column',
@@ -27,7 +33,7 @@ const useStyles = makeStyles({
   textInput: {
     flexGrow: 1,
   },
-});
+};
 
 export function generateDraftId() {
   return Math.random().toString(36);
@@ -50,7 +56,6 @@ export default function QuestionOptions({
   enableClipboardImport = false,
   allowOptionInfo = false,
 }: Props) {
-  const classes = useStyles();
   const { tr, surveyLanguage, initializeLocalizedObject } = useTranslations();
 
   // Array of references to the option input elements
@@ -120,8 +125,8 @@ export default function QuestionOptions({
   }
 
   return (
-    <div className={classes.wrapper}>
-      <div className={classes.row}>
+    <Box sx={styles.wrapper}>
+      <Box sx={styles.row}>
         <Fab
           color="primary"
           disabled={disabled}
@@ -140,7 +145,7 @@ export default function QuestionOptions({
           <Add />
         </Fab>
         <Typography style={{ paddingLeft: '1rem' }}>{title}</Typography>
-      </div>
+      </Box>
       <div>
         <DndWrapper
           onDragEnd={(dragOptions) => {
@@ -157,11 +162,11 @@ export default function QuestionOptions({
           sortableItems={options.map((option, index) => ({
             id: String(option?.id ?? option.draftId),
             renderElement: (isDragging) => (
-              <div className={`${classes.row} ${classes.option}`}>
+              <Box sx={{ ...styles.row, ...styles.option }}>
                 <DragHandle isDragging={isDragging}>
                   <DragIndicator />
                 </DragHandle>
-                <div className={classes.textInput}>
+                <Box sx={styles.textInput}>
                   <TextField
                     multiline
                     inputRef={inputRefs[index]}
@@ -220,7 +225,7 @@ export default function QuestionOptions({
                       }
                     }}
                   />
-                </div>
+                </Box>
                 {allowOptionInfo && (
                   <OptionInfoDialog
                     infoText={option?.info?.[surveyLanguage]}
@@ -255,11 +260,11 @@ export default function QuestionOptions({
                     </IconButton>
                   </span>
                 </Tooltip>
-              </div>
+              </Box>
             ),
           }))}
         />
       </div>
-    </div>
+    </Box>
   );
 }

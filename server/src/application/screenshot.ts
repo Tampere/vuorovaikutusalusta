@@ -8,7 +8,6 @@ import parseCSSColor from 'parse-css-color';
 import { Page } from 'puppeteer';
 import { Cluster } from 'puppeteer-cluster';
 import { getAvailableMapLayers } from './map';
-import logger from '@src/logger';
 
 /**
  * Oskari needs to be declared, because it is available as a global variable inside
@@ -78,8 +77,8 @@ function getFeatureStyle(
         style.strokeStyle === 'dashed'
           ? [30, 10]
           : style.strokeStyle === 'dotted'
-          ? [0, 14]
-          : null,
+            ? [0, 14]
+            : null,
       lineCap: style.strokeStyle === 'dashed' ? 'butt' : 'round',
     },
     fill: {
@@ -176,8 +175,8 @@ async function generateScreenshots({
           answer.feature.geometry.type === 'Point'
             ? 'point'
             : answer.feature.geometry.type === 'LineString'
-            ? 'line'
-            : 'area',
+              ? 'line'
+              : 'area',
           answer.question,
         ),
         question: answer.question as any,

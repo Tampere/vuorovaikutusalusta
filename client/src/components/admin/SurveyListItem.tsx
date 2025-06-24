@@ -13,31 +13,30 @@ import {
   unpublishSurvey,
 } from '@src/controllers/SurveyController';
 import { useToasts } from '@src/stores/ToastContext';
-import { makeStyles } from '@mui/styles';
 import LoadingButton from '../LoadingButton';
 import { NavLink, useRouteMatch } from 'react-router-dom';
 
-const useStyles = makeStyles((theme: Theme) => ({
-  '@keyframes pulse': {
-    '0%': {
-      opacity: 0.4,
-    },
-    '50%': {
-      opacity: 0.7,
-    },
-    '100%': {
-      opacity: 0.4,
-    },
-  },
+const styles = (theme: Theme) => ({
   loading: {
-    animation: `$pulse 1s ${theme.transitions.easing.easeIn} infinite`,
+    '@keyframes pulse': {
+      '0%': {
+        opacity: 0.4,
+      },
+      '50%': {
+        opacity: 0.7,
+      },
+      '100%': {
+        opacity: 0.4,
+      },
+    },
+    animation: `pulse 1s ${theme.transitions.easing.easeIn} infinite`,
     pointerEvents: 'none',
     filter: 'grayscale(100%)',
   },
   cardRoot: {
     paddingBottom: '8px',
   },
-}));
+});
 
 interface Props {
   survey: Survey;
@@ -51,7 +50,6 @@ export default function SurveyListItem(props: Props) {
     useState(false);
   const [loading, setLoading] = useState(false);
 
-  const classes = useStyles();
   const { tr, surveyLanguage } = useTranslations();
   const { showToast } = useToasts();
   const { url } = useRouteMatch();
@@ -68,12 +66,12 @@ export default function SurveyListItem(props: Props) {
   return (
     <>
       <Card
-        className={loading ? classes.loading : ''}
+        sx={(theme) => (loading ? styles(theme).loading : {})}
         style={
           survey.isPublished ? { filter: 'drop-shadow(0 0 0.15rem green)' } : {}
         }
       >
-        <CardContent classes={{ root: classes.cardRoot }}>
+        <CardContent sx={(theme) => styles(theme).cardRoot}>
           <Typography variant="h6" component="h3">
             {!survey.title?.[surveyLanguage] ? (
               <em>{tr.SurveyList.untitledSurvey}</em>

@@ -25,13 +25,12 @@ import {
   useMediaQuery,
   useTheme,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
+
 import { visuallyHidden } from '@mui/utils';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import { useSurveyMap } from '@src/stores/SurveyMapContext';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
-import { getClassList } from '@src/utils/classes';
 import { getFullFilePath } from '@src/utils/path';
 import { request } from '@src/utils/request';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
@@ -48,7 +47,7 @@ import SurveyMap from './SurveyMap';
 import SurveyQuestion from './SurveyQuestion';
 import TextSection from './TextSection';
 
-const useStyles = makeStyles((theme: Theme) => ({
+const styles = (theme: Theme) => ({
   root: {
     display: 'flex',
     height: '100%',
@@ -98,7 +97,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     borderColor: theme?.palette?.primary?.main ?? 'blue',
     borderWidth: '3px',
   },
-}));
+});
 
 interface Props {
   survey: Survey;
@@ -142,7 +141,7 @@ export default function SurveyStepper({
     stopModifying,
     getAllLayers,
   } = useSurveyMap();
-  const classes = useStyles();
+
   const { tr, language, surveyLanguage } = useTranslations();
   const theme = useTheme();
   const mdUp = useMediaQuery(theme.breakpoints.up('md'));
@@ -413,7 +412,7 @@ export default function SurveyStepper({
         <h1 style={{ marginLeft: '1rem' }}>{survey.title[surveyLanguage]}</h1>
 
         <Stepper
-          className={classes.stepper}
+          sx={(theme) => styles(theme).stepper}
           activeStep={pageNumber}
           orientation="vertical"
           connector={null}
@@ -426,10 +425,10 @@ export default function SurveyStepper({
               <StepLabel
                 id={`${index}-page-top`}
                 aria-current={index === pageNumber ? 'step' : false}
-                classes={{
-                  active: classes.stepActive,
-                  label: classes.stepHeader,
-                }}
+                sx={(theme) => ({
+                  '& .Mui-active': styles(theme).stepActive,
+                  '& .MuiStepLabel-label': styles(theme).stepHeader,
+                })}
               >
                 <Typography
                   id={`${index}-page-heading`}
@@ -454,7 +453,9 @@ export default function SurveyStepper({
 
               <StepContent
                 transitionDuration={0}
-                classes={{ root: classes.stepContent }}
+                sx={(theme) => ({
+                  '& .MuiStepContent-root': styles(theme).stepContent,
+                })}
               >
                 {pageUnfinished && (
                   <Box
@@ -498,7 +499,7 @@ export default function SurveyStepper({
                   )}
 
                   {page.sections.map((section, _index) => (
-                    <div className={classes.section} key={section.id}>
+                    <Box sx={(theme) => styles(theme).section} key={section.id}>
                       {section.type === 'text' ? (
                         <TextSection section={section} />
                       ) : section.type === 'image' ? (
@@ -519,7 +520,7 @@ export default function SurveyStepper({
                           />
                         </>
                       )}
-                    </div>
+                    </Box>
                   ))}
                   <StepperControls
                     registrationId={registrationId}
@@ -676,7 +677,12 @@ export default function SurveyStepper({
   }, [survey, currentPage.sidebar, surveyLanguage]);
 
   return (
-    <div className={getClassList([classes.root, loading && classes.loading])}>
+    <Box
+      sx={(theme) => ({
+        ...styles(theme).root,
+        ...(loading && styles(theme).loading),
+      })}
+    >
       {/* Side pane doesn't exist on any page - show the page in 1 column aligned to left */}
       {!sidePane && (
         <div
@@ -852,6 +858,6 @@ export default function SurveyStepper({
         }}
         onSubmit={doSubmit}
       />
-    </div>
+    </Box>
   );
 }

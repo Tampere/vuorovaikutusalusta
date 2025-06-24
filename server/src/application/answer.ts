@@ -329,8 +329,8 @@ async function answerEntriesToCSV(entries: CSVJson): Promise<string> {
     ).format('DD-MM-YYYY HH:mm')},${submissions[i].submissionLanguage}`;
     csvData += ',';
 
-    headers.forEach((headerObj, index) => {
-      for (const [headerKey, headerValue] of Object.entries(headerObj)) {
+    headers.forEach((headerObj, _index) => {
+      for (const [headerKey, _headerValue] of Object.entries(headerObj)) {
         csvData += Object.values(submissions[i])[0].hasOwnProperty(headerKey)
           ? `"${Object.values(submissions[i])[0][headerKey]}"`
           : '';
@@ -690,7 +690,7 @@ function getHeaderKey(
 
 function getSectionDetailsForHeader(section, predecessorIndexes) {
   if (section.predecessorSection) {
-    const [pageIndex, sectionIndex] =
+    const [pageIndex, _sectionIndex] =
       predecessorIndexes[section.predecessorSection].split('-');
     return `s${Number(pageIndex) + 1}k${
       Number(section.questionIndex) + 1
@@ -851,11 +851,10 @@ function createCSVHeaders(sectionMetadata: SectionHeader[]) {
             null,
             sectionHead.predecessorSection,
             predecessorIndexes,
-          )]:
-            `${getSectionDetailsForHeader(
-              sectionHead,
-              predecessorIndexes,
-            )}: ${sectionHead.title?.['fi']}` ?? '',
+          )]: `${getSectionDetailsForHeader(
+            sectionHead,
+            predecessorIndexes,
+          )}: ${sectionHead.title?.['fi']}`,
         });
     }
   });
@@ -955,7 +954,7 @@ function submissionAnswersToJson(
             sectionDetails.predecessorSection,
             predecessorIndexes,
           )
-        ] = answer.valueOptionId ? 1 : answer.valueText ?? '';
+        ] = answer.valueOptionId ? 1 : (answer.valueText ?? '');
         break;
       case 'multi-matrix':
         sectionDetails.details.subjects.forEach((subject, index) => {
@@ -991,8 +990,8 @@ function submissionAnswersToJson(
           ] = !classIndex
             ? ''
             : Number(classIndex) === -1
-            ? 'EOS'
-            : sectionDetails.details.classes[Number(classIndex)]['fi'];
+              ? 'EOS'
+              : sectionDetails.details.classes[Number(classIndex)]['fi'];
         });
         break;
       case 'sorting':

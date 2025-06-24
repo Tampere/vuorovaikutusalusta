@@ -16,7 +16,6 @@ import { sendSubmissionReport } from '@src/email/submission-report';
 import { sendSurveyRegistrationEmail } from '@src/email/survey-registration';
 import { sendUnfinishedSubmissionLink } from '@src/email/unfinished-submission';
 import { BadRequestError, ForbiddenError, NotFoundError } from '@src/error';
-import logger from '@src/logger';
 import { validateRequest } from '@src/utils';
 import { Router } from 'express';
 import asyncHandler from 'express-async-handler';

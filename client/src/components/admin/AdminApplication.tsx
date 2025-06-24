@@ -1,5 +1,5 @@
 import React from 'react';
-import fiLocale from 'date-fns/locale/fi';
+import { fi } from 'date-fns/locale';
 import { CssBaseline, ThemeProvider } from '@mui/material';
 import { theme } from '@src/themes/admin';
 import Compose from '../Compose';
@@ -24,7 +24,7 @@ export default function AdminApplication() {
       components={[
         [
           LocalizationProvider,
-          { dateAdapter: AdapterDateFns, adapterLocale: fiLocale },
+          { dateAdapter: AdapterDateFns, adapterLocale: fi },
         ],
         [ThemeProvider, { theme }],
         SurveyProvider,
@@ -48,9 +48,7 @@ export default function AdminApplication() {
           <Route path="/" exact>
             <AdminFrontPage />
           </Route>
-          <Route path="*">
-            <Redirect to="/" />
-          </Route>
+          <Route path="*" render={() => <Redirect to="/" />} />
         </Switch>
       </BrowserRouter>
     </Compose>

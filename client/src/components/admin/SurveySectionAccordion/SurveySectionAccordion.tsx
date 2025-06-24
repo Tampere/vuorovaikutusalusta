@@ -39,10 +39,11 @@ import {
   Accordion,
   AccordionSummary,
   IconButton,
+  SxProps,
   Tooltip,
   Typography,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
+
 import { useClipboard } from '@src/stores/ClipboardContext';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
@@ -69,7 +70,7 @@ import EditTextSection from '../EditTextSection';
 import { SectionDetails } from './SectionDetails';
 import { DragHandle } from '@src/components/DragAndDrop/SortableItem';
 
-const useStyles = makeStyles({
+const styles = {
   accordion: {
     background: '#ddd',
   },
@@ -93,7 +94,7 @@ const useStyles = makeStyles({
     alignItems: 'center',
     margin: 0,
   },
-});
+};
 
 interface Props {
   index: number;
@@ -108,17 +109,18 @@ interface Props {
   disableSectionCopying?: boolean;
   pageId?: number;
   isDragging?: boolean;
+  sx?: SxProps;
 }
 
 export default function SurveySectionAccordion(props: Props) {
   const [deleteConfirmDialogOpen, setDeleteConfirmDialogOpen] = useState(false);
-  const classes = useStyles();
+
   const { tr, surveyLanguage } = useTranslations();
   const { setSection, clipboardPage } = useClipboard();
   const { showToast } = useToasts();
 
   // Index is used inside a callback function -> useRef is required in React to catch all updates
-  const indexRef = useRef<number>();
+  const indexRef = useRef<number>(null);
   indexRef.current = props.index;
 
   function handleEdit(section: SurveyPageSection) {
@@ -290,18 +292,24 @@ export default function SurveySectionAccordion(props: Props) {
   return (
     <>
       <Accordion
+        {...(props.sx && { sx: props.sx })}
+        slotProps={{ heading: { component: 'div' } }}
         expanded={props.expanded}
         onChange={(_, isExpanded) => {
           props.onExpandedChange(isExpanded);
         }}
-        className={props.className ?? classes.accordion}
+        {...(props.className && { className: props.className })}
+        sx={styles.accordion}
       >
         <AccordionSummary
+          component="div"
           expandIcon={<ExpandMore />}
           aria-controls={`${props.name}-content`}
           id={`${props.name}-header`}
-          className={classes.customAccordionSummary}
-          classes={{ contentGutters: classes.contentGutters }}
+          sx={{
+            ...styles.customAccordionSummary,
+            '& .MuiAccordionSummary-contentGutters': styles.contentGutters,
+          }}
         >
           <div style={{ display: 'flex', paddingLeft: '1rem' }}>
             {accordion.tooltip ? (
@@ -313,7 +321,7 @@ export default function SurveySectionAccordion(props: Props) {
             )}
           </div>
 
-          <Typography className={classes.sectionTitle}>
+          <Typography sx={styles.sectionTitle}>
             {props.section.title?.[surveyLanguage] || (
               <em>{tr.EditSurveyPage.untitledSection}</em>
             )}
@@ -370,6 +378,7 @@ export default function SurveySectionAccordion(props: Props) {
             <DragIndicator />
           </DragHandle>
         </AccordionSummary>
+
         <SectionDetails
           pageId={props.pageId}
           disabled={props.disabled}

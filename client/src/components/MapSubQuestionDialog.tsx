@@ -13,7 +13,6 @@ import {
   FormHelperText,
   FormLabel,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import {
   getEmptyAnswer,
   useSurveyAnswers,
@@ -26,13 +25,13 @@ import NumericQuestion from './NumericQuestion';
 import RadioQuestion from './RadioQuestion';
 import SectionInfo from './SectionInfo';
 
-const useStyles = makeStyles({
+const styles = {
   content: {
     '& > :not(:last-child)': {
       marginBottom: '2rem',
     },
   },
-});
+};
 
 interface Props {
   /**
@@ -79,7 +78,7 @@ export default function MapSubQuestionDialog({
   ]);
   const dialogRef = useRef(null);
   const [dirty, setDirty] = useState<boolean[]>([]);
-  const classes = useStyles();
+
   const { getValidationErrors } = useSurveyAnswers();
   const { tr, surveyLanguage } = useTranslations();
 
@@ -118,7 +117,7 @@ export default function MapSubQuestionDialog({
       aria-label={tr.MapQuestion.subQuestionDialog}
     >
       {title && <DialogTitle>{title}</DialogTitle>}
-      <DialogContent className={classes.content}>
+      <DialogContent sx={styles.content}>
         {subQuestions?.map((question, index) => (
           <FormControl
             component="fieldset"

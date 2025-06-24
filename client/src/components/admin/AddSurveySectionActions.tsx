@@ -16,8 +16,7 @@ import {
   ViewComfy,
   ViewComfyAlt,
 } from '@mui/icons-material';
-import { Fab, Grid, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
+import { Box, Fab, Grid, Typography } from '@mui/material';
 import { duplicateFiles } from '@src/controllers/AdminFileController';
 import { useClipboard } from '@src/stores/ClipboardContext';
 import { useSurvey } from '@src/stores/SurveyContext';
@@ -27,13 +26,13 @@ import React, { ReactNode, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { generateDraftId } from './QuestionOptions';
 
-const useStyles = makeStyles({
+const styles = {
   actionItem: {
     display: 'flex',
     alignItems: 'center',
     gap: '1rem',
   },
-});
+};
 
 interface Props {
   followUpSectionId?: number;
@@ -44,7 +43,6 @@ interface Props {
 }
 
 export default function AddSurveySectionActions(props: Props) {
-  const classes = useStyles();
   const { tr, initializeLocalizedObject } = useTranslations();
   const { addSection } = useSurvey();
   const { clipboardSection } = useClipboard();
@@ -309,14 +307,14 @@ export default function AddSurveySectionActions(props: Props) {
   return (
     <Grid container>
       <Grid container direction="row">
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           {questionButtons
             .filter(
               (button) => !props.types || props.types.includes(button.type),
             )
             .map((button) => (
-              <Grid item key={button.type} style={{ padding: '0.5rem' }}>
-                <div className={classes.actionItem}>
+              <Grid key={button.type} style={{ padding: '0.5rem' }}>
+                <Box sx={styles.actionItem}>
                   <Fab
                     color="primary"
                     aria-label={button.ariaLabel}
@@ -328,18 +326,18 @@ export default function AddSurveySectionActions(props: Props) {
                     {button.icon}
                   </Fab>
                   <Typography>{button.label}</Typography>
-                </div>
+                </Box>
               </Grid>
             ))}
         </Grid>
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           {sectionButtons
             .filter(
               (button) => !props.types || props.types.includes(button.type),
             )
             .map((button) => (
-              <Grid item key={button.type} style={{ padding: '0.5rem' }}>
-                <div className={classes.actionItem}>
+              <Grid key={button.type} style={{ padding: '0.5rem' }}>
+                <Box sx={styles.actionItem}>
                   <Fab
                     color="primary"
                     aria-label={button.ariaLabel}
@@ -350,12 +348,12 @@ export default function AddSurveySectionActions(props: Props) {
                     {button.icon}
                   </Fab>
                   <Typography>{button.label}</Typography>
-                </div>
+                </Box>
               </Grid>
             ))}
           {!props.disableSectionPaste && (
-            <Grid item style={{ padding: '0.5rem' }}>
-              <div className={classes.actionItem}>
+            <Grid style={{ padding: '0.5rem' }}>
+              <Box sx={styles.actionItem}>
                 <Fab
                   disabled={!clipboardSection}
                   color="secondary"
@@ -389,11 +387,10 @@ export default function AddSurveySectionActions(props: Props) {
                   <ContentPaste />
                 </Fab>
                 <Typography>{tr.EditSurveyPage.attachSection}</Typography>
-              </div>
+              </Box>
             </Grid>
           )}
           <Grid
-            item
             style={{
               padding: '0.5rem',
               display: 'flex',

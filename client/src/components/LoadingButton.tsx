@@ -1,12 +1,11 @@
 import { CircularProgress } from '@mui/material';
 import { Button, ButtonProps } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import React from 'react';
 
 // Size of the circular progress component
 const progressSize = 24;
 
-const useStyles = makeStyles({
+const styles = {
   progress: {
     position: 'absolute',
     top: '50%',
@@ -14,7 +13,7 @@ const useStyles = makeStyles({
     marginTop: -0.5 * progressSize,
     marginLeft: -0.5 * progressSize,
   },
-});
+};
 
 interface Props {
   loading?: boolean;
@@ -27,13 +26,10 @@ export default function LoadingButton({
   loading,
   ...props
 }: Props & ButtonProps) {
-  const classes = useStyles();
   return (
     <Button {...props} disabled={loading || props.disabled}>
       {props.children}
-      {loading && (
-        <CircularProgress size={progressSize} className={classes.progress} />
-      )}
+      {loading && <CircularProgress size={progressSize} sx={styles.progress} />}
     </Button>
   );
 }

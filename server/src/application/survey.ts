@@ -235,7 +235,7 @@ const surveyPageColumnSet = getColumnSet<DBSurveyPage>('survey_page', [
 /**
  * Helper function for creating section option column set for database queries
  */
-const sectionOptionColumnSet = getColumnSet<DBSectionOption>('option', [
+const _sectionOptionColumnSet = getColumnSet<DBSectionOption>('option', [
   'section_id',
   'idx',
   { name: 'text', cast: 'json' },
@@ -1693,6 +1693,8 @@ function dbSurveyJoinToSection(dbSurveyJoin: DBSurveyJoin): SurveyPageSection {
         ...(sectionTypesWithOptions.includes(type) && { options: [] }),
         // Add an initial empty group array if the type allows option groups
         ...(type === 'grouped-checkbox' && { groups: [] }),
+        // Add an initial empty subquestions array if the type allows subquestions
+        ...(type === 'map' && { subQuestions: [] }),
       };
 }
 

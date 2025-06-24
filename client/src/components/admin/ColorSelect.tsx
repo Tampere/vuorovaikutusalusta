@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react';
 import { Select, FormControl, MenuItem, InputLabel } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
-import { makeStyles } from '@mui/styles';
 import ColorIndicator from './ColorIndicator';
 
 interface Props {
@@ -10,7 +9,7 @@ interface Props {
   onChange: (color: string) => void;
 }
 
-const useStyles = makeStyles({
+const styles = {
   select: {
     minWidth: '10rem',
     width: 'fit-content',
@@ -18,11 +17,10 @@ const useStyles = makeStyles({
     flexDirection: 'row',
     alignItems: 'center',
   },
-});
+};
 
 export default function ColorSelect({ label, value, onChange }: Props) {
   const { tr } = useTranslations();
-  const classes = useStyles();
 
   const colors = useMemo<{ name: string; value: string }[]>(
     () => [
@@ -33,7 +31,7 @@ export default function ColorSelect({ label, value, onChange }: Props) {
       { name: tr.ColorSelect.colors.berryRed, value: '#ad3963' },
       { name: tr.ColorSelect.colors.warmGreen, value: '#418155' },
     ],
-    [tr]
+    [tr],
   );
 
   return (
@@ -45,10 +43,7 @@ export default function ColorSelect({ label, value, onChange }: Props) {
         labelId="color-select-label"
         id="color"
         label={label ?? tr.ColorSelect.color}
-        className={classes.select}
-        classes={{
-          select: classes.select,
-        }}
+        sx={{ ...styles.select, '& .MuiSelect-select': styles.select }}
         value={value == null ? colors[0].value : value}
         onChange={(event) => {
           onChange(event.target.value);

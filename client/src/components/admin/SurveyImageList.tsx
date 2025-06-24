@@ -2,7 +2,6 @@
 
 import { File, ImageType } from '@interfaces/survey';
 import {
-  Box,
   Button,
   Container,
   Dialog,
@@ -13,9 +12,9 @@ import {
   TextField,
   Theme,
   Typography,
+  Box,
 } from '@mui/material';
 import { Cancel, PhotoLibrary } from '@mui/icons-material';
-import { makeStyles } from '@mui/styles';
 import { useToasts } from '@src/stores/ToastContext';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useTranslations } from '@src/stores/TranslationContext';
@@ -23,10 +22,8 @@ import { request } from '@src/utils/request';
 import React, { useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 
-const useStyles = makeStyles((theme: Theme) => ({
-  noImageBackground: {
-    backgroundColor: '#D3D3D3',
-  },
+const styles = (theme: Theme) => ({
+  noImageBackground: { backgroundColor: '#D3D3D3' },
   container: {
     width: '90%',
     display: 'flex',
@@ -42,16 +39,14 @@ const useStyles = makeStyles((theme: Theme) => ({
     backgroundColor: '#fafafa',
     transition: 'border .24s ease-in-out',
   },
-  addImageIcon: {
-    color: theme.palette.primary.main,
-  },
+  addImageIcon: { color: theme.palette.primary.main },
   deleteImageIcon: {
     position: 'absolute',
     top: '5px',
     left: '5px',
     fontSize: '26px',
   },
-}));
+});
 
 interface Props {
   imageType: ImageType;
@@ -61,7 +56,6 @@ const MEGAS = 10;
 const MAX_FILE_SIZE = MEGAS * 1000 * 1000; // ten megabytes
 
 export default function SurveyImageList({ imageType }: Props) {
-  const classes = useStyles();
   const { tr } = useTranslations();
   const { editSurvey, activeSurvey } = useSurvey();
   const { showToast } = useToasts();
@@ -160,10 +154,7 @@ export default function SurveyImageList({ imageType }: Props) {
   }
 
   const { acceptedFiles, fileRejections, getRootProps, getInputProps } =
-    useDropzone({
-      maxFiles: 1,
-      validator: fileSizeValidator,
-    });
+    useDropzone({ maxFiles: 1, validator: fileSizeValidator });
 
   useEffect(() => {
     if (fileRejections?.length > 0) {
@@ -335,19 +326,15 @@ export default function SurveyImageList({ imageType }: Props) {
             rowHeight={164}
           >
             <ImageListItem
-              className={classes.noImageBackground}
+              sx={(theme) => styles(theme).noImageBackground}
               style={
                 imageType === 'backgroundImage'
                   ? !activeSurvey?.backgroundImageName
-                    ? {
-                        border: '4px solid #1976d2',
-                      }
+                    ? { border: '4px solid #1976d2' }
                     : null
                   : imageType === 'thanksPageImage'
                   ? !activeSurvey?.thanksPage.imageName
-                    ? {
-                        border: '4px solid #1976d2',
-                      }
+                    ? { border: '4px solid #1976d2' }
                     : null
                   : null
               }
@@ -363,11 +350,7 @@ export default function SurveyImageList({ imageType }: Props) {
                   justifyContent: 'center',
                 }}
               >
-                <Typography
-                  style={{
-                    textAlign: 'center',
-                  }}
-                >
+                <Typography style={{ textAlign: 'center' }}>
                   {imageType === 'backgroundImage'
                     ? tr.SurveyImageList.noBackgroundImage
                     : imageType === 'thanksPageImage'
@@ -386,7 +369,7 @@ export default function SurveyImageList({ imageType }: Props) {
               >
                 <Cancel
                   color="error"
-                  className={classes.deleteImageIcon}
+                  sx={(theme) => styles(theme).deleteImageIcon}
                   onClick={(event) =>
                     handleDeletingImage(event, image.fileName, image.filePath)
                   }
@@ -406,7 +389,7 @@ export default function SurveyImageList({ imageType }: Props) {
             ))}
           </ImageList>
         </DialogContent>
-        <section className={classes.container}>
+        <Box component="section" sx={(theme) => styles(theme).container}>
           <div {...getRootProps({ className: 'dropzone' })}>
             <input {...getInputProps()} />
             <p style={{ color: 'purple', cursor: 'pointer' }}>
@@ -440,7 +423,7 @@ export default function SurveyImageList({ imageType }: Props) {
               />
             </aside>
           ) : null}
-        </section>
+        </Box>
         <DialogActions>
           <Button onClick={() => closeDialog()} autoFocus>
             {tr.commands.cancel}

@@ -1,6 +1,5 @@
-import { Link, ListItem } from '@mui/material';
+import { Link, ListItemButton } from '@mui/material';
 import { OpenInNew } from '@mui/icons-material';
-import { makeStyles } from '@mui/styles';
 import React, { ReactNode } from 'react';
 import { NavLink } from 'react-router-dom';
 
@@ -11,20 +10,18 @@ interface Props {
   children: ReactNode;
 }
 
-const useStyles = makeStyles({
+const styles = {
   item: {
     '&:not(.Mui-selected)': {
       backgroundColor: '#333',
     },
   },
-});
+};
 
 export default function ListItemLink(props: Props) {
-  const classes = useStyles();
   return (
-    <ListItem
-      button
-      className={classes.item}
+    <ListItemButton
+      sx={styles.item}
       component={props.external ? Link : NavLink}
       {...(!props.external && {
         to: props.to,
@@ -40,6 +37,6 @@ export default function ListItemLink(props: Props) {
     >
       {props.children}
       {props.newTab && <OpenInNew />}
-    </ListItem>
+    </ListItemButton>
   );
 }

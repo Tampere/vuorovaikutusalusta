@@ -21,7 +21,6 @@ import {
   ListItemText,
   Theme,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
@@ -42,20 +41,20 @@ import { BranchIcon } from '../icons/BranchIcon';
 import { DndWrapper } from '../DragAndDrop/DndWrapper';
 import { DragHandle } from '../DragAndDrop/SortableItem';
 
-const useStyles = makeStyles((theme: Theme) => ({
-  '@keyframes pulse': {
-    '0%': {
-      opacity: 0.4,
-    },
-    '50%': {
-      opacity: 0.7,
-    },
-    '100%': {
-      opacity: 0.4,
-    },
-  },
+const styles = (theme: Theme) => ({
   loading: {
-    animation: `$pulse 1s ${theme.transitions.easing.easeIn} infinite`,
+    '@keyframes pulse': {
+      '0%': {
+        opacity: 0.4,
+      },
+      '50%': {
+        opacity: 0.7,
+      },
+      '100%': {
+        opacity: 0.4,
+      },
+    },
+    animation: `pulse 1s ${theme.transitions.easing.easeIn} infinite`,
   },
   disabled: {
     pointerEvents: 'none',
@@ -66,7 +65,7 @@ const useStyles = makeStyles((theme: Theme) => ({
       backgroundColor: '#747474',
     },
   },
-}));
+});
 
 interface Props {
   width: number;
@@ -77,7 +76,6 @@ interface Props {
 export default function EditSurveySideBar(props: Props) {
   const [newPageDisabled, setNewPageDisabled] = useState(false);
 
-  const classes = useStyles();
   const history = useHistory();
   const { url } = useRouteMatch();
   const {
@@ -219,14 +217,15 @@ export default function EditSurveySideBar(props: Props) {
         />
         <div style={{ display: 'flex', flexDirection: 'row' }}>
           <ListItem
-            sx={{
+            sx={(theme) => ({
               display: 'flex',
               flexDirection: 'row',
               justifyContent: 'space-around',
-            }}
-            className={`${
-              newPageDisabled || activeSurveyLoading ? classes.disabled : ''
-            } ${newPageLoading ? classes.loading : ''}`}
+              ...(newPageDisabled || activeSurveyLoading
+                ? styles(theme).disabled
+                : {}),
+              ...(newPageLoading ? styles(theme).loading : {}),
+            })}
             onClick={async () => {
               setNewPageDisabled(true);
               try {
@@ -256,14 +255,14 @@ export default function EditSurveySideBar(props: Props) {
             }}
           ></div>
           <ListItemButton
-            className={classes.listItemButton}
             disabled={!clipboardPage}
-            sx={{
+            sx={(theme) => ({
               display: 'flex',
               flexDirection: 'row',
               justifyContent: 'space-around',
               width: '100%',
-            }}
+              ...styles(theme).listItemButton,
+            })}
             onClick={async () => {
               setNewPageDisabled(true);
               try {

@@ -1,11 +1,11 @@
 import { LocalizedText, Survey, SurveyEmailInfoItem } from '@interfaces/survey';
 import {
+  Box,
   Checkbox,
   FormControlLabel,
   FormHelperText,
   Typography,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React from 'react';
@@ -15,7 +15,7 @@ import RichTextEditor from '../RichTextEditor';
 import EditSurveySectionTranslations from './EditSurveySectionTranslations';
 import TranslationField from './TranslationField';
 
-const useStyles = makeStyles({
+const styles = {
   rowContainer: {
     display: 'flex',
     flexDirection: 'row',
@@ -46,7 +46,7 @@ const useStyles = makeStyles({
     border: '1px solid lightgrey',
     borderRadius: '0.5rem',
   },
-});
+};
 
 function surveyToTranslationString(survey: Survey) {
   const columnHeaders = 'Label \t fi \t en \n';
@@ -121,7 +121,6 @@ export default function EditSurveyTranslations() {
     editPage,
   } = useSurvey();
   const { tr, languages } = useTranslations();
-  const classes = useStyles();
 
   return (
     <>
@@ -149,35 +148,35 @@ export default function EditSurveyTranslations() {
         </div>
         {activeSurvey.localisationEnabled && (
           <>
-            <div
-              className={classes.rowContainer}
+            <Box
+              sx={styles.rowContainer}
               style={{ justifyContent: 'flex-start' }}
             >
               <Typography>
                 {tr.EditSurveyTranslations.copyTextFields}
               </Typography>
               <CopyToClipboard data={surveyToTranslationString(activeSurvey)} />
-            </div>
+            </Box>
             <Typography variant="h5">
               {tr.EditSurveyTranslations.supportedLanguages}:{' '}
             </Typography>
-            <div className={classes.rowContainer}>
+            <Box sx={styles.rowContainer}>
               {languages.map((lang, langIndex) => {
                 return (
-                  <div
-                    className={classes.langContainer}
+                  <Box
+                    sx={styles.langContainer}
                     key={`lang-container-${langIndex}`}
                   >
-                    <div
-                      className={classes.rowContainer}
+                    <Box
+                      sx={styles.rowContainer}
                       style={{ justifyContent: 'flex-start' }}
                     >
                       <Typography variant="h6" style={{ fontWeight: 'bold' }}>
                         {tr.EditSurveyTranslations[lang].toLocaleUpperCase()}
                       </Typography>
-                    </div>
+                    </Box>
                     <br />
-                    <Typography className={classes.titleText}>
+                    <Typography sx={styles.titleText}>
                       {langIndex === 0
                         ? tr.EditSurveyTranslations.surveyTitle
                         : ''}{' '}
@@ -196,7 +195,7 @@ export default function EditSurveyTranslations() {
                         });
                       }}
                     />
-                    <Typography className={classes.titleText}>
+                    <Typography sx={styles.titleText}>
                       {langIndex === 0
                         ? tr.EditSurveyTranslations.surveySubtitle
                         : ''}{' '}
@@ -218,7 +217,7 @@ export default function EditSurveyTranslations() {
                     {activeSurvey.email.enabled && (
                       <>
                         <br />
-                        <Typography className={classes.titleText}>
+                        <Typography sx={styles.titleText}>
                           {langIndex === 0
                             ? tr.EditSurveyTranslations.emailInfo
                             : ''}
@@ -260,9 +259,9 @@ export default function EditSurveyTranslations() {
                         />
                         {activeSurvey?.email?.info?.map(
                           (infoRow: SurveyEmailInfoItem, index: number) => (
-                            <div
+                            <Box
                               key={`email-info-${index}`}
-                              className={classes.keyValueContainer}
+                              sx={styles.keyValueContainer}
                             >
                               <TranslationField
                                 variant="standard"
@@ -310,13 +309,13 @@ export default function EditSurveyTranslations() {
                                   });
                                 }}
                               />
-                            </div>
+                            </Box>
                           ),
                         )}
                       </>
                     )}
                     <br />
-                    <Typography className={classes.titleText}>
+                    <Typography sx={styles.titleText}>
                       {langIndex === 0
                         ? tr.EditSurveyTranslations.surveyPages
                         : ''}{' '}
@@ -325,7 +324,7 @@ export default function EditSurveyTranslations() {
                     {activeSurvey.pages.map((page, pageIndex) => {
                       return (
                         <div key={`page-container-${pageIndex}`}>
-                          <Typography className={classes.titleText}>
+                          <Typography sx={styles.titleText}>
                             {langIndex === 0
                               ? `${pageIndex + 1}. ${
                                   tr.EditSurveyTranslations.page
@@ -333,7 +332,7 @@ export default function EditSurveyTranslations() {
                               : ''}
                             &nbsp;
                           </Typography>
-                          <div className={classes.pageContainer}>
+                          <Box sx={styles.pageContainer}>
                             <TranslationField
                               variant="standard"
                               color="primary"
@@ -398,12 +397,12 @@ export default function EditSurveyTranslations() {
                                 )}
                               </div>
                             ))}
-                          </div>
+                          </Box>
                         </div>
                       );
                     })}
                     <>
-                      <Typography className={classes.titleText}>
+                      <Typography sx={styles.titleText}>
                         {langIndex === 0
                           ? tr.EditSurveyTranslations.thanksPage
                           : ''}
@@ -444,10 +443,10 @@ export default function EditSurveyTranslations() {
                         editorHeight={'100px'}
                       />
                     </>
-                  </div>
+                  </Box>
                 );
               })}
-            </div>
+            </Box>
           </>
         )}
       </Fieldset>

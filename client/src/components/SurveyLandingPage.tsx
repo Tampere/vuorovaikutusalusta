@@ -8,13 +8,11 @@ import {
   Stack,
   useMediaQuery,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
-import { getClassList } from '@src/utils/classes';
 import React from 'react';
 import Footer from './Footer';
 
-const useStyles = makeStyles((theme: Theme & { [customKey: string]: any }) => ({
+const styles = (theme: Theme & { [customKey: string]: any }) => ({
   heading: {
     fontSize: '2rem',
     wordBreak: 'break-word',
@@ -72,7 +70,7 @@ const useStyles = makeStyles((theme: Theme & { [customKey: string]: any }) => ({
     color: 'white',
     textAlign: 'center',
   },
-}));
+});
 
 interface Props {
   survey: Survey;
@@ -89,7 +87,6 @@ export default function SurveyLandingPage({
   onStart,
   surveyBackgroundImage,
 }: Props) {
-  const classes = useStyles({ imageName: survey?.backgroundImageName ?? '' });
   const { tr, surveyLanguage } = useTranslations();
   const mediumWidth = useMediaQuery('(max-width: 640px)');
   return (
@@ -114,9 +111,9 @@ export default function SurveyLandingPage({
           className="test-survey-header"
           sx={{ position: 'absolute', width: '100%' }}
         >
-          <div className={classes.testSurveyHeader}>
+          <Box sx={(theme) => styles(theme).testSurveyHeader}>
             {tr.TestSurveyFrame.text}
-          </div>
+          </Box>
         </Box>
       )}
       <Box
@@ -145,17 +142,29 @@ export default function SurveyLandingPage({
         }}
       >
         <div>
-          <h1 className={getClassList([classes.heading, classes.title])}>
+          <Box
+            component="h1"
+            sx={(theme) => ({
+              ...styles(theme).heading,
+              ...styles(theme).title,
+            })}
+          >
             <span>{survey.title?.[surveyLanguage]}</span>
-          </h1>
+          </Box>
           {survey.subtitle?.[surveyLanguage] && (
-            <h2 className={getClassList([classes.heading, classes.subtitle])}>
+            <Box
+              component="h2"
+              sx={(theme) => ({
+                ...styles(theme).heading,
+                ...styles(theme).subtitle,
+              })}
+            >
               <span>{survey.subtitle?.[surveyLanguage]}</span>
-            </h2>
+            </Box>
           )}
         </div>
         <Button onClick={onStart}>
-          <Typography variant="body1" className={classes.start}>
+          <Typography variant="body1" sx={(theme) => styles(theme).start}>
             {continueUnfinished
               ? tr.SurveyPage.continueSurveyLink
               : tr.SurveyPage.startSurveyLink}
@@ -211,7 +220,10 @@ export default function SurveyLandingPage({
         />
 
         {surveyBackgroundImage?.attributions ? (
-          <Typography className={classes.imageCopyright} variant="body2">
+          <Typography
+            sx={(theme) => styles(theme).imageCopyright}
+            variant="body2"
+          >
             {surveyBackgroundImage.attributions}
           </Typography>
         ) : null}
