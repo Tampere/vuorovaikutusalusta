@@ -57,7 +57,7 @@ router.post(
  * Endpoint for inserting a single file
  */
 router.post(
-  '/:filePath?',
+  '/{:filePath}',
   validateRequest([
     param('filePath')
       .optional()
@@ -89,7 +89,7 @@ router.post(
  * Endpoint for fetching all available survey images with certain type specified by filepath
  */
 router.get(
-  '/:filePath?',
+  '/{:filePath}',
   ensureAuthenticated(),
   asyncHandler(async (req, res) => {
     const { filePath } = req.params;
@@ -104,7 +104,7 @@ router.get(
  * Endpoint for fetching a single local file
  */
 router.get(
-  '/:filePath?/:fileName',
+  '/{:filePath}/:fileName',
   validateRequest([
     param('fileName').isString().withMessage('fileName must be a string'),
     param('filePath')
@@ -127,7 +127,7 @@ router.get(
  */
 
 router.post(
-  '/copy/*',
+  '/copy/*splat',
   ensureAuthenticated(),
 
   asyncHandler(async (req, res) => {
@@ -153,7 +153,7 @@ router.post(
  * Endpoint for deleting a single file
  */
 router.delete(
-  '/:filePath?/:fileName',
+  '/{:filePath}/:fileName',
   validateRequest([
     param('fileName').isString().withMessage('fileName must be a string'),
     param('filePath')

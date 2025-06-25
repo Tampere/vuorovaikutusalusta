@@ -9,7 +9,7 @@ import useTranslations from '@src/translations/useTranslations';
 import { indexToAlpha } from '@src/utils';
 import { readFileSync, rmSync } from 'fs';
 import moment from 'moment';
-import ogr2ogr from 'ogr2ogr';
+import { ogr2ogr } from 'ogr2ogr';
 import { getAvailableMapLayers } from './map';
 import { getSurvey } from './survey';
 
@@ -957,7 +957,7 @@ function submissionAnswersToJson(
         ] = answer.valueOptionId ? 1 : (answer.valueText ?? '');
         break;
       case 'multi-matrix':
-        sectionDetails.details.subjects.forEach((subject, index) => {
+        sectionDetails.details.subjects.forEach((_subject, index) => {
           const classIndexes = JSON.stringify(answer.valueJson?.[index]);
           JSON.parse(classIndexes).forEach((optionIndex: string) => {
             const optionIdx = Number(optionIndex);

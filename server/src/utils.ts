@@ -12,7 +12,7 @@ import { Geometry } from 'geojson';
 export function validateRequest(chains: ValidationChain[]) {
   return [
     ...chains,
-    (req: Request, res: Response, next: NextFunction) => {
+    (req: Request, _res: Response, next: NextFunction) => {
       try {
         validationResult(req).throw();
         next();

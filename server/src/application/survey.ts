@@ -1904,7 +1904,7 @@ function surveySectionsToRows(
       filePath = undefined,
       conditions = undefined,
       ...details
-    } = { ...surveySection };
+    } = { ...(surveySection as any) }; // TODO fix typing here
     return {
       id,
       survey_page_id: pageId,

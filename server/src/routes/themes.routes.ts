@@ -11,10 +11,10 @@ const router = Router();
 router.get(
   '/',
   ensureAuthenticated(),
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (_req, res) => {
     const themes = await getAllSurveyThemes();
     res.json(themes);
-  })
+  }),
 );
 
 export default router;

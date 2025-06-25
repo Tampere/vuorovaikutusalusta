@@ -184,12 +184,12 @@ async function generateScreenshots({
     );
     try {
       await page.waitForNetworkIdle({ timeout: networkIdleTimeout });
-    } catch (error) {
+    } catch (_error) {
       // Ignore timeout errors
     }
 
     // Make sure the tiles get rendered after network becomes idle
-    await page.waitForTimeout(3000);
+    await new Promise((resolve) => setTimeout(resolve, 3000));
     const image = (await page.screenshot({
       type: 'png',
       captureBeyondViewport: false,
