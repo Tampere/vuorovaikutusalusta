@@ -8,9 +8,33 @@ import { initializeDatabase, migrateUp } from './database';
 import { HttpResponseError } from './error';
 import logger from './logger';
 import rootRouter from './routes';
+import helmet from 'helmet';
 
 async function start() {
   const app = express();
+
+  app.use((req, res, next) => {
+    if (req.path.startsWith('/api')) {
+      return helmet({
+        contentSecurityPolicy: {
+          useDefaults: false,
+          directives: {
+            'default-src': "'none'",
+            'frame-ancestors': "'none'",
+          },
+        },
+      })(req, res, next);
+    } else {
+      return helmet({
+        contentSecurityPolicy: {
+          directives: {
+            'connect-src': "'self'",
+            'frame-src': null,
+          },
+        },
+      })(req, res, next);
+    }
+  });
 
   const port = Number(process.env.PORT ?? 3000);
   // Database initialization and connection test
