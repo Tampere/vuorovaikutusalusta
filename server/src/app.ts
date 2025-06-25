@@ -73,7 +73,7 @@ async function start() {
 
   // Serve admin frontend from remaining admin URLs
   app.get(
-    '/admin/*',
+    '/admin/*splat',
     ensureAuthenticated({
       redirectToLogin: true,
     }),
@@ -83,7 +83,7 @@ async function start() {
   );
 
   // Serve frontend files from remaining URLs
-  app.get('/*', (_req, res, _next) => {
+  app.get('/*splat', (_req, res, _next) => {
     res.sendFile(path.join(__dirname, '../static/index.html'));
   });
 
@@ -98,7 +98,10 @@ async function start() {
     });
   });
 
-  app.listen(port, () => {
+  app.listen(port, (error) => {
+    if (error) {
+      throw error;
+    }
     logger.info(`Server listening to port ${port}`);
   });
 }

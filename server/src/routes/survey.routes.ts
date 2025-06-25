@@ -62,8 +62,8 @@ router.get(
     const { filterByAuthored, filterByPublished } = req.query;
 
     const surveys = await getSurveys(
-      filterByAuthored ? userId : null,
-      Boolean(filterByPublished),
+      filterByAuthored === 'true' ? userId : null,
+      filterByPublished === 'true',
       isInternalUser(req.user) ? undefined : req.user,
     );
     res.status(200).json(surveys);
