@@ -9,7 +9,7 @@ import useTranslations from '@src/translations/useTranslations';
 import { indexToAlpha } from '@src/utils';
 import { readFileSync, rmSync } from 'fs';
 import moment from 'moment';
-import ogr2ogr from 'ogr2ogr';
+import { ogr2ogr } from 'ogr2ogr';
 import { getAvailableMapLayers } from './map';
 import { getSurvey } from './survey';
 

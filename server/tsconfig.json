@@ -1,6 +1,8 @@
 {
   "compilerOptions": {
-    "moduleResolution": "node",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "isolatedModules": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "outDir": "dist",
