@@ -36,6 +36,8 @@ export function configureAuth(app: Express) {
     done(null, user ?? null);
   });
 
+  app.set('trust proxy', 1); // Needed for secure cookie to work if the app is behind a proxy (e.g. Azure App Service)
+
   // Initialize Express session middleware
   app.use(
     expressSession({
@@ -43,6 +45,8 @@ export function configureAuth(app: Express) {
       cookie: {
         // 30 days
         maxAge: 30 * 24 * 60 * 60 * 1000,
+        secure: true,
+        sameSite: 'none',
       },
       resave: false,
       saveUninitialized: false,
