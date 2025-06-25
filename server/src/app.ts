@@ -77,18 +77,18 @@ async function start() {
     ensureAuthenticated({
       redirectToLogin: true,
     }),
-    (req, res) => {
+    (_req, res) => {
       res.sendFile(path.join(__dirname, '../static/admin/index.html'));
     },
   );
 
   // Serve frontend files from remaining URLs
-  app.get('/*', (req, res, _next) => {
+  app.get('/*', (_req, res, _next) => {
     res.sendFile(path.join(__dirname, '../static/index.html'));
   });
 
   // Default error handler
-  app.use((error: HttpResponseError, req, res, _next) => {
+  app.use((error: HttpResponseError, _req, res, _next) => {
     logger.error(`Request error: ${error.message}`);
     console.error(error);
     res.status(error.status || 500);

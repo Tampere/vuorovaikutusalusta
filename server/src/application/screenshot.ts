@@ -184,7 +184,7 @@ async function generateScreenshots({
     );
     try {
       await page.waitForNetworkIdle({ timeout: networkIdleTimeout });
-    } catch (error) {
+    } catch (_error) {
       // Ignore timeout errors
     }
 

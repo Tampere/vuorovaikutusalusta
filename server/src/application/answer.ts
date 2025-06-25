@@ -957,7 +957,7 @@ function submissionAnswersToJson(
         ] = answer.valueOptionId ? 1 : (answer.valueText ?? '');
         break;
       case 'multi-matrix':
-        sectionDetails.details.subjects.forEach((subject, index) => {
+        sectionDetails.details.subjects.forEach((_subject, index) => {
           const classIndexes = JSON.stringify(answer.valueJson?.[index]);
           JSON.parse(classIndexes).forEach((optionIndex: string) => {
             const optionIdx = Number(optionIndex);

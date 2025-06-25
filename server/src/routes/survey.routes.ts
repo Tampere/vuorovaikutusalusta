@@ -35,7 +35,7 @@ const router = Router();
 router.get(
   '/report-emails',
   ensureAuthenticated(),
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (_req, res) => {
     const emails = await getDistinctAutoSendToEmails();
     res.json(emails);
   }),

@@ -154,7 +154,7 @@ export function ensureAuthenticated(options?: { redirectToLogin?: boolean }) {
 export function ensureSurveyGroupAccess(surveyIdIdentifier: string = 'id') {
   return asyncHandler(
     // Note! Super important to wrap this in asyncHandler to catch errors as express doesn't catch async errors by default
-    async (req: Request, res: Response, next: NextFunction) => {
+    async (req: Request, _res: Response, next: NextFunction) => {
       // Admin and internal users have access to all surveys
       if (isAdmin(req.user) || isInternalUser(req.user)) {
         return next();

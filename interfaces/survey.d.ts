@@ -41,7 +41,7 @@ export type SurveyQuestion =
 export type SurveyMapSubQuestion = Exclude<SurveyQuestion, SurveyMapQuestion>;
 
 /**
- * Common fields for survey page sectionsx
+ * Common fields for survey page sections
  */
 interface CommonSurveyPageSection {
   /**
