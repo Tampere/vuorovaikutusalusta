@@ -10,7 +10,7 @@ import {
   Tooltip,
 } from 'recharts';
 import React from 'react';
-import { format, getWeek, getYear, parse } from 'date-fns';
+import { format, getWeek, getYear, parse, isDate } from 'date-fns';
 import { Box, Skeleton, useTheme } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
 
@@ -141,10 +141,11 @@ export function DataChart({ submissions, submissionsLoading }: Props) {
           <XAxis
             dataKey={displayByWeek ? 'week' : 'date'}
             tickFormatter={(data) => {
-              if (data)
+              if (data && /^\d{2}\.\d{2}\.\d{4}$/.test(data)) {
                 return displayByWeek
                   ? data
                   : format(parse(data, 'dd.MM.yyyy', new Date()), 'd.M.');
+              }
             }}
           >
             <Label
