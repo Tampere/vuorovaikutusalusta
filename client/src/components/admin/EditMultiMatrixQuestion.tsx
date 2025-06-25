@@ -11,7 +11,7 @@ import {
   Typography,
 } from '@mui/material';
 import React from 'react';
-import QuestionOptions from './QuestionOptions';
+import QuestionOptions, { generateDraftId } from './QuestionOptions';
 import { useTranslations } from '@src/stores/TranslationContext';
 
 interface Props {
@@ -162,11 +162,17 @@ export function EditMultiMatrixQuestion({
         })}
       </div>
       <QuestionOptions
-        options={section.subjects.map((subject) => ({ text: subject }))}
+        options={section.subjects.map((subject) => ({
+          text: subject,
+          draftId: subject.id ?? generateDraftId(),
+        }))}
         onChange={(subjects: any) => {
           onChange({
             ...section,
-            subjects: subjects.map((subject: any) => ({ ...subject.text })),
+            subjects: subjects.map((subject: any) => ({
+              ...subject.text,
+              id: subject.id,
+            })),
           });
         }}
         title={tr.SurveySections.subjects}

@@ -225,7 +225,7 @@ export interface SurveySliderQuestion extends CommonSurveyPageQuestion {
 export interface SurveyMatrixQuestion extends CommonSurveyPageQuestion {
   type: 'matrix';
   classes: LocalizedText[];
-  subjects: LocalizedText[];
+  subjects: (LocalizedText & { id?: string })[]; // Id is used for sorting purposes
   allowEmptyAnswer: boolean;
 }
 
@@ -236,7 +236,7 @@ export interface SurveyMatrixQuestion extends CommonSurveyPageQuestion {
 export interface SurveyMultiMatrixQuestion extends CommonSurveyPageQuestion {
   type: 'multi-matrix';
   classes: LocalizedText[];
-  subjects: LocalizedText[];
+  subjects: (LocalizedText & { id?: string })[]; // Id is used for sorting purposes
   allowEmptyAnswer: boolean;
   answerLimits: {
     min?: number;
@@ -489,7 +489,7 @@ export interface Survey {
 }
 
 /**
- * A single option of a multichoise question
+ * A single option for variety of questions
  */
 export interface SectionOption {
   /**
