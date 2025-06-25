@@ -66,4 +66,4 @@ ENV TZ=Europe/Helsinki
 # Define Chromium path, as it was not installed in the previous phase
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 
-CMD npm start
+CMD ["npm", "start"]
