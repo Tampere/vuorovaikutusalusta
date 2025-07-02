@@ -29,7 +29,7 @@ async function start() {
         contentSecurityPolicy: {
           directives: {
             'connect-src': "'self'",
-            'frame-src': null,
+            'frame-src': 'https://kartat.tampere.fi',
           },
         },
       })(req, res, next);
