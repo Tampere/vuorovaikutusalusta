@@ -192,6 +192,8 @@
     "deleteGroup": "Delete group"
   },
   "AddSurveySectionActions": {
+    "personalInfoDisabled": "The personal information question has already been added to the survey.",
+    "personalInfoQuestion": "Add personal information question",
     "radioQuestion": "Add radio button question (single choice)",
     "checkBoxQuestion": "Add checkbox question (multiple choice)",
     "numericQuestion": "Add numeric question",
@@ -213,6 +215,7 @@
     "scale": "Scale"
   },
   "SurveySection": {
+    "personalInfoQuestion": "Personal information question",
     "radioQuestion": "Radio button question (single choice)",
     "checkBoxQuestion": "Radio button question (single choice)",
     "numericQuestion": "Numeric question",
@@ -258,6 +261,20 @@
     "attachmentFileFormats": "Supported file formats: jpg, jpeg, png, pdf, docx, xlsx.",
     "deleteUploadedFile": "Delete uploaded file",
     "replace": "Replace the selected file by clicking here."
+  },
+  "PersonalInfoQuestion": {
+    "label": "Personal information",
+    "nameLabel": "Name",
+    "emailLabel": "Email",
+    "phoneLabel": "Phone number",
+    "addressLabel": "Address",
+    "customLegend": "Custom field",
+    "customLabel": "Other information...",
+    "nameError": "Check the name.",
+    "emailError": "Check the email address.",
+    "phoneError": "Check the phone number.",
+    "addressError": "Check the address.",
+    "customError": "Check the {label}."
   },
   "SurveyImageList": {
     "attributions": "Copyright & attributions",

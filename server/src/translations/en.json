@@ -14,5 +14,12 @@
   "responseTime": "Time of the response",
   "attachments": "Attachments",
   "fi": "finnish",
-  "en": "english"
+  "en": "english",
+  "PersonalInfo": {
+    "label": "Personal Information",
+    "name": "Name",
+    "email": "Email address",
+    "phone": "Phone number",
+    "address": "Address"
+  }
 }

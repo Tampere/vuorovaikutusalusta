@@ -469,7 +469,7 @@ router.get(
 
     const [survey, answerEntries, timestamp] = await Promise.all([
       getSurvey({ id: surveyId }),
-      getAnswerEntries(submissionId),
+      getAnswerEntries(submissionId, req.query.withPersonalInfo === 'true'),
       getTimestamp(submissionId),
     ]);
     const pdfBuffer = await generatePdf(
@@ -505,7 +505,10 @@ router.get(
       throw new ForbiddenError('User not author nor admin of the survey');
     }
 
-    const submissions = await getSubmissionsForSurvey(surveyId);
+    const submissions = await getSubmissionsForSurvey(
+      surveyId,
+      req.query.withPersonalInfo === 'true',
+    );
     res.json(submissions);
   }),
 );

@@ -1,12 +1,14 @@
 import {
   AnswerEntry,
   LanguageCode,
+  PersonalInfoAnswer,
   SectionOption,
   Survey,
   SurveyFollowUpSection,
   SurveyMapQuestion,
   SurveyMatrixQuestion,
   SurveyPageSection,
+  SurveyPersonalInfoQuestion,
 } from '@interfaces/survey';
 import logger from '@src/logger';
 import useTranslations from '@src/translations/useTranslations';
@@ -82,15 +84,14 @@ function findFollowUpMapQuestion(
   entryId: number,
 ): SurveyMapQuestion {
   let followUpSectionIndex: number;
-  const sectionIndex = sections.findIndex(
-    (section) =>
-      section.followUpSections?.some((followUpSection, followUpIndex) => {
-        if (followUpSection.id === entryId) {
-          followUpSectionIndex = followUpIndex;
-          return true;
-        }
-        return false;
-      }),
+  const sectionIndex = sections.findIndex((section) =>
+    section.followUpSections?.some((followUpSection, followUpIndex) => {
+      if (followUpSection.id === entryId) {
+        followUpSectionIndex = followUpIndex;
+        return true;
+      }
+      return false;
+    }),
   );
 
   // Entry id is already only for map questions
@@ -143,6 +144,52 @@ function prepareMapAnswers(
     );
 }
 
+function getPersonalInfoForPrint(
+  personalInfoQuestion: SurveyPersonalInfoQuestion,
+  answer: PersonalInfoAnswer,
+  lang: LanguageCode,
+) {
+  const tr = useTranslations(lang);
+
+  if (!personalInfoQuestion || !answer) {
+    return [];
+  }
+
+  const data: Content[] = [
+    ...(personalInfoQuestion.askName
+      ? [{ text: `${tr.PersonalInfo.name}: ${answer.name}` }]
+      : []),
+    ...(personalInfoQuestion.askEmail
+      ? [{ text: `${tr.PersonalInfo.email}: ${answer.email}` }]
+      : []),
+    ...(personalInfoQuestion.askPhone
+      ? [{ text: `${tr.PersonalInfo.phone}: ${answer.phone}` }]
+      : []),
+    ...(personalInfoQuestion.askAddress
+      ? [{ text: `${tr.PersonalInfo.address}: ${answer.address}` }]
+      : []),
+    ...personalInfoQuestion.customQuestions
+      .filter((q) => q.ask)
+      .map((q, idx) => {
+        return { text: `${q.label?.[lang]}: ${answer.custom[idx]}` };
+      }),
+  ].map((e) => {
+    return { ...e, fontSize: 12, margin: [0, 0, 0, 8] };
+  });
+
+  const personalInfoContent: Content[] = [
+    {
+      text: `${tr.PersonalInfo.label}:`,
+      fontSize: 12,
+      bold: true,
+      margin: [0, 10, 0, 8],
+    },
+    ...data,
+  ];
+
+  return personalInfoContent;
+}
+
 async function getFrontPage(
   survey: Survey,
   submissionId: number,
@@ -154,6 +201,24 @@ async function getFrontPage(
   const image = survey.backgroundImageName
     ? await getFile(survey.backgroundImageName, survey.backgroundImagePath)
     : null;
+
+  const personalInfoQuestion = survey.pages
+    .map((page) =>
+      page.sections.find((section) => section.type === 'personal-info'),
+    )
+    .find<SurveyPersonalInfoQuestion>(
+      (section): section is SurveyPersonalInfoQuestion => Boolean(section),
+    );
+
+  const personalInfoAnswerEntry = answerEntries.find(
+    (entry) => entry.type === 'personal-info',
+  );
+
+  const personalInfo = getPersonalInfoForPrint(
+    personalInfoQuestion,
+    personalInfoAnswerEntry?.value,
+    language,
+  );
 
   const [logo, banner] = await Promise.all([
     getStaticIconSvg('logo'),
@@ -217,6 +282,7 @@ async function getFrontPage(
         fontSize: 12,
         margin: [0, 0, 0, 10],
       })),
+    personalInfo,
     { text: '', pageBreak: 'after' },
   ];
 }
@@ -258,15 +324,15 @@ function getContent(
     style: isSubQuestion
       ? 'subQuestionTitle'
       : isFollowUpSection
-      ? 'followUpSectionTitle'
-      : 'questionTitle',
+        ? 'followUpSectionTitle'
+        : 'questionTitle',
   };
 
   const style = isSubQuestion
     ? 'subQuestionAnswer'
     : isFollowUpSection
-    ? 'followUpSectionAnswer'
-    : 'answer';
+      ? 'followUpSectionAnswer'
+      : 'answer';
 
   switch (answerEntry.type) {
     case 'free-text':
@@ -324,10 +390,10 @@ function getContent(
               answerEntry.value[index] === '-1'
                 ? tr.dontKnow
                 : answerEntry.value[index] == null
-                ? '-'
-                : question.classes[Number(answerEntry.value[index])]?.[
-                    language
-                  ] ?? '-'
+                  ? '-'
+                  : (question.classes[Number(answerEntry.value[index])]?.[
+                      language
+                    ] ?? '-')
             }`,
             style,
           })),

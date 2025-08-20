@@ -14,5 +14,12 @@
   "responseTime": "Tallennusaika",
   "attachments": "Liitteet",
   "fi": "suomi",
-  "en": "englanti"
+  "en": "englanti",
+  "PersonalInfo": {
+    "label": "Vastaajan tiedot",
+    "name": "Nimi",
+    "email": "Sähköpostiosoite",
+    "phone": "Puhelinnumero",
+    "address": "Osoite"
+  }
 }

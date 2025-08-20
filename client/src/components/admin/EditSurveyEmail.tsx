@@ -63,6 +63,28 @@ export default function EditSurveyEmail() {
         </div>
         {activeSurvey.email.enabled && (
           <>
+            <div>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={activeSurvey.email.includePersonalInfo ?? false}
+                    onChange={(event) => {
+                      editSurvey({
+                        ...activeSurvey,
+                        email: {
+                          ...activeSurvey.email,
+                          includePersonalInfo: event.target.checked,
+                        },
+                      });
+                    }}
+                  />
+                }
+                label={'Sisällytä henkilötiedot'}
+              />
+              <FormHelperText>
+                Henkilötiedot sisällytetään pdf raportin etusivulle.
+              </FormHelperText>
+            </div>
             <Autocomplete
               multiple
               freeSolo

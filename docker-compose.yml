@@ -25,7 +25,7 @@ services:
     ports:
       - '3000:3000'
   database:
-    image: kartoza/postgis:12.4
+    image: kartoza/postgis:13
     environment:
       POSTGRES_USER: vuorovaikutusalusta_user
       POSTGRES_PASSWORD: password

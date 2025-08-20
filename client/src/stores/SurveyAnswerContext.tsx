@@ -2,6 +2,7 @@ import {
   AnswerEntry,
   Conditions,
   LanguageCode,
+  PersonalInfoAnswer,
   Survey,
   SurveyPage,
   SurveyPageSection,
@@ -78,6 +79,18 @@ export const SurveyAnswerContext = createContext<Context>(null);
 
 export function getEmptyAnswer(section: SurveyPageSection): AnswerEntry {
   switch (section.type) {
+    case 'personal-info':
+      return {
+        sectionId: section.id,
+        type: section.type,
+        value: {
+          name: '',
+          email: '',
+          phone: '',
+          address: '',
+          custom: [],
+        },
+      };
     case 'checkbox':
       return {
         sectionId: section.id,
@@ -286,6 +299,23 @@ export function useSurveyAnswers() {
         (answer.value as string[][]).some((row) => row.length === 0)
       ) {
         errors.push('required');
+      } else if (question.type === 'personal-info') {
+        if (
+          question.askEmail &&
+          (answer.value as PersonalInfoAnswer).email.length === 0
+        ) {
+          errors.push('required');
+        } else if (
+          question.askName &&
+          (answer.value as PersonalInfoAnswer).name.length === 0
+        ) {
+          errors.push('required');
+        } else if (
+          question.askPhone &&
+          (answer.value as PersonalInfoAnswer).phone.length === 0
+        ) {
+          errors.push('required');
+        }
       }
       // If value is an array, check the array length - otherwise check for its emptiness
       else if (

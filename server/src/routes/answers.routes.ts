@@ -29,8 +29,9 @@ router.get(
     if (!permissionsOk) {
       throw new ForbiddenError('User not author nor admin of the survey');
     }
+    const includePersonalInfo = req.query.withPersonalInfo! === 'true';
 
-    const exportFiles = await getCSVFile(surveyId);
+    const exportFiles = await getCSVFile(surveyId, includePersonalInfo);
 
     if (!exportFiles) {
       res.status(404).json({ message: 'No attachments found' });

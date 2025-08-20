@@ -114,7 +114,7 @@ export default function SurveySubmissionsPage() {
 
     setSubmissionsLoading(true);
     async function fetchSubmissions() {
-      const submissionUrl = `/api/surveys/${survey.id}/submissions`;
+      const submissionUrl = `/api/surveys/${survey.id}/submissions?withPersonalInfo=true`;
       try {
         const submissions = await request<Submission[]>(submissionUrl);
         setSubmissions(

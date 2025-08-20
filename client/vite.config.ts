@@ -4,7 +4,7 @@ import { resolve } from 'path';
 import { defineConfig } from 'vite';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
-const proxyAddress = process.env.API_URL ?? 'http://localhost:3000';
+const proxyAddress = process.env.API_URL ?? 'http://server:3000';
 
 const isAdminRoute = (url: string) => url!.startsWith('/admin');
 const isIndexRoute = (url: string) =>
