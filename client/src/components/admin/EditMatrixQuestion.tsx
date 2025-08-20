@@ -106,13 +106,15 @@ export default function EditMatrixQuestion({ section, onChange }: Props) {
           text: subject,
           draftId: subject.id ?? generateDraftId(),
         }))}
-        onChange={(subjects: any) => {
+        onChange={(subjects) => {
           onChange({
             ...section,
-            subjects: subjects.map((subject: any) => ({
-              ...subject.text,
-              id: subject.id,
-            })),
+            subjects: subjects.map((subject) => {
+              return {
+                ...subject.text,
+                id: subject.draftId,
+              };
+            }),
           });
         }}
         title={tr.SurveySections.subjects}
