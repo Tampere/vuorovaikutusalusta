@@ -3,10 +3,11 @@
     "exportAnswers": "Export response data",
     "surveyAnswerExport": "Export survey response data",
     "chooseFileFormat": "Choose files to export",
-    "download": "download",
+    "download": "Download",
     "errorDownloadingCSV": "Failed to export CSV -file",
     "errorDownloadingGPKG": "Failed to export GeoPackage -file",
-    "attachments": "Survey response data attachments"
+    "attachments": "Survey response data attachments",
+    "personalInfo": "Include personal information"
   },
   "EditSurvey": {
     "errorFetchingSurvey": "Unable to access the survey. Please check the address or try again later.",

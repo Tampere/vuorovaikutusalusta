@@ -145,17 +145,28 @@ export default function DataExport({ surveyId }: Props) {
               />
             }
           />
-          <FormControlLabel
-            label="Henkilötiedot"
-            control={
-              <Checkbox
-                checked={includePersonalInfo}
-                onChange={(event) =>
-                  setIncludePersonalInfo(event.target.checked)
-                }
-              />
-            }
-          />
+          {selectedFileFormats.csv && (
+            <FormControlLabel
+              sx={{
+                marginLeft: '8px',
+                height: '26px',
+                '& .MuiFormControlLabel-label': {
+                  fontSize: '14px',
+                },
+                paddingBottom: '6px',
+              }}
+              label={tr.DataExport.personalInfo}
+              control={
+                <Checkbox
+                  size="small"
+                  checked={includePersonalInfo}
+                  onChange={(event) =>
+                    setIncludePersonalInfo(event.target.checked)
+                  }
+                />
+              }
+            />
+          )}
           <FormControlLabel
             label="Geopackage"
             control={

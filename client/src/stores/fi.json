@@ -3,10 +3,11 @@
     "exportAnswers": "Lataa vastaukset",
     "surveyAnswerExport": "Kyselyn vastausdatan lataus",
     "chooseFileFormat": "Valitse haluamasi tiedostomuodot",
-    "download": "lataa",
+    "download": "Lataa",
     "errorDownloadingCSV": "CSV -tiedoston lataaminen epäonnistui",
     "errorDownloadingGPKG": "GeoPackage -tiedoston lataaminen epäonnistui",
-    "attachments": "Vastausliitteet"
+    "attachments": "Vastausliitteet",
+    "personalInfo": "Sisällytä henkilötiedot"
   },
   "EditSurvey": {
     "errorFetchingSurvey": "Virhe haettaessa kyselyä. Tarkista osoite tai yritä myöhemmin uudestaan.",
