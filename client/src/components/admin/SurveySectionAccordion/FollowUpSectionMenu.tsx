@@ -49,6 +49,7 @@ export function FollowUpSectionMenu({
       document: 'documentSection',
       'free-text': 'freeTextQuestion',
       'grouped-checkbox': 'groupedCheckboxQuestion',
+      'categorized-checkbox': 'categorizedCheckboxQuestion',
       image: 'imageSection',
       map: 'mapQuestion',
       matrix: 'matrixQuestion',

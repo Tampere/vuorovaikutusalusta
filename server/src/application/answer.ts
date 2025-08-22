@@ -876,6 +876,7 @@ function createCSVHeaders(sectionMetadata: SectionHeader[]) {
       case 'radio':
       case 'checkbox':
       case 'grouped-checkbox':
+      case 'categorized-checkbox':
         sectionGroup.forEach((section) => {
           const key = getHeaderKey(
             section.pageIndex,
@@ -1086,6 +1087,7 @@ function submissionAnswersToJson(
       case 'radio':
       case 'checkbox':
       case 'grouped-checkbox':
+      case 'categorized-checkbox':
         ret[
           getHeaderKey(
             sectionDetails.pageIndex,

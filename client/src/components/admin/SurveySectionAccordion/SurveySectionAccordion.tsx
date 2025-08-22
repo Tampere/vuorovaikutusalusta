@@ -1,5 +1,6 @@
 import {
   Conditions,
+  SurveyCategorizedCheckboxQuestion,
   SurveyCheckboxQuestion,
   SurveyDocumentSection,
   SurveyFollowUpSection,
@@ -72,6 +73,8 @@ import EditTextSection from '../EditTextSection';
 import { SectionDetails } from './SectionDetails';
 import { DragHandle } from '@src/components/DragAndDrop/SortableItem';
 import { EditPersonalInfoQuestion } from '../EditPersonalInfoQuestion';
+import EditCategorizedCheckBoxQuestion from '../EditCategorizedCheckBoxQuestion/EditCategorizedCheckBoxQuestion';
+import { CategorizedCheckboxIcon } from '@src/components/icons/CategorizedCheckboxIcon';
 
 const styles = {
   accordion: {
@@ -267,6 +270,17 @@ export default function SurveySectionAccordion(props: Props) {
         <EditGroupedCheckBoxQuestion
           disabled={props.disabled}
           section={props.section as SurveyGroupedCheckboxQuestion}
+          onChange={handleEdit}
+        />
+      ),
+    },
+    'categorized-checkbox': {
+      icon: <CategorizedCheckboxIcon />,
+      tooltip: tr.SurveySection.categorizedCheckboxQuestion,
+      form: (
+        <EditCategorizedCheckBoxQuestion
+          disabled={props.disabled}
+          section={props.section as SurveyCategorizedCheckboxQuestion}
           onChange={handleEdit}
         />
       ),

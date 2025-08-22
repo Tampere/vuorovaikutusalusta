@@ -415,6 +415,7 @@ function answerEntriesToRows(
         break;
       case 'checkbox':
       case 'grouped-checkbox':
+      case 'categorized-checkbox':
         newEntries =
           entry.value.length !== 0
             ? [
@@ -647,6 +648,30 @@ function dbAnswerEntriesToAnswerEntries(
           }
           if (row.value_option_id) {
             entry.value.push(row.value_option_id);
+          }
+          break;
+        }
+        case 'categorized-checkbox': {
+          // Try to find an existing entry for this section
+          let entry = entries.find(
+            (entry): entry is AnswerEntry & { type: 'categorized-checkbox' } =>
+              entry.sectionId === row.section_id,
+          );
+          // If the entry doesn't exist, create it
+          if (
+            !entry &&
+            (entry = {
+              sectionId: row.section_id,
+              type: 'categorized-checkbox',
+              value: [],
+              filters: [],
+            })
+          ) {
+            entries.push(entry);
+          }
+          const value = row.value_option_id;
+          if (value != null) {
+            entry.value.push(value);
           }
           break;
         }

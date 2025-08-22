@@ -208,6 +208,15 @@
     "untitledGroup": "Nimetön ryhmä",
     "deleteGroup": "Poista ryhmä"
   },
+  "EditCategorizedCheckBoxQuestion": {
+    "categoryGroupsLabel": "Luokitukset",
+    "categoryAddPlaceholder": "Syötä lisättävä luokka...",
+    "addCategory": "Lisää luokitus",
+    "addOption": "Lisää vastausvaihtoehto",
+    "modifyCategoryGroups": "Muokkaa luokkia",
+    "hideCategorySettings": "Piilota luokka-asetukset",
+    "deleteCategoryGroup": "Poista luokka"
+  },
   "AddSurveySectionActions": {
     "personalInfoDisabled": "Henkilötietokysymys on jo lisätty kyselyyn.",
     "personalInfoQuestion": "Lisää henkilötietokysymys",
@@ -222,6 +231,7 @@
     "matrixQuestion": "Lisää likert-kysymys",
     "multiMatrixQuestion": "Lisää monivalinta-likert-kysymys",
     "groupedCheckboxQuestion": "Lisää ryhmitetty monivalintakysymys",
+    "categorizedCheckboxQuestion": "Lisää luokiteltu monivalintakysymys",
     "imageSection": "Lisää kuvaosio",
     "documentSection": "Lisää liiteosio",
     "attachmentSection": "Lisää vastausliite"
@@ -244,6 +254,7 @@
     "matrixQuestion": "Likert-kysymys",
     "multiMatrixQuestion": "Monivalinta-likert-kysymys",
     "groupedCheckboxQuestion": "Ryhmitetty monivalintakysymys",
+    "categorizedCheckboxQuestion": "Luokiteltu monivalintakysymys",
     "imageSection": "Kuvaosio",
     "documentSection": "Liiteosio",
     "attachmentSection": "Vastausliite",
@@ -555,6 +566,15 @@
     "indicatorTextMaxReached": "Olet valinnut kaikki {numbers} vaihtoehtoa.",
     "optionsSelectedInGroup": "{number} vaihtoehtoa valittu."
   },
+  "CategorizedCheckBoxQuestion": {
+    "hideOption": "Ei koske minua, piilota",
+    "showOption": "Palauta piilotettu vaihtoehto",
+    "singleHiddenOption": "Yksi piilotettu vaihtoehto",
+    "hiddenOptions": "{x} piilotettua vaihtoehtoa",
+    "categorySelectLabel": "Vaihtoehtojen rajaaminen",
+    "categorySelectDescription": "Tässä kysymyksessä on {x} vastausvaihtoehtoa. Halutessasi voit rajata vastausvaihtoehtoja, jotka näkyvät sinulle. Rajaa sinulle näkyviä vaihtoehtoja valitsemalla alla olevista luokista sopivimmat.",
+    "categorySelectDescriptionLimited": "Tässä kysymyksessä on {0} vastausvaihtoehtoa, joista voit valita enintään {1}. Halutessasi voit rajata vastausvaihtoehtoja, jotka näkyvät sinulle. Rajaa sinulle näkyviä vaihtoehtoja valitsemalla alla olevista luokista sopivimmat."
+  },
   "SubmissionInfoDialog": {
     "title": "Lähetä vastaus",
     "text": "Jos haluat saada kopion vastauksestasi, anna sähköpostiosoitteesi oheiseen kenttään.",
@@ -654,7 +674,8 @@
     "discard": "Peruuta muutokset",
     "edit": "Muokkaa",
     "copy": "Kopioi",
-    "close": "Sulje"
+    "close": "Sulje",
+    "add": "Lisää"
   },
   "options": {
     "yes": "Kyllä",

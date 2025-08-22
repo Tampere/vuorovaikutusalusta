@@ -7,6 +7,7 @@ import { SurveyPage } from '@interfaces/survey';
 const styles = {
   root: {
     display: 'flex',
+    gap: '0.5rem',
     flexDirection: 'row',
     '& > *': {
       marginRight: '0.5rem',
