@@ -363,14 +363,14 @@ async function answerEntriesToCSV(
 ): Promise<string> {
   const { submissions, headers } = entries ?? { submissions: [] };
 
-  const _personalInfoHeaders = getPersonalInfoHeadersForCSV(
+  const personalInfoHeaders = getPersonalInfoHeadersForCSV(
     personalInfoRows[0] ?? null,
   );
 
   const basicHeaders = ['Vastaustunniste', 'Aikaleima', 'Vastauskieli'];
   const allHeaders = [
     ...basicHeaders,
-    ..._personalInfoHeaders,
+    ...personalInfoHeaders,
     ...headers.map((h) => Object.values(h)[0]),
   ];
 

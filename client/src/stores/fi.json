@@ -72,6 +72,8 @@
     "requireEmailRegistrationHelperText": "Kyselyn etusivulla vastaajan täytyy antaa sähköpostiosoitteensa. Osoitteeseen toimitetaan linkki, josta pääsee vastaamaan kyselyyn. Kyselyyn voi vastata vain kerran samasta sähköpostiosoitteesta."
   },
   "EditSurveyEmail": {
+    "includePersonalInfo": "Inkludera respondentens personuppgifter",
+    "includePersonalInfoHelperText": "Eventuella svar på personuppgiftsfrågan inkluderas på framsidan av pdf-rapporten.",
     "enable": "Salli vastausten raportointi sähköpostitse",
     "enableHelperText": "Jos sallit vastausten raportoinnin sähköpostitse, lähetetään yksittäiset vastaukset pdf-raportteina alla määrittelemiisi osoitteisiin. Lisäksi vastaajalta kysytään kyselyn lopussa hänen sähköpostiosoitettaan, johon pdf-raportti voidaan toimittaa.",
     "autoSendTo": "Vastaanottajien sähköpostiosoitteet",
@@ -94,7 +96,7 @@
     "phoneLabel": "Puhelinnumero",
     "addressLabel": "Osoite",
     "customLegend": "Mukautettu kenttä",
-    "customLabel": "Muu tieto...",
+    "customQuestion": "Muu tieto...",
     "nameError": "Tarkista nimi.",
     "emailError": "Tarkista sähköpostiosoite.",
     "phoneError": "Tarkista puhelinnumero.",

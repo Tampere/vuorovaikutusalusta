@@ -79,10 +79,10 @@ export default function EditSurveyEmail() {
                     }}
                   />
                 }
-                label={'Sisällytä henkilötiedot'}
+                label={tr.EditSurveyEmail.includePersonalInfo}
               />
               <FormHelperText>
-                Henkilötiedot sisällytetään pdf raportin etusivulle.
+                {tr.EditSurveyEmail.includePersonalInfoHelperText}
               </FormHelperText>
             </div>
             <Autocomplete

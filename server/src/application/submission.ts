@@ -1,7 +1,6 @@
 import {
   AnswerEntry,
   LanguageCode,
-  LocalizedText,
   MapQuestionAnswer,
   Submission,
   SurveyMapSubQuestionAnswer,
@@ -955,9 +954,7 @@ export async function getSubmissionsForSurvey(
   );
 
   const personalInfoRows = withPersonalInfo
-    ? await getDb().manyOrNone<
-        DBPersonalInfo & DBSubmission & { customLabel: LocalizedText }
-      >(
+    ? await getDb().manyOrNone<DBPersonalInfo & DBSubmission>(
         `SELECT
           s.updated_at,
           s.id as submission_id,
@@ -966,8 +963,7 @@ export async function getSubmissionsForSurvey(
           pgp_sym_decrypt(pi.email, $(encryptionKey)) as email,
           pgp_sym_decrypt(pi.phone, $(encryptionKey)) as phone,
           pgp_sym_decrypt(pi.address, $(encryptionKey)) as address,
-          pgp_sym_decrypt(pi.custom, $(encryptionKey))::text[] as custom,
-          (ps.details->>'customLabel')::jsonb as "customLabel"
+          pgp_sym_decrypt(pi.custom, $(encryptionKey))::text[] as custom
         FROM data.submission s
         INNER JOIN data.personal_info pi ON pi.submission_id = s.id
         LEFT JOIN data.page_section ps ON ps.id = pi.section_id
@@ -1010,7 +1006,6 @@ export async function getSubmissionsForSurvey(
         phone: personalInfoRow.phone,
         address: personalInfoRow.address,
         custom: personalInfoRow.custom,
-        customLabel: personalInfoRow.customLabel,
       },
     };
 

@@ -72,6 +72,8 @@
     "requireEmailRegistrationHelperText": "On the survey front page, the respondent must provide their email address. A link will be sent to the address, from which the survey can be answered. The survey can only be answered once from the same email address."
   },
   "EditSurveyEmail": {
+    "includePersonalInfo": "Include respondent's personal information",
+    "includePersonalInfoHelperText": "Responses to the personal information question, if any, will be included on the front page of the PDF report.",
     "enable": "Enable sending reports of the survey answers via email",
     "enableHelperText": "If you enable sending answer reports via email, reports of individual respondent's answers will be send as pdf-reports to the mailing list described below. At the end of the survey, the respondent is asked for an email address where the answer report can be sent to.",
     "autoSendTo": "Email recipients",
@@ -270,7 +272,7 @@
     "phoneLabel": "Phone number",
     "addressLabel": "Address",
     "customLegend": "Custom field",
-    "customLabel": "Other information...",
+    "customQuestion": "Other information...",
     "nameError": "Check the name.",
     "emailError": "Check the email address.",
     "phoneError": "Check the phone number.",

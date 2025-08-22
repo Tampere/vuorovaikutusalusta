@@ -195,7 +195,7 @@ export function EditPersonalInfoQuestion({ section, onChange }: Props) {
                     <Input
                       value={cq.label?.[surveyLanguage] ?? ''}
                       style={inputStyle}
-                      placeholder={tr.PersonalInfoQuestion.customLabel}
+                      placeholder={tr.PersonalInfoQuestion.customQuestion}
                       onChange={(e) => {
                         const newQuestions = section.customQuestions.map(
                           (prev, prevIdx) => {
