@@ -28,6 +28,7 @@ export default function DataExport({ surveyId }: Props) {
     geopackage: false,
     attachments: false,
   });
+  const [includePersonalInfo, setIncludePersonalInfo] = useState(false);
   const { tr } = useTranslations();
   const { showToast } = useToasts();
 
@@ -36,9 +37,12 @@ export default function DataExport({ surveyId }: Props) {
 
   async function exportCSV() {
     try {
-      const res = await fetch(`/api/answers/${surveyId}/file-export/csv`, {
-        method: 'GET',
-      });
+      const res = await fetch(
+        `/api/answers/${surveyId}/file-export/csv?withPersonalInfo=${includePersonalInfo}`,
+        {
+          method: 'GET',
+        },
+      );
 
       const csvText = await res.text();
       const textBlob = new Blob([csvText], { type: 'text/csv;charset=utf-8' });
@@ -59,7 +63,7 @@ export default function DataExport({ surveyId }: Props) {
   async function exportGeoPackage() {
     try {
       const res = await fetch(
-        `/api/answers/${surveyId}/file-export/geopackage`,
+        `/api/answers/${surveyId}/file-export/geopackage?withPersonalInfo=${includePersonalInfo}`,
         {
           method: 'GET',
         },
@@ -141,6 +145,28 @@ export default function DataExport({ surveyId }: Props) {
               />
             }
           />
+          {selectedFileFormats.csv && (
+            <FormControlLabel
+              sx={{
+                marginLeft: '8px',
+                height: '26px',
+                '& .MuiFormControlLabel-label': {
+                  fontSize: '14px',
+                },
+                paddingBottom: '6px',
+              }}
+              label={tr.DataExport.personalInfo}
+              control={
+                <Checkbox
+                  size="small"
+                  checked={includePersonalInfo}
+                  onChange={(event) =>
+                    setIncludePersonalInfo(event.target.checked)
+                  }
+                />
+              }
+            />
+          )}
           <FormControlLabel
             label="Geopackage"
             control={

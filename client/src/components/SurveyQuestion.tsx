@@ -2,6 +2,7 @@ import type {
   AnswerEntry,
   FileAnswer,
   MapQuestionAnswer,
+  PersonalInfoAnswer,
   Submission,
   SurveyQuestion as SurveyQuestionType,
 } from '@interfaces/survey';
@@ -27,6 +28,7 @@ import SectionInfo from './SectionInfo';
 import SliderQuestion from './SliderQuestion';
 import SortingQuestion from './SortingQuestion';
 import MultiMatrixQuestion from './MultiMatrixQuestion';
+import { PersonalInfoQuestion } from './PersonalInfoQuestion';
 
 interface Props {
   question: SurveyQuestionType;
@@ -137,6 +139,21 @@ function SurveyQuestion({
           />
         )}
       </FormLabel>
+
+      {/* Personal info question */}
+      {question.type === 'personal-info' && (
+        <PersonalInfoQuestion
+          value={value as PersonalInfoAnswer}
+          onChange={(value) => {
+            updateAnswer({
+              sectionId: question.id,
+              type: question.type,
+              value,
+            });
+          }}
+          question={question}
+        />
+      )}
 
       {/* Radio question */}
       {question.type === 'radio' && (

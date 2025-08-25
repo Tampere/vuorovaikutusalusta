@@ -11,6 +11,7 @@ import {
   SurveyMultiMatrixQuestion,
   SurveyNumericQuestion,
   SurveyPageSection,
+  SurveyPersonalInfoQuestion,
   SurveyRadioQuestion,
   SurveySliderQuestion,
   SurveySortingQuestion,
@@ -29,6 +30,7 @@ import {
   LinearScale,
   Looks4,
   Map,
+  Person,
   RadioButtonChecked,
   Subject,
   TextFields,
@@ -69,6 +71,7 @@ import EditSortingQuestion from '../EditSortingQuestion';
 import EditTextSection from '../EditTextSection';
 import { SectionDetails } from './SectionDetails';
 import { DragHandle } from '@src/components/DragAndDrop/SortableItem';
+import { EditPersonalInfoQuestion } from '../EditPersonalInfoQuestion';
 
 const styles = {
   accordion: {
@@ -138,6 +141,16 @@ export default function SurveySectionAccordion(props: Props) {
       form: ReactNode;
     };
   } = {
+    'personal-info': {
+      icon: <Person />,
+      tooltip: tr.SurveySection.personalInfoQuestion,
+      form: (
+        <EditPersonalInfoQuestion
+          section={props.section as SurveyPersonalInfoQuestion}
+          onChange={handleEdit}
+        />
+      ),
+    },
     checkbox: {
       icon: <CheckBox />,
       tooltip: tr.SurveySection.checkBoxQuestion,

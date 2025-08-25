@@ -31,7 +31,8 @@ export type SurveyQuestion =
   | SurveyMultiMatrixQuestion
   | SurveyMatrixQuestion
   | SurveyGroupedCheckboxQuestion
-  | SurveyAttachmentQuestion;
+  | SurveyAttachmentQuestion
+  | SurveyPersonalInfoQuestion;
 
 /**
  * Subquestion type for map questions.
@@ -101,6 +102,17 @@ interface FileAnswer {
 }
 
 /**
+ * Personal info anwers
+ */
+interface PersonalInfoAnswer {
+  name: string | null;
+  email: string | null;
+  phone: string | null;
+  address: string | null;
+  custom: (string | null)[];
+}
+
+/**
  * Checkbox question
  */
 export interface SurveyCheckboxQuestion extends CommonSurveyPageQuestion {
@@ -111,6 +123,21 @@ export interface SurveyCheckboxQuestion extends CommonSurveyPageQuestion {
     max?: number;
   };
   allowCustomAnswer: boolean;
+}
+
+/**
+ * Personal info question
+ */
+export interface SurveyPersonalInfoQuestion extends CommonSurveyPageQuestion {
+  type: 'personal-info';
+  askName: boolean;
+  askEmail: boolean;
+  askPhone: boolean;
+  askAddress: boolean;
+  customQuestions: {
+    ask: boolean;
+    label?: LocalizedText;
+  }[];
 }
 
 /**
@@ -465,6 +492,10 @@ export interface Survey {
      * Optional free-form information to be shown on the front page of the report
      */
     info: SurveyEmailInfoItem[];
+    /**
+     * Should sensitive data be included in email
+     */
+    includePersonalInfo: boolean;
   };
   /**
    * Should the survey be able to be saved as unfinished
@@ -613,6 +644,10 @@ export type AnswerEntry = {
   | {
       type: 'attachment';
       value: { fileString: string; fileName: string }[];
+    }
+  | {
+      type: 'personal-info';
+      value: PersonalInfoAnswer;
     }
 );
 

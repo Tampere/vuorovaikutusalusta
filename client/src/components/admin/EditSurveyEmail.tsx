@@ -63,6 +63,28 @@ export default function EditSurveyEmail() {
         </div>
         {activeSurvey.email.enabled && (
           <>
+            <div>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={activeSurvey.email.includePersonalInfo ?? false}
+                    onChange={(event) => {
+                      editSurvey({
+                        ...activeSurvey,
+                        email: {
+                          ...activeSurvey.email,
+                          includePersonalInfo: event.target.checked,
+                        },
+                      });
+                    }}
+                  />
+                }
+                label={tr.EditSurveyEmail.includePersonalInfo}
+              />
+              <FormHelperText>
+                {tr.EditSurveyEmail.includePersonalInfoHelperText}
+              </FormHelperText>
+            </div>
             <Autocomplete
               multiple
               freeSolo

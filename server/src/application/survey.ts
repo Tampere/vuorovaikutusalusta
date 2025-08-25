@@ -78,6 +78,7 @@ interface DBSurvey {
   localisation_enabled: boolean;
   submission_count?: number;
   email_registration_required: boolean;
+  email_include_personal_info: boolean;
 }
 
 /**
@@ -266,8 +267,8 @@ export async function registerSubmitterToSurvey(
     email: string;
     id: string;
   }>(
-    `SELECT id, pgp_sym_decrypt(email, $2) AS email, survey_id AS "surveyId" 
-      FROM data.survey_email_registration 
+    `SELECT id, pgp_sym_decrypt(email, $2) AS email, survey_id AS "surveyId"
+      FROM data.survey_email_registration
       WHERE survey_id = $1 AND pgp_sym_decrypt(email, $2) = $3`,
     [surveyId, process.env.DATABASE_ENCRYPTION_KEY, email],
   );
@@ -275,9 +276,9 @@ export async function registerSubmitterToSurvey(
     return registration;
   }
   return getDb().one<{ surveyId: string; email: string; id: string }>(
-    `INSERT INTO data.survey_email_registration (survey_id, email) 
+    `INSERT INTO data.survey_email_registration (survey_id, email)
       VALUES ($1, pgp_sym_encrypt($2, $3))
-      RETURNING survey_id AS "surveyId", pgp_sym_decrypt(email, $3) as email, id 
+      RETURNING survey_id AS "surveyId", pgp_sym_decrypt(email, $3) as email, id
       `,
     [surveyId, email, process.env.DATABASE_ENCRYPTION_KEY],
   );
@@ -294,10 +295,10 @@ export async function getSurveyRegistration(id: string) {
     has_submission: boolean;
   }>(
     `
-    SELECT 
-      ser.id, 
-      pgp_sym_decrypt(ser.email, $2) AS email, 
-      ser.survey_id, 
+    SELECT
+      ser.id,
+      pgp_sym_decrypt(ser.email, $2) AS email,
+      ser.survey_id,
       EXISTS (
         SELECT 1 FROM data.submission s WHERE s.registration_id = ser.id AND s.unfinished_token IS NULL
       ) AS has_submission
@@ -324,8 +325,8 @@ export async function getSurveyRegistration(id: string) {
  */
 export async function getSurveyRegistrationsForSurvey(surveyId: number) {
   const registrations = await getDb().manyOrNone<DBSurveyEmailRegistration>(
-    `SELECT id, pgp_sym_decrypt(email, $2), survey_id 
-      FROM data.survey_email_registration 
+    `SELECT id, pgp_sym_decrypt(email, $2), survey_id
+      FROM data.survey_email_registration
       WHERE survey_id = $1`,
     [surveyId, process.env.DATABASE_ENCRYPTION_KEY],
   );
@@ -374,7 +375,7 @@ export async function getPublishedSurvey(
 ) {
   const rows = await getDb().manyOrNone<DBSurveyJoin>(
     `
-    SELECT 
+    SELECT
       survey_page_section.*,
       option.id as option_id,
       option.text as option_text,
@@ -629,7 +630,7 @@ export async function getPublishedSurvey(
 export async function getSurvey(params: { id: number } | { name: string }) {
   const rows = await getDb().manyOrNone<DBSurveyJoin>(
     `
-    SELECT 
+    SELECT
       survey_page_section.*,
       option.id as option_id,
       option.text as option_text,
@@ -1080,9 +1081,9 @@ async function upsertSectionConditions(
 
   const upsertQuery =
     getMultiInsertQuery(conditionRows, conditionColumnSet) +
-    ` ON CONFLICT (id) DO UPDATE SET 
-        equals = excluded.equals, 
-        less_than = excluded.less_than, 
+    ` ON CONFLICT (id) DO UPDATE SET
+        equals = excluded.equals,
+        less_than = excluded.less_than,
         greater_than = excluded.greater_than
       RETURNING *`;
 
@@ -1171,19 +1172,19 @@ async function deleteRemovedLinkedSections(
   const rows = await getDb().manyOrNone<{ id: number }>(
     `
     WITH follow_ups AS (
-      SELECT id 
-      FROM data.page_section 
+      SELECT id
+      FROM data.page_section
       WHERE predecessor_section = $1
-    ), 
+    ),
     follow_up_child_sections AS (
-      SELECT ps.id 
-      FROM data.page_section ps 
+      SELECT ps.id
+      FROM data.page_section ps
       INNER JOIN follow_ups ON ps.parent_section = follow_ups.id
     )
-    SELECT id FROM follow_ups 
-    UNION 
-    SELECT id FROM follow_up_child_sections 
-    UNION 
+    SELECT id FROM follow_ups
+    UNION
+    SELECT id FROM follow_up_child_sections
+    UNION
     SELECT id FROM data.page_section WHERE parent_section = $1;
     `,
     [parentSectionId],
@@ -1305,7 +1306,8 @@ export async function updateSurvey(survey: Survey) {
         allow_saving_unfinished = $25,
         localisation_enabled = $26,
         display_privacy_statement = $27,
-        email_registration_required = $28
+        email_registration_required = $28,
+        email_include_personal_info = $29
       WHERE id = $1 RETURNING *`,
       [
         survey.id,
@@ -1336,6 +1338,7 @@ export async function updateSurvey(survey: Survey) {
         survey.localisationEnabled,
         survey.displayPrivacyStatement,
         survey.emailRegistrationRequired,
+        survey.email.includePersonalInfo,
       ],
     )
     .catch((error) => {
@@ -1610,6 +1613,7 @@ function dbSurveyToSurvey(
       subject: dbSurvey.email_subject,
       body: dbSurvey.email_body,
       info: dbSurvey.email_info,
+      includePersonalInfo: dbSurvey.email_include_personal_info,
     },
     allowSavingUnfinished: dbSurvey.allow_saving_unfinished,
     localisationEnabled: dbSurvey.localisation_enabled,

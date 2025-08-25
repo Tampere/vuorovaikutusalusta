@@ -13,6 +13,7 @@ import {
   ViewComfy,
   ViewComfyAlt,
   ArrowForwardIosSharp,
+  Person,
 } from '@mui/icons-material';
 import { SurveyQuestion } from '@interfaces/survey';
 import { useTranslations } from '@src/stores/TranslationContext';
@@ -49,6 +50,8 @@ function getQuestionIcon(
       return <AttachFile color="primary" />;
     case 'free-text':
       return <TextFields color="primary" />;
+    case 'personal-info':
+      return <Person color="primary" />;
     default:
       assertNever(questionType);
   }

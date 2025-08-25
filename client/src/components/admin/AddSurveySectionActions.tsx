@@ -10,13 +10,14 @@ import {
   LinearScale,
   Looks4,
   Map,
+  Person,
   RadioButtonChecked,
   Subject,
   TextFields,
   ViewComfy,
   ViewComfyAlt,
 } from '@mui/icons-material';
-import { Box, Fab, Grid, Typography } from '@mui/material';
+import { Box, Fab, Grid, Tooltip, Typography } from '@mui/material';
 import { duplicateFiles } from '@src/controllers/AdminFileController';
 import { useClipboard } from '@src/stores/ClipboardContext';
 import { useSurvey } from '@src/stores/SurveyContext';
@@ -52,12 +53,26 @@ export default function AddSurveySectionActions(props: Props) {
     pageId: string;
   }>();
 
+  const personalInfoDisabled = activeSurvey.pages.some((page) =>
+    page.sections.some((section) => section.type === 'personal-info'),
+  );
+
   // Sequence for making each section ID unique before they're added to database
   const [sectionSequence, setSectionSequence] = useState(-1);
 
   const defaultSections: {
     [type in SurveyPageSection['type']]: SurveyPageSection;
   } = {
+    'personal-info': {
+      type: 'personal-info',
+      title: initializeLocalizedObject(''),
+      isRequired: false,
+      askName: false,
+      askEmail: false,
+      askPhone: false,
+      askAddress: false,
+      customQuestions: [{ ask: false, label: initializeLocalizedObject('') }],
+    },
     checkbox: {
       type: 'checkbox',
       title: initializeLocalizedObject(''),
@@ -211,6 +226,12 @@ export default function AddSurveySectionActions(props: Props) {
     icon: ReactNode;
   }[] = [
     {
+      type: 'personal-info',
+      label: tr.AddSurveySectionActions.personalInfoQuestion,
+      ariaLabel: 'add-personal-info-section',
+      icon: <Person />,
+    },
+    {
       type: 'radio',
       label: tr.AddSurveySectionActions.radioQuestion,
       ariaLabel: 'add-radio-question',
@@ -315,16 +336,31 @@ export default function AddSurveySectionActions(props: Props) {
             .map((button) => (
               <Grid key={button.type} style={{ padding: '0.5rem' }}>
                 <Box sx={styles.actionItem}>
-                  <Fab
-                    color="primary"
-                    aria-label={button.ariaLabel}
-                    size="small"
-                    onClick={handleAdd(button.type)}
-                    disabled={props.disabled}
-                    style={{ minWidth: '40px' }}
+                  <Tooltip
+                    title={
+                      personalInfoDisabled && button.type === 'personal-info'
+                        ? tr.AddSurveySectionActions.personalInfoDisabled
+                        : ''
+                    }
+                    placement="left"
                   >
-                    {button.icon}
-                  </Fab>
+                    <span>
+                      <Fab
+                        color="primary"
+                        aria-label={button.ariaLabel}
+                        size="small"
+                        onClick={handleAdd(button.type)}
+                        disabled={
+                          props.disabled ||
+                          (button.type === 'personal-info' &&
+                            personalInfoDisabled)
+                        }
+                        style={{ minWidth: '40px' }}
+                      >
+                        {button.icon}
+                      </Fab>
+                    </span>
+                  </Tooltip>
                   <Typography>{button.label}</Typography>
                 </Box>
               </Grid>

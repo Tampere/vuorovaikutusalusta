@@ -3,10 +3,11 @@
     "exportAnswers": "Export response data",
     "surveyAnswerExport": "Export survey response data",
     "chooseFileFormat": "Choose files to export",
-    "download": "download",
+    "download": "Download",
     "errorDownloadingCSV": "Failed to export CSV -file",
     "errorDownloadingGPKG": "Failed to export GeoPackage -file",
-    "attachments": "Survey response data attachments"
+    "attachments": "Survey response data attachments",
+    "personalInfo": "Include personal information"
   },
   "EditSurvey": {
     "errorFetchingSurvey": "Unable to access the survey. Please check the address or try again later.",
@@ -71,6 +72,8 @@
     "requireEmailRegistrationHelperText": "On the survey front page, the respondent must provide their email address. A link will be sent to the address, from which the survey can be answered. The survey can only be answered once from the same email address."
   },
   "EditSurveyEmail": {
+    "includePersonalInfo": "Include respondent's personal information",
+    "includePersonalInfoHelperText": "Responses to the personal information question, if any, will be included on the front page of the PDF report.",
     "enable": "Enable sending reports of the survey answers via email",
     "enableHelperText": "If you enable sending answer reports via email, reports of individual respondent's answers will be send as pdf-reports to the mailing list described below. At the end of the survey, the respondent is asked for an email address where the answer report can be sent to.",
     "autoSendTo": "Email recipients",
@@ -192,6 +195,8 @@
     "deleteGroup": "Delete group"
   },
   "AddSurveySectionActions": {
+    "personalInfoDisabled": "The personal information question has already been added to the survey.",
+    "personalInfoQuestion": "Add personal information question",
     "radioQuestion": "Add radio button question (single choice)",
     "checkBoxQuestion": "Add checkbox question (multiple choice)",
     "numericQuestion": "Add numeric question",
@@ -213,6 +218,7 @@
     "scale": "Scale"
   },
   "SurveySection": {
+    "personalInfoQuestion": "Personal information question",
     "radioQuestion": "Radio button question (single choice)",
     "checkBoxQuestion": "Radio button question (single choice)",
     "numericQuestion": "Numeric question",
@@ -258,6 +264,20 @@
     "attachmentFileFormats": "Supported file formats: jpg, jpeg, png, pdf, docx, xlsx.",
     "deleteUploadedFile": "Delete uploaded file",
     "replace": "Replace the selected file by clicking here."
+  },
+  "PersonalInfoQuestion": {
+    "label": "Personal information",
+    "nameLabel": "Name",
+    "emailLabel": "Email",
+    "phoneLabel": "Phone number",
+    "addressLabel": "Address",
+    "customLegend": "Custom field",
+    "customQuestion": "Other information...",
+    "nameError": "Check the name.",
+    "emailError": "Check the email address.",
+    "phoneError": "Check the phone number.",
+    "addressError": "Check the address.",
+    "customError": "Check the {label}."
   },
   "SurveyImageList": {
     "attributions": "Copyright & attributions",

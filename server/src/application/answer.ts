@@ -4,7 +4,7 @@ import {
   LocalizedText,
   MapLayer,
 } from '@interfaces/survey';
-import { getDb } from '@src/database';
+import { encryptionKey, getDb } from '@src/database';
 import useTranslations from '@src/translations/useTranslations';
 import { indexToAlpha } from '@src/utils';
 import { readFileSync, rmSync } from 'fs';
@@ -126,6 +126,28 @@ interface TypeDetails {
   optionTexts?: TextCell;
   pageIndex: number;
   predecessorSection?: number;
+}
+
+interface SubmissionPersonalInfo {
+  submissionId: string;
+  name: string | null;
+  email: string | null;
+  phone: string | null;
+  address: string | null;
+  custom: (string | null)[];
+  timeStamp: Date;
+  language: LanguageCode;
+  details: {
+    isRequired: boolean;
+    askName: boolean;
+    askEmail: boolean;
+    askPhone: boolean;
+    askAddress: boolean;
+    customQuestions: {
+      ask: boolean;
+      label: LocalizedText;
+    }[];
+  };
 }
 
 /**
@@ -310,23 +332,72 @@ function dbEntriesToFeatures(
   );
 }
 
+function getPersonalInfoHeadersForCSV(
+  input: SubmissionPersonalInfo = null,
+): string[] {
+  if (!input) return [];
+
+  const basicHeaders = [];
+
+  if (input.details.askName) basicHeaders.push('Vastaajan nimi');
+  if (input.details.askEmail) basicHeaders.push('Vastaajan sähköposti');
+  if (input.details.askPhone) basicHeaders.push('Vastaajan puhelinnumero');
+  if (input.details.askAddress) basicHeaders.push('Vastaajan osoite');
+
+  // Map asked custom questions to headers
+  const customQuestionHeaders = input.details.customQuestions
+    .map((e) => e.label['fi'])
+    .filter((e) => e.length > 0); // Filter out answers that are too short
+
+  return [...basicHeaders, ...customQuestionHeaders];
+}
+
 /**
  * Parses custom CSVJson format into csv
  * @param entries
  * @returns Promise resolving to csv formatted string
  */
-async function answerEntriesToCSV(entries: CSVJson): Promise<string> {
-  const { submissions, headers } = entries;
+async function answerEntriesToCSV(
+  entries?: CSVJson,
+  personalInfoRows?: SubmissionPersonalInfo[],
+): Promise<string> {
+  const { submissions, headers } = entries ?? { submissions: [] };
 
-  let csvData = `Vastaustunniste,Aikaleima,Vastauskieli,${headers.map(
-    (header) => `"${Object.values(header)[0].replace(/"/g, '""')}"`,
-  )}\n`;
+  const personalInfoHeaders = getPersonalInfoHeadersForCSV(
+    personalInfoRows[0] ?? null,
+  );
+
+  const basicHeaders = ['Vastaustunniste', 'Aikaleima', 'Vastauskieli'];
+  const allHeaders = [
+    ...basicHeaders,
+    ...personalInfoHeaders,
+    ...headers.map((h) => Object.values(h)[0]),
+  ];
+
+  let csvData = `${allHeaders.map((e) => `"${e}"`).toString()}\n`;
 
   for (let i = 0; i < submissions.length; ++i) {
     // Timestamp + submission language
     csvData += `${Object.keys(submissions[i])[0]},${moment(
       submissions[i].timeStamp,
     ).format('DD-MM-YYYY HH:mm')},${submissions[i].submissionLanguage}`;
+    csvData += ',';
+
+    const piRow = personalInfoRows.find(
+      (e) => e.submissionId == Object.keys(submissions[i])[0],
+    );
+
+    csvData += [
+      piRow.details.askName ? piRow.name : null,
+      piRow.details.askEmail ? piRow.email : null,
+      piRow.details.askPhone ? piRow.phone : null,
+      piRow.details.askAddress ? piRow.address : null,
+      ...piRow.custom,
+    ]
+      .filter((e) => e !== null)
+      .map((e) => `"${e}"`)
+      .toString();
+
     csvData += ',';
 
     headers.forEach((headerObj, _index) => {
@@ -339,11 +410,44 @@ async function answerEntriesToCSV(entries: CSVJson): Promise<string> {
       }
     });
 
-    csvData = csvData.substring(0, csvData.length - 1);
+    csvData =
+      csvData.substring(csvData.length - 1) === ','
+        ? csvData.substring(0, csvData.length - 1)
+        : csvData;
 
     // Newline
     csvData += '\n';
   }
+
+  // Add submissions that only contain personal info
+  csvData += personalInfoRows
+    .filter(
+      (pi) => !submissions.some((s) => Object.keys(s)[0] == pi.submissionId),
+    )
+    .map((piSub) => {
+      let rowString = `${piSub.submissionId},${moment(piSub.timeStamp).format(
+        'DD-MM-YYYY HH:mm',
+      )},${piSub.language},`;
+
+      rowString += [
+        piSub.details.askName ? piSub.name : null,
+        piSub.details.askEmail ? piSub.email : null,
+        piSub.details.askPhone ? piSub.phone : null,
+        piSub.details.askAddress ? piSub.address : null,
+        ...piSub.custom,
+      ]
+        .filter((e) => e !== null)
+        .map((e) => `"${e}"`)
+        .toString();
+
+      return rowString;
+    })
+    .join('\n');
+
+  csvData =
+    csvData.substring(csvData.length - 1) === ','
+      ? csvData.substring(0, csvData.length - 1)
+      : csvData;
 
   return csvData;
 }
@@ -352,11 +456,43 @@ async function answerEntriesToCSV(entries: CSVJson): Promise<string> {
  * @param surveyId
  * @returns Promise resolving to csv formatted string
  */
-export async function getCSVFile(surveyId: number): Promise<string> {
+export async function getCSVFile(
+  surveyId: number,
+  withPersonalInfo = false,
+): Promise<string> {
   const rows = await getAnswerDBEntries(surveyId);
-  if (!rows) return null;
+  const personalInfoRows = withPersonalInfo
+    ? await getPersonalInfosForSurvey(surveyId)
+    : null;
+  if (!rows && !personalInfoRows) return null;
 
-  return answerEntriesToCSV(await entriesToCSVFormat(rows, surveyId));
+  return answerEntriesToCSV(
+    await entriesToCSVFormat(rows, surveyId),
+    personalInfoRows,
+  );
+}
+
+/** Get decrypted personal info question answers entries for the given survey id */
+export async function getPersonalInfosForSurvey(surveyId: number) {
+  return getDb().manyOrNone<SubmissionPersonalInfo>(
+    `
+    SELECT
+      pi.submission_id AS "submissionId",
+      pgp_sym_decrypt(pi.name, $(encryptionKey)) AS name,
+      pgp_sym_decrypt(pi.email, $(encryptionKey)) AS email,
+      pgp_sym_decrypt(pi.phone, $(encryptionKey)) AS phone,
+      pgp_sym_decrypt(pi.address, $(encryptionKey)) AS address,
+      pgp_sym_decrypt(pi.custom, $(encryptionKey))::text[] AS custom,
+      sub.created_at as "timeStamp",
+      sub.language,
+      ps.details
+    FROM data.personal_info pi
+    LEFT JOIN data.submission sub ON pi.submission_id = sub.id
+    LEFT JOIN data.page_section ps ON pi.section_id = ps.id
+    WHERE sub.unfinished_token IS NULL AND sub.survey_id = $(surveyId);
+  `,
+    { surveyId, encryptionKey },
+  );
 }
 
 /**
@@ -841,6 +977,9 @@ function createCSVHeaders(sectionMetadata: SectionHeader[]) {
           });
         });
         break;
+      // Skip personal info headers (constructed separately)
+      case 'personal-info':
+        break;
       // numeric, free-text, slider
       default:
         allHeaders.push({
@@ -910,17 +1049,19 @@ function createCSVSubmissions(
 
   const allAnswers = [];
 
-  Object.entries(answersToSubmissionId).forEach(([key, value]) => {
-    allAnswers.push({
-      [key]: submissionAnswersToJson(
-        value as AnswerEntry[],
-        sectionIdToDetails,
-        predecessorIndexes,
-      ),
-      timeStamp: value[0].createdAt,
-      submissionLanguage: value[0].submissionLanguage,
-    });
-  });
+  Object.entries(answersToSubmissionId).forEach(
+    ([key, value]: [string, AnswerEntry[]]) => {
+      allAnswers.push({
+        [key]: submissionAnswersToJson(
+          value,
+          sectionIdToDetails,
+          predecessorIndexes,
+        ),
+        timeStamp: value[0].createdAt,
+        submissionLanguage: value[0].submissionLanguage,
+      });
+    },
+  );
 
   return allAnswers;
 }
@@ -1045,7 +1186,7 @@ function getValue(answer: AnswerEntry, answerType: string) {
 async function entriesToCSVFormat(
   answerEntries: AnswerEntry[],
   surveyId: number,
-): Promise<CSVJson> {
+): Promise<CSVJson | undefined> {
   if (!answerEntries) return;
 
   const sectionMetadata = await getSectionHeaders(surveyId);

@@ -3,10 +3,11 @@
     "exportAnswers": "Lataa vastaukset",
     "surveyAnswerExport": "Kyselyn vastausdatan lataus",
     "chooseFileFormat": "Valitse haluamasi tiedostomuodot",
-    "download": "lataa",
+    "download": "Lataa",
     "errorDownloadingCSV": "CSV -tiedoston lataaminen epäonnistui",
     "errorDownloadingGPKG": "GeoPackage -tiedoston lataaminen epäonnistui",
-    "attachments": "Vastausliitteet"
+    "attachments": "Vastausliitteet",
+    "personalInfo": "Sisällytä henkilötiedot"
   },
   "EditSurvey": {
     "errorFetchingSurvey": "Virhe haettaessa kyselyä. Tarkista osoite tai yritä myöhemmin uudestaan.",
@@ -71,6 +72,8 @@
     "requireEmailRegistrationHelperText": "Kyselyn etusivulla vastaajan täytyy antaa sähköpostiosoitteensa. Osoitteeseen toimitetaan linkki, josta pääsee vastaamaan kyselyyn. Kyselyyn voi vastata vain kerran samasta sähköpostiosoitteesta."
   },
   "EditSurveyEmail": {
+    "includePersonalInfo": "Inkludera respondentens personuppgifter",
+    "includePersonalInfoHelperText": "Eventuella svar på personuppgiftsfrågan inkluderas på framsidan av pdf-rapporten.",
     "enable": "Salli vastausten raportointi sähköpostitse",
     "enableHelperText": "Jos sallit vastausten raportoinnin sähköpostitse, lähetetään yksittäiset vastaukset pdf-raportteina alla määrittelemiisi osoitteisiin. Lisäksi vastaajalta kysytään kyselyn lopussa hänen sähköpostiosoitettaan, johon pdf-raportti voidaan toimittaa.",
     "autoSendTo": "Vastaanottajien sähköpostiosoitteet",
@@ -85,6 +88,20 @@
     "value": "Arvo",
     "addEntry": "Lisää rivi",
     "deleteEntry": "Poista rivi"
+  },
+  "PersonalInfoQuestion": {
+    "label": "Kysyttävät tiedot",
+    "nameLabel": "Nimi",
+    "emailLabel": "Sähköposti",
+    "phoneLabel": "Puhelinnumero",
+    "addressLabel": "Osoite",
+    "customLegend": "Mukautettu kenttä",
+    "customQuestion": "Muu tieto...",
+    "nameError": "Tarkista nimi.",
+    "emailError": "Tarkista sähköpostiosoite.",
+    "phoneError": "Tarkista puhelinnumero.",
+    "addressError": "Tarkista osoite.",
+    "customError": "Tarkista {label}."
   },
   "EditSurveyPage": {
     "name": "Sivun nimi",
@@ -192,6 +209,8 @@
     "deleteGroup": "Poista ryhmä"
   },
   "AddSurveySectionActions": {
+    "personalInfoDisabled": "Henkilötietokysymys on jo lisätty kyselyyn.",
+    "personalInfoQuestion": "Lisää henkilötietokysymys",
     "radioQuestion": "Lisää valintakysymys",
     "checkBoxQuestion": "Lisää monivalintakysymys",
     "numericQuestion": "Lisää numeerinen kysymys",
@@ -213,6 +232,7 @@
     "scale": "Asteikko"
   },
   "SurveySection": {
+    "personalInfoQuestion": "Henkilötietokysymys",
     "radioQuestion": "Valintakysymys",
     "checkBoxQuestion": "Monivalintakysymys",
     "numericQuestion": "Numeerinen kysymys",

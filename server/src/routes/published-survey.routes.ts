@@ -158,7 +158,11 @@ router.post(
     const pdfFile = await generatePdf(
       survey,
       { id: submissionId, timestamp },
-      answerEntries,
+      survey.email.includePersonalInfo
+        ? answerEntries
+        : answerEntries.filter(
+            (entry: AnswerEntry) => entry.type !== 'personal-info',
+          ),
       answerLanguage,
     );
 
