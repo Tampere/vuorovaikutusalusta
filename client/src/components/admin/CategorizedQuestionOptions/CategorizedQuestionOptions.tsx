@@ -192,6 +192,8 @@ function CategorizedOption({
         sx={{
           paddingLeft: secondOptionRowOffset,
           gap: 1,
+          minHeight: '2rem',
+          alignItems: 'center',
         }}
       >
         {option.categories &&
@@ -203,7 +205,7 @@ function CategorizedOption({
           onClick={() => {
             setDisplayGroup((prev) => !prev);
           }}
-          sx={{ paddingTop: 0, marginLeft: 'auto' }}
+          sx={{ marginLeft: 'auto' }}
           endIcon={displayGroups ? <ExpandLess /> : <ExpandMore />}
         >
           {displayGroups

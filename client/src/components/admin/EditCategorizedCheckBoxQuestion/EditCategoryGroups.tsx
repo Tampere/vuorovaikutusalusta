@@ -26,6 +26,7 @@ interface CategoryGroupProps {
   handleDeleteCategory: (categoryId: string) => void;
   handleDeleteCategoryGroup: () => void;
   handleEditCategoryGroupName: (name: string) => void;
+  handleCategoryGroupAdd: () => void;
   inputRef?: React.RefObject<HTMLInputElement>;
 }
 
@@ -85,6 +86,7 @@ function CategoryGroup({
   handleDeleteCategory,
   handleDeleteCategoryGroup,
   handleEditCategoryGroupName,
+  handleCategoryGroupAdd,
   inputRef,
 }: CategoryGroupProps) {
   const { language, tr } = useTranslations();
@@ -103,6 +105,12 @@ function CategoryGroup({
           value={name}
           onChange={(event) => {
             handleEditCategoryGroupName(event.target.value);
+          }}
+          onKeyDown={(event) => {
+            if (['Enter', 'NumpadEnter'].includes(event.nativeEvent.code)) {
+              event.preventDefault();
+              handleCategoryGroupAdd();
+            }
           }}
         />
         <Tooltip title={tr.EditCategorizedCheckBoxQuestion.deleteCategoryGroup}>
@@ -143,7 +151,10 @@ function CategoryGroup({
             }
           />
           <Button
-            disabled={!newCategory}
+            disabled={
+              !newCategory ||
+              categories.some((cat) => cat.name[language] === newCategory)
+            }
             endIcon={<ArrowForward />}
             onClick={() => {
               handleAddCategory(newCategory);
@@ -231,6 +242,7 @@ export function EditCategoryGroups({
           handleDeleteCategoryGroup={() => {
             handleCategoryGroupDelete(group.id);
           }}
+          handleCategoryGroupAdd={handleCategoryGroupAdd}
         />
       ))}
 
