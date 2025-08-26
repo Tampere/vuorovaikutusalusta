@@ -54,7 +54,14 @@ import {
   replaceIdsWithNull,
   replaceTranslationsWithNull,
 } from '@src/utils/schemaValidation';
-import React, { ReactNode, useMemo, useRef, useState } from 'react';
+import React, {
+  Component,
+  ReactElement,
+  ReactNode,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import ConfirmDialog from '../../ConfirmDialog';
 import EditAttachmentSection from '../EditAttachmentSection';
 import EditCheckBoxQuestion from '../EditCheckBoxQuestion';
@@ -139,7 +146,7 @@ export default function SurveySectionAccordion(props: Props) {
 
   const accordions: {
     [type in SurveyPageSection['type']]: {
-      icon: ReactNode;
+      icon: ReactElement;
       tooltip: string;
       form: ReactNode;
     };
@@ -264,7 +271,7 @@ export default function SurveySectionAccordion(props: Props) {
       ),
     },
     'grouped-checkbox': {
-      icon: <LibraryAddCheck />,
+      icon: <CategorizedCheckboxIcon />,
       tooltip: tr.SurveySection.groupedCheckboxQuestion,
       form: (
         <EditGroupedCheckBoxQuestion
@@ -340,9 +347,7 @@ export default function SurveySectionAccordion(props: Props) {
         >
           <div style={{ display: 'flex', paddingLeft: '1rem' }}>
             {accordion.tooltip ? (
-              <Tooltip title={accordion.tooltip}>
-                {accordion.icon as any}
-              </Tooltip>
+              <Tooltip title={accordion.tooltip}>{accordion.icon}</Tooltip>
             ) : (
               accordion.icon
             )}

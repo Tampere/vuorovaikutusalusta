@@ -107,7 +107,7 @@ export function PersonalInfoQuestion({
             {tr.PersonalInfoQuestion.nameLabel}
           </label>
           <input
-            aria-describedby={`${question.id}-nameError`}
+            aria-describedby={`${question.id}-nameInput-error`}
             id={`${question.id}-nameInput`}
             disabled={readOnly}
             autoFocus={autoFocus}
@@ -146,7 +146,7 @@ export function PersonalInfoQuestion({
             {tr.PersonalInfoQuestion.emailLabel}
           </label>
           <input
-            aria-describedby={`${question.id}-emailError`}
+            aria-describedby={`${question.id}-emailInput-error`}
             id={`${question.id}-emailInput`}
             type="email"
             disabled={readOnly}
@@ -186,7 +186,7 @@ export function PersonalInfoQuestion({
             {tr.PersonalInfoQuestion.phoneLabel}
           </label>
           <input
-            aria-describedby={`${question.id}-phoneError`}
+            aria-describedby={`${question.id}-phoneInput-error`}
             type="tel"
             id={`${question.id}-phoneInput`}
             disabled={readOnly}
@@ -232,7 +232,7 @@ export function PersonalInfoQuestion({
             {tr.PersonalInfoQuestion.addressLabel}
           </label>
           <input
-            aria-describedby={`${question.id}-addressError`}
+            aria-describedby={`${question.id}-addressInput-error`}
             id={`${question.id}-addressInput`}
             disabled={readOnly}
             autoFocus={autoFocus}
@@ -265,7 +265,7 @@ export function PersonalInfoQuestion({
           return (
             <PersonalInfoInputWrapper
               key={idx}
-              id={`${question.id}-customInput`}
+              id={`${question.id}-${idx}-customInput`}
               showError={showInputErrorsFor.custom[idx]}
               errorMessage={tr.PersonalInfoQuestion.customError.replace(
                 '{label}',
@@ -273,12 +273,12 @@ export function PersonalInfoQuestion({
               )}
               labelColor={survey.sectionTitleColor}
             >
-              <label htmlFor={`${question.id}-customInput`}>
+              <label htmlFor={`${question.id}-${idx}-customInput`}>
                 {cq.label?.[surveyLanguage] ?? ''}
               </label>
               <input
-                aria-describedby={`${question.id}-customError`}
-                id={`${question.id}-customInput`}
+                aria-describedby={`${question.id}-${idx}-customInput-error`}
+                id={`${question.id}-${idx}-customInput`}
                 disabled={readOnly}
                 autoFocus={autoFocus}
                 value={value.custom[idx] ?? ''}

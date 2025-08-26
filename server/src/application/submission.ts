@@ -195,6 +195,43 @@ async function savePersonalInfo(personalInfo: DBPersonalInfo) {
   );
 }
 
+/** Get decrypted personal info question answer from database */
+async function getPersonalInfo(
+  submissionId: number,
+): Promise<AnswerEntry<'personal-info'> | null> {
+  const result = await getDb().oneOrNone<DBPersonalInfo>(
+    `
+    SELECT
+      submission_id,
+      section_id,
+      pgp_sym_decrypt(name, $(encryptionKey)) as name,
+      pgp_sym_decrypt(email, $(encryptionKey)) as email,
+      pgp_sym_decrypt(phone, $(encryptionKey)) as phone,
+      pgp_sym_decrypt(address, $(encryptionKey)) as address,
+      pgp_sym_decrypt(custom, $(encryptionKey))::text[] as custom
+    FROM data.personal_info
+    WHERE submission_id = $(submissionId);
+  `,
+    { submissionId, encryptionKey },
+  );
+
+  if (!result) {
+    return null;
+  }
+
+  return {
+    type: 'personal-info',
+    sectionId: result.section_id,
+    value: {
+      name: result.name,
+      email: result.email,
+      phone: result.phone,
+      address: result.address,
+      custom: result.custom,
+    },
+  } as AnswerEntry<'personal-info'>;
+}
+
 /**
  * Check if given answer entries are valid.
  * @param answerEntries Answer entries to validate
@@ -654,7 +691,7 @@ function dbAnswerEntriesToAnswerEntries(
         case 'categorized-checkbox': {
           // Try to find an existing entry for this section
           let entry = entries.find(
-            (entry): entry is AnswerEntry & { type: 'categorized-checkbox' } =>
+            (entry): entry is AnswerEntry<'categorized-checkbox'> =>
               entry.sectionId === row.section_id,
           );
           // If the entry doesn't exist, create it
@@ -801,6 +838,15 @@ export async function getSurveyAnswerLanguage(token: string) {
  * @returns Answer entries for the submission
  */
 export async function getUnfinishedAnswerEntries(token: string) {
+  const { id: submissionId } = await getDb().oneOrNone<{ id: number }>(
+    `SELECT id FROM data.submission WHERE unfinished_token = $1`,
+    [token],
+  );
+
+  if (!submissionId) {
+    throw new NotFoundError(`Token not found`);
+  }
+
   const rows = await getDb()
     .manyOrNone<
       DBAnswerEntry & {
@@ -836,10 +882,13 @@ export async function getUnfinishedAnswerEntries(token: string) {
     .catch(() => {
       throw new BadRequestError(`Invalid token`);
     });
-  if (!rows.length) {
-    throw new NotFoundError(`Token not found`);
-  }
-  return dbAnswerEntriesToAnswerEntries(rows);
+
+  const personalInfo = await getPersonalInfo(submissionId);
+
+  return [
+    ...(rows ? dbAnswerEntriesToAnswerEntries(rows) : []),
+    ...(personalInfo ? [personalInfo] : []),
+  ];
 }
 
 /**
@@ -887,7 +936,7 @@ export async function getAnswerEntries(
   );
 
   const personalInfo = withPersonalInfo
-    ? [await getPersonalInfoEntry(submissionId)]
+    ? [await getPersonalInfo(submissionId)]
     : [];
 
   return [...dbAnswerEntriesToAnswerEntries(rows), ...personalInfo];
@@ -904,42 +953,6 @@ export async function getTimestamp(submissionId: number) {
     [submissionId],
   );
   return updated_at;
-}
-
-async function getPersonalInfoEntry(
-  submissionId: number,
-): Promise<AnswerEntry | null> {
-  const result = await getDb().oneOrNone<DBPersonalInfo>(
-    `
-    SELECT
-      submission_id,
-      section_id,
-      pgp_sym_decrypt(name, $(encryptionKey)) as name,
-      pgp_sym_decrypt(email, $(encryptionKey)) as email,
-      pgp_sym_decrypt(phone, $(encryptionKey)) as phone,
-      pgp_sym_decrypt(address, $(encryptionKey)) as address,
-      pgp_sym_decrypt(custom, $(encryptionKey))::text[] as custom
-    FROM data.personal_info
-    WHERE submission_id = $(submissionId);
-  `,
-    { submissionId, encryptionKey },
-  );
-
-  if (!result) {
-    return null;
-  }
-
-  return {
-    type: 'personal-info',
-    sectionId: result.section_id,
-    value: {
-      name: result.name,
-      email: result.email,
-      phone: result.phone,
-      address: result.address,
-      custom: result.custom,
-    },
-  } as AnswerEntry;
 }
 
 /**
@@ -1052,7 +1065,7 @@ export async function getSubmissionsForSurvey(
         id: x.id,
         timestamp: x.timestamp,
         answerEntries: [
-          dbAnswerEntriesToAnswerEntries(x.entries),
+          ...dbAnswerEntriesToAnswerEntries(x.entries),
           ...(x.personalInfo ? [x.personalInfo] : []),
         ],
       }) as Submission,

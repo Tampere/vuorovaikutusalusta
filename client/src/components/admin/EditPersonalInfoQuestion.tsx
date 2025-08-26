@@ -10,7 +10,7 @@ import {
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { Check } from '@mui/icons-material';
-import React from 'react';
+import React, { Fragment } from 'react';
 
 interface Props {
   section: SurveyPersonalInfoQuestion;
@@ -161,7 +161,7 @@ export function EditPersonalInfoQuestion({ section, onChange }: Props) {
         />
         {section.customQuestions.map((cq, idx) => {
           return (
-            <>
+            <Fragment key={idx}>
               <FormControlLabel
                 key={idx}
                 sx={{ marginLeft: '-9px' }}
@@ -241,7 +241,7 @@ export function EditPersonalInfoQuestion({ section, onChange }: Props) {
                   </>
                 }
               />
-            </>
+            </Fragment>
           );
         })}
       </FormGroup>

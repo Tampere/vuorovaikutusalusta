@@ -1,6 +1,8 @@
 import React, { SVGProps } from 'react';
-
-export function CategorizedCheckboxIcon(props: SVGProps<SVGSVGElement>) {
+export const CategorizedCheckboxIcon = React.forwardRef<
+  SVGSVGElement,
+  SVGProps<SVGSVGElement>
+>((props, ref) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -8,6 +10,7 @@ export function CategorizedCheckboxIcon(props: SVGProps<SVGSVGElement>) {
       height="24"
       viewBox="0 0 24 24"
       fill="none"
+      ref={ref}
       {...props}
     >
       <path
@@ -32,4 +35,6 @@ export function CategorizedCheckboxIcon(props: SVGProps<SVGSVGElement>) {
       />
     </svg>
   );
-}
+});
+
+CategorizedCheckboxIcon.displayName = 'CategorizedCheckboxIcon';
