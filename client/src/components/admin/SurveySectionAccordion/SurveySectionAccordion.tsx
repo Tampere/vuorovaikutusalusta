@@ -271,7 +271,7 @@ export default function SurveySectionAccordion(props: Props) {
       ),
     },
     'grouped-checkbox': {
-      icon: <CategorizedCheckboxIcon />,
+      icon: <LibraryAddCheck />,
       tooltip: tr.SurveySection.groupedCheckboxQuestion,
       form: (
         <EditGroupedCheckBoxQuestion
