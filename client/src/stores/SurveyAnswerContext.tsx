@@ -153,6 +153,13 @@ export function getEmptyAnswer(section: SurveyPageSection): AnswerEntry {
         type: section.type,
         value: [],
       };
+    case 'categorized-checkbox':
+      return {
+        sectionId: section.id,
+        type: section.type,
+        value: [],
+        filters: [],
+      };
     case 'attachment':
       return {
         sectionId: section.id,
@@ -230,7 +237,11 @@ export function useSurveyAnswers() {
     if (!answer.hasOwnProperty('value')) return errors; // Shouldn't happen but used just in case to prevent errors
 
     // Checkbox question validation - check possible answer limits
-    if (question.type === 'checkbox' || question.type === 'grouped-checkbox') {
+    if (
+      question.type === 'checkbox' ||
+      question.type === 'grouped-checkbox' ||
+      question.type === 'categorized-checkbox'
+    ) {
       const value = answer.value as (number | string)[];
       // Pick only non-empty selections (numbers and non-empty strings) for the check
       const nonEmptySelections = value.filter(

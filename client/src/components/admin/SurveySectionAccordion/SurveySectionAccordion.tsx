@@ -1,5 +1,6 @@
 import {
   Conditions,
+  SurveyCategorizedCheckboxQuestion,
   SurveyCheckboxQuestion,
   SurveyDocumentSection,
   SurveyFollowUpSection,
@@ -53,7 +54,14 @@ import {
   replaceIdsWithNull,
   replaceTranslationsWithNull,
 } from '@src/utils/schemaValidation';
-import React, { ReactNode, useMemo, useRef, useState } from 'react';
+import React, {
+  Component,
+  ReactElement,
+  ReactNode,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import ConfirmDialog from '../../ConfirmDialog';
 import EditAttachmentSection from '../EditAttachmentSection';
 import EditCheckBoxQuestion from '../EditCheckBoxQuestion';
@@ -72,6 +80,8 @@ import EditTextSection from '../EditTextSection';
 import { SectionDetails } from './SectionDetails';
 import { DragHandle } from '@src/components/DragAndDrop/SortableItem';
 import { EditPersonalInfoQuestion } from '../EditPersonalInfoQuestion';
+import EditCategorizedCheckBoxQuestion from '../EditCategorizedCheckBoxQuestion/EditCategorizedCheckBoxQuestion';
+import { CategorizedCheckboxIcon } from '@src/components/icons/CategorizedCheckboxIcon';
 
 const styles = {
   accordion: {
@@ -136,7 +146,7 @@ export default function SurveySectionAccordion(props: Props) {
 
   const accordions: {
     [type in SurveyPageSection['type']]: {
-      icon: ReactNode;
+      icon: ReactElement;
       tooltip: string;
       form: ReactNode;
     };
@@ -261,12 +271,23 @@ export default function SurveySectionAccordion(props: Props) {
       ),
     },
     'grouped-checkbox': {
-      icon: <LibraryAddCheck />,
+      icon: <CategorizedCheckboxIcon />,
       tooltip: tr.SurveySection.groupedCheckboxQuestion,
       form: (
         <EditGroupedCheckBoxQuestion
           disabled={props.disabled}
           section={props.section as SurveyGroupedCheckboxQuestion}
+          onChange={handleEdit}
+        />
+      ),
+    },
+    'categorized-checkbox': {
+      icon: <CategorizedCheckboxIcon />,
+      tooltip: tr.SurveySection.categorizedCheckboxQuestion,
+      form: (
+        <EditCategorizedCheckBoxQuestion
+          disabled={props.disabled}
+          section={props.section as SurveyCategorizedCheckboxQuestion}
           onChange={handleEdit}
         />
       ),
@@ -326,9 +347,7 @@ export default function SurveySectionAccordion(props: Props) {
         >
           <div style={{ display: 'flex', paddingLeft: '1rem' }}>
             {accordion.tooltip ? (
-              <Tooltip title={accordion.tooltip}>
-                {accordion.icon as any}
-              </Tooltip>
+              <Tooltip title={accordion.tooltip}>{accordion.icon}</Tooltip>
             ) : (
               accordion.icon
             )}

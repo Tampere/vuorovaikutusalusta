@@ -127,7 +127,7 @@ export function SurveyFollowUpSections({
           component="h4"
           sx={{
             fontWeight: 700,
-            color: '#676767',
+            color: '#535353',
           }}
         >
           {tr.SurveyStepper.followUpSections}

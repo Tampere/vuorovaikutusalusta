@@ -216,11 +216,11 @@ export default function EditGroupedCheckBoxQuestion({
         }}
       />
 
-      <Box sx={styles.row}>
+      <Box display="flex" alignItems="center" gap={1.5}>
         <Fab
           color="primary"
           disabled={disabled}
-          aria-label="add-checkbox-group"
+          aria-label={tr.EditGroupedCheckBoxQuestion.addGroup}
           size="small"
           onClick={() => {
             // Add a temporary new ID for the group
@@ -242,7 +242,7 @@ export default function EditGroupedCheckBoxQuestion({
         >
           <Add />
         </Fab>
-        <Typography style={{ paddingLeft: '1rem' }}>
+        <Typography aria-hidden>
           {tr.EditGroupedCheckBoxQuestion.addGroup}
         </Typography>
       </Box>

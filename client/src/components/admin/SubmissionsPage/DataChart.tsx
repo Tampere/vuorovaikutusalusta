@@ -10,7 +10,7 @@ import {
   Tooltip,
 } from 'recharts';
 import React from 'react';
-import { format, getWeek, getYear, parse, isDate } from 'date-fns';
+import { format, getWeek, getYear, parse } from 'date-fns';
 import { Box, Skeleton, useTheme } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
 

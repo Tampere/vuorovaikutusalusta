@@ -18,6 +18,7 @@ import {
   ViewComfyAlt,
 } from '@mui/icons-material';
 import { Box, Fab, Grid, Tooltip, Typography } from '@mui/material';
+import { CategorizedCheckboxIcon } from '@src/components/icons/CategorizedCheckboxIcon';
 import { duplicateFiles } from '@src/controllers/AdminFileController';
 import { useClipboard } from '@src/stores/ClipboardContext';
 import { useSurvey } from '@src/stores/SurveyContext';
@@ -188,6 +189,19 @@ export default function AddSurveySectionActions(props: Props) {
       },
       groups: [],
     },
+    'categorized-checkbox': {
+      type: 'categorized-checkbox',
+      isRequired: false,
+      title: initializeLocalizedObject(''),
+      answerLimits: {
+        min: 0,
+        max: 2,
+      },
+      options: [
+        { text: initializeLocalizedObject(''), draftId: generateDraftId() },
+      ],
+      categoryGroups: [],
+    },
     image: {
       type: 'image',
       title: initializeLocalizedObject(''),
@@ -290,6 +304,12 @@ export default function AddSurveySectionActions(props: Props) {
       label: tr.AddSurveySectionActions.groupedCheckboxQuestion,
       ariaLabel: 'add-grouped-checkbox-question',
       icon: <LibraryAddCheck />,
+    },
+    {
+      type: 'categorized-checkbox',
+      label: tr.AddSurveySectionActions.categorizedCheckboxQuestion,
+      ariaLabel: 'add-categorized-checkbox-question',
+      icon: <CategorizedCheckboxIcon fill="white" />,
     },
     {
       type: 'attachment',

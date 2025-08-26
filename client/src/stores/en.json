@@ -194,6 +194,15 @@
     "untitledGroup": "Untitled group",
     "deleteGroup": "Delete group"
   },
+  "EditCategorizedCheckBoxQuestion": {
+    "categoryGroupsLabel": "Categories",
+    "categoryAddPlaceholder": "Enter category to add...",
+    "addCategory": "Add category",
+    "addOption": "Add answer option",
+    "modifyCategoryGroups": "Modify category groups",
+    "hideCategorySettings": "Hide category settings",
+    "deleteCategoryGroup": "Delete category"
+  },
   "AddSurveySectionActions": {
     "personalInfoDisabled": "The personal information question has already been added to the survey.",
     "personalInfoQuestion": "Add personal information question",
@@ -208,6 +217,7 @@
     "matrixQuestion": "Add likert scale question",
     "multiMatrixQuestion": "Add multiple choice likert scale question",
     "groupedCheckboxQuestion": "Add grouped checkbox question",
+    "categorizedCheckboxQuestion": "Add categorized checkbox question",
     "imageSection": "Add image section",
     "documentSection": "Add document section",
     "attachmentSection": "Add attachment section"
@@ -230,6 +240,7 @@
     "matrixQuestion": "Likert scale question",
     "multiMatrixQuestion": "Multiple choice likert scale question",
     "groupedCheckboxQuestion": "Grouped checkbox question",
+    "categorizedCheckboxQuestion": "Categorized checkbox question",
     "imageSection": "Image section",
     "documentSection": "Document section",
     "attachmentSection": "Attachment section",
@@ -555,6 +566,15 @@
     "indicatorTextMaxReached": "You have selected all {numbers} options.",
     "optionsSelectedInGroup": "{number} options selected."
   },
+  "CategorizedCheckBoxQuestion": {
+    "hideOption": "Does not apply to me, hide",
+    "showOption": "Restore hidden option",
+    "singleHiddenOption": "One hidden option",
+    "hiddenOptions": "{x} hidden options",
+    "categorySelectLabel": "Filter options",
+    "categorySelectDescription": "This question has {x} answer options. If you wish, you can filter which options are shown to you. Filter the visible options by selecting the most suitable categories below.",
+    "categorySelectDescriptionLimited": "This question has {0} answer options, of which you can select a maximum of {1}. If you wish, you can filter which options are shown to you. Filter the visible options by selecting the most suitable categories below."
+  },
   "SubmissionInfoDialog": {
     "title": "Submit answers",
     "text": "If you want a copy of your answers, please write your email address in the provided field.",
@@ -654,7 +674,8 @@
     "discard": "Discard changes",
     "edit": "Edit",
     "copy": "Copy",
-    "close": "Close"
+    "close": "Close",
+    "add": "Add"
   },
   "options": {
     "yes": "Yes",

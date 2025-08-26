@@ -46,6 +46,8 @@ function getQuestionIcon(
       return <ViewComfyAlt color="primary" />;
     case 'grouped-checkbox':
       return <LibraryAddCheck color="primary" />;
+    case 'categorized-checkbox':
+      return <LibraryAddCheck color="primary" />;
     case 'attachment':
       return <AttachFile color="primary" />;
     case 'free-text':

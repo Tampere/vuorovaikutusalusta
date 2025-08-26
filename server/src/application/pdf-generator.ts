@@ -352,16 +352,9 @@ function getContent(
         },
       ];
     }
-    case 'checkbox': {
-      return [
-        heading,
-        ...answerEntry.value.map((value) => ({
-          text: getOptionSelectionText(value, options, language),
-          style,
-        })),
-      ];
-    }
-    case 'grouped-checkbox': {
+    case 'checkbox':
+    case 'grouped-checkbox':
+    case 'categorized-checkbox': {
       return [
         heading,
         ...answerEntry.value.map((value) => ({

@@ -88,6 +88,12 @@ export const buttonOverrides: Components<Omit<Theme, 'components'>> = {
       },
     },
   },
+
+  MuiCssBaseline: {
+    styleOverrides: {
+      'input:focus-visible': { outline: defaultFocusOutlineShorthand },
+    },
+  },
 };
 
 export const inputOverrides: Components<Omit<Theme, 'components'>> = {

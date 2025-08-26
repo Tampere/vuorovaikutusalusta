@@ -29,6 +29,7 @@ import SliderQuestion from './SliderQuestion';
 import SortingQuestion from './SortingQuestion';
 import MultiMatrixQuestion from './MultiMatrixQuestion';
 import { PersonalInfoQuestion } from './PersonalInfoQuestion';
+import { CategorizedCheckBoxQuestion } from './CategorizedCheckBoxQuestion';
 
 interface Props {
   question: SurveyQuestionType;
@@ -313,6 +314,31 @@ function SurveyQuestion({
           }}
           question={question}
           setDirty={setDirty}
+        />
+      )}
+      {question.type === 'categorized-checkbox' && (
+        <CategorizedCheckBoxQuestion
+          readOnly={readOnly}
+          value={value as number[]}
+          selectedFilters={
+            (
+              answers.find(
+                (a) => a.sectionId === question.id,
+              ) as AnswerEntry<'categorized-checkbox'>
+            )?.filters || []
+          }
+          onChange={(value, filters) => {
+            updateAnswer({
+              sectionId: question.id,
+              type: question.type,
+              value,
+              filters,
+            });
+          }}
+          question={question}
+          setDirty={setDirty}
+          validationErrors={validationErrors}
+          isFollowUp={props.isFollowUp}
         />
       )}
       {question.type === 'attachment' && (

@@ -2,6 +2,7 @@ import {
   Conditions,
   File,
   LocalizedText,
+  SectionOptionCategoryGroup,
   SectionOption,
   SectionOptionGroup,
   Survey,
@@ -18,6 +19,9 @@ import {
   SurveyPageSidebarType,
   SurveyRadioQuestion,
   SurveyTheme,
+  SurveySortingQuestion,
+  SurveyCategorizedCheckboxQuestion,
+  SectionOptionCategory,
 } from '@interfaces/survey';
 import { User } from '@interfaces/user';
 import {
@@ -32,14 +36,17 @@ import {
   InternalServerError,
   NotFoundError,
 } from '@src/error';
+
 import { isAdmin } from '@src/user';
 
 import { geometryToGeoJSONFeatureCollection } from '@src/utils';
 import { Geometry } from 'geojson';
+import pgPromise from 'pg-promise';
 
 const sectionTypesWithOptions: SurveyPageSection['type'][] = [
   'radio',
   'checkbox',
+  'categorized-checkbox',
   'sorting',
 ];
 
@@ -151,6 +158,33 @@ interface DBOptionGroup {
 }
 
 /**
+ * DB row of table data.option_category
+ */
+interface DBSectionOptionCategory {
+  id: string;
+  name: LocalizedText;
+  category_group_id: string;
+}
+
+/**
+ * DB row of table data.option_category_group
+ */
+interface DBSectionOptionCategoryGroup {
+  id: string;
+  idx: number;
+  name: LocalizedText;
+  section_id: number;
+}
+
+/**
+ * DB row of table data.option_category_assignment
+ */
+interface DBSectionOptionCategoryAssignment {
+  option_id: number;
+  category_id: string;
+}
+
+/**
  * DB condition row of table data.section_conditions
  */
 interface DBAllConditions {
@@ -163,7 +197,7 @@ interface DBAllConditions {
 }
 
 /**
- * Type for join DB query containing survey row and selected page, section & option columns.
+ * Type for join DB query containing survey row and selected page, section, option and category columns.
  */
 type DBSurveyJoin = DBSurvey & {
   page_id: number;
@@ -189,6 +223,7 @@ type DBSurveyJoin = DBSurvey & {
   option_text: LocalizedText;
   option_group_id: number;
   option_info: LocalizedText;
+  option_categories?: SectionOptionCategory[];
   theme_id: number;
   theme_name: string;
   theme_data: SurveyTheme;
@@ -381,7 +416,13 @@ export async function getPublishedSurvey(
       option.text as option_text,
       option.idx as option_idx,
       option.group_id as option_group_id,
-      option.info as option_info
+      option.info as option_info,
+      (
+      SELECT array_agg(jsonb_build_object('id', ca.category_id, 'name', cat.name)) 
+      FROM data.option_category_assignment ca 
+      LEFT JOIN data.option_category cat ON ca.category_id = cat.id
+      WHERE ca.option_id = option.id
+      ) as option_categories
     FROM (
       SELECT
         survey_page.*,
@@ -477,6 +518,10 @@ export async function getPublishedSurvey(
         [optionGroupIds],
       );
 
+  const sectionCategoryGroups = await getSectionCategoryGroups(
+    rows.map((row) => row.section_id).filter(Boolean),
+  );
+
   // Get all follow-up section and survey page conditions from the database
   const allConditions = await getSectionConditions(
     rows.map((row) => row.section_id).filter(Boolean),
@@ -562,6 +607,17 @@ export async function getPublishedSurvey(
           }
         }
 
+        if (linkedSection?.type === 'categorized-checkbox') {
+          linkedSection.categoryGroups = sectionCategoryGroups
+            .filter((group) => group.sectionId === linkedSection.id)
+            .map<SectionOptionCategoryGroup>((group) => ({
+              id: group.id,
+              idx: group.idx,
+              name: group.name,
+              categories: group.categories,
+            }));
+        }
+
         // If question contains options, add the option in the current row there
         if ('options' in linkedSection) {
           const option = dbSurveyJoinToOption(row);
@@ -572,6 +628,17 @@ export async function getPublishedSurvey(
       } else {
         page.sections.push(section);
       }
+    }
+
+    if (section?.type === 'categorized-checkbox') {
+      section.categoryGroups = sectionCategoryGroups
+        .filter((group) => group.sectionId === section.id)
+        .map<SectionOptionCategoryGroup>((group) => ({
+          id: group.id,
+          idx: group.idx,
+          name: group.name,
+          categories: group.categories,
+        }));
     }
 
     // Only look for options if the section type allows options
@@ -636,7 +703,13 @@ export async function getSurvey(params: { id: number } | { name: string }) {
       option.text as option_text,
       option.idx as option_idx,
       option.group_id as option_group_id,
-      option.info as option_info
+      option.info as option_info,
+      (
+      SELECT array_agg(jsonb_build_object('id', ca.category_id, 'name', cat.name)) 
+      FROM data.option_category_assignment ca 
+      LEFT JOIN data.option_category cat ON ca.category_id = cat.id
+      WHERE ca.option_id = option.id
+      ) as option_categories
     FROM (
       SELECT
         survey_page.*,
@@ -710,6 +783,10 @@ export async function getSurvey(params: { id: number } | { name: string }) {
         [optionGroupIds],
       );
 
+  const sectionCategoryGroups = await getSectionCategoryGroups(
+    rows.map((row) => row.section_id).filter(Boolean),
+  );
+
   // Get all follow-up section and survey page conditions from the database
   const allConditions = await getSectionConditions(
     rows.map((row) => row.section_id).filter(Boolean),
@@ -795,6 +872,17 @@ export async function getSurvey(params: { id: number } | { name: string }) {
           }
         }
 
+        if (linkedSection?.type === 'categorized-checkbox') {
+          linkedSection.categoryGroups = sectionCategoryGroups
+            .filter((group) => group.sectionId === linkedSection.id)
+            .map<SectionOptionCategoryGroup>((group) => ({
+              id: group.id,
+              idx: group.idx,
+              name: group.name,
+              categories: group.categories,
+            }));
+        }
+
         // If question contains options, add the option in the current row there
         if ('options' in linkedSection) {
           const option = dbSurveyJoinToOption(row);
@@ -807,10 +895,25 @@ export async function getSurvey(params: { id: number } | { name: string }) {
       }
     }
 
+    if (section?.type === 'categorized-checkbox') {
+      section.categoryGroups = sectionCategoryGroups
+        .filter((group) => group.sectionId === section.id)
+        .map<SectionOptionCategoryGroup>((group) => ({
+          id: group.id,
+          idx: group.idx,
+          name: group.name,
+          categories: group.categories,
+        }));
+    }
+
     // Only look for options if the section type allows options
     if (sectionTypesWithOptions.includes(section?.type)) {
       // For some reason TS cannot infer the section here correctly from the if above - assume the type in the new variable
-      const question = section as SurveyRadioQuestion | SurveyCheckboxQuestion;
+      const question = section as
+        | SurveyRadioQuestion
+        | SurveyCheckboxQuestion
+        | SurveySortingQuestion
+        | SurveyCategorizedCheckboxQuestion;
       // Try to find the pre-existing question option object
       let option = question.options.find(
         (option) => option.id === row.option_id,
@@ -925,9 +1028,14 @@ export async function createSurvey(user: User) {
  * @param index Index
  * @returns Updated DB section
  */
-async function upsertSection(section: DBSurveyPageSection, index: number) {
+async function upsertSection(
+  section: DBSurveyPageSection,
+  index: number,
+  tx?: pgPromise.ITask<{}>,
+) {
+  const conn = tx || getDb();
   // Negative IDs can be assigned as temporary IDs for e.g. drag and drop - change them to null
-  return await getDb().one<DBSurveyPageSection>(
+  return await conn.one<DBSurveyPageSection>(
     `
     INSERT INTO data.page_section (id, survey_page_id, idx, title, type, body, details, parent_section, info, file_name, file_path, predecessor_section)
     VALUES (
@@ -987,9 +1095,14 @@ async function upsertSection(section: DBSurveyPageSection, index: number) {
  * @param index Index
  * @returns Updated DB option
  */
-async function upsertOption(option: DBSectionOption, index: number) {
+async function upsertOption(
+  option: DBSectionOption,
+  index: number,
+  tx: pgPromise.ITask<{}>,
+) {
+  const conn = tx ?? getDb();
   // Negative IDs can be assigned as temporary IDs for e.g. drag and drop - change them to null
-  return await getDb().one<DBSectionOption>(
+  return await conn.one<DBSectionOption>(
     `
     INSERT INTO data.option (id, text, section_id, idx, group_id, info)
     VALUES (
@@ -1027,14 +1140,70 @@ async function upsertOption(option: DBSectionOption, index: number) {
 }
 
 /**
+ * Upserts (updates or inserts) given option category assignments.
+ * @param group Option category group
+ * @param index Index
+ * @returns Updated DB option category group
+ */
+async function insertOptionCategoryAssignment(
+  assignment: DBSectionOptionCategoryAssignment,
+  tx?: pgPromise.ITask<{}>,
+) {
+  const conn = tx ?? getDb();
+  return await conn.one<DBSectionOptionCategoryAssignment>(
+    `
+    INSERT INTO data.option_category_assignment (option_id, category_id)
+    VALUES ($(optionId), $(categoryId))
+    RETURNING option_id, category_id
+    `,
+    {
+      optionId: assignment.option_id,
+      categoryId: assignment.category_id,
+    },
+  );
+}
+
+/**
+ * Inserts a new option category into the database.
+ * @param Option category
+ * @returns Inserted DB option category
+ */
+async function insertOptionCategory(
+  category: Omit<DBSectionOptionCategory, 'id'>,
+  groupId: string,
+  tx?: pgPromise.ITask<{}>,
+) {
+  const conn = tx ?? getDb();
+  return await conn.one<DBSectionOptionCategory>(
+    `
+    INSERT INTO data.option_category (name, category_group_id)
+    VALUES (
+      $(name)::json,
+      $(groupId)
+    )
+    RETURNING id, name, category_group_id
+  `,
+    {
+      name: category.name,
+      groupId,
+    },
+  );
+}
+
+/**
  * Upserts (updates or inserts) given option group with given index.
  * @param group Option group
  * @param index Index
  * @returns Updated DB option group
  */
-async function upsertOptionGroup(group: DBOptionGroup, index: number) {
+async function upsertOptionGroup(
+  group: DBOptionGroup,
+  index: number,
+  tx?: pgPromise.ITask<{}>,
+) {
+  const conn = tx ?? getDb();
   // Negative IDs can be assigned as temporary IDs for e.g. drag and drop - change them to null
-  return await getDb().one<DBOptionGroup>(
+  return await conn.one<DBOptionGroup>(
     `
     INSERT INTO data.option_group (id, name, idx, section_id)
     VALUES (
@@ -1074,7 +1243,9 @@ async function upsertSectionConditions(
   sectionId: number,
   pageId: number,
   conditions: Conditions,
+  tx?: pgPromise.ITask<{}>,
 ) {
+  const conn = tx ?? getDb();
   const conditionRows = conditionsToRows(conditions, sectionId, pageId);
 
   if (conditionRows.length === 0) return;
@@ -1087,7 +1258,7 @@ async function upsertSectionConditions(
         greater_than = excluded.greater_than
       RETURNING *`;
 
-  const rows = await getDb().manyOrNone(upsertQuery);
+  const rows = await conn.manyOrNone(upsertQuery);
 
   if (Object.values(conditions).some((values) => values?.length > 0) && !rows)
     throw new Error('Unable to upsert conditions');
@@ -1102,16 +1273,19 @@ async function upsertSectionConditions(
 async function deleteSectionConditions(
   pageIds: number[],
   sectionIds: number[],
+  tx?: pgPromise.ITask<{}>,
 ) {
   let rows: { id: number }[];
 
+  const conn = tx ?? getDb();
+
   if (pageIds && pageIds.length > 0) {
-    rows = await getDb().manyOrNone<{ id: number }>(
+    rows = await conn.manyOrNone<{ id: number }>(
       'DELETE FROM data.section_conditions WHERE survey_page_id = ANY ($1) RETURNING id',
       [pageIds],
     );
   } else {
-    rows = await getDb().manyOrNone<{ id: number }>(
+    rows = await conn.manyOrNone<{ id: number }>(
       'DELETE FROM data.section_conditions WHERE section_id = ANY ($1) RETURNING id',
       [sectionIds],
     );
@@ -1128,6 +1302,57 @@ async function getSectionConditions(sectionIds: number[]) {
   );
 }
 
+async function getSectionCategoryGroups(sectionIds: number[]) {
+  const result = await getDb().manyOrNone<
+    DBSectionOptionCategoryGroup & {
+      category_id: string;
+      category_name: LocalizedText;
+    }
+  >(
+    `
+    SELECT 
+        cg.id, 
+        cg.idx, 
+        cg.name, 
+        cg.section_id,
+        c.id AS category_id,
+        c.name AS category_name 
+    FROM data.option_category_group cg
+    LEFT JOIN data.option_category c ON c.category_group_id = cg.id
+    WHERE section_id = ANY ($1)
+    ORDER BY cg.section_id, cg.idx ASC`,
+    [sectionIds],
+  );
+  return result.reduce<(SectionOptionCategoryGroup & { sectionId: number })[]>(
+    (groups, row) => {
+      // Try to find the pre-existing group
+      let group = groups.find((g) => g.id === row.id);
+      if (!group) {
+        // Group not yet added - add converted row to survey
+        group = {
+          id: row.id,
+          name: row.name,
+          idx: row.idx,
+          sectionId: row.section_id,
+          categories: [],
+        };
+        groups.push(group);
+      }
+
+      // Add the category to the group
+      if (row.category_id) {
+        group.categories.push({
+          id: row.category_id,
+          name: row.category_name,
+        });
+      }
+
+      return groups;
+    },
+    [],
+  );
+}
+
 /**
  * When updating a survey, deletes all sections (and subsections linked to them) that should be removed from DB.
  * @param surveyId Survey ID
@@ -1136,9 +1361,11 @@ async function getSectionConditions(sectionIds: number[]) {
 async function deleteRemovedSections(
   surveyId: number,
   newSections: DBSurveyPageSection[],
+  tx?: pgPromise.ITask<{}>,
 ) {
+  const conn = tx ?? getDb();
   // Get all existing sections
-  const rows = await getDb().manyOrNone<{ id: number }>(
+  const rows = await conn.manyOrNone<{ id: number }>(
     `SELECT id FROM data.page_section WHERE parent_section IS NULL AND predecessor_section IS NULL AND survey_page_id IN (
        SELECT id FROM data.survey_page WHERE survey_id = $1
     )`,
@@ -1151,7 +1378,7 @@ async function deleteRemovedSections(
     (newSections ?? []).every((newSection) => newSection.id !== id),
   );
   if (removedSectionIds.length) {
-    await getDb().none(
+    await conn.none(
       `DELETE FROM data.page_section WHERE id = ANY ($1) OR parent_section = ANY ($1) OR predecessor_section = ANY($1)`,
       [removedSectionIds],
     );
@@ -1167,9 +1394,11 @@ async function deleteRemovedLinkedSections(
   parentSectionId: number,
   newSubQuestions: SurveyMapSubQuestion[],
   newFollowUpSections: SurveyPageSection[],
+  tx?: pgPromise.ITask<{}>,
 ) {
+  const conn = tx ?? getDb();
   // Get all existing linked sections (follow-up sections can have child sections but child sections can't have follow-up sections)
-  const rows = await getDb().manyOrNone<{ id: number }>(
+  const rows = await conn.manyOrNone<{ id: number }>(
     `
     WITH follow_ups AS (
       SELECT id
@@ -1202,14 +1431,14 @@ async function deleteRemovedLinkedSections(
     (newSections ?? []).every((newQuestion) => newQuestion.id !== id),
   );
   if (removedQuestionIds.length) {
-    await getDb().none(`DELETE FROM data.page_section WHERE id = ANY ($1)`, [
+    await conn.none(`DELETE FROM data.page_section WHERE id = ANY ($1)`, [
       removedQuestionIds,
     ]);
   }
 }
 
 /**
- * When updating a page section, deletes all options that should be removed from DB.
+ * When updating a page section, deletes all options and option categories that should be removed from DB.
  * @param sectionId Section ID
  * @param newOptions New options
  * @param optionGroupId Option group ID
@@ -1218,15 +1447,17 @@ async function deleteRemovedOptions(
   sectionId: number,
   newOptions: SectionOption[],
   optionGroupId?: number,
+  tx?: pgPromise.ITask<{}>,
 ) {
+  const conn = tx ?? getDb();
   // Get all existing options
   const rows =
     optionGroupId != null
-      ? await getDb().manyOrNone<{ id: number }>(
+      ? await conn.manyOrNone<{ id: number }>(
           `SELECT id FROM data.option WHERE section_id = $1 AND group_id = $2`,
           [sectionId, optionGroupId],
         )
-      : await getDb().manyOrNone<{ id: number }>(
+      : await conn.manyOrNone<{ id: number }>(
           `SELECT id FROM data.option WHERE section_id = $1 AND group_id IS NULL`,
           [sectionId],
         );
@@ -1237,7 +1468,7 @@ async function deleteRemovedOptions(
     (newOptions ?? []).every((newOption) => newOption.id !== id),
   );
   if (removedOptionIds.length) {
-    await getDb().none(`DELETE FROM data.option WHERE id = ANY ($1)`, [
+    await conn.none(`DELETE FROM data.option WHERE id = ANY ($1)`, [
       removedOptionIds,
     ]);
   }
@@ -1252,9 +1483,11 @@ async function deleteRemovedOptions(
 async function deleteRemovedOptionGroups(
   sectionId: number,
   newGroups: SectionOptionGroup[],
+  tx?: pgPromise.ITask<{}>,
 ) {
+  const conn = tx ?? getDb();
   // Get all existing option groups
-  const rows = await getDb().manyOrNone<{ id: number }>(
+  const rows = await conn.manyOrNone<{ id: number }>(
     `SELECT id FROM data.option_group WHERE section_id = $1`,
     [sectionId],
   );
@@ -1265,10 +1498,398 @@ async function deleteRemovedOptionGroups(
     (newGroups ?? []).every((newGroup) => newGroup.id !== id),
   );
   if (removedGroupIds.length) {
-    await getDb().none(`DELETE FROM data.option_group WHERE id = ANY ($1)`, [
+    await conn.none(`DELETE FROM data.option_group WHERE id = ANY ($1)`, [
       removedGroupIds,
     ]);
   }
+}
+
+async function updateCategoryGroups(
+  sectionId: SurveySectionRow['id'],
+  categoryGroups: SectionOptionCategoryGroup[],
+  tx?: pgPromise.ITask<{}>,
+): Promise<(DBSectionOptionCategoryGroup & { draftId: string })[]> {
+  const conn = tx ?? getDb();
+  // Delete existing option category groups and related categories for this section.
+  await conn.none(
+    `DELETE FROM data.option_category_group WHERE section_id = $1`,
+    [sectionId],
+  );
+
+  const categoryGroupRows = categoryGroups.map((group) => ({
+    name: group.name,
+    idx: group.idx,
+    section_id: sectionId,
+    draftId: group.id, // Assign client generated ID to draftId for later reference
+  }));
+
+  return Promise.all(
+    categoryGroupRows.map(async (group) => {
+      const { id } = await conn.one<{ id: string }>(
+        `INSERT INTO data.option_category_group (name, idx, section_id)
+        VALUES ($1, $2, $3)
+       RETURNING id`,
+        [group.name, group.idx, group.section_id],
+      );
+      return { ...group, id };
+    }),
+  );
+}
+
+async function upsertCategories(
+  categoryGroups: SectionOptionCategoryGroup[],
+  tx: pgPromise.ITask<{}>,
+): Promise<(DBSectionOptionCategory & { draftId: string })[]> {
+  // Flatten categories from all groups.
+  const categoriesData = categoryGroups.flatMap((group) =>
+    group.categories.map((category) => ({
+      name: category.name,
+      category_group_id: group.id,
+      draftId: category.id,
+    })),
+  );
+
+  if (categoriesData.length === 0) return [];
+
+  return Promise.all(
+    categoriesData.map(async (category) => {
+      const { id } = await insertOptionCategory(
+        category,
+        category.category_group_id,
+        tx,
+      );
+      return {
+        ...category,
+        id,
+      };
+    }),
+  );
+}
+
+async function upsertCategoryAssignments(
+  options: SectionOption[],
+  categories: (DBSectionOptionCategory & { draftId: string })[],
+  tx: pgPromise.ITask<{}>,
+): Promise<DBSectionOptionCategoryAssignment[]> {
+  const categoryAssignments = options
+    .flatMap((option) => {
+      return (
+        option.categories?.map((category) => {
+          const categoryId = categories.find(
+            (cat) => cat.draftId === category.id,
+          )?.id;
+          if (!categoryId) return null;
+
+          return {
+            option_id: option.id,
+            category_id: categoryId,
+          };
+        }) ?? []
+      );
+    })
+    .filter(Boolean);
+
+  if (categoryAssignments.length === 0) return [];
+
+  return Promise.all(
+    categoryAssignments.map((assignment) =>
+      insertOptionCategoryAssignment(assignment, tx),
+    ),
+  );
+}
+
+/**
+ * Updates section option categories and category groups for a given section.
+ * @returns All saved category rows in the provided category groups.
+ */
+async function updateSectionOptionCategories(
+  sectionId: SurveySectionRow['id'],
+  categoryGroups: SectionOptionCategoryGroup[],
+  t: pgPromise.ITask<{}>,
+) {
+  if (!categoryGroups) {
+    return null;
+  }
+
+  const categoryGroupRows = await updateCategoryGroups(
+    sectionId,
+    categoryGroups,
+    t,
+  );
+  const savedCategoryGroups = categoryGroups.map((group) => ({
+    ...group,
+    id: categoryGroupRows.find(
+      (categoryGroupRow) => categoryGroupRow.draftId === group.id,
+    )?.id,
+  }));
+  return upsertCategories(savedCategoryGroups, t);
+}
+
+type SurveySectionRow = ReturnType<typeof surveySectionsToRows>[number];
+
+async function updateSurveySections(survey: Survey, t: pgPromise.ITask<{}>) {
+  // Form a flat array of all new section rows under each page
+  const sections = survey.pages.reduce((result, page) => {
+    return [...result, ...surveySectionsToRows(page.sections, page.id)];
+  }, [] as SurveySectionRow[]);
+
+  // Delete sections that were removed from the updated survey
+  await deleteRemovedSections(survey.id, sections, t);
+
+  await Promise.all(
+    sections.map(async (section) => {
+      const sectionRow = await upsertSection(section, section.idx, t);
+
+      // Delete options that were removed
+      await deleteRemovedOptions(section.id, section.options, undefined, t);
+
+      let categoryRows:
+        | Awaited<ReturnType<typeof updateSectionOptionCategories>>
+        | undefined;
+      if (section.categoryGroups) {
+        categoryRows = await updateSectionOptionCategories(
+          sectionRow.id,
+          section.categoryGroups,
+          t,
+        );
+      }
+
+      // Update/insert the remaining options
+      if (section.options?.length) {
+        const options = optionsToRows(section.options, sectionRow.id);
+
+        const optionRows = await Promise.all(
+          options.map((option, index) => upsertOption(option, index, t)),
+        );
+
+        if (categoryRows) {
+          const optionsWithCategories = section.options.map<SectionOption>(
+            (option, index) => ({
+              ...option,
+              id: optionRows.find((optionRow) => optionRow.idx === index)?.id,
+            }),
+          );
+
+          await upsertCategoryAssignments(
+            optionsWithCategories,
+            categoryRows,
+            t,
+          );
+        }
+      }
+
+      // Delete removed subquestion and follow-up sections
+      await deleteRemovedLinkedSections(
+        section.id,
+        section.subQuestions,
+        section.followUpSections,
+      );
+
+      // If there are subquestions or follow-up sections, update them
+      if (section.subQuestions?.length || section.followUpSections?.length) {
+        const linkedSections = [
+          ...surveySectionsToRows(
+            section?.subQuestions ?? [],
+            section.survey_page_id,
+            sectionRow.id,
+          ),
+          ...surveySectionsToRows(
+            section?.followUpSections ?? [],
+            section.survey_page_id,
+            null,
+            sectionRow.id,
+          ),
+        ];
+
+        // Update each subquestion and follow-up section in its own block
+        await Promise.all(
+          linkedSections.map(async (linkedSection, index) => {
+            const linkedSectionRow = await upsertSection(
+              linkedSection,
+              index,
+              t,
+            );
+
+            // Refresh conditions for a follow-up section
+            if (linkedSection.predecessor_section) {
+              // Upsert follow-up section subquestions if applicable
+
+              if (linkedSection?.subQuestions) {
+                const subQuestionRows = surveySectionsToRows(
+                  linkedSection.subQuestions,
+                  linkedSection.survey_page_id,
+                  linkedSectionRow.id,
+                );
+
+                await Promise.all(
+                  subQuestionRows.map(async (question, index) => {
+                    const sectionRow = await upsertSection(question, index, t);
+
+                    // Delete options that were removed
+                    await deleteRemovedOptions(
+                      question.id,
+                      question.options,
+                      undefined,
+                      t,
+                    );
+
+                    // Update/insert the remaining options
+                    if (question.options?.length) {
+                      const options = optionsToRows(
+                        question.options,
+                        sectionRow.id,
+                      );
+                      await Promise.all(
+                        options.map((option, index) =>
+                          upsertOption(option, index, t),
+                        ),
+                      );
+                    }
+                  }),
+                );
+              }
+
+              // use sectionRow id that was generated when saving follow-up section to db
+              await deleteSectionConditions(null, [linkedSectionRow.id], t);
+              // Filter out null values from conditions caused by trying to save "-" as numeric condition
+              const validConditions = {
+                equals: linkedSection.conditions.equals.filter(
+                  (value) => value != null,
+                ),
+                lessThan: linkedSection.conditions.lessThan.filter(
+                  (value) => value != null,
+                ),
+                greaterThan: linkedSection.conditions.greaterThan.filter(
+                  (value) => value != null,
+                ),
+              };
+              await upsertSectionConditions(
+                linkedSectionRow.id,
+                null,
+                validConditions,
+              );
+            }
+
+            // Delete options that were removed
+            await deleteRemovedOptions(linkedSection.id, linkedSection.options);
+
+            let categoryRows:
+              | Awaited<ReturnType<typeof updateSectionOptionCategories>>
+              | undefined;
+            if (linkedSection.categoryGroups) {
+              categoryRows = await updateSectionOptionCategories(
+                linkedSectionRow.id,
+                linkedSection.categoryGroups,
+                t,
+              );
+            }
+
+            // Update/insert the remaining options
+            if (linkedSection.options?.length) {
+              const optionRows = optionsToRows(
+                linkedSection.options,
+                linkedSectionRow.id,
+              );
+              const linkedSectionDbOptions = await Promise.all(
+                optionRows.map((option, index) =>
+                  upsertOption(option, index, t),
+                ),
+              );
+
+              if (categoryRows) {
+                const optionsWithCategories =
+                  linkedSection.options.map<SectionOption>((option, index) => ({
+                    ...option,
+                    id: linkedSectionDbOptions.find(
+                      (optionRow) => optionRow.idx === index,
+                    )?.id,
+                  }));
+
+                await upsertCategoryAssignments(
+                  optionsWithCategories,
+                  categoryRows,
+                  t,
+                );
+              }
+            }
+
+            await deleteRemovedOptionGroups(
+              linkedSectionRow.id,
+              linkedSection.groups,
+              t,
+            );
+            await updateSectionOptionGroups(linkedSection, linkedSectionRow, t);
+          }),
+        );
+      }
+
+      await deleteRemovedOptionGroups(section.id, section.groups, t);
+      await updateSectionOptionGroups(section, sectionRow, t);
+    }),
+  );
+}
+
+async function updateSectionOptionGroups(
+  section: SurveySectionRow,
+  sectionRow: DBSurveyPageSection,
+  t: pgPromise.ITask<{}>,
+) {
+  // If there are option groups, update them
+  if (section.groups?.length) {
+    await Promise.all(
+      section.groups.map(async (group, index) => {
+        const groupRow = await upsertOptionGroup(
+          {
+            id: group.id,
+            name: group.name,
+            section_id: sectionRow.id,
+            idx: index,
+          },
+          index,
+          t,
+        );
+
+        // Delete removed options from the group
+        await deleteRemovedOptions(section.id, group.options, groupRow.id, t);
+
+        // Upsert all options
+        const options = optionsToRows(
+          group.options,
+          sectionRow.id,
+          groupRow.id,
+        );
+        await Promise.all(
+          options.map((option, index) => upsertOption(option, index, t)),
+        );
+      }),
+    );
+  }
+}
+
+async function updateSurveyConditions(survey: Survey, t: pgPromise.ITask<{}>) {
+  await Promise.all(
+    survey.pages.map(async (page) => {
+      const sectionIds = Object.keys(page.conditions).map((sectionId) => {
+        return Number(sectionId);
+      });
+
+      await deleteSectionConditions([page.id], sectionIds, t);
+      Object.entries(page.conditions).map(async ([sectionId, conditions]) => {
+        // Filter out null values from conditions caused by trying to save "-" as numeric condition
+        const validConditions = {
+          equals: conditions.equals.filter((value) => value != null),
+          lessThan: conditions.lessThan.filter((value) => value != null),
+          greaterThan: conditions.greaterThan.filter((value) => value != null),
+        };
+        await upsertSectionConditions(
+          Number(sectionId),
+          page.id,
+          validConditions,
+          t,
+        );
+      });
+    }),
+  );
 }
 
 /**
@@ -1276,10 +1897,12 @@ async function deleteRemovedOptionGroups(
  * @param survey
  */
 export async function updateSurvey(survey: Survey) {
-  // Update the survey itself
-  const surveyRow = await getDb()
-    .one<DBSurvey>(
-      `UPDATE data.survey SET
+  // Wrap all of the upserting goodness inside a single transaction
+  await getDb().tx(async (t) => {
+    // Update the survey itself
+    const surveyRow = await t
+      .one<DBSurvey>(
+        `UPDATE data.survey SET
         name = $2,
         title = $3,
         subtitle = $4,
@@ -1309,238 +1932,62 @@ export async function updateSurvey(survey: Survey) {
         email_registration_required = $28,
         email_include_personal_info = $29
       WHERE id = $1 RETURNING *`,
-      [
-        survey.id,
-        survey.name,
-        survey.title,
-        survey.subtitle,
-        survey.author,
-        survey.authorUnit,
-        survey.mapUrl,
-        survey.startDate,
-        survey.endDate,
-        survey.allowTestSurvey,
-        survey.thanksPage.title,
-        survey.thanksPage.text,
-        survey.backgroundImageName ?? null,
-        survey.backgroundImagePath ?? null,
-        survey.thanksPage.imageName ?? null,
-        survey.thanksPage.imagePath ?? null,
-        survey.admins,
-        survey.theme?.id ?? null,
-        survey.sectionTitleColor,
-        survey.email.enabled,
-        survey.email.autoSendTo,
-        survey.email.subject,
-        survey.email.body,
-        JSON.stringify(survey.email.info),
-        survey.allowSavingUnfinished,
-        survey.localisationEnabled,
-        survey.displayPrivacyStatement,
-        survey.emailRegistrationRequired,
-        survey.email.includePersonalInfo,
-      ],
-    )
-    .catch((error) => {
-      throw error.constraint === 'survey_name_key'
-        ? new BadRequestError(
-            `Survey name ${survey.name} already exists`,
-            'duplicate_survey_name',
-          )
-        : error;
-    });
-
-  if (!surveyRow) {
-    throw new NotFoundError(`Survey with ID ${survey.id} not found`);
-  }
-
-  // Update the survey pages
-  await getDb().none(
-    getMultiUpdateQuery(
-      surveyPagesToRows(survey.pages, survey.id),
-      surveyPageColumnSet,
-    ) + ' WHERE t.id = v.id',
-  );
-
-  // Update survey page conditions
-  await Promise.all(
-    survey.pages.map(async (page) => {
-      // TODO combine these into a transaction
-
-      const sectionIds = Object.keys(page.conditions).map((sectionId) => {
-        return Number(sectionId);
+        [
+          survey.id,
+          survey.name,
+          survey.title,
+          survey.subtitle,
+          survey.author,
+          survey.authorUnit,
+          survey.mapUrl,
+          survey.startDate,
+          survey.endDate,
+          survey.allowTestSurvey,
+          survey.thanksPage.title,
+          survey.thanksPage.text,
+          survey.backgroundImageName ?? null,
+          survey.backgroundImagePath ?? null,
+          survey.thanksPage.imageName ?? null,
+          survey.thanksPage.imagePath ?? null,
+          survey.admins,
+          survey.theme?.id ?? null,
+          survey.sectionTitleColor,
+          survey.email.enabled,
+          survey.email.autoSendTo,
+          survey.email.subject,
+          survey.email.body,
+          JSON.stringify(survey.email.info),
+          survey.allowSavingUnfinished,
+          survey.localisationEnabled,
+          survey.displayPrivacyStatement,
+          survey.emailRegistrationRequired,
+          survey.email.includePersonalInfo,
+        ],
+      )
+      .catch((error) => {
+        throw error.constraint === 'survey_name_key'
+          ? new BadRequestError(
+              `Survey name ${survey.name} already exists`,
+              'duplicate_survey_name',
+            )
+          : error;
       });
 
-      await deleteSectionConditions([page.id], sectionIds);
-      Object.entries(page.conditions).map(async ([sectionId, conditions]) => {
-        // Filter out null values from conditions caused by trying to save "-" as numeric condition
-        const validConditions = {
-          equals: conditions.equals.filter((value) => value != null),
-          lessThan: conditions.lessThan.filter((value) => value != null),
-          greaterThan: conditions.greaterThan.filter((value) => value != null),
-        };
-        await upsertSectionConditions(
-          Number(sectionId),
-          page.id,
-          validConditions,
-        );
-      });
-    }),
-  );
+    if (!surveyRow) {
+      throw new NotFoundError(`Survey with ID ${survey.id} not found`);
+    }
 
-  // Form a flat array of all new section rows under each page
-  const sections = survey.pages.reduce(
-    (result, page) => {
-      return [...result, ...surveySectionsToRows(page.sections, page.id)];
-    },
-    [] as ReturnType<typeof surveySectionsToRows>,
-  );
+    // Update the survey pages
+    await t.none(
+      getMultiUpdateQuery(
+        surveyPagesToRows(survey.pages, survey.id),
+        surveyPageColumnSet,
+      ) + ' WHERE t.id = v.id',
+    );
 
-  // Delete sections that were removed from the updated survey
-  await deleteRemovedSections(survey.id, sections);
-
-  // Update all sections
-  await Promise.all(
-    sections.map(async (section) => {
-      const sectionRow = await upsertSection(section, section.idx);
-
-      // Delete options that were removed
-      await deleteRemovedOptions(section.id, section.options);
-
-      // Update/insert the remaining options
-      if (section.options?.length) {
-        const options = optionsToRows(section.options, sectionRow.id);
-        await Promise.all(options.map(upsertOption));
-      }
-
-      // Delete removed subquestion and follow-up sections
-      await deleteRemovedLinkedSections(
-        section.id,
-        section.subQuestions,
-        section.followUpSections,
-      );
-
-      // If there are subquestions or follow-up sections, update them
-      if (section.subQuestions?.length || section.followUpSections?.length) {
-        const linkedSections = [
-          ...surveySectionsToRows(
-            section?.subQuestions ?? [],
-            section.survey_page_id,
-            sectionRow.id,
-          ),
-          ...surveySectionsToRows(
-            section?.followUpSections ?? [],
-            section.survey_page_id,
-            null,
-            sectionRow.id,
-          ),
-        ];
-
-        // Update each subquestion and follow-up section in its own block
-        await Promise.all(
-          linkedSections.map(async (linkedSection, index) => {
-            const sectionRow = await upsertSection(linkedSection, index);
-
-            // Refresh conditions for a follow-up section
-            if (linkedSection.predecessor_section) {
-              // Upsert follow-up section subquestions if applicable
-
-              if (linkedSection?.subQuestions) {
-                const subQuestionRows = surveySectionsToRows(
-                  linkedSection.subQuestions,
-                  linkedSection.survey_page_id,
-                  sectionRow.id,
-                );
-
-                await Promise.all(
-                  subQuestionRows.map(async (question, index) => {
-                    const sectionRow = await upsertSection(question, index);
-
-                    // Delete options that were removed
-
-                    await deleteRemovedOptions(question.id, question.options);
-
-                    // Update/insert the remaining options
-                    if (question.options?.length) {
-                      const options = optionsToRows(
-                        question.options,
-                        sectionRow.id,
-                      );
-                      await Promise.all(options.map(upsertOption));
-                    }
-                  }),
-                );
-              }
-
-              // use sectionRow id that was generated when saving follow-up section to db
-              await deleteSectionConditions(null, [sectionRow.id]);
-              // Filter out null values from conditions caused by trying to save "-" as numeric condition
-              const validConditions = {
-                equals: linkedSection.conditions.equals.filter(
-                  (value) => value != null,
-                ),
-                lessThan: linkedSection.conditions.lessThan.filter(
-                  (value) => value != null,
-                ),
-                greaterThan: linkedSection.conditions.greaterThan.filter(
-                  (value) => value != null,
-                ),
-              };
-              await upsertSectionConditions(
-                sectionRow.id,
-                null,
-                validConditions,
-              );
-            }
-
-            // Delete options that were removed
-            await deleteRemovedOptions(linkedSection.id, linkedSection.options);
-
-            // Update/insert the remaining options
-            if (linkedSection.options?.length) {
-              const options = optionsToRows(
-                linkedSection.options,
-                sectionRow.id,
-              );
-              await Promise.all(options.map(upsertOption));
-            }
-          }),
-        );
-      }
-
-      // Delete removed option groups
-      await deleteRemovedOptionGroups(section.id, section.groups);
-
-      // If there are option groups, update them
-      if (section.groups?.length) {
-        await Promise.all(
-          section.groups.map(async (group, index) => {
-            const groupRow = await upsertOptionGroup(
-              {
-                id: group.id,
-                name: group.name,
-                section_id: sectionRow.id,
-                idx: index,
-              },
-              index,
-            );
-
-            // Delete removed options from the group
-            await deleteRemovedOptions(section.id, group.options, groupRow.id);
-
-            // Upsert all options
-            const options = optionsToRows(
-              group.options,
-              sectionRow.id,
-              groupRow.id,
-            );
-            await Promise.all(options.map(upsertOption));
-          }),
-        );
-      }
-    }),
-  );
-
+    await updateSurveyConditions(survey, t);
+    await updateSurveySections(survey, t);
+  });
   return await getSurvey({ id: survey.id });
 }
 
@@ -1699,6 +2146,8 @@ function dbSurveyJoinToSection(dbSurveyJoin: DBSurveyJoin): SurveyPageSection {
         ...(type === 'grouped-checkbox' && { groups: [] }),
         // Add an initial empty subquestions array if the type allows subquestions
         ...(type === 'map' && { subQuestions: [] }),
+        // Add an initial empty category groups array if the type allows categorized options
+        ...(type === 'categorized-checkbox' && { categoryGroups: [] }),
       };
 }
 
@@ -1714,6 +2163,9 @@ function dbSurveyJoinToOption(dbSurveyJoin: DBSurveyJoin): SectionOption {
         id: dbSurveyJoin.option_id,
         text: dbSurveyJoin.option_text,
         info: dbSurveyJoin.option_info,
+        ...(dbSurveyJoin.option_categories && {
+          categories: dbSurveyJoin.option_categories,
+        }),
       };
 }
 
@@ -1902,6 +2354,7 @@ function surveySectionsToRows(
       options = undefined,
       subQuestions = undefined,
       followUpSections = undefined,
+      categoryGroups = undefined,
       info = undefined,
       groups = undefined,
       fileName = undefined,
@@ -1920,6 +2373,7 @@ function surveySectionsToRows(
       options,
       subQuestions,
       followUpSections,
+      categoryGroups,
       groups,
       parent_section: parentSectionId ?? null,
       predecessor_section: predecessorSectionId ?? null,
@@ -1931,6 +2385,7 @@ function surveySectionsToRows(
       options: SectionOption[];
       subQuestions: SurveyMapSubQuestion[];
       followUpSections: SurveyFollowUpSection[];
+      categoryGroups: SectionOptionCategoryGroup[];
       groups: SectionOptionGroup[];
       conditions: Conditions;
     };

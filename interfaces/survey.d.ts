@@ -32,7 +32,8 @@ export type SurveyQuestion =
   | SurveyMatrixQuestion
   | SurveyGroupedCheckboxQuestion
   | SurveyAttachmentQuestion
-  | SurveyPersonalInfoQuestion;
+  | SurveyPersonalInfoQuestion
+  | SurveyCategorizedCheckboxQuestion;
 
 /**
  * Subquestion type for map questions.
@@ -282,6 +283,20 @@ export interface SurveyGroupedCheckboxQuestion
     max?: number;
   };
   groups: SectionOptionGroup[];
+}
+
+/**
+ * Categorized checkbox question
+ */
+export interface SurveyCategorizedCheckboxQuestion
+  extends CommonSurveyPageQuestion {
+  type: 'categorized-checkbox';
+  answerLimits: {
+    min?: number;
+    max?: number;
+  };
+  categoryGroups: SectionOptionCategoryGroup[];
+  options: SectionOption[];
 }
 
 /**
@@ -539,6 +554,24 @@ export interface SectionOption {
    * Localized text field of the option's info
    */
   info?: LocalizedText;
+  /**
+   * Categories where the option belongs to
+   */
+  categories?: SectionOptionCategory[];
+}
+
+/**
+ * A single category for checkbox question's options
+ */
+export interface SectionOptionCategory {
+  /**
+   * Id of the category
+   */
+  id: string;
+  /**
+   * Name of the category
+   */
+  name: LocalizedText;
 }
 
 /**
@@ -557,6 +590,28 @@ export interface SectionOptionGroup {
    * Options of the group
    */
   options: SectionOption[];
+}
+
+/**
+ * A group of categories of a categorized checkbox question
+ */
+export interface SectionOptionCategoryGroup {
+  /**
+   * Group ID
+   */
+  id: string;
+  /**
+   * Index of the group in the survey page section
+   */
+  idx: number;
+  /**
+   * Name of the group
+   */
+  name: LocalizedText;
+  /**
+   * Categories of the group
+   */
+  categories: SectionOptionCategory[];
 }
 
 /**
@@ -590,66 +645,70 @@ export interface MapQuestionAnswer {
   subQuestionAnswers: SurveyMapSubQuestionAnswer[];
 }
 
+interface AnswerEntryByType {
+  'free-text': {
+    type: 'free-text';
+    value: string;
+  };
+  checkbox: {
+    type: 'checkbox';
+    value: (string | number)[];
+  };
+  radio: {
+    type: 'radio';
+    value: string | number;
+  };
+  numeric: {
+    type: 'numeric';
+    value: number;
+  };
+  map: {
+    type: 'map';
+    value: MapQuestionAnswer[];
+  };
+  sorting: {
+    type: 'sorting';
+    value: number[];
+  };
+  slider: {
+    type: 'slider';
+    value: number;
+  };
+  matrix: {
+    type: 'matrix';
+    value: string[];
+  };
+  'multi-matrix': {
+    type: 'multi-matrix';
+    value: string[][];
+  };
+  'grouped-checkbox': {
+    type: 'grouped-checkbox';
+    value: number[];
+  };
+  'categorized-checkbox': {
+    type: 'categorized-checkbox';
+    value: number[];
+    filters: string[];
+  };
+  attachment: {
+    type: 'attachment';
+    value: FileAnswer[];
+  };
+  'personal-info': {
+    type: 'personal-info';
+    value: PersonalInfoAnswer;
+  };
+}
+
+type AnswerEntryType = keyof AnswerEntryByType;
+
 /**
  * Submission entry interface
  */
-export type AnswerEntry = {
-  /**
-   * ID of the page section
-   */
+export type AnswerEntry<T extends AnswerEntryType = AnswerEntryType> = {
   sectionId: number;
-} & /**
- * Type of the section
- */ (
-  | {
-      type: 'free-text';
-      value: string;
-    }
-  | {
-      type: 'checkbox';
-      value: (string | number)[];
-    }
-  | {
-      type: 'radio';
-      value: string | number;
-    }
-  | {
-      type: 'numeric';
-      value: number;
-    }
-  | {
-      type: 'map';
-      value: MapQuestionAnswer[];
-    }
-  | {
-      type: 'sorting';
-      value: number[];
-    }
-  | {
-      type: 'slider';
-      value: number;
-    }
-  | {
-      type: 'matrix';
-      value: string[];
-    }
-  | {
-      type: 'multi-matrix';
-      value: string[][];
-    }
-  | {
-      type: 'grouped-checkbox';
-      value: number[];
-    }
-  | {
-      type: 'attachment';
-      value: { fileString: string; fileName: string }[];
-    }
-  | {
-      type: 'personal-info';
-      value: PersonalInfoAnswer;
-    }
-);
+} & AnswerEntryByType[T];
 
 /**
  * Oskari map layer

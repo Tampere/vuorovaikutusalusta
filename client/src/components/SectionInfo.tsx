@@ -1,9 +1,11 @@
 import {
+  Box,
   Button,
   Dialog,
   DialogActions,
   DialogContent,
   IconButton,
+  SxProps,
   Tooltip,
 } from '@mui/material';
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
@@ -12,16 +14,18 @@ import ReactMarkdown from 'react-markdown';
 import rehypeExternalLinks from 'rehype-external-links';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { useId } from 'react';
+import { Theme } from '@emotion/react';
 
 interface Props {
   subject: string;
   infoText: string;
   style?: React.CSSProperties;
   hiddenFromScreenReader?: boolean;
+  sx?: SxProps<Theme>;
 }
 
 export default forwardRef(function SectionInfo(
-  { subject, infoText, style, hiddenFromScreenReader = false }: Props,
+  { sx, subject, infoText, style, hiddenFromScreenReader = false }: Props,
   ref,
 ) {
   const { tr } = useTranslations();
@@ -34,7 +38,11 @@ export default forwardRef(function SectionInfo(
   });
 
   return (
-    <div style={style ?? {}} aria-hidden={hiddenFromScreenReader}>
+    <Box
+      {...(sx && { sx: sx })}
+      style={style ?? {}}
+      aria-hidden={hiddenFromScreenReader}
+    >
       <Tooltip title={tr.SurveyQuestion.showInfo}>
         <IconButton
           aria-label={`${tr.SurveyQuestion.showInfo}: ${subject}`}
@@ -65,6 +73,6 @@ export default forwardRef(function SectionInfo(
           </Button>
         </DialogActions>
       </Dialog>
-    </div>
+    </Box>
   );
 });
