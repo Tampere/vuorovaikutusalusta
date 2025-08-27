@@ -45,6 +45,7 @@ export async function initializeDatabase() {
           migrationConnection = await db.connect();
         } catch (error) {
           logger.warn(`Error connecting to database: ${error}`);
+          logger.info(process.env.DATABASE_URL);
           if (retryCount < connectRetries) {
             logger.info(
               `Retrying database connection (${++retryCount}/${connectRetries})`,

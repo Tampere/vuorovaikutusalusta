@@ -689,6 +689,27 @@ export async function getPublishedSurvey(
   }, dbSurveyToSurvey(rows[0])) as Survey;
 }
 
+export async function getSurveyTitle(
+  params: { id: number } | { name: string },
+  lang: 'fi' | 'en' = 'fi',
+) {
+  const survey = await getDb().oneOrNone<{ title: LocalizedText }>(
+    `SELECT
+      survey.title
+      FROM data.survey survey
+      WHERE ${'id' in params ? `survey.id = $1` : `survey.name = $1`}
+    `,
+    ['id' in params ? params.id : params.name],
+  );
+
+  const notFoundTitle = {
+    fi: 'Kyselyä ei löytynyt',
+    en: 'Survey not found',
+  };
+
+  return survey ? survey.title[lang] : notFoundTitle[lang];
+}
+
 /**
  * Gets the survey with given ID or name from the database.
  * @param params Query parameter (search by ID or name)

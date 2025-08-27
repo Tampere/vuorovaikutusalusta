@@ -9,6 +9,9 @@ import { HttpResponseError } from './error';
 import logger from './logger';
 import rootRouter from './routes';
 import helmet from 'helmet';
+import { readFile } from 'fs/promises';
+import { createServer } from 'vite';
+import { getSurveyTitle } from './application/survey';
 
 async function start() {
   const app = express();
@@ -28,7 +31,11 @@ async function start() {
       return helmet({
         contentSecurityPolicy: {
           directives: {
-            'connect-src': "'self'",
+            'connect-src': ["'self'"],
+            'script-src': [
+              "'self'",
+              "'sha256-Z2/iFzh9VMlVkEOar1f/oSHWwQk3ve1qk/C2WdsC4Xk='",
+            ],
             'frame-src': 'https://kartat.tampere.fi',
           },
         },
@@ -106,9 +113,48 @@ async function start() {
     },
   );
 
+  const isDev = process.env.NODE_ENV === 'development';
+  let vite;
+  if (isDev) {
+    vite = await createServer({
+      server: { middlewareMode: true },
+      appType: 'custom',
+      root: '',
+      optimizeDeps: { include: [] },
+    });
+
+    app.use(vite.middlewares);
+  }
+
   // Serve frontend files from remaining URLs
-  app.get('/*splat', (_req, res, _next) => {
-    res.sendFile(path.join(__dirname, '../static/index.html'));
+  app.get('/:surveyname', async (req, res, next) => {
+    const baseTemplate = await readFile(
+      !isDev
+        ? path.resolve(__dirname, '../static/index.html')
+        : path.resolve(__dirname, '../index.html'),
+      'utf-8',
+    );
+
+    //Janky local proxy rewrite
+    const name = req.params.surveyname.split('_').pop();
+
+    const title = await getSurveyTitle({ name });
+
+    try {
+      const template = !isDev
+        ? baseTemplate
+        : await vite.transformIndexHtml(req.url, baseTemplate);
+
+      const renderedHtml = template
+        .replaceAll(`<!--app-title -->`, title)
+        .replace('@clientSrc', 'src');
+
+      res.status(200).set({ 'Content-Type': 'text/html' }).end(renderedHtml);
+    } catch (e: any) {
+      isDev && vite.ssrFixStacktrace(e);
+      console.log(e.stack);
+      next(e);
+    }
   });
 
   // Default error handler
