@@ -26,7 +26,6 @@ import { DragHandle } from '../../DragAndDrop/SortableItem';
 import { OptionCategoriesSelect } from './OptionCategoriesSelect';
 import { theme } from '@src/themes/admin';
 
-const headerHeight = '1.825rem';
 const fontSize = '0.875rem';
 const optionRowBackground = 'rgba(0,0,0,0.1)';
 
@@ -56,9 +55,8 @@ const styles = {
     flex: 1,
     border: 'none',
     borderRadius: theme.spacing(0.5),
-    height: `calc(${headerHeight} * 1.1)`,
     lineHeight: '1.75',
-    '& input': {
+    '& textarea': {
       fontSize,
     },
   },
@@ -98,60 +96,60 @@ function CategorizedOption({
         <DragHandle isDragging={isDragging}>
           <DragIndicator />
         </DragHandle>
-        <Box flex={1} display="flex">
-          <TextField
-            variant="standard"
-            inputRef={inputRefs[index]}
-            sx={styles.textInput}
-            autoComplete="off"
-            data-1p-ignore
-            disabled={disabled}
-            value={option.text?.[surveyLanguage] ?? ''}
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              const value = event.target.value;
-              // Only allow copying from clipboard if
-              // 1) feature is enabled
-              // 2) the copied fields' format is correct
-              // 3) clipboard is pasted on the last option field
-              if (enableClipboardImport && index + 1 === options.length) {
-                handleClipboardInput(value, index, option);
+
+        <TextField
+          multiline
+          variant="standard"
+          inputRef={inputRefs[index]}
+          sx={styles.textInput}
+          autoComplete="off"
+          data-1p-ignore
+          disabled={disabled}
+          value={option.text?.[surveyLanguage] ?? ''}
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+            const value = event.target.value;
+            // Only allow copying from clipboard if
+            // 1) feature is enabled
+            // 2) the copied fields' format is correct
+            // 3) clipboard is pasted on the last option field
+            if (enableClipboardImport && index + 1 === options.length) {
+              handleClipboardInput(value, index, option);
+            } else {
+              onChange(
+                options.map((option, i) => {
+                  return index === i
+                    ? {
+                        ...option,
+                        draftId: option.draftId,
+                        text: {
+                          ...option.text,
+                          [surveyLanguage]: value,
+                        },
+                      }
+                    : option;
+                }),
+              );
+            }
+          }}
+          onKeyDown={(event) => {
+            if (['Enter', 'NumpadEnter'].includes(event.nativeEvent.code)) {
+              event.preventDefault();
+              if (index === options.length - 1) {
+                // Last item on list - add new option
+                onChange([
+                  ...options,
+                  {
+                    text: initializeLocalizedObject(''),
+                    draftId: generateDraftId(),
+                  },
+                ]);
               } else {
-                onChange(
-                  options.map((option, i) => {
-                    return index === i
-                      ? {
-                          ...option,
-                          draftId: option.draftId,
-                          text: {
-                            ...option.text,
-                            [surveyLanguage]: value,
-                          },
-                        }
-                      : option;
-                  }),
-                );
+                // Focus on the next item
+                inputRefs[index + 1].current.focus();
               }
-            }}
-            onKeyDown={(event) => {
-              if (['Enter', 'NumpadEnter'].includes(event.nativeEvent.code)) {
-                event.preventDefault();
-                if (index === options.length - 1) {
-                  // Last item on list - add new option
-                  onChange([
-                    ...options,
-                    {
-                      text: initializeLocalizedObject(''),
-                      draftId: generateDraftId(),
-                    },
-                  ]);
-                } else {
-                  // Focus on the next item
-                  inputRefs[index + 1].current.focus();
-                }
-              }
-            }}
-          />
-        </Box>
+            }
+          }}
+        />
         {allowOptionInfo && (
           <OptionInfoDialog
             infoText={option?.info?.[surveyLanguage]}
@@ -292,6 +290,7 @@ export function CategorizedQuestionOptions({
         )
           return null;
         return {
+          ...optionToChange,
           draftId: index > 0 ? generateDraftId() : optionToChange.draftId,
           text: {
             ...(index === 0

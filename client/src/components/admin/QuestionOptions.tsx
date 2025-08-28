@@ -94,6 +94,7 @@ export default function QuestionOptions({
           (clipboardRows.length > 1 && optionFields[0] === '')
         )
           return null;
+
         return {
           draftId: index > 0 ? generateDraftId() : optionToChange.draftId,
           text: {

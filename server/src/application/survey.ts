@@ -1616,12 +1616,14 @@ async function updateSectionOptionCategories(
     categoryGroups,
     t,
   );
+
   const savedCategoryGroups = categoryGroups.map((group) => ({
     ...group,
     id: categoryGroupRows.find(
       (categoryGroupRow) => categoryGroupRow.draftId === group.id,
     )?.id,
   }));
+
   return upsertCategories(savedCategoryGroups, t);
 }
 

@@ -27,6 +27,7 @@ import asyncHandler from 'express-async-handler';
 import { body, param, query } from 'express-validator';
 import { validateRequest } from '../utils';
 import { isInternalUser } from '@src/user';
+import { randomUUID } from 'crypto';
 const router = Router();
 
 /**
@@ -242,6 +243,10 @@ router.post(
     // Just in case: change every 'id' -field found on the copied survey into null to prevent overwriting anything
     function eachRecursive(obj) {
       for (const key in obj) {
+        // Don't modify categorized checkbox questions yet
+        if (key === 'categories') {
+          continue;
+        }
         if (typeof obj[key] == 'object' && obj[key] !== null) {
           eachRecursive(obj[key]);
         } else {
@@ -253,6 +258,38 @@ router.post(
     }
 
     eachRecursive(copiedSurveyData);
+
+    // Create custom ids for categorized checkbox options which are needed for saving
+    copiedSurveyData.pages.forEach((page) => {
+      page.sections.forEach((section) => {
+        if (section.type === 'categorized-checkbox') {
+          const sectionCategoryIdMap = {};
+          section.categoryGroups = section.categoryGroups.map((group) => {
+            return {
+              ...group,
+              categories: group.categories?.map((category) => {
+                sectionCategoryIdMap[category.id] =
+                  sectionCategoryIdMap[category.id] ?? randomUUID();
+                return {
+                  ...category,
+                  id: sectionCategoryIdMap[category.id], // category id
+                };
+              }),
+              id: randomUUID(), // category group id
+            };
+          });
+          section.options = section.options.map((option) => {
+            return {
+              ...option,
+              categories: option.categories?.map((category) => ({
+                ...category,
+                id: sectionCategoryIdMap[category.id],
+              })),
+            };
+          });
+        }
+      });
+    });
 
     // Duplicates all files in original survey to keep fileurls unique
     const surveyWithDuplicatedFiles = await duplicateFiles(

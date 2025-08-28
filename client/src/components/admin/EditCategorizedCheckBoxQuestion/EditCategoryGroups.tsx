@@ -146,6 +146,16 @@ function CategoryGroup({
             onChange={(event) => {
               setNewCategory(event.target.value);
             }}
+            onKeyDown={(event) => {
+              if (
+                ['Enter', 'NumpadEnter'].includes(event.nativeEvent.code) &&
+                categories.every((cat) => cat.name[language] !== newCategory)
+              ) {
+                event.preventDefault();
+                handleAddCategory(newCategory);
+                setNewCategory('');
+              }
+            }}
             placeholder={
               tr.EditCategorizedCheckBoxQuestion.categoryAddPlaceholder
             }

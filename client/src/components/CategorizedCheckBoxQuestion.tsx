@@ -344,23 +344,25 @@ export function CategorizedCheckBoxQuestion({
       ? [...selectedFilters, categoryId]
       : selectedFilters.filter((id) => id !== categoryId);
 
-    const categoriesToHide = question.categoryGroups
-      .filter((group) =>
-        group.categories.some((category) =>
-          newSelectedFilters.includes(category.id),
-        ),
-      )
-      .flatMap((group) =>
-        group.categories
-          .filter((category) => !newSelectedFilters.includes(category.id))
-          .map((cat) => cat.id),
-      );
+    const filterByGroups = question.categoryGroups.map((group) =>
+      group.categories
+        .map((category) => category.id)
+        .filter((category) => newSelectedFilters.includes(category)),
+    );
+
+    const optionIdsToShow = question.options
+      .filter((option) => {
+        const optionCategoryIds = option.categories.map((cat) => cat.id);
+        return filterByGroups.every(
+          (group) =>
+            group.length === 0 ||
+            group.some((catId) => optionCategoryIds.includes(catId)),
+        );
+      })
+      .map((option) => option.id);
 
     setHiddenOptions(
-      question.options.filter(
-        (option) =>
-          option.categories?.some((cat) => categoriesToHide.includes(cat.id)),
-      ),
+      question.options.filter((option) => !optionIdsToShow.includes(option.id)),
     );
 
     onChange(value, newSelectedFilters);
