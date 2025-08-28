@@ -157,16 +157,16 @@ function getPersonalInfoForPrint(
 
   const data: Content[] = [
     ...(personalInfoQuestion.askName
-      ? [{ text: `${tr.PersonalInfo.name}: ${answer.name} ?? ''` }]
+      ? [{ text: `${tr.PersonalInfo.name}: ${answer.name ?? ''}` }]
       : []),
     ...(personalInfoQuestion.askEmail
-      ? [{ text: `${tr.PersonalInfo.email}: ${answer.email} ?? ''` }]
+      ? [{ text: `${tr.PersonalInfo.email}: ${answer.email ?? ''}` }]
       : []),
     ...(personalInfoQuestion.askPhone
-      ? [{ text: `${tr.PersonalInfo.phone}: ${answer.phone} ?? ''` }]
+      ? [{ text: `${tr.PersonalInfo.phone}: ${answer.phone ?? ''}` }]
       : []),
     ...(personalInfoQuestion.askAddress
-      ? [{ text: `${tr.PersonalInfo.address}: ${answer.address} ?? ''` }]
+      ? [{ text: `${tr.PersonalInfo.address}: ${answer.address ?? ''}` }]
       : []),
     ...personalInfoQuestion.customQuestions
       .filter((q) => q.ask)
