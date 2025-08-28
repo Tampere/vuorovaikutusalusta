@@ -120,7 +120,7 @@ function SurveyQuestion({
       >
         <Typography
           component="h3"
-          sx={{ margin: readOnly ? 0 : '' }}
+          sx={{ marginBottom: readOnly ? '1rem' : '' }}
           variant={props.isFollowUp ? 'followUpSectionTitle' : 'questionTitle'}
         >
           {question.title?.[surveyLanguage]}
