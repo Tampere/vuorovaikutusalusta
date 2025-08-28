@@ -78,7 +78,6 @@ export default function QuestionOptions({
     optionIndex: number,
     optionToChange: SectionOption,
   ) {
-    console.log(optionValue);
     const clipboardRows = optionValue.split(/(?!\B"[^"]*)\n(?![^"]*"\B)/);
     const optionFields = clipboardRows
       .map((row, index): SectionOption => {
@@ -95,7 +94,7 @@ export default function QuestionOptions({
           (clipboardRows.length > 1 && optionFields[0] === '')
         )
           return null;
-        console.log(optionFields);
+
         return {
           draftId: index > 0 ? generateDraftId() : optionToChange.draftId,
           text: {

@@ -108,7 +108,6 @@ function CategorizedOption({
           value={option.text?.[surveyLanguage] ?? ''}
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
             const value = event.target.value;
-            console.log(JSON.stringify(value));
             // Only allow copying from clipboard if
             // 1) feature is enabled
             // 2) the copied fields' format is correct
