@@ -12,6 +12,7 @@ import {
   SurveyMultiMatrixQuestion,
   SurveyNumericQuestion,
   SurveyPageSection,
+  SurveyPersonalInfoQuestion,
   SurveyRadioQuestion,
   SurveySliderQuestion,
   SurveySortingQuestion,
@@ -29,6 +30,7 @@ import {
   LinearScale,
   Looks4,
   Map,
+  Person,
   RadioButtonChecked,
   Subject,
   TextFields,
@@ -64,6 +66,7 @@ import EditTextSection from '../EditTextSection';
 import { FollowUpSectionMenu } from './FollowUpSectionMenu';
 import { DragHandle } from '@src/components/DragAndDrop/SortableItem';
 import EditCategorizedCheckBoxQuestion from '../EditCategorizedCheckBoxQuestion/EditCategorizedCheckBoxQuestion';
+import { EditPersonalInfoQuestion } from '../EditPersonalInfoQuestion';
 
 const styles = {
   accordion: {
@@ -287,6 +290,16 @@ export function FollowUpSectionAccordion(props: Props) {
       icon: <AttachFile />,
       tooltip: tr.SurveySection.attachmentSection,
       form: <EditAttachmentSection />,
+    },
+    'personal-info': {
+      icon: <Person />,
+      tooltip: tr.SurveySection.personalInfoQuestion,
+      form: (
+        <EditPersonalInfoQuestion
+          section={props.section as SurveyPersonalInfoQuestion}
+          onChange={handleEdit}
+        />
+      ),
     },
   };
 

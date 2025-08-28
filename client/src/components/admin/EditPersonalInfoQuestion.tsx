@@ -197,8 +197,8 @@ export function EditPersonalInfoQuestion({ section, onChange }: Props) {
                       style={inputStyle}
                       placeholder={tr.PersonalInfoQuestion.customQuestion}
                       onChange={(e) => {
-                        const newQuestions = section.customQuestions.map(
-                          (prev, prevIdx) => {
+                        const newQuestions = section.customQuestions
+                          .map((prev, prevIdx) => {
                             if (prevIdx !== idx) return prev;
                             return {
                               ...prev,
@@ -207,21 +207,29 @@ export function EditPersonalInfoQuestion({ section, onChange }: Props) {
                                 [surveyLanguage]: e.target.value,
                               },
                             };
-                          },
-                        );
+                          })
+                          .filter((e, idx) => {
+                            if (idx === section.customQuestions.length - 1)
+                              return true; // Never remove last element
+                            return e.label[surveyLanguage].length > 0;
+                          });
 
                         // Add new input row if there are no empty rows anymore
                         if (
-                          newQuestions.filter(
-                            (e) => e.label[surveyLanguage].length === 0,
-                          ).length <= 0
-                        )
+                          newQuestions[newQuestions.length - 1].label[
+                            surveyLanguage
+                          ].length !== 0
+                        ) {
                           newQuestions.push({
                             ask: false,
                             label: initializeLocalizedObject(''),
                           });
+                        }
 
-                        onChange({ ...section, customQuestions: newQuestions });
+                        onChange({
+                          ...section,
+                          customQuestions: newQuestions,
+                        });
                       }}
                     />
                     {cq.label[surveyLanguage] !== '' && (

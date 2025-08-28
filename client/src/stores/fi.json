@@ -72,8 +72,8 @@
     "requireEmailRegistrationHelperText": "Kyselyn etusivulla vastaajan täytyy antaa sähköpostiosoitteensa. Osoitteeseen toimitetaan linkki, josta pääsee vastaamaan kyselyyn. Kyselyyn voi vastata vain kerran samasta sähköpostiosoitteesta."
   },
   "EditSurveyEmail": {
-    "includePersonalInfo": "Inkludera respondentens personuppgifter",
-    "includePersonalInfoHelperText": "Eventuella svar på personuppgiftsfrågan inkluderas på framsidan av pdf-rapporten.",
+    "includePersonalInfo": "Sisällytä vastaajan henkilötiedot",
+    "includePersonalInfoHelperText": "Mahdollisen henkilötietokysymyksen vastaukset sisällytetään pdf-raportin etusivulle.",
     "enable": "Salli vastausten raportointi sähköpostitse",
     "enableHelperText": "Jos sallit vastausten raportoinnin sähköpostitse, lähetetään yksittäiset vastaukset pdf-raportteina alla määrittelemiisi osoitteisiin. Lisäksi vastaajalta kysytään kyselyn lopussa hänen sähköpostiosoitettaan, johon pdf-raportti voidaan toimittaa.",
     "autoSendTo": "Vastaanottajien sähköpostiosoitteet",
