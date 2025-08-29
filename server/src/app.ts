@@ -152,7 +152,7 @@ async function start() {
       res.status(200).set({ 'Content-Type': 'text/html' }).end(renderedHtml);
     } catch (e: any) {
       isDev && vite.ssrFixStacktrace(e);
-      console.log(e.stack);
+      logger.error(e.stack);
       next(e);
     }
   });
