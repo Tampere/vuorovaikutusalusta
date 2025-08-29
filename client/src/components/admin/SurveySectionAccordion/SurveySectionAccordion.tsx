@@ -55,7 +55,6 @@ import {
   replaceTranslationsWithNull,
 } from '@src/utils/schemaValidation';
 import React, {
-  Component,
   ReactElement,
   ReactNode,
   useMemo,

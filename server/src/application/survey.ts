@@ -21,7 +21,6 @@ import {
   SurveyTheme,
   SurveySortingQuestion,
   SurveyCategorizedCheckboxQuestion,
-  SectionOptionCategory,
 } from '@interfaces/survey';
 import { User } from '@interfaces/user';
 import {
@@ -223,7 +222,7 @@ type DBSurveyJoin = DBSurvey & {
   option_text: LocalizedText;
   option_group_id: number;
   option_info: LocalizedText;
-  option_categories?: SectionOptionCategory[];
+  option_categories?: string[];
   theme_id: number;
   theme_name: string;
   theme_data: SurveyTheme;
@@ -418,7 +417,7 @@ export async function getPublishedSurvey(
       option.group_id as option_group_id,
       option.info as option_info,
       (
-      SELECT array_agg(jsonb_build_object('id', ca.category_id, 'name', cat.name)) 
+      SELECT array_agg(ca.category_id) 
       FROM data.option_category_assignment ca 
       LEFT JOIN data.option_category cat ON ca.category_id = cat.id
       WHERE ca.option_id = option.id
@@ -705,7 +704,7 @@ export async function getSurvey(params: { id: number } | { name: string }) {
       option.group_id as option_group_id,
       option.info as option_info,
       (
-      SELECT array_agg(jsonb_build_object('id', ca.category_id, 'name', cat.name)) 
+      SELECT array_agg(ca.category_id) 
       FROM data.option_category_assignment ca 
       LEFT JOIN data.option_category cat ON ca.category_id = cat.id
       WHERE ca.option_id = option.id
@@ -1574,9 +1573,9 @@ async function upsertCategoryAssignments(
   const categoryAssignments = options
     .flatMap((option) => {
       return (
-        option.categories?.map((category) => {
+        option.categories?.map((catId) => {
           const categoryId = categories.find(
-            (cat) => cat.draftId === category.id,
+            (cat) => cat.draftId === catId,
           )?.id;
           if (!categoryId) return null;
 

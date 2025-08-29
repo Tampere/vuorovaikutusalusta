@@ -1,7 +1,4 @@
-import {
-  SectionOptionCategory,
-  SectionOptionCategoryGroup,
-} from '@interfaces/survey';
+import { SectionOptionCategoryGroup } from '@interfaces/survey';
 import {
   Box,
   Checkbox,
@@ -15,8 +12,8 @@ import React from 'react';
 
 interface Props {
   optionCategoryGroups: SectionOptionCategoryGroup[];
-  selectedCategories: SectionOptionCategory[];
-  onChange: (categories: SectionOptionCategory[]) => void;
+  selectedCategories: string[];
+  onChange: (categories: string[]) => void;
 }
 
 export function OptionCategoriesSelect({
@@ -52,18 +49,14 @@ export function OptionCategoriesSelect({
                     sx={(theme) => ({ paddingY: theme.spacing(0.4) })}
                     onChange={(e) => {
                       if (e.target.checked) {
-                        onChange([...selectedCategories, category]);
+                        onChange([...selectedCategories, category.id]);
                       } else {
                         onChange(
-                          selectedCategories.filter(
-                            (c) => c.id !== category.id,
-                          ),
+                          selectedCategories.filter((c) => c !== category.id),
                         );
                       }
                     }}
-                    checked={selectedCategories.some(
-                      (c) => c.id === category.id,
-                    )}
+                    checked={selectedCategories.some((c) => c === category.id)}
                   />
                 }
                 label={category.name[language]}

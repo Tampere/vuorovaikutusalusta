@@ -281,10 +281,9 @@ router.post(
           section.options = section.options.map((option) => {
             return {
               ...option,
-              categories: option.categories?.map((category) => ({
-                ...category,
-                id: sectionCategoryIdMap[category.id],
-              })),
+              categories: option.categories?.map(
+                (categoryId) => sectionCategoryIdMap[categoryId],
+              ), // map old category id to new
             };
           });
         }
