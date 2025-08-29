@@ -13,6 +13,8 @@ import { readFile } from 'fs/promises';
 import { createServer } from 'vite';
 import { getSurveyTitle } from './application/survey';
 
+const isDev = process.env.NODE_ENV === 'development';
+
 async function start() {
   const app = express();
 
@@ -34,7 +36,9 @@ async function start() {
             'connect-src': ["'self'"],
             'script-src': [
               "'self'",
-              "'sha256-Z2/iFzh9VMlVkEOar1f/oSHWwQk3ve1qk/C2WdsC4Xk='",
+              isDev
+                ? "'sha256-Z2/iFzh9VMlVkEOar1f/oSHWwQk3ve1qk/C2WdsC4Xk='" // Hash for server built vite, only needed on local
+                : '',
             ],
             'frame-src': 'https://kartat.tampere.fi',
           },
@@ -113,7 +117,6 @@ async function start() {
     },
   );
 
-  const isDev = process.env.NODE_ENV === 'development';
   let vite;
   if (isDev) {
     vite = await createServer({
