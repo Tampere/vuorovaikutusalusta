@@ -204,12 +204,13 @@ async function getFrontPage(
     : null;
 
   const personalInfoQuestion = survey.pages
-    .map((page) =>
-      page.sections.find((section) => section.type === 'personal-info'),
+    .flatMap((page) =>
+      page.sections.flatMap((section) => [
+        section,
+        ...section.followUpSections,
+      ]),
     )
-    .find<SurveyPersonalInfoQuestion>(
-      (section): section is SurveyPersonalInfoQuestion => Boolean(section),
-    );
+    .find((section) => section.type === 'personal-info');
 
   const personalInfoAnswerEntry = answerEntries.find(
     (entry) => entry.type === 'personal-info',
