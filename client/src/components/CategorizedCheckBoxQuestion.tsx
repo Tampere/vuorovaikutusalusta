@@ -46,7 +46,6 @@ const styles = (theme: Theme, isFollowUp?: boolean) => ({
     },
   },
   secondaryText: {
-    color: isFollowUp ? theme.palette.grey[800] : theme.palette.grey[600],
     fontSize: '0.875rem',
   },
   errorText: {
@@ -109,6 +108,12 @@ function CategoriesSelect({
                   '{x}',
                   optionCount.toString(),
                 )}
+          </Typography>
+          <Typography sx={(theme) => styles(theme, isFollowUp).secondaryText}>
+            {tr.CategorizedCheckBoxQuestion.categorySelectDescriptionSecondary}
+          </Typography>
+          <Typography sx={(theme) => styles(theme, isFollowUp).secondaryText}>
+            {tr.CategorizedCheckBoxQuestion.categorySelectDescriptionTertiary}
           </Typography>
           <Stack gap={2}>
             {categoryGroups.map((group) => (
@@ -352,7 +357,7 @@ export function CategorizedCheckBoxQuestion({
 
     const optionIdsToShow = question.options
       .filter((option) => {
-        const optionCategoryIds = option.categories.map((cat) => cat.id);
+        const optionCategoryIds = option.categories?.map((id) => id) ?? [];
         return filterByGroups.every(
           (group) =>
             group.length === 0 ||
@@ -375,19 +380,19 @@ export function CategorizedCheckBoxQuestion({
           .replace('{min}', question.answerLimits.min.toString())
           .replace('{max}', question.answerLimits.max.toString())
       : question.answerLimits?.min
-      ? // Only min limit is set
-        tr.GroupedCheckBoxQuestion.helperTextMin.replace(
-          '{min}',
-          question.answerLimits.min.toString(),
-        )
-      : question.answerLimits?.max
-      ? // Only max limit is set
-        tr.GroupedCheckBoxQuestion.helperTextMax.replace(
-          '{max}',
-          question.answerLimits.max.toString(),
-        )
-      : // No limits are set
-        tr.GroupedCheckBoxQuestion.helperText;
+        ? // Only min limit is set
+          tr.GroupedCheckBoxQuestion.helperTextMin.replace(
+            '{min}',
+            question.answerLimits.min.toString(),
+          )
+        : question.answerLimits?.max
+          ? // Only max limit is set
+            tr.GroupedCheckBoxQuestion.helperTextMax.replace(
+              '{max}',
+              question.answerLimits.max.toString(),
+            )
+          : // No limits are set
+            tr.GroupedCheckBoxQuestion.helperText;
 
   return (
     <Box

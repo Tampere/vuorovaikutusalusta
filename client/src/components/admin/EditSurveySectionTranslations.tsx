@@ -134,6 +134,88 @@ export default function EditSurveySectionTranslations({
           })}
         </div>
       )}
+      {section.type === 'categorized-checkbox' && (
+        <div>
+          {section.categoryGroups.map((group, groupIndex) => {
+            return (
+              <div key={`group-index=${groupIndex}`}>
+                <TranslationField
+                  value={group.name[languageCode] ?? ''}
+                  onChange={(event) => {
+                    const updatedGroups = [...section.categoryGroups];
+                    updatedGroups[groupIndex].name = {
+                      ...updatedGroups[groupIndex].name,
+                      [languageCode]: event.target.value,
+                    };
+                    onEdit({ ...section, categoryGroups: updatedGroups });
+                  }}
+                />
+                {group.categories.map((category, optionIndex) => (
+                  <div key={`option-index-${optionIndex}`}>
+                    <TranslationField
+                      value={category.name[languageCode] ?? ''}
+                      onChange={(event) => {
+                        const updatedGroups = [...section.categoryGroups];
+                        const updatedCategories = [...group.categories];
+                        updatedCategories[optionIndex].name = {
+                          ...updatedCategories[optionIndex].name,
+                          [languageCode]: event.target.value,
+                        };
+                        updatedGroups[groupIndex].categories =
+                          updatedCategories;
+                        onEdit({ ...section, categoryGroups: updatedGroups });
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
+            );
+          })}
+          {section.options.map((option, optionIndex) => (
+            <div key={`option-index-${optionIndex}`}>
+              <TranslationField
+                value={option.text[languageCode] ?? ''}
+                onChange={(event) => {
+                  const updatedOptions = [...section.options];
+                  updatedOptions[optionIndex].text = {
+                    ...updatedOptions[optionIndex].text,
+                    [languageCode]: event.target.value,
+                  };
+                  onEdit({ ...section, options: updatedOptions });
+                }}
+              />
+              {languages
+                .map((supportedLanguage) =>
+                  Boolean(option.info?.[supportedLanguage]),
+                )
+                .includes(true) && (
+                <div
+                  style={{
+                    wordBreak: 'break-word',
+                    overflow: 'hidden',
+                    whiteSpace: 'nowrap',
+                    position: 'relative',
+                  }}
+                >
+                  <RichTextEditor
+                    value={option.info?.[languageCode]}
+                    missingValue={Boolean(!option.info?.[languageCode])}
+                    onChange={(value) => {
+                      const updatedOptions = [...section.options];
+                      updatedOptions[optionIndex].info = {
+                        ...updatedOptions[optionIndex].info,
+                        [languageCode]: value,
+                      };
+                      onEdit({ ...section, options: updatedOptions });
+                    }}
+                    editorHeight={'100px'}
+                  />
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
       {section.type === 'slider' && (section.maxLabel || section.minLabel) && (
         <div>
           <TranslationField
@@ -239,6 +321,30 @@ export default function EditSurveySectionTranslations({
           }}
         />
       )}
+      {section.type === 'personal-info' &&
+        section.customQuestions.map((question, idx) => (
+          <TranslationField
+            key={`${question.label}-${idx}`}
+            value={question.label?.[languageCode] ?? ''}
+            onChange={(event) => {
+              onEdit({
+                ...section,
+                customQuestions: section.customQuestions.map(
+                  (customQuestion, customQuestionIdx) =>
+                    customQuestionIdx === idx
+                      ? {
+                          ...customQuestion,
+                          label: {
+                            ...customQuestion.label,
+                            [languageCode]: event.target.value,
+                          },
+                        }
+                      : customQuestion,
+                ),
+              });
+            }}
+          />
+        ))}
       {/* Section info */}
       {section.info && (
         <div

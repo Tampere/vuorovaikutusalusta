@@ -557,7 +557,7 @@ export interface SectionOption {
   /**
    * Categories where the option belongs to
    */
-  categories?: SectionOptionCategory[];
+  categories?: SectionOptionCategory['id'][];
 }
 
 /**
@@ -569,7 +569,7 @@ export interface SectionOptionCategory {
    */
   id: string;
   /**
-   * Name of the category
+   * Localized name of the category
    */
   name: LocalizedText;
 }

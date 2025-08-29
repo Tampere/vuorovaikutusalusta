@@ -89,7 +89,7 @@ function CategoryGroup({
   handleCategoryGroupAdd,
   inputRef,
 }: CategoryGroupProps) {
-  const { language, tr } = useTranslations();
+  const { surveyLanguage, tr } = useTranslations();
   const [newCategory, setNewCategory] = useState('');
 
   return (
@@ -149,7 +149,9 @@ function CategoryGroup({
             onKeyDown={(event) => {
               if (
                 ['Enter', 'NumpadEnter'].includes(event.nativeEvent.code) &&
-                categories.every((cat) => cat.name[language] !== newCategory)
+                categories.every(
+                  (cat) => cat.name[surveyLanguage] !== newCategory,
+                )
               ) {
                 event.preventDefault();
                 handleAddCategory(newCategory);
@@ -163,7 +165,7 @@ function CategoryGroup({
           <Button
             disabled={
               !newCategory ||
-              categories.some((cat) => cat.name[language] === newCategory)
+              categories.some((cat) => cat.name[surveyLanguage] === newCategory)
             }
             endIcon={<ArrowForward />}
             onClick={() => {
@@ -186,7 +188,7 @@ function CategoryGroup({
           {categories.map((category) => (
             <Chip
               sx={{ fontSize: '0.75rem' }}
-              label={category.name[language]}
+              label={category.name[surveyLanguage]}
               key={category.id}
               onDelete={() => handleDeleteCategory(category.id)}
             />
@@ -214,7 +216,7 @@ export function EditCategoryGroups({
   handleCategoryGroupEdit,
   handleCategoryGroupDelete,
 }: Props) {
-  const { tr, language } = useTranslations();
+  const { tr, surveyLanguage } = useTranslations();
 
   // Array of references to the option input elements
   const inputRefs = useMemo(
@@ -238,7 +240,7 @@ export function EditCategoryGroups({
           inputRef={inputRefs[idx]}
           groupIndex={idx}
           key={group.id}
-          name={group.name[language]}
+          name={group.name[surveyLanguage]}
           categories={group.categories}
           handleAddCategory={(category) => {
             handleCategoryAdd(group.id, category);

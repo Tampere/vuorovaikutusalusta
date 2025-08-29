@@ -90,6 +90,15 @@ function CategorizedOption({
 }: CategorizedOptionProps) {
   const { tr, surveyLanguage, initializeLocalizedObject } = useTranslations();
   const [displayGroups, setDisplayGroup] = useState(false);
+
+  function getCategoryName(categoryId: string) {
+    return (
+      optionCategoryGroups
+        .flatMap((group) => group.categories)
+        .find((cat) => cat.id === categoryId)?.name[surveyLanguage] ?? ''
+    );
+  }
+
   return (
     <Stack sx={styles.optionRowRoot}>
       <Box sx={styles.optionRowInput}>
@@ -195,8 +204,8 @@ function CategorizedOption({
         }}
       >
         {option.categories &&
-          option.categories.map((category) => (
-            <Chip label={category.name[surveyLanguage]} key={category.id} />
+          option.categories.map((categoryId) => (
+            <Chip label={getCategoryName(categoryId)} key={categoryId} />
           ))}
 
         <Button

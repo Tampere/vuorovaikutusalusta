@@ -41,7 +41,7 @@ export default function EditCategorizedCheckBoxQuestion({
   disabled,
   onChange,
 }: Props) {
-  const { tr, initializeLocalizedObject } = useTranslations();
+  const { tr, initializeLocalizedObject, surveyLanguage } = useTranslations();
   function clampValue(value: number, min: number, max: number) {
     return value === null ? null : Math.max(Math.min(max, value), min);
   }
@@ -173,7 +173,10 @@ export default function EditCategorizedCheckBoxQuestion({
                       ...group.categories,
                       {
                         id: crypto.randomUUID(),
-                        name: initializeLocalizedObject(category),
+                        name: {
+                          ...initializeLocalizedObject(''),
+                          [surveyLanguage]: category,
+                        },
                       },
                     ],
                   };
