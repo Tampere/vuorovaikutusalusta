@@ -25,7 +25,7 @@ export default defineConfig({
           if (isAdminRoute(req.url!)) {
             req.url = '/admin/';
           } else if (isIndexRoute(req.url!)) {
-            req.url = '/';
+            req.url = `/frontproxy_${req.url.split('/').pop()}`;
           }
           next();
         });
@@ -35,7 +35,7 @@ export default defineConfig({
           if (isAdminRoute(req.url!)) {
             req.url = '/admin/';
           } else if (isIndexRoute(req.url!)) {
-            req.url = '/';
+            req.url = `/frontproxy_${req.url.split('/').pop()}`;
           }
           next();
         });
@@ -50,7 +50,9 @@ export default defineConfig({
     watch: { usePolling: process.env.VITE_USE_POLLING === 'true' },
     host: '0.0.0.0',
     port: 8080,
+    allowedHosts: ['server'],
     proxy: {
+      '^/frontproxy_[a-z0-9]*': proxyAddress,
       '/api': proxyAddress,
       '/login': proxyAddress,
       '/.auth': proxyAddress,

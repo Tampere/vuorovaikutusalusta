@@ -21,6 +21,7 @@ services:
       - .git:/app/.git:cached
       - ./server:/app/server:cached
       - ./interfaces:/app/interfaces:cached
+      - ./client:/app/client:cached
       - /app/server/node_modules
     ports:
       - '3000:3000'
