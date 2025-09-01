@@ -139,7 +139,9 @@ async function start() {
     );
 
     //Janky local proxy rewrite
-    const name = req.params.surveyname.split('_').pop();
+    const name = isDev
+      ? req.params.surveyname.split('frontproxy_').pop()
+      : req.params.surveyname;
 
     const title = await getSurveyTitle({ name });
 
