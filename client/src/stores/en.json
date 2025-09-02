@@ -39,6 +39,7 @@
     "deleteSurveySuccessful": "Survey successfully deleted!",
     "allowSavingUnfinished": "Allow saving an unfinished survey",
     "displayPrivacyStatement": "Display link for data protection and management in the footer",
+    "saveFailedAnswerSubmitted": "Survey responses prevent saving changes.",
     "copyPage": "Copy page",
     "attachNewPage": "Attach page",
     "pageAttached": "Please note that selected map layers are not copied. Check map layer selections and fix published map url if needed.",
@@ -106,6 +107,13 @@
         "greaterThan": "answer is at least"
       }
     },
+    "confirmEditDialog": {
+      "title": "Can the already accumulated responses be distorted?",
+      "content": "Responses have already been received for the survey. Editing the questions now may cause the responses to be distorted.",
+      "confirm": "Are you sure you want to continue?"
+    },
+    "fetchingSubmissions": "Fetching submissions",
+    "errorFetchingSubmissions": "Error checking survey response data.",
     "deletePage": "Delete page",
     "confirmDeletePage": "Are you sure you want to delete this page? The action cannot be reversed.",
     "deletePageFailed": "Error while deleting the survey page. Please try again later.",

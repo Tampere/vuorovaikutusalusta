@@ -4,6 +4,12 @@ import {
   Box,
   Button,
   Checkbox,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   FormControl,
   FormControlLabel,
   FormGroup,
@@ -62,6 +68,30 @@ export default function EditSurveyPage() {
   const [mapPreviewOpen, setMapPreviewOpen] = useState(false);
   const [modifyMapView, setModifyMapView] = useState(false);
 
+  const [isEditable, setIsEditable] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    const getSubmissions = async () => {
+      try {
+        const submissions = await (
+          await fetch(`/api/surveys/${surveyId}/submissions`)
+        ).json();
+        if (submissions.length > 0) {
+          setIsEditable(false);
+        } else {
+          setIsEditable(true);
+        }
+      } catch (error) {
+        showToast({
+          severity: 'error',
+          message: tr.EditSurveyPage.errorFetchingSubmissions,
+        });
+        setIsEditable(true);
+      }
+    };
+    getSubmissions();
+  }, []);
+
   const page = useMemo(() => {
     return activeSurvey.pages.find((page) => page.id === Number(pageId));
   }, [activeSurvey, pageId]);
@@ -92,6 +122,46 @@ export default function EditSurveyPage() {
   function handleDeleteDefaultView() {
     setDefaultView(null);
     editPage({ ...page, sidebar: { ...page.sidebar, defaultMapView: null } });
+  }
+
+  if (isEditable === null) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '1rem',
+          textAlign: 'center',
+          alignItems: 'center',
+          mt: 4,
+        }}
+      >
+        <Typography
+          variant="h6"
+          sx={{
+            color: 'primary.main',
+            mt: 2,
+            '&::after': {
+              display: 'inline-block',
+              width: '1em',
+              textAlign: 'left',
+              animation: 'blink 1s steps(1, end) infinite',
+              content: '""',
+            },
+            '@keyframes blink': {
+              '0%, 20%': { content: '""' },
+              '40%': { content: '"."' },
+              '60%': { content: '".."' },
+              '80%, 100%': { content: '"..."' },
+            },
+          }}
+        >
+          {tr.EditSurveyPage.fetchingSubmissions}
+        </Typography>
+
+        <CircularProgress sx={{ color: 'primary.main' }} />
+      </Box>
+    );
   }
 
   return !page ? null : (
@@ -417,6 +487,43 @@ export default function EditSurveyPage() {
           })
         }
       />
+      <Dialog
+        open={!isEditable}
+        onClose={() => setDeleteConfirmDialogOpen(false)}
+      >
+        <DialogTitle>{tr.EditSurveyPage.confirmEditDialog.title}</DialogTitle>
+        <DialogContent
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '1rem',
+            maxWidth: '500px',
+          }}
+        >
+          <DialogContentText>
+            {tr.EditSurveyPage.confirmEditDialog.content}
+          </DialogContentText>
+          <DialogContentText>
+            {tr.EditSurveyPage.confirmEditDialog.confirm}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => history.push(`kyselyt/${surveyId}/perustiedot`)}
+            color="primary"
+          >
+            {tr.commands.cancel}
+          </Button>
+          <Button
+            onClick={() => {
+              setIsEditable(true);
+            }}
+            color="primary"
+          >
+            {tr.options.yes}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Fieldset>
   );
 }

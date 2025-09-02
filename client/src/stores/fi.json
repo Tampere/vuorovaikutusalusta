@@ -39,6 +39,7 @@
     "deleteSurveySuccessful": "Kysely poistettiin onnistuneesti!",
     "allowSavingUnfinished": "Salli kyselyn tallentaminen keskeneräisenä",
     "displayPrivacyStatement": "Näytä tietosuoja ja tiedonhallinta -linkki alatunnisteessa",
+    "saveFailedAnswerSubmitted": "Kyselyn vastaukset estävät muutosten tallentamisen.",
     "copyPage": "Kopioi sivu",
     "attachNewPage": "Liitä sivu",
     "pageAttached": "Huomaa, että karttatasovalinnat eivät kopioidu. Tarkista karttatasovalinnat ja korjaa tarvittaessa karttajulkaisuosoitetta.",
@@ -120,6 +121,13 @@
         "greaterThan": "vastaus on vähintään"
       }
     },
+    "confirmEditDialog": {
+      "title": "Saavatko jo kertyneet vastaukset vääristyä?",
+      "content": "Kyselyyn on jo saapunut vastauksia. Kysymysten muokkaaminen nyt saattaa aiheuttaa vastausten vääristymisen.",
+      "confirm": "Haluatko varmasti jatkaa?"
+    },
+    "fetchingSubmissions": "Tarkistetaan vastauksia",
+    "errorFetchingSubmissions": "Virhe tarkistettaessa kyselyn vastaustietoja.",
     "deletePage": "Poista sivu",
     "confirmDeletePage": "Haluatko varmasti poistaa tämän sivun? Toimintoa ei voida perua.",
     "deletePageFailed": "Sivun poistamisessa tapahtui virhe. Yritä myöhemmin uudestaan.",

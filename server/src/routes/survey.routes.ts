@@ -21,7 +21,7 @@ import {
   userCanEditSurvey,
 } from '@src/application/survey';
 import { ensureAuthenticated, ensureSurveyGroupAccess } from '@src/auth';
-import { ForbiddenError } from '@src/error';
+import { BadRequestError, ForbiddenError } from '@src/error';
 import { Router } from 'express';
 import asyncHandler from 'express-async-handler';
 import { body, param, query } from 'express-validator';
@@ -193,8 +193,20 @@ router.put(
       endDate: req.body.endDate ? new Date(req.body.endDate) : null,
       pages: req.body.pages,
     };
-    const updatedSurvey = await updateSurvey(survey);
-    res.status(200).json(updatedSurvey);
+
+    try {
+      const updatedSurvey = await updateSurvey(survey);
+      res.status(200).json(updatedSurvey);
+    } catch (error) {
+      throw (error.table === 'answer_entry' ||
+        error.table === 'personal_info') &&
+        Boolean(error.constraint)
+        ? new BadRequestError(
+            `Submitted answer prevents survey update: ${error.constraint}`,
+            'submitted_answer_prevents_update',
+          )
+        : error;
+    }
   }),
 );
 
