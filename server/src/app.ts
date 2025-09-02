@@ -130,7 +130,7 @@ async function start() {
   }
 
   // Serve frontend files from remaining URLs
-  app.get('/:surveyname', async (req, res, next) => {
+  app.get(['/:surveyname', '/:surveyname/*splat'], async (req, res, next) => {
     const baseTemplate = await readFile(
       !isDev
         ? path.resolve(__dirname, '../static/index.html')
@@ -148,11 +148,15 @@ async function start() {
     try {
       const template = !isDev
         ? baseTemplate
-        : await vite.transformIndexHtml(req.url, baseTemplate);
+        : await vite.transformIndexHtml('/', baseTemplate);
+
+      console.log(template);
 
       const renderedHtml = template
         .replaceAll(`<!--app-title -->`, title)
         .replace('@clientSrc', 'src');
+
+      console.log(renderedHtml);
 
       res.status(200).set({ 'Content-Type': 'text/html' }).end(renderedHtml);
     } catch (e: any) {

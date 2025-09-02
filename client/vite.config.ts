@@ -22,20 +22,32 @@ export default defineConfig({
       name: 'rewrite-middleware',
       configureServer(server) {
         server.middlewares.use((req, _res, next) => {
+          if (req.url.endsWith('src/index.tsx')) {
+            req.url = '/src/index.tsx';
+            next();
+            return;
+          }
+
           if (isAdminRoute(req.url!)) {
             req.url = '/admin/';
           } else if (isIndexRoute(req.url!)) {
-            req.url = `/frontproxy_${req.url.split('/').pop()}`;
+            req.url = `/frontproxy_${req.url.substring(1)}`;
           }
           next();
         });
       },
       configurePreviewServer(server) {
         server.middlewares.use((req, _res, next) => {
+          if (req.url.endsWith('src/index.tsx')) {
+            req.url = '/src/index.tsx';
+            next();
+            return;
+          }
+
           if (isAdminRoute(req.url!)) {
             req.url = '/admin/';
           } else if (isIndexRoute(req.url!)) {
-            req.url = `/frontproxy_${req.url.split('/').pop()}`;
+            req.url = `/frontproxy_${req.url.substring(1)}`;
           }
           next();
         });
