@@ -638,7 +638,8 @@
     "missingTranslation": "Käännös puuttuu",
     "optionInfo": "Vaihtoehdon lisätiedot",
     "emailInfo": "Sähköposti",
-    "thanksPage": "Kiitos-sivu"
+    "thanksPage": "Kiitos-sivu",
+    "sections": "Kysymykset"
   },
   "SurveySubmissionsPage": {
     "attachments": "Liitteet",

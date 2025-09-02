@@ -638,7 +638,8 @@
     "missingTranslation": "Missing translation",
     "optionInfo": "Option info",
     "emailInfo": "Email",
-    "thanksPage": "Thank you -page"
+    "thanksPage": "Thank you -page",
+    "sections": "Sections"
   },
   "SurveySubmissionsPage": {
     "attachments": "Attachments",
