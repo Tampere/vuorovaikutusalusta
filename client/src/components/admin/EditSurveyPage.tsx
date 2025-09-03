@@ -21,6 +21,7 @@ import {
   ToggleButton,
   ToggleButtonGroup,
   Typography,
+  useTheme,
 } from '@mui/material';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useAdminMap } from '@src/stores/SurveyMapContext';
@@ -69,6 +70,7 @@ export default function EditSurveyPage() {
   const [modifyMapView, setModifyMapView] = useState(false);
 
   const [isEditable, setIsEditable] = useState<boolean | null>(null);
+  const theme = useTheme();
 
   useEffect(() => {
     const getSubmissions = async () => {
@@ -491,7 +493,9 @@ export default function EditSurveyPage() {
         open={!isEditable}
         onClose={() => setDeleteConfirmDialogOpen(false)}
       >
-        <DialogTitle>{tr.EditSurveyPage.confirmEditDialog.title}</DialogTitle>
+        <DialogTitle color={theme.palette.error.dark}>
+          {tr.EditSurveyPage.confirmEditDialog.title}
+        </DialogTitle>
         <DialogContent
           sx={{
             display: 'flex',
