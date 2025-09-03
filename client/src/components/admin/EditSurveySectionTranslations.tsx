@@ -4,40 +4,150 @@ import {
   SurveyMapSubQuestion,
   SurveyPageSection,
 } from '@interfaces/survey';
-import { useTranslations } from '@src/stores/TranslationContext';
-import React from 'react';
+import {
+  getSurveySectionTranslationKey,
+  useTranslations,
+} from '@src/stores/TranslationContext';
+import React, { ReactElement } from 'react';
 import RichTextEditor from '../RichTextEditor';
 import TranslationField from './TranslationField';
 import Box from '@mui/material/Box';
+import {
+  CheckBox,
+  FormatListNumbered,
+  LibraryAddCheck,
+  LinearScale,
+  Looks4,
+  Person,
+  RadioButtonChecked,
+  TextFields,
+  ViewComfy,
+  ViewComfyAlt,
+  Map,
+  AttachFile,
+  Subject,
+  Article,
+  Image,
+} from '@mui/icons-material';
+import { CategorizedCheckboxIcon } from '../icons/CategorizedCheckboxIcon';
+import { capitalizeFirstLetter } from '@src/utils/strings';
 
 const styles = {
   sectionContainer: {
-    border: '2px solid grey',
-    padding: '1rem',
     marginBottom: '1rem',
   },
   titleText: {
     color: 'grey',
   },
+  boldInput: {
+    '& .MuiInputBase-input': {
+      fontWeight: 500,
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+    },
+  },
 };
+
+const sectionIcons: {
+  type: SurveyPageSection['type'];
+  icon: ReactElement;
+}[] = [
+  {
+    type: 'personal-info',
+    icon: <Person />,
+  },
+  {
+    type: 'radio',
+    icon: <RadioButtonChecked />,
+  },
+  {
+    type: 'checkbox',
+    icon: <CheckBox />,
+  },
+  {
+    type: 'free-text',
+    icon: <TextFields />,
+  },
+  {
+    type: 'numeric',
+    icon: <Looks4 />,
+  },
+  {
+    type: 'map',
+    icon: <Map />,
+  },
+  {
+    type: 'sorting',
+    icon: <FormatListNumbered />,
+  },
+  {
+    type: 'slider',
+    icon: <LinearScale />,
+  },
+  {
+    type: 'matrix',
+    icon: <ViewComfy />,
+  },
+  {
+    type: 'multi-matrix',
+    icon: <ViewComfyAlt />,
+  },
+  {
+    type: 'grouped-checkbox',
+    icon: <LibraryAddCheck />,
+  },
+  {
+    type: 'categorized-checkbox',
+    icon: <CategorizedCheckboxIcon />,
+  },
+  {
+    type: 'attachment',
+    icon: <AttachFile />,
+  },
+  {
+    type: 'text',
+    icon: <Subject />,
+  },
+  {
+    type: 'image',
+    icon: <Image />,
+  },
+  {
+    type: 'document',
+    icon: <Article />,
+  },
+];
 
 interface Props {
   section: SurveyPageSection;
   languageCode: LanguageCode;
   onEdit: (section: SurveyPageSection) => void;
+  hideIcon?: boolean;
 }
 
 export default function EditSurveySectionTranslations({
   section,
   languageCode,
   onEdit,
+  hideIcon = true,
 }: Props) {
-  const { languages } = useTranslations();
+  const { languages, tr, language } = useTranslations();
+  const getTranslationPlaceholder = (fieldName: string) =>
+    `${capitalizeFirstLetter(
+      languageCode,
+    ).toUpperCase()}: ${capitalizeFirstLetter(
+      tr.SurveySection[getSurveySectionTranslationKey(section.type)],
+    )}, ${fieldName}`;
 
   return (
     <Box sx={styles.sectionContainer}>
       <TranslationField
-        variant="standard"
+        placeholder={getTranslationPlaceholder(tr.EditSurveyTranslations.title)}
+        variant="outlined"
+        {...(!hideIcon && {
+          leftIcon: sectionIcons.find((s) => s.type === section.type)?.icon,
+        })}
+        sx={styles.boldInput}
         value={section.title?.[languageCode] ?? ''}
         onChange={(event) => {
           onEdit({
@@ -51,7 +161,11 @@ export default function EditSurveySectionTranslations({
         section.type === 'sorting') &&
         section.options?.map((option: SectionOption, optionIndex) => (
           <TranslationField
+            placeholder={getTranslationPlaceholder(
+              tr.EditSurveyTranslations.option,
+            )}
             key={`option-field-${optionIndex}`}
+            variant="standard"
             value={option.text[languageCode]}
             onChange={(event) => {
               const updatedOptions = [...section.options];
@@ -72,6 +186,10 @@ export default function EditSurveySectionTranslations({
             return (
               <div key={`group-index=${groupIndex}`}>
                 <TranslationField
+                  placeholder={getTranslationPlaceholder(
+                    tr.EditSurveyTranslations.optionGroup,
+                  )}
+                  variant="standard"
                   value={group.name[languageCode] ?? ''}
                   onChange={(event) => {
                     const updatedGroups = [...section.groups];
@@ -85,6 +203,10 @@ export default function EditSurveySectionTranslations({
                 {group.options.map((option, optionIndex) => (
                   <div key={`option-index-${optionIndex}`}>
                     <TranslationField
+                      placeholder={getTranslationPlaceholder(
+                        tr.EditSurveyTranslations.option,
+                      )}
+                      variant="standard"
                       value={option.text[languageCode] ?? ''}
                       onChange={(event) => {
                         const updatedGroups = [...section.groups];
@@ -140,6 +262,10 @@ export default function EditSurveySectionTranslations({
             return (
               <div key={`group-index=${groupIndex}`}>
                 <TranslationField
+                  placeholder={getTranslationPlaceholder(
+                    tr.EditSurveyTranslations.categoryGroup,
+                  )}
+                  variant="standard"
                   value={group.name[languageCode] ?? ''}
                   onChange={(event) => {
                     const updatedGroups = [...section.categoryGroups];
@@ -153,6 +279,10 @@ export default function EditSurveySectionTranslations({
                 {group.categories.map((category, optionIndex) => (
                   <div key={`option-index-${optionIndex}`}>
                     <TranslationField
+                      placeholder={getTranslationPlaceholder(
+                        tr.EditSurveyTranslations.category,
+                      )}
+                      variant="standard"
                       value={category.name[languageCode] ?? ''}
                       onChange={(event) => {
                         const updatedGroups = [...section.categoryGroups];
@@ -174,6 +304,10 @@ export default function EditSurveySectionTranslations({
           {section.options.map((option, optionIndex) => (
             <div key={`option-index-${optionIndex}`}>
               <TranslationField
+                placeholder={getTranslationPlaceholder(
+                  tr.EditSurveyTranslations.option,
+                )}
+                variant="standard"
                 value={option.text[languageCode] ?? ''}
                 onChange={(event) => {
                   const updatedOptions = [...section.options];
@@ -219,6 +353,10 @@ export default function EditSurveySectionTranslations({
       {section.type === 'slider' && (section.maxLabel || section.minLabel) && (
         <div>
           <TranslationField
+            placeholder={getTranslationPlaceholder(
+              tr.EditSurveyTranslations.min,
+            )}
+            variant="standard"
             value={section.minLabel?.[languageCode]}
             onChange={(event) =>
               onEdit({
@@ -231,6 +369,10 @@ export default function EditSurveySectionTranslations({
             }
           />
           <TranslationField
+            placeholder={getTranslationPlaceholder(
+              tr.EditSurveyTranslations.max,
+            )}
+            variant="standard"
             value={section.maxLabel?.[languageCode]}
             onChange={(event) =>
               onEdit({
@@ -249,6 +391,10 @@ export default function EditSurveySectionTranslations({
           {section.classes &&
             section.classes.map((matrixClass, classIndex) => (
               <TranslationField
+                placeholder={getTranslationPlaceholder(
+                  tr.EditSurveyTranslations.class,
+                )}
+                variant="standard"
                 key={`matrix-class-${classIndex}`}
                 value={matrixClass[languageCode] ?? ''}
                 onChange={(event) => {
@@ -264,6 +410,10 @@ export default function EditSurveySectionTranslations({
           {section.subjects &&
             section.subjects.map((matrixSubject, subjectIndex) => (
               <TranslationField
+                placeholder={getTranslationPlaceholder(
+                  tr.EditSurveyTranslations.subject,
+                )}
+                variant="standard"
                 key={`matrix-subject-${subjectIndex}`}
                 value={matrixSubject[languageCode] ?? ''}
                 onChange={(event) => {
@@ -309,6 +459,10 @@ export default function EditSurveySectionTranslations({
       )}
       {section.type === 'image' && (
         <TranslationField
+          placeholder={getTranslationPlaceholder(
+            tr.EditSurveyTranslations.altText,
+          )}
+          variant="standard"
           value={section.altText[languageCode] ?? ''}
           onChange={(event) => {
             onEdit({
@@ -324,6 +478,10 @@ export default function EditSurveySectionTranslations({
       {section.type === 'personal-info' &&
         section.customQuestions.map((question, idx) => (
           <TranslationField
+            placeholder={getTranslationPlaceholder(
+              capitalizeFirstLetter(question.label[language]),
+            )}
+            variant="standard"
             key={`${question.label}-${idx}`}
             value={question.label?.[languageCode] ?? ''}
             onChange={(event) => {

@@ -646,7 +646,18 @@
     "missingTranslation": "Käännös puuttuu",
     "optionInfo": "Vaihtoehdon lisätiedot",
     "emailInfo": "Sähköposti",
-    "thanksPage": "Kiitos-sivu"
+    "thanksPage": "Kiitos-sivu",
+    "sections": "Kysymykset",
+    "option": "Vaihtoehto",
+    "optionGroup": "Vastausryhmä",
+    "title": "Otsikko",
+    "categoryGroup": "Luokka ryhmä",
+    "category": "Luokka",
+    "min": "minimiarvo",
+    "max": "maksimiarvo",
+    "class": "Vastausluokka",
+    "subject": "Vastausaihe",
+    "altText": "Vaihtoehtoinen teksti kuvalle"
   },
   "SurveySubmissionsPage": {
     "attachments": "Liitteet",

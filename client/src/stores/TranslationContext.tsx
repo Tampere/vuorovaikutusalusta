@@ -2,7 +2,7 @@ import React, { ReactNode, useContext, useMemo, useReducer } from 'react';
 import { useHistory } from 'react-router-dom';
 import en from './en.json';
 import fi from './fi.json';
-import { LocalizedText } from '@interfaces/survey';
+import { LocalizedText, SurveyPageSection } from '@interfaces/survey';
 
 // Object containing all translations
 const translations = {
@@ -14,6 +14,9 @@ const translations = {
  * All possible languages
  */
 type Language = keyof typeof translations;
+
+/** Translations */
+export type Translations = (typeof translations)['fi'];
 
 /**
  * Reducer state type
@@ -126,4 +129,45 @@ export default function TranslationProvider({ children }: Props) {
       {children}
     </TranslationContext.Provider>
   );
+}
+
+export function getSurveySectionTranslationKey(
+  sectionType: SurveyPageSection['type'],
+): keyof Translations['SurveySection'] {
+  switch (sectionType) {
+    case 'personal-info':
+      return 'personalInfoQuestion';
+    case 'radio':
+      return 'radioQuestion';
+    case 'checkbox':
+      return 'checkBoxQuestion';
+    case 'free-text':
+      return 'freeTextQuestion';
+    case 'numeric':
+      return 'numericQuestion';
+    case 'map':
+      return 'mapQuestion';
+    case 'sorting':
+      return 'sortingQuestion';
+    case 'slider':
+      return 'sliderQuestion';
+    case 'matrix':
+      return 'matrixQuestion';
+    case 'multi-matrix':
+      return 'multiMatrixQuestion';
+    case 'grouped-checkbox':
+      return 'groupedCheckboxQuestion';
+    case 'categorized-checkbox':
+      return 'categorizedCheckboxQuestion';
+    case 'attachment':
+      return 'attachmentSection';
+    case 'text':
+      return 'textSection';
+    case 'image':
+      return 'imageSection';
+    case 'document':
+      return 'documentSection';
+    default:
+      throw new Error('Unknown section type');
+  }
 }

@@ -87,6 +87,7 @@ interface Props {
   onChange: (value: string) => void;
   editorHeight?: string;
   missingValue?: boolean;
+  placeholder?: string;
 }
 
 /**
@@ -137,6 +138,7 @@ export default function RichTextEditor(props: Props) {
     <Box sx={styles(props.editorHeight).root}>
       {props.label && <FormLabel>{props.label}</FormLabel>}
       <Editor
+        placeholder={props.placeholder}
         readOnly={props.disabled}
         toolbar={{
           options: ['inline', 'list', 'link'],
