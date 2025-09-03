@@ -417,8 +417,8 @@ export async function getPublishedSurvey(
       option.group_id as option_group_id,
       option.info as option_info,
       (
-      SELECT array_agg(ca.category_id) 
-      FROM data.option_category_assignment ca 
+      SELECT array_agg(ca.category_id)
+      FROM data.option_category_assignment ca
       LEFT JOIN data.option_category cat ON ca.category_id = cat.id
       WHERE ca.option_id = option.id
       ) as option_categories
@@ -725,8 +725,8 @@ export async function getSurvey(params: { id: number } | { name: string }) {
       option.group_id as option_group_id,
       option.info as option_info,
       (
-      SELECT array_agg(ca.category_id) 
-      FROM data.option_category_assignment ca 
+      SELECT array_agg(ca.category_id)
+      FROM data.option_category_assignment ca
       LEFT JOIN data.option_category cat ON ca.category_id = cat.id
       WHERE ca.option_id = option.id
       ) as option_categories
@@ -1330,13 +1330,13 @@ async function getSectionCategoryGroups(sectionIds: number[]) {
     }
   >(
     `
-    SELECT 
-        cg.id, 
-        cg.idx, 
-        cg.name, 
+    SELECT
+        cg.id,
+        cg.idx,
+        cg.name,
         cg.section_id,
         c.id AS category_id,
-        c.name AS category_name 
+        c.name AS category_name
     FROM data.option_category_group cg
     LEFT JOIN data.option_category c ON c.category_group_id = cg.id
     WHERE section_id = ANY ($1)
@@ -2018,10 +2018,26 @@ export async function updateSurvey(survey: Survey) {
  * @param survey
  */
 export async function deleteSurvey(id: Number) {
-  const row = await getDb().oneOrNone<DBSurvey>(
-    `DELETE FROM data.survey WHERE id = $1 RETURNING *`,
-    [id],
-  );
+  const row = await getDb().tx(async (t) => {
+    const submissions = await t.manyOrNone(
+      `SELECT id FROM data.submission WHERE survey_id = $1`,
+      [id],
+    );
+
+    if (submissions.length > 0) {
+      const submissionIds = submissions.map((s) => s.id);
+      await t.any(
+        `DELETE FROM data.answer_entry WHERE submission_id = ANY ($1);
+          DELETE FROM data.personal_info WHERE submission_id = ANY ($1);`,
+        [submissionIds],
+      );
+    }
+
+    return t.oneOrNone<DBSurvey>(
+      `DELETE FROM data.survey WHERE id = $1 RETURNING *`,
+      [id],
+    );
+  });
 
   if (!row) {
     throw new NotFoundError(`Survey with ID ${id} not found`);

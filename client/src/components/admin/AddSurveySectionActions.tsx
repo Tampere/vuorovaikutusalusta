@@ -58,9 +58,10 @@ export default function AddSurveySectionActions(props: Props) {
     page.sections.some(
       (section) =>
         section.type === 'personal-info' ||
-        section.followUpSections.some(
-          (fSection) => fSection.type === 'personal-info',
-        ),
+        (section.followUpSections &&
+          section.followUpSections.some(
+            (fSection) => fSection.type === 'personal-info',
+          )),
     ),
   );
 

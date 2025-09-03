@@ -26,6 +26,17 @@ export default function EditSurveyControls() {
   const { showToast } = useToasts();
   const { tr } = useTranslations();
 
+  function getErrorInfoText(info: string) {
+    switch (info) {
+      case 'duplicate_survey_name':
+        return tr.EditSurvey.saveFailedDuplicateName;
+      case 'submitted_answer_prevents_update':
+        return tr.EditSurvey.saveFailedAnswerSubmitted;
+      default:
+        return tr.EditSurvey.saveFailed;
+    }
+  }
+
   const validationErrorTooltip = useMemo(() => {
     return (
       <>
@@ -67,10 +78,7 @@ export default function EditSurveyControls() {
               } catch (error) {
                 showToast({
                   severity: 'error',
-                  message:
-                    error.info === 'duplicate_survey_name'
-                      ? tr.EditSurvey.saveFailedDuplicateName
-                      : tr.EditSurvey.saveFailed,
+                  message: getErrorInfoText(error.info),
                 });
               }
             }}
