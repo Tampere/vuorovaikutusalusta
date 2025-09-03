@@ -1,4 +1,9 @@
-import { LocalizedText, Survey, SurveyEmailInfoItem } from '@interfaces/survey';
+import {
+  LanguageCode,
+  LocalizedText,
+  Survey,
+  SurveyEmailInfoItem,
+} from '@interfaces/survey';
 import {
   Box,
   Checkbox,
@@ -7,7 +12,10 @@ import {
   Typography,
 } from '@mui/material';
 import { useSurvey } from '@src/stores/SurveyContext';
-import { useTranslations } from '@src/stores/TranslationContext';
+import {
+  getSurveySectionTranslationKey,
+  useTranslations,
+} from '@src/stores/TranslationContext';
 import React from 'react';
 import CopyToClipboard from '../CopyToClipboard';
 import Fieldset from '../Fieldset';
@@ -15,6 +23,7 @@ import RichTextEditor from '../RichTextEditor';
 import EditSurveySectionTranslations from './EditSurveySectionTranslations';
 import TranslationField from './TranslationField';
 import { Description, TextFields } from '@mui/icons-material';
+import { capitalizeFirstLetter } from '@src/utils/strings';
 
 const styles = {
   rowContainer: {
@@ -127,6 +136,10 @@ export default function EditSurveyTranslations() {
     editPage,
   } = useSurvey();
   const { tr, languages } = useTranslations();
+  const getTranslationPlaceholder = (
+    value: string,
+    languageCode: LanguageCode,
+  ) => `${capitalizeFirstLetter(languageCode).toUpperCase()}: ${value}`;
 
   return (
     <>
@@ -232,6 +245,10 @@ export default function EditSurveyTranslations() {
                           &nbsp;
                         </Typography>
                         <TranslationField
+                          placeholder={getTranslationPlaceholder(
+                            tr.EditSurveyEmail.emailSubject,
+                            lang,
+                          )}
                           value={activeSurvey.email.subject?.[lang] ?? ''}
                           variant="outlined"
                           sx={styles.boldInput}
@@ -249,6 +266,10 @@ export default function EditSurveyTranslations() {
                           }
                         />
                         <RichTextEditor
+                          placeholder={getTranslationPlaceholder(
+                            tr.EditSurveyEmail.emailBody,
+                            lang,
+                          )}
                           value={activeSurvey.email.body?.[lang] ?? ''}
                           missingValue={Boolean(
                             !activeSurvey.email.body?.[lang],
@@ -274,6 +295,10 @@ export default function EditSurveyTranslations() {
                               sx={styles.keyValueContainer}
                             >
                               <TranslationField
+                                placeholder={getTranslationPlaceholder(
+                                  `${tr.EditSurveyEmail.info}, ${tr.KeyValueForm.key}`,
+                                  lang,
+                                )}
                                 variant="standard"
                                 color="primary"
                                 value={infoRow.name?.[lang] ?? ''}
@@ -297,6 +322,10 @@ export default function EditSurveyTranslations() {
                                 }}
                               />
                               <TranslationField
+                                placeholder={getTranslationPlaceholder(
+                                  `${tr.EditSurveyEmail.info}, ${tr.KeyValueForm.value}`,
+                                  lang,
+                                )}
                                 variant="standard"
                                 color="primary"
                                 value={infoRow.value?.[lang] ?? ''}
@@ -371,6 +400,10 @@ export default function EditSurveyTranslations() {
 
                           <Box sx={styles.pageContainer}>
                             <TranslationField
+                              placeholder={getTranslationPlaceholder(
+                                tr.EditSurveyPage.name,
+                                lang,
+                              )}
                               leftIcon={langIndex === 0 && <Description />}
                               variant="outlined"
                               sx={styles.boldInput}
@@ -388,6 +421,10 @@ export default function EditSurveyTranslations() {
                             />
                             {page.sidebar.type == 'image' && (
                               <TranslationField
+                                placeholder={getTranslationPlaceholder(
+                                  tr.EditSurveyPage.imageAltText,
+                                  lang,
+                                )}
                                 leftIcon={langIndex === 0 && <TextFields />}
                                 variant="outlined"
                                 sx={styles.boldInput}
@@ -464,6 +501,10 @@ export default function EditSurveyTranslations() {
                         &nbsp;
                       </Typography>
                       <TranslationField
+                        placeholder={getTranslationPlaceholder(
+                          tr.EditSurveyTranslations.title,
+                          lang,
+                        )}
                         leftIcon={langIndex === 0 && <TextFields />}
                         sx={styles.boldInput}
                         value={activeSurvey.thanksPage.title?.[lang] ?? ''}
@@ -481,6 +522,10 @@ export default function EditSurveyTranslations() {
                         }
                       />
                       <RichTextEditor
+                        placeholder={getTranslationPlaceholder(
+                          tr.EditSurveyThanksPage.text,
+                          lang,
+                        )}
                         value={activeSurvey.thanksPage.text?.[lang] ?? ''}
                         missingValue={Boolean(
                           !activeSurvey.thanksPage.text?.[lang],

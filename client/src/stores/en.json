@@ -639,7 +639,17 @@
     "optionInfo": "Option info",
     "emailInfo": "Email",
     "thanksPage": "Thank you -page",
-    "sections": "Sections"
+    "sections": "Sections",
+    "option": "Option",
+    "optionGroup": "Option group",
+    "title": "Title",
+    "categoryGroup": "Category group",
+    "category": "Category",
+    "min": "Minimum value",
+    "max": "Maximum value",
+    "class": "Answer class",
+    "subject": "Answer subject",
+    "altText": "Image alternative text"
   },
   "SurveySubmissionsPage": {
     "attachments": "Attachments",

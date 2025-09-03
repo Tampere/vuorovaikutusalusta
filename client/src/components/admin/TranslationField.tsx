@@ -9,6 +9,7 @@ interface Props {
   color?: 'error' | 'primary' | 'secondary' | 'warning' | 'info' | 'success';
   sx?: SxProps;
   leftIcon?: React.ReactElement;
+  placeholder?: string;
 }
 
 export default function TranslationField({
@@ -18,6 +19,7 @@ export default function TranslationField({
   color,
   sx,
   leftIcon,
+  placeholder,
 }: Props) {
   const { tr } = useTranslations();
 
@@ -42,7 +44,9 @@ export default function TranslationField({
         value={value ?? ''}
         onChange={onChange}
         error={!value}
-        placeholder={!value ? tr.EditSurveyTranslations.missingTranslation : ''}
+        placeholder={
+          placeholder ?? tr.EditSurveyTranslations.missingTranslation
+        }
         sx={{
           '& .MuiInputBase-input': {
             overflow: 'hidden',
