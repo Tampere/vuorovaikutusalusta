@@ -234,6 +234,7 @@ export default function GroupedCheckBoxQuestion({
                     />
                     {option.info?.[surveyLanguage] && (
                       <SectionInfo
+                        style={{ float: 'right', marginLeft: 'auto' }}
                         infoText={option.info?.[surveyLanguage]}
                         subject={option.text?.[surveyLanguage]}
                       />
