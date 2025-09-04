@@ -169,6 +169,7 @@ function SurveyQuestion({
           }}
           question={question}
           setDirty={setDirty}
+          readOnly={readOnly}
         />
       )}
       {/* Checkbox question */}
@@ -185,6 +186,7 @@ function SurveyQuestion({
           question={question}
           setDirty={setDirty}
           validationErrors={validationErrors}
+          readOnly={readOnly}
         />
       )}
       {/* Free text question */}

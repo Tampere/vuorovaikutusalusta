@@ -124,6 +124,7 @@ export interface SurveyCheckboxQuestion extends CommonSurveyPageQuestion {
     max?: number;
   };
   allowCustomAnswer: boolean;
+  displaySelection: boolean;
 }
 
 /**
@@ -148,6 +149,7 @@ export interface SurveyRadioQuestion extends CommonSurveyPageQuestion {
   type: 'radio';
   options: SectionOption[];
   allowCustomAnswer: boolean;
+  displaySelection: boolean;
 }
 
 /**

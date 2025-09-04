@@ -225,6 +225,9 @@
     "hideCategorySettings": "Piilota luokka-asetukset",
     "deleteCategoryGroup": "Poista luokka"
   },
+  "EditCheckBoxQuestion": {
+    "displayAsSelect": "Esitä kysymyksen vastausvaihtoehdot alasvetovalikkona"
+  },
   "AddSurveySectionActions": {
     "personalInfoDisabled": "Henkilötietokysymys on jo lisätty kyselyyn.",
     "personalInfoQuestion": "Lisää henkilötietokysymys",

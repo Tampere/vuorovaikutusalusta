@@ -51,6 +51,24 @@ export default function EditRadioQuestion({
         <FormControlLabel
           control={
             <Checkbox
+              name="display-selection"
+              disabled={disabled}
+              checked={section.displaySelection}
+              onChange={(event) => {
+                onChange({
+                  ...section,
+                  displaySelection: event.target.checked,
+                });
+              }}
+            />
+          }
+          label={tr.EditCheckBoxQuestion.displayAsSelect}
+        />
+      </FormGroup>
+      <FormGroup row>
+        <FormControlLabel
+          control={
+            <Checkbox
               name="allow-custom-answer"
               disabled={disabled}
               checked={section.allowCustomAnswer}
