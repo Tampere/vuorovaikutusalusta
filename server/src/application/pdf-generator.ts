@@ -207,7 +207,7 @@ async function getFrontPage(
     .flatMap((page) =>
       page.sections.flatMap((section) => [
         section,
-        ...section.followUpSections,
+        ...(section.followUpSections ?? []),
       ]),
     )
     .find((section) => section.type === 'personal-info');

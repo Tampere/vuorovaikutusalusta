@@ -361,7 +361,7 @@ async function answerEntriesToCSV(
   entries?: CSVJson,
   personalInfoRows?: SubmissionPersonalInfo[],
 ): Promise<string> {
-  const { submissions, headers } = entries ?? { submissions: [] };
+  const { submissions, headers = [] } = entries ?? { submissions: [] };
 
   const personalInfoHeaders = getPersonalInfoHeadersForCSV(
     personalInfoRows[0] ?? null,
