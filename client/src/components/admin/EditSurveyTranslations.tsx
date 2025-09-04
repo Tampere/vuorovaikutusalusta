@@ -12,10 +12,7 @@ import {
   Typography,
 } from '@mui/material';
 import { useSurvey } from '@src/stores/SurveyContext';
-import {
-  getSurveySectionTranslationKey,
-  useTranslations,
-} from '@src/stores/TranslationContext';
+import { useTranslations } from '@src/stores/TranslationContext';
 import React from 'react';
 import CopyToClipboard from '../CopyToClipboard';
 import Fieldset from '../Fieldset';

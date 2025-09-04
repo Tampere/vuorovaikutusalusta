@@ -150,13 +150,9 @@ async function start() {
         ? baseTemplate
         : await vite.transformIndexHtml('/', baseTemplate);
 
-      console.log(template);
-
       const renderedHtml = template
         .replaceAll(`<!--app-title -->`, title)
         .replace('@clientSrc', 'src');
-
-      console.log(renderedHtml);
 
       res.status(200).set({ 'Content-Type': 'text/html' }).end(renderedHtml);
     } catch (e: any) {

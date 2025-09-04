@@ -223,7 +223,8 @@
     "addOption": "Lisää vastausvaihtoehto",
     "modifyCategoryGroups": "Muokkaa luokkia",
     "hideCategorySettings": "Piilota luokka-asetukset",
-    "deleteCategoryGroup": "Poista luokka"
+    "deleteCategoryGroup": "Poista luokka",
+    "unnamedCategoryGroup": "Nimetön luokitus"
   },
   "AddSurveySectionActions": {
     "personalInfoDisabled": "Henkilötietokysymys on jo lisätty kyselyyn.",
@@ -651,7 +652,7 @@
     "option": "Vaihtoehto",
     "optionGroup": "Vastausryhmä",
     "title": "Otsikko",
-    "categoryGroup": "Luokka ryhmä",
+    "categoryGroup": "Luokkaryhmä",
     "category": "Luokka",
     "min": "minimiarvo",
     "max": "maksimiarvo",

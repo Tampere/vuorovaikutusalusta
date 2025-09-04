@@ -209,7 +209,8 @@
     "addOption": "Add answer option",
     "modifyCategoryGroups": "Modify category groups",
     "hideCategorySettings": "Hide category settings",
-    "deleteCategoryGroup": "Delete category"
+    "deleteCategoryGroup": "Delete category",
+    "unnamedCategoryGroup": "Unnamed category"
   },
   "AddSurveySectionActions": {
     "personalInfoDisabled": "The personal information question has already been added to the survey.",

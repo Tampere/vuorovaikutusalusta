@@ -476,33 +476,37 @@ export default function EditSurveySectionTranslations({
         />
       )}
       {section.type === 'personal-info' &&
-        section.customQuestions.map((question, idx) => (
-          <TranslationField
-            placeholder={getTranslationPlaceholder(
-              capitalizeFirstLetter(question.label[language]),
-            )}
-            variant="standard"
-            key={`${question.label}-${idx}`}
-            value={question.label?.[languageCode] ?? ''}
-            onChange={(event) => {
-              onEdit({
-                ...section,
-                customQuestions: section.customQuestions.map(
-                  (customQuestion, customQuestionIdx) =>
-                    customQuestionIdx === idx
-                      ? {
-                          ...customQuestion,
-                          label: {
-                            ...customQuestion.label,
-                            [languageCode]: event.target.value,
-                          },
-                        }
-                      : customQuestion,
-                ),
-              });
-            }}
-          />
-        ))}
+        section.customQuestions.map((question, idx) => {
+          if (!question.ask && languages.every((lang) => !question.label[lang]))
+            return null;
+          return (
+            <TranslationField
+              placeholder={getTranslationPlaceholder(
+                capitalizeFirstLetter(question.label[language]),
+              )}
+              variant="standard"
+              key={`${question.label}-${idx}`}
+              value={question.label?.[languageCode] ?? ''}
+              onChange={(event) => {
+                onEdit({
+                  ...section,
+                  customQuestions: section.customQuestions.map(
+                    (customQuestion, customQuestionIdx) =>
+                      customQuestionIdx === idx
+                        ? {
+                            ...customQuestion,
+                            label: {
+                              ...customQuestion.label,
+                              [languageCode]: event.target.value,
+                            },
+                          }
+                        : customQuestion,
+                  ),
+                });
+              }}
+            />
+          );
+        })}
       {/* Section info */}
       {section.info && (
         <div

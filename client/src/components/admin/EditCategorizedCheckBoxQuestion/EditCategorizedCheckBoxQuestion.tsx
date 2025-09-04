@@ -156,7 +156,11 @@ export default function EditCategorizedCheckBoxQuestion({
                 {
                   id: crypto.randomUUID(),
                   idx: section.categoryGroups.length,
-                  name: initializeLocalizedObject('Nimetön luokitus'),
+                  name: {
+                    ...initializeLocalizedObject(''),
+                    [surveyLanguage]:
+                      tr.EditCategorizedCheckBoxQuestion.unnamedCategoryGroup,
+                  },
                   categories: [],
                 },
               ],
@@ -216,7 +220,10 @@ export default function EditCategorizedCheckBoxQuestion({
                 if (group.id === groupId) {
                   return {
                     ...group,
-                    name: initializeLocalizedObject(name),
+                    name: {
+                      ...initializeLocalizedObject(''),
+                      [surveyLanguage]: name,
+                    },
                   };
                 }
                 return group;
