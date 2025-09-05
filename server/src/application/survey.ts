@@ -1705,6 +1705,7 @@ async function updateSurveySections(survey: Survey, t: pgPromise.ITask<{}>) {
         section.id,
         section.subQuestions,
         section.followUpSections,
+        t,
       );
 
       // If there are subquestions or follow-up sections, update them
@@ -1785,15 +1786,22 @@ async function updateSurveySections(survey: Survey, t: pgPromise.ITask<{}>) {
                   (value) => value != null,
                 ),
               };
+
               await upsertSectionConditions(
                 linkedSectionRow.id,
                 null,
                 validConditions,
+                t,
               );
             }
 
             // Delete options that were removed
-            await deleteRemovedOptions(linkedSection.id, linkedSection.options);
+            await deleteRemovedOptions(
+              linkedSection.id,
+              linkedSection.options,
+              undefined,
+              t,
+            );
 
             let categoryRows:
               | Awaited<ReturnType<typeof updateSectionOptionCategories>>
