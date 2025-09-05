@@ -14,6 +14,7 @@ import {
   Stack,
   Theme,
   Typography,
+  useTheme,
 } from '@mui/material';
 import { ExpandMore } from '@mui/icons-material';
 import { visuallyHidden } from '@mui/utils';
@@ -178,6 +179,7 @@ function Option({
   onHiddenChange,
 }: OptionProps) {
   const { tr, surveyLanguage } = useTranslations();
+  const theme = useTheme();
 
   return (
     <Box
@@ -236,6 +238,9 @@ function Option({
             sx={{
               '& .MuiButtonBase-root': {
                 paddingY: 0,
+              },
+              [theme.containerQueries.down(mobileBreakPoint)]: {
+                marginLeft: 'auto',
               },
             }}
             infoText={option.info?.[surveyLanguage]}
@@ -380,19 +385,19 @@ export function CategorizedCheckBoxQuestion({
           .replace('{min}', question.answerLimits.min.toString())
           .replace('{max}', question.answerLimits.max.toString())
       : question.answerLimits?.min
-        ? // Only min limit is set
-          tr.GroupedCheckBoxQuestion.helperTextMin.replace(
-            '{min}',
-            question.answerLimits.min.toString(),
-          )
-        : question.answerLimits?.max
-          ? // Only max limit is set
-            tr.GroupedCheckBoxQuestion.helperTextMax.replace(
-              '{max}',
-              question.answerLimits.max.toString(),
-            )
-          : // No limits are set
-            tr.GroupedCheckBoxQuestion.helperText;
+      ? // Only min limit is set
+        tr.GroupedCheckBoxQuestion.helperTextMin.replace(
+          '{min}',
+          question.answerLimits.min.toString(),
+        )
+      : question.answerLimits?.max
+      ? // Only max limit is set
+        tr.GroupedCheckBoxQuestion.helperTextMax.replace(
+          '{max}',
+          question.answerLimits.max.toString(),
+        )
+      : // No limits are set
+        tr.GroupedCheckBoxQuestion.helperText;
 
   return (
     <Box
