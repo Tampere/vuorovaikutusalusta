@@ -194,11 +194,11 @@ async function generateScreenshots({
     }
 
     // Make sure the tiles get rendered after network becomes idle
-    await page.waitForTimeout(3000);
+    await new Promise((resolve) => setTimeout(resolve, 3000));
     const image = (await page.screenshot({
       type: 'png',
       captureBeyondViewport: false,
-    })) as Buffer;
+    })) as unknown as Buffer;
 
     returnData.push({
       sectionId: answer.sectionId,
