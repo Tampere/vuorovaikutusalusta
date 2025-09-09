@@ -1,9 +1,11 @@
-import { SurveyCheckboxQuestion } from '@interfaces/survey';
+import { LanguageCode, SurveyCheckboxQuestion } from '@interfaces/survey';
 import {
   Checkbox,
   FormControlLabel,
   FormGroup,
   FormHelperText,
+  MenuItem,
+  Select,
   TextField,
 } from '@mui/material';
 import { visuallyHidden } from '@mui/utils';
@@ -22,6 +24,7 @@ interface Props {
   question: SurveyCheckboxQuestion;
   setDirty: (dirty: boolean) => void;
   validationErrors?: string[];
+  readOnly?: boolean;
 }
 
 export default function CheckBoxQuestion({
@@ -31,6 +34,7 @@ export default function CheckBoxQuestion({
   question,
   setDirty,
   validationErrors = null,
+  readOnly = false,
 }: Props) {
   const [customAnswerValue, setCustomAnswerValue] = useState('');
   const { tr, surveyLanguage } = useTranslations();
@@ -71,6 +75,21 @@ export default function CheckBoxQuestion({
     setCustomAnswerValue(customValue ?? '');
   }, [value]);
 
+  function getRenderValue() {
+    if (value.length === 0) return;
+    if (value.length === 1) {
+      if (value[0] === customAnswerValue) return tr.SurveyQuestion.customAnswer;
+      return `${
+        question.options.find((o) => o.id === value[0]).text[surveyLanguage]
+      }`;
+    }
+    return `${value.length} ${tr.MultiMatrixQuestion.selected}`;
+  }
+
+  function handleSelectChange(newSelection: (string | number)[]) {
+    onChange(newSelection);
+  }
+
   return (
     <>
       {answerLimitText && (
@@ -89,81 +108,137 @@ export default function CheckBoxQuestion({
           )}
         </>
       )}
-      <FormGroup>
-        {question.options.map((option, index) => (
-          <FormControlLabel
-            key={option.id}
-            label={option.text?.[surveyLanguage] ?? ''}
-            control={
-              <Checkbox
-                action={actionRef.current[index]}
-                autoFocus={index === 0 && autoFocus}
-                // TS can't infer the precise memoized value type from question.type, but for checkboxes it's always an array
-                checked={value.includes(option.id)}
-                onChange={(event) => {
-                  setDirty(true);
-                  const newValue = event.currentTarget.checked
-                    ? // Add the value to the selected options
-                      [...value, option.id]
-                    : // Filter out the value from the selected options
-                      value.filter((optionId) => optionId !== option.id);
-                  onChange(newValue);
-                }}
-                name={option.text?.[surveyLanguage]}
-              />
-            }
-            sx={{
-              lineHeight: 1.2,
-              marginBottom: '0.5em',
-              marginTop: '0.5em',
-            }}
-          />
-        ))}
-        {question.allowCustomAnswer && (
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={value.includes(customAnswerValue)}
-                onChange={(event) => {
-                  const newValue = event.currentTarget.checked
-                    ? // Add the custom answer to the array
-                      [...value, customAnswerValue]
-                    : // Remove any custom answers (of type string) from the array
-                      value.filter((option) => typeof option !== 'string');
-                  onChange(newValue);
-                }}
-              />
-            }
-            label={tr.SurveyQuestion.customAnswer}
-            sx={{
-              lineHeight: 1.2,
-              marginBottom: '0.5em',
-              marginTop: '0.5em',
-            }}
-          />
-        )}
-        {value.includes(customAnswerValue) && (
-          <TextField
-            value={customAnswerValue}
-            required={question.isRequired}
-            placeholder={tr.SurveyQuestion.customAnswerField}
-            inputProps={{
-              maxLength: customAnswerMaxLength,
-              'aria-label': tr.SurveyQuestion.customAnswerField,
-            }}
+      {question.displaySelection && !readOnly && (
+        <FormGroup>
+          <Select
+            multiple
+            value={value}
+            renderValue={() => getRenderValue()}
             onChange={(event) => {
-              setCustomAnswerValue(event.currentTarget.value);
-              onChange(
-                value.map((option) =>
-                  typeof option === 'string'
-                    ? event.currentTarget.value
-                    : option,
-                ),
-              );
+              if (Array.isArray(event.target.value)) {
+                handleSelectChange(event.target.value);
+                return;
+              }
+              handleSelectChange([event.target.value]);
             }}
-          />
-        )}
-      </FormGroup>
+          >
+            {question.options.map((o) => (
+              <MenuItem key={o.id} value={o.id}>
+                <Checkbox checked={value.includes(o.id)} />
+                {o.text[surveyLanguage]}
+              </MenuItem>
+            ))}
+            {question.allowCustomAnswer && (
+              <MenuItem value={customAnswerValue}>
+                <Checkbox checked={value.includes(customAnswerValue)} />
+                {tr.SurveyQuestion.customAnswer}
+              </MenuItem>
+            )}
+          </Select>
+          {value.includes(customAnswerValue) && (
+            <TextField
+              value={customAnswerValue}
+              required={question.isRequired}
+              //placeholder={tr.SurveyQuestion.customAnswerField}
+              label={tr.SurveyQuestion.customAnswerField}
+              sx={{
+                marginTop: '0.5em',
+              }}
+              inputProps={{
+                maxLength: customAnswerMaxLength,
+                'aria-label': tr.SurveyQuestion.customAnswerField,
+              }}
+              onChange={(event) => {
+                setCustomAnswerValue(event.currentTarget.value);
+                onChange(
+                  value.map((option) =>
+                    typeof option === 'string'
+                      ? event.currentTarget.value
+                      : option,
+                  ),
+                );
+              }}
+            />
+          )}
+        </FormGroup>
+      )}
+      {(readOnly || !question.displaySelection) && (
+        <FormGroup>
+          {question.options.map((option, index) => (
+            <FormControlLabel
+              key={option.id}
+              label={option.text?.[surveyLanguage] ?? ''}
+              control={
+                <Checkbox
+                  action={actionRef.current[index]}
+                  autoFocus={index === 0 && autoFocus}
+                  // TS can't infer the precise memoized value type from question.type, but for checkboxes it's always an array
+                  checked={value.includes(option.id)}
+                  onChange={(event) => {
+                    setDirty(true);
+                    const newValue = event.currentTarget.checked
+                      ? // Add the value to the selected options
+                        [...value, option.id]
+                      : // Filter out the value from the selected options
+                        value.filter((optionId) => optionId !== option.id);
+                    onChange(newValue);
+                  }}
+                  name={option.text?.[surveyLanguage]}
+                />
+              }
+              sx={{
+                lineHeight: 1.2,
+                marginBottom: '0.5em',
+                marginTop: '0.5em',
+              }}
+            />
+          ))}
+          {question.allowCustomAnswer && (
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={value.includes(customAnswerValue)}
+                  onChange={(event) => {
+                    const newValue = event.currentTarget.checked
+                      ? // Add the custom answer to the array
+                        [...value, customAnswerValue]
+                      : // Remove any custom answers (of type string) from the array
+                        value.filter((option) => typeof option !== 'string');
+                    onChange(newValue);
+                  }}
+                />
+              }
+              label={tr.SurveyQuestion.customAnswer}
+              sx={{
+                lineHeight: 1.2,
+                marginBottom: '0.5em',
+                marginTop: '0.5em',
+              }}
+            />
+          )}
+          {value.includes(customAnswerValue) && (
+            <TextField
+              value={customAnswerValue}
+              required={question.isRequired}
+              placeholder={tr.SurveyQuestion.customAnswerField}
+              inputProps={{
+                maxLength: customAnswerMaxLength,
+                'aria-label': tr.SurveyQuestion.customAnswerField,
+              }}
+              onChange={(event) => {
+                setCustomAnswerValue(event.currentTarget.value);
+                onChange(
+                  value.map((option) =>
+                    typeof option === 'string'
+                      ? event.currentTarget.value
+                      : option,
+                  ),
+                );
+              }}
+            />
+          )}
+        </FormGroup>
+      )}
     </>
   );
 }

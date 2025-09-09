@@ -1,5 +1,13 @@
 import { SurveyRadioQuestion } from '@interfaces/survey';
-import { FormControlLabel, Radio, RadioGroup, TextField } from '@mui/material';
+import {
+  FormControlLabel,
+  FormGroup,
+  MenuItem,
+  Radio,
+  RadioGroup,
+  Select,
+  TextField,
+} from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { createRef, useEffect, useRef, useState } from 'react';
 
@@ -9,6 +17,7 @@ interface Props {
   onChange: (value: number | string) => void;
   question: SurveyRadioQuestion;
   setDirty: (dirty: boolean) => void;
+  readOnly?: boolean;
 }
 
 /**
@@ -32,8 +41,10 @@ export default function RadioQuestion({
   onChange,
   question,
   setDirty,
+  readOnly = false,
 }: Props) {
   const [customAnswerValue, setCustomAnswerValue] = useState('');
+  const [customSelected, setCustomSelected] = useState(false);
   const { tr, surveyLanguage } = useTranslations();
   const actionRef = useRef([]);
 
@@ -56,63 +67,125 @@ export default function RadioQuestion({
 
   return (
     <>
-      <RadioGroup
-        id={`${question.id}-input`}
-        value={value}
-        onChange={(event) => {
-          const numericValue = Number(event.currentTarget.value);
-          if (event.currentTarget.value.length > 0 && !isNaN(numericValue)) {
-            setDirty(true);
-          }
-          // Empty strings are converted to 0 with Number()
-          onChange(
-            event.currentTarget.value.length > 0 && !isNaN(numericValue)
-              ? numericValue
-              : event.currentTarget.value,
-          );
-        }}
-        name={`${question.title?.[surveyLanguage]}-group`}
-      >
-        {question.options.map((option, index) => (
-          <FormControlLabel
-            key={option.id}
-            value={option.id}
-            label={option.text?.[surveyLanguage] ?? ''}
-            sx={styles.labelStyles}
-            control={
-              <Radio
-                action={actionRef.current[index]}
-                autoFocus={index === 0 && autoFocus}
-              />
-            }
-          />
-        ))}
-        {question.allowCustomAnswer && (
-          <>
-            <FormControlLabel
-              value={customAnswerValue}
-              label={tr.SurveyQuestion.customAnswer}
-              control={<Radio />}
-            />
-            {/* Value is a number (ID) when a pre-defined option is selected - otherwise it's custom */}
-            {typeof value === 'string' && (
-              <TextField
-                value={customAnswerValue}
-                required={question.isRequired}
-                placeholder={tr.SurveyQuestion.customAnswerField}
-                inputProps={{
-                  maxLength: customAnswerMaxLength,
-                  'aria-label': tr.SurveyQuestion.customAnswerField,
-                }}
-                onChange={(event) => {
-                  setCustomAnswerValue(event.currentTarget.value);
-                  onChange(event.currentTarget.value);
-                }}
-              />
+      {!readOnly && question.displaySelection && (
+        <FormGroup>
+          <Select
+            value={value}
+            displayEmpty
+            renderValue={(value) => {
+              if (typeof value === 'string')
+                return tr.SurveyQuestion.customAnswer;
+              return `${
+                question.options.find((o) => o.id === value)?.text[
+                  surveyLanguage
+                ] ?? ''
+              }`;
+            }}
+            onChange={(event) => {
+              const numericValue = Number(event.target.value);
+              if (event.target.value !== '' && !isNaN(numericValue)) {
+                setDirty(true);
+              }
+              // Empty strings are converted to 0 with Number()
+              onChange(
+                event.target.value !== '' && !isNaN(numericValue)
+                  ? numericValue
+                  : event.target.value,
+              );
+            }}
+          >
+            {question.options.map((o) => (
+              <MenuItem key={o.id} value={o.id}>
+                <Radio checked={!customSelected && value === o.id} />
+                {o.text[surveyLanguage]}
+              </MenuItem>
+            ))}
+            {question.allowCustomAnswer && (
+              <MenuItem key={'custom'} value={customAnswerValue}>
+                <Radio checked={typeof value === 'string'} />
+                {tr.SurveyQuestion.customAnswer}
+              </MenuItem>
             )}
-          </>
-        )}
-      </RadioGroup>
+          </Select>
+          {typeof value === 'string' && (
+            <TextField
+              value={customAnswerValue}
+              required={question.isRequired}
+              label={tr.SurveyQuestion.customAnswerField}
+              sx={{
+                marginTop: '0.5em',
+              }}
+              aria-label={tr.SurveyQuestion.customAnswerField}
+              inputProps={{
+                maxLength: customAnswerMaxLength,
+              }}
+              onChange={(event) => {
+                setCustomAnswerValue(event.currentTarget.value);
+                onChange(event.currentTarget.value);
+              }}
+            />
+          )}
+        </FormGroup>
+      )}
+      {(!question.displaySelection || readOnly) && (
+        <RadioGroup
+          id={`${question.id}-input`}
+          value={value}
+          onChange={(event) => {
+            const numericValue = Number(event.currentTarget.value);
+            if (event.currentTarget.value.length > 0 && !isNaN(numericValue)) {
+              setDirty(true);
+            }
+            // Empty strings are converted to 0 with Number()
+            onChange(
+              event.currentTarget.value.length > 0 && !isNaN(numericValue)
+                ? numericValue
+                : event.currentTarget.value,
+            );
+          }}
+          name={`${question.title?.[surveyLanguage]}-group`}
+        >
+          {question.options.map((option, index) => (
+            <FormControlLabel
+              key={option.id}
+              value={option.id}
+              label={option.text?.[surveyLanguage] ?? ''}
+              sx={styles.labelStyles}
+              control={
+                <Radio
+                  action={actionRef.current[index]}
+                  autoFocus={index === 0 && autoFocus}
+                />
+              }
+            />
+          ))}
+          {question.allowCustomAnswer && (
+            <>
+              <FormControlLabel
+                value={customAnswerValue}
+                label={tr.SurveyQuestion.customAnswer}
+                control={<Radio />}
+              />
+              {/* Value is a number (ID) when a pre-defined option is selected - otherwise it's custom */}
+              {typeof value === 'string' && (
+                <TextField
+                  value={customAnswerValue}
+                  required={question.isRequired}
+                  placeholder={tr.SurveyQuestion.customAnswerField}
+                  inputProps={{
+                    maxLength: customAnswerMaxLength,
+                    'aria-label': tr.SurveyQuestion.customAnswerField,
+                  }}
+                  onChange={(event) => {
+                    setCustomAnswerValue(event.currentTarget.value);
+                    onChange(event.currentTarget.value);
+                  }}
+                />
+              )}
+            </>
+          )}
+        </RadioGroup>
+      )}
     </>
   );
 }

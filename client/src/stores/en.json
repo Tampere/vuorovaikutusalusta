@@ -212,6 +212,9 @@
     "deleteCategoryGroup": "Delete category",
     "unnamedCategoryGroup": "Unnamed category"
   },
+  "EditCheckBoxQuestion": {
+    "displayAsSelect": "Display options as dropdown selection"
+  },
   "AddSurveySectionActions": {
     "personalInfoDisabled": "The personal information question has already been added to the survey.",
     "personalInfoQuestion": "Add personal information question",
