@@ -227,21 +227,11 @@ const Option = forwardRef(function Option(
         component={motion.div as any}
         initial={{
           opacity: 0,
+          height: 0,
         }}
         animate={{
           opacity: 1,
-          transition: {
-            default: {
-              duration: animationDuration,
-              delay: 0,
-              ease: animationEase,
-            },
-          },
-        }}
-        exit={{
-          opacity: 0,
-          height: 0,
-          margin: 0,
+          height: 'auto',
           transition: {
             default: {
               duration: animationDuration,
@@ -314,7 +304,7 @@ const Option = forwardRef(function Option(
         animate: {
           opacity: 1,
           height: 'auto',
-          overflow: 'hidden',
+          overflow: 'visible',
           transform: 'translateX(0)',
           transition: {
             height: {
@@ -359,8 +349,10 @@ const Option = forwardRef(function Option(
       display="flex"
       gap={1}
       sx={(theme) => ({
+        alignItems: 'center',
         containerType: 'inline-size',
         [theme.containerQueries.down(mobileBreakPoint)]: {
+          alignItems: 'flex-start',
           flexDirection: 'column',
           marginY: '0.5rem',
           gap: 0,
@@ -432,22 +424,30 @@ const Option = forwardRef(function Option(
       </Box>
 
       {!readOnly && (
-        <Box display="flex" alignItems="center" gap={1}>
-          {(!optionChecked || doesNotMatchFilters) && (
-            <Box
-              aria-hidden="true"
-              component="span"
-              sx={(theme) => ({
-                display: 'flex',
-                alignItems: 'center',
-                [theme.containerQueries.down(mobileBreakPoint)]: {
-                  display: 'none',
-                },
-              })}
-            >
-              –
-            </Box>
-          )}
+        <>
+          <AnimatePresence>
+            {(!optionChecked || doesNotMatchFilters) && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                <Box
+                  aria-hidden="true"
+                  component="span"
+                  sx={(theme) => ({
+                    display: 'flex',
+                    alignItems: 'center',
+                    [theme.containerQueries.down(mobileBreakPoint)]: {
+                      display: 'none',
+                    },
+                  })}
+                >
+                  –
+                </Box>
+              </motion.div>
+            )}
+          </AnimatePresence>
           <AnimatePresence>
             {!optionChecked && (
               <MotionButton
@@ -475,9 +475,24 @@ const Option = forwardRef(function Option(
           <AnimatePresence>
             {doesNotMatchFilters && optionChecked && (
               <MotionTypography
-                initial={{ opacity: 0, maxHeight: 0 }}
-                animate={{ opacity: 1, maxHeight: '4rem' }}
-                exit={{ opacity: 0, maxHeight: 0 }}
+                initial={{
+                  opacity: 0,
+                  maxHeight: 0,
+                }}
+                animate={{
+                  opacity: 1,
+                  maxHeight: '4rem',
+                  transition: {
+                    opacity: { delay: animationDuration },
+                  },
+                }}
+                exit={{
+                  opacity: 0,
+                  maxHeight: 0,
+                  transition: {
+                    opacity: { delay: animationDuration },
+                  },
+                }}
                 sx={{
                   color: orange[600],
                   height: 'fit-content',
@@ -487,7 +502,7 @@ const Option = forwardRef(function Option(
               </MotionTypography>
             )}
           </AnimatePresence>
-        </Box>
+        </>
       )}
     </Box>
   );
@@ -887,16 +902,16 @@ export function CategorizedCheckBoxQuestion({
                       selectedFilters={selectedFilters}
                       isVisible={false}
                       onHiddenChange={() => {
+                        // For screen readers
+                        checkBoxInputRef.current[
+                          checkBoxInputRef.current.length - 1
+                        ]?.current?.focus();
+
                         setHiddenOptions((prev) =>
                           prev.filter(
                             (hiddenOption) => hiddenOption.id !== option.id,
                           ),
                         );
-
-                        // For screen readers
-                        checkBoxInputRef.current[
-                          checkBoxInputRef.current.length - 1
-                        ]?.current?.focus();
                       }}
                     />
                   );
