@@ -521,11 +521,11 @@ export function CategorizedCheckBoxQuestion({
     () =>
       new IntersectionObserver(
         (entries) => {
-          setOptionsInfoSticky(entries[0].intersectionRatio < 1);
+          setOptionsInfoSticky(entries[0].boundingClientRect.top < 1);
         },
         {
           rootMargin: '-1px 0px 0px 0px',
-          threshold: 1.0,
+          threshold: [1],
         },
       ),
   );
@@ -722,9 +722,13 @@ export function CategorizedCheckBoxQuestion({
             ...(optionsInfoSticky && {
               border: `1px solid ${theme.palette.grey[400]}`,
               boxShadow: '0px 2px 10px 0px rgba(0, 0, 0, 0.25)',
-              marginLeft: isFollowUp ? '-0.75rem' : '-1.25rem',
-              marginRight: isFollowUp ? '-0.75rem' : '-1.5rem',
-              paddingX: isFollowUp ? '0.75rem' : '1.25rem',
+              marginLeft: isFollowUp ? '-0.75rem' : '-3rem',
+              marginRight: isFollowUp
+                ? '-0.75rem'
+                : surveyHasSideSection
+                ? '-1.5rem'
+                : 0,
+              paddingX: isFollowUp ? '0.75rem' : '3rem',
               background: 'white',
               paddingBottom: 1,
               [theme.breakpoints.down('md')]: {
