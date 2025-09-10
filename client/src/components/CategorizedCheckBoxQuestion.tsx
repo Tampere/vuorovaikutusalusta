@@ -35,7 +35,6 @@ import { mobileTopDrawerHiddenHeight } from './SurveyStepper';
 
 const animationDuration = 0.3;
 const mobileBreakPoint = 500;
-const optionHeight = '3rem';
 
 const styles = (theme: Theme) => ({
   accordion: {
@@ -70,6 +69,9 @@ const styles = (theme: Theme) => ({
     color: theme.palette.primary.main,
   },
 });
+
+const MotionButton = motion.create(Button);
+const MotionTypography = motion.create(Typography);
 
 interface CategoriesSelectProps {
   categoryGroups: SectionOptionCategoryGroup[];
@@ -252,7 +254,7 @@ const Option = forwardRef(function Option(
           onHiddenChange();
         }}
         sx={(theme) => ({
-          height: optionHeight,
+          height: 'auto',
           [theme.containerQueries.down(mobileBreakPoint)]: {
             marginY: '0.5rem',
           },
@@ -311,7 +313,7 @@ const Option = forwardRef(function Option(
         },
         animate: {
           opacity: 1,
-          height: optionHeight,
+          height: 'auto',
           overflow: 'hidden',
           transform: 'translateX(0)',
           transition: {
@@ -446,36 +448,45 @@ const Option = forwardRef(function Option(
               –
             </Box>
           )}
-          {!optionChecked && (
-            <Button
-              aria-description={option.text?.[surveyLanguage]}
-              sx={(theme) => ({
-                height: '24px',
-                paddingLeft: 0,
-                [theme.containerQueries.down(mobileBreakPoint)]: {
-                  paddingY: 0,
-                },
-              })}
-              variant="text"
-              onClick={() => {
-                onHiddenChange();
-              }}
-            >
-              {isVisible
-                ? tr.CategorizedCheckBoxQuestion.hideOption
-                : tr.CategorizedCheckBoxQuestion.showOption}
-            </Button>
-          )}
-          {doesNotMatchFilters && optionChecked && (
-            <Typography
-              sx={{
-                color: orange[600],
-                height: 'fit-content',
-              }}
-            >
-              {tr.CategorizedCheckBoxQuestion.doesNotMatchFilters}
-            </Typography>
-          )}
+          <AnimatePresence>
+            {!optionChecked && (
+              <MotionButton
+                initial={{ opacity: 0, maxHeight: 0 }}
+                animate={{ opacity: 1, maxHeight: '4rem' }}
+                exit={{ opacity: 0, maxHeight: 0 }}
+                aria-description={option.text?.[surveyLanguage]}
+                sx={(theme) => ({
+                  paddingLeft: 0,
+                  [theme.containerQueries.down(mobileBreakPoint)]: {
+                    paddingY: 0,
+                  },
+                })}
+                variant="text"
+                onClick={() => {
+                  onHiddenChange();
+                }}
+              >
+                {isVisible
+                  ? tr.CategorizedCheckBoxQuestion.hideOption
+                  : tr.CategorizedCheckBoxQuestion.showOption}
+              </MotionButton>
+            )}{' '}
+          </AnimatePresence>
+          <AnimatePresence>
+            {doesNotMatchFilters && optionChecked && (
+              <MotionTypography
+                initial={{ opacity: 0, maxHeight: 0 }}
+                animate={{ opacity: 1, maxHeight: '4rem' }}
+                exit={{ opacity: 0, maxHeight: 0 }}
+                sx={{
+                  color: orange[600],
+                  height: 'fit-content',
+                }}
+              >
+                {tr.CategorizedCheckBoxQuestion.doesNotMatchFilters}
+              </MotionTypography>
+            )}
+          </AnimatePresence>
         </Box>
       )}
     </Box>

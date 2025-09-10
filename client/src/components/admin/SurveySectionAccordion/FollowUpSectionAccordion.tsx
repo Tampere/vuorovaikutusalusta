@@ -67,6 +67,7 @@ import { FollowUpSectionMenu } from './FollowUpSectionMenu';
 import { DragHandle } from '@src/components/DragAndDrop/SortableItem';
 import EditCategorizedCheckBoxQuestion from '../EditCategorizedCheckBoxQuestion/EditCategorizedCheckBoxQuestion';
 import { EditPersonalInfoQuestion } from '../EditPersonalInfoQuestion';
+import { CategorizedCheckboxIcon } from '@src/components/icons/CategorizedCheckboxIcon';
 
 const styles = {
   accordion: {
@@ -256,7 +257,7 @@ export function FollowUpSectionAccordion(props: Props) {
       ),
     },
     'categorized-checkbox': {
-      icon: <LibraryAddCheck />,
+      icon: <CategorizedCheckboxIcon />,
       tooltip: tr.SurveySection.categorizedCheckboxQuestion,
       form: (
         <EditCategorizedCheckBoxQuestion
