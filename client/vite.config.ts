@@ -7,6 +7,15 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 const proxyAddress = process.env.API_URL ?? 'http://localhost:3000';
 const appVersion = process.env.APP_VERSION ?? 'local-dev';
 
+const isAdminRoute = (url: string) => url.startsWith('/admin');
+const isIndexRoute = (url: string) =>
+  !url.startsWith('/api') &&
+  !url.startsWith('/login') &&
+  !url.startsWith('/.auth') &&
+  !url.startsWith('/logout') &&
+  !url.startsWith('/@') &&
+  !url.includes('.');
+
 export default defineConfig({
   appType: 'mpa',
   plugins: [
@@ -17,8 +26,10 @@ export default defineConfig({
       configureServer(config) {
         // Rewrite all /admin paths to use the admin client application
         config.middlewares.use((req, _res, next) => {
-          if (req.url.startsWith('/admin')) {
+          if (isAdminRoute(req.url)) {
             req.url = '/admin/';
+          } else if (isIndexRoute(req.url)) {
+            req.url = '/';
           }
           next();
         });
