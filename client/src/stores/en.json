@@ -580,6 +580,9 @@
   },
   "CategorizedCheckBoxQuestion": {
     "hideOption": "Hide this option",
+    "doesNotMatchFilters": "Does not match your filter criteria",
+    "hiddenHelpertext": "Option was hidden because it does not match your filter criteria.",
+    "cancel": "Cancel",
     "showOption": "Restore hidden option",
     "singleHiddenOption": "One hidden option",
     "hiddenOptions": "{x} hidden options",

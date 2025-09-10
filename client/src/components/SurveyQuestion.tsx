@@ -39,6 +39,7 @@ interface Props {
   value?: AnswerEntry['value'];
   submission?: Submission;
   isFollowUp?: boolean;
+  surveyHasSideSection?: boolean;
 }
 
 function SurveyQuestion({
@@ -320,6 +321,8 @@ function SurveyQuestion({
       )}
       {question.type === 'categorized-checkbox' && (
         <CategorizedCheckBoxQuestion
+          surveyHasSideSection={props.surveyHasSideSection}
+          isFollowUp={props.isFollowUp}
           readOnly={readOnly}
           value={value as number[]}
           selectedFilters={
@@ -340,7 +343,6 @@ function SurveyQuestion({
           question={question}
           setDirty={setDirty}
           validationErrors={validationErrors}
-          isFollowUp={props.isFollowUp}
         />
       )}
       {question.type === 'attachment' && (

@@ -580,6 +580,9 @@
   },
   "CategorizedCheckBoxQuestion": {
     "hideOption": "Piilota tämä vaihtoehto",
+    "doesNotMatchFilters": "Ei vastaa rajausehtojasi",
+    "hiddenHelpertext": "Vaihtoehto piilotettiin, koska se ei vastaa rajausehtojasi.",
+    "cancel": "Peru",
     "showOption": "Palauta piilotettu vaihtoehto",
     "singleHiddenOption": "Yksi piilotettu vaihtoehto",
     "hiddenOptions": "{x} piilotettua vaihtoehtoa",
