@@ -47,14 +47,16 @@ import SurveyMap from './SurveyMap';
 import SurveyQuestion from './SurveyQuestion';
 import TextSection from './TextSection';
 
-const styles = (theme: Theme) => ({
+export const mobileTopDrawerHiddenHeight = 50;
+
+const styles = (theme: Theme, noRightContent?: boolean) => ({
   root: {
     display: 'flex',
     height: '100%',
   },
   stepper: {
     width: '100%',
-    maxWidth: '50rem',
+    maxWidth: noRightContent ? '60rem' : '50rem',
     padding: '1rem',
   },
   '@keyframes pulse': {
@@ -412,7 +414,9 @@ export default function SurveyStepper({
         <h1 style={{ marginLeft: '1rem' }}>{survey.title[surveyLanguage]}</h1>
 
         <Stepper
-          sx={(theme) => styles(theme).stepper}
+          sx={(theme) =>
+            styles(theme, currentPage.sidebar.type === 'none').stepper
+          }
           activeStep={pageNumber}
           orientation="vertical"
           connector={null}
@@ -463,7 +467,11 @@ export default function SurveyStepper({
                     tabIndex={-1}
                     sx={{ ':focus': { outline: 'none' } }}
                   >
-                    <Alert aria-live="off" severity="error">
+                    <Alert
+                      aria-live="off"
+                      severity="error"
+                      sx={{ width: 'fit-content' }}
+                    >
                       {tr.SurveyStepper.unfinishedAnswers}
                       <p style={visuallyHidden}>
                         {tr.SurveyStepper.unfinishedAnswersInfo}
@@ -509,11 +517,17 @@ export default function SurveyStepper({
                       ) : (
                         <>
                           <SurveyQuestion
+                            surveyHasSideSection={
+                              currentPage.sidebar.type !== 'none'
+                            }
                             question={section}
                             pageUnfinished={pageUnfinished}
                             mobileDrawerOpen={mobileDrawerOpen}
                           />
                           <SurveyFollowUpSections
+                            surveyHasSideSection={
+                              currentPage.sidebar.type !== 'none'
+                            }
                             section={section}
                             mobileDrawerOpen={mobileDrawerOpen}
                             pageUnfinished={pageUnfinished}
@@ -769,7 +783,7 @@ export default function SurveyStepper({
               top: 0,
               left: 0,
               right: 0,
-              height: 50,
+              height: mobileTopDrawerHiddenHeight,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',

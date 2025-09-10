@@ -20,20 +20,34 @@ import { ExpandMore } from '@mui/icons-material';
 import { visuallyHidden } from '@mui/utils';
 
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { createRef, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  createRef,
+  forwardRef,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import SectionInfo from './SectionInfo';
+import { orange } from '@mui/material/colors';
+import { AnimatePresence, motion } from 'motion/react';
+import { mobileTopDrawerHiddenHeight } from './SurveyStepper';
 
+const animationDuration = 0.3;
 const mobileBreakPoint = 500;
+const optionHeight = '3rem';
 
-const styles = (theme: Theme, isFollowUp?: boolean) => ({
+const styles = (theme: Theme) => ({
   accordion: {
     '&:before': { display: 'none' },
     background: 'inherit',
   },
   accordionSummary: {
     justifyContent: 'flex-start',
+    gap: theme.spacing(1),
     '& .MuiAccordionSummary-content': {
-      width: 'fit-content',
+      whiteSpace: 'nowrap',
+      flex: 0,
     },
     fontFamily: 'inherit',
     fontSize: 'inherit',
@@ -63,7 +77,6 @@ interface CategoriesSelectProps {
   maxAnswerCount?: number;
   onCategoryChange: (categoryId: string, selected: boolean) => void;
   selectedFilters: string[];
-  isFollowUp?: boolean;
 }
 
 function CategoriesSelect({
@@ -72,12 +85,12 @@ function CategoriesSelect({
   maxAnswerCount,
   onCategoryChange,
   selectedFilters,
-  isFollowUp,
 }: CategoriesSelectProps) {
   const { surveyLanguage, tr } = useTranslations();
 
   return (
     <Accordion
+      defaultExpanded
       disableGutters
       square
       elevation={0}
@@ -100,7 +113,7 @@ function CategoriesSelect({
       </AccordionSummary>
       <AccordionDetails>
         <Stack gap={2}>
-          <Typography sx={(theme) => styles(theme, isFollowUp).secondaryText}>
+          <Typography sx={(theme) => styles(theme).secondaryText}>
             {maxAnswerCount
               ? tr.CategorizedCheckBoxQuestion.categorySelectDescriptionLimited
                   .replace('{0}', optionCount.toString())
@@ -110,10 +123,10 @@ function CategoriesSelect({
                   optionCount.toString(),
                 )}
           </Typography>
-          <Typography sx={(theme) => styles(theme, isFollowUp).secondaryText}>
+          <Typography sx={(theme) => styles(theme).secondaryText}>
             {tr.CategorizedCheckBoxQuestion.categorySelectDescriptionSecondary}
           </Typography>
-          <Typography sx={(theme) => styles(theme, isFollowUp).secondaryText}>
+          <Typography sx={(theme) => styles(theme).secondaryText}>
             {tr.CategorizedCheckBoxQuestion.categorySelectDescriptionTertiary}
           </Typography>
           <Stack gap={2}>
@@ -126,7 +139,7 @@ function CategoriesSelect({
                 <Box component={'legend'} sx={{ fontWeight: 500 }}>
                   {group.name[surveyLanguage]}
                 </Box>
-                <Box display="flex" flexWrap="wrap">
+                <Box display="flex" flexWrap="wrap" gap="0.25rem">
                   {group.categories.map((category) => (
                     <FormControlLabel
                       key={category.id}
@@ -136,7 +149,6 @@ function CategoriesSelect({
                           onChange={(e) =>
                             onCategoryChange(category.id, e.target.checked)
                           }
-                          sx={{ paddingY: '0.25rem' }}
                         />
                       }
                       label={category.name[surveyLanguage]}
@@ -159,30 +171,188 @@ interface OptionProps extends Props {
   index: number;
   option: SectionOption;
   isVisible: boolean;
+  doesNotMatchFilters?: boolean;
   onHiddenChange: () => void;
 }
 
-function Option({
-  option,
-  readOnly,
-  maxReached,
-  value,
-  checkBoxInputRef,
-  question,
-  index,
-  actionRef,
-  autoFocus,
-  setDirty,
-  onChange,
-  selectedFilters,
-  isVisible,
-  onHiddenChange,
-}: OptionProps) {
+const Option = forwardRef(function Option(
+  {
+    option,
+    readOnly,
+    maxReached,
+    value,
+    checkBoxInputRef,
+    question,
+    index,
+    actionRef,
+    autoFocus,
+    setDirty,
+    onChange,
+    selectedFilters,
+    isVisible,
+    onHiddenChange,
+    doesNotMatchFilters,
+  }: OptionProps,
+  ref,
+) {
+  const [previousValue, setPreviousValue] = useState<number[] | null>(null);
+  const [cancelTempHidden, setCancelTempHidden] = useState(false);
+
+  const hiddenOptionRef = useRef<HTMLButtonElement>(null);
+
+  const animationEase = [0.4, 0, 0.2, 1];
+
+  useEffect(() => {
+    if (hiddenOptionRef.current && previousValue) {
+      hiddenOptionRef.current.focus();
+    }
+  }, [hiddenOptionRef.current, previousValue]);
+
+  useEffect(() => {
+    if (cancelTempHidden && checkBoxInputRef.current[index].current) {
+      checkBoxInputRef.current[index].current.focus();
+      setCancelTempHidden(false);
+    }
+  }, [cancelTempHidden, checkBoxInputRef.current[index]]);
+
   const { tr, surveyLanguage } = useTranslations();
   const theme = useTheme();
+  const optionChecked = value.includes(option.id);
+
+  if (previousValue) {
+    return (
+      <Box
+        component={motion.div as any}
+        initial={{
+          opacity: 0,
+        }}
+        animate={{
+          opacity: 1,
+          transition: {
+            default: {
+              duration: animationDuration,
+              delay: 0,
+              ease: animationEase,
+            },
+          },
+        }}
+        exit={{
+          opacity: 0,
+          height: 0,
+          margin: 0,
+          transition: {
+            default: {
+              duration: animationDuration,
+              delay: 0,
+              ease: animationEase,
+            },
+          },
+        }}
+        onMouseLeave={() => {
+          onHiddenChange();
+        }}
+        sx={(theme) => ({
+          height: optionHeight,
+          [theme.containerQueries.down(mobileBreakPoint)]: {
+            marginY: '0.5rem',
+          },
+        })}
+        display="flex"
+        alignItems={'center'}
+        gap={1}
+      >
+        <Typography sx={{ color: theme.palette.text.secondary }}>
+          {tr.CategorizedCheckBoxQuestion.hiddenHelpertext}
+        </Typography>
+        <Box
+          aria-hidden="true"
+          component="span"
+          sx={(theme) => ({
+            display: 'flex',
+            alignItems: 'center',
+            [theme.containerQueries.down(mobileBreakPoint)]: {
+              display: 'none',
+            },
+          })}
+        >
+          –
+        </Box>
+        <Button
+          ref={hiddenOptionRef}
+          onBlur={() => {
+            onHiddenChange();
+          }}
+          aria-description={tr.CategorizedCheckBoxQuestion.hiddenHelpertext}
+          sx={{
+            paddingLeft: 0,
+          }}
+          variant="text"
+          onClick={() => {
+            onChange(previousValue, selectedFilters);
+            setPreviousValue(null);
+            setCancelTempHidden(false);
+          }}
+        >
+          {tr.CategorizedCheckBoxQuestion.cancel}
+        </Button>
+      </Box>
+    );
+  }
 
   return (
     <Box
+      component={motion.div as any}
+      {...(!readOnly && {
+        initial: {
+          opacity: 0,
+          height: 0,
+          overflow: 'hidden',
+          transform: 'translateX(-10%)',
+        },
+        animate: {
+          opacity: 1,
+          height: optionHeight,
+          overflow: 'hidden',
+          transform: 'translateX(0)',
+          transition: {
+            height: {
+              duration: animationDuration,
+              delay: 0,
+              ease: animationEase,
+            },
+            default: {
+              duration: animationDuration,
+              delay: animationDuration,
+              ease: animationEase,
+            },
+          },
+        },
+        exit: {
+          opacity: 0,
+          height: 0,
+          margin: 0,
+          overflow: 'hidden',
+          transform: 'translateX(-10%)',
+          transition: {
+            height: {
+              duration: animationDuration,
+              delay: animationDuration,
+              ease: animationEase,
+            },
+            margin: {
+              duration: animationDuration,
+              delay: animationDuration,
+              ease: animationEase,
+            },
+            default: {
+              duration: animationDuration,
+              delay: 0,
+              ease: animationEase,
+            },
+          },
+        },
+      })}
+      ref={ref}
       key={option.id}
       display="flex"
       gap={1}
@@ -190,7 +360,7 @@ function Option({
         containerType: 'inline-size',
         [theme.containerQueries.down(mobileBreakPoint)]: {
           flexDirection: 'column',
-          marginBottom: theme.spacing(1),
+          marginY: '0.5rem',
           gap: 0,
           '& button': {
             width: 'fit-content',
@@ -198,7 +368,13 @@ function Option({
         },
       })}
     >
-      <Box display="flex" alignItems={'center'}>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: theme.spacing(1),
+        }}
+      >
         <FormControlLabel
           sx={{ marginRight: 0 }}
           label={option.text?.[surveyLanguage] ?? ''}
@@ -218,8 +394,7 @@ function Option({
               }}
               action={actionRef.current[index]}
               autoFocus={index === 0 && autoFocus}
-              // TS can't infer the precise memoized value type from question.type, but for checkboxes it's always an array
-              checked={value.includes(option.id)}
+              checked={optionChecked}
               onChange={(event) => {
                 setDirty(true);
                 const newValue = event.currentTarget.checked
@@ -227,6 +402,11 @@ function Option({
                     [...value, option.id]
                   : // Filter out the value from the selected options
                     value.filter((optionId) => optionId !== option.id);
+
+                if (isVisible && doesNotMatchFilters && optionChecked) {
+                  setPreviousValue(value);
+                }
+
                 onChange(newValue, selectedFilters);
               }}
               name={option.text?.[surveyLanguage]}
@@ -237,7 +417,7 @@ function Option({
           <SectionInfo
             sx={{
               '& .MuiButtonBase-root': {
-                paddingY: 0,
+                padding: 0,
               },
               [theme.containerQueries.down(mobileBreakPoint)]: {
                 marginLeft: 'auto',
@@ -250,43 +430,57 @@ function Option({
       </Box>
 
       {!readOnly && (
-        <>
-          <Box
-            aria-hidden="true"
-            component="span"
-            sx={(theme) => ({
-              display: 'flex',
-              alignItems: 'center',
-              [theme.containerQueries.down(mobileBreakPoint)]: {
-                display: 'none',
-              },
-            })}
-          >
-            –
-          </Box>
-          <Button
-            aria-description={option.text?.[surveyLanguage]}
-            sx={(theme) => ({
-              paddingLeft: 0,
-              [theme.containerQueries.down(mobileBreakPoint)]: {
-                paddingTop: 0,
-                marginBottom: theme.spacing(0.5),
-              },
-            })}
-            variant="text"
-            onClick={() => {
-              onHiddenChange();
-            }}
-          >
-            {isVisible
-              ? tr.CategorizedCheckBoxQuestion.hideOption
-              : tr.CategorizedCheckBoxQuestion.showOption}
-          </Button>
-        </>
+        <Box display="flex" alignItems="center" gap={1}>
+          {(!optionChecked || doesNotMatchFilters) && (
+            <Box
+              aria-hidden="true"
+              component="span"
+              sx={(theme) => ({
+                display: 'flex',
+                alignItems: 'center',
+                [theme.containerQueries.down(mobileBreakPoint)]: {
+                  display: 'none',
+                },
+              })}
+            >
+              –
+            </Box>
+          )}
+          {!optionChecked && (
+            <Button
+              aria-description={option.text?.[surveyLanguage]}
+              sx={(theme) => ({
+                height: '24px',
+                paddingLeft: 0,
+                [theme.containerQueries.down(mobileBreakPoint)]: {
+                  paddingY: 0,
+                },
+              })}
+              variant="text"
+              onClick={() => {
+                onHiddenChange();
+              }}
+            >
+              {isVisible
+                ? tr.CategorizedCheckBoxQuestion.hideOption
+                : tr.CategorizedCheckBoxQuestion.showOption}
+            </Button>
+          )}
+          {doesNotMatchFilters && optionChecked && (
+            <Typography
+              sx={{
+                color: orange[600],
+                height: 'fit-content',
+              }}
+            >
+              {tr.CategorizedCheckBoxQuestion.doesNotMatchFilters}
+            </Typography>
+          )}
+        </Box>
       )}
     </Box>
   );
-}
+});
 
 interface Props {
   value: number[];
@@ -298,9 +492,11 @@ interface Props {
   validationErrors?: string[];
   autoFocus?: boolean;
   isFollowUp?: boolean;
+  surveyHasSideSection?: boolean;
 }
 
 export function CategorizedCheckBoxQuestion({
+  isFollowUp,
   value,
   selectedFilters,
   onChange,
@@ -309,19 +505,44 @@ export function CategorizedCheckBoxQuestion({
   readOnly,
   validationErrors,
   autoFocus,
-  isFollowUp,
+  surveyHasSideSection,
 }: Props) {
   const { tr, surveyLanguage } = useTranslations();
+  const [
+    visibleOptionsNotMatchingFilters,
+    setVisibleOptionsNotMatchingFilters,
+  ] = useState<number[]>([]);
   const [hiddenOptions, setHiddenOptions] = useState<
     (typeof question)['options']
   >([]);
-
-  const visibleOptions = question.options.filter(
-    (option) => !hiddenOptions.includes(option),
+  const optionInfoRef = useRef<HTMLDivElement>(null);
+  const [optionsInfoSticky, setOptionsInfoSticky] = useState(false);
+  const [observer] = useState<IntersectionObserver>(
+    () =>
+      new IntersectionObserver(
+        (entries) => {
+          setOptionsInfoSticky(entries[0].intersectionRatio < 1);
+        },
+        {
+          rootMargin: '-1px 0px 0px 0px',
+          threshold: 1.0,
+        },
+      ),
   );
+
+  function getVisibleOptions(hiddenOptions: (typeof question)['options']) {
+    return question.options.filter((option) => !hiddenOptions.includes(option));
+  }
+
+  const visibleOptions = getVisibleOptions(hiddenOptions);
 
   const actionRef = useRef([]);
   const checkBoxInputRef = useRef([]);
+  const visibleOptionRefs = useRef<React.RefObject<HTMLDivElement>[]>([]);
+
+  visibleOptionRefs.current = visibleOptions.map(
+    (_, i) => visibleOptionRefs.current[i] ?? createRef(),
+  );
 
   actionRef.current = visibleOptions.map(
     (_, i) => actionRef.current[i] ?? createRef(),
@@ -332,9 +553,28 @@ export function CategorizedCheckBoxQuestion({
   );
 
   useEffect(() => {
+    if (optionInfoRef.current) {
+      observer.observe(optionInfoRef.current);
+    }
+
+    return () => {
+      if (optionInfoRef.current) {
+        observer.unobserve(optionInfoRef.current);
+      }
+    };
+  }, [optionInfoRef.current]);
+
+  useEffect(() => {
     // autoFocus prop won't trigger focus styling, must be done manually
     autoFocus && actionRef.current[0]?.current.focusVisible();
   }, []);
+
+  useEffect(() => {
+    updateVisibleOptionsNotMatchingFilters(
+      selectedFilters,
+      getVisibleOptions(hiddenOptions),
+    );
+  }, [hiddenOptions, selectedFilters, value]);
 
   const maxReached = useMemo(() => {
     return question.answerLimits && value.length >= question.answerLimits.max;
@@ -348,6 +588,34 @@ export function CategorizedCheckBoxQuestion({
         : tr.GroupedCheckBoxQuestion.indicatorText
     ).split('{numbers}');
   }, [tr, maxReached]);
+
+  function updateVisibleOptionsNotMatchingFilters(
+    selectedFilters: string[],
+    visibleOptions: (typeof question)['options'],
+  ) {
+    const filterByGroups = question.categoryGroups.map((group) =>
+      group.categories
+        .map((category) => category.id)
+        .filter((category) => selectedFilters.includes(category)),
+    );
+
+    setVisibleOptionsNotMatchingFilters(
+      visibleOptions
+        .filter((option) => {
+          const optionCategoryIds = option.categories?.map((id) => id) ?? [];
+
+          return (
+            value.includes(option.id) && // Option checked
+            !filterByGroups.every(
+              (group) =>
+                group.length === 0 ||
+                group.some((catId) => optionCategoryIds.includes(catId)),
+            )
+          );
+        })
+        .map((option) => option.id),
+    );
+  }
 
   function handleCategoryFilterChange(categoryId: string, isSelected: boolean) {
     const newSelectedFilters = isSelected
@@ -363,19 +631,46 @@ export function CategorizedCheckBoxQuestion({
     const optionIdsToShow = question.options
       .filter((option) => {
         const optionCategoryIds = option.categories?.map((id) => id) ?? [];
-        return filterByGroups.every(
-          (group) =>
-            group.length === 0 ||
-            group.some((catId) => optionCategoryIds.includes(catId)),
+
+        return (
+          value.includes(option.id) || // Option checked
+          filterByGroups.every(
+            (group) =>
+              group.length === 0 ||
+              group.some((catId) => optionCategoryIds.includes(catId)),
+          )
         );
       })
       .map((option) => option.id);
 
-    setHiddenOptions(
-      question.options.filter((option) => !optionIdsToShow.includes(option.id)),
+    onChange(value, newSelectedFilters);
+    const newHiddenOptions = question.options.filter(
+      (option) => !optionIdsToShow.includes(option.id),
     );
 
-    onChange(value, newSelectedFilters);
+    // Animate the hiding of options
+    visibleOptions.forEach((opt, idx) => {
+      const element = visibleOptionRefs.current[idx];
+      if (
+        element.current &&
+        newHiddenOptions.findIndex((o) => o.id === opt.id) !== -1
+      ) {
+        element.current.style.transform = 'translateX(-10%)';
+        element.current.style.opacity = '0';
+        setTimeout(() => {
+          element.current.style.height = '0';
+        }, animationDuration);
+      }
+    });
+
+    // If options are being shown, wait until the hiding animation is done
+    if (newHiddenOptions.length > hiddenOptions.length) {
+      setTimeout(() => {
+        setHiddenOptions(newHiddenOptions);
+      }, animationDuration * 2);
+    } else {
+      setHiddenOptions(newHiddenOptions);
+    }
   }
 
   const answerLimitText =
@@ -413,74 +708,123 @@ export function CategorizedCheckBoxQuestion({
           categoryGroups={question.categoryGroups}
           optionCount={question.options.length}
           maxAnswerCount={question.answerLimits?.max}
-          isFollowUp={isFollowUp}
         />
       )}
       {!readOnly && (
-        <Typography
+        <Box
+          ref={optionInfoRef}
           sx={(theme) => ({
-            marginTop: theme.spacing(2),
-            ...styles(theme, isFollowUp).secondaryText,
-            ...(validationErrors &&
-              validationErrors.includes('answerLimits') &&
-              styles(theme).errorText),
+            minHeight: '3.5rem', // Prevent flickering when becoming sticky
+            position: 'sticky',
+            top: 0,
+            zIndex: 1,
+
+            ...(optionsInfoSticky && {
+              border: `1px solid ${theme.palette.grey[400]}`,
+              boxShadow: '0px 2px 10px 0px rgba(0, 0, 0, 0.25)',
+              marginLeft: isFollowUp ? '-0.75rem' : '-1.25rem',
+              marginRight: isFollowUp ? '-0.75rem' : '-1.5rem',
+              paddingX: isFollowUp ? '0.75rem' : '1.25rem',
+              background: 'white',
+              paddingBottom: 1,
+              [theme.breakpoints.down('md')]: {
+                ...(surveyHasSideSection && {
+                  paddingTop: `${mobileTopDrawerHiddenHeight}px`,
+                }),
+              },
+            }),
           })}
         >
-          {answerLimitText}
-        </Typography>
-      )}
-      {validationErrors && validationErrors.includes('answerLimits') && (
-        <Typography style={visuallyHidden} role="alert">
-          {`${question.title?.[surveyLanguage]}, ${answerLimitText}`}
-        </Typography>
-      )}
-      <Typography
-        sx={(theme) => ({
-          ...styles(theme, isFollowUp).secondaryText,
-          marginTop: theme.spacing(1),
-          marginBottom: theme.spacing(2),
-        })}
-        id={`${question.id}-indicator`}
-      >
-        {indicatorTextStart}
-        <Box
-          sx={(theme) => styles(theme).indicatorNumbers}
-          component="span"
-          className={[maxReached && 'max-reached'].filter(Boolean).join(' ')}
-        >
-          {value.length}
-          {question.answerLimits?.max && `/${question.answerLimits.max}`}
+          {optionsInfoSticky && (
+            <Typography
+              component="p"
+              sx={(theme) => ({
+                margin: theme.spacing(0.5, 0, 0, 0),
+                fontSize: '1.125rem',
+              })}
+              variant={'questionTitle'}
+            >
+              {question.title[surveyLanguage]}
+            </Typography>
+          )}
+          <Typography
+            sx={(theme) => ({
+              marginTop: theme.spacing(2),
+              ...styles(theme).secondaryText,
+              ...(validationErrors &&
+                validationErrors.includes('answerLimits') &&
+                styles(theme).errorText),
+              ...(optionsInfoSticky && { display: 'inline' }),
+            })}
+          >
+            {answerLimitText}{' '}
+          </Typography>
+          {validationErrors && validationErrors.includes('answerLimits') && (
+            <Typography style={visuallyHidden} role="alert">
+              {`${question.title?.[surveyLanguage]}, ${answerLimitText}`}
+            </Typography>
+          )}
+          <Typography
+            sx={(theme) => ({
+              ...styles(theme).secondaryText,
+              marginTop: theme.spacing(1),
+              marginBottom: theme.spacing(2),
+              ...(optionsInfoSticky && { display: 'inline' }),
+            })}
+            id={`${question.id}-indicator`}
+          >
+            {indicatorTextStart}
+            <Box
+              sx={(theme) => styles(theme).indicatorNumbers}
+              component="span"
+              className={[maxReached && 'max-reached']
+                .filter(Boolean)
+                .join(' ')}
+            >
+              {value.length}
+              {question.answerLimits?.max && `/${question.answerLimits.max}`}
+            </Box>
+            {indicatorTextEnd}
+          </Typography>
         </Box>
-        {indicatorTextEnd}
-      </Typography>
-      {visibleOptions.map((option, index) => (
-        <Option
-          key={option.id}
-          option={option}
-          readOnly={readOnly}
-          maxReached={maxReached}
-          value={value}
-          checkBoxInputRef={checkBoxInputRef}
-          question={question}
-          index={index}
-          actionRef={actionRef}
-          autoFocus={autoFocus && index === 0}
-          setDirty={setDirty}
-          onChange={onChange}
-          selectedFilters={selectedFilters}
-          isVisible
-          onHiddenChange={() => {
-            const toFocusIndex =
-              index === visibleOptions.length - 1 ? index - 1 : index + 1;
-            // For screen readers
-
-            checkBoxInputRef.current[toFocusIndex]?.current?.focus();
-            setHiddenOptions((prev) => [...prev, option]);
-          }}
-        />
-      ))}
-      <Box aria-live="polite">
-        {hiddenOptions.length > 0 && (
+      )}
+      <Box display={'flex'} flexDirection="column">
+        <AnimatePresence>
+          {visibleOptions.map((option, index) => (
+            <Option
+              key={option.id}
+              ref={visibleOptionRefs.current[index]}
+              option={option}
+              readOnly={readOnly}
+              maxReached={maxReached}
+              value={value}
+              checkBoxInputRef={checkBoxInputRef}
+              question={question}
+              index={index}
+              actionRef={actionRef}
+              autoFocus={autoFocus && index === 0}
+              setDirty={setDirty}
+              onChange={onChange}
+              selectedFilters={selectedFilters}
+              isVisible
+              doesNotMatchFilters={visibleOptionsNotMatchingFilters.includes(
+                option.id,
+              )}
+              onHiddenChange={() => {
+                const toFocusIndex =
+                  index === visibleOptions.length - 1 ? index - 1 : index + 1;
+                // For screen readers
+                checkBoxInputRef.current[toFocusIndex]?.current?.focus();
+                setHiddenOptions((prev) =>
+                  Array.from(new Set([...prev, option])),
+                );
+              }}
+            />
+          ))}
+        </AnimatePresence>
+      </Box>
+      <Box aria-live="polite" mt={2}>
+        {hiddenOptions.length > 0 ? (
           <Accordion
             disableGutters
             elevation={0}
@@ -509,40 +853,44 @@ export function CategorizedCheckBoxQuestion({
                 containerType: 'inline-size',
               }}
             >
-              {hiddenOptions.map((option, index) => {
-                return (
-                  <Option
-                    key={option.id}
-                    option={option}
-                    readOnly={readOnly}
-                    maxReached={maxReached}
-                    value={value}
-                    checkBoxInputRef={checkBoxInputRef}
-                    question={question}
-                    index={index}
-                    actionRef={actionRef}
-                    autoFocus={autoFocus && index === 0}
-                    setDirty={setDirty}
-                    onChange={onChange}
-                    selectedFilters={selectedFilters}
-                    isVisible={false}
-                    onHiddenChange={() => {
-                      setHiddenOptions((prev) =>
-                        prev.filter(
-                          (hiddenOption) => hiddenOption.id !== option.id,
-                        ),
-                      );
+              <AnimatePresence>
+                {hiddenOptions.map((option, index) => {
+                  return (
+                    <Option
+                      key={option.id}
+                      option={option}
+                      readOnly={readOnly}
+                      maxReached={maxReached}
+                      value={value}
+                      checkBoxInputRef={checkBoxInputRef}
+                      question={question}
+                      index={index}
+                      actionRef={actionRef}
+                      autoFocus={autoFocus && index === 0}
+                      setDirty={setDirty}
+                      onChange={onChange}
+                      selectedFilters={selectedFilters}
+                      isVisible={false}
+                      onHiddenChange={() => {
+                        setHiddenOptions((prev) =>
+                          prev.filter(
+                            (hiddenOption) => hiddenOption.id !== option.id,
+                          ),
+                        );
 
-                      // For screen readers
-                      checkBoxInputRef.current[
-                        checkBoxInputRef.current.length - 1
-                      ]?.current?.focus();
-                    }}
-                  />
-                );
-              })}
+                        // For screen readers
+                        checkBoxInputRef.current[
+                          checkBoxInputRef.current.length - 1
+                        ]?.current?.focus();
+                      }}
+                    />
+                  );
+                })}
+              </AnimatePresence>
             </AccordionDetails>
           </Accordion>
+        ) : (
+          <Box height="3rem" />
         )}
       </Box>
     </Box>

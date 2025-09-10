@@ -72,6 +72,7 @@ interface Props {
   pageUnfinished: boolean;
   mobileDrawerOpen: boolean;
   answer?: AnswerItem; // For submissions page
+  surveyHasSideSection?: boolean;
 }
 
 export function SurveyFollowUpSections({
@@ -79,6 +80,7 @@ export function SurveyFollowUpSections({
   pageUnfinished,
   mobileDrawerOpen,
   answer,
+  surveyHasSideSection,
 }: Props) {
   const { getFollowUpSectionsToDisplay } = useSurveyAnswers();
 
@@ -153,6 +155,7 @@ export function SurveyFollowUpSections({
             <DocumentSection isFollowUp key={sect.id} section={sect} />
           ) : (
             <SurveyQuestion
+              surveyHasSideSection={surveyHasSideSection}
               isFollowUp
               key={sect.id}
               question={sect}
