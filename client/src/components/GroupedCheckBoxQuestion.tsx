@@ -85,6 +85,7 @@ export default function GroupedCheckBoxQuestion({
   readOnly = false,
 }: Props) {
   const [expanded, setExpanded] = useState<number>(null);
+  const mobileBreakPoint = 500;
 
   const { tr, surveyLanguage } = useTranslations();
 
@@ -196,11 +197,19 @@ export default function GroupedCheckBoxQuestion({
                 onBlur={() => {
                   setDirty(true);
                 }}
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'flex-start',
+                }}
               >
                 {group.options.map((option) => (
-                  <div
+                  <Box
                     key={option.id}
-                    style={{ display: 'flex', flexDirection: 'row' }}
+                    display="flex"
+                    flexDirection="row"
+                    alignItems={'center'}
+                    sx={{ containerType: 'inline-size', width: '100%' }}
                   >
                     <FormControlLabel
                       label={option.text?.[surveyLanguage] ?? ''}
@@ -234,12 +243,18 @@ export default function GroupedCheckBoxQuestion({
                     />
                     {option.info?.[surveyLanguage] && (
                       <SectionInfo
-                        style={{ float: 'right', marginLeft: 'auto' }}
+                        sx={(theme) => {
+                          return {
+                            [theme.containerQueries.down(mobileBreakPoint)]: {
+                              marginLeft: 'auto',
+                            },
+                          };
+                        }}
                         infoText={option.info?.[surveyLanguage]}
                         subject={option.text?.[surveyLanguage]}
                       />
                     )}
-                  </div>
+                  </Box>
                 ))}
               </FormGroup>
             </AccordionDetails>

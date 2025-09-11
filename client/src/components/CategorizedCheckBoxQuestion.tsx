@@ -406,14 +406,18 @@ const Option = forwardRef(function Option(
         />
         {option.info?.[surveyLanguage] && (
           <SectionInfo
-            sx={{
+            sx={(theme) => ({
               '& .MuiButtonBase-root': {
                 padding: 0,
               },
               [theme.containerQueries.down(mobileBreakPoint)]: {
                 marginLeft: 'auto',
               },
-            }}
+              [theme.containerQueries.down(mobileBreakPoint)]: {
+                float: 'right',
+                marginLeft: 'auto',
+              },
+            })}
             infoText={option.info?.[surveyLanguage]}
             subject={option.text?.[surveyLanguage]}
           />

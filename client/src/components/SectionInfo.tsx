@@ -1,3 +1,4 @@
+import { Help as HelpIcon } from '@mui/icons-material';
 import {
   Box,
   Button,
@@ -6,15 +7,13 @@ import {
   DialogContent,
   IconButton,
   SxProps,
+  Theme,
   Tooltip,
 } from '@mui/material';
-import React, { forwardRef, useImperativeHandle, useState } from 'react';
-import { Help as HelpIcon } from '@mui/icons-material';
+import { useTranslations } from '@src/stores/TranslationContext';
+import React, { forwardRef, useId, useImperativeHandle, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import rehypeExternalLinks from 'rehype-external-links';
-import { useTranslations } from '@src/stores/TranslationContext';
-import { useId } from 'react';
-import { Theme } from '@emotion/react';
 
 interface Props {
   subject: string;
