@@ -354,11 +354,8 @@ const Option = forwardRef(function Option(
         [theme.containerQueries.down(mobileBreakPoint)]: {
           alignItems: 'flex-start',
           flexDirection: 'column',
-          marginY: '0.5rem',
+          marginY: '0.75rem',
           gap: 0,
-          '& button': {
-            width: 'fit-content',
-          },
         },
       })}
     >
@@ -453,11 +450,12 @@ const Option = forwardRef(function Option(
               <MotionButton
                 initial={{ opacity: 0, maxHeight: 0 }}
                 animate={{ opacity: 1, maxHeight: '4rem' }}
-                exit={{ opacity: 0, maxHeight: 0 }}
+                exit={{ opacity: 0, maxHeight: 0, marginTop: 0 }}
                 aria-description={option.text?.[surveyLanguage]}
                 sx={(theme) => ({
                   paddingLeft: 0,
                   [theme.containerQueries.down(mobileBreakPoint)]: {
+                    marginTop: '0.5rem',
                     paddingY: 0,
                   },
                 })}
