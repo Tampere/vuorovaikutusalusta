@@ -48,6 +48,7 @@ export function SectionDetails({
     title: null,
     conditions: { equals: [], lessThan: [], greaterThan: [] },
     id: followUpSectionSequence,
+    displaySelection: false,
   };
 
   return (

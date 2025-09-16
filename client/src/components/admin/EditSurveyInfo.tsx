@@ -3,6 +3,7 @@ import {
   Autocomplete,
   Box,
   Checkbox,
+  Chip,
   FormControlLabel,
   FormHelperText,
   FormLabel,
@@ -44,7 +45,7 @@ const styles = {
 export default function EditSurveyInfo() {
   const [deleteConfirmDialogOpen, setDeleteConfirmDialogOpen] = useState(false);
   const [deleteSurveyLoading, setDeleteSurveyLoading] = useState(false);
-  const [users, setUsers] = useState<User[]>(null);
+  const [users, setUsers] = useState<User[]>([]);
   const [usersLoading, setUsersLoading] = useState(true);
 
   const {
@@ -69,7 +70,7 @@ export default function EditSurveyInfo() {
     async function fetchOtherUsers() {
       setUsersLoading(true);
       try {
-        const users = await fetch('/api/users/others').then(
+        const users = await fetch('/api/users').then(
           (response) => response.json() as Promise<User[]>,
         );
         setUsers(users);
@@ -181,16 +182,40 @@ export default function EditSurveyInfo() {
         <Autocomplete
           multiple
           disabled={usersLoading}
-          options={users ?? []}
+          filterSelectedOptions
+          options={users}
           getOptionLabel={(user) => user.fullName}
-          value={
-            users?.filter((user) => activeSurvey.admins?.includes(user.id)) ??
-            []
+          renderValue={(users) =>
+            users.map((user) => (
+              <Chip
+                key={user.id}
+                label={user.fullName}
+                sx={{ margin: '3px' }}
+                {...(user.id !== activeSurvey.authorId
+                  ? {
+                      onDelete: () =>
+                        editSurvey({
+                          ...activeSurvey,
+                          admins: activeSurvey.admins.filter(
+                            (a) => a !== user.id,
+                          ),
+                        }),
+                    }
+                  : {})}
+              ></Chip>
+            ))
           }
-          onChange={(_, value: User[]) => {
+          value={users?.filter(
+            (user) =>
+              activeSurvey.admins?.includes(user.id) ||
+              activeSurvey.authorId === user.id,
+          )}
+          onChange={(_, value) => {
             editSurvey({
               ...activeSurvey,
-              admins: value.map((user) => user.id),
+              admins: value
+                .filter((user) => user.id !== activeSurvey.authorId)
+                .map((user) => user.id),
             });
           }}
           renderOption={(props, user) => (
