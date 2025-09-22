@@ -286,7 +286,8 @@
     "allowEmptyAnswer": "Salli “En osaa sanoa” -vaihtoehto",
     "optionInfo": "Kysymysvaihtoehdon lisätiedot",
     "removeOption": "Poista vastausvaihtoehto",
-    "selectAnswer": "Valitse vastaus"
+    "selectAnswer": "Valitse vastaus",
+    "accessibilityNotice": "Huom! Kysymystyypin on tunnistettu olevan monissa kyselypalveluissa vaikea käyttää erilaisilla ruudunlukuohjelmilla. Jos käytät kysymystyyppiä, pohdi vastaajaryhmää ja käytä tarvittaessa muita kysymystyyppejä tai laadi erikseen saavutettava kysely."
   },
   "NumericQuestion": {
     "minValue": "Arvon pitää olla vähintään {minValue}",
