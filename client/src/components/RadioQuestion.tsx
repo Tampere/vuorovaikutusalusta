@@ -70,9 +70,11 @@ export default function RadioQuestion({
       {!readOnly && question.displaySelection && (
         <FormGroup>
           <Select
-            value={value}
+            value={value ?? ('DEFAULT_SELECT_ANSWER' as const)}
             displayEmpty
             renderValue={(value) => {
+              if (value === 'DEFAULT_SELECT_ANSWER')
+                return tr.SurveySections.selectAnswer;
               if (typeof value === 'string')
                 return tr.SurveyQuestion.customAnswer;
               return `${

@@ -273,6 +273,7 @@
     "optionInfo": "Answer option information",
     "removeOption": "Delete answer option",
     "selectAnswer": "Select an answer",
+    "selectMultipleAnswers": "Select answers",
     "accessibilityNotice": "This question type is known to be difficult to use with screen readers. If using this question type, evaluate your target demographic and use other question types as needed or create a separate, accessible, survey."
   },
   "NumericQuestion": {

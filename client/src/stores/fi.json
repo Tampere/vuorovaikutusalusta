@@ -287,6 +287,7 @@
     "optionInfo": "Kysymysvaihtoehdon lisätiedot",
     "removeOption": "Poista vastausvaihtoehto",
     "selectAnswer": "Valitse vastaus",
+    "selectMultipleAnswers": "Valitse vastaukset",
     "accessibilityNotice": "Huom! Kysymystyypin on tunnistettu olevan monissa kyselypalveluissa vaikea käyttää erilaisilla ruudunlukuohjelmilla. Jos käytät kysymystyyppiä, pohdi vastaajaryhmää ja käytä tarvittaessa muita kysymystyyppejä tai laadi erikseen saavutettava kysely."
   },
   "NumericQuestion": {
