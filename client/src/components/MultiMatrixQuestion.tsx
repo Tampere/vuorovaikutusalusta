@@ -181,7 +181,7 @@ export default function MultiMatrixQuestion({
   function getSelectionRenderValue(subjectIndex: number) {
     const valueList = value?.[subjectIndex];
     if (valueList.length === 0) {
-      return;
+      return tr.SurveySections.selectMultipleAnswers;
     }
     if (valueList.length > 1) {
       return `${valueList.length} ${tr.MultiMatrixQuestion.selected}`;
@@ -485,6 +485,7 @@ export default function MultiMatrixQuestion({
                           onOpen={() => setBackdropOpen(true)}
                           onClose={() => setBackdropOpen(false)}
                           multiple
+                          displayEmpty
                           renderValue={() =>
                             getSelectionRenderValue(subjectIndex)
                           }

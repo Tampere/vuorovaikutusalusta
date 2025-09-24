@@ -76,7 +76,7 @@ export default function CheckBoxQuestion({
   }, [value]);
 
   function getRenderValue() {
-    if (value.length === 0) return;
+    if (value.length === 0) return tr.SurveySections.selectMultipleAnswers;
     if (value.length === 1) {
       if (value[0] === customAnswerValue) return tr.SurveyQuestion.customAnswer;
       return `${
@@ -114,6 +114,7 @@ export default function CheckBoxQuestion({
             multiple
             value={value}
             renderValue={() => getRenderValue()}
+            displayEmpty
             onChange={(event) => {
               if (Array.isArray(event.target.value)) {
                 handleSelectChange(event.target.value);
