@@ -1,5 +1,5 @@
 import { MigrationBuilder, ColumnDefinitions } from 'node-pg-migrate';
-import { compressImage } from '../src/utils';
+import sharp from 'sharp';
 
 export const shorthands: ColumnDefinitions | undefined = undefined;
 
@@ -17,7 +17,10 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 
   for (const row of rows) {
     const fileBuffer = Buffer.from(row.file, 'base64');
-    const compressedFile = await compressImage(fileBuffer, 20);
+    const compressedFile = await sharp(fileBuffer)
+      .rotate()
+      .toFormat('jpeg', { quality: 20 })
+      .toBuffer();
     await pgm.db.query(
       `
         UPDATE data.files
