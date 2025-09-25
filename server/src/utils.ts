@@ -2,8 +2,9 @@ import { NextFunction, Request, Response } from 'express';
 import { ValidationChain, validationResult } from 'express-validator';
 import { BadRequestError } from './error';
 import { ImageType } from '@interfaces/survey';
-import { MimeType } from '@interfaces/admin';
+import { MimeType as PdfMimeType } from '@interfaces/admin';
 import { Geometry } from 'geojson';
+import sharp from 'sharp';
 
 /**
  * Middleware function for validating a request against provided validation rules.
@@ -56,12 +57,12 @@ export function parseImageType(val: unknown): ImageType | null {
   return val;
 }
 
-function isMimeType(val: string): val is MimeType {
+function isPdfMimeType(val: string): val is PdfMimeType {
   return val === 'application/pdf';
 }
 
-export function parseMimeType(val: unknown): MimeType {
-  if (!isString(val) || !isMimeType(val)) {
+export function parsePdfMimeType(val: unknown): PdfMimeType {
+  if (!isString(val) || !isPdfMimeType(val)) {
     throw new Error('Invalid value for mimeType');
   }
   return val;
@@ -71,6 +72,11 @@ export function assertNever(value: never): never {
   throw new Error(
     `Unhandled discriminated union member: ${JSON.stringify(value)}`,
   );
+}
+
+/** Creates a compressed JPEG image buffer */
+export function compressImage(image: Buffer, quality: number) {
+  return sharp(image).rotate().toFormat('jpeg', { quality }).toBuffer();
 }
 
 /**

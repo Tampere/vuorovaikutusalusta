@@ -3,6 +3,7 @@
 import { File, ImageType } from '@interfaces/survey';
 import {
   Button,
+  CircularProgress,
   Container,
   Dialog,
   DialogActions,
@@ -21,6 +22,7 @@ import { useTranslations } from '@src/stores/TranslationContext';
 import { request } from '@src/utils/request';
 import React, { useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
+import { set } from 'date-fns';
 
 const styles = (theme: Theme) => ({
   noImageBackground: { backgroundColor: '#D3D3D3' },
@@ -64,6 +66,7 @@ export default function SurveyImageList({ imageType }: Props) {
   const [imageAttributions, setImageAttributions] = useState<string>('');
   const [imageAltText, setImageAltText] = useState<string | null>(null);
   const [activeImage, setActiveImage] = useState<File | null>(null);
+  const [loadingImages, setLoadingImages] = useState(false);
 
   /** Fetch all images from db during component mount */
   useEffect(() => {
@@ -84,6 +87,7 @@ export default function SurveyImageList({ imageType }: Props) {
   }
 
   async function getImages() {
+    setLoadingImages(true);
     try {
       const res = await request<File[]>(
         `/api/file/${
@@ -92,11 +96,12 @@ export default function SurveyImageList({ imageType }: Props) {
             : imageType === 'thanksPageImage'
             ? 'thanks-page-images'
             : ''
-        }`,
+        }?compressed=true`,
       );
-
+      setLoadingImages(false);
       setImages(res);
     } catch (error) {
+      setLoadingImages(false);
       showToast({
         severity: 'error',
         message: tr.SurveyImageList.multipleImagesDownloadError,
@@ -276,118 +281,166 @@ export default function SurveyImageList({ imageType }: Props) {
         onClick={() => setImageDialogOpen((prev) => !prev)}
       >
         <PhotoLibrary />
-        <Typography
-          style={{
-            textTransform: 'none',
-            maxWidth: '400px',
-            textOverflow: 'ellipsis',
-            overflow: 'hidden',
-            whiteSpace: 'nowrap',
-            paddingRight: '0.5rem',
-          }}
-        >
-          {imageType === 'backgroundImage'
-            ? tr.SurveyImageList.surveyImage
-            : imageType === 'thanksPageImage'
-            ? tr.SurveyImageList.thanksPageImage
-            : tr.SurveyImageList.image}
-          {': '}
-          {activeImage
-            ? ` ${activeImage?.fileName}`
-            : ` ${tr.SurveyImageList.noImage.toLowerCase()}`}
-        </Typography>
-        {activeImage && (
-          <img
-            src={`data:image/;base64,${activeImage.data}`}
-            srcSet={`data:image/;base64,${activeImage.data}`}
-            alt={`survey-image-${activeImage.fileName}`}
-            loading="lazy"
-            style={{
-              height: '60px',
-              width: '60px',
-              filter: 'drop-shadow(0px 0px 4px lightgrey)',
+        {loadingImages ? (
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              paddingLeft: '1rem',
             }}
-          />
+          >
+            <Typography>Ladataan kuvia</Typography>
+            <CircularProgress size={'1rem'} />
+          </Box>
+        ) : (
+          <>
+            <Typography
+              style={{
+                textTransform: 'none',
+                maxWidth: '400px',
+                textOverflow: 'ellipsis',
+                overflow: 'hidden',
+                whiteSpace: 'nowrap',
+                paddingRight: '0.5rem',
+              }}
+            >
+              {imageType === 'backgroundImage'
+                ? tr.SurveyImageList.surveyImage
+                : imageType === 'thanksPageImage'
+                ? tr.SurveyImageList.thanksPageImage
+                : tr.SurveyImageList.image}
+              {': '}
+              {activeImage
+                ? ` ${activeImage?.fileName}`
+                : ` ${tr.SurveyImageList.noImage.toLowerCase()}`}
+            </Typography>
+            {activeImage && (
+              <img
+                src={`data:image/;base64,${activeImage.data}`}
+                srcSet={`data:image/;base64,${activeImage.data}`}
+                alt={`survey-image-${activeImage.fileName}`}
+                loading="lazy"
+                style={{
+                  height: '60px',
+                  width: '60px',
+                  filter: 'drop-shadow(0px 0px 4px lightgrey)',
+                }}
+              />
+            )}
+          </>
         )}
       </Button>
       <Dialog onClose={() => closeDialog()} open={imageDialogOpen}>
         <DialogContent>
-          <div
-            style={{
-              width: '100%',
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'flex-end',
-            }}
-          ></div>
-          <ImageList
-            sx={{ minWidth: 200, minHeight: 200 }}
-            cols={3}
-            rowHeight={164}
-          >
-            <ImageListItem
-              sx={(theme) => styles(theme).noImageBackground}
-              style={
-                imageType === 'backgroundImage'
-                  ? !activeSurvey?.backgroundImageName
-                    ? { border: '4px solid #1976d2' }
-                    : null
-                  : imageType === 'thanksPageImage'
-                  ? !activeSurvey?.thanksPage.imageName
-                    ? { border: '4px solid #1976d2' }
-                    : null
-                  : null
-              }
-              onClick={() => handleEmptyImage()}
+          {loadingImages ? (
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                paddingLeft: '1rem',
+              }}
             >
-              <Container
+              <Typography>{tr.SurveyImageList.loadingImages}</Typography>
+              <CircularProgress size={'1rem'} />
+            </Box>
+          ) : (
+            <Box
+              sx={{
+                '@keyframes fadeIn': {
+                  from: { opacity: 0 },
+                  to: { opacity: 1 },
+                },
+                animation: 'fadeIn 0.3s',
+              }}
+            >
+              <div
                 style={{
+                  width: '100%',
                   display: 'flex',
-                  padding: '0px 4px',
-                  height: '100%',
-                  maxWidth: '155px',
-                  flexDirection: 'column',
-                  justifyContent: 'center',
+                  flexDirection: 'row',
+                  justifyContent: 'flex-end',
                 }}
+              />
+              <ImageList
+                sx={{ minWidth: 200, minHeight: 200 }}
+                cols={3}
+                rowHeight={164}
               >
-                <Typography style={{ textAlign: 'center' }}>
-                  {imageType === 'backgroundImage'
-                    ? tr.SurveyImageList.noBackgroundImage
-                    : imageType === 'thanksPageImage'
-                    ? tr.SurveyImageList.noThanksPageImage
-                    : tr.SurveyImageList.noImage}
-                </Typography>
-              </Container>
-            </ImageListItem>
-            {images.map((image) => (
-              <ImageListItem
-                style={getImageBorderStyle(image)}
-                key={image.fileName}
-                onClick={() =>
-                  handleListItemClick(image.fileName, image.filePath)
-                }
-              >
-                <Cancel
-                  color="error"
-                  sx={(theme) => styles(theme).deleteImageIcon}
-                  onClick={(event) =>
-                    handleDeletingImage(event, image.fileName, image.filePath)
-                  }
-                />
-                <img
-                  src={`data:image/;base64,${image.data}`}
-                  srcSet={`data:image/;base64,${image.data}`}
-                  alt={
-                    imageAltText
-                      ? imageAltText
-                      : `survey-image-${image.fileName}`
-                  }
-                  loading="lazy"
-                  style={{ height: '100%' }}
-                />
-              </ImageListItem>
-            ))}
-          </ImageList>
+                <ImageListItem
+                  sx={(theme) => ({
+                    ...styles(theme).noImageBackground,
+                    ...(imageType === 'backgroundImage'
+                      ? !activeSurvey?.backgroundImageName
+                        ? { border: '4px solid #1976d2' }
+                        : {}
+                      : imageType === 'thanksPageImage'
+                      ? !activeSurvey?.thanksPage.imageName
+                        ? { border: '4px solid #1976d2' }
+                        : {}
+                      : {}),
+                  })}
+                  onClick={() => handleEmptyImage()}
+                >
+                  <Container
+                    style={{
+                      display: 'flex',
+                      padding: '0px 4px',
+                      height: '100%',
+                      maxWidth: '155px',
+                      flexDirection: 'column',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Typography
+                      style={{
+                        textAlign: 'center',
+                      }}
+                    >
+                      {imageType === 'backgroundImage'
+                        ? tr.SurveyImageList.noBackgroundImage
+                        : imageType === 'thanksPageImage'
+                        ? tr.SurveyImageList.noThanksPageImage
+                        : tr.SurveyImageList.noImage}
+                    </Typography>
+                  </Container>
+                </ImageListItem>
+                {images.map((image) => (
+                  <ImageListItem
+                    style={getImageBorderStyle(image)}
+                    key={image.fileName}
+                    onClick={() =>
+                      handleListItemClick(image.fileName, image.filePath)
+                    }
+                  >
+                    <Cancel
+                      color="error"
+                      sx={(theme) => styles(theme).deleteImageIcon}
+                      onClick={(event) =>
+                        handleDeletingImage(
+                          event,
+                          image.fileName,
+                          image.filePath,
+                        )
+                      }
+                    />
+                    <img
+                      src={`data:image/;base64,${image.data}`}
+                      srcSet={`data:image/;base64,${image.data}`}
+                      alt={
+                        imageAltText
+                          ? imageAltText
+                          : `survey-image-${image.fileName}`
+                      }
+                      loading="lazy"
+                      style={{ height: '100%' }}
+                    />
+                  </ImageListItem>
+                ))}
+              </ImageList>
+            </Box>
+          )}
         </DialogContent>
         <Box component="section" sx={(theme) => styles(theme).container}>
           <div {...getRootProps({ className: 'dropzone' })}>

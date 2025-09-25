@@ -9,7 +9,7 @@ import {
   storeFile,
 } from '@src/application/survey';
 import { ensureAuthenticated } from '@src/auth';
-import { parseMimeType, validateRequest } from '@src/utils';
+import { parsePdfMimeType, validateRequest } from '@src/utils';
 import { Router } from 'express';
 import asyncHandler from 'express-async-handler';
 import { param } from 'express-validator';
@@ -45,7 +45,7 @@ router.post(
     const { buffer, originalname, mimetype } = req.file;
     const { name } = await storeAdminInstructions(
       originalname,
-      parseMimeType(mimetype),
+      parsePdfMimeType(mimetype),
       buffer,
     );
 
@@ -93,8 +93,10 @@ router.get(
   ensureAuthenticated(),
   asyncHandler(async (req, res) => {
     const { filePath } = req.params;
+    const { compressed } = req.query;
+
     const filePathArray = filePath?.split('/') ?? [];
-    const row = await getImages(filePathArray);
+    const row = await getImages(filePathArray, compressed === 'true');
 
     res.status(200).json(row);
   }),
