@@ -35,10 +35,11 @@ import {
   InternalServerError,
   NotFoundError,
 } from '@src/error';
+import logger from '@src/logger';
 
 import { isAdmin } from '@src/user';
 
-import { geometryToGeoJSONFeatureCollection } from '@src/utils';
+import { compressImage, geometryToGeoJSONFeatureCollection } from '@src/utils';
 import { Geometry } from 'geojson';
 import pgPromise from 'pg-promise';
 
@@ -2578,6 +2579,18 @@ export async function storeFile({
   details: { [key: string]: any };
   surveyId: number;
 }) {
+  const isImage = mimetype.startsWith('image/');
+  let compressedFileString: string | null = null;
+  try {
+    if (isImage) {
+      compressedFileString = `\\x${(await compressImage(buffer, 20)).toString(
+        'hex',
+      )}`;
+    }
+  } catch (error) {
+    logger.info(`Error while compressing image: ${error}`);
+  }
+
   const fileString = `\\x${buffer.toString('hex')}`;
 
   const splittedFileNameArray = name.split('.');
@@ -2607,10 +2620,11 @@ export async function storeFile({
 
   const row = await getDb().oneOrNone<{ path: string[]; name: string }>(
     `
-    INSERT INTO data.files (file, details, file_path, file_name, mime_type, survey_id)
-    VALUES ($(fileString), $(details), $(path), $(fileUrl), $(mimetype), $(surveyId))
+    INSERT INTO data.files (file, compressed_file, details, file_path, file_name, mime_type, survey_id)
+    VALUES ($(fileString), $(compressedFileString), $(details), $(path), $(fileUrl), $(mimetype), $(surveyId))
     ON CONFLICT ON CONSTRAINT pk_files DO UPDATE SET
       file = $(fileString),
+      compressed_file = $(compressedFileString),
       details = $(details),
       file_path = $(path),
       file_name = $(fileUrl),
@@ -2620,6 +2634,7 @@ export async function storeFile({
     `,
     {
       fileString,
+      compressedFileString,
       details,
       path,
       fileUrl,
@@ -2670,17 +2685,21 @@ export async function getFile(fileName: string, filePath: string[]) {
  * Get all survey images from the database
  * @returns SurveyImage[]
  */
-export async function getImages(imagePath: string[]) {
+export async function getImages(imagePath: string[], getCompressed = false) {
   const rows = await getDb().manyOrNone(
     `
-    SELECT id, details, file, file_name, file_path FROM data.files WHERE file_path = $1;
+    SELECT id, details, ${
+      getCompressed ? 'compressed_file AS file' : 'file'
+    }, file_name, file_path 
+    FROM data.files 
+    WHERE file_path = $1;
   `,
     [imagePath],
   );
 
   return rows.map((row) => ({
     id: row.id,
-    data: row.file.toString('base64'),
+    data: row.file?.toString('base64'),
     attributions: row.details?.attributions,
     altText: row.details?.imageAltText,
     fileName: row.file_name,
