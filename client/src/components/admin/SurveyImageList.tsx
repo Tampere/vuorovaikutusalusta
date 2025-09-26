@@ -1,6 +1,4 @@
-// @ts-nocheck
-
-import { File, ImageType } from '@interfaces/survey';
+import { File, ImageType, SurveyImage } from '@interfaces/survey';
 import {
   Button,
   CircularProgress,
@@ -21,7 +19,7 @@ import { useSurvey } from '@src/stores/SurveyContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { request } from '@src/utils/request';
 import React, { useEffect, useState } from 'react';
-import { useDropzone } from 'react-dropzone';
+import { FileWithPath, useDropzone } from 'react-dropzone';
 import { set } from 'date-fns';
 
 const styles = (theme: Theme) => ({
@@ -61,12 +59,15 @@ export default function SurveyImageList({ imageType }: Props) {
   const { tr } = useTranslations();
   const { editSurvey, activeSurvey } = useSurvey();
   const { showToast } = useToasts();
-  const [images, setImages] = useState<File[]>([]);
+  const [images, setImages] = useState<SurveyImage[]>([]);
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
   const [imageAttributions, setImageAttributions] = useState<string>('');
   const [imageAltText, setImageAltText] = useState<string | null>(null);
-  const [activeImage, setActiveImage] = useState<File | null>(null);
+  const [activeImage, setActiveImage] = useState<SurveyImage | null>(null);
   const [loadingImages, setLoadingImages] = useState(false);
+  const [preview, setPreview] = useState<string | null>(null);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [uploadedImage, setUploadedImage] = useState<FileWithPath | null>(null);
 
   /** Fetch all images from db during component mount */
   useEffect(() => {
@@ -77,11 +78,25 @@ export default function SurveyImageList({ imageType }: Props) {
     setActiveImage(getActiveImage());
   });
 
-  function fileSizeValidator(file) {
+  useEffect(() => {
+    activeImage && setSelectedImage(activeImage.fileName);
+  }, [activeImage]);
+
+  function handleSelectedImageChange(newSelection: string | null) {
+    setSelectedImage(newSelection);
+    const image = images.find((image) => image.fileName === newSelection);
+    setImageAltText(image?.altText ?? '');
+    setImageAttributions(image?.attributions ?? '');
+  }
+
+  function fileSizeValidator(file: FileWithPath) {
     if (file.size > MAX_FILE_SIZE) {
       return {
         code: 'file-size-exceeded',
-        message: tr.SurveyImageList.imageSizeExceeded.replace('{x}', MEGAS),
+        message: tr.SurveyImageList.imageSizeExceeded.replace(
+          '{x}',
+          MEGAS.toString(),
+        ),
       };
     }
   }
@@ -89,7 +104,7 @@ export default function SurveyImageList({ imageType }: Props) {
   async function getImages() {
     setLoadingImages(true);
     try {
-      const res = await request<File[]>(
+      const res = await request<SurveyImage[]>(
         `/api/file/${
           imageType === 'backgroundImage'
             ? 'background-images'
@@ -110,29 +125,11 @@ export default function SurveyImageList({ imageType }: Props) {
   }
 
   function handleListItemClick(fileName?: string, filePath?: string[]) {
-    setImageDialogOpen((prev) => !prev);
-
     if (!fileName) {
+      handleSelectedImageChange(null);
       return;
     }
-    switch (imageType) {
-      case 'backgroundImage':
-        editSurvey({
-          ...activeSurvey,
-          backgroundImageName: fileName,
-          backgroundImagePath: filePath,
-        });
-        break;
-      case 'thanksPageImage':
-        editSurvey({
-          ...activeSurvey,
-          thanksPage: {
-            ...activeSurvey.thanksPage,
-            imageName: fileName,
-            imagePath: filePath,
-          },
-        });
-    }
+    handleSelectedImageChange(fileName);
   }
 
   async function handleDeletingImage(
@@ -159,7 +156,15 @@ export default function SurveyImageList({ imageType }: Props) {
   }
 
   const { acceptedFiles, fileRejections, getRootProps, getInputProps } =
-    useDropzone({ maxFiles: 1, validator: fileSizeValidator });
+    useDropzone({
+      maxFiles: 1,
+      validator: fileSizeValidator,
+      onDrop: (acceptedFiles) => {
+        setPreview(URL.createObjectURL(acceptedFiles[0]));
+        setUploadedImage(acceptedFiles[0]);
+        handleSelectedImageChange('NEW');
+      },
+    });
 
   useEffect(() => {
     if (fileRejections?.length > 0) {
@@ -170,30 +175,96 @@ export default function SurveyImageList({ imageType }: Props) {
     }
   }, [fileRejections]);
 
-  const files = acceptedFiles?.map((file: any) => (
-    <div key={file.path}>
+  const files = uploadedImage ? (
+    <div key={uploadedImage.path}>
       <span>
-        {' '}
-        {file.path} - {file.size / 1000} kb{' '}
+        {uploadedImage.path} - {uploadedImage.size / 1000} kb{' '}
       </span>
     </div>
-  ));
+  ) : (
+    <div />
+  );
 
   const closeDialog = () => {
     setImageDialogOpen((prev) => !prev);
-    acceptedFiles?.length && acceptedFiles?.shift();
+    setUploadedImage(null);
   };
 
+  function updateImage(imgName: string, imgPath: string[]) {
+    switch (imageType) {
+      case 'backgroundImage':
+        editSurvey({
+          ...activeSurvey,
+          backgroundImageName: imgName,
+          backgroundImagePath: imgPath,
+        });
+        break;
+      case 'thanksPageImage':
+        editSurvey({
+          ...activeSurvey,
+          thanksPage: {
+            ...activeSurvey.thanksPage,
+            imageName: imgName,
+            imagePath: imgPath,
+          },
+        });
+    }
+  }
+
+  async function handleDialogSave() {
+    if (selectedImage === null) {
+      handleEmptyImage();
+      return;
+    }
+
+    if (uploadedImage) {
+      const res = await handleImageUpload();
+      updateImage(res.id.name, res.id.path); // TODO: Fix these being under id, server side returned wrong
+      setSelectedImage(res.id.name);
+    }
+
+    // Fetch selected pic
+    const selected = images.find((img) => img.fileName === selectedImage);
+
+    if (selected) {
+      try {
+        const response = await fetch(`/api/file/${selected?.id}/details`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            attributions: imageAttributions,
+            imageAltText,
+          }),
+        });
+
+        // update existing image state
+        getImages();
+      } catch (e) {
+        showToast({
+          severity: 'error',
+          message: tr.SurveyImageList.imageDownloadError,
+        });
+      }
+      updateImage(selected.fileName, selected.filePath);
+    }
+
+    setImageDialogOpen(false);
+  }
+
   async function handleImageUpload() {
-    if (!acceptedFiles?.length) return;
+    if (!uploadedImage) return;
 
     const formData = new FormData();
-    formData.append('file', acceptedFiles[0]);
-    formData.append('attributions', imageAttributions);
-    imageAltText && formData.append('imageAltText', imageAltText);
+    formData.append('file', uploadedImage);
+    if (selectedImage === uploadedImage.name) {
+      formData.append('attributions', imageAttributions);
+      imageAltText && formData.append('imageAltText', imageAltText);
+    }
 
     try {
-      await fetch(
+      const res = await fetch(
         `/api/file/${
           imageType === 'backgroundImage'
             ? 'background-images'
@@ -203,15 +274,15 @@ export default function SurveyImageList({ imageType }: Props) {
         }`,
         { method: 'POST', body: formData },
       );
-      acceptedFiles.shift();
+      setUploadedImage(null);
       getImages();
-      setImageAltText('');
-      setImageAttributions('');
+      return res.json();
     } catch (error) {
       showToast({
         severity: 'error',
         message: tr.SurveyImageList.imageUploadError,
       });
+      return null;
     }
   }
 
@@ -260,18 +331,9 @@ export default function SurveyImageList({ imageType }: Props) {
   }
 
   function getImageBorderStyle(image: File) {
-    let style: { border: string } | {} = {};
-    switch (imageType) {
-      case 'backgroundImage':
-        image?.fileName === activeSurvey?.backgroundImageName &&
-          (style = { border: '4px solid #1976d2' });
-        break;
-
-      case 'thanksPageImage':
-        image?.fileName === activeSurvey?.thanksPage.imageName &&
-          (style = { border: '4px solid #1976d2' });
-    }
-    return style;
+    return image.fileName === selectedImage
+      ? { border: '4px solid #1976d2' }
+      : { border: '4px solid transparent' }; //Transparent border to stop elements shifting on colour change
   }
 
   return (
@@ -342,8 +404,24 @@ export default function SurveyImageList({ imageType }: Props) {
                 paddingLeft: '1rem',
               }}
             >
-              <Typography>{tr.SurveyImageList.loadingImages}</Typography>
-              <CircularProgress size={'1rem'} />
+              <ImageList
+                sx={{ minWidth: 200, minHeight: 200 }}
+                cols={3}
+                rowHeight={164}
+              >
+                <ImageListItem
+                  sx={(theme) => styles(theme).noImageBackground}
+                  style={
+                    selectedImage === null
+                      ? { border: '4px solid #1976d2' }
+                      : null
+                  }
+                  onClick={() => handleSelectedImageChange(null)}
+                >
+                  <Typography>{tr.SurveyImageList.loadingImages}</Typography>
+                  <CircularProgress size={'1rem'} />
+                </ImageListItem>
+              </ImageList>
             </Box>
           ) : (
             <Box
@@ -371,17 +449,12 @@ export default function SurveyImageList({ imageType }: Props) {
                 <ImageListItem
                   sx={(theme) => ({
                     ...styles(theme).noImageBackground,
-                    ...(imageType === 'backgroundImage'
-                      ? !activeSurvey?.backgroundImageName
-                        ? { border: '4px solid #1976d2' }
-                        : {}
-                      : imageType === 'thanksPageImage'
-                      ? !activeSurvey?.thanksPage.imageName
-                        ? { border: '4px solid #1976d2' }
-                        : {}
+                    ...(selectedImage === null
+                      ? { border: '4px solid #1976d2' }
                       : {}),
                   })}
-                  onClick={() => handleEmptyImage()}
+                  key={'no-image'}
+                  onClick={() => handleSelectedImageChange(null)}
                 >
                   <Container
                     style={{
@@ -406,6 +479,19 @@ export default function SurveyImageList({ imageType }: Props) {
                     </Typography>
                   </Container>
                 </ImageListItem>
+                {uploadedImage && (
+                  <ImageListItem
+                    style={
+                      selectedImage === 'NEW'
+                        ? { border: '4px solid #1976d2' }
+                        : {}
+                    }
+                    key={uploadedImage.name}
+                    onClick={() => handleSelectedImageChange('NEW')}
+                  >
+                    <img src={preview} style={{ height: '100%' }}></img>
+                  </ImageListItem>
+                )}
                 {images.map((image) => (
                   <ImageListItem
                     style={getImageBorderStyle(image)}
@@ -442,14 +528,33 @@ export default function SurveyImageList({ imageType }: Props) {
             </Box>
           )}
         </DialogContent>
+        {selectedImage && (
+          <Box component="section" sx={(theme) => styles(theme).container}>
+            <TextField
+              id="outlined-alt-text"
+              label={tr.EditImageSection.altText}
+              value={imageAltText ? imageAltText : ''}
+              onChange={(event) => setImageAltText(event.target.value)}
+              fullWidth
+              sx={{ marginTop: 1, marginBottom: 1 }}
+            />
+            <TextField
+              id="outlined-name"
+              label={tr.SurveyImageList.attributions}
+              value={imageAttributions}
+              onChange={(event) => setImageAttributions(event.target.value)}
+              fullWidth
+            />
+          </Box>
+        )}
         <Box component="section" sx={(theme) => styles(theme).container}>
           <div {...getRootProps({ className: 'dropzone' })}>
             <input {...getInputProps()} />
             <p style={{ color: 'purple', cursor: 'pointer' }}>
-              {tr.DropZone.dropFiles.replace('{x}', MEGAS)}
+              {tr.DropZone.dropFiles.replace('{x}', MEGAS.toString())}
             </p>
           </div>
-          {acceptedFiles?.length ? (
+          {uploadedImage && (
             <aside
               style={{
                 display: 'flex',
@@ -461,29 +566,34 @@ export default function SurveyImageList({ imageType }: Props) {
               <h4>{tr.SurveyImageList.files}</h4>
               {files}
 
-              <TextField
+              {/*<TextField
                 id="outlined-alt-text"
                 label={tr.EditImageSection.altText}
                 value={imageAltText ? imageAltText : ''}
                 onChange={(event) => setImageAltText(event.target.value)}
-                sx={{ marginTop: 1, marginBottom: 1, width: 250 }}
+                sx={{ marginTop: 1, marginBottom: 1 }}
               />
               <TextField
                 id="outlined-name"
                 label={tr.SurveyImageList.attributions}
                 value={imageAttributions}
                 onChange={(event) => setImageAttributions(event.target.value)}
-              />
+              />*/}
             </aside>
-          ) : null}
+          )}
         </Box>
         <DialogActions>
           <Button onClick={() => closeDialog()} autoFocus>
             {tr.commands.cancel}
           </Button>
           <Button
-            disabled={!acceptedFiles?.length || !imageAttributions.length}
-            onClick={() => handleImageUpload()}
+            disabled={
+              activeImage &&
+              selectedImage === activeImage.fileName &&
+              activeImage.altText === imageAltText &&
+              activeImage.attributions === imageAttributions
+            }
+            onClick={() => handleDialogSave()}
           >
             {tr.commands.save}
           </Button>

@@ -749,7 +749,7 @@ export interface File {
   /**
    * Path of the file in the file hierarchy
    */
-  filePath: string;
+  filePath: string[];
   /**
    * File mime type
    */

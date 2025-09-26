@@ -7,12 +7,13 @@ import {
   getImages,
   removeFile,
   storeFile,
+  updateDetails,
 } from '@src/application/survey';
 import { ensureAuthenticated } from '@src/auth';
 import { parsePdfMimeType, validateRequest } from '@src/utils';
 import { Router } from 'express';
 import asyncHandler from 'express-async-handler';
-import { param } from 'express-validator';
+import { body, param } from 'express-validator';
 import multer from 'multer';
 
 const router = Router();
@@ -99,6 +100,33 @@ router.get(
     const row = await getImages(filePathArray, compressed === 'true');
 
     res.status(200).json(row);
+  }),
+);
+
+/**
+ * Endpoint to update file details
+ */
+router.post(
+  '/{:id}/details',
+  ensureAuthenticated(),
+  validateRequest([
+    param('id').isInt(),
+    body('attributions')
+      .isString()
+      .optional({ nullable: true })
+      .withMessage('attributions must be a string'),
+    body('imageAltText')
+      .isString()
+      .optional({ nullable: true })
+      .withMessage('altText must be a string'),
+  ]),
+  asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const { ...details } = req.body;
+    console.log(details);
+
+    const result_code = (await updateDetails(Number(id), details)) ? 200 : 404;
+    res.status(result_code).send();
   }),
 );
 

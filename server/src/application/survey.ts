@@ -2707,6 +2707,18 @@ export async function getImages(imagePath: string[], getCompressed = false) {
   })) as SurveyImage[];
 }
 
+export async function updateDetails(
+  fileId: number,
+  details: Record<string, unknown>,
+) {
+  const update = await getDb().oneOrNone<{ id: number }>(
+    `UPDATE data.files SET details = $1 WHERE id = $2 RETURNING id;`,
+    [details, fileId],
+  );
+
+  return update.id === fileId;
+}
+
 /**
  * Delete a single file from the db
  * @param fileName name of the file
