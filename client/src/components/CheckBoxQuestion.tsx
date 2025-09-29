@@ -122,6 +122,15 @@ export default function CheckBoxQuestion({
               }
               handleSelectChange([event.target.value]);
             }}
+            MenuProps={{
+              slotProps: {
+                paper: {
+                  sx: {
+                    maxHeight: '60%',
+                  },
+                },
+              },
+            }}
           >
             {question.options.map((o) => (
               <MenuItem key={o.id} value={o.id}>

@@ -83,6 +83,15 @@ export default function RadioQuestion({
                 ] ?? ''
               }`;
             }}
+            MenuProps={{
+              slotProps: {
+                paper: {
+                  sx: {
+                    maxHeight: '60%',
+                  },
+                },
+              },
+            }}
             onChange={(event) => {
               const numericValue = Number(event.target.value);
               if (event.target.value !== '' && !isNaN(numericValue)) {
