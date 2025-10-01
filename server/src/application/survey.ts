@@ -86,6 +86,8 @@ interface DBSurvey {
   submission_count?: number;
   email_registration_required: boolean;
   email_include_personal_info: boolean;
+  background_image_display_attributions: boolean;
+  thanks_image_display_attributions: boolean;
 }
 
 /**
@@ -460,6 +462,8 @@ export async function getPublishedSurvey(
           survey.display_privacy_statement,
           survey.theme_id,
           survey.email_registration_required,
+          survey.background_image_display_attributions,
+          survey.thanks_image_display_attributions,
           theme_name,
           theme_data,
           page.id as page_id,
@@ -1929,6 +1933,7 @@ async function updateSurveyConditions(survey: Survey, t: pgPromise.ITask<{}>) {
  */
 export async function updateSurvey(survey: Survey) {
   // Wrap all of the upserting goodness inside a single transaction
+  console.log(survey);
   await getDb().tx(async (t) => {
     // Update the survey itself
     const surveyRow = await t
@@ -1961,7 +1966,9 @@ export async function updateSurvey(survey: Survey) {
         localisation_enabled = $26,
         display_privacy_statement = $27,
         email_registration_required = $28,
-        email_include_personal_info = $29
+        email_include_personal_info = $29,
+        thanks_image_display_attributions = $30,
+        background_image_display_attributions = $31
       WHERE id = $1 RETURNING *`,
         [
           survey.id,
@@ -1993,6 +2000,8 @@ export async function updateSurvey(survey: Survey) {
           survey.displayPrivacyStatement,
           survey.emailRegistrationRequired,
           survey.email.includePersonalInfo,
+          survey.displayThanksAttributions,
+          survey.displayBackgroundAttributions,
         ],
       )
       .catch((error) => {
@@ -2112,6 +2121,9 @@ function dbSurveyToSurvey(
     allowSavingUnfinished: dbSurvey.allow_saving_unfinished,
     localisationEnabled: dbSurvey.localisation_enabled,
     emailRegistrationRequired: dbSurvey.email_registration_required,
+    displayBackgroundAttributions:
+      dbSurvey.background_image_display_attributions,
+    displayThanksAttributions: dbSurvey.thanks_image_display_attributions,
     // Single survey row won't contain pages - they get aggregated from a join query
     pages: [],
   };
@@ -2690,9 +2702,10 @@ export async function getImages(imagePath: string[], getCompressed = false) {
     `
     SELECT id, details, ${
       getCompressed ? 'compressed_file AS file' : 'file'
-    }, file_name, file_path 
-    FROM data.files 
-    WHERE file_path = $1;
+    }, file_name, file_path
+    FROM data.files
+    WHERE file_path = $1
+    ORDER BY id;
   `,
     [imagePath],
   );

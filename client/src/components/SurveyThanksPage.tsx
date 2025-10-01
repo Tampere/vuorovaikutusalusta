@@ -16,7 +16,7 @@ import Footer from './Footer';
 
 type StyleKeys = 'testSurveyHeader';
 
-const styles: Record<StyleKeys, SxProps<Theme>> = {
+const styles = (theme: Theme & { [customKey: string]: any }) => ({
   testSurveyHeader: {
     padding: '2px',
     width: '100%',
@@ -25,7 +25,15 @@ const styles: Record<StyleKeys, SxProps<Theme>> = {
     textAlign: 'center',
     position: 'absolute',
   },
-};
+  imageCopyright: {
+    position: 'absolute',
+    right: 0,
+    bottom: 0,
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.primary.contrastText,
+    padding: '0.6rem',
+  },
+});
 
 interface Props {
   survey: Survey;
@@ -129,6 +137,15 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
               src={`/api/file/${survey.thanksPage.imagePath[0]}/${survey.thanksPage.imageName}`}
               alt={imageAltText ?? ''}
             />
+            {survey.displayThanksAttributions &&
+              surveyBackgroundImage?.attributions && (
+                <Typography
+                  sx={(theme) => styles(theme).imageCopyright}
+                  variant="body2"
+                >
+                  {surveyBackgroundImage.attributions}
+                </Typography>
+              )}
           </div>
         )}
       </Box>

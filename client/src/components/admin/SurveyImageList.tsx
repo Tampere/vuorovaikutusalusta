@@ -12,6 +12,8 @@ import {
   Theme,
   Typography,
   Box,
+  Checkbox,
+  Stack,
 } from '@mui/material';
 import { Cancel, PhotoLibrary } from '@mui/icons-material';
 import { useToasts } from '@src/stores/ToastContext';
@@ -20,7 +22,6 @@ import { useTranslations } from '@src/stores/TranslationContext';
 import { request } from '@src/utils/request';
 import React, { useEffect, useState } from 'react';
 import { FileWithPath, useDropzone } from 'react-dropzone';
-import { set } from 'date-fns';
 
 const styles = (theme: Theme) => ({
   noImageBackground: { backgroundColor: '#D3D3D3' },
@@ -68,6 +69,11 @@ export default function SurveyImageList({ imageType }: Props) {
   const [preview, setPreview] = useState<string | null>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [uploadedImage, setUploadedImage] = useState<FileWithPath | null>(null);
+  const [displayAttributions, setDisplayAttributions] = useState(
+    imageType === 'backgroundImage'
+      ? activeSurvey.displayBackgroundAttributions
+      : activeSurvey.displayThanksAttributions,
+  );
 
   /** Fetch all images from db during component mount */
   useEffect(() => {
@@ -79,7 +85,11 @@ export default function SurveyImageList({ imageType }: Props) {
   });
 
   useEffect(() => {
-    activeImage && setSelectedImage(activeImage.fileName);
+    if (activeImage) {
+      setSelectedImage(activeImage.fileName);
+      setImageAltText(activeImage.altText);
+      setImageAttributions(activeImage.attributions);
+    }
   }, [activeImage]);
 
   function handleSelectedImageChange(newSelection: string | null) {
@@ -197,11 +207,13 @@ export default function SurveyImageList({ imageType }: Props) {
           ...activeSurvey,
           backgroundImageName: imgName,
           backgroundImagePath: imgPath,
+          displayBackgroundAttributions: displayAttributions,
         });
         break;
       case 'thanksPageImage':
         editSurvey({
           ...activeSurvey,
+          displayThanksAttributions: displayAttributions,
           thanksPage: {
             ...activeSurvey.thanksPage,
             imageName: imgName,
@@ -258,7 +270,7 @@ export default function SurveyImageList({ imageType }: Props) {
 
     const formData = new FormData();
     formData.append('file', uploadedImage);
-    if (selectedImage === uploadedImage.name) {
+    if (selectedImage === 'NEW') {
       formData.append('attributions', imageAttributions);
       imageAltText && formData.append('imageAltText', imageAltText);
     }
@@ -528,32 +540,41 @@ export default function SurveyImageList({ imageType }: Props) {
             </Box>
           )}
         </DialogContent>
-        {selectedImage && (
-          <Box component="section" sx={(theme) => styles(theme).container}>
-            <TextField
-              id="outlined-alt-text"
-              label={tr.EditImageSection.altText}
-              value={imageAltText ? imageAltText : ''}
-              onChange={(event) => setImageAltText(event.target.value)}
-              fullWidth
-              sx={{ marginTop: 1, marginBottom: 1 }}
-            />
-            <TextField
-              id="outlined-name"
-              label={tr.SurveyImageList.attributions}
-              value={imageAttributions}
-              onChange={(event) => setImageAttributions(event.target.value)}
-              fullWidth
-            />
-          </Box>
-        )}
-        <Box component="section" sx={(theme) => styles(theme).container}>
-          <div {...getRootProps({ className: 'dropzone' })}>
+        <Stack component="section" sx={(theme) => styles(theme).container}>
+          {selectedImage && (
+            <>
+              <TextField
+                id="outlined-alt-text"
+                label={tr.EditImageSection.altText}
+                value={imageAltText ?? ''}
+                onChange={(event) => setImageAltText(event.target.value)}
+                fullWidth
+                sx={{ marginTop: 1, marginBottom: 1 }}
+              />
+              <TextField
+                id="outlined-name"
+                label={tr.SurveyImageList.attributions}
+                value={imageAttributions ?? ''}
+                onChange={(event) => setImageAttributions(event.target.value)}
+                fullWidth
+              />
+              <Box alignItems={'center'} pt={1} alignSelf={'flex-start'}>
+                <Checkbox
+                  aria-label="display-attributions"
+                  value={displayAttributions}
+                  checked={displayAttributions}
+                  onChange={(e) => setDisplayAttributions(e.target.checked)}
+                />
+                {tr.EditSurvey.displayAttributions}
+              </Box>
+            </>
+          )}
+          <Box {...getRootProps({ className: 'dropzone' })}>
             <input {...getInputProps()} />
             <p style={{ color: 'purple', cursor: 'pointer' }}>
               {tr.DropZone.dropFiles.replace('{x}', MEGAS.toString())}
             </p>
-          </div>
+          </Box>
           {uploadedImage && (
             <aside
               style={{
@@ -565,23 +586,9 @@ export default function SurveyImageList({ imageType }: Props) {
             >
               <h4>{tr.SurveyImageList.files}</h4>
               {files}
-
-              {/*<TextField
-                id="outlined-alt-text"
-                label={tr.EditImageSection.altText}
-                value={imageAltText ? imageAltText : ''}
-                onChange={(event) => setImageAltText(event.target.value)}
-                sx={{ marginTop: 1, marginBottom: 1 }}
-              />
-              <TextField
-                id="outlined-name"
-                label={tr.SurveyImageList.attributions}
-                value={imageAttributions}
-                onChange={(event) => setImageAttributions(event.target.value)}
-              />*/}
             </aside>
           )}
-        </Box>
+        </Stack>
         <DialogActions>
           <Button onClick={() => closeDialog()} autoFocus>
             {tr.commands.cancel}
@@ -591,7 +598,11 @@ export default function SurveyImageList({ imageType }: Props) {
               activeImage &&
               selectedImage === activeImage.fileName &&
               activeImage.altText === imageAltText &&
-              activeImage.attributions === imageAttributions
+              activeImage.attributions === imageAttributions &&
+              (imageType === 'backgroundImage'
+                ? activeSurvey.displayBackgroundAttributions
+                : activeSurvey.displayThanksAttributions) ===
+                displayAttributions
             }
             onClick={() => handleDialogSave()}
           >

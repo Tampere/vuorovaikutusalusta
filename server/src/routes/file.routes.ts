@@ -123,7 +123,6 @@ router.post(
   asyncHandler(async (req, res) => {
     const { id } = req.params;
     const { ...details } = req.body;
-    console.log(details);
 
     const result_code = (await updateDetails(Number(id), details)) ? 200 : 404;
     res.status(result_code).send();

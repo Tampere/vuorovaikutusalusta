@@ -534,6 +534,14 @@ export interface Survey {
    * Is email registration required for submissions?
    */
   emailRegistrationRequired: boolean;
+  /**
+   * Should background image attributions be shown?
+   */
+  displayBackgroundAttributions: boolean;
+  /**
+   * Should thanks image attributions be shown?
+   */
+  displayThanksAttributions: boolean;
 }
 
 /**
