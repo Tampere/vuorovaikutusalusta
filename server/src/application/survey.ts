@@ -108,6 +108,8 @@ interface DBSurveyPage {
   sidebar_image_name: string;
   sidebar_image_alt_text: LocalizedText;
   sidebar_image_size: SurveyPageSidebarImageSize;
+  sidebar_image_attributions: LocalizedText;
+  default_map_view: Geometry;
 }
 
 /**
@@ -207,6 +209,7 @@ type DBSurveyJoin = DBSurvey & {
   page_sidebar_type: SurveyPageSidebarType;
   page_sidebar_map_layers: number[];
   page_sidebar_image_path: string[];
+  page_sidebar_image_attributions: LocalizedText;
   page_sidebar_image_name: string;
   page_sidebar_image_alt_text: LocalizedText;
   page_sidebar_image_size: SurveyPageSidebarImageSize;
@@ -267,6 +270,10 @@ const surveyPageColumnSet = getColumnSet<DBSurveyPage>('survey_page', [
     cast: 'json',
   },
   'sidebar_image_size',
+  {
+    name: 'sidebar_image_attributions',
+    cast: 'json',
+  },
   getGeoJSONColumn('default_map_view', 3067),
 ]);
 
@@ -475,6 +482,7 @@ export async function getPublishedSurvey(
           page.sidebar_image_name as page_sidebar_image_name,
           page.sidebar_image_alt_text as page_sidebar_image_alt_text,
           page.sidebar_image_size as page_sidebar_image_size,
+          page.sidebar_image_attributions as page_sidebar_image_attributions,
           public.ST_AsGeoJSON(public.ST_Transform(page.default_map_view, 3067))::json as default_map_view
         FROM
           (
@@ -761,6 +769,7 @@ export async function getSurvey(params: { id: number } | { name: string }) {
           page.sidebar_image_name as page_sidebar_image_name,
           page.sidebar_image_alt_text as page_sidebar_image_alt_text,
           page.sidebar_image_size as page_sidebar_image_size,
+          page.sidebar_image_attributions as page_sidebar_image_attributions,
           public.ST_AsGeoJSON(public.ST_Transform(page.default_map_view, 3067))::json as default_map_view
         FROM
           (
@@ -1933,7 +1942,6 @@ async function updateSurveyConditions(survey: Survey, t: pgPromise.ITask<{}>) {
  */
 export async function updateSurvey(survey: Survey) {
   // Wrap all of the upserting goodness inside a single transaction
-  console.log(survey);
   await getDb().tx(async (t) => {
     // Update the survey itself
     const surveyRow = await t
@@ -2168,6 +2176,7 @@ function dbSurveyJoinToPage(dbSurveyJoin: DBSurveyJoin): SurveyPage {
           imagePath: dbSurveyJoin.page_sidebar_image_path,
           imageName: dbSurveyJoin.page_sidebar_image_name,
           imageAltText: dbSurveyJoin.page_sidebar_image_alt_text,
+          imageAttributions: dbSurveyJoin.page_sidebar_image_attributions,
           imageSize: dbSurveyJoin.page_sidebar_image_size,
           defaultMapView: dbSurveyJoin.default_map_view
             ? geometryToGeoJSONFeatureCollection(
@@ -2372,7 +2381,7 @@ function surveyPagesToRows(
   surveyPages: SurveyPage[],
   surveyId: number,
 ): DBSurveyPage[] {
-  return surveyPages.map((surveyPage, index) => {
+  return surveyPages.map((surveyPage, index): DBSurveyPage => {
     return {
       id: surveyPage.id,
       idx: index,
@@ -2384,9 +2393,10 @@ function surveyPagesToRows(
       sidebar_image_name: surveyPage.sidebar.imageName,
       sidebar_image_alt_text: surveyPage.sidebar.imageAltText,
       sidebar_image_size: surveyPage.sidebar.imageSize,
+      sidebar_image_attributions: surveyPage.sidebar.imageAttributions,
       default_map_view:
         surveyPage.sidebar.defaultMapView?.features[0]?.geometry ?? null,
-    } as DBSurveyPage;
+    };
   });
 }
 

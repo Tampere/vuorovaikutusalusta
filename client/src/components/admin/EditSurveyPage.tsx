@@ -17,6 +17,7 @@ import {
   Radio,
   RadioGroup,
   Skeleton,
+  Stack,
   TextField,
   ToggleButton,
   ToggleButtonGroup,
@@ -398,6 +399,23 @@ export default function EditSurveyPage() {
                   ...page.sidebar,
                   imageAltText: {
                     ...page.sidebar.imageAltText,
+                    [surveyLanguage]: event.target.value,
+                  },
+                },
+              });
+            }}
+          />
+          <TextField
+            style={{ width: '100%', marginTop: 8 }}
+            label={tr.EditSurveyPage.imageAttributions}
+            value={page.sidebar?.imageAttributions?.[surveyLanguage] ?? ''}
+            onChange={(event) => {
+              editPage({
+                ...page,
+                sidebar: {
+                  ...page.sidebar,
+                  imageAttributions: {
+                    ...page.sidebar.imageAttributions,
                     [surveyLanguage]: event.target.value,
                   },
                 },

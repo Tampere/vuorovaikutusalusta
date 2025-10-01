@@ -56,7 +56,20 @@ export default function EditImageSection({ section, onChange }: Props) {
             },
           })
         }
-      ></TextField>
+      />
+      <TextField
+        value={section.attributions[surveyLanguage]}
+        label={tr.EditSurveyPage.imageAttributions}
+        onChange={(event) =>
+          onChange({
+            ...section,
+            attributions: {
+              ...section.attributions,
+              [surveyLanguage]: event.target.value,
+            },
+          })
+        }
+      />
     </>
   );
 }

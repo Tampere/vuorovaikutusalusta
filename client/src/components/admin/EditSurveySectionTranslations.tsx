@@ -458,22 +458,40 @@ export default function EditSurveySectionTranslations({
         </>
       )}
       {section.type === 'image' && (
-        <TranslationField
-          placeholder={getTranslationPlaceholder(
-            tr.EditSurveyTranslations.altText,
-          )}
-          variant="standard"
-          value={section.altText[languageCode] ?? ''}
-          onChange={(event) => {
-            onEdit({
-              ...section,
-              altText: {
-                ...section.altText,
-                [languageCode]: event.target.value,
-              },
-            });
-          }}
-        />
+        <>
+          <TranslationField
+            placeholder={getTranslationPlaceholder(
+              tr.EditSurveyTranslations.altText,
+            )}
+            variant="standard"
+            value={section.altText[languageCode] ?? ''}
+            onChange={(event) => {
+              onEdit({
+                ...section,
+                altText: {
+                  ...section.altText,
+                  [languageCode]: event.target.value,
+                },
+              });
+            }}
+          />
+          <TranslationField
+            placeholder={getTranslationPlaceholder(
+              tr.EditSurveyTranslations.attributions,
+            )}
+            variant="standard"
+            value={section.attributions[languageCode] ?? ''}
+            onChange={(event) => {
+              onEdit({
+                ...section,
+                attributions: {
+                  ...section.attributions,
+                  [languageCode]: event.target.value,
+                },
+              });
+            }}
+          />
+        </>
       )}
       {section.type === 'personal-info' &&
         section.customQuestions.map((question, idx) => {

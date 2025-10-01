@@ -417,29 +417,59 @@ export default function EditSurveyTranslations() {
                               }
                             />
                             {page.sidebar.type == 'image' && (
-                              <TranslationField
-                                placeholder={getTranslationPlaceholder(
-                                  tr.EditSurveyPage.imageAltText,
-                                  lang,
-                                )}
-                                leftIcon={langIndex === 0 && <TextFields />}
-                                variant="outlined"
-                                sx={styles.boldInput}
-                                color="primary"
-                                value={page.sidebar?.imageAltText?.[lang] ?? ''}
-                                onChange={(event) =>
-                                  editPage({
-                                    ...page,
-                                    sidebar: {
-                                      ...page.sidebar,
-                                      imageAltText: {
-                                        ...page.sidebar.imageAltText,
-                                        [lang]: event.target.value,
+                              <>
+                                <TranslationField
+                                  placeholder={getTranslationPlaceholder(
+                                    tr.EditSurveyPage.imageAltText,
+                                    lang,
+                                  )}
+                                  leftIcon={langIndex === 0 && <TextFields />}
+                                  variant="outlined"
+                                  sx={styles.boldInput}
+                                  color="primary"
+                                  value={
+                                    page.sidebar?.imageAltText?.[lang] ?? ''
+                                  }
+                                  onChange={(event) =>
+                                    editPage({
+                                      ...page,
+                                      sidebar: {
+                                        ...page.sidebar,
+                                        imageAltText: {
+                                          ...page.sidebar.imageAltText,
+                                          [lang]: event.target.value,
+                                        },
                                       },
-                                    },
-                                  })
-                                }
-                              />
+                                    })
+                                  }
+                                />
+                                <TranslationField
+                                  placeholder={getTranslationPlaceholder(
+                                    tr.EditSurveyPage.imageAttributions,
+                                    lang,
+                                  )}
+                                  leftIcon={langIndex === 0 && <TextFields />}
+                                  variant="outlined"
+                                  sx={styles.boldInput}
+                                  color="primary"
+                                  value={
+                                    page.sidebar?.imageAttributions?.[lang] ??
+                                    ''
+                                  }
+                                  onChange={(event) =>
+                                    editPage({
+                                      ...page,
+                                      sidebar: {
+                                        ...page.sidebar,
+                                        imageAttributions: {
+                                          ...page.sidebar.imageAttributions,
+                                          [lang]: event.target.value,
+                                        },
+                                      },
+                                    })
+                                  }
+                                />
+                              </>
                             )}
                             <Typography
                               sx={{
