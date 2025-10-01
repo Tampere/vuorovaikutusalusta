@@ -256,37 +256,6 @@ const Option = forwardRef(function Option(
         <Typography sx={{ color: theme.palette.text.secondary }}>
           {tr.CategorizedCheckBoxQuestion.hiddenHelpertext}
         </Typography>
-        <Box
-          aria-hidden="true"
-          component="span"
-          sx={(theme) => ({
-            display: 'flex',
-            alignItems: 'center',
-            [theme.containerQueries.down(mobileBreakPoint)]: {
-              display: 'none',
-            },
-          })}
-        >
-          –
-        </Box>
-        <Button
-          ref={hiddenOptionRef}
-          onBlur={() => {
-            onHiddenChange();
-          }}
-          aria-description={tr.CategorizedCheckBoxQuestion.hiddenHelpertext}
-          sx={{
-            paddingLeft: 0,
-          }}
-          variant="text"
-          onClick={() => {
-            onChange(previousValue, selectedFilters);
-            setPreviousValue(null);
-            setCancelTempHidden(false);
-          }}
-        >
-          {tr.CategorizedCheckBoxQuestion.cancel}
-        </Button>
       </Box>
     );
   }
