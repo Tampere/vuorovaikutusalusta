@@ -169,6 +169,7 @@ export interface SurveyImageSection
     SectionFile {
   type: 'image';
   altText: LocalizedText;
+  attributions: LocalizedText;
 }
 
 /**
@@ -349,6 +350,10 @@ export interface SurveyPageSidebar {
    * Information how the picture is displayed
    */
   imageSize: SurveyPageSidebarImageSize;
+  /**
+   * Attributions for sidebar image
+   */
+  imageAttributions: LocalizedText;
 }
 
 /**

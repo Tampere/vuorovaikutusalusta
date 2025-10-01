@@ -1,5 +1,5 @@
 import { SurveyImageSection } from '@interfaces/survey';
-import { FormLabel, Link, Typography } from '@mui/material';
+import { Box, FormLabel, Link, Theme, Typography } from '@mui/material';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { getFullFilePath } from '@src/utils/path';
@@ -10,6 +10,17 @@ interface Props {
   section: SurveyImageSection;
   isFollowUp?: boolean;
 }
+
+const styles = (theme: Theme) => ({
+  imageCopyright: {
+    position: 'absolute',
+    right: 0,
+    bottom: '.41rem',
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.primary.contrastText,
+    padding: '.6rem',
+  },
+});
 
 export default function ImageSection({ section, isFollowUp = false }: Props) {
   const { survey } = useSurveyAnswers();
@@ -44,11 +55,22 @@ export default function ImageSection({ section, isFollowUp = false }: Props) {
           />
         )}
       </div>
-      <img
-        style={{ maxWidth: '100%' }}
-        src={`/api/file/${fullFilePath}`}
-        alt={section.altText[language]}
-      />
+      <Box position={'relative'}>
+        <img
+          style={{ maxWidth: '100%' }}
+          src={`/api/file/${fullFilePath}`}
+          alt={section.altText[language]}
+        />
+        <Typography
+          sx={(theme) => styles(theme).imageCopyright}
+          variant="body2"
+          maxWidth={'100%'}
+          display={'inline-block'}
+          align="right"
+        >
+          {section.attributions?.[surveyLanguage]}
+        </Typography>
+      </Box>
       <div style={{ display: 'flex', flexDirection: 'row' }}>
         <Link href={`/api/file/${fullFilePath}`} target={'__blank'}>
           {tr.ImageSection.openInNewTab}

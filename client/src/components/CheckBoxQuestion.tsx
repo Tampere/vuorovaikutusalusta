@@ -1,4 +1,4 @@
-import { LanguageCode, SurveyCheckboxQuestion } from '@interfaces/survey';
+import { SurveyCheckboxQuestion } from '@interfaces/survey';
 import {
   Checkbox,
   FormControlLabel,

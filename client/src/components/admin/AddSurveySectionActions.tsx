@@ -91,6 +91,7 @@ export default function AddSurveySectionActions(props: Props) {
       ],
       answerLimits: null,
       allowCustomAnswer: false,
+      displaySelection: false,
     },
     radio: {
       type: 'radio',
@@ -101,6 +102,7 @@ export default function AddSurveySectionActions(props: Props) {
         { text: initializeLocalizedObject(''), draftId: generateDraftId() },
       ],
       allowCustomAnswer: false,
+      displaySelection: false,
     },
     numeric: {
       type: 'numeric',
@@ -215,6 +217,7 @@ export default function AddSurveySectionActions(props: Props) {
       fileName: null,
       filePath: [],
       altText: initializeLocalizedObject(''),
+      attributions: initializeLocalizedObject(''),
     },
     document: {
       type: 'document',

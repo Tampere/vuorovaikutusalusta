@@ -163,7 +163,8 @@
     "addFollowUpQuestion": "Lisää jatkokysymys",
     "addFollowUpButtonTile": "Tallenna kysymys lisätäksesi jatkokysymyksen",
     "confirmDeleteSection": "Haluatko varmasti poistaa tämän osion?",
-    "imageAltText": "Kuvan vaihtoehtoinen teksti",
+    "imageAltText": "Vaihtoehtoinen teksti kuvalle",
+    "imageAttributions": "Kuvan tekijänoikeustiedot",
     "imageScaling": "Kuvan skaalaus",
     "imageScalingLabel": {
       "original": "Alkuperäinen koko",
@@ -668,7 +669,8 @@
     "max": "maksimiarvo",
     "class": "Vastausluokka",
     "subject": "Vastausaihe",
-    "altText": "Vaihtoehtoinen teksti kuvalle"
+    "altText": "Vaihtoehtoinen teksti kuvalle",
+    "attributions": "Kuvan tekijänoikeustiedot"
   },
   "SurveySubmissionsPage": {
     "attachments": "Liitteet",

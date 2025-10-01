@@ -99,6 +99,14 @@ const styles = (theme: Theme, noRightContent?: boolean) => ({
     borderColor: theme?.palette?.primary?.main ?? 'blue',
     borderWidth: '3px',
   },
+  imageCopyright: {
+    position: 'absolute',
+    right: 0,
+    bottom: 0,
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.primary.contrastText,
+    padding: '0.6rem',
+  },
 });
 
 interface Props {
@@ -668,18 +676,26 @@ export default function SurveyStepper({
             }}
           >
             {currentPage.sidebar.imageName && (
-              <img
-                style={
-                  currentPage.sidebar.imageSize === 'original'
-                    ? { margin: '0 auto' }
-                    : currentPage.sidebar.imageSize === 'fitted'
-                    ? { margin: '0 auto', maxWidth: '100%' }
-                    : null
-                }
-                aria-hidden={true}
-                alt={currentPage.sidebar?.imageAltText?.[surveyLanguage]}
-                src={`/api/file/${fullSidebarImagePath}`}
-              />
+              <>
+                <img
+                  style={
+                    currentPage.sidebar.imageSize === 'original'
+                      ? { margin: '0 auto' }
+                      : currentPage.sidebar.imageSize === 'fitted'
+                      ? { margin: '0 auto', maxWidth: '100%' }
+                      : null
+                  }
+                  aria-hidden={true}
+                  alt={currentPage.sidebar?.imageAltText?.[surveyLanguage]}
+                  src={`/api/file/${fullSidebarImagePath}`}
+                />
+                <Typography
+                  sx={(theme) => styles(theme).imageCopyright}
+                  variant="body2"
+                >
+                  {currentPage.sidebar?.imageAttributions?.[surveyLanguage]}
+                </Typography>
+              </>
             )}
           </div>
         );
