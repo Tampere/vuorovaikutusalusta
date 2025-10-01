@@ -44,7 +44,8 @@
     "attachNewPage": "Liitä sivu",
     "pageAttached": "Huomaa, että karttatasovalinnat eivät kopioidu. Tarkista karttatasovalinnat ja korjaa tarvittaessa karttajulkaisuosoitetta.",
     "pageCopied": "Sivu kopioitu leikepöydälle. Voit nyt liittää kopioidun sivun haluamallesi kyselylle.",
-    "checkConditionalSections": "Huomaa, että jatkokysymyksien ehdot eivät kopioidu. Tarkista ehdot tarvittaessa."
+    "checkConditionalSections": "Huomaa, että jatkokysymyksien ehdot eivät kopioidu. Tarkista ehdot tarvittaessa.",
+    "displayAttributions": "Näytä tekijänoikeustiedot"
   },
   "EditSurveyInfo": {
     "title": "Kyselyn otsikko",

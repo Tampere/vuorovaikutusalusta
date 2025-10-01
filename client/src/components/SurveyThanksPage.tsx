@@ -13,10 +13,11 @@ import React, { useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import rehypeExternalLinks from 'rehype-external-links';
 import Footer from './Footer';
+import { useImageHeaderQuery } from '@src/utils/useImageHeaderQuery';
 
 type StyleKeys = 'testSurveyHeader';
 
-const styles: Record<StyleKeys, SxProps<Theme>> = {
+const styles = (theme: Theme) => ({
   testSurveyHeader: {
     padding: '2px',
     width: '100%',
@@ -25,7 +26,15 @@ const styles: Record<StyleKeys, SxProps<Theme>> = {
     textAlign: 'center',
     position: 'absolute',
   },
-};
+  imageCopyright: {
+    position: 'absolute',
+    right: 0,
+    bottom: 0,
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.primary.contrastText,
+    padding: '0.6rem',
+  },
+});
 
 interface Props {
   survey: Survey;
@@ -34,6 +43,11 @@ interface Props {
 
 export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
   const [imageAltText, setImageAltText] = useState<string | null>(null);
+  const thanksPageImageQuery = useImageHeaderQuery(
+    `/api/file/${survey.thanksPage.imagePath.join('/')}/${
+      survey.thanksPage.imageName
+    }`,
+  );
 
   useEffect(() => {
     async function getImageHeaders() {
@@ -72,7 +86,9 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
       justifyContent="space-between"
     >
       {isTestSurvey && (
-        <Box sx={{ ...styles.testSurveyHeader }}>{tr.TestSurveyFrame.text}</Box>
+        <Box sx={(theme) => ({ ...styles(theme).testSurveyHeader })}>
+          {tr.TestSurveyFrame.text}
+        </Box>
       )}
       <Box
         className="header-content"
@@ -129,6 +145,15 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
               src={`/api/file/${survey.thanksPage.imagePath[0]}/${survey.thanksPage.imageName}`}
               alt={imageAltText ?? ''}
             />
+            {survey.displayThanksAttributions &&
+              thanksPageImageQuery.imageHeaders?.attributions && (
+                <Typography
+                  sx={(theme) => styles(theme).imageCopyright}
+                  variant="body2"
+                >
+                  {thanksPageImageQuery.imageHeaders?.attributions}
+                </Typography>
+              )}
           </div>
         )}
       </Box>

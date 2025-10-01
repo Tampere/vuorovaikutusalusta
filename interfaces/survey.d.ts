@@ -534,6 +534,14 @@ export interface Survey {
    * Is email registration required for submissions?
    */
   emailRegistrationRequired: boolean;
+  /**
+   * Should background image attributions be shown?
+   */
+  displayBackgroundAttributions: boolean;
+  /**
+   * Should thanks image attributions be shown?
+   */
+  displayThanksAttributions: boolean;
 }
 
 /**
@@ -749,7 +757,7 @@ export interface File {
   /**
    * Path of the file in the file hierarchy
    */
-  filePath: string;
+  filePath: string[];
   /**
    * File mime type
    */

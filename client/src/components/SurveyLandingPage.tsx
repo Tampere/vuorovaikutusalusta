@@ -219,14 +219,15 @@ export default function SurveyLandingPage({
           alt={tr.IconAltTexts.bannerAltText}
         />
 
-        {surveyBackgroundImage?.attributions ? (
-          <Typography
-            sx={(theme) => styles(theme).imageCopyright}
-            variant="body2"
-          >
-            {surveyBackgroundImage.attributions}
-          </Typography>
-        ) : null}
+        {survey.displayBackgroundAttributions &&
+          surveyBackgroundImage?.attributions && (
+            <Typography
+              sx={(theme) => styles(theme).imageCopyright}
+              variant="body2"
+            >
+              {surveyBackgroundImage.attributions}
+            </Typography>
+          )}
       </Box>
     </Stack>
   );
