@@ -13,10 +13,11 @@ import React, { useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import rehypeExternalLinks from 'rehype-external-links';
 import Footer from './Footer';
+import { useImageHeaderQuery } from '@src/utils/useImageHeaderQuery';
 
 type StyleKeys = 'testSurveyHeader';
 
-const styles = (theme: Theme & { [customKey: string]: any }) => ({
+const styles = (theme: Theme) => ({
   testSurveyHeader: {
     padding: '2px',
     width: '100%',
@@ -42,6 +43,11 @@ interface Props {
 
 export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
   const [imageAltText, setImageAltText] = useState<string | null>(null);
+  const thanksPageImageQuery = useImageHeaderQuery(
+    `/api/file/${survey.thanksPage.imagePath.join('/')}/${
+      survey.thanksPage.imageName
+    }`,
+  );
 
   useEffect(() => {
     async function getImageHeaders() {
@@ -80,7 +86,9 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
       justifyContent="space-between"
     >
       {isTestSurvey && (
-        <Box sx={{ ...styles.testSurveyHeader }}>{tr.TestSurveyFrame.text}</Box>
+        <Box sx={(theme) => ({ ...styles(theme).testSurveyHeader })}>
+          {tr.TestSurveyFrame.text}
+        </Box>
       )}
       <Box
         className="header-content"
@@ -138,12 +146,12 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
               alt={imageAltText ?? ''}
             />
             {survey.displayThanksAttributions &&
-              surveyBackgroundImage?.attributions && (
+              thanksPageImageQuery.imageHeaders?.attributions && (
                 <Typography
                   sx={(theme) => styles(theme).imageCopyright}
                   variant="body2"
                 >
-                  {surveyBackgroundImage.attributions}
+                  {thanksPageImageQuery.imageHeaders?.attributions}
                 </Typography>
               )}
           </div>
