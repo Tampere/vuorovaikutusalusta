@@ -558,7 +558,12 @@ export default function SurveyImageList({ imageType }: Props) {
                 onChange={(event) => setImageAttributions(event.target.value)}
                 fullWidth
               />
-              <Box alignItems={'center'} pt={1} alignSelf={'flex-start'}>
+              <Box
+                alignItems={'center'}
+                pt={1}
+                alignSelf={'flex-start'}
+                display={'flex'}
+              >
                 <Checkbox
                   aria-label="display-attributions"
                   value={displayAttributions}
