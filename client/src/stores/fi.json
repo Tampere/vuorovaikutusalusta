@@ -45,7 +45,7 @@
     "pageAttached": "Huomaa, että karttatasovalinnat eivät kopioidu. Tarkista karttatasovalinnat ja korjaa tarvittaessa karttajulkaisuosoitetta.",
     "pageCopied": "Sivu kopioitu leikepöydälle. Voit nyt liittää kopioidun sivun haluamallesi kyselylle.",
     "checkConditionalSections": "Huomaa, että jatkokysymyksien ehdot eivät kopioidu. Tarkista ehdot tarvittaessa.",
-    "displayAttributions": "Näytä tekijänoikeustiedot"
+    "displayAttributions": "Näytä tekijänoikeustiedot kyselyssä"
   },
   "EditSurveyInfo": {
     "title": "Kyselyn otsikko",
