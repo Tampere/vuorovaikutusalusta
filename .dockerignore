@@ -10,7 +10,8 @@ client/*
 !client/vite.config.ts
 !client/jest.config.json
 !client/setupTests.ts
-!client/.eslintrc
+!client/eslint.config.mjs
+
 
 server/*
 !server/package*.json
@@ -22,6 +23,6 @@ server/*
 !server/entrypoint.sh
 !server/migration.config.js
 !server/jest.config.json
-!server/.eslintrc
+!server/eslint.config.mjs
 
 !interfaces

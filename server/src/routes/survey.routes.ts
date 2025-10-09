@@ -20,12 +20,14 @@ import {
   updateSurvey,
   userCanEditSurvey,
 } from '@src/application/survey';
-import { ensureAuthenticated } from '@src/auth';
-import { ForbiddenError } from '@src/error';
+import { ensureAuthenticated, ensureSurveyGroupAccess } from '@src/auth';
+import { BadRequestError, ForbiddenError } from '@src/error';
 import { Router } from 'express';
 import asyncHandler from 'express-async-handler';
 import { body, param, query } from 'express-validator';
 import { validateRequest } from '../utils';
+import { isInternalUser } from '@src/user';
+import { randomUUID } from 'crypto';
 const router = Router();
 
 /**
@@ -34,7 +36,7 @@ const router = Router();
 router.get(
   '/report-emails',
   ensureAuthenticated(),
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (_req, res) => {
     const emails = await getDistinctAutoSendToEmails();
     res.json(emails);
   }),
@@ -59,9 +61,11 @@ router.get(
   asyncHandler(async (req, res) => {
     const userId = req.user.id;
     const { filterByAuthored, filterByPublished } = req.query;
+
     const surveys = await getSurveys(
-      filterByAuthored ? userId : null,
-      Boolean(filterByPublished),
+      filterByAuthored === 'true' ? userId : null,
+      filterByPublished === 'true',
+      isInternalUser(req.user) ? undefined : req.user,
     );
     res.status(200).json(surveys);
   }),
@@ -76,6 +80,7 @@ router.get(
     param('id').isNumeric().toInt().withMessage('ID must be a number'),
   ]),
   ensureAuthenticated(),
+  ensureSurveyGroupAccess(),
   asyncHandler(async (req, res) => {
     const id = Number(req.params.id);
     const survey = await getSurvey({ id });
@@ -101,6 +106,7 @@ router.post(
 router.put(
   '/:id',
   ensureAuthenticated(),
+  ensureSurveyGroupAccess(),
   validateRequest([
     param('id').isNumeric().toInt().withMessage('ID must be a number'),
     body('name')
@@ -147,6 +153,10 @@ router.put(
       .isString()
       .optional({ nullable: true })
       .withMessage('End date must be a date'),
+    body('emailIdentRequired')
+      .optional()
+      .isBoolean()
+      .withMessage('emailIdentRequired must be a boolean'),
     body('pages').optional().isArray().withMessage('Pages must be an array'),
     body('pages.*.id')
       .optional()
@@ -183,8 +193,20 @@ router.put(
       endDate: req.body.endDate ? new Date(req.body.endDate) : null,
       pages: req.body.pages,
     };
-    const updatedSurvey = await updateSurvey(survey);
-    res.status(200).json(updatedSurvey);
+
+    try {
+      const updatedSurvey = await updateSurvey(survey);
+      res.status(200).json(updatedSurvey);
+    } catch (error) {
+      throw (error.table === 'answer_entry' ||
+        error.table === 'personal_info') &&
+        Boolean(error.constraint)
+        ? new BadRequestError(
+            `Submitted answer prevents survey update: ${error.constraint}`,
+            'submitted_answer_prevents_update',
+          )
+        : error;
+    }
   }),
 );
 
@@ -194,6 +216,7 @@ router.put(
 router.delete(
   '/:id',
   ensureAuthenticated(),
+  ensureSurveyGroupAccess(),
   validateRequest([
     param('id').isNumeric().toInt().withMessage('ID must be a number'),
   ]),
@@ -214,6 +237,7 @@ router.delete(
 router.post(
   '/:id/copy',
   ensureAuthenticated(),
+  ensureSurveyGroupAccess(),
   validateRequest([
     param('id').isNumeric().toInt().withMessage('ID must be a number'),
   ]),
@@ -231,6 +255,10 @@ router.post(
     // Just in case: change every 'id' -field found on the copied survey into null to prevent overwriting anything
     function eachRecursive(obj) {
       for (const key in obj) {
+        // Don't modify categorized checkbox questions yet
+        if (key === 'categories') {
+          continue;
+        }
         if (typeof obj[key] == 'object' && obj[key] !== null) {
           eachRecursive(obj[key]);
         } else {
@@ -242,6 +270,37 @@ router.post(
     }
 
     eachRecursive(copiedSurveyData);
+
+    // Create custom ids for categorized checkbox options which are needed for saving
+    copiedSurveyData.pages.forEach((page) => {
+      page.sections.forEach((section) => {
+        if (section.type === 'categorized-checkbox') {
+          const sectionCategoryIdMap = {};
+          section.categoryGroups = section.categoryGroups.map((group) => {
+            return {
+              ...group,
+              categories: group.categories?.map((category) => {
+                sectionCategoryIdMap[category.id] =
+                  sectionCategoryIdMap[category.id] ?? randomUUID();
+                return {
+                  ...category,
+                  id: sectionCategoryIdMap[category.id], // category id
+                };
+              }),
+              id: randomUUID(), // category group id
+            };
+          });
+          section.options = section.options.map((option) => {
+            return {
+              ...option,
+              categories: option.categories?.map(
+                (categoryId) => sectionCategoryIdMap[categoryId],
+              ), // map old category id to new
+            };
+          });
+        }
+      });
+    });
 
     // Duplicates all files in original survey to keep fileurls unique
     const surveyWithDuplicatedFiles = await duplicateFiles(
@@ -351,6 +410,7 @@ async function processFileUrl(
 router.post(
   '/:id/publish',
   ensureAuthenticated(),
+  ensureSurveyGroupAccess(),
   validateRequest([
     param('id').isNumeric().toInt().withMessage('ID must be a number'),
   ]),
@@ -372,6 +432,7 @@ router.post(
 router.post(
   '/:id/unpublish',
   ensureAuthenticated(),
+  ensureSurveyGroupAccess(),
   validateRequest([
     param('id').isNumeric().toInt().withMessage('ID must be a number'),
   ]),
@@ -393,6 +454,7 @@ router.post(
 router.post(
   '/:id/page',
   ensureAuthenticated(),
+  ensureSurveyGroupAccess(),
   validateRequest([
     param('id').isNumeric().toInt().withMessage('ID must be a number'),
   ]),
@@ -414,6 +476,7 @@ router.post(
 router.delete(
   '/:surveyId/page/:id',
   ensureAuthenticated(),
+  ensureSurveyGroupAccess('surveyId'),
   validateRequest([
     param('surveyId')
       .isNumeric()
@@ -442,6 +505,7 @@ router.delete(
 router.get(
   '/:surveyId/report/:submissionId/:lang',
   ensureAuthenticated(),
+  ensureSurveyGroupAccess('surveyId'),
   asyncHandler(async (req, res) => {
     const surveyId = Number(req.params.surveyId);
     const submissionId = Number(req.params.submissionId);
@@ -453,7 +517,7 @@ router.get(
 
     const [survey, answerEntries, timestamp] = await Promise.all([
       getSurvey({ id: surveyId }),
-      getAnswerEntries(submissionId),
+      getAnswerEntries(submissionId, req.query.withPersonalInfo === 'true'),
       getTimestamp(submissionId),
     ]);
     const pdfBuffer = await generatePdf(
@@ -476,6 +540,7 @@ router.get(
 router.get(
   '/:id/submissions',
   ensureAuthenticated(),
+  ensureSurveyGroupAccess(),
   validateRequest([
     param('id').isNumeric().toInt().withMessage('ID must be a number'),
   ]),
@@ -488,7 +553,10 @@ router.get(
       throw new ForbiddenError('User not author nor admin of the survey');
     }
 
-    const submissions = await getSubmissionsForSurvey(surveyId);
+    const submissions = await getSubmissionsForSurvey(
+      surveyId,
+      req.query.withPersonalInfo === 'true',
+    );
     res.json(submissions);
   }),
 );

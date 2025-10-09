@@ -25,13 +25,12 @@ import {
   useMediaQuery,
   useTheme,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
+
 import { visuallyHidden } from '@mui/utils';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import { useSurveyMap } from '@src/stores/SurveyMapContext';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
-import { getClassList } from '@src/utils/classes';
 import { getFullFilePath } from '@src/utils/path';
 import { request } from '@src/utils/request';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
@@ -48,14 +47,16 @@ import SurveyMap from './SurveyMap';
 import SurveyQuestion from './SurveyQuestion';
 import TextSection from './TextSection';
 
-const useStyles = makeStyles((theme: Theme) => ({
+export const mobileTopDrawerHiddenHeight = 50;
+
+const styles = (theme: Theme, noRightContent?: boolean) => ({
   root: {
     display: 'flex',
     height: '100%',
   },
   stepper: {
     width: '100%',
-    maxWidth: '50rem',
+    maxWidth: noRightContent ? '60rem' : '50rem',
     padding: '1rem',
   },
   '@keyframes pulse': {
@@ -98,7 +99,15 @@ const useStyles = makeStyles((theme: Theme) => ({
     borderColor: theme?.palette?.primary?.main ?? 'blue',
     borderWidth: '3px',
   },
-}));
+  imageCopyright: {
+    position: 'absolute',
+    right: 0,
+    bottom: 0,
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.primary.contrastText,
+    padding: '0.6rem',
+  },
+});
 
 interface Props {
   survey: Survey;
@@ -123,6 +132,7 @@ export default function SurveyStepper({
     isPageValid,
     answers,
     unfinishedToken,
+    registrationId,
     getPageInvalidQuestions,
     updatePageMapLayers,
     updateAnswer,
@@ -141,7 +151,7 @@ export default function SurveyStepper({
     stopModifying,
     getAllLayers,
   } = useSurveyMap();
-  const classes = useStyles();
+
   const { tr, language, surveyLanguage } = useTranslations();
   const theme = useTheme();
   const mdUp = useMediaQuery(theme.breakpoints.up('md'));
@@ -314,9 +324,14 @@ export default function SurveyStepper({
     const visibleAnswers = getAnswersForSubmission(visiblePages);
 
     try {
+      const searchParamsString = new URLSearchParams({
+        ...(unfinishedToken && { token: unfinishedToken }),
+        ...(registrationId && { registration: registrationId }),
+      }).toString();
+
       await request(
         `/api/published-surveys/${survey.name}/submission${
-          unfinishedToken ? `?token=${unfinishedToken}` : ''
+          searchParamsString ? `?${searchParamsString}` : ''
         }`,
         { method: 'POST', body: { entries: visibleAnswers, info, language } },
       );
@@ -407,7 +422,9 @@ export default function SurveyStepper({
         <h1 style={{ marginLeft: '1rem' }}>{survey.title[surveyLanguage]}</h1>
 
         <Stepper
-          className={classes.stepper}
+          sx={(theme) =>
+            styles(theme, currentPage.sidebar.type === 'none').stepper
+          }
           activeStep={pageNumber}
           orientation="vertical"
           connector={null}
@@ -420,10 +437,10 @@ export default function SurveyStepper({
               <StepLabel
                 id={`${index}-page-top`}
                 aria-current={index === pageNumber ? 'step' : false}
-                classes={{
-                  active: classes.stepActive,
-                  label: classes.stepHeader,
-                }}
+                sx={(theme) => ({
+                  '& .Mui-active': styles(theme).stepActive,
+                  '& .MuiStepLabel-label': styles(theme).stepHeader,
+                })}
               >
                 <Typography
                   id={`${index}-page-heading`}
@@ -433,7 +450,7 @@ export default function SurveyStepper({
                     margin: 0,
                     fontSize: '1em',
                     '&:focus': { outline: 'none' },
-                    color: pageConditionsPassed(page) ? 'grey' : '',
+                    color: pageConditionsPassed(page) ? '#6b6b6b' : '',
                   }}
                 >
                   <span style={visuallyHidden}>
@@ -448,7 +465,9 @@ export default function SurveyStepper({
 
               <StepContent
                 transitionDuration={0}
-                classes={{ root: classes.stepContent }}
+                sx={(theme) => ({
+                  '& .MuiStepContent-root': styles(theme).stepContent,
+                })}
               >
                 {pageUnfinished && (
                   <Box
@@ -456,7 +475,11 @@ export default function SurveyStepper({
                     tabIndex={-1}
                     sx={{ ':focus': { outline: 'none' } }}
                   >
-                    <Alert aria-live="off" severity="error">
+                    <Alert
+                      aria-live="off"
+                      severity="error"
+                      sx={{ width: 'fit-content' }}
+                    >
                       {tr.SurveyStepper.unfinishedAnswers}
                       <p style={visuallyHidden}>
                         {tr.SurveyStepper.unfinishedAnswersInfo}
@@ -492,7 +515,7 @@ export default function SurveyStepper({
                   )}
 
                   {page.sections.map((section, _index) => (
-                    <div className={classes.section} key={section.id}>
+                    <Box sx={(theme) => styles(theme).section} key={section.id}>
                       {section.type === 'text' ? (
                         <TextSection section={section} />
                       ) : section.type === 'image' ? (
@@ -502,20 +525,27 @@ export default function SurveyStepper({
                       ) : (
                         <>
                           <SurveyQuestion
+                            surveyHasSideSection={
+                              currentPage.sidebar.type !== 'none'
+                            }
                             question={section}
                             pageUnfinished={pageUnfinished}
                             mobileDrawerOpen={mobileDrawerOpen}
                           />
                           <SurveyFollowUpSections
+                            surveyHasSideSection={
+                              currentPage.sidebar.type !== 'none'
+                            }
                             section={section}
                             mobileDrawerOpen={mobileDrawerOpen}
                             pageUnfinished={pageUnfinished}
                           />
                         </>
                       )}
-                    </div>
+                    </Box>
                   ))}
                   <StepperControls
+                    registrationId={registrationId}
                     nextPage={nextPage}
                     previousPage={previousPage}
                     isTestSurvey={isTestSurvey}
@@ -646,18 +676,26 @@ export default function SurveyStepper({
             }}
           >
             {currentPage.sidebar.imageName && (
-              <img
-                style={
-                  currentPage.sidebar.imageSize === 'original'
-                    ? { margin: '0 auto' }
-                    : currentPage.sidebar.imageSize === 'fitted'
-                    ? { margin: '0 auto', maxWidth: '100%' }
-                    : null
-                }
-                aria-hidden={true}
-                alt={currentPage.sidebar?.imageAltText?.[surveyLanguage]}
-                src={`/api/file/${fullSidebarImagePath}`}
-              />
+              <>
+                <img
+                  style={
+                    currentPage.sidebar.imageSize === 'original'
+                      ? { margin: '0 auto' }
+                      : currentPage.sidebar.imageSize === 'fitted'
+                      ? { margin: '0 auto', maxWidth: '100%' }
+                      : null
+                  }
+                  aria-hidden={true}
+                  alt={currentPage.sidebar?.imageAltText?.[surveyLanguage]}
+                  src={`/api/file/${fullSidebarImagePath}`}
+                />
+                <Typography
+                  sx={(theme) => styles(theme).imageCopyright}
+                  variant="body2"
+                >
+                  {currentPage.sidebar?.imageAttributions?.[surveyLanguage]}
+                </Typography>
+              </>
             )}
           </div>
         );
@@ -669,7 +707,12 @@ export default function SurveyStepper({
   }, [survey, currentPage.sidebar, surveyLanguage]);
 
   return (
-    <div className={getClassList([classes.root, loading && classes.loading])}>
+    <Box
+      sx={(theme) => ({
+        ...styles(theme).root,
+        ...(loading && styles(theme).loading),
+      })}
+    >
       {/* Side pane doesn't exist on any page - show the page in 1 column aligned to left */}
       {!sidePane && (
         <div
@@ -756,7 +799,7 @@ export default function SurveyStepper({
               top: 0,
               left: 0,
               right: 0,
-              height: 50,
+              height: mobileTopDrawerHiddenHeight,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -845,6 +888,6 @@ export default function SurveyStepper({
         }}
         onSubmit={doSubmit}
       />
-    </div>
+    </Box>
   );
 }

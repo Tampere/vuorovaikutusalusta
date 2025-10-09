@@ -1,4 +1,5 @@
 import {
+  SurveyCategorizedCheckboxQuestion,
   SurveyCheckboxQuestion,
   SurveyDocumentSection,
   SurveyFollowUpSection,
@@ -11,6 +12,7 @@ import {
   SurveyMultiMatrixQuestion,
   SurveyNumericQuestion,
   SurveyPageSection,
+  SurveyPersonalInfoQuestion,
   SurveyRadioQuestion,
   SurveySliderQuestion,
   SurveySortingQuestion,
@@ -28,6 +30,7 @@ import {
   LinearScale,
   Looks4,
   Map,
+  Person,
   RadioButtonChecked,
   Subject,
   TextFields,
@@ -38,15 +41,13 @@ import {
   Accordion,
   AccordionSummary,
   Tooltip,
-  Typography
+  Typography,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
+
 import { FollowUpListItemIcon } from '@src/components/icons/FollowUpListItemIcon';
-import { useClipboard } from '@src/stores/ClipboardContext';
-import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { ReactNode, useMemo, useRef, useState } from 'react';
-import { DraggableProvided } from 'react-beautiful-dnd';
+
 import ConfirmDialog from '../../ConfirmDialog';
 import EditAttachmentSection from '../EditAttachmentSection';
 import EditCheckBoxQuestion from '../EditCheckBoxQuestion';
@@ -63,8 +64,12 @@ import EditSliderQuestion from '../EditSliderQuestion';
 import EditSortingQuestion from '../EditSortingQuestion';
 import EditTextSection from '../EditTextSection';
 import { FollowUpSectionMenu } from './FollowUpSectionMenu';
+import { DragHandle } from '@src/components/DragAndDrop/SortableItem';
+import EditCategorizedCheckBoxQuestion from '../EditCategorizedCheckBoxQuestion/EditCategorizedCheckBoxQuestion';
+import { EditPersonalInfoQuestion } from '../EditPersonalInfoQuestion';
+import { CategorizedCheckboxIcon } from '@src/components/icons/CategorizedCheckboxIcon';
 
-const useStyles = makeStyles({
+const styles = {
   accordion: {
     background: '#ddd',
   },
@@ -88,7 +93,7 @@ const useStyles = makeStyles({
     alignItems: 'center',
     margin: 0,
   },
-});
+};
 
 interface Props {
   pageId: number;
@@ -104,18 +109,16 @@ interface Props {
   name: string;
   onEdit: (section: SurveyPageSection | SurveyFollowUpSection) => void;
   onDelete: (index: number) => void;
-  provided: DraggableProvided;
+  isDragging?: boolean;
 }
 
 export function FollowUpSectionAccordion(props: Props) {
   const [deleteConfirmDialogOpen, setDeleteConfirmDialogOpen] = useState(false);
-  const classes = useStyles();
+
   const { tr, surveyLanguage } = useTranslations();
-  const { setSection, clipboardPage } = useClipboard();
-  const { showToast } = useToasts();
 
   // Index is used inside a callback function -> useRef is required in React to catch all updates
-  const indexRef = useRef<number>();
+  const indexRef = useRef<number>(null);
   indexRef.current = props.index;
 
   function handleEdit(section: SurveyPageSection | SurveyFollowUpSection) {
@@ -171,7 +174,6 @@ export function FollowUpSectionAccordion(props: Props) {
       tooltip: tr.SurveySection.mapQuestion,
       form: (
         <EditMapQuestion
-          disableSectionCopying
           disabled={props.disabled}
           section={props.section as SurveyMapQuestion}
           onChange={handleEdit}
@@ -254,6 +256,17 @@ export function FollowUpSectionAccordion(props: Props) {
         />
       ),
     },
+    'categorized-checkbox': {
+      icon: <CategorizedCheckboxIcon />,
+      tooltip: tr.SurveySection.categorizedCheckboxQuestion,
+      form: (
+        <EditCategorizedCheckBoxQuestion
+          disabled={props.disabled}
+          section={props.section as SurveyCategorizedCheckboxQuestion}
+          onChange={handleEdit}
+        />
+      ),
+    },
     image: {
       icon: <Image />,
       tooltip: tr.SurveySection.imageSection,
@@ -279,6 +292,16 @@ export function FollowUpSectionAccordion(props: Props) {
       tooltip: tr.SurveySection.attachmentSection,
       form: <EditAttachmentSection />,
     },
+    'personal-info': {
+      icon: <Person />,
+      tooltip: tr.SurveySection.personalInfoQuestion,
+      form: (
+        <EditPersonalInfoQuestion
+          section={props.section as SurveyPersonalInfoQuestion}
+          onChange={handleEdit}
+        />
+      ),
+    },
   };
 
   const accordion = useMemo(() => {
@@ -288,20 +311,24 @@ export function FollowUpSectionAccordion(props: Props) {
   return (
     <>
       <Accordion
-        ref={props.provided.innerRef}
         expanded={props.expanded}
         onChange={(_, isExpanded) => {
           props.onExpandedChange(isExpanded);
         }}
-        className={props.className ?? classes.accordion}
+        {...(props.className && { className: props.className })}
+        sx={styles.accordion}
         style={{ backgroundColor: '#FDE1FF' }}
+        slotProps={{ heading: { component: 'div' } }}
       >
         <AccordionSummary
+          component="div"
           expandIcon={<ExpandMore />}
           aria-controls={`${props.name}-content`}
           id={`${props.name}-header`}
-          className={classes.customAccordionSummary}
-          classes={{ contentGutters: classes.contentGutters }}
+          sx={{
+            ...styles.customAccordionSummary,
+            '& .MuiAccordionSummary-contentGutters': styles.contentGutters,
+          }}
         >
           <div
             style={{
@@ -325,14 +352,14 @@ export function FollowUpSectionAccordion(props: Props) {
             )}
           </div>
 
-          <Typography className={classes.sectionTitle}>
+          <Typography sx={styles.sectionTitle}>
             {props.section.title?.[surveyLanguage] || (
               <em>{tr.EditSurveyPage.untitledSection}</em>
             )}
           </Typography>
-          <div {...props.provided.dragHandleProps} style={{ display: 'flex' }}>
+          <DragHandle isDragging={props.isDragging}>
             <DragIndicator />
-          </div>
+          </DragHandle>
         </AccordionSummary>
 
         <FollowUpSectionMenu

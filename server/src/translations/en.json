@@ -7,10 +7,19 @@
   "dontKnow": "I don't know",
   "unfinishedSubmission": "Unfinished submission",
   "unfinishedSurveyInfo": "Your submission to the survey {surveyTitle} has been saved as unfinished. Your answers will be taken into account only when you have finished answering the survey and submitted your answers.",
+  "surveyRegistrationLink": "Survey response link:",
+  "surveyRegistrationInfo": "You have requested a response link for the survey: {surveyTitle}. You can only respond to the survey once.",
   "continueWithLink": "You can continue answering the survey while it is open via the following link: <linkki>.",
   "submissionId": "Submission identifier",
   "responseTime": "Time of the response",
   "attachments": "Attachments",
   "fi": "finnish",
-  "en": "english"
+  "en": "english",
+  "PersonalInfo": {
+    "label": "Personal Information",
+    "name": "Name",
+    "email": "Email address",
+    "phone": "Phone number",
+    "address": "Address"
+  }
 }

@@ -7,12 +7,13 @@ import {
   getImages,
   removeFile,
   storeFile,
+  updateDetails,
 } from '@src/application/survey';
 import { ensureAuthenticated } from '@src/auth';
-import { parseMimeType, validateRequest } from '@src/utils';
+import { parsePdfMimeType, validateRequest } from '@src/utils';
 import { Router } from 'express';
 import asyncHandler from 'express-async-handler';
-import { param } from 'express-validator';
+import { body, param } from 'express-validator';
 import multer from 'multer';
 
 const router = Router();
@@ -45,7 +46,7 @@ router.post(
     const { buffer, originalname, mimetype } = req.file;
     const { name } = await storeAdminInstructions(
       originalname,
-      parseMimeType(mimetype),
+      parsePdfMimeType(mimetype),
       buffer,
     );
 
@@ -57,7 +58,7 @@ router.post(
  * Endpoint for inserting a single file
  */
 router.post(
-  '/:filePath?',
+  '/{:filePath}',
   validateRequest([
     param('filePath')
       .optional()
@@ -89,14 +90,42 @@ router.post(
  * Endpoint for fetching all available survey images with certain type specified by filepath
  */
 router.get(
-  '/:filePath?',
+  '/{:filePath}',
   ensureAuthenticated(),
   asyncHandler(async (req, res) => {
     const { filePath } = req.params;
+    const { compressed } = req.query;
+
     const filePathArray = filePath?.split('/') ?? [];
-    const row = await getImages(filePathArray);
+    const row = await getImages(filePathArray, compressed === 'true');
 
     res.status(200).json(row);
+  }),
+);
+
+/**
+ * Endpoint to update file details
+ */
+router.post(
+  '/{:id}/details',
+  ensureAuthenticated(),
+  validateRequest([
+    param('id').isInt(),
+    body('attributions')
+      .isString()
+      .optional({ nullable: true })
+      .withMessage('attributions must be a string'),
+    body('imageAltText')
+      .isString()
+      .optional({ nullable: true })
+      .withMessage('altText must be a string'),
+  ]),
+  asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const { ...details } = req.body;
+
+    const result_code = (await updateDetails(Number(id), details)) ? 200 : 404;
+    res.status(result_code).send();
   }),
 );
 
@@ -104,7 +133,7 @@ router.get(
  * Endpoint for fetching a single local file
  */
 router.get(
-  '/:filePath?/:fileName',
+  '/{:filePath}/:fileName',
   validateRequest([
     param('fileName').isString().withMessage('fileName must be a string'),
     param('filePath')
@@ -117,7 +146,7 @@ router.get(
     const filePathArray = filePath?.split('/') ?? [];
     const row = await getFile(fileName, filePathArray);
     res.set('Content-type', row.mimeType);
-    res.set('File-details', JSON.stringify(row.details));
+    res.set('File-details', JSON.stringify(row.details).normalize('NFC')); // Normalize to NFC to avoid issues with special characters
     res.status(200).send(row.data);
   }),
 );
@@ -127,7 +156,7 @@ router.get(
  */
 
 router.post(
-  '/copy/*',
+  '/copy/*splat',
   ensureAuthenticated(),
 
   asyncHandler(async (req, res) => {
@@ -153,7 +182,7 @@ router.post(
  * Endpoint for deleting a single file
  */
 router.delete(
-  '/:filePath?/:fileName',
+  '/{:filePath}/:fileName',
   validateRequest([
     param('fileName').isString().withMessage('fileName must be a string'),
     param('filePath')

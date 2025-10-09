@@ -17,8 +17,6 @@ import {
 } from '@mui/material';
 import { visuallyHidden } from '@mui/utils';
 
-import { makeStyles } from '@mui/styles';
-
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useRef, useState } from 'react';
 
@@ -35,7 +33,7 @@ interface ComponentState {
   breakPoint: number;
 }
 
-const useStyles = makeStyles({
+const styles = {
   matrixRow: {
     display: 'flex',
     flexDirection: 'row',
@@ -55,7 +53,7 @@ const useStyles = makeStyles({
     zIndex: 1,
     textAlign: 'left',
   },
-});
+};
 
 export default function MatrixQuestion({
   value,
@@ -64,7 +62,7 @@ export default function MatrixQuestion({
   setBackdropOpen,
 }: Props) {
   const { tr, surveyLanguage } = useTranslations();
-  const classes = useStyles();
+
   const isMobileWidth = useMediaQuery('(max-width:430px)');
   const [componentState, setComponentState] = useState<ComponentState>({
     isOverflow: false,
@@ -156,13 +154,13 @@ export default function MatrixQuestion({
             )}
             <TableHead>
               <TableRow>
-                <TableCell scope="col" className={classes.stickyLeft} />
+                <TableCell scope="col" sx={styles.stickyLeft} />
                 {question.classes.map((entry, index) => {
                   return (
                     <TableCell
                       scope="col"
                       key={index}
-                      className={`${classes.matrixCell} ${classes.matrixText}`}
+                      sx={{ ...styles.matrixCell, ...styles.matrixText }}
                     >
                       {entry?.[surveyLanguage] ?? index}
                     </TableCell>
@@ -171,8 +169,11 @@ export default function MatrixQuestion({
                 {question.allowEmptyAnswer && (
                   <TableCell
                     scope="col"
-                    sx={{ backgroundColor: '#efefef' }}
-                    className={`${classes.matrixCell} ${classes.matrixText}`}
+                    sx={{
+                      ...styles.matrixCell,
+                      ...styles.matrixText,
+                      backgroundColor: '#efefef',
+                    }}
                   >
                     {tr.MatrixQuestion.emptyAnswer}
                   </TableCell>
@@ -186,18 +187,18 @@ export default function MatrixQuestion({
                     <TableCell
                       component="th"
                       scope="row"
-                      className={[
-                        classes.stickyLeft,
-                        classes.matrixCell,
-                        classes.matrixText,
-                      ].join(' ')}
+                      sx={{
+                        ...styles.stickyLeft,
+                        ...styles.matrixCell,
+                        ...styles.matrixText,
+                      }}
                     >
                       {subject?.[surveyLanguage]}
                     </TableCell>
                     {question.classes.map((_entry, classIndex) => (
                       <TableCell
                         key={classIndex.toString()}
-                        className={classes.matrixCell}
+                        sx={styles.matrixCell}
                       >
                         <Radio
                           name={`question-${question.id}-${subjectIndex}`}
@@ -213,8 +214,10 @@ export default function MatrixQuestion({
                     ))}
                     {question.allowEmptyAnswer && (
                       <TableCell
-                        className={classes.matrixCell}
-                        sx={{ backgroundColor: '#efefef' }}
+                        sx={{
+                          ...styles.matrixCell,
+                          backgroundColor: '#efefef',
+                        }}
                       >
                         <Radio
                           name={`question-${question.id}-${subjectIndex}`}
@@ -244,18 +247,21 @@ export default function MatrixQuestion({
               <TableRow>
                 <TableCell
                   scope="col"
-                  className={[
-                    classes.stickyLeft,
-                    classes.matrixCell,
-                    classes.matrixText,
-                  ].join(' ')}
+                  sx={{
+                    ...styles.stickyLeft,
+                    ...styles.matrixCell,
+                    ...styles.matrixText,
+                  }}
                 >
                   {tr.MatrixQuestion.subject}
                 </TableCell>
                 <TableCell
                   scope="col"
-                  className={[classes.matrixCell, classes.matrixText].join(' ')}
-                  sx={{ '&&': { textAlign: 'left' } }}
+                  sx={{
+                    ...styles.matrixCell,
+                    ...styles.matrixText,
+                    '&&': { textAlign: 'left' },
+                  }}
                 >
                   {tr.MatrixQuestion.response}
                 </TableCell>
@@ -268,11 +274,11 @@ export default function MatrixQuestion({
                     <TableCell
                       component="th"
                       scope="row"
-                      className={[
-                        classes.stickyLeft,
-                        classes.matrixCell,
-                        classes.matrixText,
-                      ].join(' ')}
+                      sx={{
+                        ...styles.stickyLeft,
+                        ...styles.matrixCell,
+                        ...styles.matrixText,
+                      }}
                     >
                       {subject?.[surveyLanguage]}
                     </TableCell>

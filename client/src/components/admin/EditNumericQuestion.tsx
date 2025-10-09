@@ -5,7 +5,6 @@ import {
   FormGroup,
   TextField,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React from 'react';
 
@@ -15,11 +14,11 @@ interface Props {
   onChange: (section: SurveyNumericQuestion) => void;
 }
 
-const useStyles = makeStyles({
+const styles = {
   numberField: {
     maxWidth: '10rem',
   },
-});
+};
 
 export default function EditNumericQuestion({
   section,
@@ -27,7 +26,6 @@ export default function EditNumericQuestion({
   onChange,
 }: Props) {
   const { tr } = useTranslations();
-  const classes = useStyles();
 
   return (
     <>
@@ -51,7 +49,7 @@ export default function EditNumericQuestion({
       </FormGroup>
       <TextField
         type="number"
-        className={classes.numberField}
+        sx={styles.numberField}
         label={tr.EditSliderQuestion.minValue}
         value={section.minValue ?? ''}
         onChange={(event) => {
@@ -65,7 +63,7 @@ export default function EditNumericQuestion({
       />
       <TextField
         type="number"
-        className={classes.numberField}
+        sx={styles.numberField}
         label={tr.EditSliderQuestion.maxValue}
         value={section.maxValue ?? ''}
         onChange={(event) => {

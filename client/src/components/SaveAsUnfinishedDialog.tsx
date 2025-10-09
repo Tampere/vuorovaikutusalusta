@@ -7,7 +7,6 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
@@ -19,22 +18,24 @@ interface Props {
   isTestSurvey: boolean;
   onCancel: () => void;
   onSave: (token: string) => void;
+  registrationId?: string;
 }
 
-const useStyles = makeStyles({
+const styles = {
   paragraph: {
     marginBottom: '1rem',
   },
-});
+};
 
 export default function SaveAsUnfinishedDialog({
   open,
   isTestSurvey,
   onCancel,
   onSave,
+  registrationId,
 }: Props) {
   const { tr, language } = useTranslations();
-  const classes = useStyles();
+
   const [email, setEmail] = useState('');
   const [emailDirty, setEmailDirty] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -50,9 +51,14 @@ export default function SaveAsUnfinishedDialog({
     }
     setLoading(true);
     try {
+      const searchParamsString = new URLSearchParams({
+        ...(unfinishedToken && { token: unfinishedToken }),
+        ...(registrationId && { registration: registrationId }),
+      }).toString();
+
       const { token } = await request<{ token: string }>(
         `/api/published-surveys/${survey.name}/unfinished-submission${
-          unfinishedToken ? `?token=${unfinishedToken}` : ''
+          searchParamsString ? `?${searchParamsString}` : ''
         }`,
         {
           method: 'POST',
@@ -61,7 +67,7 @@ export default function SaveAsUnfinishedDialog({
             entries: answers,
             language,
           },
-        }
+        },
       );
       showToast({
         message: tr.SaveAsUnfinishedDialog.saveSuccessful,
@@ -86,15 +92,15 @@ export default function SaveAsUnfinishedDialog({
         setEmailDirty(false);
         onCancel();
       }}
-      aria-describedby='save-dialog-content'
+      aria-describedby="save-dialog-content"
     >
       <DialogTitle>{tr.SurveyStepper.saveAsUnfinished}</DialogTitle>
       <DialogContent>
-        <div id='save-dialog-content'>
-          <Typography variant="body1" className={classes.paragraph}>
+        <div id="save-dialog-content">
+          <Typography variant="body1" sx={styles.paragraph}>
             {tr.SaveAsUnfinishedDialog.description}
           </Typography>
-          <Typography variant="body1" className={classes.paragraph}>
+          <Typography variant="body1" sx={styles.paragraph}>
             {tr.SaveAsUnfinishedDialog.disclaimer}
           </Typography>
         </div>
@@ -103,7 +109,7 @@ export default function SaveAsUnfinishedDialog({
           aria-label={tr.SaveAsUnfinishedDialog.email}
           label={tr.SaveAsUnfinishedDialog.email}
           required
-          name='email'
+          name="email"
           error={emailDirty && !email.length}
           value={email}
           inputProps={{ type: 'email' }}
@@ -117,7 +123,7 @@ export default function SaveAsUnfinishedDialog({
           sx={{
             '& .MuiOutlinedInput-root.Mui-focused': {
               outlineOffset: '.5em', // Outline obstructs label otherwise
-            }
+            },
           }}
         />
       </DialogContent>
@@ -132,7 +138,7 @@ export default function SaveAsUnfinishedDialog({
           {tr.commands.cancel}
         </Button>
         <Button
-          variant='contained'
+          variant="contained"
           onClick={handleSave}
           disabled={loading || !email.length}
         >

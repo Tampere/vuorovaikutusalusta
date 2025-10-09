@@ -49,6 +49,7 @@ export function FollowUpSectionMenu({
       document: 'documentSection',
       'free-text': 'freeTextQuestion',
       'grouped-checkbox': 'groupedCheckboxQuestion',
+      'categorized-checkbox': 'categorizedCheckboxQuestion',
       image: 'imageSection',
       map: 'mapQuestion',
       matrix: 'matrixQuestion',
@@ -58,6 +59,7 @@ export function FollowUpSectionMenu({
       slider: 'sliderQuestion',
       sorting: 'sortingQuestion',
       text: 'textSection',
+      'personal-info': 'personalInfoQuestion',
     };
 
     if (!Object.keys(translationEntries).includes(type))

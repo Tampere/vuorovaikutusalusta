@@ -1,12 +1,11 @@
 import React, { useMemo } from 'react';
 import { useSurvey } from '@src/stores/SurveyContext';
-import { makeStyles } from '@mui/styles';
-import { Fab, Tooltip } from '@mui/material';
+import { Box, Fab, Tooltip } from '@mui/material';
 import { Save, Undo } from '@mui/icons-material';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 
-const useStyles = makeStyles({
+const styles = {
   root: {
     display: 'flex',
     gap: '1rem',
@@ -14,10 +13,9 @@ const useStyles = makeStyles({
     bottom: '1rem',
     right: '1rem',
   },
-});
+};
 
 export default function EditSurveyControls() {
-  const classes = useStyles();
   const {
     hasActiveSurveyChanged,
     activeSurveyLoading,
@@ -27,6 +25,17 @@ export default function EditSurveyControls() {
   } = useSurvey();
   const { showToast } = useToasts();
   const { tr } = useTranslations();
+
+  function getErrorInfoText(info: string) {
+    switch (info) {
+      case 'duplicate_survey_name':
+        return tr.EditSurvey.saveFailedDuplicateName;
+      case 'submitted_answer_prevents_update':
+        return tr.EditSurvey.saveFailedAnswerSubmitted;
+      default:
+        return tr.EditSurvey.saveFailed;
+    }
+  }
 
   const validationErrorTooltip = useMemo(() => {
     return (
@@ -42,7 +51,7 @@ export default function EditSurveyControls() {
   }, [validationErrors]);
 
   return (
-    <div className={classes.root}>
+    <Box sx={styles.root}>
       <Tooltip
         title={
           validationErrors.length > 0
@@ -69,10 +78,7 @@ export default function EditSurveyControls() {
               } catch (error) {
                 showToast({
                   severity: 'error',
-                  message:
-                    error.info === 'duplicate_survey_name'
-                      ? tr.EditSurvey.saveFailedDuplicateName
-                      : tr.EditSurvey.saveFailed,
+                  message: getErrorInfoText(error.info),
                 });
               }
             }}
@@ -95,6 +101,6 @@ export default function EditSurveyControls() {
           </Fab>
         </span>
       </Tooltip>
-    </div>
+    </Box>
   );
 }

@@ -2,6 +2,7 @@ import type {
   AnswerEntry,
   FileAnswer,
   MapQuestionAnswer,
+  PersonalInfoAnswer,
   Submission,
   SurveyQuestion as SurveyQuestionType,
 } from '@interfaces/survey';
@@ -27,6 +28,8 @@ import SectionInfo from './SectionInfo';
 import SliderQuestion from './SliderQuestion';
 import SortingQuestion from './SortingQuestion';
 import MultiMatrixQuestion from './MultiMatrixQuestion';
+import { PersonalInfoQuestion } from './PersonalInfoQuestion';
+import { CategorizedCheckBoxQuestion } from './CategorizedCheckBoxQuestion';
 
 interface Props {
   question: SurveyQuestionType;
@@ -36,6 +39,7 @@ interface Props {
   value?: AnswerEntry['value'];
   submission?: Submission;
   isFollowUp?: boolean;
+  surveyHasSideSection?: boolean;
 }
 
 function SurveyQuestion({
@@ -117,7 +121,7 @@ function SurveyQuestion({
       >
         <Typography
           component="h3"
-          sx={{ margin: readOnly ? 0 : '' }}
+          sx={{ marginBottom: readOnly ? '1rem' : '' }}
           variant={props.isFollowUp ? 'followUpSectionTitle' : 'questionTitle'}
         >
           {question.title?.[surveyLanguage]}
@@ -138,6 +142,21 @@ function SurveyQuestion({
         )}
       </FormLabel>
 
+      {/* Personal info question */}
+      {question.type === 'personal-info' && (
+        <PersonalInfoQuestion
+          value={value as PersonalInfoAnswer}
+          onChange={(value) => {
+            updateAnswer({
+              sectionId: question.id,
+              type: question.type,
+              value,
+            });
+          }}
+          question={question}
+        />
+      )}
+
       {/* Radio question */}
       {question.type === 'radio' && (
         <RadioQuestion
@@ -151,6 +170,7 @@ function SurveyQuestion({
           }}
           question={question}
           setDirty={setDirty}
+          readOnly={readOnly}
         />
       )}
       {/* Checkbox question */}
@@ -167,6 +187,7 @@ function SurveyQuestion({
           question={question}
           setDirty={setDirty}
           validationErrors={validationErrors}
+          readOnly={readOnly}
         />
       )}
       {/* Free text question */}
@@ -296,6 +317,32 @@ function SurveyQuestion({
           }}
           question={question}
           setDirty={setDirty}
+        />
+      )}
+      {question.type === 'categorized-checkbox' && (
+        <CategorizedCheckBoxQuestion
+          surveyHasSideSection={props.surveyHasSideSection}
+          isFollowUp={props.isFollowUp}
+          readOnly={readOnly}
+          value={value as number[]}
+          selectedFilters={
+            (
+              answers.find(
+                (a) => a.sectionId === question.id,
+              ) as AnswerEntry<'categorized-checkbox'>
+            )?.filters || []
+          }
+          onChange={(value, filters) => {
+            updateAnswer({
+              sectionId: question.id,
+              type: question.type,
+              value,
+              filters,
+            });
+          }}
+          question={question}
+          setDirty={setDirty}
+          validationErrors={validationErrors}
         />
       )}
       {question.type === 'attachment' && (

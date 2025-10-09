@@ -1,10 +1,7 @@
 import { Box } from '@mui/material';
 import React, { ReactNode } from 'react';
 
-type FooterProps = {
-  children?: ReactNode;
-  style?: React.CSSProperties;
-};
+type FooterProps = { children?: ReactNode; style?: React.CSSProperties };
 
 export default function Footer(props: FooterProps) {
   if (props.children === undefined) return null;
@@ -15,16 +12,15 @@ export default function Footer(props: FooterProps) {
       style={props.style ?? {}}
       sx={{
         fontSize: '.8rem',
-        padding: '0.5rem 1rem 0',
+        background: '#ffffff7e',
+        backdropFilter: 'blur(5px)',
+        padding: '0.25rem 1rem',
         '& ul': {
           padding: 0,
           '& li': {
             display: 'inline-block',
             marginLeft: '.8em',
-            '&::before': {
-              content: '"•"',
-              marginRight: '.8em',
-            },
+            '&::before': { content: '"•"', marginRight: '.8em' },
           },
         },
       }}

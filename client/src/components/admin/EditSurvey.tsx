@@ -9,6 +9,7 @@ import {
   Route,
   Switch,
   useHistory,
+  useLocation,
   useParams,
   useRouteMatch,
 } from 'react-router-dom';
@@ -27,6 +28,7 @@ export default function EditSurvey() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const { path, url } = useRouteMatch();
+  const location = useLocation();
   const { surveyId } = useParams<{ surveyId: string }>();
   const {
     fetchSurveyToContext,
@@ -94,7 +96,9 @@ export default function EditSurvey() {
         sx={{
           flexGrow: 1,
           p: 3,
-          maxWidth: '45rem',
+          ...(!location.pathname.includes('käännökset') && {
+            maxWidth: '47rem',
+          }),
           margin: '0 auto',
           boxSizing: 'border-box',
         }}

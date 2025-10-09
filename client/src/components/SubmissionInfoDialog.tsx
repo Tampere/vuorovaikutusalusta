@@ -8,7 +8,6 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useState } from 'react';
 
@@ -18,11 +17,11 @@ interface Props {
   onSubmit: (info: SubmissionInfo) => void;
 }
 
-const useStyles = makeStyles({
+const styles = {
   paragraph: {
     marginBottom: '1rem',
   },
-});
+};
 
 export default function SubmissionInfoDialog({
   open,
@@ -30,7 +29,7 @@ export default function SubmissionInfoDialog({
   onSubmit,
 }: Props) {
   const { tr } = useTranslations();
-  const classes = useStyles();
+
   const [email, setEmail] = useState<string>(null);
   const [emailDirty, setEmailDirty] = useState(false);
 
@@ -43,7 +42,7 @@ export default function SubmissionInfoDialog({
     >
       <DialogTitle>{tr.SubmissionInfoDialog.title}</DialogTitle>
       <DialogContent>
-        <Typography variant="body1" className={classes.paragraph}>
+        <Typography variant="body1" sx={styles.paragraph}>
           {tr.SubmissionInfoDialog.text}
         </Typography>
         <TextField

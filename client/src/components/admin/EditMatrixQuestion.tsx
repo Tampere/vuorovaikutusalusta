@@ -12,7 +12,7 @@ import {
 import { Add, Cancel } from '@mui/icons-material';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React from 'react';
-import QuestionOptions from './QuestionOptions';
+import QuestionOptions, { generateDraftId } from './QuestionOptions';
 
 interface Props {
   section: SurveyMatrixQuestion;
@@ -67,7 +67,7 @@ export default function EditMatrixQuestion({ section, onChange }: Props) {
             <div key={`matrix-class-${index}`} style={{ position: 'relative' }}>
               <Tooltip title={entry[surveyLanguage] ?? ''}>
                 <TextField
-                  inputProps={{ autoFocus: true }}
+                  slotProps={{ input: { autoFocus: true } }}
                   style={{
                     marginRight: '0.25rem',
                     backgroundColor: 'rgba(0,0,0,0.2)',
@@ -102,11 +102,19 @@ export default function EditMatrixQuestion({ section, onChange }: Props) {
         })}
       </div>
       <QuestionOptions
-        options={section.subjects.map((subject) => ({ text: subject }))}
-        onChange={(subjects: any) => {
+        options={section.subjects.map((subject) => ({
+          text: subject,
+          draftId: subject.id ?? generateDraftId(),
+        }))}
+        onChange={(subjects) => {
           onChange({
             ...section,
-            subjects: subjects.map((subject: any) => ({ ...subject.text })),
+            subjects: subjects.map((subject) => {
+              return {
+                ...subject.text,
+                id: subject.draftId,
+              };
+            }),
           });
         }}
         title={tr.SurveySections.subjects}

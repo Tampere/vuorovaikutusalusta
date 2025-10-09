@@ -10,14 +10,15 @@ import {
   LinearScale,
   Looks4,
   Map,
+  Person,
   RadioButtonChecked,
   Subject,
   TextFields,
   ViewComfy,
   ViewComfyAlt,
 } from '@mui/icons-material';
-import { Fab, Grid, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
+import { Box, Fab, Grid, Tooltip, Typography } from '@mui/material';
+import { CategorizedCheckboxIcon } from '@src/components/icons/CategorizedCheckboxIcon';
 import { duplicateFiles } from '@src/controllers/AdminFileController';
 import { useClipboard } from '@src/stores/ClipboardContext';
 import { useSurvey } from '@src/stores/SurveyContext';
@@ -25,14 +26,15 @@ import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { ReactNode, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { generateDraftId } from './QuestionOptions';
 
-const useStyles = makeStyles({
+const styles = {
   actionItem: {
     display: 'flex',
     alignItems: 'center',
     gap: '1rem',
   },
-});
+};
 
 interface Props {
   followUpSectionId?: number;
@@ -43,7 +45,6 @@ interface Props {
 }
 
 export default function AddSurveySectionActions(props: Props) {
-  const classes = useStyles();
   const { tr, initializeLocalizedObject } = useTranslations();
   const { addSection } = useSurvey();
   const { clipboardSection } = useClipboard();
@@ -53,28 +54,55 @@ export default function AddSurveySectionActions(props: Props) {
     pageId: string;
   }>();
 
+  const personalInfoDisabled = activeSurvey.pages.some((page) =>
+    page.sections.some(
+      (section) =>
+        section.type === 'personal-info' ||
+        (section.followUpSections &&
+          section.followUpSections.some(
+            (fSection) => fSection.type === 'personal-info',
+          )),
+    ),
+  );
+
   // Sequence for making each section ID unique before they're added to database
   const [sectionSequence, setSectionSequence] = useState(-1);
 
   const defaultSections: {
     [type in SurveyPageSection['type']]: SurveyPageSection;
   } = {
+    'personal-info': {
+      type: 'personal-info',
+      title: initializeLocalizedObject(''),
+      isRequired: false,
+      askName: false,
+      askEmail: false,
+      askPhone: false,
+      askAddress: false,
+      customQuestions: [{ ask: false, label: initializeLocalizedObject('') }],
+    },
     checkbox: {
       type: 'checkbox',
       title: initializeLocalizedObject(''),
       isRequired: false,
       info: null,
-      options: [{ text: initializeLocalizedObject('') }],
+      options: [
+        { text: initializeLocalizedObject(''), draftId: generateDraftId() },
+      ],
       answerLimits: null,
       allowCustomAnswer: false,
+      displaySelection: false,
     },
     radio: {
       type: 'radio',
       title: initializeLocalizedObject(''),
       isRequired: false,
       info: null,
-      options: [{ text: initializeLocalizedObject('') }],
+      options: [
+        { text: initializeLocalizedObject(''), draftId: generateDraftId() },
+      ],
       allowCustomAnswer: false,
+      displaySelection: false,
     },
     numeric: {
       type: 'numeric',
@@ -121,7 +149,9 @@ export default function AddSurveySectionActions(props: Props) {
     sorting: {
       type: 'sorting',
       title: initializeLocalizedObject(''),
-      options: [{ text: initializeLocalizedObject('') }],
+      options: [
+        { text: initializeLocalizedObject(''), draftId: generateDraftId() },
+      ],
       isRequired: false,
       info: null,
     },
@@ -168,12 +198,26 @@ export default function AddSurveySectionActions(props: Props) {
       },
       groups: [],
     },
+    'categorized-checkbox': {
+      type: 'categorized-checkbox',
+      isRequired: false,
+      title: initializeLocalizedObject(''),
+      answerLimits: {
+        min: 0,
+        max: 2,
+      },
+      options: [
+        { text: initializeLocalizedObject(''), draftId: generateDraftId() },
+      ],
+      categoryGroups: [],
+    },
     image: {
       type: 'image',
       title: initializeLocalizedObject(''),
       fileName: null,
       filePath: [],
       altText: initializeLocalizedObject(''),
+      attributions: initializeLocalizedObject(''),
     },
     document: {
       type: 'document',
@@ -205,6 +249,12 @@ export default function AddSurveySectionActions(props: Props) {
     ariaLabel: string;
     icon: ReactNode;
   }[] = [
+    {
+      type: 'personal-info',
+      label: tr.AddSurveySectionActions.personalInfoQuestion,
+      ariaLabel: 'add-personal-info-section',
+      icon: <Person />,
+    },
     {
       type: 'radio',
       label: tr.AddSurveySectionActions.radioQuestion,
@@ -266,6 +316,12 @@ export default function AddSurveySectionActions(props: Props) {
       icon: <LibraryAddCheck />,
     },
     {
+      type: 'categorized-checkbox',
+      label: tr.AddSurveySectionActions.categorizedCheckboxQuestion,
+      ariaLabel: 'add-categorized-checkbox-question',
+      icon: <CategorizedCheckboxIcon fill="white" />,
+    },
+    {
       type: 'attachment',
       label: tr.AddSurveySectionActions.attachmentSection,
       ariaLabel: 'add-attachment-section',
@@ -302,37 +358,52 @@ export default function AddSurveySectionActions(props: Props) {
   return (
     <Grid container>
       <Grid container direction="row">
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           {questionButtons
             .filter(
               (button) => !props.types || props.types.includes(button.type),
             )
             .map((button) => (
-              <Grid item key={button.type} style={{ padding: '0.5rem' }}>
-                <div className={classes.actionItem}>
-                  <Fab
-                    color="primary"
-                    aria-label={button.ariaLabel}
-                    size="small"
-                    onClick={handleAdd(button.type)}
-                    disabled={props.disabled}
-                    style={{ minWidth: '40px' }}
+              <Grid key={button.type} style={{ padding: '0.5rem' }}>
+                <Box sx={styles.actionItem}>
+                  <Tooltip
+                    title={
+                      personalInfoDisabled && button.type === 'personal-info'
+                        ? tr.AddSurveySectionActions.personalInfoDisabled
+                        : ''
+                    }
+                    placement="left"
                   >
-                    {button.icon}
-                  </Fab>
+                    <span>
+                      <Fab
+                        color="primary"
+                        aria-label={button.ariaLabel}
+                        size="small"
+                        onClick={handleAdd(button.type)}
+                        disabled={
+                          props.disabled ||
+                          (button.type === 'personal-info' &&
+                            personalInfoDisabled)
+                        }
+                        style={{ minWidth: '40px' }}
+                      >
+                        {button.icon}
+                      </Fab>
+                    </span>
+                  </Tooltip>
                   <Typography>{button.label}</Typography>
-                </div>
+                </Box>
               </Grid>
             ))}
         </Grid>
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           {sectionButtons
             .filter(
               (button) => !props.types || props.types.includes(button.type),
             )
             .map((button) => (
-              <Grid item key={button.type} style={{ padding: '0.5rem' }}>
-                <div className={classes.actionItem}>
+              <Grid key={button.type} style={{ padding: '0.5rem' }}>
+                <Box sx={styles.actionItem}>
                   <Fab
                     color="primary"
                     aria-label={button.ariaLabel}
@@ -343,12 +414,12 @@ export default function AddSurveySectionActions(props: Props) {
                     {button.icon}
                   </Fab>
                   <Typography>{button.label}</Typography>
-                </div>
+                </Box>
               </Grid>
             ))}
           {!props.disableSectionPaste && (
-            <Grid item style={{ padding: '0.5rem' }}>
-              <div className={classes.actionItem}>
+            <Grid style={{ padding: '0.5rem' }}>
+              <Box sx={styles.actionItem}>
                 <Fab
                   disabled={!clipboardSection}
                   color="secondary"
@@ -382,11 +453,10 @@ export default function AddSurveySectionActions(props: Props) {
                   <ContentPaste />
                 </Fab>
                 <Typography>{tr.EditSurveyPage.attachSection}</Typography>
-              </div>
+              </Box>
             </Grid>
           )}
           <Grid
-            item
             style={{
               padding: '0.5rem',
               display: 'flex',

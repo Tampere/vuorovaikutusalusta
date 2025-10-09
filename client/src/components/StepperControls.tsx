@@ -1,19 +1,19 @@
-import { Button } from '@mui/material';
-import { makeStyles } from '@mui/styles';
+import { Box, Button } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useState } from 'react';
 import SaveAsUnfinishedDialog from './SaveAsUnfinishedDialog';
 import { SurveyPage } from '@interfaces/survey';
 
-const useStyles = makeStyles({
+const styles = {
   root: {
     display: 'flex',
+    gap: '0.5rem',
     flexDirection: 'row',
     '& > *': {
       marginRight: '0.5rem',
     },
   },
-});
+};
 
 interface Props {
   activeStep: number;
@@ -28,16 +28,16 @@ interface Props {
   onSaveUnfinished?: (token: string) => void;
   nextPage: SurveyPage;
   previousPage: SurveyPage;
+  registrationId?: string;
 }
 
 export default function StepperControls(props: Props) {
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const { tr } = useTranslations();
-  const classes = useStyles();
 
   return (
     <>
-      <div className={classes.root}>
+      <Box sx={styles.root}>
         {props.activeStep > 0 && (
           <Button
             disabled={props.disabled}
@@ -79,7 +79,7 @@ export default function StepperControls(props: Props) {
             {tr.SurveyStepper.saveAsUnfinished}
           </Button>
         )}
-      </div>
+      </Box>
       {props.allowSavingUnfinished && (
         <SaveAsUnfinishedDialog
           open={saveDialogOpen}
@@ -91,6 +91,7 @@ export default function StepperControls(props: Props) {
             props.onSaveUnfinished?.(token);
             setSaveDialogOpen(false);
           }}
+          registrationId={props.registrationId}
         />
       )}
     </>

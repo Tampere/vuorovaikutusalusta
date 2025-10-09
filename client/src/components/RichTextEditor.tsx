@@ -1,18 +1,66 @@
-import { FormLabel } from '@mui/material';
-import { makeStyles } from '@mui/styles';
+import { Box, FormLabel } from '@mui/material';
+
 import { useTranslations } from '@src/stores/TranslationContext';
 import { convertFromRaw, convertToRaw, EditorState } from 'draft-js';
 import { draftToMarkdown, markdownToDraft } from 'markdown-draft-js';
 import React, { useEffect, useState } from 'react';
 import { Editor } from 'react-draft-wysiwyg';
 
-const useStyles = makeStyles({
+const styles = (editorHeight?: string) => ({
   root: {
     position: 'relative',
-  },
-  disabled: {
-    opacity: 0.4,
-    pointerEvents: 'none',
+    '& .rdw-editor-wrapper': {
+      border: '1px solid transparent',
+    },
+    '& .rdw-editor-disabled': {
+      opacity: 0.4,
+      pointerEvents: 'none',
+    },
+    '& .rdw-editor-missing-value': {
+      border: '1px solid red',
+    },
+    '& .rdw-editor-main': {
+      height: editorHeight,
+      background: '#fff',
+      padding: '0 1rem',
+      border: '1px solid #ccc',
+      borderTop: 'none',
+      borderRadius: 0,
+      borderBottomLeftRadius: '4px',
+      borderBottomRightRadius: '4px',
+      '& .rdw-link-decorator-icon': {
+        top: '-50%',
+      },
+    },
+    '& .rdw-editor-toolbar': {
+      padding: 0,
+      background: '#f4f4f4',
+      marginBottom: 0,
+      borderRadius: 0,
+      borderTopLeftRadius: '4px',
+      borderTopRightRadius: '4px',
+      border: '1px solid #ccc',
+      '& > *': {
+        marginBottom: 0,
+      },
+      '& .rdw-option-wrapper': {
+        border: 'none',
+        boxShadow: 'none',
+        margin: 0,
+        padding: '8px',
+        borderRadius: 0,
+        '&:hover': {
+          background: '#aaa',
+        },
+      },
+      '& .rdw-option-active': {
+        background: '#bbb',
+        boxShadow: 'none',
+      },
+      '& .rdw-option-disabled': {
+        pointerEvents: 'none',
+      },
+    },
   },
   disabledOverlay: {
     position: 'absolute',
@@ -20,59 +68,17 @@ const useStyles = makeStyles({
     left: 0,
     right: 0,
     bottom: 0,
-    borderRadius: 4,
+    borderRadius: '4px',
     opacity: 0.4,
     background: '#ddd',
   },
-  wrapper: {
-    border: '1px solid transparent',
-  },
-  missingValue: {
-    border: '1px solid red',
-  },
-  editor: {
-    height: (props: { editorHeight?: string }) => props.editorHeight,
-    background: '#fff',
-    padding: '0 1rem',
-    border: '1px solid #ccc',
-    borderTop: 'none',
-    borderRadius: 0,
-    borderBottomLeftRadius: 4,
-    borderBottomRightRadius: 4,
-    '& .rdw-link-decorator-icon': {
-      top: '-50%',
-    },
-  },
-  toolbar: {
-    padding: 0,
-    background: '#f4f4f4',
-    marginBottom: 0,
-    borderRadius: 0,
-    borderTopLeftRadius: 4,
-    borderTopRightRadius: 4,
-    border: '1px solid #ccc',
-    '& > *': {
-      marginBottom: 0,
-    },
-    '& .rdw-option-wrapper': {
-      border: 'none',
-      boxShadow: 'none',
-      margin: 0,
-      padding: 8,
-      borderRadius: 0,
-      '&:hover': {
-        background: '#aaa',
-      },
-    },
-    '& .rdw-option-active': {
-      background: '#bbb',
-      boxShadow: 'none',
-    },
-    '& .rdw-option-disabled': {
-      pointerEvents: 'none',
-    },
-  },
 });
+
+const classes = {
+  wrapper: 'rdw-editor-wrapper',
+  missingValue: 'rdw-editor-missing-value',
+  disabled: 'rdw-editor-disabled',
+};
 
 interface Props {
   value: string;
@@ -81,6 +87,7 @@ interface Props {
   onChange: (value: string) => void;
   editorHeight?: string;
   missingValue?: boolean;
+  placeholder?: string;
 }
 
 /**
@@ -107,17 +114,16 @@ function editorStateToMarkdown(editorState: EditorState) {
 
 export default function RichTextEditor(props: Props) {
   const [editorState, setEditorState] = useState(
-    markdownToEditorState(props.value)
+    markdownToEditorState(props.value),
   );
 
   const { language, surveyLanguage } = useTranslations();
 
   useEffect(
     () => setEditorState(markdownToEditorState(props.value)),
-    [language, surveyLanguage]
+    [language, surveyLanguage],
   );
 
-  const classes = useStyles(props);
   const { tr } = useTranslations();
 
   function handleEditorStateChange(editorState: EditorState) {
@@ -129,9 +135,10 @@ export default function RichTextEditor(props: Props) {
   }
 
   return (
-    <div className={classes.root}>
+    <Box sx={styles(props.editorHeight).root}>
       {props.label && <FormLabel>{props.label}</FormLabel>}
       <Editor
+        placeholder={props.placeholder}
         readOnly={props.disabled}
         toolbar={{
           options: ['inline', 'list', 'link'],
@@ -147,14 +154,14 @@ export default function RichTextEditor(props: Props) {
         }}
         wrapperClassName={`${props.missingValue ? classes.missingValue : ''} ${
           props.disabled ? ` ${classes.disabled}` : ''
-        } ${classes.wrapper}`}
-        editorClassName={classes.editor}
-        toolbarClassName={classes.toolbar}
+        }`}
         localization={{ translations: tr.RichTextEditor }}
         editorState={editorState}
         onEditorStateChange={handleEditorStateChange}
       />
-      {props.disabled && <div className={classes.disabledOverlay} />}
-    </div>
+      {props.disabled && (
+        <Box sx={styles(props.editorHeight).disabledOverlay} />
+      )}
+    </Box>
   );
 }

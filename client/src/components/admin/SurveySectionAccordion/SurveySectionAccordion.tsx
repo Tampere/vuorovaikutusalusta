@@ -1,5 +1,6 @@
 import {
   Conditions,
+  SurveyCategorizedCheckboxQuestion,
   SurveyCheckboxQuestion,
   SurveyDocumentSection,
   SurveyFollowUpSection,
@@ -11,6 +12,7 @@ import {
   SurveyMultiMatrixQuestion,
   SurveyNumericQuestion,
   SurveyPageSection,
+  SurveyPersonalInfoQuestion,
   SurveyRadioQuestion,
   SurveySliderQuestion,
   SurveySortingQuestion,
@@ -29,6 +31,7 @@ import {
   LinearScale,
   Looks4,
   Map,
+  Person,
   RadioButtonChecked,
   Subject,
   TextFields,
@@ -39,10 +42,11 @@ import {
   Accordion,
   AccordionSummary,
   IconButton,
+  SxProps,
   Tooltip,
   Typography,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
+
 import { useClipboard } from '@src/stores/ClipboardContext';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
@@ -50,8 +54,13 @@ import {
   replaceIdsWithNull,
   replaceTranslationsWithNull,
 } from '@src/utils/schemaValidation';
-import React, { ReactNode, useMemo, useRef, useState } from 'react';
-import { DraggableProvided } from 'react-beautiful-dnd';
+import React, {
+  ReactElement,
+  ReactNode,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import ConfirmDialog from '../../ConfirmDialog';
 import EditAttachmentSection from '../EditAttachmentSection';
 import EditCheckBoxQuestion from '../EditCheckBoxQuestion';
@@ -68,8 +77,12 @@ import EditSliderQuestion from '../EditSliderQuestion';
 import EditSortingQuestion from '../EditSortingQuestion';
 import EditTextSection from '../EditTextSection';
 import { SectionDetails } from './SectionDetails';
+import { DragHandle } from '@src/components/DragAndDrop/SortableItem';
+import { EditPersonalInfoQuestion } from '../EditPersonalInfoQuestion';
+import EditCategorizedCheckBoxQuestion from '../EditCategorizedCheckBoxQuestion/EditCategorizedCheckBoxQuestion';
+import { CategorizedCheckboxIcon } from '@src/components/icons/CategorizedCheckboxIcon';
 
-const useStyles = makeStyles({
+const styles = {
   accordion: {
     background: '#ddd',
   },
@@ -93,7 +106,7 @@ const useStyles = makeStyles({
     alignItems: 'center',
     margin: 0,
   },
-});
+};
 
 interface Props {
   index: number;
@@ -105,20 +118,21 @@ interface Props {
   name: string;
   onEdit: (index: number, section: SurveyPageSection) => void;
   onDelete: (index: number) => void;
-  provided: DraggableProvided;
   disableSectionCopying?: boolean;
   pageId?: number;
+  isDragging?: boolean;
+  sx?: SxProps;
 }
 
 export default function SurveySectionAccordion(props: Props) {
   const [deleteConfirmDialogOpen, setDeleteConfirmDialogOpen] = useState(false);
-  const classes = useStyles();
+
   const { tr, surveyLanguage } = useTranslations();
   const { setSection, clipboardPage } = useClipboard();
   const { showToast } = useToasts();
 
   // Index is used inside a callback function -> useRef is required in React to catch all updates
-  const indexRef = useRef<number>();
+  const indexRef = useRef<number>(null);
   indexRef.current = props.index;
 
   function handleEdit(section: SurveyPageSection) {
@@ -131,11 +145,21 @@ export default function SurveySectionAccordion(props: Props) {
 
   const accordions: {
     [type in SurveyPageSection['type']]: {
-      icon: ReactNode;
+      icon: ReactElement;
       tooltip: string;
       form: ReactNode;
     };
   } = {
+    'personal-info': {
+      icon: <Person />,
+      tooltip: tr.SurveySection.personalInfoQuestion,
+      form: (
+        <EditPersonalInfoQuestion
+          section={props.section as SurveyPersonalInfoQuestion}
+          onChange={handleEdit}
+        />
+      ),
+    },
     checkbox: {
       icon: <CheckBox />,
       tooltip: tr.SurveySection.checkBoxQuestion,
@@ -256,6 +280,17 @@ export default function SurveySectionAccordion(props: Props) {
         />
       ),
     },
+    'categorized-checkbox': {
+      icon: <CategorizedCheckboxIcon />,
+      tooltip: tr.SurveySection.categorizedCheckboxQuestion,
+      form: (
+        <EditCategorizedCheckBoxQuestion
+          disabled={props.disabled}
+          section={props.section as SurveyCategorizedCheckboxQuestion}
+          onChange={handleEdit}
+        />
+      ),
+    },
     image: {
       icon: <Image />,
       tooltip: tr.SurveySection.imageSection,
@@ -290,31 +325,34 @@ export default function SurveySectionAccordion(props: Props) {
   return (
     <>
       <Accordion
-        ref={props.provided.innerRef}
+        {...(props.sx && { sx: props.sx })}
+        slotProps={{ heading: { component: 'div' } }}
         expanded={props.expanded}
         onChange={(_, isExpanded) => {
           props.onExpandedChange(isExpanded);
         }}
-        className={props.className ?? classes.accordion}
+        {...(props.className && { className: props.className })}
+        sx={styles.accordion}
       >
         <AccordionSummary
+          component="div"
           expandIcon={<ExpandMore />}
           aria-controls={`${props.name}-content`}
           id={`${props.name}-header`}
-          className={classes.customAccordionSummary}
-          classes={{ contentGutters: classes.contentGutters }}
+          sx={{
+            ...styles.customAccordionSummary,
+            '& .MuiAccordionSummary-contentGutters': styles.contentGutters,
+          }}
         >
           <div style={{ display: 'flex', paddingLeft: '1rem' }}>
             {accordion.tooltip ? (
-              <Tooltip title={accordion.tooltip}>
-                {accordion.icon as any}
-              </Tooltip>
+              <Tooltip title={accordion.tooltip}>{accordion.icon}</Tooltip>
             ) : (
               accordion.icon
             )}
           </div>
 
-          <Typography className={classes.sectionTitle}>
+          <Typography sx={styles.sectionTitle}>
             {props.section.title?.[surveyLanguage] || (
               <em>{tr.EditSurveyPage.untitledSection}</em>
             )}
@@ -367,10 +405,11 @@ export default function SurveySectionAccordion(props: Props) {
               <ContentCopy />
             </IconButton>
           )}
-          <div {...props.provided.dragHandleProps} style={{ display: 'flex' }}>
+          <DragHandle isDragging={props.isDragging}>
             <DragIndicator />
-          </div>
+          </DragHandle>
         </AccordionSummary>
+
         <SectionDetails
           pageId={props.pageId}
           disabled={props.disabled}

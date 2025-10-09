@@ -2,6 +2,7 @@ import {
   AnswerEntry,
   Conditions,
   LanguageCode,
+  PersonalInfoAnswer,
   Survey,
   SurveyPage,
   SurveyPageSection,
@@ -21,7 +22,8 @@ import { isFollowUpSectionParentType, isString } from '@src/utils/typeCheck';
 interface State {
   answers: AnswerEntry[];
   survey: Survey;
-  unfinishedToken: string;
+  unfinishedToken: string | null;
+  registrationId: string | null;
 }
 
 type Action =
@@ -48,6 +50,10 @@ type Action =
   | {
       type: 'SET_UNFINISHED_TOKEN';
       token: string;
+    }
+  | {
+      type: 'SET_REGISTRATION_ID';
+      registrationId: string;
     };
 
 type Context = [State, React.Dispatch<Action>];
@@ -56,6 +62,7 @@ const stateDefaults: State = {
   answers: [],
   survey: null,
   unfinishedToken: null,
+  registrationId: null,
 };
 
 // Section types that won't have an answer (e.g. text sections)
@@ -72,6 +79,18 @@ export const SurveyAnswerContext = createContext<Context>(null);
 
 export function getEmptyAnswer(section: SurveyPageSection): AnswerEntry {
   switch (section.type) {
+    case 'personal-info':
+      return {
+        sectionId: section.id,
+        type: section.type,
+        value: {
+          name: '',
+          email: '',
+          phone: '',
+          address: '',
+          custom: [],
+        },
+      };
     case 'checkbox':
       return {
         sectionId: section.id,
@@ -133,6 +152,13 @@ export function getEmptyAnswer(section: SurveyPageSection): AnswerEntry {
         sectionId: section.id,
         type: section.type,
         value: [],
+      };
+    case 'categorized-checkbox':
+      return {
+        sectionId: section.id,
+        type: section.type,
+        value: [],
+        filters: [],
       };
     case 'attachment':
       return {
@@ -211,7 +237,11 @@ export function useSurveyAnswers() {
     if (!answer.hasOwnProperty('value')) return errors; // Shouldn't happen but used just in case to prevent errors
 
     // Checkbox question validation - check possible answer limits
-    if (question.type === 'checkbox' || question.type === 'grouped-checkbox') {
+    if (
+      question.type === 'checkbox' ||
+      question.type === 'grouped-checkbox' ||
+      question.type === 'categorized-checkbox'
+    ) {
       const value = answer.value as (number | string)[];
       // Pick only non-empty selections (numbers and non-empty strings) for the check
       const nonEmptySelections = value.filter(
@@ -280,6 +310,23 @@ export function useSurveyAnswers() {
         (answer.value as string[][]).some((row) => row.length === 0)
       ) {
         errors.push('required');
+      } else if (question.type === 'personal-info') {
+        if (
+          question.askEmail &&
+          (answer.value as PersonalInfoAnswer).email.length === 0
+        ) {
+          errors.push('required');
+        } else if (
+          question.askName &&
+          (answer.value as PersonalInfoAnswer).name.length === 0
+        ) {
+          errors.push('required');
+        } else if (
+          question.askPhone &&
+          (answer.value as PersonalInfoAnswer).phone.length === 0
+        ) {
+          errors.push('required');
+        }
       }
       // If value is an array, check the array length - otherwise check for its emptiness
       else if (
@@ -567,6 +614,13 @@ export function useSurveyAnswers() {
       dispatch({ type: 'SET_UNFINISHED_TOKEN', token });
     },
     /**
+     * Sets the registration ID into the context.
+     * @param registrationId Registration ID
+     */
+    setRegistrationId(registrationId: string) {
+      dispatch({ type: 'SET_REGISTRATION_ID', registrationId });
+    },
+    /**
      * Updates the given map layers to the state.
      * @param page Page to be updated
      * @param mapLayers Visible map layers
@@ -628,6 +682,11 @@ function reducer(state: State, action: Action): State {
       return {
         ...state,
         unfinishedToken: action.token,
+      };
+    case 'SET_REGISTRATION_ID':
+      return {
+        ...state,
+        registrationId: action.registrationId,
       };
     default:
       throw new Error('Invalid action type');

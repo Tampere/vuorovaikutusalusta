@@ -1,4 +1,4 @@
-import React, { ComponentType } from 'react';
+import React, { ComponentType, ReactElement } from 'react';
 import { ReactNode } from 'react';
 
 type Components = ComponentType | [ComponentType, { [key: string]: any }];
@@ -18,5 +18,5 @@ export default function Compose({ components, children }: Props) {
       ? [current[0], current[1]]
       : [current, {}];
     return <Component {...props}>{children}</Component>;
-  }, children) as JSX.Element;
+  }, children) as ReactElement;
 }

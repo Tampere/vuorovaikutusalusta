@@ -5,9 +5,9 @@
 ###
 # Base image declaration
 ###
-FROM node:20.5-alpine AS base
+FROM node:22.16-alpine AS base
 
-ENV APPDIR /app
+ENV APPDIR=/app
 
 ###
 # Client build stage
@@ -66,4 +66,4 @@ ENV TZ=Europe/Helsinki
 # Define Chromium path, as it was not installed in the previous phase
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 
-CMD npm start
+CMD ["npm", "start"]

@@ -1,6 +1,5 @@
 import { decrypt } from '@src/crypto';
 import { Express } from 'express';
-import session, { Session, SessionData } from 'express-session';
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { upsertUser } from '../user';
@@ -47,10 +46,11 @@ export function configureGoogleOAuth(app: Express) {
           id: profile.id,
           fullName: profile.displayName,
           email: profile._json.email,
+          roles: [], // Google OAuth does not provide roles, so we leave it empty
         });
         return done(null, user);
-      }
-    )
+      },
+    ),
   );
 
   // Login endpoint
@@ -61,7 +61,7 @@ export function configureGoogleOAuth(app: Express) {
       req.session.redirectUrl = decrypt(String(req.query.redirect)) ?? '/admin';
       next();
     },
-    passport.authenticate('google', { scope: ['profile', 'email'] })
+    passport.authenticate('google', { scope: ['profile', 'email'] }),
   );
 
   // OAuth callback endpoint
@@ -75,6 +75,6 @@ export function configureGoogleOAuth(app: Express) {
       // Get original request URL from session
       const redirectUrl = req.session.redirectUrl ?? '/admin';
       res.redirect(redirectUrl);
-    }
+    },
   );
 }

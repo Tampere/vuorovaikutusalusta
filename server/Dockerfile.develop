@@ -2,11 +2,12 @@
 # Development image for Node.js server
 ##
 
-FROM node:20.5-alpine
+FROM node:22.16-alpine
 
 # Define Git directory and install Git for running Jest only on changed files
 ENV GIT_WORK_TREE=/app/server
 ENV GIT_DIR=/app/.git
+ENV NODE_ENV=development
 
 # Tell Puppeteer to skip installing Chrome. We'll be using the installed package.
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
@@ -29,4 +30,4 @@ RUN npm i
 ENV TZ=Europe/Helsinki
 
 # Run migrations before starting the server
-CMD npm run dev
+CMD ["npm", "run", "dev"]

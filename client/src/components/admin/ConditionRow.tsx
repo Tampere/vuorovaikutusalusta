@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import { Conditions, SectionOption } from '@interfaces/survey';
 import {
@@ -80,6 +80,11 @@ export function ConditionRow({
   const [validationError, setValidationError] = useState(false);
   const { tr, surveyLanguage } = useTranslations();
 
+  const savedOptions = useMemo(
+    () => options.filter((option) => Boolean(option.id)),
+    [options],
+  );
+
   return (
     <FormControl
       fullWidth
@@ -128,7 +133,7 @@ export function ConditionRow({
         />
       ) : (
         <Select
-          disabled={options.every((option) => option.id < 0)}
+          disabled={savedOptions.every((option) => option.id < 0)}
           multiple
           sx={{
             flex: 1,
@@ -147,10 +152,10 @@ export function ConditionRow({
             onInput(value);
           }}
           renderValue={(selected) => (
-            <SelectPlaceholder selected={selected} options={options} />
+            <SelectPlaceholder selected={selected} options={savedOptions} />
           )}
         >
-          {options?.map((option) => (
+          {savedOptions?.map((option) => (
             <MenuItem value={option.id} key={option.id}>
               <Checkbox checked={conditions?.equals.includes(option.id)} />
               <Typography>{option.text[surveyLanguage]}</Typography>

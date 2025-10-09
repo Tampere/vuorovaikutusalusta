@@ -3,6 +3,7 @@ import {
   Autocomplete,
   Box,
   Checkbox,
+  Chip,
   FormControlLabel,
   FormHelperText,
   FormLabel,
@@ -11,15 +12,15 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
+
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
-import fiLocale from 'date-fns/locale/fi';
-import enLocale from 'date-fns/locale/en-GB';
+import { fi, enGB } from 'date-fns/locale';
+
 import React, { useEffect, useMemo, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import CopyToClipboard from '../CopyToClipboard';
@@ -31,7 +32,7 @@ import SurveyImageList from './SurveyImageList';
 import ThemeSelect from './ThemeSelect';
 import { assertNever } from '@src/utils/typeCheck';
 
-const useStyles = makeStyles({
+const styles = {
   dateTimePicker: {
     width: 'fit-content',
   },
@@ -39,12 +40,12 @@ const useStyles = makeStyles({
     display: 'flex',
     justifyContent: 'flex-start',
   },
-});
+};
 
 export default function EditSurveyInfo() {
   const [deleteConfirmDialogOpen, setDeleteConfirmDialogOpen] = useState(false);
   const [deleteSurveyLoading, setDeleteSurveyLoading] = useState(false);
-  const [users, setUsers] = useState<User[]>(null);
+  const [users, setUsers] = useState<User[]>([]);
   const [usersLoading, setUsersLoading] = useState(true);
 
   const {
@@ -61,8 +62,6 @@ export default function EditSurveyInfo() {
   const { showToast } = useToasts();
   const history = useHistory();
 
-  const classes = useStyles();
-
   const testSurveyUrl = useMemo(() => {
     return `${window.location.origin}/${originalActiveSurvey.name}/testi`;
   }, [originalActiveSurvey.name]);
@@ -71,7 +70,7 @@ export default function EditSurveyInfo() {
     async function fetchOtherUsers() {
       setUsersLoading(true);
       try {
-        const users = await fetch('/api/users/others').then(
+        const users = await fetch('/api/users').then(
           (response) => response.json() as Promise<User[]>,
         );
         setUsers(users);
@@ -90,9 +89,9 @@ export default function EditSurveyInfo() {
   const localLanguage = useMemo(() => {
     switch (language) {
       case 'fi':
-        return fiLocale;
+        return fi;
       case 'en':
-        return enLocale;
+        return enGB;
       default:
         return assertNever(language);
     }
@@ -183,18 +182,47 @@ export default function EditSurveyInfo() {
         <Autocomplete
           multiple
           disabled={usersLoading}
-          options={users ?? []}
+          filterSelectedOptions
+          options={users}
           getOptionLabel={(user) => user.fullName}
-          value={
-            users?.filter((user) => activeSurvey.admins?.includes(user.id)) ??
-            []
+          renderValue={(users) =>
+            users.map((user) => (
+              <Chip
+                key={user.id}
+                label={user.fullName}
+                sx={{ margin: '3px' }}
+                {...(user.id !== activeSurvey.authorId
+                  ? {
+                      onDelete: () =>
+                        editSurvey({
+                          ...activeSurvey,
+                          admins: activeSurvey.admins.filter(
+                            (a) => a !== user.id,
+                          ),
+                        }),
+                    }
+                  : {})}
+              ></Chip>
+            ))
           }
-          onChange={(_, value: User[]) => {
+          value={users?.filter(
+            (user) =>
+              activeSurvey.admins?.includes(user.id) ||
+              activeSurvey.authorId === user.id,
+          )}
+          onChange={(_, value) => {
             editSurvey({
               ...activeSurvey,
-              admins: value.map((user) => user.id),
+              admins: value
+                .filter((user) => user.id !== activeSurvey.authorId)
+                .map((user) => user.id),
             });
           }}
+          renderOption={(props, user) => (
+            <li {...props} key={user.id}>
+              {user.fullName}
+            </li>
+          )}
           renderInput={(params) => (
             <TextField
               {...params}
@@ -293,6 +321,26 @@ export default function EditSurveyInfo() {
           }
           label={tr.EditSurvey.allowSavingUnfinished}
         />
+        <div>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={activeSurvey.emailRegistrationRequired}
+                onChange={(event) =>
+                  editSurvey({
+                    ...activeSurvey,
+                    emailRegistrationRequired: event.target.checked,
+                  })
+                }
+                inputProps={{ 'aria-label': 'require-email-identification' }}
+              />
+            }
+            label={tr.EditSurveyInfo.requireEmailRegistration}
+          />
+          <FormHelperText>
+            {tr.EditSurveyInfo.requireEmailRegistrationHelperText}
+          </FormHelperText>
+        </div>
         <FormControlLabel
           control={
             <Checkbox
@@ -347,7 +395,7 @@ export default function EditSurveyInfo() {
           </FormHelperText>
         </div>
 
-        <div className={classes.actions}>
+        <Box sx={styles.actions}>
           <LoadingButton
             variant="contained"
             color="error"
@@ -358,7 +406,7 @@ export default function EditSurveyInfo() {
           >
             {tr.EditSurvey.deleteSurvey}
           </LoadingButton>
-        </div>
+        </Box>
       </Fieldset>
       <DeleteSurveyDialog
         open={deleteConfirmDialogOpen}

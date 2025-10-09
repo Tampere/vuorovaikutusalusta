@@ -9,7 +9,7 @@ import SurveyMapProvider from '@src/stores/SurveyMapContext';
 import SurveyThemeProvider from '@src/stores/SurveyThemeProvider';
 import ToastProvider from '@src/stores/ToastContext';
 import TranslationProvider from '@src/stores/TranslationContext';
-import fiLocale from 'date-fns/locale/fi';
+import { fi } from 'date-fns/locale';
 import React from 'react';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import Compose from './Compose';
@@ -25,7 +25,7 @@ const Application = () => {
       components={[
         [
           LocalizationProvider,
-          { dateAdapter: AdapterDateFns, adapterLocale: fiLocale },
+          { dateAdapter: AdapterDateFns, adapterLocale: fi },
         ],
         SurveyThemeProvider,
         TranslationProvider,

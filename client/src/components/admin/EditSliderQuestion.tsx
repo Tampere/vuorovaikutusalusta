@@ -9,7 +9,6 @@ import {
   RadioGroup,
   TextField,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useEffect } from 'react';
 
@@ -19,11 +18,11 @@ interface Props {
   onChange: (section: SurveySliderQuestion) => void;
 }
 
-const useStyles = makeStyles({
+const styles = {
   numberField: {
     maxWidth: '10rem',
   },
-});
+};
 
 export default function EditSliderQuestion({
   section,
@@ -31,8 +30,6 @@ export default function EditSliderQuestion({
   onChange,
 }: Props) {
   const { tr, surveyLanguage } = useTranslations();
-
-  const classes = useStyles();
 
   // When switching to literal presentation type, change numeric value boundaries accordingly
   useEffect(() => {
@@ -134,7 +131,7 @@ export default function EditSliderQuestion({
         <>
           <TextField
             type="number"
-            className={classes.numberField}
+            sx={styles.numberField}
             label={tr.EditSliderQuestion.minValue}
             value={section.minValue ?? ''}
             onChange={(event) => {
@@ -148,7 +145,7 @@ export default function EditSliderQuestion({
           />
           <TextField
             type="number"
-            className={classes.numberField}
+            sx={styles.numberField}
             label={tr.EditSliderQuestion.maxValue}
             value={section.maxValue ?? ''}
             onChange={(event) => {

@@ -1,11 +1,16 @@
-import { LocalizedText, Survey, SurveyEmailInfoItem } from '@interfaces/survey';
 import {
+  LanguageCode,
+  LocalizedText,
+  Survey,
+  SurveyEmailInfoItem,
+} from '@interfaces/survey';
+import {
+  Box,
   Checkbox,
   FormControlLabel,
   FormHelperText,
   Typography,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React from 'react';
@@ -14,25 +19,28 @@ import Fieldset from '../Fieldset';
 import RichTextEditor from '../RichTextEditor';
 import EditSurveySectionTranslations from './EditSurveySectionTranslations';
 import TranslationField from './TranslationField';
+import { Description, TextFields } from '@mui/icons-material';
+import { capitalizeFirstLetter } from '@src/utils/strings';
 
-const useStyles = makeStyles({
+const styles = {
   rowContainer: {
     display: 'flex',
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    gap: '1rem',
     alignItems: 'center',
+    '& .translations-field-icon svg': {
+      fill: '#7A7A7A',
+    },
   },
   langContainer: {
     display: 'flex',
     flexDirection: 'column',
     flexGrow: 1,
     marginLeft: '0.2rem',
+    maxWidth: '36rem',
   },
   pageContainer: {
-    padding: '1rem',
     marginBottom: '1rem',
-    border: '2px dashed lightgrey',
-    borderRadius: '0.5rem',
   },
   missingTranslation: {
     color: 'red',
@@ -41,12 +49,16 @@ const useStyles = makeStyles({
     color: 'grey',
   },
   keyValueContainer: {
-    padding: '1rem',
     marginTop: '0.5rem',
-    border: '1px solid lightgrey',
-    borderRadius: '0.5rem',
   },
-});
+  boldInput: {
+    '& .MuiInputBase-input': {
+      fontWeight: 500,
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+    },
+  },
+};
 
 function surveyToTranslationString(survey: Survey) {
   const columnHeaders = 'Label \t fi \t en \n';
@@ -121,7 +133,10 @@ export default function EditSurveyTranslations() {
     editPage,
   } = useSurvey();
   const { tr, languages } = useTranslations();
-  const classes = useStyles();
+  const getTranslationPlaceholder = (
+    value: string,
+    languageCode: LanguageCode,
+  ) => `${capitalizeFirstLetter(languageCode).toUpperCase()}: ${value}`;
 
   return (
     <>
@@ -149,43 +164,44 @@ export default function EditSurveyTranslations() {
         </div>
         {activeSurvey.localisationEnabled && (
           <>
-            <div
-              className={classes.rowContainer}
+            <Box
+              sx={styles.rowContainer}
               style={{ justifyContent: 'flex-start' }}
             >
               <Typography>
                 {tr.EditSurveyTranslations.copyTextFields}
               </Typography>
               <CopyToClipboard data={surveyToTranslationString(activeSurvey)} />
-            </div>
+            </Box>
             <Typography variant="h5">
               {tr.EditSurveyTranslations.supportedLanguages}:{' '}
             </Typography>
-            <div className={classes.rowContainer}>
+            <Box sx={styles.rowContainer}>
               {languages.map((lang, langIndex) => {
                 return (
-                  <div
-                    className={classes.langContainer}
+                  <Box
+                    sx={styles.langContainer}
                     key={`lang-container-${langIndex}`}
                   >
-                    <div
-                      className={classes.rowContainer}
+                    <Box
+                      sx={styles.rowContainer}
                       style={{ justifyContent: 'flex-start' }}
                     >
                       <Typography variant="h6" style={{ fontWeight: 'bold' }}>
                         {tr.EditSurveyTranslations[lang].toLocaleUpperCase()}
                       </Typography>
-                    </div>
+                    </Box>
                     <br />
-                    <Typography className={classes.titleText}>
+                    <Typography sx={styles.titleText}>
                       {langIndex === 0
                         ? tr.EditSurveyTranslations.surveyTitle
                         : ''}{' '}
                       &nbsp;
                     </Typography>
                     <TranslationField
-                      variant="standard"
+                      variant="outlined"
                       value={activeSurvey.title?.[lang] ?? ''}
+                      sx={styles.boldInput}
                       onChange={(event) => {
                         editSurvey({
                           ...activeSurvey,
@@ -196,14 +212,15 @@ export default function EditSurveyTranslations() {
                         });
                       }}
                     />
-                    <Typography className={classes.titleText}>
+                    <Typography sx={styles.titleText}>
                       {langIndex === 0
                         ? tr.EditSurveyTranslations.surveySubtitle
                         : ''}{' '}
                       &nbsp;
                     </Typography>
                     <TranslationField
-                      variant="standard"
+                      variant="outlined"
+                      sx={styles.boldInput}
                       value={activeSurvey.subtitle?.[lang] ?? ''}
                       onChange={(event) => {
                         editSurvey({
@@ -218,14 +235,20 @@ export default function EditSurveyTranslations() {
                     {activeSurvey.email.enabled && (
                       <>
                         <br />
-                        <Typography className={classes.titleText}>
+                        <Typography sx={styles.titleText}>
                           {langIndex === 0
                             ? tr.EditSurveyTranslations.emailInfo
                             : ''}
                           &nbsp;
                         </Typography>
                         <TranslationField
+                          placeholder={getTranslationPlaceholder(
+                            tr.EditSurveyEmail.emailSubject,
+                            lang,
+                          )}
                           value={activeSurvey.email.subject?.[lang] ?? ''}
+                          variant="outlined"
+                          sx={styles.boldInput}
                           onChange={(event) =>
                             editSurvey({
                               ...activeSurvey,
@@ -240,6 +263,10 @@ export default function EditSurveyTranslations() {
                           }
                         />
                         <RichTextEditor
+                          placeholder={getTranslationPlaceholder(
+                            tr.EditSurveyEmail.emailBody,
+                            lang,
+                          )}
                           value={activeSurvey.email.body?.[lang] ?? ''}
                           missingValue={Boolean(
                             !activeSurvey.email.body?.[lang],
@@ -260,11 +287,15 @@ export default function EditSurveyTranslations() {
                         />
                         {activeSurvey?.email?.info?.map(
                           (infoRow: SurveyEmailInfoItem, index: number) => (
-                            <div
+                            <Box
                               key={`email-info-${index}`}
-                              className={classes.keyValueContainer}
+                              sx={styles.keyValueContainer}
                             >
                               <TranslationField
+                                placeholder={getTranslationPlaceholder(
+                                  `${tr.EditSurveyEmail.info}, ${tr.KeyValueForm.key}`,
+                                  lang,
+                                )}
                                 variant="standard"
                                 color="primary"
                                 value={infoRow.name?.[lang] ?? ''}
@@ -288,6 +319,10 @@ export default function EditSurveyTranslations() {
                                 }}
                               />
                               <TranslationField
+                                placeholder={getTranslationPlaceholder(
+                                  `${tr.EditSurveyEmail.info}, ${tr.KeyValueForm.value}`,
+                                  lang,
+                                )}
                                 variant="standard"
                                 color="primary"
                                 value={infoRow.value?.[lang] ?? ''}
@@ -310,13 +345,13 @@ export default function EditSurveyTranslations() {
                                   });
                                 }}
                               />
-                            </div>
+                            </Box>
                           ),
                         )}
                       </>
                     )}
                     <br />
-                    <Typography className={classes.titleText}>
+                    <Typography sx={styles.titleText}>
                       {langIndex === 0
                         ? tr.EditSurveyTranslations.surveyPages
                         : ''}{' '}
@@ -325,17 +360,50 @@ export default function EditSurveyTranslations() {
                     {activeSurvey.pages.map((page, pageIndex) => {
                       return (
                         <div key={`page-container-${pageIndex}`}>
-                          <Typography className={classes.titleText}>
-                            {langIndex === 0
-                              ? `${pageIndex + 1}. ${
-                                  tr.EditSurveyTranslations.page
-                                }`
-                              : ''}
-                            &nbsp;
-                          </Typography>
-                          <div className={classes.pageContainer}>
+                          <Box
+                            display={'flex'}
+                            alignItems={'center'}
+                            gap="0.5rem"
+                            height="2.5rem"
+                          >
+                            {langIndex === 0 && (
+                              <>
+                                <Box
+                                  sx={(theme) => ({
+                                    borderRadius: '50%',
+                                    height: '1.5rem',
+                                    fontWeight: 500,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    color: 'white',
+                                    aspectRatio: '1 / 1',
+                                    background: theme.palette.primary.main,
+                                  })}
+                                >
+                                  {pageIndex + 1}.
+                                </Box>
+                                <Typography
+                                  sx={{
+                                    ...styles.titleText,
+                                    marginY: '0.5rem',
+                                  }}
+                                >
+                                  {tr.EditSurveyTranslations.page} &nbsp;
+                                </Typography>
+                              </>
+                            )}
+                          </Box>
+
+                          <Box sx={styles.pageContainer}>
                             <TranslationField
-                              variant="standard"
+                              placeholder={getTranslationPlaceholder(
+                                tr.EditSurveyPage.name,
+                                lang,
+                              )}
+                              leftIcon={langIndex === 0 && <Description />}
+                              variant="outlined"
+                              sx={styles.boldInput}
                               color="primary"
                               value={page.title?.[lang] ?? ''}
                               onChange={(event) =>
@@ -349,27 +417,76 @@ export default function EditSurveyTranslations() {
                               }
                             />
                             {page.sidebar.type == 'image' && (
-                              <TranslationField
-                                variant="standard"
-                                color="primary"
-                                value={page.sidebar?.imageAltText?.[lang] ?? ''}
-                                onChange={(event) =>
-                                  editPage({
-                                    ...page,
-                                    sidebar: {
-                                      ...page.sidebar,
-                                      imageAltText: {
-                                        ...page.sidebar.imageAltText,
-                                        [lang]: event.target.value,
+                              <>
+                                <TranslationField
+                                  placeholder={getTranslationPlaceholder(
+                                    tr.EditSurveyPage.imageAltText,
+                                    lang,
+                                  )}
+                                  leftIcon={langIndex === 0 && <TextFields />}
+                                  variant="outlined"
+                                  sx={styles.boldInput}
+                                  color="primary"
+                                  value={
+                                    page.sidebar?.imageAltText?.[lang] ?? ''
+                                  }
+                                  onChange={(event) =>
+                                    editPage({
+                                      ...page,
+                                      sidebar: {
+                                        ...page.sidebar,
+                                        imageAltText: {
+                                          ...page.sidebar.imageAltText,
+                                          [lang]: event.target.value,
+                                        },
                                       },
-                                    },
-                                  })
-                                }
-                              />
+                                    })
+                                  }
+                                />
+                                <TranslationField
+                                  placeholder={getTranslationPlaceholder(
+                                    tr.EditSurveyPage.imageAttributions,
+                                    lang,
+                                  )}
+                                  leftIcon={langIndex === 0 && <TextFields />}
+                                  variant="outlined"
+                                  sx={styles.boldInput}
+                                  color="primary"
+                                  value={
+                                    page.sidebar?.imageAttributions?.[lang] ??
+                                    ''
+                                  }
+                                  onChange={(event) =>
+                                    editPage({
+                                      ...page,
+                                      sidebar: {
+                                        ...page.sidebar,
+                                        imageAttributions: {
+                                          ...page.sidebar.imageAttributions,
+                                          [lang]: event.target.value,
+                                        },
+                                      },
+                                    })
+                                  }
+                                />
+                              </>
                             )}
+                            <Typography
+                              sx={{
+                                ...styles.titleText,
+                                marginTop: '1rem',
+                                marginBottom: '0.5rem',
+                              }}
+                            >
+                              {langIndex === 0
+                                ? tr.EditSurveyTranslations.sections
+                                : ''}
+                              &nbsp;
+                            </Typography>
                             {page.sections.map((section, sectionIndex) => (
                               <div key={`survey-section-${sectionIndex}`}>
                                 <EditSurveySectionTranslations
+                                  hideIcon={langIndex !== 0}
                                   languageCode={lang}
                                   section={section}
                                   onEdit={(editedSection) =>
@@ -383,6 +500,7 @@ export default function EditSurveyTranslations() {
                                 {section?.followUpSections?.map(
                                   (followUpSection, index) => (
                                     <EditSurveySectionTranslations
+                                      hideIcon={langIndex !== 0}
                                       key={`survey-follow-up-section-${sectionIndex}-${index}`}
                                       languageCode={lang}
                                       section={followUpSection}
@@ -398,18 +516,24 @@ export default function EditSurveyTranslations() {
                                 )}
                               </div>
                             ))}
-                          </div>
+                          </Box>
                         </div>
                       );
                     })}
                     <>
-                      <Typography className={classes.titleText}>
+                      <Typography sx={styles.titleText}>
                         {langIndex === 0
                           ? tr.EditSurveyTranslations.thanksPage
                           : ''}
                         &nbsp;
                       </Typography>
                       <TranslationField
+                        placeholder={getTranslationPlaceholder(
+                          tr.EditSurveyTranslations.title,
+                          lang,
+                        )}
+                        leftIcon={langIndex === 0 && <TextFields />}
+                        sx={styles.boldInput}
                         value={activeSurvey.thanksPage.title?.[lang] ?? ''}
                         onChange={(event) =>
                           editSurvey({
@@ -425,6 +549,10 @@ export default function EditSurveyTranslations() {
                         }
                       />
                       <RichTextEditor
+                        placeholder={getTranslationPlaceholder(
+                          tr.EditSurveyThanksPage.text,
+                          lang,
+                        )}
                         value={activeSurvey.thanksPage.text?.[lang] ?? ''}
                         missingValue={Boolean(
                           !activeSurvey.thanksPage.text?.[lang],
@@ -444,10 +572,10 @@ export default function EditSurveyTranslations() {
                         editorHeight={'100px'}
                       />
                     </>
-                  </div>
+                  </Box>
                 );
               })}
-            </div>
+            </Box>
           </>
         )}
       </Fieldset>

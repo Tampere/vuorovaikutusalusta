@@ -23,6 +23,13 @@ const pgp: PgPromise.IMain<{}, IClient> = PgPromise({
 let db: PgPromise.IDatabase<{}, IClient> = null;
 let migrationConnection: PgPromise.IConnected<{}, IClient> = null;
 
+// Common DB encryption key
+export const encryptionKey = process.env.DATABASE_ENCRYPTION_KEY;
+// Ensure the environment variable is found to prevent runtime errors
+if (!encryptionKey) {
+  throw new Error(`Environment variable DATABASE_ENCRYPTION_KEY is missing!`);
+}
+
 /**
  * Initializes the database.
  */
@@ -38,6 +45,7 @@ export async function initializeDatabase() {
           migrationConnection = await db.connect();
         } catch (error) {
           logger.warn(`Error connecting to database: ${error}`);
+          logger.info(process.env.DATABASE_URL);
           if (retryCount < connectRetries) {
             logger.info(
               `Retrying database connection (${++retryCount}/${connectRetries})`,
@@ -103,16 +111,16 @@ export function getGeoJSONColumn(
       return !value
         ? 'NULL'
         : value.properties?.bufferRadius != null
-        ? // If geometry provided with buffer radius, add ST_Buffer
-          pgp.as.format(
-            'public.ST_Buffer(public.ST_Transform(public.ST_SetSRID(public.ST_GeomFromGeoJSON($1), $2), $3), $4)',
-            [value, inputSRID, defaultSrid, value.properties.bufferRadius],
-          )
-        : pgp.as.format(
-            // Transform provided geometry to default SRID
-            'public.ST_Transform(public.ST_SetSRID(public.ST_GeomFromGeoJSON($1), $2), $3)',
-            [value, inputSRID, defaultSrid],
-          );
+          ? // If geometry provided with buffer radius, add ST_Buffer
+            pgp.as.format(
+              'public.ST_Buffer(public.ST_Transform(public.ST_SetSRID(public.ST_GeomFromGeoJSON($1), $2), $3), $4)',
+              [value, inputSRID, defaultSrid, value.properties.bufferRadius],
+            )
+          : pgp.as.format(
+              // Transform provided geometry to default SRID
+              'public.ST_Transform(public.ST_SetSRID(public.ST_GeomFromGeoJSON($1), $2), $3)',
+              [value, inputSRID, defaultSrid],
+            );
     },
   };
 }

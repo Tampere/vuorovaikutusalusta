@@ -1,15 +1,21 @@
 {
   "compilerOptions": {
-    "moduleResolution": "node",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "isolatedModules": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
+    "lib": ["es2021", "dom"],
+    "allowSyntheticDefaultImports": true,
     "outDir": "dist",
+    "jsx": "react-jsx",
     "baseUrl": ".",
     "skipLibCheck": true,
     "paths": {
       "@src/*": ["src/*", "dist/*"],
-      "@interfaces/*": ["../interfaces/*"]
+      "@interfaces/*": ["../interfaces/*"],
+      "@clientSrc/*": ["../client/src/*"]
     }
   },
-  "include": ["src"]
+  "include": ["src", "vite.config.ts"]
 }

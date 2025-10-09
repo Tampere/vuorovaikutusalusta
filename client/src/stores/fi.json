@@ -3,10 +3,11 @@
     "exportAnswers": "Lataa vastaukset",
     "surveyAnswerExport": "Kyselyn vastausdatan lataus",
     "chooseFileFormat": "Valitse haluamasi tiedostomuodot",
-    "download": "lataa",
+    "download": "Lataa",
     "errorDownloadingCSV": "CSV -tiedoston lataaminen epäonnistui",
     "errorDownloadingGPKG": "GeoPackage -tiedoston lataaminen epäonnistui",
-    "attachments": "Vastausliitteet"
+    "attachments": "Vastausliitteet",
+    "personalInfo": "Sisällytä henkilötiedot"
   },
   "EditSurvey": {
     "errorFetchingSurvey": "Virhe haettaessa kyselyä. Tarkista osoite tai yritä myöhemmin uudestaan.",
@@ -38,11 +39,13 @@
     "deleteSurveySuccessful": "Kysely poistettiin onnistuneesti!",
     "allowSavingUnfinished": "Salli kyselyn tallentaminen keskeneräisenä",
     "displayPrivacyStatement": "Näytä tietosuoja ja tiedonhallinta -linkki alatunnisteessa",
+    "saveFailedAnswerSubmitted": "Kyselyn vastaukset estävät muutosten tallentamisen.",
     "copyPage": "Kopioi sivu",
     "attachNewPage": "Liitä sivu",
     "pageAttached": "Huomaa, että karttatasovalinnat eivät kopioidu. Tarkista karttatasovalinnat ja korjaa tarvittaessa karttajulkaisuosoitetta.",
     "pageCopied": "Sivu kopioitu leikepöydälle. Voit nyt liittää kopioidun sivun haluamallesi kyselylle.",
-    "checkConditionalSections": "Huomaa, että jatkokysymyksien ehdot eivät kopioidu. Tarkista ehdot tarvittaessa."
+    "checkConditionalSections": "Huomaa, että jatkokysymyksien ehdot eivät kopioidu. Tarkista ehdot tarvittaessa.",
+    "displayAttributions": "Näytä tekijänoikeustiedot kyselyssä"
   },
   "EditSurveyInfo": {
     "title": "Kyselyn otsikko",
@@ -66,9 +69,13 @@
     "titleColor": "Osioiden otsikoiden väri",
     "allowTestSurvey": "Julkaise testikysely",
     "allowTestSurveyHelperText": "Kyselystä julkaistaan testiversio oman osoitteen taakse. Testikyselystä ei tallenneta vastauksia.",
-    "testSurveyUrl": "Testikyselyn osoite"
+    "testSurveyUrl": "Testikyselyn osoite",
+    "requireEmailRegistration": "Kyselyyn tunnistautuminen sähköpostilla",
+    "requireEmailRegistrationHelperText": "Kyselyn etusivulla vastaajan täytyy antaa sähköpostiosoitteensa. Osoitteeseen toimitetaan linkki, josta pääsee vastaamaan kyselyyn. Kyselyyn voi vastata vain kerran samasta sähköpostiosoitteesta."
   },
   "EditSurveyEmail": {
+    "includePersonalInfo": "Sisällytä vastaajan henkilötiedot",
+    "includePersonalInfoHelperText": "Mahdollisen henkilötietokysymyksen vastaukset sisällytetään pdf-raportin etusivulle.",
     "enable": "Salli vastausten raportointi sähköpostitse",
     "enableHelperText": "Jos sallit vastausten raportoinnin sähköpostitse, lähetetään yksittäiset vastaukset pdf-raportteina alla määrittelemiisi osoitteisiin. Lisäksi vastaajalta kysytään kyselyn lopussa hänen sähköpostiosoitettaan, johon pdf-raportti voidaan toimittaa.",
     "autoSendTo": "Vastaanottajien sähköpostiosoitteet",
@@ -83,6 +90,20 @@
     "value": "Arvo",
     "addEntry": "Lisää rivi",
     "deleteEntry": "Poista rivi"
+  },
+  "PersonalInfoQuestion": {
+    "label": "Kysyttävät tiedot",
+    "nameLabel": "Nimi",
+    "emailLabel": "Sähköposti",
+    "phoneLabel": "Puhelinnumero",
+    "addressLabel": "Osoite",
+    "customLegend": "Mukautettu kenttä",
+    "customQuestion": "Muu tieto...",
+    "nameError": "Tarkista nimi.",
+    "emailError": "Tarkista sähköpostiosoite.",
+    "phoneError": "Tarkista puhelinnumero.",
+    "addressError": "Tarkista osoite.",
+    "customError": "Tarkista {label}."
   },
   "EditSurveyPage": {
     "name": "Sivun nimi",
@@ -101,6 +122,13 @@
         "greaterThan": "vastaus on vähintään"
       }
     },
+    "confirmEditDialog": {
+      "title": "Saavatko jo kertyneet vastaukset vääristyä?",
+      "content": "Kyselyyn on jo saapunut vastauksia. Kysymysten muokkaaminen nyt saattaa aiheuttaa vastausten vääristymisen.",
+      "confirm": "Haluatko varmasti jatkaa?"
+    },
+    "fetchingSubmissions": "Tarkistetaan vastauksia",
+    "errorFetchingSubmissions": "Virhe tarkistettaessa kyselyn vastaustietoja.",
     "deletePage": "Poista sivu",
     "confirmDeletePage": "Haluatko varmasti poistaa tämän sivun? Toimintoa ei voida perua.",
     "deletePageFailed": "Sivun poistamisessa tapahtui virhe. Yritä myöhemmin uudestaan.",
@@ -135,7 +163,8 @@
     "addFollowUpQuestion": "Lisää jatkokysymys",
     "addFollowUpButtonTile": "Tallenna kysymys lisätäksesi jatkokysymyksen",
     "confirmDeleteSection": "Haluatko varmasti poistaa tämän osion?",
-    "imageAltText": "Kuvan vaihtoehtoinen teksti",
+    "imageAltText": "Vaihtoehtoinen teksti kuvalle",
+    "imageAttributions": "Kuvan tekijänoikeustiedot",
     "imageScaling": "Kuvan skaalaus",
     "imageScalingLabel": {
       "original": "Alkuperäinen koko",
@@ -144,6 +173,15 @@
     "sectionCopied": "Osio kopioitu leikepöydälle. Voit nyt liittää kopioidun osion haluamallesi kyselylle.",
     "sectionAttached": "Huomaa, että karttatasovalinnat eivät kopioidu. Tarkista karttatasovalinnat ja korjaa tarvittaessa karttajulkaisuosoitetta",
     "attachSection": "Uusi osio leikepöydältä"
+  },
+  "SurveyRegistrationPage": {
+    "email": "Sähköposti",
+    "emailHelperText": "Sähköpostiosoite on virheellinen.",
+    "alreadySubmitted": "Olet jo vastannut tähän kyselyyn. Kiitos vastauksestasi!",
+    "registrationSuccessful": "Kiitos! Sähköpostisi on lähetetty linkki kyselyyn. Voit nyt sulkea tämän välilehden.",
+    "registrationHelper": "Sinun tulee tilata linkki sähköpostiisi, jotta pystyt vastaamaan kyselyyn. Voit tilata kyselylinkin vain kerran sähköpostiosoitteeseesi.",
+    "submit": "Lähetä",
+    "sendingLink": "Lähetetään linkkiä sähköpostiin"
   },
   "FollowUpSection": {
     "title": "Jatkokysymys kysymykselle",
@@ -180,7 +218,22 @@
     "untitledGroup": "Nimetön ryhmä",
     "deleteGroup": "Poista ryhmä"
   },
+  "EditCategorizedCheckBoxQuestion": {
+    "categoryGroupsLabel": "Luokitukset",
+    "categoryAddPlaceholder": "Syötä lisättävä luokka...",
+    "addCategory": "Lisää luokitus",
+    "addOption": "Lisää vastausvaihtoehto",
+    "modifyCategoryGroups": "Muokkaa luokkia",
+    "hideCategorySettings": "Piilota luokka-asetukset",
+    "deleteCategoryGroup": "Poista luokka",
+    "unnamedCategoryGroup": "Nimetön luokitus"
+  },
+  "EditCheckBoxQuestion": {
+    "displayAsSelect": "Esitä kysymyksen vastausvaihtoehdot alasvetovalikkona"
+  },
   "AddSurveySectionActions": {
+    "personalInfoDisabled": "Henkilötietokysymys on jo lisätty kyselyyn.",
+    "personalInfoQuestion": "Lisää henkilötietokysymys",
     "radioQuestion": "Lisää valintakysymys",
     "checkBoxQuestion": "Lisää monivalintakysymys",
     "numericQuestion": "Lisää numeerinen kysymys",
@@ -192,6 +245,7 @@
     "matrixQuestion": "Lisää likert-kysymys",
     "multiMatrixQuestion": "Lisää monivalinta-likert-kysymys",
     "groupedCheckboxQuestion": "Lisää ryhmitetty monivalintakysymys",
+    "categorizedCheckboxQuestion": "Lisää luokiteltu monivalintakysymys",
     "imageSection": "Lisää kuvaosio",
     "documentSection": "Lisää liiteosio",
     "attachmentSection": "Lisää vastausliite"
@@ -202,6 +256,7 @@
     "scale": "Asteikko"
   },
   "SurveySection": {
+    "personalInfoQuestion": "Henkilötietokysymys",
     "radioQuestion": "Valintakysymys",
     "checkBoxQuestion": "Monivalintakysymys",
     "numericQuestion": "Numeerinen kysymys",
@@ -213,6 +268,7 @@
     "matrixQuestion": "Likert-kysymys",
     "multiMatrixQuestion": "Monivalinta-likert-kysymys",
     "groupedCheckboxQuestion": "Ryhmitetty monivalintakysymys",
+    "categorizedCheckboxQuestion": "Luokiteltu monivalintakysymys",
     "imageSection": "Kuvaosio",
     "documentSection": "Liiteosio",
     "attachmentSection": "Vastausliite",
@@ -232,7 +288,9 @@
     "allowEmptyAnswer": "Salli “En osaa sanoa” -vaihtoehto",
     "optionInfo": "Kysymysvaihtoehdon lisätiedot",
     "removeOption": "Poista vastausvaihtoehto",
-    "selectAnswer": "Valitse vastaus"
+    "selectAnswer": "Valitse vastaus",
+    "selectMultipleAnswers": "Valitse vastaukset",
+    "accessibilityNotice": "Huom! Kysymystyypin on tunnistettu olevan monissa kyselypalveluissa vaikea käyttää erilaisilla ruudunlukuohjelmilla. Jos käytät kysymystyyppiä, pohdi vastaajaryhmää ja käytä tarvittaessa muita kysymystyyppejä tai laadi erikseen saavutettava kysely."
   },
   "NumericQuestion": {
     "minValue": "Arvon pitää olla vähintään {minValue}",
@@ -253,6 +311,7 @@
     "noBackgroundImage": "Ei taustakuvaa",
     "noThanksPageImage": "Ei Kiitos-sivun kuvaa",
     "noImage": "Ei kuvaa",
+    "loadingImages": "Ladataan kuvia",
     "surveyImage": "Kyselyn taustakuva",
     "thanksPageImage": "Kiitos-sivun kuva",
     "image": "Kuva",
@@ -382,7 +441,9 @@
     "continueSurveyLink": "Jatka kyselyä tästä",
     "loadUnfinishedSuccessful": "Tallennetut vastaukset ladattu onnistuneesti! Voit jatkaa kyselyn täyttämistä.",
     "errorTokenNotFound": "Antamallasi osoitteella ei löytynyt tallennettuja vastauksia. Tarkista osoite tai aloita kyselyn täyttäminen alusta.",
-    "errorLoadingUnfinished": "Tallennettujen vastausten lataamisessa tapahtui virhe. Yritä myöhemmin uudestaan."
+    "errorLoadingUnfinished": "Tallennettujen vastausten lataamisessa tapahtui virhe. Yritä myöhemmin uudestaan.",
+    "registrationNotFound": "Tunnuksella ei löydy tallennettuja rekisteröitymisiä. Ole hyvä ja rekisteröidy kyselyyn uudelleen.",
+    "errorLoadingRegistration": "Virhe ladattaessa kyselyn rekisteröitymisiä."
   },
   "UnavailableSurvey": {
     "surveyNotPublished": "Kiitos mielenkiinnostasi! Kysely ei ole tällä hetkellä avoinna eikä siihen voi vastata.",
@@ -496,10 +557,10 @@
     "inPosition": "Sijalla ",
     "announcement": {
       "focus": "Siirrä tätä vaihtoehtoa painamalla välilyöntiä. Saattaa olla tarpeen aktivoida kohdistustila.",
-      "grab": "Tartuit vaihtoehtoon sijalla {position} . Siirrä ylös tai alaspäin nuolinäppäimillä.",
-      "move": "Nyt sijalla {position} kautta {length} . Aseta tähän painamalla välilyöntiä.",
-      "drop": "Asetettu sijalle {position} .",
-      "droppedInPlace": "Asetettu alkuperäiselle paikalleen sijalle {position}"
+      "grab": "Tartuit vaihtoehtoon sijalla {position}. Siirrä ylös tai alaspäin nuolinäppäimillä.",
+      "move": "Nyt sijalla {position} kautta {length}. Aseta tähän painamalla välilyöntiä.",
+      "drop": "Asetettu sijalle {position}.",
+      "droppedInPlace": "Asetettu alkuperäiselle paikalleen sijalle {position}."
     }
   },
   "DocumentSection": {
@@ -521,6 +582,20 @@
     "indicatorText": "Olet valinnut {numbers} vaihtoehtoa.",
     "indicatorTextMaxReached": "Olet valinnut kaikki {numbers} vaihtoehtoa.",
     "optionsSelectedInGroup": "{number} vaihtoehtoa valittu."
+  },
+  "CategorizedCheckBoxQuestion": {
+    "hideOption": "Piilota tämä vaihtoehto",
+    "doesNotMatchFilters": "Ei vastaa rajausehtojasi",
+    "hiddenHelpertext": "Vaihtoehto piilotettiin, koska se ei vastaa rajausehtojasi.",
+    "cancel": "Peru",
+    "showOption": "Palauta piilotettu vaihtoehto",
+    "singleHiddenOption": "Yksi piilotettu vaihtoehto",
+    "hiddenOptions": "{x} piilotettua vaihtoehtoa",
+    "categorySelectLabel": "Vaihtoehtojen rajaaminen",
+    "categorySelectDescription": "Tässä kysymyksessä on {x} vastausvaihtoehtoa. Halutessasi voit rajata vastausvaihtoehtoja, jotka näkyvät sinulle. Rajaa sinulle näkyviä vaihtoehtoja valitsemalla alla olevista luokista sopivimmat.",
+    "categorySelectDescriptionLimited": "Tässä kysymyksessä on {0} vastausvaihtoehtoa, joista voit valita enintään {1}. Halutessasi voit rajata vastausvaihtoehtoja, jotka näkyvät sinulle. Rajaa sinulle näkyviä vaihtoehtoja valitsemalla alla olevista luokista sopivimmat.",
+    "categorySelectDescriptionSecondary": "Voit myös rajata näkymää piilottamalla yksittäisiä rivejä vaihtoehtojen listasta painikkeesta \"Piilota tämä vaihtoehto\".",
+    "categorySelectDescriptionTertiary": "Voit poistaa rajaukset joko poistamalla tekemäsi valinnat tai palauttamalla piilotetut vaihtoehdot piilotettujen vaihtoehtojen listauksesta."
   },
   "SubmissionInfoDialog": {
     "title": "Lähetä vastaus",
@@ -583,7 +658,19 @@
     "missingTranslation": "Käännös puuttuu",
     "optionInfo": "Vaihtoehdon lisätiedot",
     "emailInfo": "Sähköposti",
-    "thanksPage": "Kiitos-sivu"
+    "thanksPage": "Kiitos-sivu",
+    "sections": "Kysymykset",
+    "option": "Vaihtoehto",
+    "optionGroup": "Vastausryhmä",
+    "title": "Otsikko",
+    "categoryGroup": "Luokkaryhmä",
+    "category": "Luokka",
+    "min": "minimiarvo",
+    "max": "maksimiarvo",
+    "class": "Vastausluokka",
+    "subject": "Vastausaihe",
+    "altText": "Vaihtoehtoinen teksti kuvalle",
+    "attributions": "Kuvan tekijänoikeustiedot"
   },
   "SurveySubmissionsPage": {
     "attachments": "Liitteet",
@@ -605,6 +692,9 @@
       "yAxisLabel": "Vastauksia"
     }
   },
+  "DragAndDrop": {
+    "draggable": "Raahattava"
+  },
   "navigation": {
     "next": "Seuraava",
     "back": "Takaisin"
@@ -618,7 +708,8 @@
     "discard": "Peruuta muutokset",
     "edit": "Muokkaa",
     "copy": "Kopioi",
-    "close": "Sulje"
+    "close": "Sulje",
+    "add": "Lisää"
   },
   "options": {
     "yes": "Kyllä",

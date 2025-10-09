@@ -3,10 +3,11 @@
     "exportAnswers": "Export response data",
     "surveyAnswerExport": "Export survey response data",
     "chooseFileFormat": "Choose files to export",
-    "download": "download",
+    "download": "Download",
     "errorDownloadingCSV": "Failed to export CSV -file",
     "errorDownloadingGPKG": "Failed to export GeoPackage -file",
-    "attachments": "Survey response data attachments"
+    "attachments": "Survey response data attachments",
+    "personalInfo": "Include personal information"
   },
   "EditSurvey": {
     "errorFetchingSurvey": "Unable to access the survey. Please check the address or try again later.",
@@ -38,11 +39,13 @@
     "deleteSurveySuccessful": "Survey successfully deleted!",
     "allowSavingUnfinished": "Allow saving an unfinished survey",
     "displayPrivacyStatement": "Display link for data protection and management in the footer",
+    "saveFailedAnswerSubmitted": "Survey responses prevent saving changes.",
     "copyPage": "Copy page",
     "attachNewPage": "Attach page",
     "pageAttached": "Please note that selected map layers are not copied. Check map layer selections and fix published map url if needed.",
     "pageCopied": "Page copied to clipboard. Use can now attach the page to any survey.",
-    "checkConditionalSections": "Please note that conditions for follow up questions are not copied."
+    "checkConditionalSections": "Please note that conditions for follow up questions are not copied.",
+    "displayAttributions": "Display attributions on survey"
   },
   "EditSurveyInfo": {
     "title": "Survey title",
@@ -66,9 +69,13 @@
     "titleColor": "Color for the section titles",
     "allowTestSurvey": "Publish test survey",
     "allowTestSurveyHelperText": "Test survey will be published under its own url. Test survey answers are not saved.",
-    "testSurveyUrl": "Test survey url"
+    "testSurveyUrl": "Test survey url",
+    "requireEmailRegistration": "Require email identification for the survey",
+    "requireEmailRegistrationHelperText": "On the survey front page, the respondent must provide their email address. A link will be sent to the address, from which the survey can be answered. The survey can only be answered once from the same email address."
   },
   "EditSurveyEmail": {
+    "includePersonalInfo": "Include respondent's personal information",
+    "includePersonalInfoHelperText": "Responses to the personal information question, if any, will be included on the front page of the PDF report.",
     "enable": "Enable sending reports of the survey answers via email",
     "enableHelperText": "If you enable sending answer reports via email, reports of individual respondent's answers will be send as pdf-reports to the mailing list described below. At the end of the survey, the respondent is asked for an email address where the answer report can be sent to.",
     "autoSendTo": "Email recipients",
@@ -101,6 +108,13 @@
         "greaterThan": "answer is at least"
       }
     },
+    "confirmEditDialog": {
+      "title": "Can the already accumulated responses be distorted?",
+      "content": "Responses have already been received for the survey. Editing the questions now may cause the responses to be distorted.",
+      "confirm": "Are you sure you want to continue?"
+    },
+    "fetchingSubmissions": "Fetching submissions",
+    "errorFetchingSubmissions": "Error checking survey response data.",
     "deletePage": "Delete page",
     "confirmDeletePage": "Are you sure you want to delete this page? The action cannot be reversed.",
     "deletePageFailed": "Error while deleting the survey page. Please try again later.",
@@ -136,6 +150,7 @@
     "addFollowUpButtonTile": "Save the draft question to add a follow-up section",
     "confirmDeleteSection": "Are you sure you want to delete this section?",
     "imageAltText": "Alternative text for the image",
+    "imageAttributions": "Attributions for the image",
     "imageScaling": "Image scaling",
     "imageScalingLabel": {
       "original": "Original size",
@@ -144,6 +159,15 @@
     "sectionCopied": "Section copied to clipboard and can now be attached to a question.",
     "sectionAttached": "Please note that selected map layers are not copied. Check map layer selections and fix published map url if needed.",
     "attachSection": "Copy section from clipboard"
+  },
+  "SurveyRegistrationPage": {
+    "email": "Email",
+    "emailHelperText": "The email address is invalid.",
+    "alreadySubmitted": "You have already answered this survey. Thank you for your participation!",
+    "registrationSuccessful": "Thank you! A link to the survey has been sent to your email. You can now close this tab.",
+    "registrationHelper": "You must order a link to your email to answer the survey. You can only order the survey link once to your email address.",
+    "submit": "Send",
+    "sendingLink": "Sending the link to your email"
   },
   "FollowUpSection": {
     "title": "Follow-up question for ",
@@ -180,7 +204,22 @@
     "untitledGroup": "Untitled group",
     "deleteGroup": "Delete group"
   },
+  "EditCategorizedCheckBoxQuestion": {
+    "categoryGroupsLabel": "Categories",
+    "categoryAddPlaceholder": "Enter category to add...",
+    "addCategory": "Add category",
+    "addOption": "Add answer option",
+    "modifyCategoryGroups": "Modify category groups",
+    "hideCategorySettings": "Hide category settings",
+    "deleteCategoryGroup": "Delete category",
+    "unnamedCategoryGroup": "Unnamed category"
+  },
+  "EditCheckBoxQuestion": {
+    "displayAsSelect": "Display options as dropdown selection"
+  },
   "AddSurveySectionActions": {
+    "personalInfoDisabled": "The personal information question has already been added to the survey.",
+    "personalInfoQuestion": "Add personal information question",
     "radioQuestion": "Add radio button question (single choice)",
     "checkBoxQuestion": "Add checkbox question (multiple choice)",
     "numericQuestion": "Add numeric question",
@@ -192,6 +231,7 @@
     "matrixQuestion": "Add likert scale question",
     "multiMatrixQuestion": "Add multiple choice likert scale question",
     "groupedCheckboxQuestion": "Add grouped checkbox question",
+    "categorizedCheckboxQuestion": "Add categorized checkbox question",
     "imageSection": "Add image section",
     "documentSection": "Add document section",
     "attachmentSection": "Add attachment section"
@@ -202,6 +242,7 @@
     "scale": "Scale"
   },
   "SurveySection": {
+    "personalInfoQuestion": "Personal information question",
     "radioQuestion": "Radio button question (single choice)",
     "checkBoxQuestion": "Radio button question (single choice)",
     "numericQuestion": "Numeric question",
@@ -213,6 +254,7 @@
     "matrixQuestion": "Likert scale question",
     "multiMatrixQuestion": "Multiple choice likert scale question",
     "groupedCheckboxQuestion": "Grouped checkbox question",
+    "categorizedCheckboxQuestion": "Categorized checkbox question",
     "imageSection": "Image section",
     "documentSection": "Document section",
     "attachmentSection": "Attachment section",
@@ -232,7 +274,9 @@
     "allowEmptyAnswer": "Allow 'I don't know' -answers",
     "optionInfo": "Answer option information",
     "removeOption": "Delete answer option",
-    "selectAnswer": "Select an answer"
+    "selectAnswer": "Select an answer",
+    "selectMultipleAnswers": "Select answers",
+    "accessibilityNotice": "This question type is known to be difficult to use with screen readers. If using this question type, evaluate your target demographic and use other question types as needed or create a separate, accessible, survey."
   },
   "NumericQuestion": {
     "minValue": "Minimum value {minValue}",
@@ -248,11 +292,26 @@
     "deleteUploadedFile": "Delete uploaded file",
     "replace": "Replace the selected file by clicking here."
   },
+  "PersonalInfoQuestion": {
+    "label": "Personal information",
+    "nameLabel": "Name",
+    "emailLabel": "Email",
+    "phoneLabel": "Phone number",
+    "addressLabel": "Address",
+    "customLegend": "Custom field",
+    "customQuestion": "Other information...",
+    "nameError": "Check the name.",
+    "emailError": "Check the email address.",
+    "phoneError": "Check the phone number.",
+    "addressError": "Check the address.",
+    "customError": "Check the {label}."
+  },
   "SurveyImageList": {
     "attributions": "Copyright & attributions",
     "noBackgroundImage": "No background image",
     "noThanksPageImage": "No thank you page image",
     "noImage": "No image",
+    "loadingImages": "Loading images",
     "surveyImage": "Survey background image",
     "thanksPageImage": "Image for thank you page",
     "image": "Image",
@@ -382,7 +441,9 @@
     "continueSurveyLink": "Continue the survey",
     "loadUnfinishedSuccessful": "Previous answers were loaded successfully! You can now continue answering the survey.",
     "errorTokenNotFound": "Previous answers were not found with the provided address. Please check the address and try again, or start the survey from the beginning.",
-    "errorLoadingUnfinished": "Failed to load previously stored answers. Please try again later."
+    "errorLoadingUnfinished": "Failed to load previously stored answers. Please try again later.",
+    "registrationNotFound": "No registrations found with the provided token. Please register for the survey again.",
+    "errorLoadingRegistration": "Error while loading survey registrations."
   },
   "UnavailableSurvey": {
     "surveyNotPublished": "The survey is not available at the moment. Thank You for your interest on the survey!",
@@ -496,10 +557,10 @@
     "inPosition": "In position ",
     "announcement": {
       "focus": "Move this item by pressing spacebar. You may need to activate focus mode.",
-      "grab": "Picked up from position {position} . Move with arrow keys.",
-      "move": "Now at position {position} out of {length} . Set here by pressing spacebar.",
-      "drop": "Set to position {position} .",
-      "droppedInPlace": "Replaced to the original position {position} ."
+      "grab": "Picked up from position {position}. Move with arrow keys.",
+      "move": "Now at position {position} out of {length}. Set here by pressing spacebar.",
+      "drop": "Set to position {position}.",
+      "droppedInPlace": "Replaced to the original position {position}."
     }
   },
   "DocumentSection": {
@@ -521,6 +582,20 @@
     "indicatorText": "You have selected {numbers} options.",
     "indicatorTextMaxReached": "You have selected all {numbers} options.",
     "optionsSelectedInGroup": "{number} options selected."
+  },
+  "CategorizedCheckBoxQuestion": {
+    "hideOption": "Hide this option",
+    "doesNotMatchFilters": "Does not match your filter criteria",
+    "hiddenHelpertext": "Option was hidden because it does not match your filter criteria.",
+    "cancel": "Cancel",
+    "showOption": "Restore hidden option",
+    "singleHiddenOption": "One hidden option",
+    "hiddenOptions": "{x} hidden options",
+    "categorySelectLabel": "Filter options",
+    "categorySelectDescription": "This question has {x} answer options. If you wish, you can filter which options are shown to you. Filter the visible options by selecting the most suitable categories below.",
+    "categorySelectDescriptionLimited": "This question has {0} answer options, of which you can select a maximum of {1}. If you wish, you can filter which options are shown to you. Filter the visible options by selecting the most suitable categories below.",
+    "categorySelectDescriptionSecondary": "You can also narrow down the view by hiding individual rows from the options list using the \"Hide this option\" button.",
+    "categorySelectDescriptionTertiary": "You can remove the filters either by deselecting your selections or by restoring hidden options from the list of hidden options."
   },
   "SubmissionInfoDialog": {
     "title": "Submit answers",
@@ -583,7 +658,19 @@
     "missingTranslation": "Missing translation",
     "optionInfo": "Option info",
     "emailInfo": "Email",
-    "thanksPage": "Thank you -page"
+    "thanksPage": "Thank you -page",
+    "sections": "Sections",
+    "option": "Option",
+    "optionGroup": "Option group",
+    "title": "Title",
+    "categoryGroup": "Category group",
+    "category": "Category",
+    "min": "Minimum value",
+    "max": "Maximum value",
+    "class": "Answer class",
+    "subject": "Answer subject",
+    "altText": "Image alternative text",
+    "attributions": "Image attributions"
   },
   "SurveySubmissionsPage": {
     "attachments": "Attachments",
@@ -605,6 +692,9 @@
       "yAxisLabel": "Answers"
     }
   },
+  "DragAndDrop": {
+    "draggable": "draggable"
+  },
   "navigation": {
     "next": "Next",
     "back": "Back"
@@ -618,7 +708,8 @@
     "discard": "Discard changes",
     "edit": "Edit",
     "copy": "Copy",
-    "close": "Close"
+    "close": "Close",
+    "add": "Add"
   },
   "options": {
     "yes": "Yes",

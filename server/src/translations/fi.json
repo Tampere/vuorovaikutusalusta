@@ -7,10 +7,19 @@
   "dontKnow": "En osaa sanoa",
   "unfinishedSubmission": "Keskeneräinen vastaus",
   "unfinishedSurveyInfo": "Vastauksesi kyselyyn {surveyTitle} on tallennettu keskeneräisenä. Vastauksesi otetaan huomioon vasta, kun olet vastannut kyselyn loppuun ja lähettänyt lopullisen vastauksesi.",
+  "surveyRegistrationLink": "Vastauslinkki kyselyyn:",
+  "surveyRegistrationInfo": "Olet tilannut vastauslinkin kyselyyn: {surveyTitle}. Voit vastata kyselyyn vain kerran.",
   "continueWithLink": "Voit jatkaa vastaamista kyselyn ollessa auki avaamalla seuraavan linkin:",
   "submissionId": "Vastaustunniste",
   "responseTime": "Tallennusaika",
   "attachments": "Liitteet",
   "fi": "suomi",
-  "en": "englanti"
+  "en": "englanti",
+  "PersonalInfo": {
+    "label": "Vastaajan tiedot",
+    "name": "Nimi",
+    "email": "Sähköpostiosoite",
+    "phone": "Puhelinnumero",
+    "address": "Osoite"
+  }
 }

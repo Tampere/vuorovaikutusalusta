@@ -8,13 +8,11 @@ import {
   Stack,
   useMediaQuery,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
-import { getClassList } from '@src/utils/classes';
 import React from 'react';
 import Footer from './Footer';
 
-const useStyles = makeStyles((theme: Theme & { [customKey: string]: any }) => ({
+const styles = (theme: Theme & { [customKey: string]: any }) => ({
   heading: {
     fontSize: '2rem',
     wordBreak: 'break-word',
@@ -29,27 +27,21 @@ const useStyles = makeStyles((theme: Theme & { [customKey: string]: any }) => ({
       padding: '1rem',
       boxDecorationBreak: 'clone',
       ...theme.landingPage?.title,
-      [theme.breakpoints.down(600)]: {
-        padding: '2vw',
-      },
+      [theme.breakpoints.down(600)]: { padding: '2vw' },
     },
   },
   title: {
     fontFamily: '"Montserrat", sans-serif',
     fontSize: '3rem',
     ...theme.landingPage?.title,
-    [theme.breakpoints.down(600)]: {
-      fontSize: '9vw',
-    },
+    [theme.breakpoints.down(600)]: { fontSize: '9vw' },
   },
   subtitle: {
     fontFamily: '"Montserrat", sans-serif',
     fontSize: '2rem',
     textTransform: 'none',
     ...theme.landingPage?.subtitle,
-    [theme.breakpoints.down(600)]: {
-      fontSize: '6vw',
-    },
+    [theme.breakpoints.down(600)]: { fontSize: '6vw' },
   },
   start: {
     fontFamily: '"Montserrat", sans-serif',
@@ -59,13 +51,9 @@ const useStyles = makeStyles((theme: Theme & { [customKey: string]: any }) => ({
     padding: '0.5rem',
     textDecoration: 'none',
     transition: 'transform 200ms ease-out',
-    '&:hover': {
-      transform: 'scale(1.1)',
-    },
+    '&:hover': { transform: 'scale(1.1)' },
     ...theme.landingPage?.start,
-    [theme.breakpoints.down(600)]: {
-      fontSize: '6vw',
-    },
+    [theme.breakpoints.down(600)]: { fontSize: '6vw' },
   },
 
   imageCopyright: {
@@ -82,7 +70,7 @@ const useStyles = makeStyles((theme: Theme & { [customKey: string]: any }) => ({
     color: 'white',
     textAlign: 'center',
   },
-}));
+});
 
 interface Props {
   survey: Survey;
@@ -99,7 +87,6 @@ export default function SurveyLandingPage({
   onStart,
   surveyBackgroundImage,
 }: Props) {
-  const classes = useStyles({ imageName: survey?.backgroundImageName ?? '' });
   const { tr, surveyLanguage } = useTranslations();
   const mediumWidth = useMediaQuery('(max-width: 640px)');
   return (
@@ -124,9 +111,9 @@ export default function SurveyLandingPage({
           className="test-survey-header"
           sx={{ position: 'absolute', width: '100%' }}
         >
-          <div className={classes.testSurveyHeader}>
+          <Box sx={(theme) => styles(theme).testSurveyHeader}>
             {tr.TestSurveyFrame.text}
-          </div>
+          </Box>
         </Box>
       )}
       <Box
@@ -140,10 +127,7 @@ export default function SurveyLandingPage({
         }}
       >
         <img
-          style={{
-            maxWidth: '60%',
-            maxHeight: '100%',
-          }}
+          style={{ maxWidth: '60%', maxHeight: '100%' }}
           src={`/api/feature-styles/icons/logo`}
           alt={tr.IconAltTexts.logoAltText}
         />
@@ -158,17 +142,29 @@ export default function SurveyLandingPage({
         }}
       >
         <div>
-          <h1 className={getClassList([classes.heading, classes.title])}>
+          <Box
+            component="h1"
+            sx={(theme) => ({
+              ...styles(theme).heading,
+              ...styles(theme).title,
+            })}
+          >
             <span>{survey.title?.[surveyLanguage]}</span>
-          </h1>
+          </Box>
           {survey.subtitle?.[surveyLanguage] && (
-            <h2 className={getClassList([classes.heading, classes.subtitle])}>
+            <Box
+              component="h2"
+              sx={(theme) => ({
+                ...styles(theme).heading,
+                ...styles(theme).subtitle,
+              })}
+            >
               <span>{survey.subtitle?.[surveyLanguage]}</span>
-            </h2>
+            </Box>
           )}
         </div>
         <Button onClick={onStart}>
-          <Typography variant="body1" className={classes.start}>
+          <Typography variant="body1" sx={(theme) => styles(theme).start}>
             {continueUnfinished
               ? tr.SurveyPage.continueSurveyLink
               : tr.SurveyPage.startSurveyLink}
@@ -187,7 +183,9 @@ export default function SurveyLandingPage({
           whiteSpace: 'nowrap',
         }}
       >
-        <Footer>
+        <Footer
+          {...(mediumWidth && { style: { transform: 'translateY(-20%)' } })}
+        >
           <Link
             color="primary"
             underline="hover"
@@ -221,11 +219,15 @@ export default function SurveyLandingPage({
           alt={tr.IconAltTexts.bannerAltText}
         />
 
-        {surveyBackgroundImage?.attributions ? (
-          <Typography className={classes.imageCopyright} variant="body2">
-            {surveyBackgroundImage.attributions}
-          </Typography>
-        ) : null}
+        {survey.displayBackgroundAttributions &&
+          surveyBackgroundImage?.attributions && (
+            <Typography
+              sx={(theme) => styles(theme).imageCopyright}
+              variant="body2"
+            >
+              {surveyBackgroundImage.attributions}
+            </Typography>
+          )}
       </Box>
     </Stack>
   );

@@ -4,7 +4,7 @@ import {
   getGeoPackageFile,
 } from '@src/application/answer';
 import { userCanEditSurvey } from '@src/application/survey';
-import { ensureAuthenticated } from '@src/auth';
+import { ensureAuthenticated, ensureSurveyGroupAccess } from '@src/auth';
 import { BadRequestError, ForbiddenError } from '@src/error';
 import { Router } from 'express';
 import asyncHandler from 'express-async-handler';
@@ -19,6 +19,7 @@ const router = Router();
 router.get(
   '/:id/file-export/csv',
   ensureAuthenticated(),
+  ensureSurveyGroupAccess(),
   validateRequest([
     param('id').isNumeric().toInt().withMessage('ID must be a number'),
   ]),
@@ -28,8 +29,9 @@ router.get(
     if (!permissionsOk) {
       throw new ForbiddenError('User not author nor admin of the survey');
     }
+    const includePersonalInfo = req.query.withPersonalInfo! === 'true';
 
-    const exportFiles = await getCSVFile(surveyId);
+    const exportFiles = await getCSVFile(surveyId, includePersonalInfo);
 
     if (!exportFiles) {
       res.status(404).json({ message: 'No attachments found' });
@@ -47,6 +49,7 @@ router.get(
 router.get(
   '/:id/file-export/geopackage',
   ensureAuthenticated(),
+  ensureSurveyGroupAccess(),
   validateRequest([
     param('id').isNumeric().toInt().withMessage('ID must be a number'),
   ]),
@@ -73,6 +76,7 @@ router.get(
 router.get(
   '/:id/file-export/attachments',
   ensureAuthenticated(),
+  ensureSurveyGroupAccess(),
   validateRequest([
     param('id').isNumeric().toInt().withMessage('ID must be a number'),
   ]),

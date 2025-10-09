@@ -140,11 +140,13 @@ export function DataChart({ submissions, submissionsLoading }: Props) {
         >
           <XAxis
             dataKey={displayByWeek ? 'week' : 'date'}
-            tickFormatter={(data) =>
-              displayByWeek
-                ? data
-                : format(parse(data, 'dd.MM.yyyy', new Date()), 'd.M.')
-            }
+            tickFormatter={(data) => {
+              if (data && /^\d{2}\.\d{2}\.\d{4}$/.test(data)) {
+                return displayByWeek
+                  ? data
+                  : format(parse(data, 'dd.MM.yyyy', new Date()), 'd.M.');
+              }
+            }}
           >
             <Label
               value={

@@ -10,13 +10,14 @@ import {
   FormGroup,
   FormControlLabel,
   Checkbox,
+  Box,
 } from '@mui/material';
 import { Add, DragIndicator, ExpandMore } from '@mui/icons-material';
-import { makeStyles } from '@mui/styles';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useState } from 'react';
-import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import QuestionOptions from './QuestionOptions';
+import { DndWrapper } from '../DragAndDrop/DndWrapper';
+import { DragHandle } from '../DragAndDrop/SortableItem';
 
 interface Props {
   section: SurveyGroupedCheckboxQuestion;
@@ -24,7 +25,7 @@ interface Props {
   onChange: (section: SurveyGroupedCheckboxQuestion) => void;
 }
 
-const useStyles = makeStyles({
+const styles = {
   accordion: {
     background: '#bbb',
   },
@@ -40,7 +41,7 @@ const useStyles = makeStyles({
   answerLimitInput: {
     marginRight: '1rem',
   },
-});
+};
 
 export default function EditGroupedCheckBoxQuestion({
   section,
@@ -50,7 +51,6 @@ export default function EditGroupedCheckBoxQuestion({
   const [openedGroupId, setOpenedGroupId] = useState<number>(null);
 
   const { tr, surveyLanguage } = useTranslations();
-  const classes = useStyles();
 
   return (
     <>
@@ -82,11 +82,11 @@ export default function EditGroupedCheckBoxQuestion({
           <TextField
             id="min-answers"
             disabled={disabled}
-            className={classes.answerLimitInput}
+            sx={styles.answerLimitInput}
             type="number"
             variant="standard"
             label={tr.SurveySections.minAnswers}
-            InputLabelProps={{ shrink: true }}
+            slotProps={{ inputLabel: { shrink: true } }}
             value={section.answerLimits?.min ?? ''}
             onChange={(event) => {
               // Negative numbers shouldn't be allowed
@@ -106,7 +106,7 @@ export default function EditGroupedCheckBoxQuestion({
             type="number"
             variant="standard"
             label={tr.SurveySections.maxAnswers}
-            InputLabelProps={{ shrink: true }}
+            slotProps={{ inputLabel: { shrink: true } }}
             value={section.answerLimits?.max ?? ''}
             onChange={(event) => {
               // Negative numbers shouldn't be allowed
@@ -122,19 +122,84 @@ export default function EditGroupedCheckBoxQuestion({
           />
         </FormGroup>
       )}
-      <DragDropContext
-        onDragEnd={(event) => {
-          if (!event.destination) {
-            return;
-          }
-          const groupId = Number(event.draggableId);
-          const oldIndex = section.groups.findIndex(
-            (group) => group.id === groupId
-          );
+      <DndWrapper
+        sortableItems={section.groups.map((group, index) => ({
+          id: String(group.id),
+          renderElement: (isDragging) => (
+            <Accordion
+              slotProps={{ heading: { component: 'div' } }}
+              key={group.id}
+              sx={styles.accordion}
+              expanded={openedGroupId === group.id}
+              onChange={(_, isExpanded) => {
+                setOpenedGroupId(isExpanded ? group.id : null);
+              }}
+            >
+              <AccordionSummary
+                component="div"
+                expandIcon={<ExpandMore />}
+                aria-controls={`group-${index}-content`}
+                id={`group-${index}-header`}
+              >
+                <Typography style={{ flexGrow: 1 }}>
+                  {group.name[surveyLanguage] || (
+                    <em>{tr.EditGroupedCheckBoxQuestion.untitledGroup}</em>
+                  )}
+                </Typography>
+                <DragHandle isDragging={isDragging}>
+                  <DragIndicator />
+                </DragHandle>
+              </AccordionSummary>
+              <AccordionDetails sx={styles.group}>
+                <TextField
+                  autoFocus
+                  disabled={disabled}
+                  label={tr.EditGroupedCheckBoxQuestion.groupName}
+                  value={group.name[surveyLanguage]}
+                  variant="standard"
+                  onChange={(event) => {
+                    group.name[surveyLanguage] = event.target.value;
+                    onChange({
+                      ...section,
+                    });
+                  }}
+                />
+                <QuestionOptions
+                  options={group.options}
+                  disabled={disabled}
+                  onChange={(options) => {
+                    group.options = [...options];
+                    onChange({ ...section });
+                  }}
+                  title={tr.SurveySections.options}
+                  allowOptionInfo
+                  enableClipboardImport
+                />
+                <div>
+                  <Button
+                    variant="contained"
+                    disabled={disabled}
+                    onClick={() => {
+                      onChange({
+                        ...section,
+                        groups: section.groups.filter((_, i) => i !== index),
+                      });
+                    }}
+                  >
+                    {tr.EditGroupedCheckBoxQuestion.deleteGroup}
+                  </Button>
+                </div>
+              </AccordionDetails>
+            </Accordion>
+          ),
+        }))}
+        onDragEnd={(opts) => {
+          const { oldIndex, newIndex, movedItemId } = opts;
+
           const group = section.groups[oldIndex];
-          const newIndex = event.destination.index;
+
           const otherGroups = section.groups.filter(
-            (group) => group.id !== groupId
+            (group) => String(group.id) !== String(movedItemId),
           );
           onChange({
             ...section,
@@ -149,102 +214,13 @@ export default function EditGroupedCheckBoxQuestion({
             setOpenedGroupId(newIndex);
           }
         }}
-      >
-        <Droppable droppableId="option-groups">
-          {(provided) => (
-            <div {...provided.droppableProps} ref={provided.innerRef}>
-              {section.groups.map((group, index) => (
-                <Draggable
-                  key={group.id}
-                  draggableId={String(group.id)}
-                  index={index}
-                >
-                  {(provided) => (
-                    <Accordion
-                      {...provided.draggableProps}
-                      ref={provided.innerRef}
-                      key={group.id}
-                      className={classes.accordion}
-                      expanded={openedGroupId === group.id}
-                      onChange={(_, isExpanded) => {
-                        setOpenedGroupId(isExpanded ? group.id : null);
-                      }}
-                    >
-                      <AccordionSummary
-                        expandIcon={<ExpandMore />}
-                        aria-controls={`group-${index}-content`}
-                        id={`group-${index}-header`}
-                      >
-                        <Typography style={{ flexGrow: 1 }}>
-                          {group.name[surveyLanguage] || (
-                            <em>
-                              {tr.EditGroupedCheckBoxQuestion.untitledGroup}
-                            </em>
-                          )}
-                        </Typography>
-                        <div
-                          {...provided.dragHandleProps}
-                          style={{ display: 'flex' }}
-                        >
-                          <DragIndicator />
-                        </div>
-                      </AccordionSummary>
-                      <AccordionDetails className={classes.group}>
-                        <TextField
-                          autoFocus
-                          disabled={disabled}
-                          label={tr.EditGroupedCheckBoxQuestion.groupName}
-                          value={group.name[surveyLanguage]}
-                          variant="standard"
-                          onChange={(event) => {
-                            group.name[surveyLanguage] = event.target.value;
-                            onChange({
-                              ...section,
-                            });
-                          }}
-                        />
-                        <QuestionOptions
-                          options={group.options}
-                          disabled={disabled}
-                          onChange={(options) => {
-                            group.options = [...options];
-                            onChange({ ...section });
-                          }}
-                          title={tr.SurveySections.options}
-                          allowOptionInfo
-                          enableClipboardImport
-                        />
-                        <div>
-                          <Button
-                            variant="contained"
-                            disabled={disabled}
-                            onClick={() => {
-                              onChange({
-                                ...section,
-                                groups: section.groups.filter(
-                                  (_, i) => i !== index
-                                ),
-                              });
-                            }}
-                          >
-                            {tr.EditGroupedCheckBoxQuestion.deleteGroup}
-                          </Button>
-                        </div>
-                      </AccordionDetails>
-                    </Accordion>
-                  )}
-                </Draggable>
-              ))}
-              {provided.placeholder}
-            </div>
-          )}
-        </Droppable>
-      </DragDropContext>
-      <div className={classes.row}>
+      />
+
+      <Box display="flex" alignItems="center" gap={1.5}>
         <Fab
           color="primary"
           disabled={disabled}
-          aria-label="add-checkbox-group"
+          aria-label={tr.EditGroupedCheckBoxQuestion.addGroup}
           size="small"
           onClick={() => {
             // Add a temporary new ID for the group
@@ -266,10 +242,10 @@ export default function EditGroupedCheckBoxQuestion({
         >
           <Add />
         </Fab>
-        <Typography style={{ paddingLeft: '1rem' }}>
+        <Typography aria-hidden>
           {tr.EditGroupedCheckBoxQuestion.addGroup}
         </Typography>
-      </div>
+      </Box>
     </>
   );
 }

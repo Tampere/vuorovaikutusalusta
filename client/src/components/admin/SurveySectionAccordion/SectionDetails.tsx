@@ -1,6 +1,7 @@
 import { SurveyFollowUpSection, SurveyPageSection } from '@interfaces/survey';
 import {
   AccordionDetails,
+  Alert,
   Button,
   Checkbox,
   FormControlLabel,
@@ -48,6 +49,7 @@ export function SectionDetails({
     title: null,
     conditions: { equals: [], lessThan: [], greaterThan: [] },
     id: followUpSectionSequence,
+    displaySelection: false,
   };
 
   return (
@@ -91,6 +93,9 @@ export function SectionDetails({
           }
         />
       </FormGroup>
+      {['matrix', 'multi-matrix', 'slider'].includes(section.type) && (
+        <Alert severity="info">{tr.SurveySections.accessibilityNotice}</Alert>
+      )}
       {section.showInfo && (
         <RichTextEditor
           value={section.info?.[surveyLanguage] ?? ''}

@@ -6,7 +6,7 @@ import {
   Select,
   Theme,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
+
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useEffect, useState } from 'react';
@@ -17,7 +17,7 @@ interface Props {
   onChange: (theme: SurveyTheme) => void;
 }
 
-const useStyles = makeStyles({
+const styles = {
   select: {
     minWidth: '10rem',
     width: 'fit-content',
@@ -25,13 +25,12 @@ const useStyles = makeStyles({
     flexDirection: 'row',
     alignItems: 'center',
   },
-});
+};
 
 export default function ThemeSelect({ value, onChange }: Props) {
   const [loading, setLoading] = useState(true);
   const [themes, setThemes] = useState<SurveyTheme[]>([]);
 
-  const classes = useStyles();
   const { showToast } = useToasts();
   const { tr } = useTranslations();
 
@@ -39,7 +38,7 @@ export default function ThemeSelect({ value, onChange }: Props) {
     async function fetchThemes() {
       try {
         const themes = await fetch('/api/themes').then(
-          (response) => response.json() as Promise<SurveyTheme[]>
+          (response) => response.json() as Promise<SurveyTheme[]>,
         );
         setThemes(themes);
       } catch (error) {
@@ -60,15 +59,12 @@ export default function ThemeSelect({ value, onChange }: Props) {
         labelId="theme-select-label"
         id="theme"
         label={tr.EditSurveyInfo.theme}
-        className={classes.select}
-        classes={{
-          select: classes.select,
-        }}
+        sx={{ '& .MuiSelect-select': styles.select }}
         disabled={loading}
         value={loading || value == null ? '' : value}
         onChange={(event) => {
           onChange(
-            themes.find((theme) => theme.id === event.target.value) ?? null
+            themes.find((theme) => theme.id === event.target.value) ?? null,
           );
         }}
       >
