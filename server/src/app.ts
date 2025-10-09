@@ -40,7 +40,7 @@ async function start() {
                 ? "'sha256-Z2/iFzh9VMlVkEOar1f/oSHWwQk3ve1qk/C2WdsC4Xk='" // Hash for server built vite, only needed on local
                 : '',
             ],
-            'frame-src': 'https://kartat.tampere.fi',
+            'frame-src': process.env.ALLOWED_IFRAME_DOMAINS,
           },
         },
       })(req, res, next);
