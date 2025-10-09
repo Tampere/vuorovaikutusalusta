@@ -59,7 +59,7 @@ export default function ImageSection({ section, isFollowUp = false }: Props) {
         <img
           style={{ maxWidth: '100%' }}
           src={`/api/file/${fullFilePath}`}
-          alt={section.altText[language]}
+          alt={section.altText?.[language]}
         />
         <Typography
           sx={(theme) => styles(theme).imageCopyright}

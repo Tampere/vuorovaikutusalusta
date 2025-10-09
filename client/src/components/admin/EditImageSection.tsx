@@ -45,7 +45,7 @@ export default function EditImageSection({ section, onChange }: Props) {
         }}
       />
       <TextField
-        value={section.altText[surveyLanguage]}
+        value={section.altText?.[surveyLanguage]}
         label={tr.EditImageSection.altText}
         onChange={(event) =>
           onChange({
@@ -58,7 +58,7 @@ export default function EditImageSection({ section, onChange }: Props) {
         }
       />
       <TextField
-        value={section.attributions[surveyLanguage]}
+        value={section.attributions?.[surveyLanguage]}
         label={tr.EditSurveyPage.imageAttributions}
         onChange={(event) =>
           onChange({
