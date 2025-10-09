@@ -464,7 +464,7 @@ export default function EditSurveySectionTranslations({
               tr.EditSurveyTranslations.altText,
             )}
             variant="standard"
-            value={section.altText[languageCode] ?? ''}
+            value={section.altText?.[languageCode] ?? ''}
             onChange={(event) => {
               onEdit({
                 ...section,
@@ -480,7 +480,7 @@ export default function EditSurveySectionTranslations({
               tr.EditSurveyTranslations.attributions,
             )}
             variant="standard"
-            value={section.attributions[languageCode] ?? ''}
+            value={section.attributions?.[languageCode] ?? ''}
             onChange={(event) => {
               onEdit({
                 ...section,
