@@ -29,7 +29,7 @@ const styles = (theme: Theme) => ({
   imageCopyright: {
     position: 'absolute',
     right: 0,
-    bottom: 0,
+    bottom: '.5em',
     backgroundColor: theme.palette.primary.main,
     color: theme.palette.primary.contrastText,
     padding: '0.6rem',
@@ -136,7 +136,12 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
           </ReactMarkdown>
         </div>
         {survey.thanksPage.imageName && (
-          <div className="spacer" style={{ minHeight: '40vh', width: '100%' }}>
+          <Box
+            position={'relative'}
+            className="spacer"
+            style={{ minHeight: '40vh', width: '100%' }}
+            display={'inline-block'}
+          >
             <img
               style={{
                 maxHeight: !mobileLandscape ? '40vh' : '100vh',
@@ -150,11 +155,13 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
                 <Typography
                   sx={(theme) => styles(theme).imageCopyright}
                   variant="body2"
+                  maxWidth={'100%'}
+                  display={'inline-block'}
                 >
                   {thanksPageImageQuery.imageHeaders?.attributions}
                 </Typography>
               )}
-          </div>
+          </Box>
         )}
       </Box>
       <Box
