@@ -689,12 +689,14 @@ export default function SurveyStepper({
                   alt={currentPage.sidebar?.imageAltText?.[surveyLanguage]}
                   src={`/api/file/${fullSidebarImagePath}`}
                 />
-                <Typography
-                  sx={(theme) => styles(theme).imageCopyright}
-                  variant="body2"
-                >
-                  {currentPage.sidebar?.imageAttributions?.[surveyLanguage]}
-                </Typography>
+                {currentPage.sidebar?.imageAttributions?.[surveyLanguage] && (
+                  <Typography
+                    sx={(theme) => styles(theme).imageCopyright}
+                    variant="body2"
+                  >
+                    {currentPage.sidebar?.imageAttributions?.[surveyLanguage]}
+                  </Typography>
+                )}
               </>
             )}
           </div>
