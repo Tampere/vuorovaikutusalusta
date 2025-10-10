@@ -29,7 +29,7 @@ const styles = (theme: Theme) => ({
   imageCopyright: {
     position: 'absolute',
     right: 0,
-    bottom: '.4rem',
+    bottom: '.5em',
     backgroundColor: theme.palette.primary.main,
     color: theme.palette.primary.contrastText,
     padding: '0.6rem',
@@ -140,6 +140,7 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
             position={'relative'}
             className="spacer"
             style={{ minHeight: '40vh', width: '100%' }}
+            display={'inline-block'}
           >
             <img
               style={{
@@ -154,6 +155,8 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
                 <Typography
                   sx={(theme) => styles(theme).imageCopyright}
                   variant="body2"
+                  maxWidth={'100%'}
+                  display={'inline-block'}
                 >
                   {thanksPageImageQuery.imageHeaders?.attributions}
                 </Typography>
