@@ -139,7 +139,7 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
           <Box
             position={'relative'}
             className="spacer"
-            style={{ minHeight: '40vh', width: '100%' }}
+            style={{ width: '100%' }}
             display={'inline-block'}
           >
             <img
