@@ -66,7 +66,7 @@ export default function SurveyImageList({ imageType }: Props) {
   const [imageAltText, setImageAltText] = useState<string | null>(null);
   const [activeImage, setActiveImage] = useState<SurveyImage | null>(null);
   const [loadingImages, setLoadingImages] = useState(false);
-  const [preview, setPreview] = useState<string | null>(null);
+  const [preview, setPreview] = useState<string | ArrayBuffer | null>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [uploadedImage, setUploadedImage] = useState<FileWithPath | null>(null);
   const [displayAttributions, setDisplayAttributions] = useState(
@@ -170,7 +170,11 @@ export default function SurveyImageList({ imageType }: Props) {
       maxFiles: 1,
       validator: fileSizeValidator,
       onDrop: (acceptedFiles) => {
-        setPreview(URL.createObjectURL(acceptedFiles[0]));
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          setPreview(event.target.result);
+        };
+        reader.readAsDataURL(acceptedFiles[0]);
         setUploadedImage(acceptedFiles[0]);
         handleSelectedImageChange('NEW');
       },
@@ -501,7 +505,7 @@ export default function SurveyImageList({ imageType }: Props) {
                     key={uploadedImage.name}
                     onClick={() => handleSelectedImageChange('NEW')}
                   >
-                    <img src={preview} style={{ height: '100%' }}></img>
+                    <img src={`${preview}`} style={{ height: '100%' }}></img>
                   </ImageListItem>
                 )}
                 {images.map((image) => (
