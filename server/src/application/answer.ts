@@ -363,9 +363,10 @@ async function answerEntriesToCSV(
 ): Promise<string> {
   const { submissions, headers = [] } = entries ?? { submissions: [] };
 
-  const personalInfoHeaders = getPersonalInfoHeadersForCSV(
-    personalInfoRows[0] ?? null,
-  );
+  const personalInfoHeaders =
+    personalInfoRows && personalInfoRows.length > 0
+      ? getPersonalInfoHeadersForCSV(personalInfoRows[0])
+      : [];
 
   const basicHeaders = ['Vastaustunniste', 'Aikaleima', 'Vastauskieli'];
   const allHeaders = [
@@ -383,22 +384,24 @@ async function answerEntriesToCSV(
     ).format('DD-MM-YYYY HH:mm')},${submissions[i].submissionLanguage}`;
     csvData += ',';
 
-    const piRow = personalInfoRows.find(
-      (e) => e.submissionId == Object.keys(submissions[i])[0],
-    );
+    if (personalInfoRows && personalInfoRows.length > 0) {
+      const piRow = personalInfoRows.find(
+        (e) => e.submissionId == Object.keys(submissions[i])[0],
+      );
 
-    csvData += [
-      piRow.details.askName ? piRow.name : null,
-      piRow.details.askEmail ? piRow.email : null,
-      piRow.details.askPhone ? piRow.phone : null,
-      piRow.details.askAddress ? piRow.address : null,
-      ...piRow.custom,
-    ]
-      .filter((e) => e !== null)
-      .map((e) => `"${e}"`)
-      .toString();
+      csvData += [
+        piRow.details.askName ? piRow.name : null,
+        piRow.details.askEmail ? piRow.email : null,
+        piRow.details.askPhone ? piRow.phone : null,
+        piRow.details.askAddress ? piRow.address : null,
+        ...piRow.custom,
+      ]
+        .filter((e) => e !== null)
+        .map((e) => `"${e}"`)
+        .toString();
 
-    csvData += ',';
+      csvData += ',';
+    }
 
     headers.forEach((headerObj, _index) => {
       for (const [headerKey, _headerValue] of Object.entries(headerObj)) {
@@ -420,29 +423,32 @@ async function answerEntriesToCSV(
   }
 
   // Add submissions that only contain personal info
-  csvData += personalInfoRows
-    .filter(
-      (pi) => !submissions.some((s) => Object.keys(s)[0] == pi.submissionId),
-    )
-    .map((piSub) => {
-      let rowString = `${piSub.submissionId},${moment(piSub.timeStamp).format(
-        'DD-MM-YYYY HH:mm',
-      )},${piSub.language},`;
 
-      rowString += [
-        piSub.details.askName ? piSub.name : null,
-        piSub.details.askEmail ? piSub.email : null,
-        piSub.details.askPhone ? piSub.phone : null,
-        piSub.details.askAddress ? piSub.address : null,
-        ...piSub.custom,
-      ]
-        .filter((e) => e !== null)
-        .map((e) => `"${e}"`)
-        .toString();
+  if (personalInfoRows) {
+    csvData += personalInfoRows
+      .filter(
+        (pi) => !submissions.some((s) => Object.keys(s)[0] == pi.submissionId),
+      )
+      .map((piSub) => {
+        let rowString = `${piSub.submissionId},${moment(piSub.timeStamp).format(
+          'DD-MM-YYYY HH:mm',
+        )},${piSub.language},`;
 
-      return rowString;
-    })
-    .join('\n');
+        rowString += [
+          piSub.details.askName ? piSub.name : null,
+          piSub.details.askEmail ? piSub.email : null,
+          piSub.details.askPhone ? piSub.phone : null,
+          piSub.details.askAddress ? piSub.address : null,
+          ...piSub.custom,
+        ]
+          .filter((e) => e !== null)
+          .map((e) => `"${e}"`)
+          .toString();
+
+        return rowString;
+      })
+      .join('\n');
+  }
 
   csvData =
     csvData.substring(csvData.length - 1) === ','
