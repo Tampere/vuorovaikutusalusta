@@ -8,8 +8,11 @@ import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { ReactNode, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import BudgetingIcon from '../icons/BudgetingIcon';
 import CheckboxCheckedIcon from '../icons/CheckboxCheckedIcon';
 import ClipboardSmallIcon from '../icons/ClipboardSmallIcon';
+import DownloadFileIcon from '../icons/DownloadFileIcon';
+import { ImageCheckIcon } from '../icons/ImageCheckIcon';
 import ImageSmallIcon from '../icons/ImageSmallIcon';
 import LikertGroupIcon from '../icons/LikertGroupIcon';
 import MapIcon from '../icons/MapIcon';
@@ -18,13 +21,11 @@ import MultiCheckmarkIcon from '../icons/MultiCheckmarkIcon';
 import NumericFieldIcon from '../icons/NumericFieldIcon';
 import OrderedIcon from '../icons/OrderedIcon';
 import PaperclipIcon from '../icons/PaperclipIcon';
+import PersonIcon from '../icons/PersonIcon';
 import RadioButtonCheckedIcon from '../icons/RadioButtonCheckedIcon';
 import SliderIcon from '../icons/SliderIcon';
 import TextFieldIcon from '../icons/TextFieldIcon';
-import DownloadFileIcon from '../icons/DownloadFileIcon';
 import TextSectionIcon from '../icons/TextSectionIcon';
-import { ImageCheckIcon } from '../icons/ImageCheckIcon';
-import PersonIcon from '../icons/PersonIcon';
 
 const useStyles = makeStyles({
   actionItem: {
@@ -216,6 +217,19 @@ export default function AddSurveySectionActions(props: Props) {
       title: initializeLocalizedObject(''),
       fileUrl: null,
     },
+    budgeting: {
+      type: 'budgeting',
+      isRequired: false,
+      title: initializeLocalizedObject(''),
+      budgetingMode: 'direct',
+      totalBudget: 0,
+      unit: '€',
+      targets: [],
+      allocationDirection: 'increasing',
+      requireFullAllocation: false,
+      allowPercentageInput: false,
+      helperText: initializeLocalizedObject(''),
+    },
   };
 
   function handleAdd(type: SurveyPageSection['type']) {
@@ -312,6 +326,12 @@ export default function AddSurveySectionActions(props: Props) {
       label: tr.AddSurveySectionActions.attachmentSection,
       ariaLabel: 'add-attachment-section',
       icon: <PaperclipIcon />,
+    },
+    {
+      type: 'budgeting',
+      label: tr.AddSurveySectionActions.budgetingQuestion,
+      ariaLabel: 'add-budgeting-section',
+      icon: <BudgetingIcon />,
     },
   ];
 

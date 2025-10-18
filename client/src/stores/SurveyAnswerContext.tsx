@@ -9,6 +9,7 @@ import {
   SurveyQuestion,
 } from '@interfaces/survey';
 import { request } from '@src/utils/request';
+import { isFollowUpSectionParentType, isString } from '@src/utils/typeCheck';
 import React, {
   ReactNode,
   createContext,
@@ -16,9 +17,8 @@ import React, {
   useMemo,
   useReducer,
 } from 'react';
-import { useTranslations } from './TranslationContext';
-import { isFollowUpSectionParentType, isString } from '@src/utils/typeCheck';
 import { getLocalizedMapUrls } from './SurveyContext';
+import { useTranslations } from './TranslationContext';
 
 interface State {
   answers: AnswerEntry[];
@@ -160,6 +160,12 @@ export function getEmptyAnswer(section: SurveyPageSection): AnswerEntry {
         type: section.type,
         value: [],
       };
+    case 'budgeting':
+      return {
+        sectionId: section.id,
+        type: section.type,
+        value: section.targets.map(() => 0),
+      };
     default:
       throw new Error(
         `No default value defined for questions of type "${section.type}"`,
@@ -202,6 +208,10 @@ export function isAnswerEmpty(
     if (!name && !email && !phone && !address && !custom) {
       return true;
     }
+  }
+  // Budgeting question is considered unanswered if all values are 0
+  if (question.type === 'budgeting') {
+    return (value as number[]).every((v) => v === 0);
   }
   // If value is an array, check the array length - otherwise check for its emptiness
   else if (
@@ -298,6 +308,18 @@ export function useSurveyAnswers() {
       }
     }
 
+    // Budgeting question validation - check if full budget is allocated when required
+    // In "pieces" mode, requireFullAllocation is ignored
+    if (question.type === 'budgeting' && question.budgetingMode !== 'pieces') {
+      const budgetSum = (answer.value as number[]).reduce((a, b) => a + b, 0);
+      if (
+        question.requireFullAllocation &&
+        budgetSum !== question.totalBudget
+      ) {
+        errors.push('answerLimits');
+      }
+    }
+
     if (question.isRequired) {
       // Matrix is considered incomplete, if the answer array doesn't contain as many answers (exluding nulls) as there are rows in the matrix
       if (question.type === 'matrix') {
@@ -382,14 +404,14 @@ export function useSurveyAnswers() {
           )
             ? true
             : conditionForSection.greaterThan.some(
-                (conditionValue) => answerEntry.value >= conditionValue,
-              )
-            ? true
-            : conditionForSection.lessThan.some(
-                (conditionValue) => answerEntry.value <= conditionValue,
-              )
-            ? true
-            : false;
+                  (conditionValue) => answerEntry.value >= conditionValue,
+                )
+              ? true
+              : conditionForSection.lessThan.some(
+                    (conditionValue) => answerEntry.value <= conditionValue,
+                  )
+                ? true
+                : false;
 
         default:
           return false;
@@ -452,14 +474,14 @@ export function useSurveyAnswers() {
             )
               ? true
               : section.conditions.greaterThan.some(
-                  (conditionValue) => value >= conditionValue,
-                )
-              ? true
-              : section.conditions.lessThan.some(
-                  (conditionValue) => value <= conditionValue,
-                )
-              ? true
-              : false;
+                    (conditionValue) => value >= conditionValue,
+                  )
+                ? true
+                : section.conditions.lessThan.some(
+                      (conditionValue) => value <= conditionValue,
+                    )
+                  ? true
+                  : false;
           })
           .map((s) => s.id);
       default:

@@ -21,5 +21,11 @@
     "email": "Email address",
     "phone": "Phone number",
     "address": "Address"
+  },
+  "BudgetingQuestion": {
+    "targetName": "Target",
+    "amount": "Amount",
+    "total": "Total",
+    "perPiece": "pc"
   }
 }

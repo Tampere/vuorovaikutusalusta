@@ -1,5 +1,6 @@
 import {
   Conditions,
+  SurveyBudgetingQuestion,
   SurveyCheckboxQuestion,
   SurveyDocumentSection,
   SurveyFollowUpSection,
@@ -18,23 +19,7 @@ import {
   SurveySortingQuestion,
   SurveyTextSection,
 } from '@interfaces/survey';
-import CheckboxCheckedIcon from '@src/components/icons/CheckboxCheckedIcon';
-import RadioButtonCheckedIcon from '@src/components/icons/RadioButtonCheckedIcon';
-import NumericFieldIcon from '@src/components/icons/NumericFieldIcon';
-import MapIcon from '@src/components/icons/MapIcon';
-import TextFieldIcon from '@src/components/icons/TextFieldIcon';
-import OrderedIcon from '@src/components/icons/OrderedIcon';
-import MatrixIcon from '@src/components/icons/MatrixIcon';
-import LikertGroupIcon from '@src/components/icons/LikertGroupIcon';
-import MultiCheckmarkIcon from '@src/components/icons/MultiCheckmarkIcon';
-import ImageSmallIcon from '@src/components/icons/ImageSmallIcon';
-import DownloadFileIcon from '@src/components/icons/DownloadFileIcon';
-import PaperclipIcon from '@src/components/icons/PaperclipIcon';
-import SliderIcon from '@src/components/icons/SliderIcon';
-import TextSectionIcon from '@src/components/icons/TextSectionIcon';
-import DraggableIcon from '@src/components/icons/DraggableIcon';
-import DocumentCopyIcon from '@src/components/icons/DocumentCopyIcon';
-import ChevronDownIcon from '@src/components/icons/ChevronDownIcon';
+import { Person } from '@mui/icons-material';
 import {
   Accordion,
   AccordionSummary,
@@ -43,6 +28,26 @@ import {
   Typography,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import EditBudgetingQuestion from '@src/components/admin/EditBudgetingQuestion';
+import CheckboxCheckedIcon from '@src/components/icons/CheckboxCheckedIcon';
+import ChevronDownIcon from '@src/components/icons/ChevronDownIcon';
+import DocumentCopyIcon from '@src/components/icons/DocumentCopyIcon';
+import DownloadFileIcon from '@src/components/icons/DownloadFileIcon';
+import DraggableIcon from '@src/components/icons/DraggableIcon';
+import { ImageCheckIcon } from '@src/components/icons/ImageCheckIcon';
+import ImageSmallIcon from '@src/components/icons/ImageSmallIcon';
+import LikertGroupIcon from '@src/components/icons/LikertGroupIcon';
+import MapIcon from '@src/components/icons/MapIcon';
+import MatrixIcon from '@src/components/icons/MatrixIcon';
+import MultiCheckmarkIcon from '@src/components/icons/MultiCheckmarkIcon';
+import NumericFieldIcon from '@src/components/icons/NumericFieldIcon';
+import OrderedIcon from '@src/components/icons/OrderedIcon';
+import PaperclipIcon from '@src/components/icons/PaperclipIcon';
+import RadioButtonCheckedIcon from '@src/components/icons/RadioButtonCheckedIcon';
+import SliderIcon from '@src/components/icons/SliderIcon';
+import TextFieldIcon from '@src/components/icons/TextFieldIcon';
+import TextSectionIcon from '@src/components/icons/TextSectionIcon';
+import BudgetingIcon from '@src/components/icons/BudgetingIcon';
 import { useClipboard } from '@src/stores/ClipboardContext';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
@@ -63,15 +68,13 @@ import EditMapQuestion from '../EditMapQuestion';
 import EditMatrixQuestion from '../EditMatrixQuestion';
 import { EditMultiMatrixQuestion } from '../EditMultiMatrixQuestion';
 import EditNumericQuestion from '../EditNumericQuestion';
+import { EditPersonalInfoQuestion } from '../EditPersonalInfoQuestion';
+import EditRadioImageQuestion from '../EditRadioImageQuestion';
 import EditRadioQuestion from '../EditRadioQuestion';
 import EditSliderQuestion from '../EditSliderQuestion';
 import EditSortingQuestion from '../EditSortingQuestion';
 import EditTextSection from '../EditTextSection';
 import { SectionDetails } from './SectionDetails';
-import { Person } from '@mui/icons-material';
-import { EditPersonalInfoQuestion } from '../EditPersonalInfoQuestion';
-import EditRadioImageQuestion from '../EditRadioImageQuestion';
-import { ImageCheckIcon } from '@src/components/icons/ImageCheckIcon';
 
 const useStyles = makeStyles({
   accordion: {
@@ -308,6 +311,16 @@ export default function SurveySectionAccordion(props: Props) {
       icon: <PaperclipIcon />,
       tooltip: tr.SurveySection.attachmentSection,
       form: <EditAttachmentSection />,
+    },
+    budgeting: {
+      icon: <BudgetingIcon />,
+      tooltip: tr.SurveySection.budgetingQuestion,
+      form: (
+        <EditBudgetingQuestion
+          section={props.section as SurveyBudgetingQuestion}
+          onChange={handleEdit}
+        />
+      ),
     },
   };
 

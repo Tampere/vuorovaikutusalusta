@@ -12,6 +12,7 @@ import MultiCheckmarkIcon from '@src/components/icons/MultiCheckmarkIcon';
 import PaperclipIcon from '@src/components/icons/PaperclipIcon';
 import TextSectionIcon from '@src/components/icons/TextSectionIcon';
 import ChevronRightIcon from '@src/components/icons/ChevronRightIcon';
+import BudgetingIcon from '@src/components/icons/BudgetingIcon';
 
 import { SurveyQuestion } from '@interfaces/survey';
 import { useTranslations } from '@src/stores/TranslationContext';
@@ -55,6 +56,8 @@ function getQuestionIcon(
       return <TextSectionIcon color="primary" />;
     case 'personal-info':
       return <Person color="primary" />;
+    case 'budgeting':
+      return <BudgetingIcon color="primary" />;
     default:
       assertNever(questionType);
   }

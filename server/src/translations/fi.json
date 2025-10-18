@@ -21,5 +21,11 @@
     "email": "Sähköpostiosoite",
     "phone": "Puhelinnumero",
     "address": "Osoite"
+  },
+  "BudgetingQuestion": {
+    "targetName": "Kohde",
+    "amount": "Määrä",
+    "total": "Yhteensä",
+    "perPiece": "kpl"
   }
 }

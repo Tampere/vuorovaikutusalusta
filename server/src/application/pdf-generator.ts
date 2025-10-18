@@ -5,6 +5,7 @@ import {
   SectionImageOption,
   SectionOption,
   Survey,
+  SurveyBudgetingQuestion,
   SurveyFollowUpSection,
   SurveyMapQuestion,
   SurveyMatrixQuestion,
@@ -525,6 +526,88 @@ function getContent(
             ],
           };
         }),
+      ];
+    }
+    case 'budgeting': {
+      const question = section as SurveyBudgetingQuestion;
+
+      // Calculate total used budget
+      const totalUsedBudget = question.targets.reduce((sum, target, index) => {
+        const value = answerEntry.value[index] || 0;
+        if (question.budgetingMode === 'pieces') {
+          return sum + value * (target.price || 0);
+        }
+        return sum + value;
+      }, 0);
+
+      // For 'pieces' mode: show 3 columns (Target, Amount in pieces, Total in money)
+      // For 'direct' mode: show 2 columns (Target, Amount in money)
+      const isPiecesMode = question.budgetingMode === 'pieces';
+
+      return [
+        heading,
+        {
+          table: {
+            headerRows: 1,
+            widths: isPiecesMode ? ['*', 'auto', 'auto'] : ['*', 'auto'],
+            body: [
+              // Header row
+              isPiecesMode
+                ? [
+                    { text: tr.BudgetingQuestion.targetName, bold: true },
+                    { text: tr.BudgetingQuestion.amount, bold: true },
+                    { text: tr.BudgetingQuestion.total, bold: true },
+                  ]
+                : [
+                    { text: tr.BudgetingQuestion.targetName, bold: true },
+                    { text: tr.BudgetingQuestion.amount, bold: true },
+                  ],
+              // Data rows
+              ...question.targets.map((target, index) => {
+                const value = answerEntry.value[index] || 0;
+                const monetary = isPiecesMode
+                  ? value * (target.price || 0)
+                  : value;
+
+                if (isPiecesMode) {
+                  return [
+                    target.name[language],
+                    `${value} ${tr.BudgetingQuestion.perPiece}`,
+                    `${monetary} ${question.unit || ''}`,
+                  ];
+                } else {
+                  return [
+                    target.name[language],
+                    `${value} ${question.unit || ''}`,
+                  ];
+                }
+              }),
+              // Total row
+              isPiecesMode
+                ? [
+                    {
+                      text: tr.BudgetingQuestion.total,
+                      bold: true,
+                      colSpan: 2,
+                    },
+                    {},
+                    {
+                      text: `${totalUsedBudget} / ${question.totalBudget} ${question.unit || ''}`,
+                      bold: true,
+                    },
+                  ]
+                : [
+                    { text: tr.BudgetingQuestion.total, bold: true },
+                    {
+                      text: `${totalUsedBudget} / ${question.totalBudget} ${question.unit || ''}`,
+                      bold: true,
+                    },
+                  ],
+            ],
+          },
+          style,
+          margin: [0, 0, 0, 10],
+        },
       ];
     }
     // Unlisted types are ignored in the PDF
