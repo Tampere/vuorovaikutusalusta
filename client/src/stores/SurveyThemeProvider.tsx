@@ -2,7 +2,13 @@ import { Survey } from '@interfaces/survey';
 import { createTheme, Theme } from '@mui/material';
 import { fiFI } from '@mui/material/locale';
 import { ThemeProvider } from '@mui/material/styles';
-import { buttonOverrides, defaultSurveyTheme, inputOverrides, stepperOverrides } from '@src/themes/survey';
+import {
+  buttonOverrides,
+  defaultSurveyTheme,
+  inputOverrides,
+  stepperOverrides,
+  textOverrides,
+} from '@src/themes/survey';
 import React, { ReactNode, useContext, useMemo, useReducer } from 'react';
 
 /**
@@ -44,7 +50,7 @@ export function useSurveyTheme() {
   const context = useContext(SurveyThemeContext);
   if (!context) {
     throw new Error(
-      'useSurveyTheme must be used within the SurveyThemeProvider'
+      'useSurveyTheme must be used within the SurveyThemeProvider',
     );
   }
   const [state, dispatch] = context;
@@ -61,10 +67,13 @@ export function useSurveyTheme() {
             {
               ...survey.theme?.data,
               components: {
-                ...buttonOverrides, ...inputOverrides, ...stepperOverrides,
+                ...buttonOverrides,
+                ...inputOverrides,
+                ...stepperOverrides,
+                ...textOverrides,
               },
             },
-            fiFI
+            fiFI,
           )
         : defaultSurveyTheme;
       dispatch({ type: 'SET_THEME', value: theme });
