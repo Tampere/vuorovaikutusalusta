@@ -325,7 +325,7 @@
     "budgetTargetName": "Nimi",
     "budgetTargetCost": "Kustannus",
     "requireFullAllocation": "Koko budjetti käytettävä",
-    "allowPercentageInput": "Salli prosentuaalinen syöttö",
+    "inputMode": "Syöttötapa",
     "allocationDirection": "Budjetin käytön suunta",
     "allocationDirectionIncreasing": "Budjettia täytetään (nollasta ylöspäin)",
     "absoluteMode": "Absoluuttiset arvot",

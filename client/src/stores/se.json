@@ -326,7 +326,7 @@
     "budgetTargetName": "Namn",
     "budgetTargetCost": "Kostnad",
     "requireFullAllocation": "Hela budgeten måste användas",
-    "allowPercentageInput": "Tillåt procentinmatning",
+    "inputMode": "Inmatningsläge",
     "allocationDirection": "Riktning för budgetfördelning",
     "allocationDirectionIncreasing": "Budgeten fylls (från noll och uppåt)",
     "allocationDirectionDecreasing": "Budgeten förbrukas (från full till noll)",

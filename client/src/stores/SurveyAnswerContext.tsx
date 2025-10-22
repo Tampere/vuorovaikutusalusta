@@ -311,11 +311,12 @@ export function useSurveyAnswers() {
     // Budgeting question validation - check if full budget is allocated when required
     // In "pieces" mode, requireFullAllocation is ignored
     if (question.type === 'budgeting' && question.budgetingMode !== 'pieces') {
-      const budgetSum = (answer.value as number[]).reduce((a, b) => a + b, 0);
-      if (
-        question.requireFullAllocation &&
-        budgetSum !== question.totalBudget
-      ) {
+      const inputMode = question.inputMode ?? 'absolute';
+      const sum = (answer.value as number[]).reduce((a, b) => a + b, 0);
+      const expectedTotal =
+        inputMode === 'percentage' ? 100 : question.totalBudget;
+
+      if (question.requireFullAllocation && sum !== expectedTotal) {
         errors.push('answerLimits');
       }
     }

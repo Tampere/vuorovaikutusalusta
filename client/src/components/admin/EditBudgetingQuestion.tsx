@@ -92,23 +92,32 @@ export default function EditBudgetingQuestion({ section, onChange }: Props) {
           />
         }
       />
-      <FormControlLabel
-        disabled={section.budgetingMode === 'pieces'}
-        label={tr.BudgetingQuestion.allowPercentageInput}
-        control={
-          <Checkbox
-            checked={
-              section.budgetingMode === 'direct' && section.allowPercentageInput
-            }
-            onChange={(event) =>
-              onChange({
-                ...section,
-                allowPercentageInput: event.target.checked,
-              })
-            }
+      <Box>
+        <Box sx={{ mb: 1 }}>{tr.BudgetingQuestion.inputMode}</Box>
+        <RadioGroup
+          row
+          value={section.inputMode ?? 'absolute'}
+          onChange={(event) =>
+            onChange({
+              ...section,
+              inputMode: event.target.value as 'absolute' | 'percentage',
+            })
+          }
+        >
+          <FormControlLabel
+            disabled={section.budgetingMode === 'pieces'}
+            value="absolute"
+            label={tr.BudgetingQuestion.absoluteMode}
+            control={<Radio />}
           />
-        }
-      />
+          <FormControlLabel
+            disabled={section.budgetingMode === 'pieces'}
+            value="percentage"
+            label={tr.BudgetingQuestion.percentageMode}
+            control={<Radio />}
+          />
+        </RadioGroup>
+      </Box>
       <RadioGroup
         value={section.allocationDirection}
         onChange={(event) =>

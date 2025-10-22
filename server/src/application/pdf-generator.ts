@@ -530,14 +530,26 @@ function getContent(
     }
     case 'budgeting': {
       const question = section as SurveyBudgetingQuestion;
+      const inputMode = question.inputMode ?? 'absolute';
 
-      // Calculate total used budget
-      const totalUsedBudget = question.targets.reduce((sum, target, index) => {
-        const value = answerEntry.value[index] || 0;
+      // Helper function to convert stored values to monetary amounts for display
+      const getMonetaryValue = (storedValue: number, index: number): number => {
         if (question.budgetingMode === 'pieces') {
-          return sum + value * (target.price || 0);
+          // Pieces mode: multiply piece count by price
+          return storedValue * (question.targets[index]?.price || 0);
         }
-        return sum + value;
+        if (inputMode === 'percentage') {
+          // Percentage mode: convert percentage to monetary value
+          return Math.round((storedValue / 100) * question.totalBudget);
+        }
+        // Absolute mode: value is already monetary
+        return storedValue;
+      };
+
+      // Calculate total used budget in monetary terms
+      const totalUsedBudget = question.targets.reduce((sum, _target, index) => {
+        const storedValue = answerEntry.value[index] || 0;
+        return sum + getMonetaryValue(storedValue, index);
       }, 0);
 
       // For 'pieces' mode: show 3 columns (Target, Amount in pieces, Total in money)
@@ -564,21 +576,19 @@ function getContent(
                   ],
               // Data rows
               ...question.targets.map((target, index) => {
-                const value = answerEntry.value[index] || 0;
-                const monetary = isPiecesMode
-                  ? value * (target.price || 0)
-                  : value;
+                const storedValue = answerEntry.value[index] || 0;
+                const monetary = getMonetaryValue(storedValue, index);
 
                 if (isPiecesMode) {
                   return [
                     target.name[language],
-                    `${value} ${tr.BudgetingQuestion.perPiece}`,
+                    `${storedValue} ${tr.BudgetingQuestion.perPiece}`,
                     `${monetary} ${question.unit || ''}`,
                   ];
                 } else {
                   return [
                     target.name[language],
-                    `${value} ${question.unit || ''}`,
+                    `${monetary} ${question.unit || ''}`,
                   ];
                 }
               }),

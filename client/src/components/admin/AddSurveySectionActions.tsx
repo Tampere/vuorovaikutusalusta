@@ -227,7 +227,7 @@ export default function AddSurveySectionActions(props: Props) {
       targets: [],
       allocationDirection: 'increasing',
       requireFullAllocation: false,
-      allowPercentageInput: false,
+      inputMode: 'absolute',
       helperText: initializeLocalizedObject(''),
     },
   };

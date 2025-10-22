@@ -13,8 +13,6 @@ import {
   TableHead,
   TableRow,
   TextField,
-  ToggleButton,
-  ToggleButtonGroup,
   Typography,
   useTheme,
 } from '@mui/material';
@@ -23,7 +21,7 @@ import { MarkdownView } from '@src/components/MarkdownView';
 import { NumericStepperInput } from '@src/components/NumericStepperInput';
 import { SliderWithLimit } from '@src/components/SliderWithLimit';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 
 interface Props {
   question: SurveyBudgetingQuestion;
@@ -34,28 +32,8 @@ interface Props {
   validationErrors?: string[];
 }
 
-type InputMode = 'absolute' | 'percentage';
-
 function updateValue(value: number[], index: number, targetValue: number) {
   return value.map((v, i) => (i === index ? (targetValue as number) : v));
-}
-
-function convertToPercentage(
-  absoluteValue: number,
-  totalBudget: number,
-): number {
-  return Math.round((absoluteValue / totalBudget) * 100);
-}
-
-/**
- * Convert a percentage value to an absolute monetary value
- * Uses rounding to ensure integer results
- */
-function convertFromPercentage(
-  percentage: number,
-  totalBudget: number,
-): number {
-  return Math.round((percentage / 100) * totalBudget);
 }
 
 export default function BudgetingQuestion({
@@ -68,11 +46,14 @@ export default function BudgetingQuestion({
 }: Props) {
   const { tr, language } = useTranslations();
   const theme = useTheme();
-  const [inputMode, setInputMode] = useState<InputMode>('absolute');
+
+  // Use the author-configured input mode, defaulting to absolute
+  const inputMode = question.inputMode ?? 'absolute';
 
   // Calculate total used budget in monetary terms
-  // In "direct" mode: values are already monetary amounts
   // In "pieces" mode: values are piece counts, multiply by target prices
+  // In "percentage" mode: convert percentage sum to monetary value
+  // In "absolute" mode: values are already monetary amounts
   const totalUsedBudget = useMemo(() => {
     if (question.budgetingMode === 'pieces') {
       return value.reduce((sum, pieces, index) => {
@@ -80,37 +61,26 @@ export default function BudgetingQuestion({
         return sum + pieces * price;
       }, 0);
     }
-    return value.reduce((sum, item) => item + sum, 0);
-  }, [value, question.budgetingMode, question.targets]);
 
-  const handleModeChange = (
-    _event: React.MouseEvent<HTMLElement>,
-    newMode: InputMode | null,
-  ) => {
-    if (newMode === null || newMode === inputMode) return;
-
-    // When switching TO percentage mode, floor all percentages to integers
-    // and update the absolute values in context to match
-    if (newMode === 'percentage') {
-      const percentages = value.map((val) =>
-        Math.floor((val / question.totalBudget) * 100),
-      );
-      const flooredAbsoluteValues = percentages.map((pct) =>
-        Math.round((pct / 100) * question.totalBudget),
-      );
-      onChange(flooredAbsoluteValues);
-    }
-
-    setInputMode(newMode);
-  };
-
-  // Display values - convert from absolute to percentage if needed
-  const displayValues = useMemo(() => {
     if (inputMode === 'percentage') {
-      return value.map((val) => convertToPercentage(val, question.totalBudget));
+      // Percentage mode: convert percentage sum to monetary value
+      // Use floating-point math for accurate display
+      const percentageSum = value.reduce((sum, pct) => sum + pct, 0);
+      return (percentageSum / 100) * question.totalBudget;
     }
-    return value;
-  }, [value, inputMode, question.totalBudget]);
+
+    // Absolute mode: values are already monetary
+    return value.reduce((sum, item) => item + sum, 0);
+  }, [
+    value,
+    question.budgetingMode,
+    question.targets,
+    question.totalBudget,
+    inputMode,
+  ]);
+
+  // Display values are stored directly as entered (no conversion needed)
+  const displayValues = value;
 
   function getMaxValue() {
     return inputMode === 'percentage' ? 100 : question.totalBudget;
@@ -128,6 +98,30 @@ export default function BudgetingQuestion({
 
   const remainingBudget = question.totalBudget - totalUsedBudget;
 
+  // Round the budget values for display (no decimals)
+  const displayUsedBudget = Math.round(totalUsedBudget);
+  const displayRemainingBudget = Math.round(remainingBudget);
+
+  // Format numbers with thousands separators using browser locale
+  const numberFormatter = useMemo(
+    () =>
+      new Intl.NumberFormat(navigator.language, {
+        maximumFractionDigits: 0,
+      }),
+    [],
+  );
+
+  // Format slider tooltip with number formatting and unit
+  const formatSliderTooltip = (value: number) => {
+    return `${numberFormatter.format(value)} ${getUnit()}`;
+  };
+
+  // Decide whether to use formatted text input or native number input
+  // Use formatted input only for large budgets (≥1000) in absolute mode
+  // Percentages (0-100) don't need formatting
+  const useFormattedInput =
+    inputMode === 'absolute' && question.totalBudget >= 1000;
+
   return (
     <>
       <MarkdownView>{question.helperText[language]}</MarkdownView>
@@ -137,7 +131,7 @@ export default function BudgetingQuestion({
             {tr.BudgetingQuestion.used}
           </Typography>
           <Typography variant="body2">
-            {totalUsedBudget} {question.unit}
+            {numberFormatter.format(displayUsedBudget)} {question.unit}
           </Typography>
         </Stack>
 
@@ -166,33 +160,9 @@ export default function BudgetingQuestion({
             {tr.BudgetingQuestion.remaining}
           </Typography>
           <Typography variant="body2">
-            {remainingBudget} {question.unit}
+            {numberFormatter.format(displayRemainingBudget)} {question.unit}
           </Typography>
         </Stack>
-
-        {question.allowPercentageInput &&
-          question.budgetingMode === 'direct' && (
-            <ToggleButtonGroup
-              value={inputMode}
-              exclusive
-              onChange={handleModeChange}
-              aria-label={tr.BudgetingQuestion.inputModeLabel}
-              size="small"
-            >
-              <ToggleButton
-                value="absolute"
-                aria-label={tr.BudgetingQuestion.absoluteValuesLabel}
-              >
-                {question.unit}
-              </ToggleButton>
-              <ToggleButton
-                value="percentage"
-                aria-label={tr.BudgetingQuestion.percentageLabel}
-              >
-                %
-              </ToggleButton>
-            </ToggleButtonGroup>
-          )}
       </Box>
 
       {question.requireFullAllocation &&
@@ -259,14 +229,14 @@ export default function BudgetingQuestion({
                           color="text.secondary"
                           sx={{ ml: 1 }}
                         >
-                          ({price} {question.unit} /{' '}
+                          ({numberFormatter.format(price)} {question.unit} /{' '}
                           {tr.BudgetingQuestion.perPiece})
                         </Typography>
                       )}
                     </TableCell>
                     <TableCell align="right" sx={{ width: '150px' }}>
                       <Typography variant="body2">
-                        {totalForTarget} {question.unit}
+                        {numberFormatter.format(totalForTarget)} {question.unit}
                       </Typography>
                     </TableCell>
                   </TableRow>
@@ -300,29 +270,44 @@ export default function BudgetingQuestion({
                     </TableCell>
                     <TableCell align="right" sx={{ width: '150px' }}>
                       <TextField
-                        type="number"
-                        value={displayValues[index]}
-                        onChange={(
-                          event: React.ChangeEvent<HTMLInputElement>,
-                        ) => {
+                        type={useFormattedInput ? 'text' : 'number'}
+                        value={
+                          useFormattedInput
+                            ? numberFormatter.format(displayValues[index])
+                            : displayValues[index]
+                        }
+                        onChange={(event) => {
                           setDirty(true);
-                          const displayValue = Math.max(
-                            0,
-                            Math.min(Number(event.target.value), limit),
-                          );
+                          let displayValue: number;
 
-                          if (inputMode === 'percentage') {
-                            // Convert percentage to absolute value for this item only
-                            const absoluteValue = convertFromPercentage(
-                              displayValue,
-                              question.totalBudget,
+                          if (useFormattedInput) {
+                            // Remove all non-digit characters for parsing
+                            const numericValue = event.target.value.replace(
+                              /\D/g,
+                              '',
                             );
-                            onChange(updateValue(value, index, absoluteValue));
+                            displayValue = Math.max(
+                              0,
+                              Math.min(Number(numericValue) || 0, limit),
+                            );
                           } else {
-                            // Direct absolute value
-                            onChange(updateValue(value, index, displayValue));
+                            // Native number input
+                            displayValue = Math.max(
+                              0,
+                              Math.min(Number(event.target.value), limit),
+                            );
                           }
+
+                          // Store value directly as entered (no conversion)
+                          onChange(updateValue(value, index, displayValue));
                         }}
+                        inputProps={
+                          useFormattedInput
+                            ? {
+                                inputMode: 'numeric',
+                              }
+                            : undefined
+                        }
                         InputProps={{
                           endAdornment: (
                             <InputAdornment position="end">
@@ -343,19 +328,10 @@ export default function BudgetingQuestion({
                         limit={limit}
                         onChange={(displayValue) => {
                           setDirty(true);
-
-                          if (inputMode === 'percentage') {
-                            // Convert percentage to absolute value for this item only
-                            const absoluteValue = convertFromPercentage(
-                              displayValue,
-                              question.totalBudget,
-                            );
-                            onChange(updateValue(value, index, absoluteValue));
-                          } else {
-                            // Direct absolute value
-                            onChange(updateValue(value, index, displayValue));
-                          }
+                          // Store value directly as entered (no conversion)
+                          onChange(updateValue(value, index, displayValue));
                         }}
+                        valueLabelFormat={formatSliderTooltip}
                       />
                     </TableCell>
                   </TableRow>

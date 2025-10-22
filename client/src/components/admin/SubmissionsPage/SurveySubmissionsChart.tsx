@@ -234,7 +234,9 @@ export default function Chart({ submissions, selectedQuestion }: Props) {
         };
         break;
       case 'budgeting': {
-        // For pieces mode, show piece count; for direct mode, show budget amount
+        const inputMode = selectedQuestion.inputMode ?? 'absolute';
+
+        // For pieces mode, show piece count; for direct mode, show budget amount (always monetary)
         const unit =
           selectedQuestion.budgetingMode === 'pieces'
             ? tr.BudgetingQuestion.perPiece
@@ -243,16 +245,27 @@ export default function Chart({ submissions, selectedQuestion }: Props) {
         base = {
           id: selectedQuestion.id,
           options: selectedQuestion.targets.map((target, index) => {
-            // Calculate average allocation for this target across all submissions
+            // Get raw stored allocations for this target across all submissions
             const allocations = questionAnswers.map(
               (qa: AnswerEntry & { type: 'budgeting' }) => qa.value[index] ?? 0,
             );
-            const totalAllocation = allocations.reduce(
+
+            // Convert to monetary values if stored as percentages
+            const monetaryAllocations =
+              inputMode === 'percentage'
+                ? allocations.map(
+                    (pct) => (pct / 100) * selectedQuestion.totalBudget,
+                  )
+                : allocations;
+
+            const totalAllocation = monetaryAllocations.reduce(
               (sum, val) => sum + val,
               0,
             );
             const averageAllocation =
-              allocations.length > 0 ? totalAllocation / allocations.length : 0;
+              monetaryAllocations.length > 0
+                ? totalAllocation / monetaryAllocations.length
+                : 0;
 
             // Round to 2 decimal places if needed
             const displayValue = Number.isInteger(averageAllocation)

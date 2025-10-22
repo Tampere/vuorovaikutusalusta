@@ -325,7 +325,7 @@
     "budgetTargetName": "Name",
     "budgetTargetCost": "Cost",
     "requireFullAllocation": "Require full allocation",
-    "allowPercentageInput": "Allow percentage input",
+    "inputMode": "Input mode",
     "allocationDirection": "Budget allocation direction",
     "allocationDirectionIncreasing": "Budget is filled (from zero upwards)",
     "allocationDirectionDecreasing": "Budget is spent (from full to zero)",

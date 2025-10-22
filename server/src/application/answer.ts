@@ -1220,7 +1220,10 @@ function submissionAnswersToJson(
           );
 
           const value = budgetValues[index] || 0;
-          // Store the raw numeric value (pieces for 'pieces' mode, monetary for 'direct' mode)
+          // Export raw stored values:
+          // - 'pieces' mode: piece count
+          // - 'direct' mode with 'percentage' inputMode: percentage (0-100)
+          // - 'direct' mode with 'absolute' inputMode: monetary amount
           ret[key] = value;
         });
         break;

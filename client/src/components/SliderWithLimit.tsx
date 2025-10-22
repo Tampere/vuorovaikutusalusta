@@ -7,6 +7,7 @@ interface Props {
   max: number;
   limit: number;
   sliderProps?: SliderProps;
+  valueLabelFormat?: (value: number) => string;
 }
 
 export function SliderWithLimit({
@@ -15,6 +16,7 @@ export function SliderWithLimit({
   max,
   limit,
   sliderProps,
+  valueLabelFormat,
 }: Props) {
   const theme = useTheme();
   const limitPct = (limit * 100) / max;
@@ -32,6 +34,7 @@ export function SliderWithLimit({
         onChange(clampedValue);
       }}
       valueLabelDisplay="auto"
+      valueLabelFormat={valueLabelFormat}
       sx={{
         '& .MuiSlider-rail': {
           opacity: 1,

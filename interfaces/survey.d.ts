@@ -319,7 +319,7 @@ export interface SurveyBudgetingQuestion extends CommonSurveyPageQuestion {
   targets: BudgetTarget[];
   allocationDirection: BudgetAllocationDirection;
   requireFullAllocation?: boolean;
-  allowPercentageInput?: boolean;
+  inputMode?: 'absolute' | 'percentage';
   helperText?: LocalizedText;
 }
 
