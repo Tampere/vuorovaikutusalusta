@@ -736,6 +736,7 @@
       "tooltipWeekLabel": "Viikko {x}, Vuosi",
       "tooltipTotal": "Kokonaisvastausmäärä",
       "tooltipCurrent": "Vastausmäärä",
+      "tooltipAverage": "Keskiarvo",
       "xAxisLabel": {
         "byDay": "Päivä",
         "byWeek": "Viikko"

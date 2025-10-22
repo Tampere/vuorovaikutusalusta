@@ -736,6 +736,7 @@
       "tooltipWeekLabel": "Vecka {x}, År",
       "tooltipTotal": "Totalt antal svar",
       "tooltipCurrent": "Antal svar",
+      "tooltipAverage": "Medelvärde",
       "xAxisLabel": {
         "byDay": "Dag",
         "byWeek": "Vecka"

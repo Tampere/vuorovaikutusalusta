@@ -735,6 +735,7 @@
       "tooltipWeekLabel": "Week {x}, Year",
       "tooltipTotal": "Total answers",
       "tooltipCurrent": "Answers",
+      "tooltipAverage": "Average",
       "xAxisLabel": {
         "byDay": "Day",
         "byWeek": "Week"
