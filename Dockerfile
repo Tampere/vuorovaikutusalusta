@@ -26,6 +26,10 @@ COPY client ./
 ARG APP_VERSION
 ENV APP_VERSION=${APP_VERSION}
 
+# Build argument for feature flags
+ARG VITE_ENABLED_FEATURES='[]'
+ENV VITE_ENABLED_FEATURES=${VITE_ENABLED_FEATURES}
+
 RUN npm run build
 
 ###
@@ -61,7 +65,7 @@ RUN apk update && apk add \
   ca-certificates \
   ttf-freefont
 
-# Add non-root user with explicit UID and GID 
+# Add non-root user with explicit UID and GID
 RUN addgroup --system --gid 1001 appGroup && \
   adduser --system --uid 1001 appUser
 

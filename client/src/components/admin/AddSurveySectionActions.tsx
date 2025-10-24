@@ -6,6 +6,7 @@ import { useClipboard } from '@src/stores/ClipboardContext';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
+import { isFeatureSupported } from '@src/utils/enabledFeatures';
 import React, { ReactNode, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import BudgetingIcon from '../icons/BudgetingIcon';
@@ -327,12 +328,16 @@ export default function AddSurveySectionActions(props: Props) {
       ariaLabel: 'add-attachment-section',
       icon: <PaperclipIcon />,
     },
-    {
-      type: 'budgeting',
-      label: tr.AddSurveySectionActions.budgetingQuestion,
-      ariaLabel: 'add-budgeting-section',
-      icon: <BudgetingIcon />,
-    },
+    ...(isFeatureSupported('budgetingQuestion')
+      ? [
+          {
+            type: 'budgeting',
+            label: tr.AddSurveySectionActions.budgetingQuestion,
+            ariaLabel: 'add-budgeting-section',
+            icon: <BudgetingIcon />,
+          } as const,
+        ]
+      : []),
   ];
 
   const sectionButtons: {
