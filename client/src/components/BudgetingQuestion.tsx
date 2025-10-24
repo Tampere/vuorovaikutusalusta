@@ -246,100 +246,152 @@ export default function BudgetingQuestion({
           </Table>
         </TableContainer>
       ) : (
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell sx={{ width: 'auto' }}>
-                  {tr.BudgetingQuestion.targetName}
-                </TableCell>
-                <TableCell align="right" sx={{ width: '150px' }}>
-                  {tr.KeyValueForm.value}
-                </TableCell>
-                <TableCell sx={{ width: '50%' }}></TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {question.targets.map((target, index) => {
-                const limit = getLimit(index);
+        <Box
+          role="table"
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: {
+              xs: 'auto auto',
+              sm: 'auto auto 1fr',
+            },
+            rowGap: { xs: 1, sm: 2 },
+            columnGap: { xs: 2, sm: 4 },
+            alignItems: 'center',
+          }}
+        >
+          {/* Header row */}
+          <Box role="rowgroup" sx={{ display: 'contents' }}>
+            <Box role="row" sx={{ display: 'contents' }}>
+              <Box
+                role="columnheader"
+                sx={{
+                  fontWeight: 'bold',
+                  py: 1,
+                }}
+              >
+                {tr.BudgetingQuestion.targetName}
+              </Box>
+              <Box
+                role="columnheader"
+                sx={{
+                  fontWeight: 'bold',
+                  textAlign: { xs: 'right', sm: 'left' },
+                  py: 1,
+                }}
+              >
+                {tr.KeyValueForm.value}
+              </Box>
+              <Box
+                role="columnheader"
+                sx={{
+                  fontWeight: 'bold',
+                  py: 1,
+                  display: { xs: 'none', sm: 'block' },
+                }}
+              >
+                {/* Empty header for slider column on desktop */}
+              </Box>
+            </Box>
+          </Box>
 
-                return (
-                  <TableRow key={index}>
-                    <TableCell sx={{ width: 'auto' }}>
-                      {target.name[language]}
-                    </TableCell>
-                    <TableCell align="right" sx={{ width: '150px' }}>
-                      <TextField
-                        type={useFormattedInput ? 'text' : 'number'}
-                        value={
-                          useFormattedInput
-                            ? numberFormatter.format(displayValues[index])
-                            : displayValues[index]
+          {/* Body rows */}
+          <Box role="rowgroup" sx={{ display: 'contents' }}>
+            {question.targets.map((target, index) => {
+              const limit = getLimit(index);
+
+              return (
+                <Box role="row" sx={{ display: 'contents' }} key={index}>
+                  <Box
+                    role="cell"
+                    sx={{
+                      py: 1,
+                    }}
+                  >
+                    {target.name[language]}
+                  </Box>
+                  <Box
+                    role="cell"
+                    sx={{
+                      textAlign: 'right',
+                      py: 1,
+                    }}
+                  >
+                    <TextField
+                      type={useFormattedInput ? 'text' : 'number'}
+                      value={
+                        useFormattedInput
+                          ? numberFormatter.format(displayValues[index])
+                          : displayValues[index]
+                      }
+                      onChange={(event) => {
+                        setDirty(true);
+                        let displayValue: number;
+
+                        if (useFormattedInput) {
+                          // Remove all non-digit characters for parsing
+                          const numericValue = event.target.value.replace(
+                            /\D/g,
+                            '',
+                          );
+                          displayValue = Math.max(
+                            0,
+                            Math.min(Number(numericValue) || 0, limit),
+                          );
+                        } else {
+                          // Native number input
+                          displayValue = Math.max(
+                            0,
+                            Math.min(Number(event.target.value), limit),
+                          );
                         }
-                        onChange={(event) => {
-                          setDirty(true);
-                          let displayValue: number;
 
-                          if (useFormattedInput) {
-                            // Remove all non-digit characters for parsing
-                            const numericValue = event.target.value.replace(
-                              /\D/g,
-                              '',
-                            );
-                            displayValue = Math.max(
-                              0,
-                              Math.min(Number(numericValue) || 0, limit),
-                            );
-                          } else {
-                            // Native number input
-                            displayValue = Math.max(
-                              0,
-                              Math.min(Number(event.target.value), limit),
-                            );
-                          }
-
-                          // Store value directly as entered (no conversion)
-                          onChange(updateValue(value, index, displayValue));
-                        }}
-                        inputProps={
-                          useFormattedInput
-                            ? {
-                                inputMode: 'numeric',
-                              }
-                            : undefined
-                        }
-                        InputProps={{
-                          endAdornment: (
-                            <InputAdornment position="end">
-                              {getUnit()}
-                            </InputAdornment>
-                          ),
-                        }}
-                        sx={{ width: '120px' }}
-                        disabled={readOnly}
-                        size="small"
-                        variant="standard"
-                      />
-                    </TableCell>
-                    <TableCell sx={{ width: '50%' }}>
-                      <SliderWithLimit
-                        value={displayValues[index]}
-                        max={getMaxValue()}
-                        limit={limit}
-                        onChange={(displayValue) => {
-                          setDirty(true);
-                          // Store value directly as entered (no conversion)
-                          onChange(updateValue(value, index, displayValue));
-                        }}
-                        valueLabelFormat={formatSliderTooltip}
-                      />
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </TableContainer>
+                        // Store value directly as entered (no conversion)
+                        onChange(updateValue(value, index, displayValue));
+                      }}
+                      inputProps={
+                        useFormattedInput
+                          ? {
+                              inputMode: 'numeric',
+                            }
+                          : undefined
+                      }
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            {getUnit()}
+                          </InputAdornment>
+                        ),
+                      }}
+                      sx={{ width: '120px' }}
+                      disabled={readOnly}
+                      size="small"
+                      variant="standard"
+                    />
+                  </Box>
+                  <Box
+                    role="cell"
+                    sx={{
+                      gridColumn: { xs: '1 / -1', sm: 'auto' },
+                      py: 1,
+                    }}
+                  >
+                    <SliderWithLimit
+                      value={displayValues[index]}
+                      max={getMaxValue()}
+                      limit={limit}
+                      onChange={(displayValue) => {
+                        setDirty(true);
+                        // Store value directly as entered (no conversion)
+                        onChange(updateValue(value, index, displayValue));
+                      }}
+                      valueLabelFormat={formatSliderTooltip}
+                    />
+                  </Box>
+                </Box>
+              );
+            })}
+          </Box>
+        </Box>
       )}
     </>
   );
