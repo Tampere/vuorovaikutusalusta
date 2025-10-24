@@ -7,14 +7,12 @@ import {
 import { encryptionKey, getDb } from '@src/database';
 import useTranslations from '@src/translations/useTranslations';
 import { indexToAlpha } from '@src/utils';
-import { readFileSync, rmSync } from 'fs';
+import fs, { readFileSync, rmSync } from 'fs';
 import moment from 'moment';
 import ogr2ogr from 'ogr2ogr';
+import path from 'path';
 import { getAvailableMapLayers } from './map';
 import { getSurvey } from './survey';
-import fs from 'fs';
-import path from 'path';
-import logger from '@src/logger';
 
 const tr = useTranslations('fi');
 
@@ -1019,6 +1017,25 @@ function createCSVHeaders(sectionMetadata: SectionHeader[]) {
           });
         });
         break;
+      case 'budgeting':
+        // Create one column per target
+        sectionHead.details.targets?.forEach((target, idx: number) => {
+          const key = getHeaderKey(
+            sectionHead.pageIndex,
+            sectionHead.sectionIndex,
+            idx + 1,
+            null,
+            sectionHead.predecessorSection,
+            predecessorIndexes,
+          );
+          allHeaders.push({
+            [key]: `${getSectionDetailsForHeader(
+              sectionHead,
+              predecessorIndexes,
+            )}: ${sectionHead.title['fi']} - ${target.name['fi']}`,
+          });
+        });
+        break;
       // numeric, free-text, slider
       default:
         allHeaders.push({
@@ -1187,6 +1204,30 @@ function submissionAnswersToJson(
           ] = optionId ? sectionDetails?.optionTexts[String(optionId)] : '';
         });
         break;
+      case 'budgeting': {
+        // Parse budget values from JSON
+        const budgetValues = answer.valueJson
+          ? JSON.parse(JSON.stringify(answer.valueJson))
+          : [];
+        sectionDetails.details.targets?.forEach((target, index) => {
+          const key = getHeaderKey(
+            sectionDetails.pageIndex,
+            answer.sectionIndex,
+            index + 1,
+            null,
+            sectionDetails.predecessorSection,
+            predecessorIndexes,
+          );
+
+          const value = budgetValues[index] || 0;
+          // Export raw stored values:
+          // - 'pieces' mode: piece count
+          // - 'direct' mode with 'percentage' inputMode: percentage (0-100)
+          // - 'direct' mode with 'absolute' inputMode: monetary amount
+          ret[key] = value;
+        });
+        break;
+      }
       // numeric, free-text, slider
       default:
         ret[
@@ -1244,16 +1285,16 @@ export async function getAnswerCounts(surveyId: number) {
   }>(
     `
     WITH answer_entries AS (
-      SELECT sub.id AS submission_id, ae.id, ps.type, ps.parent_section FROM DATA.submission sub 
-      LEFT JOIN DATA.answer_entry ae ON sub.id = ae.submission_id 
+      SELECT sub.id AS submission_id, ae.id, ps.type, ps.parent_section FROM DATA.submission sub
+      LEFT JOIN DATA.answer_entry ae ON sub.id = ae.submission_id
       LEFT JOIN DATA.survey s ON s.id = sub.survey_id
       LEFT JOIN DATA.page_section ps ON ps.id = ae.section_id
       WHERE s.id = $1
     ), personal_info_entries AS (
-      SELECT * FROM DATA.personal_info 
+      SELECT * FROM DATA.personal_info
       WHERE submission_id =  ANY(SELECT submission_id FROM answer_entries)
-    ) 
-    SELECT 
+    )
+    SELECT
         COUNT(*) FILTER (WHERE type <> 'map' AND TYPE <> 'attachment' AND parent_section IS NULL) AS "alphaNumericAnswers",
         COUNT(*) FILTER (WHERE type = 'attachment') AS "attachmentAnswers",
         COUNT(*) FILTER (WHERE type = 'map') AS "mapAnswers",

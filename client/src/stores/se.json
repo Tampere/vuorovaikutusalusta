@@ -248,7 +248,8 @@
     "groupedCheckboxQuestion": "Lägg till grupperad flervalsfråga",
     "imageSection": "Lägg till mediaavsnitt",
     "documentSection": "Lägg till bilageavsnitt",
-    "attachmentSection": "Lägg till svarsbilage"
+    "attachmentSection": "Lägg till svarsbilage",
+    "budgetingQuestion": "Lägg till budgeteringsfråga"
   },
   "SliderQuestion": {
     "defaultMinLabel": "Helt oenig",
@@ -272,6 +273,7 @@
     "imageSection": "Bildavsnitt",
     "documentSection": "Bilageavsnitt",
     "attachmentSection": "Svarsbilage",
+    "budgetingQuestion": "Budgeteringsfråga",
     "question": "Fråga"
   },
   "SurveySections": {
@@ -315,6 +317,34 @@
     "attachmentFileFormats": "Tillåtna filformat: jpg, jpeg, png, pdf, docx, xlsx samt de vanligaste videoformaten.",
     "deleteUploadedFile": "Ta bort uppladdad fil",
     "replace": "Ersätt vald bilaga genom att klicka."
+  },
+  "BudgetingQuestion": {
+    "budgetByPieces": "Budgetering per styck",
+    "totalBudget": "Total budget",
+    "unit": "Enhet",
+    "budgetTargets": "Budgetposter",
+    "budgetTargetName": "Namn",
+    "budgetTargetCost": "Kostnad",
+    "requireFullAllocation": "Hela budgeten måste användas",
+    "inputMode": "Inmatningsläge",
+    "allocationDirection": "Riktning för budgetfördelning",
+    "allocationDirectionIncreasing": "Budgeten fylls (från noll och uppåt)",
+    "allocationDirectionDecreasing": "Budgeten förbrukas (från full till noll)",
+    "absoluteMode": "Absoluta värden",
+    "percentageMode": "Procent",
+    "targetName": "Mål",
+    "used": "Använt",
+    "remaining": "Återstår",
+    "fullAllocationRequired": "Hela budgeten måste användas",
+    "amount": "Antal",
+    "total": "Totalt",
+    "perPiece": "st",
+    "inputModeLabel": "Inmatningsläge",
+    "absoluteValuesLabel": "Absoluta värden",
+    "percentageLabel": "Procent",
+    "decreaseValue": "Minska värde",
+    "increaseValue": "Öka värde",
+    "helperText": "Hjälptext"
   },
   "fileValidator": {
     "fileUploadError": "Fel vid uppladdning av filen.",
@@ -706,6 +736,7 @@
       "tooltipWeekLabel": "Vecka {x}, År",
       "tooltipTotal": "Totalt antal svar",
       "tooltipCurrent": "Antal svar",
+      "tooltipAverage": "Medelvärde",
       "xAxisLabel": {
         "byDay": "Dag",
         "byWeek": "Vecka"

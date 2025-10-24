@@ -248,7 +248,8 @@
     "groupedCheckboxQuestion": "Lisää ryhmitetty monivalintakysymys",
     "imageSection": "Lisää mediaosio",
     "documentSection": "Lisää liiteosio",
-    "attachmentSection": "Lisää vastausliite"
+    "attachmentSection": "Lisää vastausliite",
+    "budgetingQuestion": "Lisää budjetointikysymys"
   },
   "SliderQuestion": {
     "defaultMinLabel": "Täysin eri mieltä",
@@ -272,6 +273,7 @@
     "imageSection": "Kuvaosio",
     "documentSection": "Liiteosio",
     "attachmentSection": "Vastausliite",
+    "budgetingQuestion": "Budjetointikysymys",
     "question": "Kysymys"
   },
   "SurveySections": {
@@ -314,6 +316,34 @@
     "attachmentFileFormats": "Sallitut tiedostoformaatit: jpg, jpeg, png, pdf, docx, xlsx sekä yleisimmät videoformaatit.",
     "deleteUploadedFile": "Poista ladattu tiedosto",
     "replace": "Korvaa valittu liite napsauttamalla."
+  },
+  "BudgetingQuestion": {
+    "budgetByPieces": "Budjetointi kappaleittain",
+    "totalBudget": "Kokonaisbudjetti",
+    "unit": "Yksikkö",
+    "budgetTargets": "Budjetointikohteet",
+    "budgetTargetName": "Nimi",
+    "budgetTargetCost": "Kustannus",
+    "requireFullAllocation": "Koko budjetti käytettävä",
+    "inputMode": "Syöttötapa",
+    "allocationDirection": "Budjetin käytön suunta",
+    "allocationDirectionIncreasing": "Budjettia täytetään (nollasta ylöspäin)",
+    "absoluteMode": "Absoluuttiset arvot",
+    "percentageMode": "Prosenttiosuus",
+    "targetName": "Kohde",
+    "allocationDirectionDecreasing": "Budjettia sijoitetaan (täydestä nollaan päin)",
+    "used": "Käytetty",
+    "remaining": "Jäljellä",
+    "fullAllocationRequired": "Koko budjetti on käytettävä",
+    "amount": "Määrä",
+    "total": "Yhteensä",
+    "perPiece": "kpl",
+    "inputModeLabel": "Syöttötapa",
+    "absoluteValuesLabel": "Absoluuttiset arvot",
+    "percentageLabel": "Prosenttiosuus",
+    "decreaseValue": "Vähennä arvoa",
+    "increaseValue": "Kasvata arvoa",
+    "helperText": "Opastus"
   },
   "fileValidator": {
     "fileUploadError": "Virhe ladattaessa tiedostoa",
@@ -706,6 +736,7 @@
       "tooltipWeekLabel": "Viikko {x}, Vuosi",
       "tooltipTotal": "Kokonaisvastausmäärä",
       "tooltipCurrent": "Vastausmäärä",
+      "tooltipAverage": "Keskiarvo",
       "xAxisLabel": {
         "byDay": "Päivä",
         "byWeek": "Viikko"

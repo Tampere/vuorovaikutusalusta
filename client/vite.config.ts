@@ -6,6 +6,7 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 
 const proxyAddress = process.env.API_URL ?? 'http://localhost:3000';
 const appVersion = process.env.APP_VERSION ?? 'local-dev';
+const enabledFeatures = process.env.VITE_ENABLED_FEATURES ?? '[]';
 
 const isAdminRoute = (url: string) => url.startsWith('/admin');
 const isIndexRoute = (url: string) =>
@@ -38,6 +39,7 @@ export default defineConfig({
   ],
   define: {
     APP_VERSION: JSON.stringify(appVersion),
+    ENABLED_FEATURES: enabledFeatures,
   },
   optimizeDeps: {
     include: ['draft-convert'],

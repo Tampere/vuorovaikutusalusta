@@ -1,5 +1,5 @@
 import { AnswerEntry, Submission, SurveyQuestion } from '@interfaces/survey';
-import { useTheme, Box } from '@mui/material';
+import { Box, useTheme } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { FunctionComponent, useMemo, useState } from 'react';
 import {
@@ -24,6 +24,7 @@ type Data = {
     text: string;
     count: number;
   }[];
+  tooltipFormatter: (value: any) => [string | number, string];
 };
 
 type Range = {
@@ -182,6 +183,10 @@ export default function Chart({ submissions, selectedQuestion }: Props) {
               ),
             };
           }),
+          tooltipFormatter: (value) => [
+            value,
+            tr.SurveySubmissionsPage.dataChart.tooltipCurrent,
+          ],
         };
         break;
       case 'numeric':
@@ -222,8 +227,64 @@ export default function Chart({ submissions, selectedQuestion }: Props) {
               ),
             };
           }),
+          tooltipFormatter: (value) => [
+            value,
+            tr.SurveySubmissionsPage.dataChart.tooltipCurrent,
+          ],
         };
         break;
+      case 'budgeting': {
+        const inputMode = selectedQuestion.inputMode ?? 'absolute';
+
+        // For pieces mode, show piece count; for direct mode, show budget amount (always monetary)
+        const unit =
+          selectedQuestion.budgetingMode === 'pieces'
+            ? tr.BudgetingQuestion.perPiece
+            : (selectedQuestion.unit ?? '');
+
+        base = {
+          id: selectedQuestion.id,
+          options: selectedQuestion.targets.map((target, index) => {
+            // Get raw stored allocations for this target across all submissions
+            const allocations = questionAnswers.map(
+              (qa: AnswerEntry & { type: 'budgeting' }) => qa.value[index] ?? 0,
+            );
+
+            // Convert to monetary values if stored as percentages
+            const monetaryAllocations =
+              inputMode === 'percentage'
+                ? allocations.map(
+                    (pct) => (pct / 100) * selectedQuestion.totalBudget,
+                  )
+                : allocations;
+
+            const totalAllocation = monetaryAllocations.reduce(
+              (sum, val) => sum + val,
+              0,
+            );
+            const averageAllocation =
+              monetaryAllocations.length > 0
+                ? totalAllocation / monetaryAllocations.length
+                : 0;
+
+            // Round to 2 decimal places if needed
+            const displayValue = Number.isInteger(averageAllocation)
+              ? averageAllocation
+              : parseFloat(averageAllocation.toFixed(2));
+
+            return {
+              id: index,
+              text: target.name[surveyLanguage],
+              count: displayValue,
+            };
+          }),
+          tooltipFormatter: (value) => [
+            unit ? `${value} ${unit}` : value,
+            tr.SurveySubmissionsPage.dataChart.tooltipAverage,
+          ],
+        };
+        break;
+      }
       default:
     }
 
@@ -266,12 +327,7 @@ export default function Chart({ submissions, selectedQuestion }: Props) {
             onMouseLeave={() => setTooltip(null)}
           />
           <YAxis />
-          <Tooltip
-            formatter={(val) => [
-              val,
-              tr.SurveySubmissionsPage.dataChart.tooltipCurrent,
-            ]}
-          />
+          <Tooltip formatter={answerData.tooltipFormatter} />
 
           <Bar dataKey="count" fill={theme.palette.primary.main} />
         </BarChart>

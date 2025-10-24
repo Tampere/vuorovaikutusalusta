@@ -248,7 +248,8 @@
     "groupedCheckboxQuestion": "Add grouped checkbox question",
     "imageSection": "Add media section",
     "documentSection": "Add document section",
-    "attachmentSection": "Add attachment section"
+    "attachmentSection": "Add attachment section",
+    "budgetingQuestion": "Add budgeting question"
   },
   "SliderQuestion": {
     "defaultMinLabel": "Strongly disagree",
@@ -272,6 +273,7 @@
     "imageSection": "Image section",
     "documentSection": "Document section",
     "attachmentSection": "Attachment section",
+    "budgetingQuestion": "Budgeting question",
     "question": "Question"
   },
   "PersonalInfoQuestion": {
@@ -314,6 +316,34 @@
     "attachmentFileFormats": "Supported file formats: jpg, jpeg, png, pdf, docx, xlsx and most video formats.",
     "deleteUploadedFile": "Delete uploaded file",
     "replace": "Replace the selected file by clicking here."
+  },
+  "BudgetingQuestion": {
+    "budgetByPieces": "Budgeting by pieces",
+    "totalBudget": "Total budget",
+    "unit": "Unit",
+    "budgetTargets": "Budget targets",
+    "budgetTargetName": "Name",
+    "budgetTargetCost": "Cost",
+    "requireFullAllocation": "Require full allocation",
+    "inputMode": "Input mode",
+    "allocationDirection": "Budget allocation direction",
+    "allocationDirectionIncreasing": "Budget is filled (from zero upwards)",
+    "allocationDirectionDecreasing": "Budget is spent (from full to zero)",
+    "absoluteMode": "Absolute values",
+    "percentageMode": "Percentage",
+    "targetName": "Target",
+    "used": "Used",
+    "remaining": "Remaining",
+    "fullAllocationRequired": "Full budget must be allocated",
+    "amount": "Amount",
+    "total": "Total",
+    "perPiece": "pc",
+    "inputModeLabel": "Input mode",
+    "absoluteValuesLabel": "Absolute values",
+    "percentageLabel": "Percentage",
+    "decreaseValue": "Decrease value",
+    "increaseValue": "Increase value",
+    "helperText": "Helper text"
   },
   "fileValidator": {
     "fileUploadError": "Error while uploading the file.",
@@ -705,6 +735,7 @@
       "tooltipWeekLabel": "Week {x}, Year",
       "tooltipTotal": "Total answers",
       "tooltipCurrent": "Answers",
+      "tooltipAverage": "Average",
       "xAxisLabel": {
         "byDay": "Day",
         "byWeek": "Week"

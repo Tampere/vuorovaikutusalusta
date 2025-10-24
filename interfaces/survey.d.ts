@@ -34,7 +34,8 @@ export type SurveyQuestion =
   | SurveyMultiMatrixQuestion
   | SurveyMatrixQuestion
   | SurveyGroupedCheckboxQuestion
-  | SurveyAttachmentQuestion;
+  | SurveyAttachmentQuestion
+  | SurveyBudgetingQuestion;
 
 /**
  * Subquestion type for map questions.
@@ -301,6 +302,25 @@ export interface SurveyGroupedCheckboxQuestion
 export interface SurveyAttachmentQuestion extends CommonSurveyPageQuestion {
   type: 'attachment';
   fileUrl: string;
+}
+
+export interface BudgetTarget {
+  name: LocalizedText;
+  price?: number;
+}
+
+export type BudgetAllocationDirection = 'increasing' | 'decreasing';
+
+export interface SurveyBudgetingQuestion extends CommonSurveyPageQuestion {
+  type: 'budgeting';
+  budgetingMode: 'pieces' | 'direct';
+  totalBudget: number;
+  unit?: string;
+  targets: BudgetTarget[];
+  allocationDirection: BudgetAllocationDirection;
+  requireFullAllocation?: boolean;
+  inputMode?: 'absolute' | 'percentage';
+  helperText?: LocalizedText;
 }
 
 /**
@@ -727,6 +747,10 @@ export type AnswerEntry = {
   | {
       type: 'attachment';
       value: { fileString: string; fileName: string }[];
+    }
+  | {
+      type: 'budgeting';
+      value: number[];
     }
 );
 

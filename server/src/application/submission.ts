@@ -1,3 +1,4 @@
+import { CredentialsEntry } from '@interfaces/submission';
 import {
   AnswerEntry,
   LanguageCode,
@@ -8,7 +9,6 @@ import {
   SurveyMapSubQuestionAnswer,
   SurveyPageSection,
 } from '@interfaces/survey';
-import { CredentialsEntry } from '@interfaces/submission';
 import {
   encryptionKey,
   getColumnSet,
@@ -21,15 +21,15 @@ import {
   InternalServerError,
   NotFoundError,
 } from '@src/error';
-import logger from '@src/logger';
-import { assertNever } from '@src/utils';
-import { LineString, Point, Polygon } from 'geojson';
 import {
   bufferFromDataUrl,
   validateBinaryFile,
   validateDataUrl,
   validateTextFile,
 } from '@src/fileValidation';
+import logger from '@src/logger';
+import { assertNever } from '@src/utils';
+import { LineString, Point, Polygon } from 'geojson';
 
 /**
  * DB row of table data.answer_entry
@@ -247,11 +247,11 @@ async function savePersonalInfo(personalInfo: DBPersonalInfo) {
   await getDb().any(
     `
     INSERT INTO data.personal_info (submission_id, section_id, name, email, phone, address, custom)
-    VALUES 
-      ($(submission_id), 
+    VALUES
+      ($(submission_id),
       $(section_id),
-      pgp_sym_encrypt($(name), $(encryptionKey)), 
-      pgp_sym_encrypt($(email), $(encryptionKey)), 
+      pgp_sym_encrypt($(name), $(encryptionKey)),
+      pgp_sym_encrypt($(email), $(encryptionKey)),
       pgp_sym_encrypt($(phone), $(encryptionKey)),
       pgp_sym_encrypt($(address), $(encryptionKey)),
       pgp_sym_encrypt($(custom), $(encryptionKey))
@@ -685,6 +685,23 @@ function answerEntriesToRows(
         break;
       case 'personal-info':
         break;
+      case 'budgeting':
+        newEntries = [
+          {
+            submission_id: submissionID,
+            section_id: entry.sectionId,
+            parent_entry_id: parentEntryId,
+            value_text: null,
+            value_option_id: null,
+            value_geometry: null,
+            value_numeric: null,
+            value_json: JSON.stringify(entry.value),
+            value_file: null,
+            value_file_name: null,
+            map_layers: null,
+          },
+        ];
+        break;
       default:
         assertNever(entry);
     }
@@ -859,6 +876,14 @@ function dbAnswerEntriesToAnswerEntries(
             value: [
               { fileString: row.value_file, fileName: row.value_file_name },
             ],
+          });
+          break;
+        }
+        case 'budgeting': {
+          entries.push({
+            sectionId: row.section_id,
+            type: 'budgeting',
+            value: row.value_json as number[],
           });
           break;
         }
@@ -1101,7 +1126,7 @@ export async function getSubmissionsForSurvey(
     ? await getDb().manyOrNone<
         DBPersonalInfo & DBSubmission & { customLabel: LocalizedText }
       >(
-        `SELECT 
+        `SELECT
           s.updated_at,
           s.id as submission_id,
           pi.section_id,

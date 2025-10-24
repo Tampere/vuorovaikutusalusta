@@ -13,6 +13,7 @@ import {
   Typography,
 } from '@mui/material';
 import { visuallyHidden } from '@mui/utils';
+import BudgetingQuestion from '@src/components/BudgetingQuestion';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useMemo, useRef, useState } from 'react';
@@ -24,12 +25,12 @@ import MapQuestion from './MapQuestion';
 import MatrixQuestion from './MatrixQuestion';
 import MultiMatrixQuestion from './MultiMatrixQuestion';
 import NumericQuestion from './NumericQuestion';
+import { PersonalInfoQuestion } from './PersonalInfoQuestion';
+import { RadioImageQuestion } from './RadioImageQuestion';
 import RadioQuestion from './RadioQuestion';
 import SectionInfo from './SectionInfo';
 import SliderQuestion from './SliderQuestion';
 import SortingQuestion from './SortingQuestion';
-import { PersonalInfoQuestion } from './PersonalInfoQuestion';
-import { RadioImageQuestion } from './RadioImageQuestion';
 
 interface Props {
   question: SurveyQuestionType;
@@ -348,6 +349,22 @@ function SurveyQuestion({
               sectionId: question.id,
               type: question.type,
               value: value,
+            })
+          }
+        />
+      )}
+      {question.type === 'budgeting' && (
+        <BudgetingQuestion
+          readOnly={readOnly}
+          question={question}
+          value={value as number[]}
+          setDirty={setDirty}
+          validationErrors={validationErrors}
+          onChange={(value) =>
+            updateAnswer({
+              sectionId: question.id,
+              type: question.type,
+              value,
             })
           }
         />
