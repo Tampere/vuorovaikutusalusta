@@ -13,7 +13,7 @@ env:
   IMAGE_NAME_PROD: ${{ secrets.ACR_REGISTRY_ADDRESS }}/kartalla
   APP_VERSION: ${{ github.event_name == 'release' && github.event.release.name || format('build {0}', github.sha) }}
   ENABLED_FEATURES_TEST: '["budgetingQuestion"]'
-  ENABLED_FEATURES_PROD: '[]'
+  ENABLED_FEATURES_PROD: "[]"
 
 jobs:
   deploy:
@@ -35,8 +35,8 @@ jobs:
         with:
           push: true
           build-args: |
-            "APP_VERSION=${{ env.APP_VERSION }}"
-            "VITE_ENABLED_FEATURES=${{ github.event_name == 'release' && env.ENABLED_FEATURES_PROD || env.ENABLED_FEATURES_TEST }}"
+            APP_VERSION=${{ env.APP_VERSION }}
+            VITE_ENABLED_FEATURES=${{ github.event_name == 'release' && env.ENABLED_FEATURES_PROD || env.ENABLED_FEATURES_TEST }}
           cache-from: type=registry,ref=${{ github.event_name == 'release' && env.IMAGE_NAME_PROD || env.IMAGE_NAME_TEST }}:latest
           cache-to: type=inline
           tags: ${{ github.event_name == 'release' && env.IMAGE_NAME_PROD || env.IMAGE_NAME_TEST }}:latest
