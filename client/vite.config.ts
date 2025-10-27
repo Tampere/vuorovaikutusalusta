@@ -39,7 +39,7 @@ export default defineConfig({
   ],
   define: {
     APP_VERSION: JSON.stringify(appVersion),
-    ENABLED_FEATURES: enabledFeatures,
+    ENABLED_FEATURES: JSON.stringify(enabledFeatures),
   },
   optimizeDeps: {
     include: ['draft-convert'],
