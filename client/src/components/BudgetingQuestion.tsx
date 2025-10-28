@@ -6,12 +6,6 @@ import {
   LinearProgress,
   linearProgressClasses,
   Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   TextField,
   Typography,
   useTheme,
@@ -180,48 +174,94 @@ export default function BudgetingQuestion({
         )}
 
       {question.budgetingMode === 'pieces' ? (
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell sx={{ width: '150px' }}>
-                  {tr.BudgetingQuestion.amount}
-                </TableCell>
-                <TableCell sx={{ width: 'auto' }}>
-                  {tr.BudgetingQuestion.targetName}
-                </TableCell>
-                <TableCell align="right" sx={{ width: '150px' }}>
-                  {tr.BudgetingQuestion.total}
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {question.targets.map((target, index) => {
-                const pieces = value[index] || 0;
-                const price = target.price ?? 0;
-                const totalForTarget = pieces * price;
-                const currentMonetaryTotal = totalUsedBudget;
-                const remainingMonetaryBudget =
-                  question.totalBudget - currentMonetaryTotal;
-                const maxPieces = Math.floor(
-                  (remainingMonetaryBudget + totalForTarget) / price,
-                );
+        <Box
+          role="table"
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: {
+              xs: '1fr 150px',
+              sm: 'minmax(160px, auto) 1fr minmax(160px, auto)',
+            },
+            gridAutoRows: { xs: 'auto', sm: 'max-content' },
+            rowGap: { xs: 0.5, sm: 1 },
+            columnGap: { xs: 2, sm: 4 },
+            alignItems: 'center',
+          }}
+        >
+          {/* Header row */}
+          <Box role="rowgroup" sx={{ display: 'contents' }}>
+            <Box
+              role="row"
+              sx={{ display: 'contents', gridRow: { xs: 'auto', sm: 1 } }}
+            >
+              <Box
+                role="columnheader"
+                sx={{
+                  fontWeight: 'bold',
+                  py: 1,
+                  display: { xs: 'none', sm: 'block' },
+                  gridRow: { xs: 'auto', sm: 1 },
+                }}
+              >
+                {tr.BudgetingQuestion.amount}
+              </Box>
+              <Box
+                role="columnheader"
+                sx={{
+                  fontWeight: 'bold',
+                  py: 1,
+                  display: { xs: 'none', sm: 'block' },
+                  gridRow: { xs: 'auto', sm: 1 },
+                }}
+              >
+                {tr.BudgetingQuestion.targetName}
+              </Box>
+              <Box
+                role="columnheader"
+                sx={{
+                  fontWeight: 'bold',
+                  textAlign: { xs: 'right', sm: 'right' },
+                  py: 1,
+                  display: { xs: 'none', sm: 'block' },
+                  gridRow: { xs: 'auto', sm: 1 },
+                }}
+              >
+                {tr.BudgetingQuestion.total}
+              </Box>
+            </Box>
+          </Box>
 
-                return (
-                  <TableRow key={index}>
-                    <TableCell sx={{ width: '150px' }}>
-                      <NumericStepperInput
-                        value={pieces}
-                        onChange={(newPieces) => {
-                          setDirty(true);
-                          onChange(updateValue(value, index, newPieces));
-                        }}
-                        min={0}
-                        max={price > 0 ? maxPieces : Infinity}
-                        disabled={readOnly}
-                      />
-                    </TableCell>
-                    <TableCell sx={{ width: 'auto' }}>
+          {/* Body rows */}
+          <Box role="rowgroup" sx={{ display: 'contents' }}>
+            {question.targets.map((target, index) => {
+              const pieces = value[index] || 0;
+              const price = target.price ?? 0;
+              const totalForTarget = pieces * price;
+              const currentMonetaryTotal = totalUsedBudget;
+              const remainingMonetaryBudget =
+                question.totalBudget - currentMonetaryTotal;
+              const maxPieces = Math.floor(
+                (remainingMonetaryBudget + totalForTarget) / price,
+              );
+
+              return (
+                <React.Fragment key={index}>
+                  <Box
+                    role="row"
+                    sx={{
+                      display: 'contents',
+                      gridRow: { xs: 'auto', sm: index + 2 },
+                    }}
+                  >
+                    {/* Target name - spans full width on mobile, column 2 on desktop */}
+                    <Box
+                      role="cell"
+                      sx={{
+                        gridColumn: { xs: '1 / -1', sm: '2' },
+                        gridRow: { xs: 'auto', sm: index + 2 },
+                        py: 1,
+                      }}
+                    >
                       {target.name[language]}
                       {price > 0 && (
                         <Typography
@@ -233,18 +273,57 @@ export default function BudgetingQuestion({
                           {tr.BudgetingQuestion.perPiece})
                         </Typography>
                       )}
-                    </TableCell>
-                    <TableCell align="right" sx={{ width: '150px' }}>
+                    </Box>
+                    {/* Amount stepper - column 1 on both mobile and desktop */}
+                    <Box
+                      role="cell"
+                      sx={{
+                        gridColumn: { xs: '1', sm: '1' },
+                        gridRow: { xs: 'auto', sm: index + 2 },
+                        py: 1,
+                      }}
+                    >
+                      <NumericStepperInput
+                        value={pieces}
+                        onChange={(newPieces) => {
+                          setDirty(true);
+                          onChange(updateValue(value, index, newPieces));
+                        }}
+                        min={0}
+                        max={price > 0 ? maxPieces : Infinity}
+                        disabled={readOnly}
+                      />
+                    </Box>
+                    {/* Total - column 2 on mobile, column 3 on desktop */}
+                    <Box
+                      role="cell"
+                      sx={{
+                        gridColumn: { xs: '2', sm: '3' },
+                        gridRow: { xs: 'auto', sm: index + 2 },
+                        textAlign: 'right',
+                        py: 1,
+                      }}
+                    >
                       <Typography variant="body2">
                         {numberFormatter.format(totalForTarget)} {question.unit}
                       </Typography>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </TableContainer>
+                    </Box>
+                  </Box>
+                  {/* Separator */}
+                  {index < question.targets.length - 1 && (
+                    <Box
+                      sx={{
+                        gridColumn: '1 / -1',
+                        height: '1px',
+                        backgroundColor: theme.palette.divider,
+                      }}
+                    />
+                  )}
+                </React.Fragment>
+              );
+            })}
+          </Box>
+        </Box>
       ) : (
         <Box
           role="table"
@@ -254,7 +333,7 @@ export default function BudgetingQuestion({
               xs: 'auto auto',
               sm: 'auto auto 1fr',
             },
-            rowGap: { xs: 1, sm: 2 },
+            rowGap: { xs: 0.5, sm: 1 },
             columnGap: { xs: 2, sm: 4 },
             alignItems: 'center',
           }}
@@ -300,94 +379,107 @@ export default function BudgetingQuestion({
               const limit = getLimit(index);
 
               return (
-                <Box role="row" sx={{ display: 'contents' }} key={index}>
-                  <Box
-                    role="cell"
-                    sx={{
-                      py: 1,
-                    }}
-                  >
-                    {target.name[language]}
-                  </Box>
-                  <Box
-                    role="cell"
-                    sx={{
-                      textAlign: 'right',
-                      py: 1,
-                    }}
-                  >
-                    <TextField
-                      type={useFormattedInput ? 'text' : 'number'}
-                      value={
-                        useFormattedInput
-                          ? numberFormatter.format(displayValues[index])
-                          : displayValues[index]
-                      }
-                      onChange={(event) => {
-                        setDirty(true);
-                        let displayValue: number;
-
-                        if (useFormattedInput) {
-                          // Remove all non-digit characters for parsing
-                          const numericValue = event.target.value.replace(
-                            /\D/g,
-                            '',
-                          );
-                          displayValue = Math.max(
-                            0,
-                            Math.min(Number(numericValue) || 0, limit),
-                          );
-                        } else {
-                          // Native number input
-                          displayValue = Math.max(
-                            0,
-                            Math.min(Number(event.target.value), limit),
-                          );
+                <React.Fragment key={index}>
+                  <Box role="row" sx={{ display: 'contents' }}>
+                    <Box
+                      role="cell"
+                      sx={{
+                        py: 1,
+                      }}
+                    >
+                      {target.name[language]}
+                    </Box>
+                    <Box
+                      role="cell"
+                      sx={{
+                        textAlign: 'right',
+                        py: 1,
+                      }}
+                    >
+                      <TextField
+                        type={useFormattedInput ? 'text' : 'number'}
+                        value={
+                          useFormattedInput
+                            ? numberFormatter.format(displayValues[index])
+                            : displayValues[index]
                         }
+                        onChange={(event) => {
+                          setDirty(true);
+                          let displayValue: number;
 
-                        // Store value directly as entered (no conversion)
-                        onChange(updateValue(value, index, displayValue));
+                          if (useFormattedInput) {
+                            // Remove all non-digit characters for parsing
+                            const numericValue = event.target.value.replace(
+                              /\D/g,
+                              '',
+                            );
+                            displayValue = Math.max(
+                              0,
+                              Math.min(Number(numericValue) || 0, limit),
+                            );
+                          } else {
+                            // Native number input
+                            displayValue = Math.max(
+                              0,
+                              Math.min(Number(event.target.value), limit),
+                            );
+                          }
+
+                          // Store value directly as entered (no conversion)
+                          onChange(updateValue(value, index, displayValue));
+                        }}
+                        inputProps={
+                          useFormattedInput
+                            ? {
+                                inputMode: 'numeric',
+                              }
+                            : undefined
+                        }
+                        InputProps={{
+                          endAdornment: (
+                            <InputAdornment position="end">
+                              {getUnit()}
+                            </InputAdornment>
+                          ),
+                        }}
+                        sx={{ width: '120px' }}
+                        disabled={readOnly}
+                        size="small"
+                        variant="standard"
+                      />
+                    </Box>
+                    <Box
+                      role="cell"
+                      sx={{
+                        gridColumn: { xs: '1 / -1', sm: 'auto' },
+                        py: 1,
+                        minWidth: '200px',
                       }}
-                      inputProps={
-                        useFormattedInput
-                          ? {
-                              inputMode: 'numeric',
-                            }
-                          : undefined
-                      }
-                      InputProps={{
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            {getUnit()}
-                          </InputAdornment>
-                        ),
-                      }}
-                      sx={{ width: '120px' }}
-                      disabled={readOnly}
-                      size="small"
-                      variant="standard"
-                    />
+                    >
+                      <SliderWithLimit
+                        value={displayValues[index]}
+                        max={getMaxValue()}
+                        limit={limit}
+                        onChange={(displayValue) => {
+                          setDirty(true);
+                          // Store value directly as entered (no conversion)
+                          onChange(updateValue(value, index, displayValue));
+                        }}
+                        valueLabelFormat={formatSliderTooltip}
+                      />
+                    </Box>
                   </Box>
-                  <Box
-                    role="cell"
-                    sx={{
-                      gridColumn: { xs: '1 / -1', sm: 'auto' },
-                      py: 1,
-                    }}
-                  >
-                    <SliderWithLimit
-                      value={displayValues[index]}
-                      max={getMaxValue()}
-                      limit={limit}
-                      onChange={(displayValue) => {
-                        setDirty(true);
-                        // Store value directly as entered (no conversion)
-                        onChange(updateValue(value, index, displayValue));
+                  {/* Separator */}
+                  {index < question.targets.length - 1 && (
+                    <Box
+                      sx={{
+                        gridColumn: '1 / -1',
+                        height: '1px',
+                        backgroundColor: theme.palette.divider,
                       }}
-                      valueLabelFormat={formatSliderTooltip}
                     />
-                  </Box>
-                </Box>
+                  )}
+                </React.Fragment>
               );
             })}
           </Box>
