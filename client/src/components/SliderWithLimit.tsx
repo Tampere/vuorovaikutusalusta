@@ -30,7 +30,10 @@ export function SliderWithLimit({
       step={1}
       marks={[{ value: limit }]}
       onChange={(_, value) => {
-        const clampedValue = Math.max(0, Math.min(value as number, limit));
+        // In some rare cases (e.g. zero-width slider) the slider may call this callback with NaN value - in that case we set it to 0
+        const clampedValue = Number.isNaN(value)
+          ? 0
+          : Math.max(0, Math.min(value as number, limit));
         onChange(clampedValue);
       }}
       valueLabelDisplay="auto"
