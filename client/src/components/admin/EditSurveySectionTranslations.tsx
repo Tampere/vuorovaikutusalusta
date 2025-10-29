@@ -1,7 +1,6 @@
 import {
   LanguageCode,
   SectionImageOption,
-  SectionOption,
   SurveyMapSubQuestion,
   SurveyPageSection,
 } from '@interfaces/survey';
@@ -51,7 +50,7 @@ export default function EditSurveySectionTranslations({
       {(section.type === 'checkbox' ||
         section.type === 'radio' ||
         section.type === 'sorting') &&
-        section.options?.map((option: SectionOption, optionIndex) => (
+        section.options?.map((option, optionIndex) => (
           <TranslationField
             key={`option-field-${optionIndex}`}
             value={option.text[languageCode]}
@@ -65,6 +64,24 @@ export default function EditSurveySectionTranslations({
                 },
               };
               onEdit({ ...section, options: updatedOptions });
+            }}
+          />
+        ))}
+      {section.type === 'budgeting' &&
+        section.targets?.map((target, targetIndex) => (
+          <TranslationField
+            key={`target-field-${targetIndex}`}
+            value={target.name[languageCode]}
+            onChange={(event) => {
+              const updatedTargets = [...section.targets];
+              updatedTargets[targetIndex] = {
+                ...updatedTargets[targetIndex],
+                name: {
+                  ...target.name,
+                  [languageCode]: event.target.value,
+                },
+              };
+              onEdit({ ...section, targets: updatedTargets });
             }}
           />
         ))}

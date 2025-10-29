@@ -51,6 +51,7 @@ export function NumericStepperInput({
         onClick={handleDecrement}
         disabled={isDecrementDisabled}
         aria-label={tr.BudgetingQuestion.decreaseValue}
+        sx={{ zIndex: 0 }}
       >
         <RemoveIcon fontSize="small" />
       </Fab>
@@ -77,6 +78,7 @@ export function NumericStepperInput({
         onClick={handleIncrement}
         disabled={isIncrementDisabled}
         aria-label={tr.BudgetingQuestion.increaseValue}
+        sx={{ zIndex: 0 }}
       >
         <AddIcon fontSize="small" />
       </Fab>
