@@ -281,6 +281,8 @@ export default function BudgetingQuestion({
                         gridColumn: { xs: '1', sm: '1' },
                         gridRow: { xs: 'auto', sm: index + 2 },
                         py: 1,
+                        // Make the grid not squish the stepper (making buttons seem oval)
+                        width: 'fit-content',
                       }}
                     >
                       <NumericStepperInput
