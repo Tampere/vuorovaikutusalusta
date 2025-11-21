@@ -179,6 +179,7 @@
       "insertValue": "insert value",
       "customAnswer": "Something else, what?",
       "types": {
+        "between": "answer is between",
         "equals": "Answer is exactly",
         "contains": "Answer contains option",
         "lessThan": "answer is at most",
@@ -725,5 +726,8 @@
     "bannerAltText": "Tampere banner",
     "logoAltText": "Tampere Finland logo"
   },
-  "adminInstructions": "Open user manual"
+  "adminInstructions": "Open user manual",
+  "FollowUpSectionConditions": {
+    "literalInfo": "Note that for slider questions with verbal labels, the condition value range is always specified as numbers between 0-10."
+  }
 }
