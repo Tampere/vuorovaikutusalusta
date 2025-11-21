@@ -90,6 +90,14 @@ export default function CheckBoxQuestion({
     onChange(newSelection);
   }
 
+  function isOptionDisable(optionValue: string | number) {
+    return (
+      question.answerLimits.max &&
+      question.answerLimits.max === value.length &&
+      !value.includes(optionValue)
+    );
+  }
+
   return (
     <>
       {answerLimitText && (
@@ -133,13 +141,20 @@ export default function CheckBoxQuestion({
             }}
           >
             {question.options.map((o) => (
-              <MenuItem key={o.id} value={o.id}>
+              <MenuItem
+                key={o.id}
+                value={o.id}
+                disabled={isOptionDisable(o.id)}
+              >
                 <Checkbox checked={value.includes(o.id)} />
                 {o.text[surveyLanguage]}
               </MenuItem>
             ))}
             {question.allowCustomAnswer && (
-              <MenuItem value={customAnswerValue}>
+              <MenuItem
+                value={customAnswerValue}
+                disabled={isOptionDisable(customAnswerValue)}
+              >
                 <Checkbox checked={value.includes(customAnswerValue)} />
                 {tr.SurveyQuestion.customAnswer}
               </MenuItem>
@@ -149,14 +164,15 @@ export default function CheckBoxQuestion({
             <TextField
               value={customAnswerValue}
               required={question.isRequired}
-              //placeholder={tr.SurveyQuestion.customAnswerField}
               label={tr.SurveyQuestion.customAnswerField}
               sx={{
                 marginTop: '0.5em',
               }}
-              inputProps={{
-                maxLength: customAnswerMaxLength,
-                'aria-label': tr.SurveyQuestion.customAnswerField,
+              slotProps={{
+                htmlInput: {
+                  maxLength: customAnswerMaxLength,
+                  'aria-label': tr.SurveyQuestion.customAnswerField,
+                },
               }}
               onChange={(event) => {
                 setCustomAnswerValue(event.currentTarget.value);
@@ -180,6 +196,7 @@ export default function CheckBoxQuestion({
               label={option.text?.[surveyLanguage] ?? ''}
               control={
                 <Checkbox
+                  disabled={isOptionDisable(option.id)}
                   action={actionRef.current[index]}
                   autoFocus={index === 0 && autoFocus}
                   // TS can't infer the precise memoized value type from question.type, but for checkboxes it's always an array
@@ -207,6 +224,7 @@ export default function CheckBoxQuestion({
             <FormControlLabel
               control={
                 <Checkbox
+                  disabled={isOptionDisable(customAnswerValue)}
                   checked={value.includes(customAnswerValue)}
                   onChange={(event) => {
                     const newValue = event.currentTarget.checked
@@ -231,9 +249,11 @@ export default function CheckBoxQuestion({
               value={customAnswerValue}
               required={question.isRequired}
               placeholder={tr.SurveyQuestion.customAnswerField}
-              inputProps={{
-                maxLength: customAnswerMaxLength,
-                'aria-label': tr.SurveyQuestion.customAnswerField,
+              slotProps={{
+                htmlInput: {
+                  maxLength: customAnswerMaxLength,
+                  'aria-label': tr.SurveyQuestion.customAnswerField,
+                },
               }}
               onChange={(event) => {
                 setCustomAnswerValue(event.currentTarget.value);
