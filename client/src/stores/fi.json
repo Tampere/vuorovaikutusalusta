@@ -193,6 +193,7 @@
       "insertValue": "syötä vertailuarvo",
       "customAnswer": "Jokin muu, mikä?",
       "types": {
+        "between": "vastaus on välillä",
         "equals": "Vastaus on tasan",
         "contains": "Vastaus sisältää vaihtoehdon",
         "lessThan": "enintään",
@@ -725,5 +726,8 @@
     "bannerAltText": "Tampereen vaakunalogo",
     "logoAltText": "Tampere Finland -logo"
   },
-  "adminInstructions": "Avaa käyttöohje"
+  "adminInstructions": "Avaa käyttöohje",
+  "FollowUpSectionConditions": {
+    "literalInfo": "Huomaathan, että sanalliselle liukukytkinkysymykselle ehtojen vastausväli ilmoitetaan aina numeroina välillä 0–10."
+  }
 }

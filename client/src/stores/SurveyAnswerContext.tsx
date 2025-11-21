@@ -410,7 +410,7 @@ export function useSurveyAnswers() {
     if (
       !question?.followUpSections ||
       question.followUpSections.length === 0 ||
-      !answer?.value
+      (answer?.value !== 0 && !answer?.value)
     ) {
       return [];
     }
@@ -447,15 +447,14 @@ export function useSurveyAnswers() {
               (conditionValue) => value === conditionValue,
             )
               ? true
-              : section.conditions.greaterThan.some(
-                  (conditionValue) => value >= conditionValue,
-                )
-              ? true
-              : section.conditions.lessThan.some(
-                  (conditionValue) => value <= conditionValue,
-                )
-              ? true
-              : false;
+              : (section.conditions.greaterThan.length === 0 ||
+                  section.conditions.greaterThan.some(
+                    (conditionValue) => value >= conditionValue,
+                  )) &&
+                  (section.conditions.lessThan.length === 0 ||
+                    section.conditions.lessThan.some(
+                      (conditionValue) => value <= conditionValue,
+                    ));
           })
           .map((s) => s.id);
       default:
