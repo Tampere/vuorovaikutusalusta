@@ -21,7 +21,7 @@ export default function OskariMap({
   onFeatureClick,
   selectedAnswer,
 }: Props) {
-  const iframeRef = useRef<HTMLIFrameElement>();
+  const iframeRef = useRef<HTMLIFrameElement>(null);
   const {
     initializeMap,
     setFeatureClickHandler,

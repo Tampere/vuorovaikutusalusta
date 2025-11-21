@@ -56,7 +56,7 @@ export default function DropZone({
 
   useEffect(() => {
     if (!acceptedFiles || acceptedFiles.length === 0) return;
-    fileCallback(acceptedFiles);
+    fileCallback([...acceptedFiles]);
   }, [acceptedFiles]);
 
   return (

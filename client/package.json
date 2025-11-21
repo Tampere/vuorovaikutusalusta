@@ -8,6 +8,7 @@
     "test": "jest --config ./jest.config.json",
     "test:watch": "npm run test -- --watch",
     "lint": "eslint . --ext .ts,.tsx",
+    "tsc": "tsc --noEmit",
     "dev": "vite",
     "dev:local": "API_URL='http://localhost:3000' vite",
     "prebuild": "npm run lint && npm run test",

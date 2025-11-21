@@ -258,7 +258,8 @@
     "imageSection": "Image section",
     "documentSection": "Document section",
     "attachmentSection": "Attachment section",
-    "question": "Question"
+    "question": "Question",
+    "noSelection": "No selection"
   },
   "SurveySections": {
     "limitAnswers": "Limit the number of answers",

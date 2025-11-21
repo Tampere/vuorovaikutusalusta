@@ -72,6 +72,8 @@ export default function SplitPaneLayout({
           allowResize={false}
           onDragStarted={() => setIsResizing(true)}
           onDragFinished={() => setIsResizing(false)}
+          // Type assertion to allow children prop (react-split-pane types are incomplete)
+          {...({} as any)}
         >
           {mainPane}
           {sidePane || <div />}

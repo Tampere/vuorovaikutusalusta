@@ -758,6 +758,8 @@ export default function SurveyStepper({
           onDragFinished={() => {
             setIsResizing(false);
           }}
+          // To split pane to accept children (incomplete typings)
+          {...({} as any)}
         >
           {stepperPane}
           {sidePane}

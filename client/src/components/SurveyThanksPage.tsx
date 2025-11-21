@@ -2,7 +2,6 @@ import { Survey } from '@interfaces/survey';
 import {
   Link,
   Typography,
-  SxProps,
   Theme,
   Box,
   useMediaQuery,
@@ -14,8 +13,6 @@ import ReactMarkdown from 'react-markdown';
 import rehypeExternalLinks from 'rehype-external-links';
 import Footer from './Footer';
 import { useImageHeaderQuery } from '@src/utils/useImageHeaderQuery';
-
-type StyleKeys = 'testSurveyHeader';
 
 const styles = (theme: Theme) => ({
   testSurveyHeader: {

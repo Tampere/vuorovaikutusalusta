@@ -272,7 +272,8 @@
     "imageSection": "Kuvaosio",
     "documentSection": "Liiteosio",
     "attachmentSection": "Vastausliite",
-    "question": "Kysymys"
+    "question": "Kysymys",
+    "noSelection": "Ei valintaa"
   },
   "SurveySections": {
     "limitAnswers": "Rajoita vastauslukumäärää",

@@ -55,7 +55,7 @@ export default function MapQuestion({
   } = useSurveyMap();
   const { tr, surveyLanguage } = useTranslations();
 
-  const valueRef = useRef<MapQuestionAnswer[]>();
+  const valueRef = useRef<MapQuestionAnswer[]>(null);
   valueRef.current = value;
 
   // Listen to any geometry changes related to this question
