@@ -9,11 +9,13 @@ import {
   TextField,
 } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { createRef, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+
+const DEFAULT_VALUE = 'noSelection';
 
 interface Props {
   autoFocus?: boolean;
-  value: number | string;
+  value: number | string | null;
   onChange: (value: number | string) => void;
   question: SurveyRadioQuestion;
   setDirty: (dirty: boolean) => void;
@@ -44,19 +46,12 @@ export default function RadioQuestion({
   readOnly = false,
 }: Props) {
   const [customAnswerValue, setCustomAnswerValue] = useState('');
-  const [customSelected, setCustomSelected] = useState(false);
   const { tr, surveyLanguage } = useTranslations();
-  const actionRef = useRef([]);
-
-  if (autoFocus) {
-    actionRef.current = question.options.map(
-      (_, i) => actionRef.current[i] ?? createRef(),
-    );
-  }
+  const actionRef = useRef(null);
 
   useEffect(() => {
     // autoFocus prop won't trigger focus styling, must be done manually
-    autoFocus && actionRef.current[0]?.current.focusVisible();
+    autoFocus && actionRef.current.focusVisible();
   }, []);
 
   // Update custom answer value if value from context is string
@@ -70,10 +65,11 @@ export default function RadioQuestion({
       {!readOnly && question.displaySelection && (
         <FormGroup>
           <Select
-            value={value ?? ('DEFAULT_SELECT_ANSWER' as const)}
+            labelId={question.id.toString()}
+            value={value ?? DEFAULT_VALUE}
             displayEmpty
             renderValue={(value) => {
-              if (value === 'DEFAULT_SELECT_ANSWER')
+              if (value === DEFAULT_VALUE)
                 return tr.SurveySections.selectAnswer;
               if (typeof value === 'string')
                 return tr.SurveyQuestion.customAnswer;
@@ -93,6 +89,10 @@ export default function RadioQuestion({
               },
             }}
             onChange={(event) => {
+              if (event.target.value === DEFAULT_VALUE && value !== null) {
+                onChange(null);
+                return;
+              }
               const numericValue = Number(event.target.value);
               if (event.target.value !== '' && !isNaN(numericValue)) {
                 setDirty(true);
@@ -105,15 +105,38 @@ export default function RadioQuestion({
               );
             }}
           >
+            <MenuItem
+              key="default"
+              value={DEFAULT_VALUE}
+              style={{ color: '#6a6969' }}
+            >
+              <Radio
+                checked={value === null}
+                disableRipple
+                slotProps={{ input: { 'aria-hidden': 'true' } }}
+                sx={{ pointerEvents: 'none' }}
+              />
+              {tr.SurveySection.noSelection}
+            </MenuItem>
             {question.options.map((o) => (
               <MenuItem key={o.id} value={o.id}>
-                <Radio checked={!customSelected && value === o.id} />
+                <Radio
+                  checked={value === o.id}
+                  disableRipple
+                  slotProps={{ input: { 'aria-hidden': 'true' } }}
+                  sx={{ pointerEvents: 'none' }}
+                />
                 {o.text[surveyLanguage]}
               </MenuItem>
             ))}
             {question.allowCustomAnswer && (
               <MenuItem key={'custom'} value={customAnswerValue}>
-                <Radio checked={typeof value === 'string'} />
+                <Radio
+                  checked={typeof value === 'string'}
+                  disableRipple
+                  slotProps={{ input: { 'aria-hidden': 'true' } }}
+                  sx={{ pointerEvents: 'none' }}
+                />
                 {tr.SurveyQuestion.customAnswer}
               </MenuItem>
             )}
@@ -122,13 +145,16 @@ export default function RadioQuestion({
             <TextField
               value={customAnswerValue}
               required={question.isRequired}
-              label={tr.SurveyQuestion.customAnswerField}
+              placeholder={tr.SurveyQuestion.customAnswerField}
               sx={{
                 marginTop: '0.5em',
               }}
               aria-label={tr.SurveyQuestion.customAnswerField}
-              inputProps={{
-                maxLength: customAnswerMaxLength,
+              slotProps={{
+                htmlInput: {
+                  maxLength: customAnswerMaxLength,
+                  'aria-label': tr.SurveyQuestion.customAnswerField,
+                },
               }}
               onChange={(event) => {
                 setCustomAnswerValue(event.currentTarget.value);
@@ -143,6 +169,10 @@ export default function RadioQuestion({
           id={`${question.id}-input`}
           value={value}
           onChange={(event) => {
+            if (event.currentTarget.value === DEFAULT_VALUE && value !== null) {
+              onChange(null);
+              return;
+            }
             const numericValue = Number(event.currentTarget.value);
             if (event.currentTarget.value.length > 0 && !isNaN(numericValue)) {
               setDirty(true);
@@ -156,18 +186,22 @@ export default function RadioQuestion({
           }}
           name={`${question.title?.[surveyLanguage]}-group`}
         >
-          {question.options.map((option, index) => (
+          <FormControlLabel
+            style={{ color: '#757575' }}
+            key={'default'}
+            value={DEFAULT_VALUE}
+            checked={value === null}
+            label={tr.SurveySection.noSelection}
+            sx={styles.labelStyles}
+            control={<Radio action={actionRef.current} autoFocus={autoFocus} />}
+          />
+          {question.options.map((option) => (
             <FormControlLabel
               key={option.id}
               value={option.id}
               label={option.text?.[surveyLanguage] ?? ''}
               sx={styles.labelStyles}
-              control={
-                <Radio
-                  action={actionRef.current[index]}
-                  autoFocus={index === 0 && autoFocus}
-                />
-              }
+              control={<Radio />}
             />
           ))}
           {question.allowCustomAnswer && (
@@ -183,9 +217,11 @@ export default function RadioQuestion({
                   value={customAnswerValue}
                   required={question.isRequired}
                   placeholder={tr.SurveyQuestion.customAnswerField}
-                  inputProps={{
-                    maxLength: customAnswerMaxLength,
-                    'aria-label': tr.SurveyQuestion.customAnswerField,
+                  slotProps={{
+                    htmlInput: {
+                      maxLength: customAnswerMaxLength,
+                      'aria-label': tr.SurveyQuestion.customAnswerField,
+                    },
                   }}
                   onChange={(event) => {
                     setCustomAnswerValue(event.currentTarget.value);

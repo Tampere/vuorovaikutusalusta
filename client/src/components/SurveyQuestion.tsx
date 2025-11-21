@@ -118,6 +118,7 @@ function SurveyQuestion({
           alignItems: 'center',
           color: survey.sectionTitleColor ?? '#000000',
         }}
+        id={question.id.toString()}
       >
         <Typography
           component="h3"
@@ -160,7 +161,7 @@ function SurveyQuestion({
       {/* Radio question */}
       {question.type === 'radio' && (
         <RadioQuestion
-          value={value as number | string}
+          value={value as number | string | null}
           onChange={(value) => {
             updateAnswer({
               sectionId: question.id,
