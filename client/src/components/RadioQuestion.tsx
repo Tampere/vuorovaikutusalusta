@@ -51,7 +51,7 @@ export default function RadioQuestion({
 
   useEffect(() => {
     // autoFocus prop won't trigger focus styling, must be done manually
-    autoFocus && actionRef.current.focusVisible();
+    autoFocus && actionRef.current?.focusVisible();
   }, []);
 
   // Update custom answer value if value from context is string
@@ -65,6 +65,7 @@ export default function RadioQuestion({
       {!readOnly && question.displaySelection && (
         <FormGroup>
           <Select
+            autoFocus={autoFocus}
             labelId={question.id.toString()}
             value={value ?? DEFAULT_VALUE}
             displayEmpty
@@ -193,7 +194,7 @@ export default function RadioQuestion({
             checked={value === null}
             label={tr.SurveySection.noSelection}
             sx={styles.labelStyles}
-            control={<Radio action={actionRef.current} autoFocus={autoFocus} />}
+            control={<Radio action={actionRef} autoFocus={autoFocus} />}
           />
           {question.options.map((option) => (
             <FormControlLabel
