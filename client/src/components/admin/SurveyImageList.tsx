@@ -134,7 +134,7 @@ export default function SurveyImageList({ imageType }: Props) {
     }
   }
 
-  function handleListItemClick(fileName?: string, filePath?: string[]) {
+  function handleListItemClick(fileName?: string) {
     if (!fileName) {
       handleSelectedImageChange(null);
       return;
@@ -165,20 +165,19 @@ export default function SurveyImageList({ imageType }: Props) {
     getImages();
   }
 
-  const { acceptedFiles, fileRejections, getRootProps, getInputProps } =
-    useDropzone({
-      maxFiles: 1,
-      validator: fileSizeValidator,
-      onDrop: (acceptedFiles) => {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          setPreview(event.target.result);
-        };
-        reader.readAsDataURL(acceptedFiles[0]);
-        setUploadedImage(acceptedFiles[0]);
-        handleSelectedImageChange('NEW');
-      },
-    });
+  const { fileRejections, getRootProps, getInputProps } = useDropzone({
+    maxFiles: 1,
+    validator: fileSizeValidator,
+    onDrop: (acceptedFiles) => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setPreview(event.target.result);
+      };
+      reader.readAsDataURL(acceptedFiles[0]);
+      setUploadedImage(acceptedFiles[0]);
+      handleSelectedImageChange('NEW');
+    },
+  });
 
   useEffect(() => {
     if (fileRejections?.length > 0) {
@@ -244,7 +243,7 @@ export default function SurveyImageList({ imageType }: Props) {
 
     if (selected) {
       try {
-        const response = await fetch(`/api/file/${selected?.id}/details`, {
+        await fetch(`/api/file/${selected?.id}/details`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -512,9 +511,7 @@ export default function SurveyImageList({ imageType }: Props) {
                   <ImageListItem
                     style={getImageBorderStyle(image)}
                     key={image.fileName}
-                    onClick={() =>
-                      handleListItemClick(image.fileName, image.filePath)
-                    }
+                    onClick={() => handleListItemClick(image.fileName)}
                   >
                     <Cancel
                       color="error"
