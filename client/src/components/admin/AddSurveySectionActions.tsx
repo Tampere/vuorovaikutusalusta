@@ -1,6 +1,7 @@
 import { SurveyFollowUpSection, SurveyPageSection } from '@interfaces/survey';
 import { Fab, Grid, Tooltip, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import GeoBudgetingIcon from '@src/components/icons/GeoBudgetingIcon';
 import { duplicateFiles } from '@src/controllers/AdminFileController';
 import { useClipboard } from '@src/stores/ClipboardContext';
 import { useSurvey } from '@src/stores/SurveyContext';
@@ -352,7 +353,7 @@ export default function AddSurveySectionActions(props: Props) {
       type: 'geo-budgeting',
       label: tr.AddSurveySectionActions.geoBudgetingQuestion,
       ariaLabel: 'add-geo-budgeting-section',
-      icon: <>TODO</>,
+      icon: <GeoBudgetingIcon />,
     },
   ];
 

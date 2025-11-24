@@ -702,6 +702,23 @@ function answerEntriesToRows(
           },
         ];
         break;
+      case 'geo-budgeting':
+        newEntries = entry.value.map((value) => {
+          return {
+            submission_id: submissionID,
+            section_id: entry.sectionId,
+            parent_entry_id: parentEntryId,
+            value_text: null,
+            value_option_id: null,
+            value_geometry: value.geometry?.geometry,
+            value_numeric: value.targetId,
+            value_json: null,
+            value_file: null,
+            value_file_name: null,
+            map_layers: null,
+          };
+        });
+        break;
       default:
         assertNever(entry);
     }
@@ -884,6 +901,23 @@ function dbAnswerEntriesToAnswerEntries(
             sectionId: row.section_id,
             type: 'budgeting',
             value: row.value_json as number[],
+          });
+          break;
+        }
+        case 'geo-budgeting': {
+          entries.push({
+            sectionId: row.section_id,
+            type: 'geo-budgeting',
+            value: [
+              {
+                targetId: row.value_numeric,
+                geometry: {
+                  type: 'Feature',
+                  geometry: row.value_geometry as GeoJSON.Point,
+                  properties: {},
+                },
+              },
+            ],
           });
           break;
         }
