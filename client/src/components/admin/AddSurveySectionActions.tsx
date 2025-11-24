@@ -1,6 +1,7 @@
 import { SurveyFollowUpSection, SurveyPageSection } from '@interfaces/survey';
 import { Fab, Grid, Tooltip, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import GeoBudgetingIcon from '@src/components/icons/GeoBudgetingIcon';
 import { duplicateFiles } from '@src/controllers/AdminFileController';
 import { useClipboard } from '@src/stores/ClipboardContext';
 import { useSurvey } from '@src/stores/SurveyContext';
@@ -231,6 +232,16 @@ export default function AddSurveySectionActions(props: Props) {
       inputMode: 'absolute',
       helperText: initializeLocalizedObject(''),
     },
+    'geo-budgeting': {
+      type: 'geo-budgeting',
+      isRequired: false,
+      title: initializeLocalizedObject(''),
+      totalBudget: 0,
+      unit: '€',
+      targets: [],
+      allocationDirection: 'increasing',
+      helperText: initializeLocalizedObject(''),
+    },
   };
 
   function handleAdd(type: SurveyPageSection['type']) {
@@ -338,6 +349,12 @@ export default function AddSurveySectionActions(props: Props) {
           } as const,
         ]
       : []),
+    {
+      type: 'geo-budgeting',
+      label: tr.AddSurveySectionActions.geoBudgetingQuestion,
+      ariaLabel: 'add-geo-budgeting-section',
+      icon: <GeoBudgetingIcon />,
+    },
   ];
 
   const sectionButtons: {

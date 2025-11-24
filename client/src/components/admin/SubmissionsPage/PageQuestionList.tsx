@@ -1,25 +1,26 @@
-import { CardActionArea, ListItem, List, Typography, Box } from '@mui/material';
+import { Box, CardActionArea, List, ListItem, Typography } from '@mui/material';
 
-import CheckboxCheckedIcon from '@src/components/icons/CheckboxCheckedIcon';
-import RadioButtonCheckedIcon from '@src/components/icons/RadioButtonCheckedIcon';
-import NumericFieldIcon from '@src/components/icons/NumericFieldIcon';
-import MapIcon from '@src/components/icons/MapIcon';
-import OrderedIcon from '@src/components/icons/OrderedIcon';
-import SliderIcon from '@src/components/icons/SliderIcon';
-import MatrixIcon from '@src/components/icons/MatrixIcon';
-import LikertGroupIcon from '@src/components/icons/LikertGroupIcon';
-import MultiCheckmarkIcon from '@src/components/icons/MultiCheckmarkIcon';
-import PaperclipIcon from '@src/components/icons/PaperclipIcon';
-import TextSectionIcon from '@src/components/icons/TextSectionIcon';
-import ChevronRightIcon from '@src/components/icons/ChevronRightIcon';
 import BudgetingIcon from '@src/components/icons/BudgetingIcon';
+import CheckboxCheckedIcon from '@src/components/icons/CheckboxCheckedIcon';
+import ChevronRightIcon from '@src/components/icons/ChevronRightIcon';
+import LikertGroupIcon from '@src/components/icons/LikertGroupIcon';
+import MapIcon from '@src/components/icons/MapIcon';
+import MatrixIcon from '@src/components/icons/MatrixIcon';
+import MultiCheckmarkIcon from '@src/components/icons/MultiCheckmarkIcon';
+import NumericFieldIcon from '@src/components/icons/NumericFieldIcon';
+import OrderedIcon from '@src/components/icons/OrderedIcon';
+import PaperclipIcon from '@src/components/icons/PaperclipIcon';
+import RadioButtonCheckedIcon from '@src/components/icons/RadioButtonCheckedIcon';
+import SliderIcon from '@src/components/icons/SliderIcon';
+import TextSectionIcon from '@src/components/icons/TextSectionIcon';
 
 import { SurveyQuestion } from '@interfaces/survey';
+import { Person } from '@mui/icons-material';
+import GeoBudgetingIcon from '@src/components/icons/GeoBudgetingIcon';
+import { ImageCheckIcon } from '@src/components/icons/ImageCheckIcon';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { assertNever } from '@src/utils/typeCheck';
-import { Person } from '@mui/icons-material';
 import React from 'react';
-import { ImageCheckIcon } from '@src/components/icons/ImageCheckIcon';
 
 interface Props {
   questions: SurveyQuestion[];
@@ -58,6 +59,8 @@ function getQuestionIcon(
       return <Person color="primary" />;
     case 'budgeting':
       return <BudgetingIcon color="primary" />;
+    case 'geo-budgeting':
+      return <GeoBudgetingIcon color="primary" />;
     default:
       assertNever(questionType);
   }
