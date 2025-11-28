@@ -728,6 +728,7 @@
   },
   "adminInstructions": "Open user manual",
   "FollowUpSectionConditions": {
-    "literalInfo": "Note that for slider questions with verbal labels, the condition value range is always specified as numbers between 0-10."
+    "numericInfo": "You can fill in only one of the conditions or both. If you use the 'Answer is between' condition, you can fill in both comparison value fields or leave one of them empty.",
+    "literalInfo": "Please note that in a verbal slider question, in addition to the verbal minimum and maximum values, the respondent also sees values 0–10 (0=minimum value and 10=maximum value). The answer to a verbal slider question is also recorded in the response data as a value from 0 to 10."
   }
 }

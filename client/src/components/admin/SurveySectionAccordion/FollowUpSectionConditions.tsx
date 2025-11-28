@@ -1,10 +1,11 @@
 import { SurveyFollowUpSection, SurveyPageSection } from '@interfaces/survey';
-import { Alert, Box, FormGroup, Typography } from '@mui/material';
+import { Box, FormGroup, Stack, Tooltip, Typography } from '@mui/material';
 import { useSurvey } from '@src/stores/SurveyContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 
 import React from 'react';
 import { ConditionRow } from '../ConditionRow';
+import { Help } from '@mui/icons-material';
 
 interface Props {
   pageId: number;
@@ -26,24 +27,52 @@ export function FollowUpSectionConditions({
   const parentIsNumeric =
     parentSection.type === 'numeric' || parentSection.type === 'slider';
 
+  const parentIsLiteralSlider =
+    parentSection.type === 'slider' &&
+    parentSection.presentationType === 'literal';
+
   return (
     <>
-      {parentSection.type === 'slider' &&
-        parentSection.presentationType === 'literal' && (
-          <Alert
-            sx={{ marginBottom: '0.5rem' }}
-            variant="standard"
-            severity="info"
-          >
-            {tr.FollowUpSectionConditions.literalInfo}
-          </Alert>
-        )}
       <FormGroup>
-        <Typography sx={{ fontWeight: 700 }}>
-          {parentIsNumeric
-            ? tr.FollowUpSection.conditions.labelForMultiple
-            : tr.FollowUpSection.conditions.labelForSingle}
-        </Typography>
+        <Box display="flex" gap="0.5rem">
+          <Typography sx={{ fontWeight: 700, width: 'fit-content' }}>
+            {parentIsNumeric
+              ? tr.FollowUpSection.conditions.labelForMultiple
+              : tr.FollowUpSection.conditions.labelForSingle}
+          </Typography>
+          {(parentIsNumeric || parentIsLiteralSlider) && (
+            <Tooltip
+              slotProps={{
+                tooltip: {
+                  sx: {
+                    maxWidth: '500px',
+                  },
+                },
+              }}
+              title={
+                <Stack sx={{ gap: '0.75rem' }}>
+                  <Typography>
+                    {tr.FollowUpSectionConditions.numericInfo}
+                  </Typography>
+                  {parentIsLiteralSlider && (
+                    <Typography>
+                      {tr.FollowUpSectionConditions.literalInfo}
+                    </Typography>
+                  )}
+                </Stack>
+              }
+            >
+              <Help
+                sx={{
+                  display: 'inline-block',
+                  ':hover': {
+                    color: '#6c6c6c',
+                  },
+                }}
+              />
+            </Tooltip>
+          )}
+        </Box>
         <ConditionRow
           allowCustomAnswer={
             !(
