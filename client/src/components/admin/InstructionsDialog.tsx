@@ -80,20 +80,20 @@ export function InstructionsDialog({ isOpen, setIsOpen, setMenuOpen }: Props) {
                 .map((file) => file.size)
                 .reduce(
                   (prevValue, currentValue) => prevValue + currentValue,
-                  0
+                  0,
                 );
               if (filesSize > MAX_FILE_SIZE) {
                 showToast({
                   severity: 'error',
-                  message: tr.InstructionsDialog.fileSizeLimitError.replace(
+                  message: tr.FileUploadDialog.fileSizeLimitError.replace(
                     '{x}',
-                    String(MEGAS)
+                    String(MEGAS),
                   ),
                 });
                 return;
               }
               const fileStrings = (await Promise.all(
-                files.map((file: any) => readFileAsync(file))
+                files.map((file: any) => readFileAsync(file)),
               )) as string[];
 
               const filesAreValid = !fileStrings
@@ -105,13 +105,13 @@ export function InstructionsDialog({ isOpen, setIsOpen, setMenuOpen }: Props) {
               } else {
                 showToast({
                   severity: 'error',
-                  message: tr.InstructionsDialog.wrongFileFormat,
+                  message: tr.FileUploadDialog.wrongFileFormat,
                 });
               }
             } catch (err) {
               showToast({
                 severity: 'error',
-                message: err?.message ?? tr.InstructionsDialog.fileUploadError,
+                message: err?.message ?? tr.FileUploadDialog.fileUploadError,
               });
             }
           }}
@@ -156,7 +156,7 @@ export function InstructionsDialog({ isOpen, setIsOpen, setMenuOpen }: Props) {
             setInstructionFileName(null);
           }}
         >
-          {tr.InstructionsDialog.cancel}
+          {tr.FileUploadDialog.cancel}
         </Button>
         <Button
           onClick={async () => {
@@ -167,7 +167,7 @@ export function InstructionsDialog({ isOpen, setIsOpen, setMenuOpen }: Props) {
             }
           }}
         >
-          {tr.InstructionsDialog.submit}
+          {tr.FileUploadDialog.save}
         </Button>
       </DialogActions>
     </Dialog>

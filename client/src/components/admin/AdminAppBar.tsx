@@ -14,6 +14,7 @@ import { AdminInstructionButton } from './AdminInstructionButton';
 import AppBarUserMenu from './AppBarUserMenu';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { NavLink } from 'react-router-dom';
+import { GeneralNotificationNavigationButton } from './GeneralNotification/GeneralNotificationNavigationButton';
 
 interface Props {
   labels?: string[];
@@ -94,6 +95,7 @@ export function AdminAppBar({
           >
             <SurveyLanguageMenu />
             <LanguageMenu />
+            <GeneralNotificationNavigationButton />
             <AdminInstructionButton />
             <AppBarUserMenu />
           </div>

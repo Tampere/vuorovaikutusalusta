@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
 import { ValidationChain, validationResult } from 'express-validator';
 import { BadRequestError } from './error';
-import { ImageType } from '@interfaces/survey';
 import { MimeType as PdfMimeType } from '@interfaces/admin';
 import { Geometry } from 'geojson';
 import sharp from 'sharp';
+import { ImageType } from '@interfaces/survey';
 
 /**
  * Middleware function for validating a request against provided validation rules.
@@ -47,7 +47,11 @@ function isString(text: unknown): text is string {
 }
 
 function isImageType(val: string): val is ImageType {
-  return val === 'backgroundImage' || val === 'thanksPageImage';
+  return (
+    val === 'backgroundImage' ||
+    val === 'thanksPageImage' ||
+    val === 'generalNotifications'
+  );
 }
 
 export function parseImageType(val: unknown): ImageType | null {

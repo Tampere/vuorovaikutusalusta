@@ -11,6 +11,7 @@ import {
 import { useTranslations } from '@src/stores/TranslationContext';
 import React from 'react';
 import Footer from './Footer';
+import { PublishedGeneralNotification } from './admin/GeneralNotification/PublishedGeneralNotification';
 
 const styles = (theme: Theme & { [customKey: string]: any }) => ({
   heading: {
@@ -132,6 +133,18 @@ export default function SurveyLandingPage({
           alt={tr.IconAltTexts.logoAltText}
         />
       </Box>
+      <PublishedGeneralNotification
+        defaultOpen
+        variant={'external'}
+        sx={{
+          marginX: 'auto',
+          ...(mediumWidth && {
+            borderRadius: 0,
+            borderRight: 0,
+            borderLeft: 0,
+          }),
+        }}
+      />
       <Box
         className="middle-content"
         sx={{

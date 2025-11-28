@@ -8,6 +8,7 @@ import publishedSurveyRouter from './published-survey.routes';
 import surveyRouter from './survey.routes';
 import themesRouter from './themes.routes';
 import userRouter from './user.routes';
+import generalNotificationsRouter from './generalNotification.routes';
 
 const router = Router();
 
@@ -20,5 +21,6 @@ router.use('/answers', answersRouter);
 router.use('/themes', themesRouter);
 router.use('/feature-styles', featureStylesRouter);
 router.use('/health', healthRouter);
+router.use('/general-notifications', generalNotificationsRouter);
 
 export default router;

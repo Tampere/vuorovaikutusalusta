@@ -17,6 +17,9 @@ import LanguageRouter from '../LanguageRouter';
 import ClipboardProvider from '@src/stores/ClipboardContext';
 import SurveySubmissionsPage from './SubmissionsPage/SurveySubmissionsPage';
 import SurveyMapProvider from '@src/stores/SurveyMapContext';
+import { GeneralNotifications } from './GeneralNotification/GeneralNotificationsView';
+import UserProvider from '@src/stores/UserContext';
+import GeneralNotificationProvider from '@src/stores/GeneralNotificationContext';
 
 export default function AdminApplication() {
   return (
@@ -33,6 +36,8 @@ export default function AdminApplication() {
         ClipboardProvider,
         SurveyAnswerProvider,
         SurveyMapProvider,
+        UserProvider,
+        GeneralNotificationProvider,
       ]}
     >
       <CssBaseline />
@@ -44,6 +49,9 @@ export default function AdminApplication() {
           </Route>
           <Route path="/vastaukset/:surveyId">
             <SurveySubmissionsPage />
+          </Route>
+          <Route path="/tiedotteet">
+            <GeneralNotifications />
           </Route>
           <Route path="/" exact>
             <AdminFrontPage />
