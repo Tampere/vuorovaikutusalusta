@@ -90,6 +90,8 @@ export default function SurveyLandingPage({
 }: Props) {
   const { tr, surveyLanguage } = useTranslations();
   const mediumWidth = useMediaQuery('(max-width: 640px)');
+  const notificationWidth = useMediaQuery('(max-width: 800px)');
+
   return (
     <Stack
       direction="column"
@@ -137,8 +139,9 @@ export default function SurveyLandingPage({
         defaultOpen
         variant={'external'}
         sx={{
-          marginX: 'auto',
-          ...(mediumWidth && {
+          maxWidth: '800px',
+          alignSelf: 'center',
+          ...(notificationWidth && {
             borderRadius: 0,
             borderRight: 0,
             borderLeft: 0,

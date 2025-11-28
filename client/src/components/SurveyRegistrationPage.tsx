@@ -16,6 +16,7 @@ import React, { useState } from 'react';
 import Footer from './Footer';
 import { request } from '@src/utils/request';
 import { useToasts } from '@src/stores/ToastContext';
+import { PublishedGeneralNotification } from './admin/GeneralNotification/PublishedGeneralNotification';
 
 const helperText = (
   theme: Theme,
@@ -42,6 +43,8 @@ export function SurveyRegistrationPage({
 }: Props) {
   const { tr, surveyLanguage } = useTranslations();
   const mediumWidth = useMediaQuery('(max-width: 640px)');
+  const notificationWidth = useMediaQuery('(max-width: 800px)');
+
   const [error, setError] = useState(false);
   const [isRegistered, setIsRegistered] = useState(false);
   const [sendingRegistration, setSendingRegistration] = useState(false);
@@ -115,6 +118,19 @@ export function SurveyRegistrationPage({
           alt={tr.IconAltTexts.logoAltText}
         />
       </Box>
+      <PublishedGeneralNotification
+        variant="external"
+        defaultOpen
+        sx={{
+          maxWidth: '800px',
+          alignSelf: 'center',
+          ...(notificationWidth && {
+            borderRadius: 0,
+            borderRight: 0,
+            borderLeft: 0,
+          }),
+        }}
+      />
       <Stack
         className="middle-content"
         sx={{ gap: '1rem', alignItems: 'center', justifyContent: 'center' }}

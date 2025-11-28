@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import { GeneralNotification } from '@interfaces/generalNotification';
 import { request } from '@src/utils/request';
 import { GeneralNotificationCard } from './GeneralNotificationCard';
@@ -124,7 +124,7 @@ export function PublishedGeneralNotification({
         aria-hidden={!expanded}
       >
         {notifications.map((notification) => (
-          <>
+          <Fragment key={notification.id}>
             <Typography variant="h6" sx={{ marginTop: '1rem' }}>
               {
                 notification.title[
@@ -136,7 +136,7 @@ export function PublishedGeneralNotification({
               key={notification.id}
               content={notification.message[language] ?? ''}
             />
-          </>
+          </Fragment>
         ))}
       </Stack>
     </Stack>
