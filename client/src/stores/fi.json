@@ -728,6 +728,7 @@
   },
   "adminInstructions": "Avaa käyttöohje",
   "FollowUpSectionConditions": {
-    "literalInfo": "Huomaathan, että sanalliselle liukukytkinkysymykselle ehtojen vastausväli ilmoitetaan aina numeroina välillä 0–10."
+    "numericInfo": "Voit täyttää vain toisen ehdoista tai molemmat ehdot. Jos käytät ehtoa 'Vastaus on välillä' voit täyttää vertailuarvon molemmat kentät tai jättää kentistä jommankumman tyhjäksi.",
+    "literalInfo": "Huomaathan, että sanallisessa liukukytkinkysymyksessä vastaajalle näkyy sanallisen minimi- ja maksimiarvon lisäksi arvot 0–10 (0=minimiarvo ja 10=maksimiarvo). Sanallisen liukukytkinkysymyksen vastaus kirjautuu myös vastausdataan arvona 0–10."
   }
 }

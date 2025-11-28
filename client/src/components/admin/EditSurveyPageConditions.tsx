@@ -93,27 +93,55 @@ function SurveyPageCondition({
         }
       />
       {['numeric', 'slider'].includes(selectedQuestion?.type) && (
-        <>
+        <Box
+          component={'fieldset'}
+          sx={{
+            border: 'none',
+            margin: 0,
+            padding: 0,
+            marginTop: '10px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+          }}
+        >
+          <Box
+            component={'legend'}
+            sx={{
+              padding: 0,
+              float: 'left',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            <span style={{ fontWeight: 'bold' }}>
+              {tr.FollowUpSection.conditions.types.or}
+            </span>{' '}
+            {tr.FollowUpSection.conditions.types.between}
+          </Box>
           <ConditionRow
+            hideLabel
+            labelStyle={{ flex: '0 1 auto' }}
+            rootStyle={{ marginTop: 0 }}
             conditionIsNumeric
-            labelPrefix={tr.FollowUpSection.conditions.types.or}
             label={tr.FollowUpSection.conditions.types.greaterThan}
-            onInput={(value) => handleConditionUpdate('greaterThan', value)}
             textFieldValue={
               activePage.conditions[selectedQuestion.id]?.greaterThan[0] ?? ''
             }
+            onInput={(value) => handleConditionUpdate('greaterThan', value)}
           />
-
+          <span>{'–'}</span>
           <ConditionRow
             conditionIsNumeric
-            labelPrefix={tr.FollowUpSection.conditions.types.or}
+            hideLabel
             label={tr.FollowUpSection.conditions.types.lessThan}
-            onInput={(value) => handleConditionUpdate('lessThan', value)}
+            labelStyle={{ flex: '0 1 auto' }}
+            rootStyle={{ marginTop: 0 }}
             textFieldValue={
               activePage.conditions[selectedQuestion.id]?.lessThan[0] ?? ''
             }
+            onInput={(value) => handleConditionUpdate('lessThan', value)}
           />
-        </>
+        </Box>
       )}
     </FormControl>
   );
