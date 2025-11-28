@@ -177,7 +177,7 @@ function checkNumericConditions(
   value: number | null,
   conditions: Conditions,
 ): boolean {
-  if (!value) return false;
+  if (value === null) return false;
 
   if (conditions.equals.some((conditionValue) => value === conditionValue)) {
     return true;
