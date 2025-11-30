@@ -37,6 +37,7 @@ import ChevronDownIcon from '@src/components/icons/ChevronDownIcon';
 import DocumentCopyIcon from '@src/components/icons/DocumentCopyIcon';
 import DownloadFileIcon from '@src/components/icons/DownloadFileIcon';
 import DraggableIcon from '@src/components/icons/DraggableIcon';
+import GeoBudgetingIcon from '@src/components/icons/GeoBudgetingIcon';
 import { ImageCheckIcon } from '@src/components/icons/ImageCheckIcon';
 import ImageSmallIcon from '@src/components/icons/ImageSmallIcon';
 import LikertGroupIcon from '@src/components/icons/LikertGroupIcon';
@@ -325,7 +326,7 @@ export default function SurveySectionAccordion(props: Props) {
       ),
     },
     'geo-budgeting': {
-      icon: <></>,
+      icon: <GeoBudgetingIcon />,
       tooltip: tr.SurveySection.geoBudgetingQuestion,
       form: (
         <EditGeoBudgetingQuestion

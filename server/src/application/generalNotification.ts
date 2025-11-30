@@ -30,7 +30,7 @@ export const GENERAL_NOTIFICATION_TIMEOUT_DAYS = process.env
 export async function getRecentGeneralNotificationCount() {
   return getDb().one<{ count: number }>(
     `
-    SELECT COUNT(id)
+    SELECT COUNT(id)::int
     FROM data.general_notification
     WHERE created_at > now() - interval '${GENERAL_NOTIFICATION_TIMEOUT_DAYS} day'
     `,
@@ -40,7 +40,7 @@ export async function getRecentGeneralNotificationCount() {
 export async function getGeneralNotifications() {
   const result = await getDb().manyOrNone<DBGeneralNotification>(
     `
-    SELECT  
+    SELECT
       gn.id,
       title,
       message,
@@ -58,7 +58,7 @@ export async function getGeneralNotifications() {
 export async function getGeneralNotification(id: string) {
   const result = await getDb().oneOrNone<DBGeneralNotification>(
     `
-    SELECT  
+    SELECT
         gn.id,
         title,
         message,

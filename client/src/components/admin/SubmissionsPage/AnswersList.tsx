@@ -46,6 +46,7 @@ function isItemSelected(
 ) {
   if (!selection) return false;
 
+  // For map questions, we need to match the specific index since each geometry is a separate item
   if (selectedQuestion.type === 'map') {
     return (
       item.submission.id === selection.submissionId &&
@@ -53,6 +54,7 @@ function isItemSelected(
       item.entry.index === selection.index
     );
   }
+  // For other questions including geo-budgeting, just match submission and question
   return (
     item.submission.id === selection.submissionId &&
     item.entry.sectionId === selection.questionId
@@ -171,6 +173,24 @@ export default function AnswersList({
                           ),
                         ),
                     )}
+                  </>
+                ) : answer.entry.type === 'geo-budgeting' ? (
+                  <>
+                    <SurveyQuestion
+                      readOnly
+                      pageUnfinished={false}
+                      mobileDrawerOpen={false}
+                      question={
+                        selectedQuestion?.id === 0
+                          ? surveyQuestions.find(
+                              (question) =>
+                                question.id === answer.entry.sectionId,
+                            )
+                          : selectedQuestion
+                      }
+                      submission={answer.submission}
+                      value={answer.entry.value}
+                    />
                   </>
                 ) : (
                   <>

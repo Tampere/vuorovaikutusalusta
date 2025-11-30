@@ -713,7 +713,7 @@ export interface GeoBudgetingAnswer {
   /**
    * Index into the targets array (0-based)
    */
-  targetId: number;
+  targetIndex: number;
   /**
    * GeoJSON geometry of the placed point
    */

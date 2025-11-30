@@ -1,14 +1,42 @@
 import {
   AnswerEntry,
+  GeoBudgetingAnswer,
   Submission,
   Survey,
   SurveyPageSection,
   SurveyQuestion,
 } from '@interfaces/survey';
+import { useTranslations } from '@src/stores/TranslationContext';
+import { Feature } from 'geojson';
 import React, { useEffect, useMemo } from 'react';
 import { AnswerSelection } from './AnswersList';
 import OskariMap from './OskariMap';
-import { useTranslations } from '@src/stores/TranslationContext';
+
+/**
+ * Base properties shared by both map and geo-budgeting answer features
+ */
+interface BaseAnswerFeatureProperties {
+  question: SurveyPageSection | undefined;
+  submissionId: number;
+  index: number;
+  selected: boolean;
+}
+
+/**
+ * Additional properties specific to geo-budgeting answer features
+ */
+interface GeoBudgetingAnswerFeatureProperties
+  extends BaseAnswerFeatureProperties {
+  targetIndex: number;
+  targetIcon: string | undefined;
+}
+
+/**
+ * Union type for all answer feature properties
+ */
+type AnswerFeatureProperties =
+  | BaseAnswerFeatureProperties
+  | GeoBudgetingAnswerFeatureProperties;
 
 interface Props {
   survey: Survey;
@@ -37,6 +65,7 @@ export default function AnswerMap({
 
     return (
       question.type === 'map' ||
+      question.type === 'geo-budgeting' ||
       (question?.followUpSections?.some(
         (followUpSection) => followUpSection.type === 'map',
       ) ??
@@ -59,10 +88,11 @@ export default function AnswerMap({
 
   function getAnswerVisibility(answer: AnswerEntry) {
     if (!answer.value) return false;
-    // Current question is not selected, filter away answers that are not map answers
-    if (selectedQuestion.id === 0) return answer.type === 'map';
+    // Current question is not selected, filter away answers that are not map/geo-budgeting answers
+    if (selectedQuestion.id === 0)
+      return answer.type === 'map' || answer.type === 'geo-budgeting';
 
-    if (answer.type === 'map') {
+    if (answer.type === 'map' || answer.type === 'geo-budgeting') {
       if (answer.sectionId === selectedQuestion.id) {
         return true;
       } else if (selectedQuestion.followUpSections?.length > 0) {
@@ -76,7 +106,7 @@ export default function AnswerMap({
   }
 
   // All answer geometries that should be shown on the map
-  const features = useMemo<GeoJSON.Feature[]>(() => {
+  const features = useMemo<Feature<any, AnswerFeatureProperties>[]>(() => {
     // If no question containing map question was selected OR if the selected question was not "select all", show nothing on the map
     if (!(selectedQuestion?.id === 0 || holdsMapQuestions(selectedQuestion))) {
       return [];
@@ -85,50 +115,90 @@ export default function AnswerMap({
     return (
       submissions
         // Reduce all submissions into one array of features
-        .reduce((features, submission) => {
-          return [
-            ...features,
-            ...submission.answerEntries
+        .reduce(
+          (features, submission) => {
+            return [
+              ...features,
+              ...submission.answerEntries
 
-              .filter((answer): answer is AnswerEntry & { type: 'map' } =>
-                getAnswerVisibility(answer),
-              )
+                .filter(
+                  (
+                    answer,
+                  ): answer is AnswerEntry & {
+                    type: 'map' | 'geo-budgeting';
+                  } => getAnswerVisibility(answer),
+                )
 
-              // Reduce answer's values into a single array of features
-              .reduce((features, answer) => {
-                const question =
-                  selectedQuestion?.id === 0
-                    ? surveyQuestions
-                        .flatMap((question) => [
-                          question,
-                          ...(question?.followUpSections ?? []),
-                        ])
-                        .find((question) => question.id === answer.sectionId)
-                    : selectedQuestion;
+                // Reduce answer's values into a single array of features
+                .reduce((features, answer) => {
+                  const question =
+                    selectedQuestion?.id === 0
+                      ? surveyQuestions
+                          .flatMap((question) => [
+                            question,
+                            ...(question?.followUpSections ?? []),
+                          ])
+                          .find((question) => question.id === answer.sectionId)
+                      : selectedQuestion;
 
-                return [
-                  ...features,
-                  ...answer.value.map((value, index) => {
-                    return {
-                      id: `feature-${question?.id}-${index}-${submission?.id}`,
-                      type: 'Feature',
-                      geometry: value.geometry.geometry,
-                      properties: {
-                        question: question,
-                        submissionId: submission.id,
-                        index,
-                        selected: isFeatureSelected(
+                  return [
+                    ...features,
+                    ...answer.value
+                      .filter((value) => value.geometry?.geometry != null)
+                      .map((value, index) => {
+                        const isSelected = isFeatureSelected(
                           submission,
                           question,
                           index,
-                        ),
-                      },
-                    } as GeoJSON.Feature;
-                  }),
-                ];
-              }, []),
-          ];
-        }, [] as GeoJSON.Feature[])
+                        );
+
+                        // For geo-budgeting answers, create properties with targetIndex and targetIcon
+                        if (
+                          answer.type === 'geo-budgeting' &&
+                          question?.type === 'geo-budgeting'
+                        ) {
+                          const geoBudgetValue = value as GeoBudgetingAnswer;
+                          const properties: GeoBudgetingAnswerFeatureProperties =
+                            {
+                              question,
+                              submissionId: submission.id,
+                              index,
+                              selected: isSelected,
+                              targetIndex: geoBudgetValue.targetIndex,
+                              targetIcon:
+                                question.targets?.[geoBudgetValue.targetIndex]
+                                  ?.icon,
+                            };
+
+                          return {
+                            id: `feature-${question?.id}-${index}-${submission?.id}`,
+                            type: 'Feature',
+                            geometry: geoBudgetValue.geometry.geometry,
+                            properties,
+                          };
+                        }
+
+                        // For map questions, create base properties
+                        const properties: BaseAnswerFeatureProperties = {
+                          question,
+                          submissionId: submission.id,
+                          index,
+                          selected: isSelected,
+                        };
+
+                        return {
+                          id: `feature-${question?.id}-${index}-${submission?.id}`,
+                          type: 'Feature',
+                          geometry: value.geometry.geometry,
+                          properties,
+                        };
+                      }),
+                  ];
+                }, []),
+            ];
+          },
+          [] as Feature<any, AnswerFeatureProperties>[],
+        )
     );
   }, [selectedQuestion, selectedAnswer]);
 

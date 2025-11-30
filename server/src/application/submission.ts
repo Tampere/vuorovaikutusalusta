@@ -1,6 +1,7 @@
 import { CredentialsEntry } from '@interfaces/submission';
 import {
   AnswerEntry,
+  GeoBudgetingAnswer,
   LanguageCode,
   LocalizedText,
   MapQuestionAnswer,
@@ -447,7 +448,9 @@ export async function createSurveySubmission(
  */
 function getSRIDFromEntries(submissionEntries: AnswerEntry[]) {
   const geometryEntry = submissionEntries.find(
-    (entry) => entry.type === 'map' && entry.value.length > 0,
+    (entry) =>
+      (entry.type === 'map' || entry.type === 'geo-budgeting') &&
+      entry.value.length > 0,
   );
   if (!geometryEntry) return null;
 
@@ -596,8 +599,7 @@ function answerEntriesToRows(
             // Save subquestion answers under the entry for inserting them with correct parent entry ID later on
             subQuestionAnswers: value.subQuestionAnswers,
           };
-        }, []);
-
+        });
         break;
       case 'sorting':
         newEntries = [
@@ -711,7 +713,7 @@ function answerEntriesToRows(
             value_text: null,
             value_option_id: null,
             value_geometry: value.geometry?.geometry,
-            value_numeric: value.targetId,
+            value_numeric: value.targetIndex,
             value_json: null,
             value_file: null,
             value_file_name: null,
@@ -905,20 +907,33 @@ function dbAnswerEntriesToAnswerEntries(
           break;
         }
         case 'geo-budgeting': {
-          entries.push({
-            sectionId: row.section_id,
-            type: 'geo-budgeting',
-            value: [
-              {
-                targetId: row.value_numeric,
-                geometry: {
-                  type: 'Feature',
-                  geometry: row.value_geometry as GeoJSON.Point,
-                  properties: {},
-                },
-              },
-            ],
-          });
+          // Try to find an existing entry for this section
+          let entry = entries.find(
+            (entry): entry is AnswerEntry & { type: 'geo-budgeting' } =>
+              entry.sectionId === row.section_id,
+          );
+          // If the entry doesn't exist, create it
+          if (
+            !entry &&
+            (entry = {
+              sectionId: row.section_id,
+              type: 'geo-budgeting',
+              value: [],
+            })
+          ) {
+            entries.push(entry);
+          }
+          const value: GeoBudgetingAnswer = {
+            targetIndex: row.value_numeric,
+            geometry: {
+              type: 'Feature',
+              geometry: row.value_geometry as GeoJSON.Point,
+              properties: {},
+            },
+          };
+          if (value != null) {
+            entry.value.push(value);
+          }
           break;
         }
         case 'text':

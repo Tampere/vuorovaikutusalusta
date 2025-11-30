@@ -1,5 +1,7 @@
 import { LocalizedText } from '@interfaces/survey';
 import { Badge, Stack, ToggleButton, Typography } from '@mui/material';
+import { useTranslations } from '@src/stores/TranslationContext';
+import { getNumberFormatter } from '@src/utils/format';
 import React from 'react';
 
 interface Props {
@@ -27,61 +29,58 @@ export default function GeoBudgetingTargetButton({
   currentLanguage,
   remainingBudget,
 }: Props) {
+  const { tr, language } = useTranslations();
   const canAfford = price <= remainingBudget;
   const isDisabled = !isMapReady || !canAfford;
+  const numberFormatter = getNumberFormatter(language);
 
   return (
     <Stack alignItems="center" spacing={0.5}>
-      <ToggleButton
-        value={targetName[currentLanguage]}
-        selected={isActive}
-        onChange={onSelect}
-        disabled={isDisabled}
-        aria-label={`${targetName[currentLanguage]}, ${price}${unit} ${count > 0 ? `× ${count} placed` : 'not placed'}${!canAfford ? ', exceeds budget' : ''}`}
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 1,
-          padding: '0.5rem 1rem',
-          minWidth: '120px',
-          ...(isDisabled && {
-            opacity: 0.5,
-            '& img': {
-              filter: 'grayscale(100%)',
-            },
-          }),
-        }}
-      >
-        <Badge badgeContent={count} color="secondary">
-          {icon ? (
-            <img
-              style={{ height: '2rem', width: '2rem' }}
-              src={`data:image/svg+xml;base64,${btoa(icon)}`}
-              alt=""
-              aria-hidden="true"
-            />
-          ) : (
-            <div
-              style={{
-                height: '2rem',
-                width: '2rem',
-                backgroundColor: '#ccc',
-                borderRadius: '4px',
-              }}
-              aria-hidden="true"
-            />
-          )}
-        </Badge>
-        <Typography
+      <Badge badgeContent={count} color="secondary">
+        <ToggleButton
+          size="small"
+          value={targetName[currentLanguage]}
+          selected={isActive}
+          onChange={onSelect}
+          disabled={isDisabled}
+          aria-label={`${targetName[currentLanguage]}, ${price}${unit} ${count > 0 ? `× ${count} ${tr.GeoBudgetingQuestion.placed}` : ''}${!canAfford ? `, ${tr.GeoBudgetingQuestion.exceedsBudget}` : ''}`}
           sx={{
-            fontSize: '0.95rem',
-            fontWeight: 500,
-            textTransform: 'none',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            padding: '0.5rem',
+            minWidth: '120px',
+            maxWidth: '300px',
+            ...(isDisabled && {
+              opacity: 0.5,
+              '& img': {
+                filter: 'grayscale(100%)',
+              },
+            }),
           }}
         >
-          {targetName[currentLanguage]}
-        </Typography>
-      </ToggleButton>
+          <img
+            style={{ height: '1rem', width: '1rem' }}
+            src={
+              icon
+                ? `data:image/svg+xml;base64,${btoa(icon)}`
+                : '/api/feature-styles/icons/point_icon'
+            }
+            alt=""
+            aria-hidden="true"
+          />
+          <Typography
+            sx={{
+              fontSize: '0.95rem',
+              fontWeight: 500,
+              textTransform: 'none',
+              textAlign: 'start',
+            }}
+          >
+            {targetName[currentLanguage]}
+          </Typography>
+        </ToggleButton>
+      </Badge>
       <Typography
         variant="caption"
         color="text.secondary"
@@ -90,8 +89,7 @@ export default function GeoBudgetingTargetButton({
           fontSize: '0.8rem',
         }}
       >
-        {price}
-        {unit} × {count}
+        {numberFormatter.format(price)}&nbsp;{unit}
       </Typography>
     </Stack>
   );

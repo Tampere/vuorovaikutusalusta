@@ -14,11 +14,12 @@ import {
 } from '@mui/material';
 import { useSurveyMap } from '@src/stores/SurveyMapContext';
 import { useTranslations } from '@src/stores/TranslationContext';
+import { getNumberFormatter } from '@src/utils/format';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { MarkdownView } from './MarkdownView';
-import GeoBudgetingTargetButton from './GeoBudgetingTargetButton';
-import GeoBudgetingFeatureDialog from './GeoBudgetingFeatureDialog';
 import ConfirmDialog from './ConfirmDialog';
+import GeoBudgetingFeatureDialog from './GeoBudgetingFeatureDialog';
+import GeoBudgetingTargetButton from './GeoBudgetingTargetButton';
+import { MarkdownView } from './MarkdownView';
 
 interface Props {
   value: GeoBudgetingAnswer[];
@@ -65,7 +66,7 @@ export default function GeoBudgetingQuestion({
   const countPerTarget = useMemo(() => {
     const counts: number[] = question.targets.map(() => 0);
     value.forEach((answer) => {
-      counts[answer.targetId]++;
+      counts[answer.targetIndex]++;
     });
     return counts;
   }, [value, question.targets]);
@@ -73,21 +74,14 @@ export default function GeoBudgetingQuestion({
   // Calculate total budget used
   const totalUsedBudget = useMemo(() => {
     return value.reduce((sum, answer) => {
-      const target = question.targets[answer.targetId];
+      const target = question.targets[answer.targetIndex];
       return sum + (target.price ?? 0);
     }, 0);
   }, [value, question.targets]);
 
   const remainingBudget = question.totalBudget - totalUsedBudget;
 
-  // Formatter for numbers
-  const numberFormatter = new Intl.NumberFormat(
-    language === 'fi' ? 'fi-FI' : language === 'se' ? 'sv-SE' : 'en-US',
-    {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    },
-  );
+  const numberFormatter = getNumberFormatter(language);
 
   // Handle feature click from map (edit dialog trigger)
   useEffect(() => {
@@ -131,16 +125,16 @@ export default function GeoBudgetingQuestion({
   }, [isMapReady, question.id, onModify]);
 
   // Handle target button click - trigger drawing
-  const handleTargetSelect = async (targetId: number) => {
+  const handleTargetSelect = async (targetIndex: number) => {
     if (!isMapReady || readOnly) {
       return;
     }
 
-    setActiveTargetId(targetId);
+    setActiveTargetId(targetIndex);
     setDrawingCancelled(false);
 
     // Create a compatible question object for map drawing
-    const target = question.targets[targetId];
+    const target = question.targets[targetIndex];
     const drawQuestion: SurveyMapQuestion = {
       id: question.id,
       title: question.title,
@@ -179,7 +173,7 @@ export default function GeoBudgetingQuestion({
       onChange([
         ...valueRef.current,
         {
-          targetId,
+          targetIndex,
           geometry: geometry as any,
         },
       ]);
@@ -266,7 +260,7 @@ export default function GeoBudgetingQuestion({
             display: 'flex',
             gap: 2,
             flexWrap: 'wrap',
-            justifyContent: 'center',
+            justifyContent: 'flex-start',
             mb: 2,
           }}
         >
@@ -299,10 +293,10 @@ export default function GeoBudgetingQuestion({
           <GeoBudgetingFeatureDialog
             open={featureDialogOpen && !deleteConfirmDialogOpen}
             targetName={
-              question.targets[value[editingAnswerIndex]?.targetId]?.name
+              question.targets[value[editingAnswerIndex]?.targetIndex]?.name
             }
             targetIcon={
-              question.targets[value[editingAnswerIndex]?.targetId]?.icon
+              question.targets[value[editingAnswerIndex]?.targetIndex]?.icon
             }
             onDeleteClick={handleDeleteFeatureClick}
             onClose={() => {

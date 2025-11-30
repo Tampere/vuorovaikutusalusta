@@ -356,7 +356,9 @@
     "allocationDirection": "Budjetin käytön suunta",
     "allocationDirectionIncreasing": "Budjettia täytetään (nollasta ylöspäin)",
     "allocationDirectionDecreasing": "Budjettia sijoitetaan (täydestä nollaan päin)",
-    "helperText": "Opastus"
+    "helperText": "Opastus",
+    "placed": "sijoitettu",
+    "exceedsBudget": "ylittää budjetin"
   },
   "fileValidator": {
     "fileUploadError": "Virhe ladattaessa tiedostoa",
