@@ -92,8 +92,8 @@ export default function CheckBoxQuestion({
 
   function isOptionDisable(optionValue: string | number) {
     return (
-      question.answerLimits.max &&
-      question.answerLimits.max === value.length &&
+      question.answerLimits?.max &&
+      question.answerLimits?.max === value.length &&
       !value.includes(optionValue)
     );
   }
