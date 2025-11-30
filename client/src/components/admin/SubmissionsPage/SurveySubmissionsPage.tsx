@@ -45,7 +45,9 @@ function answerEntryToItems(
   submission: Submission,
   entry: AnswerEntry,
 ): AnswerItem[] {
-  if (!isMapEntry(entry)) {
+  // Only split map entries into separate items (one per geometry)
+  // Geo-budgeting and other types stay as single items
+  if (entry.type !== 'map') {
     return [{ submission, entry }];
   }
   return entry.value.map((value, index) => ({

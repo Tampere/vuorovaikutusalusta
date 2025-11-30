@@ -274,12 +274,12 @@ export default function SurveyStepper({
             type: 'Feature' as const,
             geometry: geoBudgetAnswer.geometry.geometry,
             id: `feature-${question.id}-${index}`,
-            // Pass question, answer index, targetId, and target icon for marker rendering
+            // Pass question, answer index, targetIndex, and target icon for marker rendering
             properties: {
               question,
               index,
-              targetId: geoBudgetAnswer.targetId,
-              targetIcon: question.targets[geoBudgetAnswer.targetId]?.icon,
+              targetIndex: geoBudgetAnswer.targetIndex,
+              targetIcon: question.targets[geoBudgetAnswer.targetIndex]?.icon,
             },
             ...(geoBudgetAnswer.geometry.crs && {
               crs: geoBudgetAnswer.geometry.crs,

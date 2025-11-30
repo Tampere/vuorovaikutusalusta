@@ -357,7 +357,9 @@
     "allocationDirection": "Riktning för budgetfördelning",
     "allocationDirectionIncreasing": "Budgeten fylls (från noll och uppåt)",
     "allocationDirectionDecreasing": "Budgeten förbrukas (från full till noll)",
-    "helperText": "Hjälptext"
+    "helperText": "Hjälptext",
+    "placed": "placerad",
+    "exceedsBudget": "överstiger budgeten"
   },
   "fileValidator": {
     "fileUploadError": "Fel vid uppladdning av filen.",
