@@ -8,7 +8,6 @@ import {
   updateGeneralNotification,
 } from '@src/application/generalNotification';
 import { ensureAdminAccess, ensureAuthenticated } from '@src/auth';
-import logger from '@src/logger';
 import { validateRequest } from '@src/utils';
 import { Router } from 'express';
 import asyncHandler from 'express-async-handler';
@@ -34,7 +33,6 @@ router.get(
   ensureAuthenticated(),
   asyncHandler(async (_req, res) => {
     const response = await getRecentGeneralNotificationCount();
-    logger.info(JSON.stringify(response));
     if (!response) {
       res.status(404).send('Not found');
     } else {
@@ -93,7 +91,6 @@ router.post(
       });
       res.status(201).send('Created');
     } catch (e) {
-      logger.info(e);
       res.status(400).send(`Bad request: ${e}`);
     }
   }),
