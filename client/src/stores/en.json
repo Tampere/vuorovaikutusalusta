@@ -316,6 +316,7 @@
     "loadingImages": "Loading images",
     "surveyImage": "Survey background image",
     "thanksPageImage": "Image for thank you page",
+    "generalNotificationImage": "Notification image",
     "image": "Image",
     "selectImage": "Choose background image",
     "addNewImage": "Add a new image",
@@ -613,20 +614,30 @@
     "hideOldResponses": "Hide old comments...",
     "showOldResponses": "Display {x} older comments"
   },
+  "AppBar": {
+    "generalNotifications": "Notifications",
+    "generalNotificationsNew": "New notifications",
+    "generalNotificationsError": "Error while fetching general notifications."
+  },
   "AppBarUserMenu": {
     "label": "User menu",
     "logout": "Logout",
     "updateInstructions": "Update user instructions"
   },
+  "FileUploadDialog": {
+    "wrongFileFormatPdf": "The file needs to be in pdf format.",
+    "wrongFileFormatImage": "The file needs to be an image (png, jpg, jpeg, gif, webp).",
+    "wrongFileFormat": "Invalid file format.",
+    "fileUploadError": "Error while uploading file.",
+    "fileSizeLimitError": "File size cannot exceed {x}MB.",
+    "save": "Tallenna",
+    "cancel": "Cancel"
+  },
   "InstructionsDialog": {
-    "fetchingError": "Error while fetching current user instructions",
+    "fetchingError": "Error while fetching current user instructions.",
     "currentInstructions": "Current instructions",
     "uploadNewInstructions": "Upload new instructions",
-    "wrongFileFormat": "The file needs to be in pdf format",
-    "fileUploadError": "Error while uploading file",
-    "fileSizeLimitError": "File size cannot exceed {x}MB",
-    "submit": "Send",
-    "cancel": "Cancel"
+    "instructionsUpdated": "Instructions updated."
   },
   "MapInfoBox": {
     "answer": "Answer"
@@ -730,5 +741,32 @@
   "FollowUpSectionConditions": {
     "numericInfo": "You can fill in only one of the conditions or both. If you use the 'Answer is between' condition, you can fill in both comparison value fields or leave one of them empty.",
     "literalInfo": "Please note that in a verbal slider question, in addition to the verbal minimum and maximum values, the respondent also sees values 0–10 (0=minimum value and 10=maximum value). The answer to a verbal slider question is also recorded in the response data as a value from 0 to 10."
+  },
+  "TextEditor": {
+    "headerTitle": "Header",
+    "boldTitle": "Bold",
+    "unorderedListTitle": "Unordered list",
+    "orderedListTitle": "Ordered list",
+    "addPicture": "Add picture"
+  },
+  "GeneralNotification": {
+    "formLabel": "Notification title",
+    "addNew": "Add new notification",
+    "noResults": "No notifications",
+    "maintenance": "Maintenance",
+    "updateSuccess": "Notification updated successfully",
+    "addSuccess": "Notification added successfully",
+    "updateFailed": "Failed to update notification",
+    "deleteSuccess": "Notification deleted successfully",
+    "deleteFailed": "Failed to delete notification",
+    "imageAltText": "Alternative text for the image",
+    "imageAttributions": "Attributions for the image",
+    "imageDeleteFailed": "Failed to delete old images from the database. Please contact tech support.",
+    "publishToAdmin": "Publish for survey editors",
+    "publishToPublic": "Publish for survey respondents",
+    "publishHelper": "Notification published for survey editors is shown on the survey list front page and notification published for respondents is shown on the survey landing page.",
+    "publishedInternally": "Published to editors",
+    "publishedExternally": "Published to respondents",
+    "newNotification": "New notification"
   }
 }

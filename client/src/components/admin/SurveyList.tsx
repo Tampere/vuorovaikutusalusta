@@ -9,6 +9,7 @@ import { Box, FormControlLabel, Skeleton, Switch } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
 import LoadingButton from '../LoadingButton';
 import { useHistory } from 'react-router-dom';
+import { PublishedGeneralNotification } from './GeneralNotification/PublishedGeneralNotification';
 
 const styles = {
   root: {
@@ -64,6 +65,7 @@ export default function SurveyList() {
 
   return (
     <Box sx={styles.root}>
+      <PublishedGeneralNotification variant="internal" />
       <Box sx={styles.actions}>
         <FormControlLabel
           value="showAuthored"

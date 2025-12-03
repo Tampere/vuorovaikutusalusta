@@ -772,7 +772,7 @@ export interface File {
 /**
  * Image used as the background of the survey landing page or in the thank you page
  */
-export interface SurveyImage extends File {
+export interface ImageFile extends File {
   /**
    * Image attributions (= who owns the image rights)
    */
@@ -845,7 +845,10 @@ export interface Submission {
   answerEntries?: AnswerEntry[];
 }
 
-export type ImageType = 'backgroundImage' | 'thanksPageImage';
+export type ImageType =
+  | 'backgroundImage'
+  | 'thanksPageImage'
+  | 'generalNotifications';
 
 /**
  * Conditions to display follow-up section

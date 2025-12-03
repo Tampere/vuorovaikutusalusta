@@ -278,6 +278,7 @@ export default function EditSurveyInfo() {
             adapterLocale={localLanguage}
             localeText={{
               dateTimePickerToolbarTitle: tr.EditSurveyInfo.selectDateAndTime,
+              cancelButtonLabel: tr.commands.cancel,
             }}
           >
             <DateTimePicker

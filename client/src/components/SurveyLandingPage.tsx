@@ -11,6 +11,7 @@ import {
 import { useTranslations } from '@src/stores/TranslationContext';
 import React from 'react';
 import Footer from './Footer';
+import { PublishedGeneralNotification } from './admin/GeneralNotification/PublishedGeneralNotification';
 
 const styles = (theme: Theme & { [customKey: string]: any }) => ({
   heading: {
@@ -89,6 +90,8 @@ export default function SurveyLandingPage({
 }: Props) {
   const { tr, surveyLanguage } = useTranslations();
   const mediumWidth = useMediaQuery('(max-width: 640px)');
+  const notificationWidth = useMediaQuery('(max-width: 800px)');
+
   return (
     <Stack
       direction="column"
@@ -132,6 +135,19 @@ export default function SurveyLandingPage({
           alt={tr.IconAltTexts.logoAltText}
         />
       </Box>
+      <PublishedGeneralNotification
+        defaultOpen
+        variant={'external'}
+        sx={{
+          maxWidth: '800px',
+          alignSelf: 'center',
+          ...(notificationWidth && {
+            borderRadius: 0,
+            borderRight: 0,
+            borderLeft: 0,
+          }),
+        }}
+      />
       <Box
         className="middle-content"
         sx={{

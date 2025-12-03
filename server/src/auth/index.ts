@@ -102,7 +102,7 @@ export function configureMockAuth(app: Express) {
     id: '12345-67890-abcde-fghij1',
     fullName: 'Teemu Konsultti',
     email: 'teemu.testaaja@testi.com',
-    roles: ['TRE_FIILIS_CONSULTANTS'],
+    roles: ['TRE_FIILIS_ADMINS'],
   };
   upsertUser(mockUser);
 
@@ -170,6 +170,21 @@ export function ensureSurveyGroupAccess(surveyIdIdentifier: string = 'id') {
 
       throw new ForbiddenError(
         `User ${req.user.id} does not have access to survey with ID ${req.params[surveyIdIdentifier]}`,
+      );
+    },
+  );
+}
+
+export function ensureAdminAccess() {
+  return asyncHandler(
+    async (req: Request, _res: Response, next: NextFunction) => {
+      // Admin and internal users have access to all surveys
+      if (isAdmin(req.user)) {
+        return next();
+      }
+
+      throw new ForbiddenError(
+        `User ${req.user.id} does not have admin access rights`,
       );
     },
   );

@@ -110,7 +110,7 @@ export default function SurveyListItem(props: Props) {
             {/* Scheduling info (start/end dates) */}
             {survey.startDate && survey.endDate ? (
               <Typography variant="body1" color="textSecondary" gutterBottom>
-                {tr.SurveyList.open} {format(survey.startDate, 'd.M.yyyy')} -{' '}
+                {tr.SurveyList.open} {format(survey.startDate, 'd.M.yyyy')}—
                 {format(survey.endDate, 'd.M.yyyy')}
               </Typography>
             ) : survey.startDate ? (
