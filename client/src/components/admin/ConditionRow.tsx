@@ -7,6 +7,7 @@ import {
   FormLabel,
   MenuItem,
   Select,
+  SxProps,
   TextField,
   Typography,
 } from '@mui/material';
@@ -56,6 +57,9 @@ function SelectPlaceholder({ selected, options }: SelectPlaceholderProps) {
 
 interface RowProps {
   label: string;
+  labelStyle?: SxProps;
+  rootStyle?: SxProps;
+  hideLabel?: boolean;
   conditionIsNumeric?: boolean;
   options?: SectionOption[];
   conditions?: Conditions;
@@ -68,6 +72,9 @@ interface RowProps {
 
 export function ConditionRow({
   label,
+  labelStyle,
+  rootStyle,
+  hideLabel,
   conditionIsNumeric = false,
   options = [],
   conditions = { equals: [], lessThan: [], greaterThan: [] },
@@ -93,21 +100,26 @@ export function ConditionRow({
         marginTop: '10px',
         alignItems: 'center',
         gap: 2,
+        ...rootStyle,
       }}
     >
-      <FormLabel
-        sx={{
-          flex: 1,
-          color: '#000',
-          textAlign: alignment,
-          transform: validationError ? 'translateY(-50%)' : null,
-        }}
-      >
-        <span style={{ fontWeight: 'bold' }}>{`${labelPrefix} `}</span>
-        {label}
-      </FormLabel>
+      {!hideLabel && (
+        <FormLabel
+          sx={{
+            flex: 1,
+            color: '#000',
+            textAlign: alignment,
+            transform: validationError ? 'translateY(-50%)' : null,
+            ...labelStyle,
+          }}
+        >
+          <span style={{ fontWeight: 'bold' }}>{`${labelPrefix} `}</span>
+          {label}
+        </FormLabel>
+      )}
       {conditionIsNumeric ? (
         <TextField
+          aria-label={hideLabel ? label : undefined}
           error={validationError}
           helperText={
             validationError && tr.FollowUpSection.conditions.validationError

@@ -179,6 +179,7 @@
       "insertValue": "insert value",
       "customAnswer": "Something else, what?",
       "types": {
+        "between": "answer is between",
         "equals": "Answer is exactly",
         "contains": "Answer contains option",
         "lessThan": "answer is at most",
@@ -258,7 +259,8 @@
     "imageSection": "Image section",
     "documentSection": "Document section",
     "attachmentSection": "Attachment section",
-    "question": "Question"
+    "question": "Question",
+    "noSelection": "No selection"
   },
   "SurveySections": {
     "limitAnswers": "Limit the number of answers",
@@ -724,5 +726,9 @@
     "bannerAltText": "Tampere banner",
     "logoAltText": "Tampere Finland logo"
   },
-  "adminInstructions": "Open user manual"
+  "adminInstructions": "Open user manual",
+  "FollowUpSectionConditions": {
+    "numericInfo": "You can fill in only one of the conditions or both. If you use the 'Answer is between' condition, you can fill in both comparison value fields or leave one of them empty.",
+    "literalInfo": "Please note that in a verbal slider question, in addition to the verbal minimum and maximum values, the respondent also sees values 0–10 (0=minimum value and 10=maximum value). The answer to a verbal slider question is also recorded in the response data as a value from 0 to 10."
+  }
 }

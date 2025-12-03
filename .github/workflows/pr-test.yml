@@ -17,6 +17,8 @@ jobs:
           node-version: '22'
       - name: Install dependencies
         run: npm ci
+      - name: Run tsc
+        run: npm run tsc
       - name: Build
         run: npm run build
   test-server:

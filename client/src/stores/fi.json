@@ -193,6 +193,7 @@
       "insertValue": "syötä vertailuarvo",
       "customAnswer": "Jokin muu, mikä?",
       "types": {
+        "between": "vastaus on välillä",
         "equals": "Vastaus on tasan",
         "contains": "Vastaus sisältää vaihtoehdon",
         "lessThan": "enintään",
@@ -272,7 +273,8 @@
     "imageSection": "Kuvaosio",
     "documentSection": "Liiteosio",
     "attachmentSection": "Vastausliite",
-    "question": "Kysymys"
+    "question": "Kysymys",
+    "noSelection": "Ei valintaa"
   },
   "SurveySections": {
     "limitAnswers": "Rajoita vastauslukumäärää",
@@ -724,5 +726,9 @@
     "bannerAltText": "Tampereen vaakunalogo",
     "logoAltText": "Tampere Finland -logo"
   },
-  "adminInstructions": "Avaa käyttöohje"
+  "adminInstructions": "Avaa käyttöohje",
+  "FollowUpSectionConditions": {
+    "numericInfo": "Voit täyttää vain toisen ehdoista tai molemmat ehdot. Jos käytät ehtoa 'Vastaus on välillä' voit täyttää vertailuarvon molemmat kentät tai jättää kentistä jommankumman tyhjäksi.",
+    "literalInfo": "Huomaathan, että sanallisessa liukukytkinkysymyksessä vastaajalle näkyy sanallisen minimi- ja maksimiarvon lisäksi arvot 0–10 (0=minimiarvo ja 10=maksimiarvo). Sanallisen liukukytkinkysymyksen vastaus kirjautuu myös vastausdataan arvona 0–10."
+  }
 }

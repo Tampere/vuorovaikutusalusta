@@ -173,6 +173,40 @@ export function getEmptyAnswer(section: SurveyPageSection): AnswerEntry {
   }
 }
 
+function checkNumericConditions(
+  value: number | null,
+  conditions: Conditions,
+): boolean {
+  if (value === null) return false;
+
+  if (conditions.equals.some((conditionValue) => value === conditionValue)) {
+    return true;
+  }
+
+  const valueIsGreaterThanCondition = conditions.greaterThan.some(
+    (conditionValue) => value >= conditionValue,
+  );
+  const valueIsLessThanCondition = conditions.lessThan.some(
+    (conditionValue) => value <= conditionValue,
+  );
+
+  // Value between conditions
+  if (conditions.greaterThan.length > 0 && conditions.lessThan.length > 0) {
+    return valueIsGreaterThanCondition && valueIsLessThanCondition;
+  }
+
+  // Open ranges
+  if (conditions.greaterThan.length > 0 && valueIsGreaterThanCondition) {
+    return true;
+  }
+
+  if (conditions.lessThan.length > 0 && valueIsLessThanCondition) {
+    return true;
+  }
+
+  return false;
+}
+
 /**
  * Checks if given answervalue for a question is empty/unanswered
  * @param question Question
@@ -354,6 +388,7 @@ export function useSurveyAnswers() {
     return state.answers.some((answerEntry) => {
       const conditionForSection =
         page.conditions?.[answerEntry.sectionId] ?? null;
+
       // Page has no condition for this answer
       if (!conditionForSection) return false;
       switch (answerEntry.type) {
@@ -373,19 +408,10 @@ export function useSurveyAnswers() {
 
         case 'numeric':
         case 'slider':
-          return conditionForSection.equals.some(
-            (conditionValue) => answerEntry.value === conditionValue,
-          )
-            ? true
-            : conditionForSection.greaterThan.some(
-                (conditionValue) => answerEntry.value >= conditionValue,
-              )
-            ? true
-            : conditionForSection.lessThan.some(
-                (conditionValue) => answerEntry.value <= conditionValue,
-              )
-            ? true
-            : false;
+          return checkNumericConditions(
+            answerEntry.value as number,
+            conditionForSection,
+          );
 
         default:
           return false;
@@ -410,7 +436,7 @@ export function useSurveyAnswers() {
     if (
       !question?.followUpSections ||
       question.followUpSections.length === 0 ||
-      !answer?.value
+      (answer?.value !== 0 && !answer?.value)
     ) {
       return [];
     }
@@ -443,19 +469,7 @@ export function useSurveyAnswers() {
               answer as Extract<AnswerEntry, { type: 'numeric' | 'slider' }>
             ).value;
 
-            return section.conditions.equals.some(
-              (conditionValue) => value === conditionValue,
-            )
-              ? true
-              : section.conditions.greaterThan.some(
-                  (conditionValue) => value >= conditionValue,
-                )
-              ? true
-              : section.conditions.lessThan.some(
-                  (conditionValue) => value <= conditionValue,
-                )
-              ? true
-              : false;
+            return checkNumericConditions(value, section.conditions);
           })
           .map((s) => s.id);
       default:

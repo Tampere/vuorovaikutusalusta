@@ -316,7 +316,7 @@ export function useSurveyMap() {
 
   const [state, dispatch] = context;
 
-  const drawingRef = useRef<boolean>();
+  const drawingRef = useRef<boolean | null>(null);
   drawingRef.current = state.questionId != null;
 
   const isMapReady = useMemo(() => {

@@ -4,7 +4,7 @@ import morgan from 'morgan';
 import * as path from 'path';
 import { initializePuppeteerCluster } from './application/screenshot';
 import { configureAuth, configureMockAuth, ensureAuthenticated } from './auth';
-import { initializeDatabase, migrateUp } from './database';
+import { getDb, initializeDatabase, migrateUp } from './database';
 import { HttpResponseError } from './error';
 import logger from './logger';
 import rootRouter from './routes';
@@ -12,6 +12,7 @@ import helmet from 'helmet';
 import { readFile } from 'fs/promises';
 import { createServer } from 'vite';
 import { getSurveyTitle } from './application/survey';
+import { startUpdatingRefreshToken } from './email/refresh-token';
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -58,6 +59,34 @@ async function start() {
 
   // Execute migrations
   await migrateUp();
+
+  if (process.env.ENABLE_EMAIL_REFRESH_TOKEN_AUTO_UPDATER === 'true') {
+    startUpdatingRefreshToken({
+      accessUrl: process.env.EMAIL_OAUTH_ACCESS_URL,
+      clientId: process.env.EMAIL_OAUTH_CLIENT_ID,
+      clientSecret: process.env.EMAIL_OAUTH_CLIENT_SECRET,
+      scope: process.env.EMAIL_OAUTH_SCOPE,
+      initialRefreshToken: process.env.EMAIL_OAUTH_REFRESH_TOKEN,
+      updateIntervalMs:
+        Number(process.env.EMAIL_OAUTH_REFRESH_TOKEN_UPDATE_INTERVAL_SECONDS) *
+        1000,
+      async loadToken() {
+        const result = await getDb().oneOrNone<{ token: string }>(
+          `SELECT token FROM email_refresh_token ORDER BY created_at DESC LIMIT 1`,
+        );
+        return result?.token;
+      },
+      async persistToken(token: string) {
+        await getDb().tx(async (tx) => {
+          // Only one token should be stored at a time, so truncate the table first
+          await tx.none(`TRUNCATE email_refresh_token`);
+          await tx.none(`INSERT INTO email_refresh_token (token) VALUES ($1)`, [
+            token,
+          ]);
+        });
+      },
+    });
+  }
 
   // Start up Puppeteer cluster for taking screenshots
   await initializePuppeteerCluster();
