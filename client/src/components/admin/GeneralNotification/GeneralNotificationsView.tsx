@@ -123,7 +123,7 @@ export function GeneralNotifications() {
 
   return (
     <>
-      <AdminAppBar labels={['notifications']} />
+      <AdminAppBar labels={[tr.AppBar.generalNotifications]} />
       <Box sx={containerStyle}>
         {activeUserIsAdmin && (
           <EditGeneralNotification
