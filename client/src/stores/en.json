@@ -703,7 +703,8 @@
       },
       "yAxisTotalLabel": "Total answers",
       "yAxisLabel": "Answers"
-    }
+    },
+    "date": "Date"
   },
   "DragAndDrop": {
     "draggable": "draggable"

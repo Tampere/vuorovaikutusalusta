@@ -703,7 +703,8 @@
       },
       "yAxisTotalLabel": "Vastauskertymä",
       "yAxisLabel": "Vastauksia"
-    }
+    },
+    "date": "Päivämäärä"
   },
   "DragAndDrop": {
     "draggable": "Raahattava"
