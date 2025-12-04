@@ -1,5 +1,6 @@
 import { AnswerEntry, Submission, SurveyQuestion } from '@interfaces/survey';
-import { useTheme, Box } from '@mui/material';
+import { useTheme, Box, Button } from '@mui/material';
+import { Download } from '@mui/icons-material';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React, { FunctionComponent, useMemo, useState } from 'react';
 import {
@@ -69,7 +70,9 @@ function buildNumericRange(range: Range, answersList: AnswerEntry[]): number[] {
   const minBuckets = 5;
 
   if (answersList[0].type === 'slider') {
-    return Array.from({ length: 11 }, (_, i) => i);
+    const min = range.min ?? 0;
+    const max = range.max ?? 10;
+    return Array.from({ length: max - min + 1 }, (_, i) => min + i);
   }
 
   // If range min/max are provided, use those. Otherwise find min/max values
@@ -121,20 +124,21 @@ function buildNumericRange(range: Range, answersList: AnswerEntry[]): number[] {
 }
 
 const CustomizedAxisTick: FunctionComponent<any> = (props: any) => {
-  const { x, y, payload } = props;
+  const { x, y, payload, rotate } = props;
   const tickValue =
     payload.value.length > 12
       ? payload.value.slice(0, 11) + '...'
       : payload.value;
+
   return (
     <g transform={`translate(${x},${y})`}>
       <text
         x={0}
         y={0}
         dy={16}
-        textAnchor="end"
+        textAnchor={rotate ? 'end' : 'middle'}
         fill="#666"
-        transform="rotate(-35)"
+        {...(rotate && { transform: 'rotate(-35)' })}
       >
         {tickValue}
       </text>
@@ -148,6 +152,27 @@ export default function Chart({ submissions, selectedQuestion }: Props) {
   const theme = useTheme();
   const { tr } = useTranslations();
   const [tooltip, setTooltip] = useState(null);
+
+  const downloadChartData = () => {
+    if (!answerData) return;
+
+    // Create CSV content
+    const csvRows = [
+      [tr.SurveySubmissionsChart.option, tr.SurveySubmissionsChart.answerCount], // Header row
+      ...answerData.options.map((option) => [option.text, option.count]),
+    ];
+
+    const csvContent = csvRows
+      .map((row) => row.map((cell) => `"${cell}"`).join(','))
+      .join('\n');
+
+    // Create blob and download
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'chart-data.csv';
+    link.click();
+  };
 
   const answerData = useMemo(() => {
     if (!selectedQuestion) return;
@@ -225,25 +250,39 @@ export default function Chart({ submissions, selectedQuestion }: Props) {
         break;
       default:
     }
-
     const optionCount = base?.options.length;
     setChartWidth(
       optionCount <= 3
-        ? 220
-        : 220 + Math.min(760, Math.log2(optionCount - 2) * 180),
+        ? 380
+        : 380 + ((optionCount > 20 ? optionCount / 2 : optionCount) - 2) * 65,
     );
+
     return base;
   }, [selectedQuestion, surveyLanguage]);
 
   return answerData ? (
-    <Box position={'relative'}>
+    <Box
+      sx={{
+        padding: '1rem',
+        width: `${chartWidth}px`,
+        minWidth: '550px',
+      }}
+    >
+      <Button
+        startIcon={<Download />}
+        size="small"
+        variant="contained"
+        onClick={downloadChartData}
+        sx={{ marginLeft: '60px', position: 'sticky', left: '60px' }}
+      >
+        {tr.SurveySubmissionsChart.downloadData}
+      </Button>
       <ResponsiveContainer
-        minWidth={250}
-        height={340}
+        minWidth={380}
+        height={700}
         style={{
           backgroundColor: '#ffffffdd',
           borderBottomRightRadius: '7px',
-          maxWidth: '800px',
         }}
       >
         <BarChart
@@ -252,14 +291,18 @@ export default function Chart({ submissions, selectedQuestion }: Props) {
           margin={{
             top: 25,
             right: 30,
-            left: 20,
+            left: 0,
             bottom: 60,
           }}
         >
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis
             dataKey="text"
-            tick={<CustomizedAxisTick />}
+            tick={
+              <CustomizedAxisTick
+                rotate={answerData.options.some((o) => o.text.length > 3)}
+              />
+            }
             interval={0}
             onMouseEnter={(params) => setTooltip(params)}
             onMouseLeave={() => setTooltip(null)}
