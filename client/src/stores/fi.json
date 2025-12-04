@@ -703,7 +703,13 @@
       },
       "yAxisTotalLabel": "Vastauskertymä",
       "yAxisLabel": "Vastauksia"
-    }
+    },
+    "date": "Päivämäärä"
+  },
+  "SurveySubmissionsChart": {
+    "downloadData": "Lataa vastaukset",
+    "option": "Vaihtoehto",
+    "answerCount": "Vastausmäärä"
   },
   "DragAndDrop": {
     "draggable": "Raahattava"

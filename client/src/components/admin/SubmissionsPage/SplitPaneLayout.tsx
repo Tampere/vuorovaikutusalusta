@@ -11,12 +11,13 @@ import {
   useTheme,
 } from '@mui/material';
 import { Close } from '@mui/icons-material';
-import React, { ReactNode, useState } from 'react';
+import React, { CSSProperties, ReactNode, useState } from 'react';
 import SplitPane from 'react-split-pane';
 
 interface Props {
   mainPane: ReactNode;
   sidePane: ReactNode | false;
+  sidePaneStyle?: CSSProperties;
   mobileDrawer: {
     open: boolean;
     setOpen: (open: boolean) => void;
@@ -25,12 +26,15 @@ interface Props {
     helperText: string;
   };
   defaultSize?: string;
+  height?: string;
 }
 
 export default function SplitPaneLayout({
   mainPane,
   sidePane,
+  sidePaneStyle,
   mobileDrawer,
+  height,
 }: Props) {
   const [isResizing, setIsResizing] = useState(false);
   const theme = useTheme();
@@ -40,7 +44,7 @@ export default function SplitPaneLayout({
     <Box
       sx={{
         width: '100%',
-        height: '100vh',
+        height: height ?? '100vh',
         display: 'flex',
       }}
     >
@@ -68,7 +72,10 @@ export default function SplitPaneLayout({
           // Dirty hack to fix iframe resizing issues with the split pane library
           // Issue: https://github.com/tomkp/react-split-pane/issues/361
           // Workaround: https://github.com/tomkp/react-split-pane/issues/241#issuecomment-677091968
-          pane2Style={{ pointerEvents: isResizing ? 'none' : 'auto' }}
+          pane2Style={{
+            pointerEvents: isResizing ? 'none' : 'auto',
+            ...sidePaneStyle,
+          }}
           allowResize={false}
           onDragStarted={() => setIsResizing(true)}
           onDragFinished={() => setIsResizing(false)}

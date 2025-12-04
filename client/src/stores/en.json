@@ -703,7 +703,13 @@
       },
       "yAxisTotalLabel": "Total answers",
       "yAxisLabel": "Answers"
-    }
+    },
+    "date": "Date"
+  },
+  "SurveySubmissionsChart": {
+    "downloadData": "Download answers",
+    "option": "Option",
+    "answerCount": "Answers"
   },
   "DragAndDrop": {
     "draggable": "draggable"

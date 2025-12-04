@@ -30,6 +30,8 @@ import DataExport from '../DataExport';
 import { AdminAppBar } from '../AdminAppBar';
 import { SurveyQuestionSummary } from './SurveyQuestionSummary';
 import { DataChart } from './DataChart';
+import Chart from './SurveySubmissionsChart';
+import { AnswerTable } from './AnswerTable';
 
 function isMapEntry(
   entry: AnswerEntry,
@@ -235,6 +237,7 @@ export default function SurveySubmissionsPage() {
         labels={[survey.title[surveyLanguage], tr.AnswersList.answers]}
       />
       <SplitPaneLayout
+        height="calc(100vh - 64px)"
         mainPane={
           <Box
             sx={{
@@ -312,19 +315,29 @@ export default function SurveySubmissionsPage() {
             )}
           </Box>
         }
+        sidePaneStyle={{ overflowY: 'auto' }}
         sidePane={
-          <AnswerMap
-            survey={survey}
-            submissions={submissions}
-            selectedQuestion={selectedQuestion}
-            onAnswerClick={(answer) => {
-              setSelectedAnswer(answer);
-            }}
-            onSelectQuestion={(question) => setSelectedQuestion(question)}
-            selectedAnswer={selectedAnswer}
-            surveyQuestions={surveyQuestions}
-            questions={questions}
-          />
+          <Box>
+            <Chart
+              submissions={submissions}
+              selectedQuestion={selectedQuestion}
+            />
+            {selectedQuestion?.type === 'free-text' && (
+              <AnswerTable submissions={submissions} />
+            )}
+            <AnswerMap
+              survey={survey}
+              submissions={submissions}
+              selectedQuestion={selectedQuestion}
+              onAnswerClick={(answer) => {
+                setSelectedAnswer(answer);
+              }}
+              onSelectQuestion={(question) => setSelectedQuestion(question)}
+              selectedAnswer={selectedAnswer}
+              surveyQuestions={surveyQuestions}
+              questions={questions}
+            />
+          </Box>
         }
         mobileDrawer={{
           open: mobileDrawerOpen,
