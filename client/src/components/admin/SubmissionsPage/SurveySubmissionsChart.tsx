@@ -148,7 +148,7 @@ const CustomizedAxisTick: FunctionComponent<any> = (props: any) => {
 
 export default function Chart({ submissions, selectedQuestion }: Props) {
   const [chartWidth, setChartWidth] = useState(240);
-  const { surveyLanguage } = useTranslations();
+  const { surveyLanguage, language } = useTranslations();
   const theme = useTheme();
   const { tr } = useTranslations();
   const [tooltip, setTooltip] = useState(null);
@@ -170,7 +170,7 @@ export default function Chart({ submissions, selectedQuestion }: Props) {
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = 'chart-data.csv';
+    link.download = `${selectedQuestion.title[language] ?? 'data'}.csv`;
     link.click();
   };
 
