@@ -50,7 +50,7 @@ interface Props {
   onSubmit: (
     formData: NotificationFormData,
     notificationId?: string,
-  ) => Promise<void>;
+  ) => Promise<boolean>;
   onCancel: () => void;
   onDelete: (notificationId: string) => Promise<void>;
 }
@@ -154,15 +154,16 @@ export function EditGeneralNotification({
           }}
           onSubmit={async (e: React.FormEvent<NotificationFormElements>) => {
             e.preventDefault();
-            await onSubmit(formData, notification?.id);
-            setFormData({
-              title: DEFAULT_LOCALIZED_TEXT,
-              message: DEFAULT_LOCALIZED_TEXT,
-              startDate: null,
-              endDate: null,
-              publishedInternally: false,
-              publishedExternally: false,
-            });
+            const submitSuccess = await onSubmit(formData, notification?.id);
+            if (submitSuccess)
+              setFormData({
+                title: DEFAULT_LOCALIZED_TEXT,
+                message: DEFAULT_LOCALIZED_TEXT,
+                startDate: null,
+                endDate: null,
+                publishedInternally: false,
+                publishedExternally: false,
+              });
           }}
           component={'form'}
         >

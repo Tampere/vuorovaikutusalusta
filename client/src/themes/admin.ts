@@ -1,6 +1,7 @@
 import { createTheme } from '@mui/material/styles';
 import { fiFI } from '@mui/material/locale';
 import { buttonOverrides } from './survey';
+import { sharedTheme } from './shared';
 
 export let theme = createTheme(
   {
@@ -44,7 +45,7 @@ export let theme = createTheme(
   fiFI,
 );
 
-theme = createTheme(theme, {
+theme = createTheme(theme, sharedTheme, {
   palette: {
     disabled: theme.palette.augmentColor({
       color: {

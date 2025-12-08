@@ -5,6 +5,7 @@ import {
   CSSInterpolation,
 } from '@mui/material/styles';
 import { fiFI } from '@mui/material/locale';
+import { sharedTheme } from './shared';
 
 declare module '@mui/material/styles' {
   interface Palette {
@@ -218,7 +219,7 @@ export let defaultSurveyTheme = createTheme(
   fiFI,
 );
 
-defaultSurveyTheme = createTheme(defaultSurveyTheme, {
+defaultSurveyTheme = createTheme(defaultSurveyTheme, sharedTheme, {
   palette: {
     disabled: defaultSurveyTheme.palette.augmentColor({
       color: {

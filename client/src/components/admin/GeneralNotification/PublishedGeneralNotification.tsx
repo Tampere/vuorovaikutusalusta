@@ -71,9 +71,10 @@ export function PublishedGeneralNotification({
         alignItems: 'stretch',
 
         paddingTop: '0.25rem',
-        border: `1px solid ${theme.palette.primary.light}`,
+        border: `1px solid ${theme.brand.red}`,
         borderRadius: '4px',
         position: 'relative',
+        background: 'white',
         ...sx,
       }}
     >
@@ -90,9 +91,13 @@ export function PublishedGeneralNotification({
         <Campaign
           sx={{ marginLeft: '0.5rem' }}
           fontSize="large"
-          htmlColor={theme.palette.primary.main}
+          htmlColor={theme.brand.red}
         />
-        <Typography variant="h6" component={'p'}>
+        <Typography
+          variant="h6"
+          component={'p'}
+          {...(!defaultOpen && { color: theme.brand.red })}
+        >
           {tr.GeneralNotification.newNotification}
         </Typography>
 
