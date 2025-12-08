@@ -103,14 +103,14 @@ export function MenuBar({
     displayAttributions: boolean;
   }) {
     if (!data.uploadedImage && !data.selectedImage) return;
+    let imageName = data.selectedImage;
+    if (data.uploadedImage) {
+      imageName = await uploadImage(data);
+    }
 
     try {
-      const name = data.uploadedImage
-        ? await uploadImage(data)
-        : data.selectedImage;
-
-      const fileUrl = `${imageApiPath}/${name}`;
-      const altText = data.imageAltText || name;
+      const fileUrl = `${imageApiPath}/${imageName}`;
+      const altText = data.imageAltText || imageName;
       const markdownFigure = `![${altText}](${fileUrl})${
         data.displayAttributions && data.imageAttributions
           ? `\n\n*${data.imageAttributions}*`
@@ -131,6 +131,7 @@ export function MenuBar({
     }
 
     setImageDialogOpen(false);
+    await getImages();
   }
 
   async function getImages() {
