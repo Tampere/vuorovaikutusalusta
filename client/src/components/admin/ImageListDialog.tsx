@@ -86,6 +86,15 @@ export default function ImageListDialog({
   const { tr } = useTranslations();
   const { showToast } = useToasts();
 
+  const isGeneralNotification = imageType === 'generalNotification';
+  const showNoImageOption = !isGeneralNotification;
+  const saveButtonText = isGeneralNotification
+    ? tr.commands.add
+    : tr.commands.save;
+  const displayAttributionsText = isGeneralNotification
+    ? tr.EditSurvey.displayAttributionsInNotification
+    : tr.EditSurvey.displayAttributions;
+
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [uploadedImage, setUploadedImage] = useState<FileWithPath | null>(null);
   const [preview, setPreview] = useState<string | ArrayBuffer | null>(null);
@@ -172,14 +181,16 @@ export default function ImageListDialog({
       imageAttributions,
       displayAttributions,
     });
+    setUploadedImage(null);
   };
 
   const isSaveDisabled =
-    activeImage &&
-    selectedImage === activeImage.fileName &&
-    activeImage.altText === imageAltText &&
-    activeImage.attributions === imageAttributions &&
-    initialDisplayAttributions === displayAttributions;
+    (isGeneralNotification && !selectedImage) ||
+    (activeImage &&
+      selectedImage === activeImage.fileName &&
+      activeImage.altText === imageAltText &&
+      activeImage.attributions === imageAttributions &&
+      initialDisplayAttributions === displayAttributions);
 
   function handleListItemClick(fileName?: string) {
     if (!fileName) {
@@ -249,39 +260,41 @@ export default function ImageListDialog({
               cols={3}
               rowHeight={164}
             >
-              <ImageListItem
-                sx={{
-                  ...styles.noImageBackground,
-                  ...(selectedImage === null
-                    ? { border: '4px solid #1976d2' }
-                    : {}),
-                }}
-                key={'no-image'}
-                onClick={() => handleSelectedImageChange(null)}
-              >
-                <Container
-                  style={{
-                    display: 'flex',
-                    padding: '0px 4px',
-                    height: '100%',
-                    maxWidth: '155px',
-                    flexDirection: 'column',
-                    justifyContent: 'center',
+              {showNoImageOption && (
+                <ImageListItem
+                  sx={{
+                    ...styles.noImageBackground,
+                    ...(selectedImage === null
+                      ? { border: '4px solid #1976d2' }
+                      : {}),
                   }}
+                  key={'no-image'}
+                  onClick={() => handleSelectedImageChange(null)}
                 >
-                  <Typography
+                  <Container
                     style={{
-                      textAlign: 'center',
+                      display: 'flex',
+                      padding: '0px 4px',
+                      height: '100%',
+                      maxWidth: '155px',
+                      flexDirection: 'column',
+                      justifyContent: 'center',
                     }}
                   >
-                    {imageType === 'backgroundImage'
-                      ? tr.SurveyImageList.noBackgroundImage
-                      : imageType === 'thanksPageImage'
-                      ? tr.SurveyImageList.noThanksPageImage
-                      : tr.SurveyImageList.noImage}
-                  </Typography>
-                </Container>
-              </ImageListItem>
+                    <Typography
+                      style={{
+                        textAlign: 'center',
+                      }}
+                    >
+                      {imageType === 'backgroundImage'
+                        ? tr.SurveyImageList.noBackgroundImage
+                        : imageType === 'thanksPageImage'
+                        ? tr.SurveyImageList.noThanksPageImage
+                        : tr.SurveyImageList.noImage}
+                    </Typography>
+                  </Container>
+                </ImageListItem>
+              )}
               {uploadedImage && (
                 <ImageListItem
                   style={
@@ -304,9 +317,12 @@ export default function ImageListDialog({
                   <Cancel
                     color="error"
                     sx={styles.deleteImageIcon}
-                    onClick={(event) =>
-                      onDeleteImage(event, image.fileName, image.filePath)
-                    }
+                    onClick={(event) => {
+                      onDeleteImage(event, image.fileName, image.filePath);
+                      if (selectedImage === image.fileName) {
+                        setSelectedImage(null);
+                      }
+                    }}
                   />
                   <img
                     src={`data:image/;base64,${image.data}`}
@@ -355,7 +371,7 @@ export default function ImageListDialog({
                 checked={displayAttributions}
                 onChange={(e) => setDisplayAttributions(e.target.checked)}
               />
-              {tr.EditSurvey.displayAttributions}
+              {displayAttributionsText}
             </Box>
           </>
         )}
@@ -391,7 +407,7 @@ export default function ImageListDialog({
           {tr.commands.cancel}
         </Button>
         <Button disabled={isSaveDisabled} onClick={handleSave}>
-          {tr.commands.save}
+          {saveButtonText}
         </Button>
       </DialogActions>
     </Dialog>

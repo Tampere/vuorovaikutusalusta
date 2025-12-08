@@ -70,7 +70,7 @@ export function GeneralNotifications() {
           method: 'PUT',
           body: {
             ...formData,
-            startDate: effectiveStartDate.toISOString(),
+            startDate: effectiveStartDate?.toISOString() ?? null,
             endDate: formData.endDate?.toISOString() ?? null,
           },
         });
@@ -94,11 +94,13 @@ export function GeneralNotifications() {
       }
       setActiveNotification({ data: null, editing: false });
       await fetchNotifications();
+      return true;
     } catch (e) {
       showToast({
         message: tr.GeneralNotification.updateFailed,
         severity: 'error',
       });
+      return false;
     }
   }
 

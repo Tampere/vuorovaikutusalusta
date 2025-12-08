@@ -32,7 +32,8 @@ export function GeneralNotificationNavigationButton() {
               width: '7px',
               height: '7px',
               borderRadius: '50%',
-              backgroundColor: 'lightGreen',
+              border: '0.5px solid white',
+              backgroundColor: theme.brand.red,
             })}
           />
         )}
