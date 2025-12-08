@@ -188,8 +188,8 @@ export async function getPublishedNotifications(
       start_date,
       end_date,
       published_internally,
-      published_externally,
-      publisher
+      published_externally
+      ${variant === 'internal' ? ', publisher' : ''}
     FROM data.general_notification gn
     WHERE ${publishedColumn} = true
       AND (start_date IS NULL OR start_date <= now())
