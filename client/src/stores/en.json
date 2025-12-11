@@ -58,6 +58,10 @@
     "admins": "Survey admins",
     "userFetchFailed": "Failed to fetch users. Try again later.",
     "adminsHelperText": "Users besides the original author of the survey, who will have access to the survey answers and who can modify the survey.",
+    "mapPublication": "Map publication",
+    "selectMapPublication": "Select map publication",
+    "mapPublicationsFetchFailed": "Failed to fetch map publications. Try again later.",
+    "mapPublicationHelperText": "Select a predefined Oskari map publication or enter the map publication URL yourself",
     "mapUrl": "URL for the Oskari map publication",
     "mapUrlError": "Failed to fetch map layers with given url. Check the url and try again later.",
     "availableMapLayers": "Available map layers:",
@@ -618,12 +622,14 @@
   "AppBar": {
     "generalNotifications": "Notifications",
     "generalNotificationsNew": "New notifications",
-    "generalNotificationsError": "Error while fetching general notifications."
+    "generalNotificationsError": "Error while fetching general notifications.",
+    "mapPublications": "Map publications"
   },
   "AppBarUserMenu": {
     "label": "User menu",
     "logout": "Logout",
-    "updateInstructions": "Update user instructions"
+    "updateInstructions": "Update user instructions",
+    "editMapPublications": "Edit map publications"
   },
   "FileUploadDialog": {
     "wrongFileFormatPdf": "The file needs to be in pdf format.",
@@ -775,5 +781,21 @@
     "publishedInternally": "Published to editors",
     "publishedExternally": "Published to respondents",
     "newNotification": "New notification"
+  },
+  "AdminMapPublications": {
+    "name": "Name",
+    "url": "Oskari map publication URL",
+    "addNew": "Add new map publication",
+    "publicationName": "Publication name",
+    "noLayersAvailable": "No layers available at this URL.",
+    "duplicateUrl": "Duplicate URL",
+    "emptyState": "No map publications yet",
+    "deleteConfirm": "Are you sure you want to delete this map publication?",
+    "nameAndUrlRequired": "Name and URL are required.",
+    "createSuccess": "Map publication created.",
+    "createFailed": "Failed to create map publication.",
+    "deleteSuccess": "Map publication deleted.",
+    "deleteFailed": "Failed to delete map publication.",
+    "fetchFailed": "Failed to load map publications."
   }
 }

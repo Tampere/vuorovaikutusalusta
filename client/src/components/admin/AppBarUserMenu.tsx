@@ -3,6 +3,8 @@ import { Box, IconButton, Menu, MenuItem, Tooltip } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { InstructionsDialog } from './InstructionsDialog';
+import { useUser } from '@src/stores/UserContext';
+import { useHistory } from 'react-router-dom';
 
 const styles = {
   root: {
@@ -15,6 +17,8 @@ export default function AppBarUserMenu() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [menuAnchorEl, setMenuAnchorEl] = useState<HTMLElement>(null);
   const [instructionsDialogOpen, setInstructionsDialogOpen] = useState(false);
+  const { activeUserIsAdmin } = useUser();
+  const history = useHistory();
 
   const { tr } = useTranslations();
 
@@ -53,6 +57,14 @@ export default function AppBarUserMenu() {
           setMenuOpen(false);
         }}
       >
+        {activeUserIsAdmin && (
+          <MenuItem onClick={() => history.push('/karttajulkaisut')}>
+            {tr.AppBarUserMenu.editMapPublications}
+          </MenuItem>
+        )}
+        <MenuItem onClick={() => setInstructionsDialogOpen(true)}>
+          {tr.AppBarUserMenu.updateInstructions}
+        </MenuItem>
         <MenuItem
           onClick={() => {
             setMenuOpen(false);
@@ -60,9 +72,6 @@ export default function AppBarUserMenu() {
           }}
         >
           {tr.AppBarUserMenu.logout}
-        </MenuItem>
-        <MenuItem onClick={() => setInstructionsDialogOpen(true)}>
-          {tr.AppBarUserMenu.updateInstructions}
         </MenuItem>
       </Menu>
       <InstructionsDialog

@@ -9,6 +9,7 @@ import surveyRouter from './survey.routes';
 import themesRouter from './themes.routes';
 import userRouter from './user.routes';
 import generalNotificationsRouter from './generalNotification.routes';
+import mapPublicationsRouter from './map-publications.routes';
 
 const router = Router();
 
@@ -22,5 +23,6 @@ router.use('/themes', themesRouter);
 router.use('/feature-styles', featureStylesRouter);
 router.use('/health', healthRouter);
 router.use('/general-notifications', generalNotificationsRouter);
+router.use('/map-publications', mapPublicationsRouter);
 
 export default router;
