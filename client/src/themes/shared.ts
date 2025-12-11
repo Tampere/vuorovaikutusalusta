@@ -1,4 +1,4 @@
-import { createTheme } from '@mui/material';
+import { ThemeOptions } from '@mui/material';
 
 declare module '@mui/material/styles' {
   interface Theme {
@@ -14,8 +14,8 @@ declare module '@mui/material/styles' {
   }
 }
 
-export const sharedTheme = createTheme({
+export const sharedTheme: ThemeOptions = {
   brand: {
     red: 'rgb(173,57,99)',
   },
-});
+};
