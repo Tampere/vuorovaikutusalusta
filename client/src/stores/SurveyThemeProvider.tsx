@@ -65,7 +65,6 @@ export function useSurveyTheme() {
     setThemeFromSurvey(survey: Survey) {
       const theme = survey.theme?.data
         ? createTheme(
-            sharedTheme,
             {
               ...survey.theme?.data,
               components: {
@@ -74,6 +73,7 @@ export function useSurveyTheme() {
                 ...stepperOverrides,
                 ...textOverrides,
               },
+              ...sharedTheme,
             },
             fiFI,
           )

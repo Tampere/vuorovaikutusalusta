@@ -45,8 +45,11 @@ export let theme = createTheme(
   fiFI,
 );
 
-theme = createTheme(theme, sharedTheme, {
+theme = createTheme({
+  ...theme,
+  ...sharedTheme,
   palette: {
+    ...theme.palette,
     disabled: theme.palette.augmentColor({
       color: {
         main: '#858585',

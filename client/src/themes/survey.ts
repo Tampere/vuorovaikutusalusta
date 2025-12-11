@@ -219,8 +219,11 @@ export let defaultSurveyTheme = createTheme(
   fiFI,
 );
 
-defaultSurveyTheme = createTheme(defaultSurveyTheme, sharedTheme, {
+defaultSurveyTheme = createTheme({
+  ...defaultSurveyTheme,
+  ...sharedTheme,
   palette: {
+    ...defaultSurveyTheme.palette,
     disabled: defaultSurveyTheme.palette.augmentColor({
       color: {
         main: '#858585',
