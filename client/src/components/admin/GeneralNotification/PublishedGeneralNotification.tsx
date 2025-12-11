@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { Fragment, useEffect, useRef, useState } from 'react';
 import { GeneralNotification } from '@interfaces/generalNotification';
 import { request } from '@src/utils/request';
 import { GeneralNotificationCard } from './GeneralNotificationCard';
@@ -17,12 +17,14 @@ interface Props {
   variant: 'internal' | 'external';
   sx?: SxProps;
   defaultOpen?: boolean;
+  isMobile?: boolean;
 }
 
 export function PublishedGeneralNotification({
   variant,
   sx,
   defaultOpen = false,
+  isMobile = false,
 }: Props) {
   const [notifications, setNotifications] = useState<GeneralNotification[]>([]);
   const [loading, setLoading] = useState(true);
@@ -30,6 +32,8 @@ export function PublishedGeneralNotification({
   const { showToast } = useToasts();
   const [expanded, setExpaned] = useState(defaultOpen);
   const theme = useTheme();
+  const [contentHeight, setContentHeight] = useState<number>(0);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     async function fetchNotifications() {
@@ -54,6 +58,12 @@ export function PublishedGeneralNotification({
     fetchNotifications();
   }, [variant]);
 
+  useEffect(() => {
+    if (contentRef.current) {
+      setContentHeight(contentRef.current.scrollHeight);
+    }
+  }, [notifications, expanded]);
+
   if (loading) {
     return null;
   }
@@ -64,10 +74,17 @@ export function PublishedGeneralNotification({
 
   return (
     <Stack
+      ref={contentRef}
       sx={{
-        maxHeight: expanded ? '100vh' : '45px',
-        overflow: 'hidden',
-        transition: 'max-height 0.3s ease-in-out',
+        maxHeight: expanded
+          ? isMobile
+            ? `${contentHeight}px`
+            : '50vh'
+          : '45px',
+        overflowY: isMobile || !expanded ? 'hidden' : 'auto',
+        transition: `max-height ${
+          isMobile && contentHeight > 1000 ? '0.5s' : '0.3s'
+        } ease-in-out`,
         alignItems: 'stretch',
 
         paddingTop: '0.25rem',
