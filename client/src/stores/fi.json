@@ -758,6 +758,7 @@
   "TextEditor": {
     "headerTitle": "Otsikko",
     "boldTitle": "Lihavoitu",
+    "italicTitle": "Kursivoitu",
     "unorderedListTitle": "Järjestämätön lista",
     "orderedListTitle": "Järjestetty lista",
     "addPicture": "Lisää kuva"

@@ -758,6 +758,7 @@
   "TextEditor": {
     "headerTitle": "Header",
     "boldTitle": "Bold",
+    "italicTitle": "Italic",
     "unorderedListTitle": "Unordered list",
     "orderedListTitle": "Ordered list",
     "addPicture": "Add picture"

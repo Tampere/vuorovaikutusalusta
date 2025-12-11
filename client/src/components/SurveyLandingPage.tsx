@@ -136,6 +136,7 @@ export default function SurveyLandingPage({
         />
       </Box>
       <PublishedGeneralNotification
+        isMobile={mediumWidth}
         defaultOpen
         variant={'external'}
         sx={{

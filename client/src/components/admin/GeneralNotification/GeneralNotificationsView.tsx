@@ -1,5 +1,5 @@
-import { Box } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import { Box, Stack } from '@mui/material';
+import React, { useEffect, useRef, useState } from 'react';
 import { EditGeneralNotification } from './EditGeneralNotification';
 import { GeneralNotificationList } from './GeneralNotificationList';
 import { AdminAppBar } from '../AdminAppBar';
@@ -34,6 +34,7 @@ export function GeneralNotifications() {
 
   const [loading, setLoading] = useState(true);
   const [notifications, setNotifications] = useState<GeneralNotification[]>([]);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   async function fetchNotifications() {
     setLoading(true);
@@ -124,7 +125,7 @@ export function GeneralNotifications() {
   }
 
   return (
-    <>
+    <Stack width="100%" sx={{ overflowY: 'auto' }} ref={scrollRef}>
       <AdminAppBar labels={[tr.AppBar.generalNotifications]} />
       <Box sx={containerStyle}>
         {activeUserIsAdmin && (
@@ -145,12 +146,15 @@ export function GeneralNotifications() {
           activeNotification={activeNotification.data}
           notifications={notifications}
           editingEnabled={activeUserIsAdmin}
-          onCancel={() => setActiveNotification({ data: null, editing: false })}
+          onCancel={() => {
+            setActiveNotification({ data: null, editing: false });
+          }}
           onEdit={(notification) => {
+            scrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
             setActiveNotification({ data: notification, editing: true });
           }}
         />
       </Box>
-    </>
+    </Stack>
   );
 }
