@@ -33,6 +33,13 @@ import { DataChart } from './DataChart';
 import Chart from './SurveySubmissionsChart';
 import { AnswerTable } from './AnswerTable';
 
+const CHART_TYPES: SurveyQuestion['type'][] = [
+  'numeric',
+  'slider',
+  'radio',
+  'checkbox',
+];
+
 function isMapEntry(
   entry: AnswerEntry,
 ): entry is AnswerEntry & { type: 'map' } {
@@ -317,27 +324,29 @@ export default function SurveySubmissionsPage() {
         }
         sidePaneStyle={{ overflowY: 'auto' }}
         sidePane={
-          <Box>
-            <Chart
-              submissions={submissions}
-              selectedQuestion={selectedQuestion}
-            />
-            {selectedQuestion?.type === 'free-text' && (
+          <>
+            {CHART_TYPES.includes(selectedQuestion.type) ? (
+              <Chart
+                submissions={submissions}
+                selectedQuestion={selectedQuestion}
+              />
+            ) : selectedQuestion?.type === 'free-text' ? (
               <AnswerTable submissions={submissions} />
+            ) : (
+              <AnswerMap
+                survey={survey}
+                submissions={submissions}
+                selectedQuestion={selectedQuestion}
+                onAnswerClick={(answer) => {
+                  setSelectedAnswer(answer);
+                }}
+                onSelectQuestion={(question) => setSelectedQuestion(question)}
+                selectedAnswer={selectedAnswer}
+                surveyQuestions={surveyQuestions}
+                questions={questions}
+              />
             )}
-            <AnswerMap
-              survey={survey}
-              submissions={submissions}
-              selectedQuestion={selectedQuestion}
-              onAnswerClick={(answer) => {
-                setSelectedAnswer(answer);
-              }}
-              onSelectQuestion={(question) => setSelectedQuestion(question)}
-              selectedAnswer={selectedAnswer}
-              surveyQuestions={surveyQuestions}
-              questions={questions}
-            />
-          </Box>
+          </>
         }
         mobileDrawer={{
           open: mobileDrawerOpen,

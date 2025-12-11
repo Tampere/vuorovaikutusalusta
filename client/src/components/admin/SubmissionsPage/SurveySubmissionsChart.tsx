@@ -260,7 +260,9 @@ export default function Chart({ submissions, selectedQuestion }: Props) {
     return base;
   }, [selectedQuestion, surveyLanguage]);
 
-  return answerData ? (
+  if (!answerData) return null;
+
+  return (
     <Box
       sx={{
         padding: '1rem',
@@ -320,7 +322,5 @@ export default function Chart({ submissions, selectedQuestion }: Props) {
       </ResponsiveContainer>
       <LabelTooltip tooltip={tooltip} />
     </Box>
-  ) : (
-    <></>
   );
 }
