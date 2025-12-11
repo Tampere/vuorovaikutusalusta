@@ -198,6 +198,14 @@ export function MenuBar({
       >
         {tr.TextEditor.boldTitle}
       </Button>
+      <Button
+        disableTouchRipple
+        onClick={() => editor.chain().focus().toggleItalic().run()}
+        disabled={!editor.can().chain().focus().toggleItalic().run()}
+        className={editorState.isBold ? 'is-active' : ''} //
+      >
+        {tr.TextEditor.italicTitle}
+      </Button>
       <Tooltip title={tr.TextEditor.unorderedListTitle}>
         <IconButton
           disableTouchRipple
