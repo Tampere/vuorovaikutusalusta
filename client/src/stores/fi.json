@@ -58,6 +58,10 @@
     "admins": "Kyselyn ylläpitäjät",
     "userFetchFailed": "Käyttäjien haku epäonnistui. Yritä myöhemmin uudestaan.",
     "adminsHelperText": "Kyselyn alkuperäisen luojan lisäksi määriteltävät käyttäjät, jotka voivat katsella kyselyn vastauksia sekä muokata kyselyä.",
+    "mapPublication": "Karttajulkaisu",
+    "selectMapPublication": "Valitse karttajulkaisu",
+    "mapPublicationsFetchFailed": "Karttajulkaisujen haku epäonnistui. Yritä myöhemmin uudestaan.",
+    "mapPublicationHelperText": "Valitse valmiiksi määritelty Oskari-karttajulkaisu tai syötä itse karttajulkaisun osoite",
     "mapUrl": "Oskari-karttajulkaisun osoite",
     "mapUrlError": "Karttatasojen haku annetulle osoitteelle epäonnistui. Tarkista osoite ja yritä uudestaan.",
     "availableMapLayers": "Saatavilla olevat karttatasot:",
@@ -618,12 +622,14 @@
   "AppBar": {
     "generalNotifications": "Tiedotteet",
     "generalNotificationsNew": "Uusia tiedotteita",
-    "generalNotificationsError": "Virhe haettaessa tiedotteita."
+    "generalNotificationsError": "Virhe haettaessa tiedotteita.",
+    "mapPublications": "Karttajulkaisut"
   },
   "AppBarUserMenu": {
     "label": "Käyttäjävalikko",
     "logout": "Kirjaudu ulos",
-    "updateInstructions": "Päivitä käyttöohjeet"
+    "updateInstructions": "Päivitä käyttöohjeet",
+    "editMapPublications": "Muokkaa karttajulkaisuja"
   },
   "FileUploadDialog": {
     "wrongFileFormatPdf": "Tiedoston tulee olla pdf-muodossa.",
@@ -775,5 +781,21 @@
     "publishedInternally": "Julkaistu muokkaajille",
     "publishedExternally": "Julkaistu vastaajille",
     "newNotification": "Uusi tiedote"
+  },
+  "AdminMapPublications": {
+    "name": "Nimi",
+    "url": "Oskari-karttajulkaisun osoite",
+    "addNew": "Lisää uusi karttajulkaisu",
+    "publicationName": "Julkaisun nimi",
+    "noLayersAvailable": "Osoitteesta ei löydy karttatasoja.",
+    "duplicateUrl": "Osoite on jo käytössä.",
+    "emptyState": "Ei karttajulkaisuja",
+    "deleteConfirm": "Haluatko varmasti poistaa tämän karttajulkaisun?",
+    "nameAndUrlRequired": "Nimi ja osoite ovat pakollisia.",
+    "createSuccess": "Karttajulkaisu luotu.",
+    "createFailed": "Karttajulkaisun luominen epäonnistui.",
+    "deleteSuccess": "Karttajulkaisu poistettu.",
+    "deleteFailed": "Karttajulkaisun poistaminen epäonnistui.",
+    "fetchFailed": "Karttajulkaisujen lataaminen epäonnistui."
   }
 }
