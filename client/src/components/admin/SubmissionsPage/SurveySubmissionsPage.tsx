@@ -325,7 +325,7 @@ export default function SurveySubmissionsPage() {
         sidePaneStyle={{ overflowY: 'auto' }}
         sidePane={
           <>
-            {CHART_TYPES.includes(selectedQuestion.type) ? (
+            {CHART_TYPES.includes(selectedQuestion?.type) ? (
               <Chart
                 submissions={submissions}
                 selectedQuestion={selectedQuestion}
