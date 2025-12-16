@@ -140,6 +140,7 @@ export default function SurveyLandingPage({
         defaultOpen
         variant={'external'}
         sx={{
+          minWidth: '50vw',
           maxWidth: '800px',
           alignSelf: 'center',
           ...(notificationWidth && {
