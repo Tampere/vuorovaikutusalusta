@@ -3,9 +3,9 @@ import {
   Box,
   Button,
   Link,
+  Stack,
   Theme,
   Typography,
-  Stack,
   useMediaQuery,
 } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
@@ -140,7 +140,7 @@ export default function SurveyLandingPage({
         defaultOpen
         variant={'external'}
         sx={{
-          minWidth: '50vw',
+          minWidth: mediumWidth ? 'auto' : '500px',
           maxWidth: '800px',
           alignSelf: 'center',
           ...(notificationWidth && {
