@@ -1,4 +1,4 @@
-import { Submission } from '@interfaces/survey';
+import { Submission, SurveyQuestion } from '@interfaces/survey';
 import {
   Paper,
   Table,
@@ -14,9 +14,10 @@ import { format } from 'date-fns';
 
 interface Props {
   submissions: Submission[];
+  selectedQuestion: SurveyQuestion;
 }
 
-export function AnswerTable({ submissions }: Props) {
+export function AnswerTable({ submissions, selectedQuestion }: Props) {
   const { tr } = useTranslations();
 
   const freeTextAnswers = useMemo(() => {
@@ -25,7 +26,11 @@ export function AnswerTable({ submissions }: Props) {
     return submissions.flatMap(
       (submission) =>
         submission.answerEntries
-          ?.filter((entry) => entry.type === 'free-text')
+          ?.filter(
+            (entry) =>
+              entry.type === 'free-text' &&
+              entry.sectionId === selectedQuestion.id,
+          )
           .map((entry) => ({
             submissionId: submission.id,
             timestamp: submission.timestamp,
@@ -33,7 +38,7 @@ export function AnswerTable({ submissions }: Props) {
             value: entry.value,
           })) || [],
     );
-  }, [submissions]);
+  }, [submissions, selectedQuestion]);
 
   if (!freeTextAnswers.length) {
     return null;
@@ -68,7 +73,9 @@ export function AnswerTable({ submissions }: Props) {
                 {format(answer.timestamp, 'd.MM.yyyy')}
               </TableCell>
 
-              <TableCell sx={{ fontWeight: 400 }}>{answer.value}</TableCell>
+              <TableCell sx={{ fontWeight: 400 }}>
+                {String(answer.value)}
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>

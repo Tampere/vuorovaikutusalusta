@@ -331,7 +331,10 @@ export default function SurveySubmissionsPage() {
                 selectedQuestion={selectedQuestion}
               />
             ) : selectedQuestion?.type === 'free-text' ? (
-              <AnswerTable submissions={submissions} />
+              <AnswerTable
+                submissions={submissions}
+                selectedQuestion={selectedQuestion}
+              />
             ) : (
               <AnswerMap
                 survey={survey}
