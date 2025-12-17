@@ -185,8 +185,8 @@ export function MenuBar({
           borderTopLeftRadius: '4px',
         }}
         disableTouchRipple
-        onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-        className={editor.isActive('heading', { level: 2 }) ? 'is-active' : ''}
+        onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+        className={editor.isActive('heading', { level: 3 }) ? 'is-active' : ''}
       >
         {tr.TextEditor.headerTitle}
       </Button>

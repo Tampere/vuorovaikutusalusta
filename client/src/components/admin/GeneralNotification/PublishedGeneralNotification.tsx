@@ -1,9 +1,5 @@
-import React, { Fragment, useEffect, useRef, useState } from 'react';
 import { GeneralNotification } from '@interfaces/generalNotification';
-import { request } from '@src/utils/request';
-import { GeneralNotificationCard } from './GeneralNotificationCard';
-import { useToasts } from '@src/stores/ToastContext';
-import { useTranslations } from '@src/stores/TranslationContext';
+import { Campaign, ExpandLess, ExpandMore } from '@mui/icons-material';
 import {
   CardActionArea,
   Stack,
@@ -11,7 +7,12 @@ import {
   Typography,
   useTheme,
 } from '@mui/material';
-import { Campaign, ExpandLess, ExpandMore } from '@mui/icons-material';
+import { useToasts } from '@src/stores/ToastContext';
+import { useTranslations } from '@src/stores/TranslationContext';
+import { request } from '@src/utils/request';
+import React, { Fragment, useEffect, useRef, useState } from 'react';
+
+import { GeneralNotificationCard } from './GeneralNotificationCard';
 
 interface Props {
   variant: 'internal' | 'external';
@@ -147,7 +148,11 @@ export function PublishedGeneralNotification({
       >
         {notifications.map((notification) => (
           <Fragment key={notification.id}>
-            <Typography variant="h6" sx={{ marginTop: '1rem' }}>
+            <Typography
+              variant="h6"
+              component={'h2'}
+              sx={{ marginTop: '1rem' }}
+            >
               {
                 notification.title[
                   variant === 'internal' ? language : surveyLanguage

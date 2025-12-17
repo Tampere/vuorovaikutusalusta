@@ -626,7 +626,6 @@
     "mapPublications": "Map publications"
   },
   "AppBarUserMenu": {
-    "label": "User menu",
     "logout": "Logout",
     "updateInstructions": "Update user instructions",
     "editMapPublications": "Edit map publications"

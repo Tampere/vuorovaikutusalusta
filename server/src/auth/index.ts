@@ -1,3 +1,5 @@
+import { userCanEditSurvey } from '@src/application/survey';
+import { ForbiddenError } from '@src/error';
 import logger from '@src/logger';
 import { getUser, isAdmin, isInternalUser, upsertUser } from '@src/user';
 import ConnectPgSimple from 'connect-pg-simple';
@@ -9,8 +11,6 @@ import { encrypt } from '../crypto';
 import { getDb } from '../database';
 import { configureAzureAuth } from './azure';
 import { configureGoogleOAuth } from './google-oauth';
-import { userCanEditSurvey } from '@src/application/survey';
-import { ForbiddenError } from '@src/error';
 
 /** Can see all surveys and edit them */
 export const ADMIN_ROLE = 'TRE_FIILIS_ADMINS';

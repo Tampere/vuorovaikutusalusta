@@ -1,8 +1,10 @@
+import { CssBaseline } from '@mui/material';
 import Image from '@tiptap/extension-image';
 import { Markdown } from '@tiptap/markdown';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import React, { useEffect } from 'react';
+import '../TextEditor/styles.css';
 
 interface Props {
   content: string;
@@ -33,5 +35,9 @@ export function GeneralNotificationCard({ content }: Props) {
   if (!editor) {
     return null;
   }
-  return <EditorContent editor={editor} />;
+  return (
+    <CssBaseline>
+      <EditorContent editor={editor} />
+    </CssBaseline>
+  );
 }

@@ -626,7 +626,6 @@
     "mapPublications": "Karttajulkaisut"
   },
   "AppBarUserMenu": {
-    "label": "Käyttäjävalikko",
     "logout": "Kirjaudu ulos",
     "updateInstructions": "Päivitä käyttöohjeet",
     "editMapPublications": "Muokkaa karttajulkaisuja"

@@ -3,9 +3,9 @@ import {
   Box,
   Button,
   Link,
+  Stack,
   Theme,
   Typography,
-  Stack,
   useMediaQuery,
 } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
@@ -135,60 +135,62 @@ export default function SurveyLandingPage({
           alt={tr.IconAltTexts.logoAltText}
         />
       </Box>
-      <PublishedGeneralNotification
-        isMobile={mediumWidth}
-        defaultOpen
-        variant={'external'}
-        sx={{
-          minWidth: '50vw',
-          maxWidth: '800px',
-          alignSelf: 'center',
-          ...(notificationWidth && {
-            borderRadius: 0,
-            borderRight: 0,
-            borderLeft: 0,
-          }),
-        }}
-      />
-      <Box
-        className="middle-content"
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <div>
-          <Box
-            component="h1"
-            sx={(theme) => ({
-              ...styles(theme).heading,
-              ...styles(theme).title,
-            })}
-          >
-            <span>{survey.title?.[surveyLanguage]}</span>
-          </Box>
-          {survey.subtitle?.[surveyLanguage] && (
+      <Stack gap={0} flexDirection={'column-reverse'}>
+        <Box
+          className="middle-content"
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <div>
             <Box
-              component="h2"
+              component="h1"
               sx={(theme) => ({
                 ...styles(theme).heading,
-                ...styles(theme).subtitle,
+                ...styles(theme).title,
               })}
             >
-              <span>{survey.subtitle?.[surveyLanguage]}</span>
+              <span>{survey.title?.[surveyLanguage]}</span>
             </Box>
-          )}
-        </div>
-        <Button onClick={onStart}>
-          <Typography variant="body1" sx={(theme) => styles(theme).start}>
-            {continueUnfinished
-              ? tr.SurveyPage.continueSurveyLink
-              : tr.SurveyPage.startSurveyLink}
-          </Typography>
-        </Button>
-      </Box>
+            {survey.subtitle?.[surveyLanguage] && (
+              <Box
+                component="h2"
+                sx={(theme) => ({
+                  ...styles(theme).heading,
+                  ...styles(theme).subtitle,
+                })}
+              >
+                <span>{survey.subtitle?.[surveyLanguage]}</span>
+              </Box>
+            )}
+          </div>
+          <Button onClick={onStart}>
+            <Typography variant="body1" sx={(theme) => styles(theme).start}>
+              {continueUnfinished
+                ? tr.SurveyPage.continueSurveyLink
+                : tr.SurveyPage.startSurveyLink}
+            </Typography>
+          </Button>
+        </Box>
+        <PublishedGeneralNotification
+          isMobile={mediumWidth}
+          defaultOpen
+          variant={'external'}
+          sx={{
+            minWidth: mediumWidth ? 'auto' : '500px',
+            maxWidth: '800px',
+            alignSelf: 'center',
+            ...(notificationWidth && {
+              borderRadius: 0,
+              borderRight: 0,
+              borderLeft: 0,
+            }),
+          }}
+        />
+      </Stack>
       <Box
         className="footer-content"
         sx={{
