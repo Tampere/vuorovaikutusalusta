@@ -1,5 +1,5 @@
-import SettingsIcon from '@mui/icons-material/Settings';
-import { Box, IconButton, Menu, MenuItem, Tooltip } from '@mui/material';
+import { AccountCircleOutlined } from '@mui/icons-material';
+import { Box, Button, Menu, MenuItem } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { useUser } from '@src/stores/UserContext';
 import React, { useState } from 'react';
@@ -10,6 +10,7 @@ const styles = {
   root: {
     display: 'flex',
     justifyContent: 'flex-end',
+    paddingLeft: '1.5rem',
   },
 };
 
@@ -17,27 +18,25 @@ export default function AppBarUserMenu() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [menuAnchorEl, setMenuAnchorEl] = useState<HTMLElement>(null);
   const [instructionsDialogOpen, setInstructionsDialogOpen] = useState(false);
-  const { activeUserIsAdmin } = useUser();
+  const { activeUserIsAdmin, activeUser } = useUser();
   const history = useHistory();
 
   const { tr } = useTranslations();
 
   return (
     <Box sx={styles.root}>
-      <Tooltip arrow title={tr.AppBarUserMenu.label}>
-        <IconButton
-          aria-label={tr.AppBarUserMenu.label}
-          aria-controls="menu-appbar"
-          aria-haspopup="true"
-          onClick={(event) => {
-            setMenuOpen(!menuOpen);
-            setMenuAnchorEl(event.currentTarget);
-          }}
-          color="inherit"
-        >
-          <SettingsIcon />
-        </IconButton>
-      </Tooltip>
+      <Button
+        aria-controls="menu-appbar"
+        aria-haspopup="true"
+        onClick={(event) => {
+          setMenuOpen(!menuOpen);
+          setMenuAnchorEl(event.currentTarget);
+        }}
+        endIcon={<AccountCircleOutlined />}
+        color="inherit"
+      >
+        {activeUser?.fullName}
+      </Button>
 
       <Menu
         sx={{ padding: '4px', transform: 'translateX(15px)' }}
