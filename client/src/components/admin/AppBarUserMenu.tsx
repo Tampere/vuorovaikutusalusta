@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import { Box, IconButton, Menu, MenuItem, Tooltip } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
+import { Box, IconButton, Menu, MenuItem, Tooltip } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
-import { InstructionsDialog } from './InstructionsDialog';
 import { useUser } from '@src/stores/UserContext';
+import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
+import { InstructionsDialog } from './InstructionsDialog';
 
 const styles = {
   root: {
@@ -62,9 +62,11 @@ export default function AppBarUserMenu() {
             {tr.AppBarUserMenu.editMapPublications}
           </MenuItem>
         )}
-        <MenuItem onClick={() => setInstructionsDialogOpen(true)}>
-          {tr.AppBarUserMenu.updateInstructions}
-        </MenuItem>
+        {activeUserIsAdmin && (
+          <MenuItem onClick={() => setInstructionsDialogOpen(true)}>
+            {tr.AppBarUserMenu.updateInstructions}
+          </MenuItem>
+        )}
         <MenuItem
           onClick={() => {
             setMenuOpen(false);

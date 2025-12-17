@@ -9,7 +9,7 @@ import {
   storeFile,
   updateDetails,
 } from '@src/application/survey';
-import { ensureAuthenticated } from '@src/auth';
+import { ensureAdminAccess, ensureAuthenticated } from '@src/auth';
 import { parsePdfMimeType, validateRequest } from '@src/utils';
 import { Router } from 'express';
 import asyncHandler from 'express-async-handler';
@@ -24,8 +24,8 @@ const upload = multer({ limits: { fileSize: 10 * 1000 * 1000 } });
  */
 router.get(
   '/instructions',
-
   ensureAuthenticated(),
+  ensureAdminAccess(),
   asyncHandler(async (_req, res) => {
     const row = await getAdminInstructions();
 
@@ -42,6 +42,7 @@ router.post(
   '/instructions',
   upload.single('file'),
   ensureAuthenticated(),
+  ensureAdminAccess(),
   asyncHandler(async (req, res) => {
     const { buffer, originalname, mimetype } = req.file;
     const { name } = await storeAdminInstructions(
