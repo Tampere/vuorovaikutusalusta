@@ -16,19 +16,18 @@ import {
   ToggleButtonGroup,
 } from '@mui/material';
 
+import { LocalizedText } from '@interfaces/survey';
+import { Add, Delete } from '@mui/icons-material';
+import { DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { useEffect, useRef, useState, useMemo } from 'react';
+import { assertNever } from '@src/utils/typeCheck';
+import { enGB, fi } from 'date-fns/locale';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   GeneralNotificationTextEditor,
   GeneralNotificationTextEditorRef,
 } from './GeneralNotificationTextEditor';
-import { Add, Delete } from '@mui/icons-material';
-import { LocalizedText } from '@interfaces/survey';
-import { DateTimePicker } from '@mui/x-date-pickers';
-import { LocalizationProvider } from '@mui/x-date-pickers';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { fi, enGB } from 'date-fns/locale';
-import { assertNever } from '@src/utils/typeCheck';
 
 const DEFAULT_LOCALIZED_TEXT: LocalizedText = { fi: '', en: '' };
 
@@ -94,13 +93,13 @@ export function EditGeneralNotification({
 
   useEffect(() => {
     setFormData(parsedNotificationData);
-    editorRef.current?.setContent(
-      parsedNotificationData.message[selectedLanguage],
-      {
-        contentType: 'markdown',
-      },
-    );
-  }, [parsedNotificationData, selectedLanguage]);
+  }, [parsedNotificationData]);
+
+  useEffect(() => {
+    editorRef.current?.setContent(formData.message[selectedLanguage], {
+      contentType: 'markdown',
+    });
+  }, [formData, selectedLanguage]);
 
   const editorRef = useRef<GeneralNotificationTextEditorRef>(null);
 
@@ -181,10 +180,6 @@ export function EditGeneralNotification({
               onChange={(_, newLanguage) => {
                 if (newLanguage !== null) {
                   setSelectedLanguage(newLanguage);
-                  editorRef.current?.setContent(
-                    formData.message?.[selectedLanguage],
-                    { contentType: 'markdown' },
-                  );
                 }
               }}
               size="small"
