@@ -45,7 +45,8 @@
     "pageAttached": "Huomaa, että karttatasovalinnat eivät kopioidu. Tarkista karttatasovalinnat ja korjaa tarvittaessa karttajulkaisuosoitetta.",
     "pageCopied": "Sivu kopioitu leikepöydälle. Voit nyt liittää kopioidun sivun haluamallesi kyselylle.",
     "checkConditionalSections": "Huomaa, että jatkokysymyksien ehdot eivät kopioidu. Tarkista ehdot tarvittaessa.",
-    "displayAttributions": "Näytä tekijänoikeustiedot kyselyssä"
+    "displayAttributions": "Näytä tekijänoikeustiedot kyselyssä",
+    "displayAttributionsInNotification": "Näytä tekijänoikeustiedot tiedotteessa"
   },
   "EditSurveyInfo": {
     "title": "Kyselyn otsikko",
@@ -57,6 +58,10 @@
     "admins": "Kyselyn ylläpitäjät",
     "userFetchFailed": "Käyttäjien haku epäonnistui. Yritä myöhemmin uudestaan.",
     "adminsHelperText": "Kyselyn alkuperäisen luojan lisäksi määriteltävät käyttäjät, jotka voivat katsella kyselyn vastauksia sekä muokata kyselyä.",
+    "mapPublication": "Valmis karttajulkaisu",
+    "selectMapPublication": "Valitse karttajulkaisu",
+    "mapPublicationsFetchFailed": "Karttajulkaisujen haku epäonnistui. Yritä myöhemmin uudestaan.",
+    "mapPublicationHelperText": "Valitse valmiiksi määritelty Oskari-karttajulkaisu tai syötä alempaan kenttään karttajulkaisun osoite, joka on laadittu kyselyäsi varten. Jos tarvitset karttajulkaisuusi karttatasoja, jotka eivät ole valmiina julkisessa Oskarissa, ota yhteyttä Paikkatietoyksikköön:  paikkatieto_tuki@tampere.fi.",
     "mapUrl": "Oskari-karttajulkaisun osoite",
     "mapUrlError": "Karttatasojen haku annetulle osoitteelle epäonnistui. Tarkista osoite ja yritä uudestaan.",
     "availableMapLayers": "Saatavilla olevat karttatasot:",
@@ -316,6 +321,7 @@
     "loadingImages": "Ladataan kuvia",
     "surveyImage": "Kyselyn taustakuva",
     "thanksPageImage": "Kiitos-sivun kuva",
+    "generalNotificationImage": "Tiedotteen kuva",
     "image": "Kuva",
     "selectImage": "Valitse taustakuva",
     "addNewImage": "Lisää uusi kuva",
@@ -613,20 +619,31 @@
     "hideOldResponses": "Piilota vanhat kommentit...",
     "showOldResponses": "Näytä {x} vanhempaa kommenttia..."
   },
+  "AppBar": {
+    "generalNotifications": "Tiedotteet",
+    "generalNotificationsNew": "Uusia tiedotteita",
+    "generalNotificationsError": "Virhe haettaessa tiedotteita.",
+    "mapPublications": "Karttajulkaisut"
+  },
   "AppBarUserMenu": {
-    "label": "Käyttäjävalikko",
     "logout": "Kirjaudu ulos",
-    "updateInstructions": "Päivitä käyttöohjeet"
+    "updateInstructions": "Päivitä käyttöohjeet",
+    "editMapPublications": "Muokkaa karttajulkaisuja"
+  },
+  "FileUploadDialog": {
+    "wrongFileFormatPdf": "Tiedoston tulee olla pdf-muodossa.",
+    "wrongFileFormatImage": "Tiedoston tulee olla kuva (png, jpg, jpeg, gif, webp).",
+    "wrongFileFormat": "Virheellinen tiedostomuoto.",
+    "fileUploadError": "Virhe ladattaessa tiedostoa.",
+    "fileSizeLimitError": "Ladattavan tiedoston koko ei saa olla yli {x}MB.",
+    "save": "Tallenna",
+    "cancel": "Peruuta"
   },
   "InstructionsDialog": {
     "fetchingError": "Virhe haettaessa nykyisiä käyttöohjeita",
     "currentInstructions": "Nykyiset käyttöohjeet",
     "uploadNewInstructions": "Uuden käyttöohjeen lataaminen",
-    "wrongFileFormat": "Tiedoston tulee olla pdf-muodossa",
-    "fileUploadError": "Virhe ladattaessa tiedostoa",
-    "fileSizeLimitError": "Ladattavan tiedoston koko ei saa olla yli {x}MB",
-    "submit": "Lähetä",
-    "cancel": "Peruuta"
+    "instructionsUpdated": "Käyttöohjeet päivitetty."
   },
   "MapInfoBox": {
     "answer": "Vastaus"
@@ -692,7 +709,13 @@
       },
       "yAxisTotalLabel": "Vastauskertymä",
       "yAxisLabel": "Vastauksia"
-    }
+    },
+    "date": "Päivämäärä"
+  },
+  "SurveySubmissionsChart": {
+    "downloadData": "Lataa vastaukset",
+    "option": "Vaihtoehto",
+    "answerCount": "Vastausmäärä"
   },
   "DragAndDrop": {
     "draggable": "Raahattava"
@@ -730,5 +753,49 @@
   "FollowUpSectionConditions": {
     "numericInfo": "Voit täyttää vain toisen ehdoista tai molemmat ehdot. Jos käytät ehtoa 'Vastaus on välillä' voit täyttää vertailuarvon molemmat kentät tai jättää kentistä jommankumman tyhjäksi.",
     "literalInfo": "Huomaathan, että sanallisessa liukukytkinkysymyksessä vastaajalle näkyy sanallisen minimi- ja maksimiarvon lisäksi arvot 0–10 (0=minimiarvo ja 10=maksimiarvo). Sanallisen liukukytkinkysymyksen vastaus kirjautuu myös vastausdataan arvona 0–10."
+  },
+  "TextEditor": {
+    "headerTitle": "Otsikko",
+    "boldTitle": "Lihavoitu",
+    "italicTitle": "Kursivoitu",
+    "unorderedListTitle": "Järjestämätön lista",
+    "orderedListTitle": "Järjestetty lista",
+    "addPicture": "Lisää kuva"
+  },
+  "GeneralNotification": {
+    "formLabel": "Tiedotteen otsikko",
+    "addNew": "Lisää uusi tiedote",
+    "noResults": "Ei tiedotteita",
+    "maintenance": "Ylläpito",
+    "updateSuccess": "Tiedote päivitetty onnistuneesti",
+    "addSuccess": "Tiedote lisätty onnistuneesti",
+    "updateFailed": "Tiedotteen päivitys epäonnistui",
+    "deleteSuccess": "Tiedote poistettu onnistuneesti",
+    "deleteFailed": "Tiedotteen poisto epäonnistui",
+    "imageAltText": "Vaihtoehtoinen teksti kuvalle",
+    "imageAttributions": "Kuvan tekijänoikeustiedot",
+    "imageDeleteFailed": "Virhe poistettaessa tietokannasta kuvia. Ota yhteyttä ylläpitoon.",
+    "publishToAdmin": "Julkaise kyselyiden muokkaajille",
+    "publishToPublic": "Julkaise kyselyiden vastaajille",
+    "publishHelper": "Kyselyn muokkaajille julkaistu tiedote näytetään kyselylistauksen etusivulla ja vastaajille julkaistu tiedote kyselyn aloitussivulla.",
+    "publishedInternally": "Julkaistu muokkaajille",
+    "publishedExternally": "Julkaistu vastaajille",
+    "newNotification": "Uusi tiedote"
+  },
+  "AdminMapPublications": {
+    "name": "Nimi",
+    "url": "Oskari-karttajulkaisun osoite",
+    "addNew": "Lisää uusi karttajulkaisu",
+    "publicationName": "Julkaisun nimi",
+    "noLayersAvailable": "Osoitteesta ei löydy karttatasoja.",
+    "duplicateUrl": "Osoite on jo käytössä.",
+    "emptyState": "Ei karttajulkaisuja",
+    "deleteConfirm": "Haluatko varmasti poistaa tämän karttajulkaisun?",
+    "nameAndUrlRequired": "Nimi ja osoite ovat pakollisia.",
+    "createSuccess": "Karttajulkaisu luotu.",
+    "createFailed": "Karttajulkaisun luominen epäonnistui.",
+    "deleteSuccess": "Karttajulkaisu poistettu.",
+    "deleteFailed": "Karttajulkaisun poistaminen epäonnistui.",
+    "fetchFailed": "Karttajulkaisujen lataaminen epäonnistui."
   }
 }

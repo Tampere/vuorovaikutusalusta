@@ -116,13 +116,15 @@ function SurveyQuestion({
         style={{
           display: 'flex',
           alignItems: 'center',
-          color: survey.sectionTitleColor ?? '#000000',
         }}
         id={question.id.toString()}
       >
         <Typography
           component="h3"
-          sx={{ marginBottom: readOnly ? '1rem' : '' }}
+          sx={{
+            marginBottom: readOnly ? '1rem' : '',
+            color: survey.sectionTitleColor,
+          }}
           variant={props.isFollowUp ? 'followUpSectionTitle' : 'questionTitle'}
         >
           {question.title?.[surveyLanguage]}

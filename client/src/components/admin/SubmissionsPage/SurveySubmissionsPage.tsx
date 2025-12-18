@@ -30,6 +30,15 @@ import DataExport from '../DataExport';
 import { AdminAppBar } from '../AdminAppBar';
 import { SurveyQuestionSummary } from './SurveyQuestionSummary';
 import { DataChart } from './DataChart';
+import Chart from './SurveySubmissionsChart';
+import { AnswerTable } from './AnswerTable';
+
+const CHART_TYPES: SurveyQuestion['type'][] = [
+  'numeric',
+  'slider',
+  'radio',
+  'checkbox',
+];
 
 function isMapEntry(
   entry: AnswerEntry,
@@ -235,6 +244,7 @@ export default function SurveySubmissionsPage() {
         labels={[survey.title[surveyLanguage], tr.AnswersList.answers]}
       />
       <SplitPaneLayout
+        height="calc(100vh - 64px)"
         mainPane={
           <Box
             sx={{
@@ -312,19 +322,34 @@ export default function SurveySubmissionsPage() {
             )}
           </Box>
         }
+        sidePaneStyle={{ overflowY: 'auto' }}
         sidePane={
-          <AnswerMap
-            survey={survey}
-            submissions={submissions}
-            selectedQuestion={selectedQuestion}
-            onAnswerClick={(answer) => {
-              setSelectedAnswer(answer);
-            }}
-            onSelectQuestion={(question) => setSelectedQuestion(question)}
-            selectedAnswer={selectedAnswer}
-            surveyQuestions={surveyQuestions}
-            questions={questions}
-          />
+          <>
+            {CHART_TYPES.includes(selectedQuestion?.type) ? (
+              <Chart
+                submissions={submissions}
+                selectedQuestion={selectedQuestion}
+              />
+            ) : selectedQuestion?.type === 'free-text' ? (
+              <AnswerTable
+                submissions={submissions}
+                selectedQuestion={selectedQuestion}
+              />
+            ) : (
+              <AnswerMap
+                survey={survey}
+                submissions={submissions}
+                selectedQuestion={selectedQuestion}
+                onAnswerClick={(answer) => {
+                  setSelectedAnswer(answer);
+                }}
+                onSelectQuestion={(question) => setSelectedQuestion(question)}
+                selectedAnswer={selectedAnswer}
+                surveyQuestions={surveyQuestions}
+                questions={questions}
+              />
+            )}
+          </>
         }
         mobileDrawer={{
           open: mobileDrawerOpen,

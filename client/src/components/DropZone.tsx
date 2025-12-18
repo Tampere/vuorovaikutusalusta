@@ -60,7 +60,7 @@ export default function DropZone({
   }, [acceptedFiles]);
 
   return (
-    <Box component="section" sx={styles.container}>
+    <Box id={'dropzone-container'} component="section" sx={styles.container}>
       <Box
         {...getRootProps({ sx: styles.dropzone })}
         aria-label={children ? tr.AttachmentQuestion.replace : ''}

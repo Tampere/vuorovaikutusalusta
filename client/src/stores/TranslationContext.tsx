@@ -13,7 +13,7 @@ const translations = {
 /**
  * All possible languages
  */
-type Language = keyof typeof translations;
+export type Language = keyof typeof translations;
 
 /** Translations */
 export type Translations = (typeof translations)['fi'];

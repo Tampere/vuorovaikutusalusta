@@ -2,6 +2,7 @@ import { Survey } from '@interfaces/survey';
 import { createTheme, Theme } from '@mui/material';
 import { fiFI } from '@mui/material/locale';
 import { ThemeProvider } from '@mui/material/styles';
+import { sharedTheme } from '@src/themes/shared';
 import {
   buttonOverrides,
   defaultSurveyTheme,
@@ -72,6 +73,7 @@ export function useSurveyTheme() {
                 ...stepperOverrides,
                 ...textOverrides,
               },
+              ...sharedTheme,
             },
             fiFI,
           )

@@ -9,7 +9,6 @@ import {
   SurveyCheckboxQuestion,
   SurveyEmailInfoItem,
   SurveyFollowUpSection,
-  SurveyImage,
   SurveyMapQuestion,
   SurveyMapSubQuestion,
   SurveyPage,
@@ -21,6 +20,7 @@ import {
   SurveyTheme,
   SurveySortingQuestion,
   SurveyCategorizedCheckboxQuestion,
+  ImageFile,
 } from '@interfaces/survey';
 import { User } from '@interfaces/user';
 import {
@@ -1007,7 +1007,7 @@ export async function getSurveys(
 ) {
   const rows = await getDb().manyOrNone<DBSurvey>(
     `SELECT
-    COUNT(sub) AS submission_count,
+    COUNT(sub)::int AS submission_count,
     survey.*
   FROM
     data.survey survey
@@ -2137,7 +2137,7 @@ function dbSurveyToSurvey(
   };
   return {
     ...survey,
-    submissionCount: Number(dbSurvey.submission_count),
+    submissionCount: dbSurvey.submission_count,
     isPublished: isPublished(survey),
     ...('theme_id' in dbSurvey && {
       theme: dbSurveyJoinToTheme(dbSurvey),
@@ -2620,7 +2620,7 @@ export async function storeFile({
 
   const searchFileName = `${splittedFileNameArray.join('.')}%.${extension}`;
   const { count } = await getDb().one<{ count: number }>(
-    `SELECT count(id) FROM data.files WHERE file_name LIKE $1;`,
+    `SELECT count(id)::int FROM data.files WHERE file_name LIKE $1;`,
     [searchFileName],
   );
   const randomHash = (Math.random() * 10)
@@ -2727,7 +2727,7 @@ export async function getImages(imagePath: string[], getCompressed = false) {
     altText: row.details?.imageAltText,
     fileName: row.file_name,
     filePath: row.file_path,
-  })) as SurveyImage[];
+  })) as ImageFile[];
 }
 
 export async function updateDetails(

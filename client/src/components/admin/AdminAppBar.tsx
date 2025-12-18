@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   AppBar,
   List,
@@ -8,12 +7,14 @@ import {
   Typography,
 } from '@mui/material';
 import { SystemStyleObject } from '@mui/system';
-import SurveyLanguageMenu from '../SurveyLanguageMenu';
+import { useTranslations } from '@src/stores/TranslationContext';
+import React from 'react';
+import { NavLink } from 'react-router-dom';
 import LanguageMenu from '../LanguageMenu';
+import SurveyLanguageMenu from '../SurveyLanguageMenu';
 import { AdminInstructionButton } from './AdminInstructionButton';
 import AppBarUserMenu from './AppBarUserMenu';
-import { useTranslations } from '@src/stores/TranslationContext';
-import { NavLink } from 'react-router-dom';
+import { GeneralNotificationNavigationButton } from './GeneralNotification/GeneralNotificationNavigationButton';
 
 interface Props {
   labels?: string[];
@@ -94,6 +95,7 @@ export function AdminAppBar({
           >
             <SurveyLanguageMenu />
             <LanguageMenu />
+            <GeneralNotificationNavigationButton />
             <AdminInstructionButton />
             <AppBarUserMenu />
           </div>

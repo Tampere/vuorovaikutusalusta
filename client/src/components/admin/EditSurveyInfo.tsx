@@ -1,13 +1,18 @@
 import { User } from '@interfaces/user';
+import { MapPublication } from '@interfaces/mapPublications';
 import {
   Autocomplete,
   Box,
   Checkbox,
   Chip,
+  FormControl,
   FormControlLabel,
   FormHelperText,
   FormLabel,
+  InputLabel,
   Link,
+  MenuItem,
+  Select,
   Skeleton,
   TextField,
   Typography,
@@ -20,6 +25,7 @@ import { useSurvey } from '@src/stores/SurveyContext';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import { fi, enGB } from 'date-fns/locale';
+import { getMapPublications } from '@src/controllers/MapPublicationsController';
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { useHistory } from 'react-router-dom';
@@ -47,6 +53,8 @@ export default function EditSurveyInfo() {
   const [deleteSurveyLoading, setDeleteSurveyLoading] = useState(false);
   const [users, setUsers] = useState<User[]>([]);
   const [usersLoading, setUsersLoading] = useState(true);
+  const [mapPublications, setMapPublications] = useState<MapPublication[]>([]);
+  const [mapPublicationsLoading, setMapPublicationsLoading] = useState(true);
 
   const {
     activeSurvey,
@@ -84,6 +92,24 @@ export default function EditSurveyInfo() {
     }
 
     fetchOtherUsers();
+  }, []);
+
+  useEffect(() => {
+    async function fetchMapPublications() {
+      setMapPublicationsLoading(true);
+      try {
+        const publications = await getMapPublications();
+        setMapPublications(publications);
+      } catch (error) {
+        showToast({
+          severity: 'error',
+          message: tr.EditSurveyInfo.mapPublicationsFetchFailed,
+        });
+      }
+      setMapPublicationsLoading(false);
+    }
+
+    fetchMapPublications();
   }, []);
 
   const localLanguage = useMemo(() => {
@@ -164,6 +190,42 @@ export default function EditSurveyInfo() {
             });
           }}
         />
+        <FormControl>
+          <InputLabel id="map-publication-select-label">
+            {tr.EditSurveyInfo.mapPublication}
+          </InputLabel>
+          <Select
+            label={tr.EditSurveyInfo.mapPublication}
+            labelId="map-publication-select-label"
+            fullWidth
+            disabled={mapPublicationsLoading}
+            value={
+              mapPublications.find((pub) => pub.url === activeSurvey.mapUrl)
+                ?.id ?? ''
+            }
+            onChange={(event) => {
+              const selectedPublication = mapPublications.find(
+                (pub) => pub.id === event.target.value,
+              );
+              editSurvey({
+                ...activeSurvey,
+                mapUrl: selectedPublication?.url ?? '',
+              });
+            }}
+          >
+            <MenuItem value="">
+              <em>{tr.EditSurveyInfo.mapPublication}</em>
+            </MenuItem>
+            {mapPublications.map((publication) => (
+              <MenuItem key={publication.id} value={publication.id}>
+                {publication.name}
+              </MenuItem>
+            ))}
+          </Select>
+          <FormHelperText>
+            {tr.EditSurveyInfo.mapPublicationHelperText}
+          </FormHelperText>
+        </FormControl>
         <TextField
           error={validationErrors.includes('survey.mapUrl')}
           label={tr.EditSurveyInfo.mapUrl}
@@ -179,6 +241,19 @@ export default function EditSurveyInfo() {
             tr.EditSurveyInfo.mapUrlError
           }
         />
+        {availableMapLayersLoading && (
+          <Skeleton variant="rectangular" height={200} width="100%" />
+        )}
+        {!availableMapLayersLoading && availableMapLayers?.length > 0 && (
+          <div>
+            <FormLabel>{tr.EditSurveyInfo.availableMapLayers}</FormLabel>
+            <ul>
+              {availableMapLayers.map((layer) => (
+                <li key={layer.id}>{layer.name}</li>
+              ))}
+            </ul>
+          </div>
+        )}
         <Autocomplete
           multiple
           disabled={usersLoading}
@@ -232,19 +307,7 @@ export default function EditSurveyInfo() {
             />
           )}
         />
-        {availableMapLayersLoading && (
-          <Skeleton variant="rectangular" height={200} width="100%" />
-        )}
-        {!availableMapLayersLoading && availableMapLayers?.length > 0 && (
-          <div>
-            <FormLabel>{tr.EditSurveyInfo.availableMapLayers}</FormLabel>
-            <ul>
-              {availableMapLayers.map((layer) => (
-                <li key={layer.id}>{layer.name}</li>
-              ))}
-            </ul>
-          </div>
-        )}
+
         <SurveyImageList imageType={'backgroundImage'} />
         <Box
           sx={{
@@ -278,6 +341,7 @@ export default function EditSurveyInfo() {
             adapterLocale={localLanguage}
             localeText={{
               dateTimePickerToolbarTitle: tr.EditSurveyInfo.selectDateAndTime,
+              cancelButtonLabel: tr.commands.cancel,
             }}
           >
             <DateTimePicker
