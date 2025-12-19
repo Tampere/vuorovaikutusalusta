@@ -39,6 +39,7 @@ interface State {
 
   defaultView: GeoJSON.FeatureCollection;
   oskariVersion: number;
+  isInitialized: boolean;
 }
 
 type Action =
@@ -88,12 +89,16 @@ type Action =
   | {
       type: 'SET_OSKARI_VERSION';
       value: number;
+    }
+  | {
+      type: 'SET_IS_INITIALIZED';
+      value: boolean;
     };
 
 type Context = [State, React.Dispatch<Action>];
 
 const stateDefaults: State = {
-  visibleLayers: null,
+  visibleLayers: [],
   allLayers: [],
   rpcChannel: null,
   helperText: null,
@@ -114,6 +119,7 @@ const stateDefaults: State = {
 
   defaultView: null,
   oskariVersion: null,
+  isInitialized: false,
 };
 
 /**
@@ -205,11 +211,6 @@ export function useAdminMap() {
 
   const [state, dispatch] = context;
 
-  const isMapReady = useMemo(
-    () => Boolean(state.rpcChannel),
-    [state.rpcChannel],
-  );
-
   function startDrawingRequest() {
     state.rpcChannel.postRequest('DrawTools.StartDrawingRequest', [
       'DefaultViewSelection',
@@ -282,7 +283,7 @@ export function useAdminMap() {
 
   return {
     ...state,
-    isMapReady,
+    isMapReady: state.isInitialized && Boolean(state.rpcChannel),
     startDrawingRequest,
     drawDefaultView,
     clearView,
@@ -325,8 +326,8 @@ export function useSurveyMap() {
       dispatch({ type: 'SET_OSKARI_VERSION', value: oskariVersion });
     });
 
-    return Boolean(state.rpcChannel);
-  }, [state.rpcChannel]);
+    return Boolean(state.isInitialized && state.rpcChannel);
+  }, [state.rpcChannel, state.isInitialized]);
 
   /**
    * Draws given geometries as features onto the map
@@ -802,6 +803,11 @@ function reducer(state: State, action: Action): State {
         ...state,
         oskariVersion: action.value,
       };
+    case 'SET_IS_INITIALIZED':
+      return {
+        ...state,
+        isInitialized: action.value,
+      };
     default:
       throw new Error('Invalid action type');
   }
@@ -840,25 +846,25 @@ export default function SurveyMapProvider({
         }
         clearInterval(interval);
         dispatch({ type: 'SET_ALL_LAYERS', layers });
-        dispatch({
-          type: 'SET_VISIBLE_LAYERS',
-          layers: state.visibleLayers ?? layers,
-        });
+        dispatch({ type: 'SET_IS_INITIALIZED', value: true });
       });
     }, 100);
-
-    return () => {
-      clearInterval(interval);
-    };
   }, [state.rpcChannel]);
+
+  useEffect(() => {
+    if (!state.rpcChannel && state.isInitialized) {
+      dispatch({ type: 'SET_IS_INITIALIZED', value: false });
+    }
+  }, [state.rpcChannel, state.isInitialized]);
 
   /**
    * Whenever changes are made to visible layers, update the visibility to state
    */
   useEffect(() => {
-    if (!state.allLayers || !state.rpcChannel) {
+    if (!state.allLayers || !state.isInitialized || !state.rpcChannel) {
       return;
     }
+
     state.allLayers.forEach((layerId) => {
       // Update visibility for each layer - only show it if current page has that layer visible
       state.rpcChannel.postRequest(
@@ -866,7 +872,12 @@ export default function SurveyMapProvider({
         [layerId, state.visibleLayers?.includes?.(layerId) ?? false],
       );
     });
-  }, [state.rpcChannel, state.allLayers, state.visibleLayers]);
+  }, [
+    state.isInitialized,
+    state.allLayers,
+    state.visibleLayers,
+    state.rpcChannel,
+  ]);
 
   return (
     <SurveyMapContext.Provider value={value}>
