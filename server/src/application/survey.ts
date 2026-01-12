@@ -1,11 +1,13 @@
 import {
   Conditions,
   File,
+  ImageFile,
   LocalizedText,
-  SectionOptionCategoryGroup,
   SectionOption,
+  SectionOptionCategoryGroup,
   SectionOptionGroup,
   Survey,
+  SurveyCategorizedCheckboxQuestion,
   SurveyCheckboxQuestion,
   SurveyEmailInfoItem,
   SurveyFollowUpSection,
@@ -17,10 +19,8 @@ import {
   SurveyPageSidebarImageSize,
   SurveyPageSidebarType,
   SurveyRadioQuestion,
-  SurveyTheme,
   SurveySortingQuestion,
-  SurveyCategorizedCheckboxQuestion,
-  ImageFile,
+  SurveyTheme,
 } from '@interfaces/survey';
 import { User } from '@interfaces/user';
 import {
@@ -39,7 +39,8 @@ import logger from '@src/logger';
 
 import { isAdmin } from '@src/user';
 
-import { compressImage, geometryToGeoJSONFeatureCollection } from '@src/utils';
+import { geometryToGeoJSONFeatureCollection } from '@src/mapUtils';
+import { compressImage } from '@src/utils';
 import { Geometry } from 'geojson';
 import pgPromise from 'pg-promise';
 

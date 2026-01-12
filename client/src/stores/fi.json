@@ -528,7 +528,8 @@
     "browsingInstructions": "Liikuta karttanäkymää nuolinäppäimillä. Lähennä ja loitonna plus- ja miinusnäppäimillä.",
     "editGeometries": "Muokkaa piirtämiäsi karttamerkintöjä",
     "finishEditingGeometries": "Lopeta karttamerkintöjen muokkaus",
-    "iFrameTitle": "Karttanäkymä"
+    "iFrameTitle": "Karttanäkymä",
+    "errorInitializingMap": "Tapahtui virhe alustettaessa karttaa."
   },
   "MatrixQuestion": {
     "emptyAnswer": "En osaa sanoa",
