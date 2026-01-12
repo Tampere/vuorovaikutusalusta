@@ -1,4 +1,6 @@
 import { useSurveyMap } from '@src/stores/SurveyMapContext';
+import { useToasts } from '@src/stores/ToastContext';
+import { useTranslations } from '@src/stores/TranslationContext';
 import { useOskari } from '@src/utils/useOskari';
 import { Feature, Geometry } from 'geojson';
 import { FeatureStyle, MarkerStyle } from 'oskari-rpc';
@@ -31,6 +33,8 @@ export default function OskariMap({
     oskariVersion,
   } = useOskari();
   const { mapFeatureColorScheme } = useSurveyMap();
+  const { showToast } = useToasts();
+  const { tr } = useTranslations();
 
   // Default feature style
   const defaultFeatureStyles = useMemo(() => {
@@ -157,7 +161,12 @@ export default function OskariMap({
     if (!iframeRef?.current) {
       return;
     }
-    initializeMap(iframeRef.current, url);
+    initializeMap(iframeRef.current, url, () => {
+      showToast({
+        severity: 'error',
+        message: tr.SurveyMap.errorInitializingMap,
+      });
+    });
   }, [iframeRef, url]);
 
   /**

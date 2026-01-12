@@ -1,5 +1,6 @@
+import { connectRpc } from '@src/oskariRpc/helpers';
 import { Feature, FeatureCollection, Point } from 'geojson';
-import OskariRPC, {
+import {
   Channel,
   DrawingEventHandler,
   FeatureEventHandler,
@@ -33,14 +34,6 @@ const defaultMarkerStyle: MarkerStyle = {
   size: null,
 };
 
-function getOrigin(url: string) {
-  const anchorElement = document.createElement('a');
-  anchorElement.href = url;
-  return `${anchorElement.protocol}//${anchorElement.hostname}${
-    anchorElement.port ? `:${anchorElement.port}` : ''
-  }`;
-}
-
 export function useOskari() {
   const [rpcChannel, setRpcChannel] = useState<Channel | null>(null);
   const [featureClickEventHandler, setFeatureClickEventHandler] =
@@ -62,16 +55,23 @@ export function useOskari() {
    * Initializes the map to fiven iframe element and Oskari map URL
    * @param iframe Iframe element
    * @param url Oskari map URL
+   * @param onError Error handler callback
    * @returns
    */
-  async function initializeMap(iframe: HTMLIFrameElement, url: string) {
+  async function initializeMap(
+    iframe: HTMLIFrameElement,
+    url: string,
+    onError?: () => void,
+  ) {
     if (!iframe || !url) {
       return;
     }
     // Reset RPC channel (i.e. make map "not ready")
     setRpcChannel(null);
     setAllLayers(null);
-    const channel = OskariRPC.connect(iframe, getOrigin(url));
+    const channel = connectRpc(iframe, url, () => {
+      onError?.();
+    });
 
     // Wait for the channel to get ready before proceeding
     await new Promise<void>((resolve) => {

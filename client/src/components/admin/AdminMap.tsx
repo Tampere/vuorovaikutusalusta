@@ -1,7 +1,9 @@
 import { SurveyPage } from '@interfaces/survey';
 import { Box, CircularProgress } from '@mui/material';
+import { connectRpc } from '@src/oskariRpc/helpers';
 import { useAdminMap } from '@src/stores/SurveyMapContext';
-import OskariRPC from 'oskari-rpc';
+import { useToasts } from '@src/stores/ToastContext';
+import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useEffect, useRef } from 'react';
 
 interface Props {
@@ -21,19 +23,8 @@ export function AdminMap({ url, page, allowDrawing = false }: Props) {
     setVisibleLayers,
   } = useAdminMap();
 
-  /**
-   * More crossbrowser-safe alternative to detecting origin from URL
-   * (compared to URL.origin, with only ~80% global support at the moment of writing this)
-   * @param url URL
-   * @returns Origin of the URL
-   */
-  function getOrigin(url: string) {
-    const anchorElement = document.createElement('a');
-    anchorElement.href = url;
-    return `${anchorElement.protocol}//${anchorElement.hostname}${
-      anchorElement.port ? `:${anchorElement.port}` : ''
-    }`;
-  }
+  const { showToast } = useToasts();
+  const { tr } = useTranslations();
 
   /**
    * Initialize RPC channel when iframe gets loaded
@@ -44,7 +35,12 @@ export function AdminMap({ url, page, allowDrawing = false }: Props) {
     }
     // Reset RPC channel (i.e. make map "not ready")
     setRpcChannel(null);
-    const channel = OskariRPC.connect(iframeRef.current, getOrigin(url));
+    const channel = connectRpc(iframeRef.current, url, () => {
+      showToast({
+        severity: 'error',
+        message: tr.SurveyMap.errorInitializingMap,
+      });
+    });
     channel.onReady(() => {
       // Set the RPC channel to context state when ready
       setRpcChannel(channel);
