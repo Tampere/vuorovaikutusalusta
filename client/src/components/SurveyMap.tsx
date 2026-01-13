@@ -1,9 +1,10 @@
-import { Fab, Tooltip } from '@mui/material';
 import { Check, Edit } from '@mui/icons-material';
-import { useSurveyMap } from '@src/stores/SurveyMapContext';
-import { useTranslations } from '@src/stores/TranslationContext';
+import { Box, CircularProgress, Fab, Tooltip } from '@mui/material';
 import { visuallyHidden } from '@mui/utils';
-import OskariRPC from 'oskari-rpc';
+import { connectRpc } from '@src/oskariRpc/helpers';
+import { useSurveyMap } from '@src/stores/SurveyMapContext';
+import { useToasts } from '@src/stores/ToastContext';
+import { useTranslations } from '@src/stores/TranslationContext';
 import React, { useEffect, useRef, useState } from 'react';
 
 interface Props {
@@ -39,20 +40,7 @@ export default function SurveyMap(props: Props) {
   } = useSurveyMap();
 
   const { tr } = useTranslations();
-
-  /**
-   * More crossbrowser-safe alternative to detecting origin from URL
-   * (compared to URL.origin, with only ~80% global support at the moment of writing this)
-   * @param url URL
-   * @returns Origin of the URL
-   */
-  function getOrigin(url: string) {
-    const anchorElement = document.createElement('a');
-    anchorElement.href = url;
-    return `${anchorElement.protocol}//${anchorElement.hostname}${
-      anchorElement.port ? `:${anchorElement.port}` : ''
-    }`;
-  }
+  const { showToast } = useToasts();
 
   /**
    * Initialize RPC channel when iframe gets loaded
@@ -63,7 +51,12 @@ export default function SurveyMap(props: Props) {
     }
     // Reset RPC channel (i.e. make map "not ready")
     setRpcChannel(null);
-    const channel = OskariRPC.connect(iframeRef.current, getOrigin(props.url));
+    const channel = connectRpc(iframeRef.current, props.url, () => {
+      showToast({
+        severity: 'error',
+        message: tr.SurveyMap.errorInitializingMap,
+      });
+    });
     channel.onReady(() => {
       // Set the RPC channel to context state when ready
       setRpcChannel(channel);
@@ -110,19 +103,34 @@ export default function SurveyMap(props: Props) {
     props.url && (
       <>
         <p style={visuallyHidden}>{tr.SurveyMap.browsingInstructions}</p>
-        <iframe
-          ref={iframeRef}
-          title={tr.SurveyMap.iFrameTitle}
-          aria-describedby="mapEmbedInstructions"
-          style={{
-            border: 0,
-            width: '100%',
-            height: '100%',
-          }}
-          src={props.url}
-          allow="geolocation"
-          allowFullScreen
-        />
+        <Box sx={{ position: 'relative', width: '100%', height: '100%' }}>
+          {!isMapReady && (
+            <CircularProgress
+              sx={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                marginTop: '-20px',
+                marginLeft: '-20px',
+                zIndex: 1,
+              }}
+            />
+          )}
+          <iframe
+            ref={iframeRef}
+            title={tr.SurveyMap.iFrameTitle}
+            aria-describedby="mapEmbedInstructions"
+            style={{
+              opacity: isMapReady ? 1 : 0,
+              border: 0,
+              width: '100%',
+              height: '100%',
+            }}
+            src={props.url}
+            allow="geolocation"
+            allowFullScreen
+          />
+        </Box>
         {!drawing && !modifying && answerGeometries?.features.length > 0 && (
           <Tooltip title={tr.SurveyMap.editGeometries}>
             <Fab

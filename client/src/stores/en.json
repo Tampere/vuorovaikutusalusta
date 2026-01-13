@@ -528,7 +528,8 @@
     "browsingInstructions": "Pan the map view with the arrow keys, zoom in and out using plus and minus keys.",
     "editGeometries": "Modify your previous map answers",
     "finishEditingGeometries": "Stop modifying map answers",
-    "iFrameTitle": "Map view"
+    "iFrameTitle": "Map view",
+    "errorInitializingMap": "An error occurred while initializing the map."
   },
   "MatrixQuestion": {
     "emptyAnswer": "I don't know",

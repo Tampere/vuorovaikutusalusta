@@ -177,6 +177,15 @@ declare module 'oskari-rpc' {
   ) => void;
 
   /**
+   * Rearrange map layers
+   */
+
+  export type RearrangeSelectedMapLayerRequest = (
+    name: 'RearrangeSelectedMapLayerRequest',
+    params: [layerId: number, newPos: number],
+  ) => void;
+
+  /**
    * Drawing event handler
    */
   export type DrawingEventHandler = (payload: {
@@ -336,7 +345,8 @@ declare module 'oskari-rpc' {
       MapModulePlugin.RemoveMarkersRequest &
       InfoBox.ShowInfoBoxRequest &
       InfoBox.HideInfoBoxRequest &
-      MapMoveRequest;
+      MapMoveRequest &
+      RearrangeSelectedMapLayerRequest;
     /**
      * Handle an Oskari event
      */
