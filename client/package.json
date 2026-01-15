@@ -15,9 +15,6 @@
     "build": "vite build",
     "preview": "vite preview"
   },
-  "lint-staged": {
-    "*.{js,jsx,ts,tsx,json}": "prettier --write --ignore-unknown"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ubigu/vuorovaikutusalusta.git"

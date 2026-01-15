@@ -12,10 +12,8 @@
     "test": "jest --config ./jest.config.json",
     "lint": "eslint . --ext .ts",
     "prebuild": "npm run lint && npm run test",
-    "build": "tsc"
-  },
-  "lint-staged": {
-    "*.{js,jsx,ts,tsx,json}": "prettier --write --ignore-unknown"
+    "build": "tsc",
+    "tsc": "tsc --noEmit"
   },
   "repository": {
     "type": "git",
