@@ -2,12 +2,12 @@ import logger from '@src/logger';
 import Email, { EmailOptions } from 'email-templates';
 import { createTransport } from 'nodemailer';
 import { resolve } from 'path';
+import { getRefreshToken } from './refresh-token';
 
 // OAuth parameters
 const oauth = {
   clientId: process.env.EMAIL_OAUTH_CLIENT_ID,
   clientSecret: process.env.EMAIL_OAUTH_CLIENT_SECRET,
-  refreshToken: process.env.EMAIL_OAUTH_REFRESH_TOKEN,
   accessUrl: process.env.EMAIL_OAUTH_ACCESS_URL,
 };
 
@@ -22,29 +22,30 @@ const config = {
   enabled: process.env.EMAIL_ENABLED === 'true',
 };
 
-// Nodemailer transport object
-const transport = process.env.LOCAL_TEST_EMAIL_ENABLED
-  ? createTransport({
-      host: process.env.SMTP_HOST,
-      port: Number(process.env.SMTP_PORT),
-      secure: false,
-      tls: { rejectUnauthorized: false },
-      auth: {
-        user: process.env.SMTP_USERNAME,
-        pass: process.env.SMTP_PASSWORD,
-      },
-    })
-  : createTransport({
-      service: process.env.EMAIL_SERVICE ?? 'gmail',
-      auth: {
-        type: 'OAuth2',
-        user: sender.address,
-        clientId: oauth.clientId,
-        clientSecret: oauth.clientSecret,
-        refreshToken: oauth.refreshToken,
-        accessUrl: oauth.accessUrl,
-      },
-    });
+function createEmailTransport(refreshToken: string) {
+  return process.env.LOCAL_TEST_EMAIL_ENABLED
+    ? createTransport({
+        host: process.env.SMTP_HOST,
+        port: Number(process.env.SMTP_PORT),
+        secure: false,
+        tls: { rejectUnauthorized: false },
+        auth: {
+          user: process.env.SMTP_USERNAME,
+          pass: process.env.SMTP_PASSWORD,
+        },
+      })
+    : createTransport({
+        service: process.env.EMAIL_SERVICE ?? 'gmail',
+        auth: {
+          type: 'OAuth2',
+          user: sender.address,
+          clientId: oauth.clientId,
+          clientSecret: oauth.clientSecret,
+          refreshToken,
+          accessUrl: oauth.accessUrl,
+        },
+      });
+}
 
 /**
  * Send an email with given options
@@ -59,6 +60,9 @@ export async function sendMail(emailOptions: EmailOptions) {
     );
     return;
   }
+
+  const refreshToken = await getRefreshToken();
+  const transport = createEmailTransport(refreshToken);
 
   const email = new Email({
     views: {
