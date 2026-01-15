@@ -227,7 +227,7 @@ export default function EditSurveyPage() {
       {page.sidebar.type === 'map' &&
         (!activeSurvey.mapUrl ? (
           <div>{tr.EditSurveyPage.warningNoMapUrl}</div>
-        ) : !availableMapLayers.length ? (
+        ) : !availableMapLayers?.length ? (
           <div>{tr.EditSurveyPage.warningNoAvailableMapLayers}</div>
         ) : (
           <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
