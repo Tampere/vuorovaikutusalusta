@@ -95,7 +95,8 @@ export function startUpdatingRefreshToken(config: RefreshConfig) {
     try {
       await updateRefreshToken(config);
     } catch (error) {
-      log(`Error updating refresh token: ${error.message}`);
+      if (error instanceof Error)
+        log(`Error updating refresh token: ${error.message}`);
     }
   }, config.updateIntervalMs);
 }
@@ -110,7 +111,7 @@ export async function getRefreshToken() {
   }
 
   // Load the initial refresh token from the database
-  cachedToken = await cachedConfig.loadToken();
+  cachedToken = (await cachedConfig?.loadToken()) ?? null;
   if (!cachedToken) {
     throw new Error('No valid refresh token found');
   }
