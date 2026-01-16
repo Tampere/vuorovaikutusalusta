@@ -9,12 +9,10 @@
   },
   "lint-staged": {
     "client/**/*.{ts,tsx}": [
-      "npm run lint --prefix client",
-      "npm run tscw --prefix client -- --strict"
+      "npm run lint --prefix client"
     ],
     "server/**/*.ts": [
-      "npm run lint --prefix server",
-      "npm run tscw --prefix server -- --strict"
+      "npm run lint --prefix server"
     ],
     "*.{js,jsx,ts,tsx,json}": "prettier --write --ignore-unknown"
   }

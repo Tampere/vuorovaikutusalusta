@@ -74,6 +74,7 @@
     "winston": "^3.17.0"
   },
   "devDependencies": {
+    "@types/compression": "^1.8.1",
     "@types/connect-pg-simple": "^7.0.3",
     "@types/email-templates": "^10.0.4",
     "@types/express": "^5.0.3",
