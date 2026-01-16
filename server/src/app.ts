@@ -1,18 +1,28 @@
 import compression from 'compression';
 import express from 'express';
+import { readFile } from 'fs/promises';
+import helmet from 'helmet';
 import morgan from 'morgan';
 import * as path from 'path';
+import { createServer } from 'vite';
 import { initializePuppeteerCluster } from './application/screenshot';
+import { getSurveyTitle } from './application/survey';
 import { configureAuth, configureMockAuth, ensureAuthenticated } from './auth';
 import { getDb, initializeDatabase, migrateUp } from './database';
+import { startUpdatingRefreshToken } from './email/refresh-token';
 import { HttpResponseError } from './error';
 import logger from './logger';
 import rootRouter from './routes';
-import helmet from 'helmet';
-import { readFile } from 'fs/promises';
-import { createServer } from 'vite';
-import { getSurveyTitle } from './application/survey';
-import { startUpdatingRefreshToken } from './email/refresh-token';
+
+function setNoCacheForIndex(res: express.Response, filePath: string) {
+  if (filePath.endsWith('index.html')) {
+    res.setHeader('Cache-Control', 'no-cache, no-store');
+  }
+}
+
+const noCacheConfig = {
+  'Cache-Control': 'no-cache, no-store',
+};
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -128,9 +138,9 @@ async function start() {
     ensureAuthenticated({
       redirectToLogin: true,
     }),
-    express.static('static/admin'),
+    express.static('static/admin', { setHeaders: setNoCacheForIndex }),
   );
-  app.use('/', express.static('static'));
+  app.use('/', express.static('static', { setHeaders: setNoCacheForIndex }));
 
   // Root router for the API
   app.use('/api', rootRouter);
@@ -142,7 +152,9 @@ async function start() {
       redirectToLogin: true,
     }),
     (_req, res) => {
-      res.sendFile(path.join(__dirname, '../static/admin/index.html'));
+      res
+        .set(noCacheConfig)
+        .sendFile(path.join(__dirname, '../static/admin/index.html'));
     },
   );
 
@@ -183,7 +195,10 @@ async function start() {
         .replaceAll(`<!--app-title -->`, title)
         .replace('@clientSrc', 'src');
 
-      res.status(200).set({ 'Content-Type': 'text/html' }).end(renderedHtml);
+      res
+        .status(200)
+        .set({ 'Content-Type': 'text/html', ...noCacheConfig })
+        .end(renderedHtml);
     } catch (e: any) {
       isDev && vite.ssrFixStacktrace(e);
       logger.error(e.stack);
