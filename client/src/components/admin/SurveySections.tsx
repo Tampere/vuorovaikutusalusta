@@ -30,50 +30,55 @@ export default function SurveySections(props: Props) {
             props.onExpandedSectionChange(newIndex);
           }
         }}
-        sortableItems={props.page.sections.map((section, index) => ({
-          id: String(section.id),
-          renderElement: (isDragging) => (
-            <div>
-              <SurveySectionAccordion
-                isDragging={isDragging}
-                pageId={props.page.id}
-                index={index}
-                disabled={props.disabled}
-                section={section}
-                name={`section-${index}`}
-                expanded={props.expandedSection === index}
-                onExpandedChange={(isExpanded) => {
-                  props.onExpandedSectionChange(isExpanded ? index : null);
-                }}
-                onEdit={(index, section) => {
-                  editSection(props.page.id, index, section);
-                }}
-                onDelete={(index) => {
-                  deleteSection(props.page.id, index);
-                  // Reset expanded section to null
-                  props.onExpandedSectionChange(null);
-                }}
-                copyingSettings={{
-                  copyingDisabled:
-                    section.type === 'personal-info' ||
-                    section.followUpSections?.some(
-                      (s) => s.type === 'personal-info',
-                    ),
-                  disabledTooltip:
-                    tr.SurveySections.personalInfoFollowUpDisablesCopying,
-                }}
-              />
-              {isFollowUpSectionParentType(section) && (
-                <FollowUpSections
-                  parentSectionIndex={index}
+        sortableItems={props.page.sections.map((section, index) => {
+          const followUpsHavePersonalInfo = section.followUpSections?.some(
+            (s) => s.type === 'personal-info',
+          );
+          return {
+            id: String(section.id),
+            renderElement: (isDragging) => (
+              <div>
+                <SurveySectionAccordion
+                  isDragging={isDragging}
+                  pageId={props.page.id}
+                  index={index}
                   disabled={props.disabled}
-                  page={props.page}
-                  parentSection={section}
+                  section={section}
+                  name={`section-${index}`}
+                  expanded={props.expandedSection === index}
+                  onExpandedChange={(isExpanded) => {
+                    props.onExpandedSectionChange(isExpanded ? index : null);
+                  }}
+                  onEdit={(index, section) => {
+                    editSection(props.page.id, index, section);
+                  }}
+                  onDelete={(index) => {
+                    deleteSection(props.page.id, index);
+                    // Reset expanded section to null
+                    props.onExpandedSectionChange(null);
+                  }}
+                  copyingSettings={{
+                    copyingDisabled:
+                      section.type === 'personal-info' ||
+                      followUpsHavePersonalInfo,
+                    ...(followUpsHavePersonalInfo && {
+                      disabledTooltip:
+                        tr.SurveySections.personalInfoFollowUpDisablesCopying,
+                    }),
+                  }}
                 />
-              )}
-            </div>
-          ),
-        }))}
+                {isFollowUpSectionParentType(section) && (
+                  <FollowUpSections
+                    parentSectionIndex={index}
+                    disabled={props.disabled}
+                    page={props.page}
+                    parentSection={section}
+                  />
+                )}
+              </div>
+            ),
+          };
+        })}
       />
     </div>
   );
