@@ -47,6 +47,8 @@ import {
   Typography,
 } from '@mui/material';
 
+import { DragHandle } from '@src/components/DragAndDrop/SortableItem';
+import { CategorizedCheckboxIcon } from '@src/components/icons/CategorizedCheckboxIcon';
 import { useClipboard } from '@src/stores/ClipboardContext';
 import { useToasts } from '@src/stores/ToastContext';
 import { useTranslations } from '@src/stores/TranslationContext';
@@ -63,6 +65,7 @@ import React, {
 } from 'react';
 import ConfirmDialog from '../../ConfirmDialog';
 import EditAttachmentSection from '../EditAttachmentSection';
+import EditCategorizedCheckBoxQuestion from '../EditCategorizedCheckBoxQuestion/EditCategorizedCheckBoxQuestion';
 import EditCheckBoxQuestion from '../EditCheckBoxQuestion';
 import EditDocumentSection from '../EditDocumentSection';
 import EditFreeTextQuestion from '../EditFreeTextQuestion';
@@ -72,15 +75,12 @@ import EditMapQuestion from '../EditMapQuestion';
 import EditMatrixQuestion from '../EditMatrixQuestion';
 import { EditMultiMatrixQuestion } from '../EditMultiMatrixQuestion';
 import EditNumericQuestion from '../EditNumericQuestion';
+import { EditPersonalInfoQuestion } from '../EditPersonalInfoQuestion';
 import EditRadioQuestion from '../EditRadioQuestion';
 import EditSliderQuestion from '../EditSliderQuestion';
 import EditSortingQuestion from '../EditSortingQuestion';
 import EditTextSection from '../EditTextSection';
 import { SectionDetails } from './SectionDetails';
-import { DragHandle } from '@src/components/DragAndDrop/SortableItem';
-import { EditPersonalInfoQuestion } from '../EditPersonalInfoQuestion';
-import EditCategorizedCheckBoxQuestion from '../EditCategorizedCheckBoxQuestion/EditCategorizedCheckBoxQuestion';
-import { CategorizedCheckboxIcon } from '@src/components/icons/CategorizedCheckboxIcon';
 
 const styles = {
   accordion: {
@@ -108,6 +108,11 @@ const styles = {
   },
 };
 
+interface CopyingSettings {
+  copyingDisabled?: boolean;
+  disabledTooltip?: string;
+}
+
 interface Props {
   index: number;
   section: SurveyPageSection;
@@ -118,7 +123,7 @@ interface Props {
   name: string;
   onEdit: (index: number, section: SurveyPageSection) => void;
   onDelete: (index: number) => void;
-  disableSectionCopying?: boolean;
+  copyingSettings?: CopyingSettings;
   pageId?: number;
   isDragging?: boolean;
   sx?: SxProps;
@@ -357,7 +362,13 @@ export default function SurveySectionAccordion(props: Props) {
               <em>{tr.EditSurveyPage.untitledSection}</em>
             )}
           </Typography>
-          {!props.disableSectionCopying && (
+          {props.copyingSettings.copyingDisabled &&
+            props.copyingSettings.disabledTooltip && (
+              <Tooltip title={props.copyingSettings.disabledTooltip}>
+                <ContentCopy htmlColor={'disabled'} />
+              </Tooltip>
+            )}
+          {!props.copyingSettings.copyingDisabled && (
             <IconButton
               onClick={async (event) => {
                 event.stopPropagation();
