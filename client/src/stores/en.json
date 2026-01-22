@@ -268,6 +268,7 @@
     "noSelection": "No selection"
   },
   "SurveySections": {
+    "personalInfoFollowUpDisablesCopying": "Personal information question as a follow-up question prevents copying.",
     "limitAnswers": "Limit the number of answers",
     "minAnswers": "Minimum number of answers",
     "maxAnswers": "Maximum number of answers",

@@ -14,8 +14,11 @@
     "paths": {
       "@src/*": ["src/*", "dist/*"],
       "@interfaces/*": ["../interfaces/*"],
-      "@clientSrc/*": ["../client/src/*"]
+      "@clientSrc/*": ["../client/src/*"],
+      "@tests/*": ["src/tests/*"],
+      "@__mocks__/*": ["src/tests/__mocks__/*"]
     }
   },
-  "include": ["src", "vite.config.ts"]
+  "include": ["src", "vite.config.ts"],
+  "exclude": ["src/__mocks__"]
 }

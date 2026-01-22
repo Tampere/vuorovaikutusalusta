@@ -1,10 +1,11 @@
 import { SurveyPage } from '@interfaces/survey';
 import { useSurvey } from '@src/stores/SurveyContext';
+import { useTranslations } from '@src/stores/TranslationContext';
 import { isFollowUpSectionParentType } from '@src/utils/typeCheck';
 import React from 'react';
+import { DndWrapper } from '../DragAndDrop/DndWrapper';
 import { FollowUpSections } from './SurveySectionAccordion/FollowUpSections';
 import SurveySectionAccordion from './SurveySectionAccordion/SurveySectionAccordion';
-import { DndWrapper } from '../DragAndDrop/DndWrapper';
 
 interface Props {
   page: SurveyPage;
@@ -15,6 +16,7 @@ interface Props {
 
 export default function SurveySections(props: Props) {
   const { editSection, deleteSection, moveSection } = useSurvey();
+  const { tr } = useTranslations();
 
   return (
     <div>
@@ -50,6 +52,15 @@ export default function SurveySections(props: Props) {
                   deleteSection(props.page.id, index);
                   // Reset expanded section to null
                   props.onExpandedSectionChange(null);
+                }}
+                copyingSettings={{
+                  copyingDisabled:
+                    section.type === 'personal-info' ||
+                    section.followUpSections?.some(
+                      (s) => s.type === 'personal-info',
+                    ),
+                  disabledTooltip:
+                    tr.SurveySections.personalInfoFollowUpDisablesCopying,
                 }}
               />
               {isFollowUpSectionParentType(section) && (

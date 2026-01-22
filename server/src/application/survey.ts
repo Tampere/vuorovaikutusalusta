@@ -44,6 +44,12 @@ import { compressImage } from '@src/utils';
 import { Geometry } from 'geojson';
 import pgPromise from 'pg-promise';
 
+const surveySectionCountLimitations: Partial<
+  Record<SurveyPageSection['type'], number>
+> = {
+  'personal-info': 1,
+};
+
 const sectionTypesWithOptions: SurveyPageSection['type'][] = [
   'radio',
   'checkbox',
@@ -1670,6 +1676,9 @@ async function updateSurveySections(survey: Survey, t: pgPromise.ITask<{}>) {
     return [...result, ...surveySectionsToRows(page.sections, page.id)];
   }, [] as SurveySectionRow[]);
 
+  if (!areSectionCountLimitsRespected(sections)) {
+    throw new BadRequestError('Section count limits not respected.');
+  }
   // Delete sections that were removed from the updated survey
   await deleteRemovedSections(survey.id, sections, t);
 
@@ -2815,4 +2824,20 @@ export async function getDistinctAutoSendToEmails() {
     SELECT DISTINCT UNNEST(email_auto_send_to) AS email FROM data.survey
   `);
   return rows.map((row) => row.email);
+}
+
+function areSectionCountLimitsRespected(sections: SurveySectionRow[]): boolean {
+  const sectionCounts: Partial<Record<SurveyPageSection['type'], number>> = {};
+
+  for (const section of sections) {
+    const type = section.type;
+    sectionCounts[type] = (sectionCounts[type] ?? 0) + 1;
+
+    const limit = surveySectionCountLimitations[type];
+    if (limit !== undefined && sectionCounts[type] > limit) {
+      return false;
+    }
+  }
+
+  return true;
 }

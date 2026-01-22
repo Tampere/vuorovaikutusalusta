@@ -1,7 +1,7 @@
 import { SurveyMapQuestion, SurveyMapSubQuestion } from '@interfaces/survey';
 import React from 'react';
-import SurveySectionAccordion from './SurveySectionAccordion/SurveySectionAccordion';
 import { DndWrapper } from '../DragAndDrop/DndWrapper';
+import SurveySectionAccordion from './SurveySectionAccordion/SurveySectionAccordion';
 
 interface Props {
   mapQuestion: SurveyMapQuestion;
@@ -26,7 +26,7 @@ export default function EditMapSubQuestions(props: Props) {
           renderElement: (isDragging) => (
             <SurveySectionAccordion
               isDragging={isDragging}
-              disableSectionCopying
+              copyingSettings={{ copyingDisabled: true }}
               index={index}
               key={index}
               sx={styles.accordion}
