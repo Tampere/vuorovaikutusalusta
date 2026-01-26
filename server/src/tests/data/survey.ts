@@ -1,0 +1,75 @@
+import { Survey, SurveyPersonalInfoQuestion } from '@interfaces/survey';
+
+export const createMockSurvey = (
+  id: number,
+  pageId: number,
+  authorId: string = 'test-user-id',
+): Survey => ({
+  id,
+  name: `test-survey-${id}`,
+  title: { fi: 'Testikysely', en: 'Test survey' },
+  subtitle: { fi: '', en: '' },
+  author: 'Test Author',
+  authorUnit: 'Test Unit',
+  authorId,
+  admins: [],
+  mapUrl: '',
+  startDate: new Date(),
+  endDate: new Date(),
+  allowTestSurvey: false,
+  createdAt: new Date(),
+  updatedAt: new Date(),
+  thanksPage: {
+    title: { fi: 'Kiitos', en: 'Thanks' },
+    text: { fi: '', en: '' },
+  },
+  theme: { id: 1, name: 'default', data: {} },
+  sectionTitleColor: '#000000',
+  email: {
+    enabled: false,
+    autoSendTo: [],
+    subject: { fi: '', en: '' },
+    body: { fi: '', en: '' },
+    info: [],
+    includePersonalInfo: false,
+  },
+  allowSavingUnfinished: false,
+  localisationEnabled: false,
+  displayPrivacyStatement: false,
+  emailRegistrationRequired: false,
+  displayThanksAttributions: false,
+  displayBackgroundAttributions: false,
+  submissionCount: 0,
+  pages: [
+    {
+      id: pageId,
+      title: { fi: 'Sivu 1', en: 'Page 1' },
+      sidebar: {
+        type: 'none',
+        mapLayers: [],
+        defaultMapView: null as any,
+        imagePath: [],
+        imageName: '',
+        imageAltText: { fi: '', en: '' },
+        imageSize: 'fitted',
+        imageAttributions: { fi: '', en: '' },
+      },
+      sections: [],
+      conditions: {},
+    },
+  ],
+});
+
+export const createMockPersonalInfoQuestion = (
+  id: number,
+): SurveyPersonalInfoQuestion => ({
+  id,
+  type: 'personal-info',
+  title: { fi: 'Henkilötiedot', en: 'Personal info' },
+  isRequired: false,
+  askName: true,
+  askEmail: true,
+  askPhone: false,
+  askAddress: false,
+  customQuestions: [],
+});

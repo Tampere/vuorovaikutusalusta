@@ -1,4 +1,12 @@
 {
   "preset": "ts-jest",
-  "testEnvironment": "node"
+  "testEnvironment": "node",
+  "testPathIgnorePatterns": ["/node_modules/", "/dist/"],
+  "moduleNameMapper": {
+    "^@src/(.*)$": "<rootDir>/src/$1",
+    "^@interfaces/(.*)$": "<rootDir>/../interfaces/$1",
+    "^@clientSrc/(.*)$": "<rootDir>/../client/src/$1",
+    "^@tests/(.*)$": "<rootDir>/src/tests/$1",
+    "^@__mocks__/(.*)$": "<rootDir>/src/tests/__mocks__/$1"
+  }
 }
