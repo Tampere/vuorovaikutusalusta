@@ -1,12 +1,10 @@
 import { SurveyTextSection } from '@interfaces/survey';
+import { Typography } from '@mui/material';
 import { useSurveyAnswers } from '@src/stores/SurveyAnswerContext';
 import { useTranslations } from '@src/stores/TranslationContext';
 import React from 'react';
-import ReactMarkdown from 'react-markdown';
-import rehypeExternalLinks from 'rehype-external-links';
-import remarkBreaks from 'remark-breaks';
+import MarkdownViewer from './MarkdownViewer';
 import SectionInfo from './SectionInfo';
-import { Typography } from '@mui/material';
 
 interface Props {
   section: SurveyTextSection;
@@ -42,12 +40,7 @@ export default function TextSection({ section, isFollowUp = false }: Props) {
         )}
       </div>
       <div style={{ color: section.bodyColor ?? '#000000' }}>
-        <ReactMarkdown
-          rehypePlugins={[rehypeExternalLinks]}
-          remarkPlugins={[remarkBreaks]}
-        >
-          {section.body?.[surveyLanguage]}
-        </ReactMarkdown>
+        <MarkdownViewer>{section.body?.[surveyLanguage]}</MarkdownViewer>
       </div>
     </>
   );
