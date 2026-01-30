@@ -1,18 +1,17 @@
 import { Survey } from '@interfaces/survey';
 import {
-  Link,
-  Typography,
-  Theme,
   Box,
-  useMediaQuery,
+  Link,
   Stack,
+  Theme,
+  Typography,
+  useMediaQuery,
 } from '@mui/material';
 import { useTranslations } from '@src/stores/TranslationContext';
-import React, { useEffect, useState } from 'react';
-import ReactMarkdown from 'react-markdown';
-import rehypeExternalLinks from 'rehype-external-links';
-import Footer from './Footer';
 import { useImageHeaderQuery } from '@src/utils/useImageHeaderQuery';
+import React, { useEffect, useState } from 'react';
+import Footer from './Footer';
+import MarkdownViewer from './MarkdownViewer';
 
 const styles = (theme: Theme) => ({
   testSurveyHeader: {
@@ -128,9 +127,9 @@ export default function SurveyThanksPage({ survey, isTestSurvey }: Props) {
           <Typography variant="h5" component="h1">
             {survey.thanksPage.title?.[surveyLanguage]}
           </Typography>
-          <ReactMarkdown rehypePlugins={[rehypeExternalLinks]}>
+          <MarkdownViewer>
             {survey.thanksPage.text?.[surveyLanguage]}
-          </ReactMarkdown>
+          </MarkdownViewer>
         </div>
         {survey.thanksPage.imageName && (
           <Box
