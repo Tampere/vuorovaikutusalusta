@@ -96,7 +96,17 @@ interface Props {
  * @returns Draft.js editor state
  */
 function markdownToEditorState(markdown: string) {
-  const rawData = markdownToDraft(markdown);
+  const rawData = markdownToDraft(markdown, {
+    remarkableOptions: { html: true },
+  });
+  // Set target="_blank" for all link entities
+  if (rawData.entityMap) {
+    Object.values(rawData.entityMap).forEach((entity: any) => {
+      if (entity.type === 'LINK') {
+        entity.data.targetOption = '_blank';
+      }
+    });
+  }
   const contentState = convertFromRaw(rawData);
   return EditorState.createWithContent(contentState);
 }
