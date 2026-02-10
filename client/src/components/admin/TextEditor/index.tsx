@@ -1,23 +1,13 @@
 import { Box, CssBaseline } from '@mui/material';
-import Image from '@tiptap/extension-image';
 import { EditorContent, SetContentOptions, useEditor } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
 import { forwardRef, ReactElement, useImperativeHandle } from 'react';
 
+import React from 'react';
 import { MenuBar } from './MenuBar';
 import './styles.css';
-import React from 'react';
-import { Markdown } from '@tiptap/markdown';
 
-const extensions = [
-  Markdown,
-  StarterKit,
-  Image.configure({
-    HTMLAttributes: {
-      style: 'max-width: 100%; height: auto;',
-    },
-  }),
-];
+import { textEditorConfig } from './config';
+export { textEditorConfig, textViewerConfig } from './config';
 
 interface Props {
   initialContent: string;
@@ -32,15 +22,12 @@ export interface TextEditorRef {
 export const TextEditor = forwardRef<TextEditorRef, Props>(
   ({ initialContent, renderFunctionButtons, onChange }, ref) => {
     const editor = useEditor({
-      editable: true,
-      extensions,
+      ...textEditorConfig,
       content: initialContent,
-      contentType: 'markdown',
       onUpdate: ({ editor }) => {
         onChange(editor.getMarkdown());
       },
     });
-
     useImperativeHandle(ref, () => ({
       setContent: (content, options) => {
         editor?.commands.setContent(content, options);

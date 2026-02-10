@@ -63,7 +63,6 @@ export function EditGeneralNotification({
   onDelete,
 }: Props) {
   const { tr, languages, language } = useTranslations();
-
   const localLanguage = useMemo(() => {
     switch (language) {
       case 'fi':
@@ -96,12 +95,17 @@ export function EditGeneralNotification({
   }, [parsedNotificationData]);
 
   useEffect(() => {
+    if (isEditorUpdate.current) {
+      isEditorUpdate.current = false;
+      return;
+    }
     editorRef.current?.setContent(formData.message[selectedLanguage], {
       contentType: 'markdown',
     });
   }, [formData, selectedLanguage]);
 
   const editorRef = useRef<GeneralNotificationTextEditorRef>(null);
+  const isEditorUpdate = useRef(false);
 
   const publishStatusUpdated =
     formData.publishedExternally !==
@@ -124,12 +128,12 @@ export function EditGeneralNotification({
     (textContentUpdated || dateContentUpdated || publishStatusUpdated);
 
   function handleOnChange(value: string) {
+    isEditorUpdate.current = true;
     setFormData((data) => ({
       ...data,
       message: { ...data.message, [selectedLanguage]: value },
     }));
   }
-
   return (
     <Box
       sx={{
