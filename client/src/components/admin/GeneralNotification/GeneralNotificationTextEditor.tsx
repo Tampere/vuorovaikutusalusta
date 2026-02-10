@@ -1,6 +1,6 @@
 import { SetContentOptions } from '@tiptap/react';
-import { TextEditor, TextEditorRef } from '../TextEditor';
 import React, { forwardRef, useImperativeHandle, useRef } from 'react';
+import { TextEditor, TextEditorRef } from '../TextEditor';
 
 interface Props {
   initialValue: string;
@@ -16,7 +16,6 @@ export const GeneralNotificationTextEditor = forwardRef<
   Props
 >(({ initialValue, onChange }, ref) => {
   const editorRef = useRef<TextEditorRef>(null);
-
   useImperativeHandle(ref, () => ({
     setContent: (content, options) => {
       editorRef.current?.setContent(content, options);
