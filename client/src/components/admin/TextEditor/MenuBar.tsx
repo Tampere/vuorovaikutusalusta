@@ -17,11 +17,11 @@ import { useTranslations } from '@src/stores/TranslationContext';
 import { Editor, useEditorState } from '@tiptap/react';
 import { useEffect, useState } from 'react';
 
-import React from 'react';
-import ImageListDialog from '../ImageListDialog';
-import { FileWithPath } from 'react-dropzone/.';
-import { request } from '@src/utils/request';
 import { ImageFile } from '@interfaces/survey';
+import { request } from '@src/utils/request';
+import React from 'react';
+import { FileWithPath } from 'react-dropzone/.';
+import ImageListDialog from '../ImageListDialog';
 
 const menuBarStyle: SxProps<Theme> = {
   backgroundColor: 'rgb(227, 227, 227)',
@@ -63,6 +63,10 @@ export function MenuBar({
 
       return {
         isBold: editor.isActive('bold'),
+        isItalic: editor.isActive('italic'),
+        isHeading: editor.isActive('heading', { level: 3 }),
+        isBulletList: editor.isActive('bulletList'),
+        isOrderedList: editor.isActive('orderedList'),
       };
     },
   });
@@ -186,7 +190,7 @@ export function MenuBar({
         }}
         disableTouchRipple
         onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-        className={editor.isActive('heading', { level: 3 }) ? 'is-active' : ''}
+        className={editorState?.isHeading ? 'is-active' : ''}
       >
         {tr.TextEditor.headerTitle}
       </Button>
@@ -194,7 +198,7 @@ export function MenuBar({
         disableTouchRipple
         onClick={() => editor.chain().focus().toggleBold().run()}
         disabled={!editor.can().chain().focus().toggleBold().run()}
-        className={editorState.isBold ? 'is-active' : ''} //
+        className={editorState?.isBold ? 'is-active' : ''}
       >
         {tr.TextEditor.boldTitle}
       </Button>
@@ -202,7 +206,7 @@ export function MenuBar({
         disableTouchRipple
         onClick={() => editor.chain().focus().toggleItalic().run()}
         disabled={!editor.can().chain().focus().toggleItalic().run()}
-        className={editorState.isBold ? 'is-active' : ''} //
+        className={editorState?.isItalic ? 'is-active' : ''}
       >
         {tr.TextEditor.italicTitle}
       </Button>
@@ -210,7 +214,7 @@ export function MenuBar({
         <IconButton
           disableTouchRipple
           onClick={() => editor.chain().focus().toggleBulletList().run()}
-          className={editor.isActive('bulletList') ? 'is-active' : ''}
+          className={editorState?.isBulletList ? 'is-active' : ''}
         >
           <FormatListBulleted />
         </IconButton>
@@ -219,7 +223,7 @@ export function MenuBar({
         <IconButton
           disableTouchRipple
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
-          className={editor.isActive('orderedList') ? 'is-active' : ''}
+          className={editorState?.isOrderedList ? 'is-active' : ''}
         >
           <FormatListNumbered />
         </IconButton>
