@@ -1,5 +1,9 @@
 import { Editor } from '@tiptap/core';
-import { textEditorConfig, textViewerConfig } from './config';
+import {
+  normalizeMarkdownMarks,
+  textEditorConfig,
+  textViewerConfig,
+} from './config';
 
 function createEditor(
   config: typeof textEditorConfig | typeof textViewerConfig,
@@ -104,6 +108,16 @@ describe.each([
     expect(roundtrip(config, input)).toBe(expected);
   });
 
+  test('preserves bold and italic on different words', () => {
+    const md = '**bold word** and *italic word*';
+    expect(roundtrip(config, md)).toBe(md);
+  });
+
+  test('preserves multiple bold words with italic', () => {
+    const md = '**first** normal *second* more **third**';
+    expect(roundtrip(config, md)).toBe(md);
+  });
+
   test('editor and viewer produce same output for same input', () => {
     const md = '### Title\n\nSome **bold** and *italic* text.\n\n* List item';
     const editorResult = roundtrip(textEditorConfig, md);
@@ -126,6 +140,42 @@ describe('Editor configs', () => {
   });
 });
 
+describe('normalizeMarkdownMarks', () => {
+  test('moves trailing space outside bold markers', () => {
+    expect(normalizeMarkdownMarks('**first **second')).toBe('**first** second');
+  });
+
+  test('moves trailing space outside italic markers', () => {
+    expect(normalizeMarkdownMarks('*first *second')).toBe('*first* second');
+  });
+
+  test('handles multiple bold spans with trailing spaces', () => {
+    expect(normalizeMarkdownMarks('**one **and **two **end')).toBe(
+      '**one** and **two** end',
+    );
+  });
+
+  test('does not modify correct markdown', () => {
+    expect(normalizeMarkdownMarks('**first** second')).toBe('**first** second');
+  });
+
+  test('fixes bold with trailing space from editor HTML', () => {
+    const editor = createEditor(textEditorConfig, '');
+    editor.commands.setContent('<p><strong>first </strong>second</p>');
+    const md = normalizeMarkdownMarks(editor.getMarkdown());
+    expect(md).toBe('**first** second');
+    editor.destroy();
+  });
+
+  test('fixes italic with trailing space from editor HTML', () => {
+    const editor = createEditor(textEditorConfig, '');
+    editor.commands.setContent('<p><em>first </em>second</p>');
+    const md = normalizeMarkdownMarks(editor.getMarkdown());
+    expect(md).toBe('*first* second');
+    editor.destroy();
+  });
+});
+
 describe('Markdown to html', () => {
   test('renders line breaks as <br> in HTML', () => {
     const editor = createEditor(textEditorConfig, 'First line\nSecond line');
@@ -138,6 +188,18 @@ describe('Markdown to html', () => {
     expect(editor.getHTML()).toBe('<p>First line</p><p>Second line</p>');
     editor.destroy();
   });
+  test('renders bold and italic on different words as HTML', () => {
+    const editor = createEditor(
+      textViewerConfig,
+      '**bold word** and *italic word*',
+    );
+    const html = editor.getHTML();
+    expect(html).toContain('<strong>');
+    expect(html).toContain('<em>');
+    expect(html).not.toContain('**');
+    editor.destroy();
+  });
+
   test('renders empty paragraph from nbsp ', () => {
     const editor = createEditor(
       textEditorConfig,

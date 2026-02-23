@@ -17,6 +17,16 @@ const sharedExtensions = [
   }),
 ];
 
+/**
+ * Fix trailing whitespace inside bold/italic markers produced by @tiptap/markdown.
+ * e.g. "**first **second" → "**first** second"
+ */
+export function normalizeMarkdownMarks(md: string): string {
+  return md
+    .replace(/\*\*(.+?) +\*\*/g, '**$1** ')
+    .replace(/(?<!\*)\*([^*]+?) +\*(?!\*)/g, '*$1* ');
+}
+
 export const textEditorConfig = {
   extensions: sharedExtensions,
   contentType: 'markdown' as const,
