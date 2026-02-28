@@ -1,9 +1,27 @@
 import { Editor } from '@tiptap/core';
-import {
-  normalizeMarkdownMarks,
-  textEditorConfig,
-  textViewerConfig,
-} from './config';
+import { textEditorConfig, textViewerConfig } from './config';
+
+type MarkType = 'bold' | 'italic';
+
+function doc(...content: object[]) {
+  return { type: 'doc' as const, content };
+}
+
+function paragraph(...content: object[]) {
+  return content.length > 0
+    ? { type: 'paragraph' as const, content }
+    : { type: 'paragraph' as const };
+}
+
+function text(content: string, ...marks: MarkType[]) {
+  return marks.length > 0
+    ? {
+        type: 'text' as const,
+        text: content,
+        marks: marks.map((type) => ({ type })),
+      }
+    : { type: 'text' as const, text: content };
+}
 
 function createEditor(
   config: typeof textEditorConfig | typeof textViewerConfig,
@@ -140,42 +158,6 @@ describe('Editor configs', () => {
   });
 });
 
-describe('normalizeMarkdownMarks', () => {
-  test('moves trailing space outside bold markers', () => {
-    expect(normalizeMarkdownMarks('**first **second')).toBe('**first** second');
-  });
-
-  test('moves trailing space outside italic markers', () => {
-    expect(normalizeMarkdownMarks('*first *second')).toBe('*first* second');
-  });
-
-  test('handles multiple bold spans with trailing spaces', () => {
-    expect(normalizeMarkdownMarks('**one **and **two **end')).toBe(
-      '**one** and **two** end',
-    );
-  });
-
-  test('does not modify correct markdown', () => {
-    expect(normalizeMarkdownMarks('**first** second')).toBe('**first** second');
-  });
-
-  test('fixes bold with trailing space from editor HTML', () => {
-    const editor = createEditor(textEditorConfig, '');
-    editor.commands.setContent('<p><strong>first </strong>second</p>');
-    const md = normalizeMarkdownMarks(editor.getMarkdown());
-    expect(md).toBe('**first** second');
-    editor.destroy();
-  });
-
-  test('fixes italic with trailing space from editor HTML', () => {
-    const editor = createEditor(textEditorConfig, '');
-    editor.commands.setContent('<p><em>first </em>second</p>');
-    const md = normalizeMarkdownMarks(editor.getMarkdown());
-    expect(md).toBe('*first* second');
-    editor.destroy();
-  });
-});
-
 describe('Markdown to html', () => {
   test('renders line breaks as <br> in HTML', () => {
     const editor = createEditor(textEditorConfig, 'First line\nSecond line');
@@ -207,5 +189,42 @@ describe('Markdown to html', () => {
     );
     expect(editor.getHTML()).toBe('<p>First line</p><p></p><p>Second line</p>');
     editor.destroy();
+  });
+});
+
+describe('Editor JSON to markdown', () => {
+  test('parses valid markdown with trailing spaces', () => {
+    const editorJson = doc(
+      paragraph(
+        text('Normal '),
+        text('bold ', 'bold'),
+        text('boldCursive   ', 'bold', 'italic'),
+        text('bold.  ', 'bold'),
+        text('cursive.  ', 'italic'),
+        text('normal'),
+      ),
+    );
+    const editor = createEditor(textEditorConfig, '');
+    editor.commands.setContent(editorJson);
+    expect(editor.getMarkdown()).toBe(
+      'Normal **bold *boldCursive*   bold.**  *cursive.*  normal',
+    );
+  });
+  test('parses valid markdown with leading spaces', () => {
+    const editorJson = doc(
+      paragraph(
+        text('Normal '),
+        text('  bold', 'bold'),
+        text('boldCursive   ', 'bold', 'italic'),
+        text('  bold', 'bold'),
+        text('  cursive', 'italic'),
+        text('normal'),
+      ),
+    );
+    const editor = createEditor(textEditorConfig, '');
+    editor.commands.setContent(editorJson);
+    expect(editor.getMarkdown()).toBe(
+      'Normal   **bold*boldCursive*     bold**  *cursive*normal',
+    );
   });
 });

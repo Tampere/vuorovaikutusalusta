@@ -6,7 +6,7 @@ import React from 'react';
 import { MenuBar } from './MenuBar';
 import './styles.css';
 
-import { normalizeMarkdownMarks, textEditorConfig } from './config';
+import { textEditorConfig } from './config';
 export { textEditorConfig, textViewerConfig } from './config';
 
 interface Props {
@@ -25,7 +25,7 @@ export const TextEditor = forwardRef<TextEditorRef, Props>(
       ...textEditorConfig,
       content: initialContent,
       onUpdate: ({ editor }) => {
-        onChange(normalizeMarkdownMarks(editor.getMarkdown()));
+        onChange(editor.getMarkdown());
       },
     });
     useImperativeHandle(ref, () => ({
