@@ -25,7 +25,6 @@ const upload = multer({ limits: { fileSize: 10 * 1000 * 1000 } });
 router.get(
   '/instructions',
   ensureAuthenticated(),
-  ensureAdminAccess(),
   asyncHandler(async (_req, res) => {
     const row = await getAdminInstructions();
 
