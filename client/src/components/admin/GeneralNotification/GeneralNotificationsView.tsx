@@ -1,16 +1,16 @@
-import { Box, Stack } from '@mui/material';
-import React, { useEffect, useRef, useState } from 'react';
-import { EditGeneralNotification } from './EditGeneralNotification';
-import { GeneralNotificationList } from './GeneralNotificationList';
-import { AdminAppBar } from '../AdminAppBar';
 import {
   GeneralNotification,
   NotificationFormData,
 } from '@interfaces/generalNotification';
-import { useTranslations } from '@src/stores/TranslationContext';
-import { request } from '@src/utils/request';
+import { Box, Stack } from '@mui/material';
 import { useToasts } from '@src/stores/ToastContext';
+import { useTranslations } from '@src/stores/TranslationContext';
 import { useUser } from '@src/stores/UserContext';
+import { request } from '@src/utils/request';
+import React, { useEffect, useRef, useState } from 'react';
+import { AdminAppBar } from '../AdminAppBar';
+import { EditGeneralNotification } from './EditGeneralNotification';
+import { GeneralNotificationList } from './GeneralNotificationList';
 
 const containerStyle = {
   margin: 'auto',

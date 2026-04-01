@@ -1,6 +1,7 @@
 {
   "testEnvironment": "jsdom",
   "moduleNameMapper": {
+    "^marked$": "<rootDir>/node_modules/marked/lib/marked.umd.js",
     "^@src(.*)$": "<rootDir>/src$1",
     "^.+\\.(css|less)$": "<rootDir>/mocks/css-mock.js"
   },

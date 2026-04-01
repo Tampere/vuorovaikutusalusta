@@ -1,9 +1,7 @@
 import { CssBaseline } from '@mui/material';
-import Image from '@tiptap/extension-image';
-import { Markdown } from '@tiptap/markdown';
 import { EditorContent, useEditor } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
 import React, { useEffect } from 'react';
+import { textViewerConfig } from '../TextEditor/config';
 import '../TextEditor/styles.css';
 
 interface Props {
@@ -12,17 +10,7 @@ interface Props {
 
 export function GeneralNotificationCard({ content }: Props) {
   const editor = useEditor({
-    extensions: [
-      Markdown,
-      StarterKit,
-      Image.configure({
-        HTMLAttributes: {
-          style: 'max-width: 100%; height: auto;',
-        },
-      }),
-    ],
-    contentType: 'markdown',
-    editable: false,
+    ...textViewerConfig,
     content: content,
   });
 
