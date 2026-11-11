@@ -16,7 +16,12 @@ const styles = {
   label: {
     cursor: 'pointer',
   },
-};
+  extremeLabel: {
+    // Keep each label on its own half of the area, with a gap in between
+    maxWidth: 'calc(50% - 0.5rem)',
+    overflowWrap: 'break-word',
+  },
+} as const;
 
 export default function SliderQuestion({
   value,
@@ -66,16 +71,18 @@ export default function SliderQuestion({
           ...styles.label,
           display: 'flex',
           justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          gap: '1rem',
         }}
         id={`${question.id}-value-label`}
         required={false}
       >
         <span style={visuallyHidden}>{tr.SliderQuestion.scale}: </span>
-        <span>
+        <span style={styles.extremeLabel}>
           {question.minValue}
           {verbalExtremes && `: ${labels.min}`}
         </span>
-        <span>
+        <span style={{ ...styles.extremeLabel, textAlign: 'right' }}>
           {question.maxValue}
           {verbalExtremes && `: ${labels.max}`}
         </span>
