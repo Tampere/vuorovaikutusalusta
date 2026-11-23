@@ -138,9 +138,33 @@ export const inputOverrides: Components<Omit<Theme, 'components'>> = {
   MuiFormControlLabel: {
     styleOverrides: {
       label: {
+        overflowWrap: 'anywhere',
         '&.Mui-disabled': {
           color: 'rgba(0, 0, 0, 0.54)',
         },
+      },
+    },
+  },
+  MuiMenuItem: {
+    styleOverrides: {
+      root: {
+        whiteSpace: 'normal',
+        overflowWrap: 'anywhere',
+      },
+    },
+  },
+  MuiMenu: {
+    styleOverrides: {
+      paper: {
+        maxWidth: 'min(40rem, calc(100% - 32px))',
+      },
+    },
+  },
+  MuiSelect: {
+    styleOverrides: {
+      select: {
+        whiteSpace: 'normal',
+        overflowWrap: 'anywhere',
       },
     },
   },
