@@ -34,7 +34,7 @@
   },
   "homepage": "https://github.com/ubigu/vuorovaikutusalusta#readme",
   "engines": {
-    "node": "^22.14.0"
+    "node": "^26.13"
   },
   "dependencies": {
     "@date-io/date-fns": "^3.2.1",

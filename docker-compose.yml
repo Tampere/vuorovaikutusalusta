@@ -32,7 +32,7 @@ services:
       POSTGRES_DB: vuorovaikutusalusta_db
       DEFAULT_COLLATION: 'fi_FI.UTF8'
       DEFAULT_CTYPE: 'fi_FI.UTF8'
-      POSTGRES_MULTIPLE_EXTENSIONS: 'pgcrypto'
+      POSTGRES_MULTIPLE_EXTENSIONS: 'postgis,pgcrypto'
       TZ: Europe/Helsinki
     volumes:
       - .db-data:/var/lib/postgresql:delegated
