@@ -44,6 +44,10 @@ export default function SurveyLanguageMenu({
           IconComponent={LanguageIcon}
           sx={{
             color: 'inherit',
+            ...(changeUILanguage && {
+              background: '#ffffff7e',
+              backdropFilter: 'blur(5px)',
+            }),
             '&>.MuiSelect-select': {
               // Accommodate the larger globe icon
               paddingRight: '38px !important',
