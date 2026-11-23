@@ -45,6 +45,7 @@ export default function SurveyLanguageMenu({
           sx={{
             color: 'inherit',
             ...(changeUILanguage && {
+              color: 'primary.main',
               background: '#ffffff7e',
               backdropFilter: 'blur(5px)',
             }),
